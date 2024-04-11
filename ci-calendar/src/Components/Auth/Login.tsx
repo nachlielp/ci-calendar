@@ -3,6 +3,7 @@ import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuth } from "./AuthContext";
+import { ButtonLink } from "../UI/LinkButton";
 enum Error {
   none = "",
   wrongPassword = "Password does not match email",
@@ -12,7 +13,7 @@ enum Error {
 export default function Login() {
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);
-  const { login, googleLogin, githubLogin } = useAuth();
+  const { login, googleLogin } = useAuth();
   const [error, setError] = useState<Error>(Error.none);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -50,13 +51,7 @@ export default function Login() {
       console.error(`Signup.googleSignIn.error: ${error}`);
     }
   };
-  const githubSignIn = async () => {
-    try {
-      await githubLogin();
-    } catch (error) {
-      console.error(`Signup.googleSignIn.error: ${error}`);
-    }
-  };
+
   return (
     <Card id="login-form" className="mx-auto max-w-sm mt-4">
       <h1 className="text-2xl font-bold text-center mb-2">Log In</h1>
@@ -96,9 +91,6 @@ export default function Login() {
             Log In
           </Button>
         </Form.Item>
-        <div style={{ textAlign: "center", paddingBottom: "12px" }}>
-          <Link to="/reset-password">Forgot Password?</Link>
-        </div>
       </Form>
       <div>
         <Button
@@ -110,18 +102,11 @@ export default function Login() {
           Sign In with Google
         </Button>
       </div>
-      <div style={{ paddingTop: "1rem" }}>
-        <Button
-          type="default"
-          onClick={githubSignIn}
-          disabled={loading}
-          style={{ width: "100%" }}
-        >
-          Sign In with Github
-        </Button>
-      </div>
-      <div style={{ paddingTop: "1rem" }}>
-        Don't have an account? <Link to="/signup">Sign Up</Link>
+
+      <div className="flex justify-center pt-4 inline-block">
+        <ButtonLink to="/reset-password">Rest Password</ButtonLink>
+        <div className="w-5"></div>
+        <ButtonLink to="/signup">Sign Up</ButtonLink>
       </div>
     </Card>
   );

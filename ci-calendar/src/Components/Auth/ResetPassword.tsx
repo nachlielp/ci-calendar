@@ -26,8 +26,8 @@ function ResetPassword() {
   };
 
   return (
-    <Card style={{ marginTop: "1rem" }}>
-      <h2> Reset Password</h2>
+    <Card id="reset-password-form" className="mx-auto max-w-sm mt-4">
+      <h1 className="text-2xl font-bold text-center mb-2">Reset Password</h1>
 
       <Form
         title=" Reset Password"
@@ -58,9 +58,6 @@ function ResetPassword() {
           </Button>
         </Form.Item>
       </Form>
-      <div style={{ textAlign: "center", paddingTop: "12px" }}>
-        <Link to="/login">Log In</Link>
-      </div>
     </Card>
   );
 }

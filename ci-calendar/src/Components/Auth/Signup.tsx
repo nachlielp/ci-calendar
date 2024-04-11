@@ -3,6 +3,7 @@ import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuth } from "./AuthContext";
+import { ButtonLink } from "../UI/LinkButton";
 
 enum Error {
   none = "",
@@ -14,7 +15,7 @@ function Signup() {
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);
   const passwordConfRef = useRef<InputRef>(null);
-  const { currentUser, signup, googleLogin, githubSignIn } = useAuth();
+  const { currentUser, signup, googleLogin } = useAuth();
   const [error, setError] = useState<Error>(Error.none);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -62,8 +63,8 @@ function Signup() {
     }
   };
   return (
-    <Card style={{ marginTop: "1rem" }}>
-      <h2>Sign Up</h2>
+    <Card id="signup-form" className="mx-auto max-w-sm mt-4">
+      <h1 className="text-2xl font-bold text-center mb-2">Sign Up</h1>
 
       <Form
         title="Sing Up"
@@ -121,19 +122,6 @@ function Signup() {
         >
           Sign In with Google
         </Button>
-      </div>
-      <div style={{ paddingTop: "1rem" }}>
-        <Button
-          type="default"
-          onClick={githubSignIn}
-          disabled={loading}
-          style={{ width: "100%" }}
-        >
-          Sign In with Github
-        </Button>
-      </div>
-      <div style={{ paddingTop: "1rem" }}>
-        Already have an account?<Link to="/login">Log In</Link>
       </div>
     </Card>
   );

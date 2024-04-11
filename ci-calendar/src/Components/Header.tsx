@@ -7,10 +7,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {
   HomeOutlined,
   LogoutOutlined,
+  LoginOutlined,
   SettingOutlined,
   UserOutlined,
-  LoginOutlined,
 } from "@ant-design/icons";
+import SideMenu from "./SideMenu";
 
 export default function Header() {
   const { currentUser, logout } = useAuth();
@@ -26,29 +27,52 @@ export default function Header() {
   return (
     <div className="container mx-auto px-0">
       <div className="flex h-14 w-full shrink-0 items-center px-4 md:px-6 bg-white sticky top-0">
-        <div id="header-left">
-          {currentUser && (
-            <Button
-              className=" flex items-center justify-center text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-              onClick={handleLogOut}
-            >
-              <LogoutOutlined />
-            </Button>
-          )}
-          {!currentUser && currentPath !== "/login" && (
-            <ButtonLink
-              to="/login"
-              className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-            >
-              <LoginOutlined />
-            </ButtonLink>
-          )}
-          <ButtonLink to="/" className="text-black text-sm mr-6 font-semibold">
+        {currentUser && (
+          <Button
+            className=" flex items-center justify-center text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+            onClick={handleLogOut}
+          >
+            <LogoutOutlined />
+          </Button>
+        )}
+        {!currentUser && currentPath !== "/login" && (
+          <ButtonLink
+            to="/login"
+            className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+          >
+            <LoginOutlined />
+          </ButtonLink>
+        )}
+        {currentPath !== "/home" && currentPath !== "/" && (
+          <ButtonLink
+            to="/home"
+            className="text-black text-sm mr-6 font-semibold"
+          >
             <HomeOutlined />
           </ButtonLink>
-          {currentUser && <UserInfo currentUser={currentUser} />}
-        </div>
-        <div id="header-right"></div>
+        )}
+        {currentUser && <UserInfo currentUser={currentUser} />}
+        {currentUser && (
+          <>
+            <div className="ml-auto  md:hidden">
+              <SideMenu />
+            </div>
+            <div className="ml-auto flex hidden md:flex">
+              <ButtonLink
+                to="/user"
+                className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+              >
+                <UserOutlined />
+              </ButtonLink>
+              <ButtonLink
+                to="/settings"
+                className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+              >
+                <SettingOutlined />
+              </ButtonLink>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

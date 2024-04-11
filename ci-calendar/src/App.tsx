@@ -10,7 +10,7 @@ import Signup from "./Components/Auth/Signup";
 import Login from "./Components/Auth/Login";
 import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
-import HomePage from "./Components/Auth/HomePage";
+import HomePage from "./Components/HomePage";
 import Header from "./Components/Header";
 
 function App() {
