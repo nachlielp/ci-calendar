@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Card, Form, Input, InputRef } from "antd";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuth } from "./AuthContext";
-import { ButtonLink } from "../UI/LinkButton";
 
 enum Error {
   none = "",

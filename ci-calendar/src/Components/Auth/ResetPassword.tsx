@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Alert, Button, Card, Form, Input, InputRef } from "antd";
-import { Link } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 function ResetPassword() {
