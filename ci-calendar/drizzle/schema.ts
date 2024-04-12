@@ -41,10 +41,11 @@ export interface SubEvent {
   startTime: string;
   endTime: string;
   teacher: string;
+  price: number;
   type: EventType;
 }
 
-export interface Event {
+export interface DbEvent {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -60,6 +61,9 @@ export interface Event {
   address: string;
   hideEvent: boolean;
   subEvents: SubEvent[];
+  limitations: string[];
+  registration: boolean;
+  linkToRegistration: string;
 }
 
 export const users = sqliteTable("users", {
@@ -97,11 +101,14 @@ export const events = sqliteTable("events", {
   owners: text("owners")
     .notNull()
     .references(() => users.id),
-  linkToEvent: text("linkToEvent").notNull(),
-  linkToPayment: text("linkToPayment").notNull(),
+  linkToEvent: text("linkToEvent"),
+  linkToPayment: text("linkToPayment"),
   district: text("district").notNull(),
   address: text("address").notNull(),
   subEvents: blob("subEvents"),
-  hideEvent: integer("hideEvent", { mode: "boolean" }).notNull(),
-  type: text("type").notNull(),
+  hideEvent: integer("hideEvent", { mode: "boolean" }),
+  types: text("types").notNull(),
+  limitations: blob("limitations"),
+  registration: integer("registration", { mode: "boolean" }),
+  linkToRegistration: text("linkToRegistration"),
 });

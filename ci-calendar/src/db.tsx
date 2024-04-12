@@ -5,8 +5,8 @@ import { createClient } from "@libsql/client";
 import { DbUser, UserType } from "../drizzle/schema";
 
 const client = createClient({
-  url: import.meta.env.VITE_NEXT_DEV_DATABASE_URL || "",
-  authToken: import.meta.env.VITE_NEXT_DEV_DATABASE_AUTH_TOKEN || "",
+  url: import.meta.env.VITE_DEV_DATABASE_URL || "",
+  authToken: import.meta.env.VITE_DEV_DATABASE_AUTH_TOKEN || "",
 });
 const db = drizzle(client, { schema });
 
@@ -131,17 +131,21 @@ export const deleteUser = async (userId: string) => {
   }
 };
 
-export const insertEvent = async (event: NewEvent) => {
+export const insertEvent = async (
+  event: NewEvent
+): Promise<{ success: boolean }> => {
   try {
     const res = await db.insert(schema.events).values(event);
+    console.log("drizzle.insertEvent.res: ", res);
     if (res.rowsAffected === 1) {
-      return { id: event.id };
+      return { success: true };
     } else {
       throw Error(`drizzle.insertEvent.res: ${JSON.stringify(res)}`);
     }
   } catch (error) {
     console.error("drizzle.insertEvent.e: ", error);
   }
+  return { success: false };
 };
 
 export const updateEvent = async (event: NewEvent) => {
@@ -150,6 +154,7 @@ export const updateEvent = async (event: NewEvent) => {
       .update(schema.events)
       .set(event)
       .where(eq(schema.events.id, event.id));
+
     if (res.rowsAffected === 1) {
       return { id: event.id };
     } else {
@@ -176,12 +181,14 @@ export const deleteEvent = async (eventId: string) => {
 };
 
 export const getEvents = async (from: string, to: string) => {
+  console.log("drizzle.getEvents.from", from);
   try {
     const events = await db
       .select()
       .from(schema.events)
-      .where(between(schema.events.startTime, from, to))
+      // .where(between(schema.events.startTime, from, to))
       .orderBy(asc(schema.events.startTime));
+    console.log("drizzle.getEvents.events", events);
     return events;
   } catch (error) {
     console.error("drizzle.getEvents.e: ", error);

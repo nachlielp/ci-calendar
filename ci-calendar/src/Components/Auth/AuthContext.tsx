@@ -2,8 +2,15 @@ import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
 import Firebase from "../../Firebase";
 import { useNavigate } from "react-router-dom";
-import { getUserByUid, insertUser } from "../../db";
-import { DbUser, UserType } from "../../../drizzle/schema";
+import { getEvents, getUserByUid, insertEvent, insertUser } from "../../db";
+import {
+  DbEvent,
+  DbUser,
+  District,
+  EventType,
+  UserType,
+} from "../../../drizzle/schema";
+import dayjs from "dayjs";
 
 export interface IUserSignup {
   email: string;
@@ -12,17 +19,20 @@ export interface IUserSignup {
 }
 interface IAuthContextType {
   currentUser: DbUser | null;
+  loading: boolean;
   signup: (signupData: IUserSignup) => Promise<UserCredential>;
   emailLogin: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
   githubLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
+  createEvent: (event: DbEvent) => Promise<{ success: boolean }>;
+  getAllEvents: () => Promise<DbEvent[]>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
 
-export function useAuth() {
+export function useAuthContext() {
   return useContext(AuthContext);
 }
 
@@ -70,8 +80,9 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       if (userRes === undefined) {
         await createUserInDb(user);
       }
+      const userType = userRes?.userType as UserType;
       if (userRes) {
-        const userObj: DbUser = { ...userRes, userType: UserType.user };
+        const userObj: DbUser = { ...userRes, userType: userType };
         setCurrentUser(userObj);
         navigate(`/`);
       }
@@ -126,14 +137,70 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
+  async function createEvent(event: DbEvent): Promise<{ success: boolean }> {
+    const modifiedEvent = {
+      ...event,
+      owners: event.owners.join(", "),
+      types: event.types.join(", "),
+    };
+    try {
+      const eventRes = await insertEvent(modifiedEvent);
+      return eventRes;
+    } catch (error) {
+      console.error(`AuthContext.createEvent error:`, error);
+      throw error;
+    }
+  }
+
+  async function getAllEvents(): Promise<DbEvent[]> {
+    console.log("AuthContext.getAllEvents");
+    const startDate = dayjs().subtract(6, "month").toISOString();
+    const endDate = dayjs().add(6, "month").toISOString();
+
+    try {
+      const events = await getEvents(startDate, endDate);
+      if (events) {
+        console.log(
+          `AuthContext.getAllEvents.event[0]:`,
+          JSON.stringify(events[1]["subEvents"])
+        );
+        return events.map((event) => ({
+          ...event,
+          owners: event.owners.split(", "),
+          types: event.types.split(", ").map((type) => type as EventType),
+          linkToEvent: event.linkToEvent || "",
+          linkToPayment: event.linkToPayment || "",
+          district: event.district as District,
+          hideEvent: event.hideEvent || false,
+          limitations:
+            typeof event.limitations === "string"
+              ? event.limitations.split(", ")
+              : [],
+          subEvents:
+            typeof event.subEvents === "string"
+              ? safelyParseJSON(event.subEvents)
+              : [],
+          registration: event.registration || false,
+          linkToRegistration: event.linkToRegistration || "",
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error(`AuthContext.getAllEvents error:`, error);
+      throw error;
+    }
+  }
   const value = {
     currentUser,
+    loading,
     signup,
     emailLogin,
     logout,
     googleLogin,
     githubLogin,
     resetPassword,
+    createEvent,
+    getAllEvents,
   };
   //
   return (
@@ -141,4 +208,14 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       {!loading && children}
     </AuthContext.Provider>
   );
+}
+function safelyParseJSON(jsonString: string) {
+  try {
+    return JSON.parse(jsonString).map((subEvent: any) => ({
+      ...subEvent,
+    }));
+  } catch (error) {
+    console.error(`AuthContext.safelyParseJSON error:`, error);
+    return [];
+  }
 }

@@ -1,6 +1,6 @@
 import { ButtonLink } from "./UI/LinkButton";
 import { Button } from "antd";
-import { useAuth } from "./Auth/AuthContext";
+import { useAuthContext } from "./Auth/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import {
@@ -14,7 +14,7 @@ import SideMenu from "./SideMenu";
 import { DbUser } from "../../drizzle/schema";
 
 export default function Header() {
-  const authContext = useAuth();
+  const authContext = useAuthContext();
   if (!authContext) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }

@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import { useAuth } from "./AuthContext";
+import { useAuthContext } from "./AuthContext";
 import { ButtonLink } from "../UI/LinkButton";
 enum LoginError {
   none = "",
@@ -11,7 +11,7 @@ enum LoginError {
 }
 
 export default function Login() {
-  const authContext = useAuth();
+  const authContext = useAuthContext();
   if (!authContext) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }

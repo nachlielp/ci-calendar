@@ -12,8 +12,11 @@ import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import HomePage from "./Components/HomePage";
 import Header from "./Components/Header";
+import EventForm from "./Components/EventForm";
+import { UserType } from "../drizzle/schema";
+import TestForm from "./Components/TestForm";
 
-function App() {
+export default function App() {
   const [firebase, setFirebase] = useState<Firebase | null>(null);
 
   useEffect(() => {
@@ -37,11 +40,26 @@ function App() {
 
               <Route path="reset-password" element={<ResetPassword />} />
               <Route path="/home" element={<HomePage />} />
-              <Route element={<PrivateRoutes />}>
-                {/* <Route path="/retention" element={<RetentionTimer />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/meditation" element={<MeditationTimer />} /> */}
-                {/* <Route path="/guided" element={<GuidedMeditation />} /> */}
+              {/* User privet routes */}
+              <Route element={<PrivateRoutes />}></Route>
+
+              {/* Teacher privet routes */}
+              <Route
+                element={
+                  <PrivateRoutes
+                    requiredRoles={[UserType.admin, UserType.teacher]}
+                  />
+                }
+              >
+                <Route path="/event-form" element={<EventForm />} />
+                <Route path="/test-form" element={<TestForm />} />
+              </Route>
+
+              {/* Admin privet routes */}
+              <Route
+                element={<PrivateRoutes requiredRoles={[UserType.admin]} />}
+              >
+                {/* <Route path="/event-form" element={<EventForm />} /> */}
               </Route>
               <Route path="*" element={<HomePage />} />
             </Routes>
@@ -51,5 +69,3 @@ function App() {
     </div>
   );
 }
-
-export default App;

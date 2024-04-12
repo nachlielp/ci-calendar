@@ -1,12 +1,32 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "./AuthContext";
+import { useAuthContext } from "./AuthContext";
+import { UserType } from "../../../drizzle/schema";
 
-export const PrivateRoutes: React.FC<{}> = ({}) => {
-  const authContext = useAuth();
+interface PrivateRoutesProps {
+  requiredRoles?: UserType[];
+}
+
+export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
+  requiredRoles: requiredRoles,
+}) => {
+  const authContext = useAuthContext();
   if (!authContext) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }
-  const { currentUser } = authContext;
-  return currentUser ? <Outlet /> : <Navigate to="/login" />;
+  const { currentUser, loading } = authContext;
+  console.log("PrivateRoutes.currentUser", currentUser);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/login" />;
+  }
+
+  if (requiredRoles && !requiredRoles.includes(currentUser.userType)) {
+    return <Navigate to="/" />;
+  }
+
+  return <Outlet />;
 };

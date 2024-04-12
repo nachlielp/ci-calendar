@@ -6,7 +6,7 @@ export default {
   out: "./drizzle",
   driver: "turso",
   dbCredentials: {
-    url: process.env.NEXT_DEV_DATABASE_URL || "",
-    authToken: process.env.NEXT_DEV_DATABASE_AUTH_TOKEN,
+    url: process.env.VITE_DEV_DATABASE_URL || "",
+    authToken: process.env.VITE_DEV_DATABASE_AUTH_TOKEN,
   },
 } satisfies Config;
