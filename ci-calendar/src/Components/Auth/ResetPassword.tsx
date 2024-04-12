@@ -3,9 +3,13 @@ import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { useAuth } from "./AuthContext";
 
 function ResetPassword() {
+  const authContext = useAuth();
+  if (!authContext) {
+    throw new Error("AuthContext is null, make sure you're within a Provider");
+  }
+  const { resetPassword } = authContext;
   const emailRef = useRef<InputRef>(null);
 
-  const { resetPassword } = useAuth();
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [messageType, setMessageType] = useState<"info" | "error">();
@@ -13,7 +17,11 @@ function ResetPassword() {
     try {
       setMessage("");
       setLoading(true);
-      await resetPassword(emailRef.current?.input?.value);
+      const email = emailRef.current?.input?.value;
+      if (!email) {
+        throw new Error("Email is required");
+      }
+      await resetPassword(email);
       setMessage("Check your inbox for further instructions");
       setMessageType("info");
     } catch (e) {

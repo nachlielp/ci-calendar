@@ -4,28 +4,34 @@ import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuth } from "./AuthContext";
 import { ButtonLink } from "../UI/LinkButton";
-enum Error {
+enum LoginError {
   none = "",
   wrongPassword = "Password does not match email",
   default = "Failed to sign in",
 }
 
 export default function Login() {
+  const authContext = useAuth();
+  if (!authContext) {
+    throw new Error("AuthContext is null, make sure you're within a Provider");
+  }
+  const { googleLogin, emailLogin } = authContext;
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);
-  const { login, googleLogin } = useAuth();
-  const [error, setError] = useState<Error>(Error.none);
+  const [error, setError] = useState<LoginError>(LoginError.none);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const onFinish = async () => {
     try {
-      setError(Error.none);
+      setError(LoginError.none);
       setLoading(true);
-      await login(
-        emailRef.current?.input?.value,
-        passwordRef.current?.input?.value
-      );
+      const email = emailRef.current?.input?.value;
+      const password = passwordRef.current?.input?.value;
+      if (!email || !password) {
+        throw new Error("Email and password are required");
+      }
+      await emailLogin(email, password);
       navigate(`/`);
     } catch (e) {
       if (e instanceof FirebaseError) {
@@ -33,11 +39,11 @@ export default function Login() {
           e.code === "auth/wrong-password" ||
           e.code === "auth/user-not-found"
         ) {
-          setError(Error.wrongPassword);
+          setError(LoginError.wrongPassword);
         }
         console.error(`Firebase Error: ${e.code}`);
       } else {
-        setError(Error.default);
+        setError(LoginError.default);
         console.error(`Other Error: ${e}`);
       }
     }

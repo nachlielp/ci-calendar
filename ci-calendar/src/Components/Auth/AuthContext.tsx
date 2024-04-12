@@ -13,6 +13,7 @@ export interface IUserSignup {
 interface IAuthContextType {
   currentUser: DbUser | null;
   signup: (signupData: IUserSignup) => Promise<UserCredential>;
+  emailLogin: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
   githubLogin: () => Promise<UserCredential | void>;
@@ -128,7 +129,7 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
   const value = {
     currentUser,
     signup,
-    login: emailLogin,
+    emailLogin,
     logout,
     googleLogin,
     githubLogin,
