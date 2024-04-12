@@ -12,9 +12,14 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import SideMenu from "./SideMenu";
+import { DbUser } from "../../drizzle/schema";
 
 export default function Header() {
-  const { currentUser, logout } = useAuth();
+  const authContext = useAuth();
+  if (!authContext) {
+    throw new Error("AuthContext is null, make sure you're within a Provider");
+  }
+  const { currentUser, logout } = authContext;
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -79,17 +84,15 @@ export default function Header() {
 }
 
 interface IUserInfoProps {
-  currentUser: User;
+  currentUser: DbUser;
 }
 const UserInfo = ({ currentUser }: IUserInfoProps) => {
-  console.log("Header.currentUser", currentUser);
+  // console.log("Header.currentUser", currentUser);
   return (
     <div>
       {currentUser && (
         <div className="mr-2 md:mr-6 md:ml-6">
-          <p className="text-black text-sm font-semibold">
-            {currentUser.displayName}
-          </p>
+          <p className="text-black text-sm font-semibold">{currentUser.name}</p>
           <p className="text-gray-400 text-xs font-semibold">
             {currentUser.email}
           </p>

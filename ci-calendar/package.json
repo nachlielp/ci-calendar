@@ -11,20 +11,22 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
+    "@libsql/client": "^0.6.0",
     "antd": "^5.16.1",
+    "drizzle-orm": "^0.30.8",
     "firebase": "^10.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3"
   },
   "devDependencies": {
-    "@types/antd": "^1.0.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
+    "drizzle-kit": "^0.20.14",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
