@@ -1,4 +1,3 @@
-import { User } from "firebase/auth";
 import { ButtonLink } from "./UI/LinkButton";
 import { Button } from "antd";
 import { useAuth } from "./Auth/AuthContext";

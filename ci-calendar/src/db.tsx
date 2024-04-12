@@ -91,24 +91,29 @@ export const updateUserTypeByEmail = async (
   }
 };
 
+interface IUserUpdate {
+  id: string;
+  name: string;
+  receiveWeeklyEmails: boolean;
+}
 export const updateUserNameAndReceiveWeeklyEmails = async (
-  userId: string,
-  newName: string,
-  receiveWeeklyEmails: boolean
+  user: IUserUpdate
 ) => {
+  console.log("drizzle.updateUserNameAndReceiveWeeklyEmails.user", user);
   try {
     const res = await db
       .update(schema.users)
-      .set({ name: newName, receiveWeeklyEmails: receiveWeeklyEmails })
-      .where(eq(schema.users.id, userId));
+      .set({ name: user.name, receiveWeeklyEmails: user.receiveWeeklyEmails })
+      .where(eq(schema.users.id, user.id));
     if (res.rowsAffected === 1) {
-      return { id: userId };
+      return { id: user.id };
     } else {
       throw Error(`drizzle.updateUserName.res: ${JSON.stringify(res)}`);
     }
   } catch (error) {
     console.error("drizzle.updateUserName.e: ", error);
   }
+  return null;
 };
 
 export const deleteUser = async (userId: string) => {

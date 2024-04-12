@@ -4,18 +4,23 @@ import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuth } from "./AuthContext";
 
-enum Error {
+enum SignupError {
   none = "",
   passwordsDontMatch = "Passwords do not match",
   passwordToShort = "Password must be at least 6 characters",
 }
 
-function Signup() {
+export default function Signup() {
+  const authContext = useAuth();
+  if (!authContext) {
+    throw new Error("AuthContext is null, make sure you're within a Provider");
+  }
+  const { currentUser, signup, googleLogin } = authContext;
+  const nameRef = useRef<InputRef>(null);
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);
   const passwordConfRef = useRef<InputRef>(null);
-  const { currentUser, signup, googleLogin } = useAuth();
-  const [error, setError] = useState<Error>(Error.none);
+  const [error, setError] = useState<SignupError>(SignupError.none);
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -32,20 +37,23 @@ function Signup() {
     ) {
       // console.log(`${passwordRef.current?.input?.value} !==
       // ${passwordConfRef.current?.input?.value}`);
-      return setError(Error.passwordsDontMatch);
+      return setError(SignupError.passwordsDontMatch);
     }
     try {
-      setError(Error.none);
+      setError(SignupError.none);
       setLoading(true);
-      await signup(
-        emailRef.current?.input?.value,
-        passwordRef.current?.input?.value
-      );
+      const email = emailRef.current?.input?.value;
+      const password = passwordRef.current?.input?.value;
+      const name = nameRef.current?.input?.value;
+      if (!email || !password || !name) {
+        throw new Error("Email or password is null");
+      }
+      await signup({ email, password, name });
       navigate("/");
     } catch (e) {
       if (e instanceof FirebaseError) {
         if (e.code === "auth/weak-password") {
-          setError(Error.passwordToShort);
+          setError(SignupError.passwordToShort);
         }
         console.error(`Firebase Error: ${e.code}`);
       } else {
@@ -73,6 +81,9 @@ function Signup() {
         style={{ maxWidth: 400 }}
         onFinish={onFinish}
       >
+        <Form.Item>
+          <Input type="text" placeholder="Name" ref={nameRef} required />
+        </Form.Item>
         <Form.Item>
           <Input type="email" placeholder="Email" ref={emailRef} required />
         </Form.Item>
@@ -125,5 +136,3 @@ function Signup() {
     </Card>
   );
 }
-
-export default Signup;

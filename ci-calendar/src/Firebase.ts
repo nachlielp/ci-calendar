@@ -58,9 +58,12 @@ export default class Firebase {
     return this.githubProvider;
   }
 
-  async signUpWithEmail(email: string, password: string): Promise<void> {
+  async signUpWithEmail(
+    email: string,
+    password: string
+  ): Promise<UserCredential> {
     try {
-      await createUserWithEmailAndPassword(this.auth, email, password);
+      return await createUserWithEmailAndPassword(this.auth, email, password);
     } catch (error: any) {
       console.error("Error signing up with email and password:", error);
       throw error;
