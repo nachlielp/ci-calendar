@@ -2,9 +2,14 @@ import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
 import Firebase from "../../Firebase";
 import { useNavigate } from "react-router-dom";
-import { getEvents, getUserByUid, insertEvent, insertUser } from "../../db";
 import {
-  DbEvent,
+  getSimpleEvents,
+  getUserByUid,
+  insertSimpleEvent,
+  insertUser,
+} from "../../db";
+import {
+  DbSimpleEvent,
   DbUser,
   District,
   EventType,
@@ -26,8 +31,8 @@ interface IAuthContextType {
   googleLogin: () => Promise<UserCredential | void>;
   githubLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
-  createEvent: (event: DbEvent) => Promise<{ success: boolean }>;
-  getAllEvents: () => Promise<DbEvent[]>;
+  createSimpleEvent: (event: DbSimpleEvent) => Promise<{ success: boolean }>;
+  getAllEvents: () => Promise<DbSimpleEvent[]>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -137,14 +142,11 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
-  async function createEvent(event: DbEvent): Promise<{ success: boolean }> {
-    const modifiedEvent = {
-      ...event,
-      owners: event.owners.join(", "),
-      types: event.types.join(", "),
-    };
+  async function createSimpleEvent(
+    event: DbSimpleEvent
+  ): Promise<{ success: boolean }> {
     try {
-      const eventRes = await insertEvent(modifiedEvent);
+      const eventRes = await insertSimpleEvent(event);
       return eventRes;
     } catch (error) {
       console.error(`AuthContext.createEvent error:`, error);
@@ -152,36 +154,35 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     }
   }
 
-  async function getAllEvents(): Promise<DbEvent[]> {
+  async function getAllEvents(): Promise<DbSimpleEvent[]> {
     console.log("AuthContext.getAllEvents");
     const startDate = dayjs().subtract(6, "month").toISOString();
     const endDate = dayjs().add(6, "month").toISOString();
 
     try {
-      const events = await getEvents(startDate, endDate);
+      const events = await getSimpleEvents(startDate, endDate);
       if (events) {
-        console.log(
-          `AuthContext.getAllEvents.event[0]:`,
-          JSON.stringify(events[1]["subEvents"])
-        );
         return events.map((event) => ({
           ...event,
-          owners: event.owners.split(", "),
-          types: event.types.split(", ").map((type) => type as EventType),
+          types:
+            event.types.split(",").map((type) => type.trim() as EventType) ||
+            [],
+          p2_types:
+            event.p2_types
+              ?.split(",")
+              .map((type) => type.trim() as EventType) || [],
+          owners: event.owners.split(",") || [],
+          teachers: event.teachers || "",
+          limitations: event.limitations?.split(",") || [],
           linkToEvent: event.linkToEvent || "",
           linkToPayment: event.linkToPayment || "",
           district: event.district as District,
           hideEvent: event.hideEvent || false,
-          limitations:
-            typeof event.limitations === "string"
-              ? event.limitations.split(", ")
-              : [],
-          subEvents:
-            typeof event.subEvents === "string"
-              ? safelyParseJSON(event.subEvents)
-              : [],
-          registration: event.registration || false,
           linkToRegistration: event.linkToRegistration || "",
+          p2_startTime: event.p2_startTime || "",
+          p2_endTime: event.p2_endTime || "",
+          p2_price: event.p2_price || NaN,
+          p2_total_price: event.p2_total_price || NaN,
         }));
       }
       return [];
@@ -199,7 +200,7 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     googleLogin,
     githubLogin,
     resetPassword,
-    createEvent,
+    createSimpleEvent,
     getAllEvents,
   };
   //
@@ -211,7 +212,9 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
 }
 function safelyParseJSON(jsonString: string) {
   try {
-    return JSON.parse(jsonString).map((subEvent: any) => ({
+    const arr = jsonString.split(",");
+    const parsed = arr.map((subEvent: any) => JSON.parse(subEvent));
+    return parsed.map((subEvent: any) => ({
       ...subEvent,
     }));
   } catch (error) {

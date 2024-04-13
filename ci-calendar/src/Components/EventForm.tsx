@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { DbEvent, UserType } from "../../drizzle/schema";
+import { UserType } from "../../drizzle/schema";
 import { useAuthContext } from "./Auth/AuthContext";
 import {
   Button,
@@ -14,17 +14,23 @@ import {
   Switch,
   TimePicker,
 } from "antd";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 
 const { RangePicker } = DatePicker;
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { SetStateAction, useState } from "react";
-import { RangePickerProps } from "antd/es/date-picker";
+// import { RangePickerProps } from "antd/es/date-picker";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import {
+  disabledDate,
+  districts,
+  eventTypes,
+  limitations,
+} from "./SimpleEventForm";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -65,17 +71,6 @@ export default function EventForm() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [isSubFields, setIsSubFields] = useState(false);
 
-  // useEffect(() => {
-  //   const unsubscribe =
-  //     form.getFieldValue("sub-events") &&
-  //     form.watch((value:any) => {
-  //       const subEvents = form.getFieldValue("sub-events") || [];
-  //       setIsSubFields(subEvents.length > 0);
-  //       console.log(`EventForm.useEffect.subEvents.length: `, subEvents.length);
-  //     });
-  //   return () => unsubscribe && unsubscribe();
-  // }, [form]);
-
   const handleDateChange = (date: SetStateAction<dayjs.Dayjs>) => {
     setSelectedDate(date);
   };
@@ -85,32 +80,33 @@ export default function EventForm() {
   const onSwitchRegistrationChange = (checked: boolean) => {
     setIsRequiredRegistration(checked);
   };
+
   const handleSubmit = async (values: any) => {
     console.log("EventForm.handleSubmit.values: ", values);
-    const event: DbEvent = {
-      id: uuidv4(),
-      createdAt: dayjs().toISOString(),
-      updatedAt: dayjs().toISOString(),
-      title: values["event-title"],
-      description: values["event-description"] || "",
-      types: values["event-types"],
-      startTime: values["event-time"][0],
-      endTime: values["event-time"][1],
-      owners: [currentUser.id],
-      linkToEvent: values["link-to-event"],
-      linkToPayment: values["link-to-pay"],
-      limitations: values["event-limitations"],
-      address: values["address"],
-      hideEvent: false,
-      subEvents: values["sub-events"],
-      district: values["district"],
-      registration: values["is-registration-required"],
-      linkToRegistration: values["link-to-registration"] || "",
-    };
+    // const event: DbBasicEvent = {
+    //   id: uuidv4(),
+    //   createdAt: dayjs().toISOString(),
+    //   updatedAt: dayjs().toISOString(),
+    //   title: values["event-title"],
+    //   description: values["event-description"] || "",
+    //   types: values["event-types"],
+    //   startTime: values["event-time"][0],
+    //   endTime: values["event-time"][1],
+    //   owners: [currentUser.id],
+    //   linkToEvent: values["link-to-event"],
+    //   linkToPayment: values["link-to-pay"],
+    //   limitations: values["event-limitations"],
+    //   address: values["address"],
+    //   hideEvent: false,
+    //   subEvents: values["sub-events"],
+    //   district: values["district"],
+    //   registration: values["is-registration-required"],
+    //   linkToRegistration: values["link-to-registration"] || "",
+    // };
     try {
-      console.log("EventForm.handleSubmit.event: ", event);
-      const res = await authContext.createEvent(event);
-      console.log(`EventForm.handleSubmit.res: `, res);
+      // console.log("EventForm.handleSubmit.event: ", event);
+      // const res = await authContext.createEvent(event);
+      // console.log(`EventForm.handleSubmit.res: `, res);
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }
@@ -404,37 +400,3 @@ export default function EventForm() {
     </Card>
   );
 }
-
-export interface SelectOption {
-  value: string;
-  label: string;
-}
-const eventTypes: SelectOption[] = [
-  { value: "jame", label: "ג'אם" },
-  { value: "class", label: "שיעור" },
-  { value: "workshop", label: "סדנה" },
-  { value: "conference", label: "כנס" },
-];
-
-const limitations: SelectOption[] = [
-  { value: "everyone", label: "פתוח לכולם" },
-  { value: "beginner", label: "מתחילים" },
-  { value: "advanced", label: "מתקדמים" },
-  { value: "male", label: "גברים" },
-  { value: "female", label: "נשים" },
-];
-
-const districts: SelectOption[] = [
-  { value: "jerusalem", label: "ירושלים" },
-  { value: "center", label: "מרכז" },
-  { value: "north", label: "צפון" },
-  { value: "south", label: "דרום" },
-];
-const disabledDate: RangePickerProps["disabledDate"] = (current) => {
-  // Can not select days before today and today
-  return (
-    current &&
-    (current < dayjs().startOf("day") ||
-      current > dayjs().add(1, "year").endOf("day"))
-  );
-};

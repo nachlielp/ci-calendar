@@ -36,7 +36,7 @@ export enum EventType {
 }
 
 export interface SubEvent {
-  index: number;
+  id: string;
   title: string;
   startTime: string;
   endTime: string;
@@ -45,7 +45,7 @@ export interface SubEvent {
   type: EventType;
 }
 
-export interface DbEvent {
+export interface DbSimpleEvent {
   id: string;
   createdAt: string;
   updatedAt: string;
@@ -55,15 +55,19 @@ export interface DbEvent {
   startTime: string;
   endTime: string;
   owners: string[];
+  teachers: string;
   linkToEvent: string;
   linkToPayment: string;
   district: District;
   address: string;
   hideEvent: boolean;
-  subEvents: SubEvent[];
   limitations: string[];
-  registration: boolean;
   linkToRegistration: string;
+  p2_types: EventType[];
+  p2_startTime: string;
+  p2_endTime: string;
+  p2_price: number;
+  p2_total_price: number;
 }
 
 export const users = sqliteTable("users", {
@@ -86,7 +90,7 @@ export const users = sqliteTable("users", {
   linkToPage: text("linkToPage").notNull(),
 });
 
-export const events = sqliteTable("events", {
+export const simpleEvents = sqliteTable("simpleEvents", {
   id: text("id").primaryKey().notNull(),
   createdAt: text("createdAt")
     .default(sql`(CURRENT_TIMESTAMP)`)
@@ -101,14 +105,18 @@ export const events = sqliteTable("events", {
   owners: text("owners")
     .notNull()
     .references(() => users.id),
+  teachers: text("teachers"),
   linkToEvent: text("linkToEvent"),
   linkToPayment: text("linkToPayment"),
   district: text("district").notNull(),
   address: text("address").notNull(),
-  subEvents: blob("subEvents"),
   hideEvent: integer("hideEvent", { mode: "boolean" }),
-  types: text("types").notNull(),
-  limitations: blob("limitations"),
-  registration: integer("registration", { mode: "boolean" }),
   linkToRegistration: text("linkToRegistration"),
+  types: text("types").notNull(),
+  limitations: text("limitations"),
+  p2_types: text("p2_types"),
+  p2_startTime: text("p2_startTime"),
+  p2_endTime: text("p2_endTime"),
+  p2_price: integer("p2_price"),
+  p2_total_price: integer("p2_total_price"),
 });

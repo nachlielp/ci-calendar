@@ -1,11 +1,11 @@
 import { Button } from "antd";
 import { useAuthContext } from "./Auth/AuthContext";
 import { ButtonLink } from "./UI/LinkButton";
-import { DbEvent } from "../../drizzle/schema";
+import { DbSimpleEvent } from "../../drizzle/schema";
 import { useState } from "react";
 
 const HomePage: React.FC = () => {
-  const [events, setEvents] = useState<DbEvent[]>([]);
+  const [events, setEvents] = useState<DbSimpleEvent[]>([]);
   const auth = useAuthContext();
   if (!auth) {
     throw new Error("Auth context not found");

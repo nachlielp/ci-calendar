@@ -2,7 +2,7 @@ import { eq, asc, between, inArray } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
-import { DbUser, UserType } from "../drizzle/schema";
+import { DbSimpleEvent, DbUser, UserType } from "../drizzle/schema";
 
 const client = createClient({
   url: import.meta.env.VITE_DEV_DATABASE_URL || "",
@@ -11,7 +11,6 @@ const client = createClient({
 const db = drizzle(client, { schema });
 
 // type NewUser = typeof schema.users.$inferInsert;
-type NewEvent = typeof schema.events.$inferInsert;
 
 export const insertUser = async (user: DbUser) => {
   try {
@@ -131,11 +130,18 @@ export const deleteUser = async (userId: string) => {
   }
 };
 
-export const insertEvent = async (
-  event: NewEvent
+export const insertSimpleEvent = async (
+  event: DbSimpleEvent
 ): Promise<{ success: boolean }> => {
   try {
-    const res = await db.insert(schema.events).values(event);
+    const modifiedEvent = {
+      ...event,
+      owners: event.owners.join(", "),
+      types: event.types.join(", "),
+      p2_types: event.p2_types.join(", "),
+      limitations: event.limitations.join(", "),
+    };
+    const res = await db.insert(schema.simpleEvents).values(modifiedEvent);
     console.log("drizzle.insertEvent.res: ", res);
     if (res.rowsAffected === 1) {
       return { success: true };
@@ -148,17 +154,24 @@ export const insertEvent = async (
   return { success: false };
 };
 
-export const updateEvent = async (event: NewEvent) => {
+export const updateSimpleEvent = async (event: DbSimpleEvent) => {
   try {
+    const modifiedEvent = {
+      ...event,
+      owners: event.owners.join(", "),
+      types: event.types.join(", "),
+      p2_types: event.p2_types.join(", "),
+      limitations: event.limitations.join(", "),
+    };
     const res = await db
-      .update(schema.events)
-      .set(event)
-      .where(eq(schema.events.id, event.id));
+      .update(schema.simpleEvents)
+      .set(modifiedEvent)
+      .where(eq(schema.simpleEvents.id, event.id));
 
     if (res.rowsAffected === 1) {
       return { id: event.id };
     } else {
-      throw Error(`drizzle.updateEvent.res: ${JSON.stringify(res)}`);
+      throw Error(`drizzle.updateSimpleEvent.res: ${JSON.stringify(res)}`);
     }
   } catch (error) {
     console.error("drizzle.updateEvent.e: ", error);
@@ -168,8 +181,8 @@ export const updateEvent = async (event: NewEvent) => {
 export const deleteEvent = async (eventId: string) => {
   try {
     const res = await db
-      .delete(schema.events)
-      .where(eq(schema.events.id, eventId));
+      .delete(schema.simpleEvents)
+      .where(eq(schema.simpleEvents.id, eventId));
     if (res.rowsAffected === 1) {
       return { id: eventId };
     } else {
@@ -180,14 +193,14 @@ export const deleteEvent = async (eventId: string) => {
   }
 };
 
-export const getEvents = async (from: string, to: string) => {
-  console.log("drizzle.getEvents.from", from);
+export const getSimpleEvents = async (from: string, to: string) => {
+  console.log("drizzle.getSimpleEvents.from", from);
   try {
     const events = await db
       .select()
-      .from(schema.events)
+      .from(schema.simpleEvents)
       // .where(between(schema.events.startTime, from, to))
-      .orderBy(asc(schema.events.startTime));
+      .orderBy(asc(schema.simpleEvents.startTime));
     console.log("drizzle.getEvents.events", events);
     return events;
   } catch (error) {
@@ -200,8 +213,8 @@ export const getEventsByOwnerId = async (userId: string) => {
   try {
     const events = await db
       .select()
-      .from(schema.events)
-      .where(eq(schema.events.owners, userId));
+      .from(schema.simpleEvents)
+      .where(eq(schema.simpleEvents.owners, userId));
     return events;
   } catch (error) {
     console.error("drizzle.getEventsByUser.e: ", error);
@@ -212,8 +225,8 @@ export const getEventById = async (eventId: string) => {
   try {
     const event = await db
       .select()
-      .from(schema.events)
-      .where(eq(schema.events.id, eventId));
+      .from(schema.simpleEvents)
+      .where(eq(schema.simpleEvents.id, eventId));
     return event;
   } catch (error) {
     console.error("drizzle.getEventById.e: ", error);
