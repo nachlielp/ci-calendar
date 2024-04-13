@@ -25,12 +25,15 @@ export const useGetUser = (uid: string) => {
   return user;
 };
 
-export const useUpdateUser = (user: DbUser) => {
-  const updateUser = async (user: DbUser) => {
-    await updateUserByUid(user);
-  };
-
-  return updateUser(user);
+export const useUpdateUser = (uid: string, partialUser: Partial<DbUser>) => {
+  let res;
+  useEffect(() => {
+    const updateUser = async () => {
+      await updateUserByUid(uid, partialUser);
+    };
+    res = updateUser();
+  }, [uid, partialUser]);
+  return res;
 };
 
 const convertUserType = (userType: string): UserType => {

@@ -63,17 +63,32 @@ export const getUserByTypes = async (userTypes: UserType[]) => {
   }
 };
 
-export const updateUserByUid = async (user: DbUser) => {
+export const updateUserByUid = async (
+  uid: string,
+  partialUser: Partial<DbUser>
+) => {
   try {
+    const { id, ...updateFields } = partialUser;
     const res = await db
       .update(schema.users)
-      .set(user)
-      .where(eq(schema.users.id, user.id));
+      .set(updateFields)
+      .where(eq(schema.users.id, uid));
     return res;
   } catch (error) {
     console.error("drizzle.updateUserByUid.e: ", error);
   }
 };
+// export const updateUserByUid = async (user: DbUser) => {
+//   try {
+//     const res = await db
+//       .update(schema.users)
+//       .set(user)
+//       .where(eq(schema.users.id, user.id));
+//     return res;
+//   } catch (error) {
+//     console.error("drizzle.updateUserByUid.e: ", error);
+//   }
+// };
 export const updateUserTypeByEmail = async (
   email: string,
   userType: UserType

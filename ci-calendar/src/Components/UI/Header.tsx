@@ -8,9 +8,7 @@ import {
   LogoutOutlined,
   LoginOutlined,
   SettingOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
-import SideMenu from "./SideMenu";
 import { DbUser } from "../../../drizzle/schema";
 import FilterModel from "./FilterModel";
 
