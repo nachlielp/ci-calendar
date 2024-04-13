@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { UserType } from "../../drizzle/schema";
-import { useAuthContext } from "./Auth/AuthContext";
+import { UserType } from "../../../drizzle/schema";
+import { useAuthContext } from "../Auth/AuthContext";
 import {
   Button,
   Card,
@@ -25,12 +25,8 @@ import { SetStateAction, useState } from "react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import {
-  disabledDate,
-  districts,
-  eventTypes,
-  limitations,
-} from "./SimpleEventForm";
+import { disabledDate } from "./SimpleEventForm";
+import { limitations, eventTypes, districts } from "../../util/options";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

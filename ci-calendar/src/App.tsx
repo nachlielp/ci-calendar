@@ -11,9 +11,9 @@ import Login from "./Components/Auth/Login";
 import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import HomePage from "./Components/HomePage";
-import Header from "./Components/Header";
+import Header from "./Components/UI/Header";
 import { UserType } from "../drizzle/schema";
-import SimpleEventForm from "./Components/SimpleEventForm";
+import SimpleEventForm from "./Components/UI/SimpleEventForm";
 
 export default function App() {
   const [firebase, setFirebase] = useState<Firebase | null>(null);

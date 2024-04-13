@@ -177,6 +177,7 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
           district: event.district as District,
           hideEvent: event.hideEvent || false,
           linkToRegistration: event.linkToRegistration || "",
+          price: event.price || NaN,
           p2_startTime: event.p2_startTime || "",
           p2_endTime: event.p2_endTime || "",
           p2_price: event.p2_price || NaN,

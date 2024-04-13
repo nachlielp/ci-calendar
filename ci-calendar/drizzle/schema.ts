@@ -63,6 +63,7 @@ export interface DbSimpleEvent {
   hideEvent: boolean;
   limitations: string[];
   linkToRegistration: string;
+  price: number;
   p2_types: EventType[];
   p2_startTime: string;
   p2_endTime: string;
@@ -114,6 +115,7 @@ export const simpleEvents = sqliteTable("simpleEvents", {
   linkToRegistration: text("linkToRegistration"),
   types: text("types").notNull(),
   limitations: text("limitations"),
+  price: integer("price"),
   p2_types: text("p2_types"),
   p2_startTime: text("p2_startTime"),
   p2_endTime: text("p2_endTime"),

@@ -1,6 +1,6 @@
-import { ButtonLink } from "./UI/LinkButton";
+import { ButtonLink } from "./LinkButton";
 import { Button } from "antd";
-import { useAuthContext } from "./Auth/AuthContext";
+import { useAuthContext } from "../Auth/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import {
@@ -11,7 +11,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import SideMenu from "./SideMenu";
-import { DbUser } from "../../drizzle/schema";
+import { DbUser } from "../../../drizzle/schema";
+import FilterModel from "./FilterModel";
 
 export default function Header() {
   const authContext = useAuthContext();
@@ -49,6 +50,7 @@ export default function Header() {
         )}
 
         {currentUser && <UserInfo currentUser={currentUser} />}
+        <FilterModel />
         {currentPath !== "/home" && currentPath !== "/" && (
           <ButtonLink
             to="/home"

@@ -5,7 +5,7 @@ import {
   UserOutlined,
   MenuFoldOutlined,
 } from "@ant-design/icons";
-import { ButtonLink } from "./UI/LinkButton";
+import { ButtonLink } from "./LinkButton";
 const SideMenu = () => {
   const [open, setOpen] = useState(false);
 

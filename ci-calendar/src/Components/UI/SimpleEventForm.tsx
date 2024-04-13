@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { DbSimpleEvent, UserType } from "../../drizzle/schema";
-import { useAuthContext } from "./Auth/AuthContext";
+import { DbSimpleEvent, UserType } from "../../../drizzle/schema";
+import { useAuthContext } from "../Auth/AuthContext";
 import {
   Button,
   Card,
@@ -23,6 +23,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { PlusOutlined } from "@ant-design/icons";
+import { limitations, eventTypes, districts } from "../../util/options";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -86,6 +87,7 @@ export default function SimpleEventForm() {
       address: values["address"],
       hideEvent: false,
       district: values["district"],
+      price: values["price"],
       linkToRegistration: values["link-to-registration"],
       p2_types: addPartTwo ? values["event-types_2"] : "",
       p2_startTime: addPartTwo ? values["event-time_2"][0] : "",
@@ -154,12 +156,7 @@ export default function SimpleEventForm() {
           <Form.Item label="מגבלות" name="event-limitations">
             <Select options={limitations} mode="multiple" />
           </Form.Item>
-          <Form.Item
-            className="mt-4"
-            label="מחיר"
-            name="price"
-            rules={[{ required: true, message: "שדה חובה" }]}
-          >
+          <Form.Item className="mt-4" label="מחיר" name="price">
             <InputNumber addonAfter="₪" />
           </Form.Item>
           <Form.Item
@@ -279,32 +276,6 @@ export default function SimpleEventForm() {
   );
 }
 
-export interface SelectOption {
-  value: string;
-  label: string;
-}
-export const eventTypes: SelectOption[] = [
-  { value: "jame", label: "ג'אם" },
-  { value: "class", label: "שיעור" },
-  { value: "workshop", label: "סדנה" },
-  { value: "conference", label: "כנס" },
-];
-
-export const limitations: SelectOption[] = [
-  { value: "everyone", label: "פתוח לכולם" },
-  { value: "beginner", label: "מתחילים" },
-  { value: "advanced", label: "מתקדמים" },
-  { value: "male", label: "גברים" },
-  { value: "female", label: "נשים" },
-  { value: "pre-registration", label: "הרשמה מראש" },
-];
-
-export const districts: SelectOption[] = [
-  { value: "jerusalem", label: "ירושלים" },
-  { value: "center", label: "מרכז" },
-  { value: "north", label: "צפון" },
-  { value: "south", label: "דרום" },
-];
 export const disabledDate: RangePickerProps["disabledDate"] = (current) => {
   return (
     current &&
