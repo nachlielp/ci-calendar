@@ -156,11 +156,9 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
 
   async function getAllEvents(): Promise<DbSimpleEvent[]> {
     console.log("AuthContext.getAllEvents");
-    const startDate = dayjs().subtract(6, "month").toISOString();
-    const endDate = dayjs().add(6, "month").toISOString();
-
+    const startDate = dayjs().startOf("day").toISOString();
     try {
-      const events = await getSimpleEvents(startDate, endDate);
+      const events = await getSimpleEvents(startDate);
       if (events) {
         return events.map((event) => ({
           ...event,
@@ -209,16 +207,4 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       {!loading && children}
     </AuthContext.Provider>
   );
-}
-function safelyParseJSON(jsonString: string) {
-  try {
-    const arr = jsonString.split(",");
-    const parsed = arr.map((subEvent: any) => JSON.parse(subEvent));
-    return parsed.map((subEvent: any) => ({
-      ...subEvent,
-    }));
-  } catch (error) {
-    console.error(`AuthContext.safelyParseJSON error:`, error);
-    return [];
-  }
 }

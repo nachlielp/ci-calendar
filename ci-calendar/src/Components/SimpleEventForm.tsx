@@ -67,6 +67,7 @@ export default function SimpleEventForm() {
 
   const handleSubmit = async (values: any) => {
     console.log("EventForm.handleSubmit.values: ", values);
+
     //TODO: setup p_2
     const event: DbSimpleEvent = {
       id: uuidv4(),
@@ -86,16 +87,16 @@ export default function SimpleEventForm() {
       hideEvent: false,
       district: values["district"],
       linkToRegistration: values["link-to-registration"],
-      p2_types: values["event-types_2"],
-      p2_startTime: values["event-time_2"][0],
-      p2_endTime: values["event-time_2"][1],
-      p2_price: values["price_2"],
-      p2_total_price: values["total-price"],
+      p2_types: addPartTwo ? values["event-types_2"] : "",
+      p2_startTime: addPartTwo ? values["event-time_2"][0] : "",
+      p2_endTime: addPartTwo ? values["event-time_2"][1] : "",
+      p2_price: addPartTwo ? values["price_2"] : "",
+      p2_total_price: addPartTwo ? values["total-price"] : "",
     };
     try {
       console.log("EventForm.handleSubmit.event: ", event);
       const res = await authContext.createSimpleEvent(event);
-      // console.log(`EventForm.handleSubmit.res: `, res);
+      console.log(`EventForm.handleSubmit.res: `, res);
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }
@@ -219,14 +220,14 @@ export default function SimpleEventForm() {
             <Form.Item
               label="סוג האירוע"
               name="event-types_2"
-              rules={[{ required: true, message: "שדה חובה" }]}
+              rules={[{ required: addPartTwo, message: "שדה חובה" }]}
             >
               <Select options={eventTypes} mode="multiple" />
             </Form.Item>
             <Form.Item
               label="שעות פעילות"
               name="event-time_2"
-              rules={[{ required: true, message: "שדה חובה" }]}
+              rules={[{ required: addPartTwo, message: "שדה חובה" }]}
               className="w-full"
             >
               <TimePicker.RangePicker

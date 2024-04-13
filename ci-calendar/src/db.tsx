@@ -1,4 +1,4 @@
-import { eq, asc, between, inArray } from "drizzle-orm";
+import { eq, asc, gt, inArray } from "drizzle-orm";
 import * as schema from "../drizzle/schema";
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
@@ -138,7 +138,7 @@ export const insertSimpleEvent = async (
       ...event,
       owners: event.owners.join(", "),
       types: event.types.join(", "),
-      p2_types: event.p2_types.join(", "),
+      p2_types: event.p2_types ? event.p2_types.join(", ") : "",
       limitations: event.limitations.join(", "),
     };
     const res = await db.insert(schema.simpleEvents).values(modifiedEvent);
@@ -193,13 +193,13 @@ export const deleteEvent = async (eventId: string) => {
   }
 };
 
-export const getSimpleEvents = async (from: string, to: string) => {
+export const getSimpleEvents = async (from: string) => {
   console.log("drizzle.getSimpleEvents.from", from);
   try {
     const events = await db
       .select()
       .from(schema.simpleEvents)
-      // .where(between(schema.events.startTime, from, to))
+      .where(gt(schema.simpleEvents.startTime, from))
       .orderBy(asc(schema.simpleEvents.startTime));
     console.log("drizzle.getEvents.events", events);
     return events;
