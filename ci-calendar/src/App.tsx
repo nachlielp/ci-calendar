@@ -14,6 +14,7 @@ import HomePage from "./Components/HomePage";
 import Header from "./Components/UI/Header";
 import { UserType } from "../drizzle/schema";
 import SimpleEventForm from "./Components/UI/SimpleEventForm";
+import UserPage from "./Components/UserPage";
 
 export default function App() {
   const [firebase, setFirebase] = useState<Firebase | null>(null);
@@ -40,7 +41,9 @@ export default function App() {
               <Route path="reset-password" element={<ResetPassword />} />
               <Route path="/home" element={<HomePage />} />
               {/* User privet routes */}
-              <Route element={<PrivateRoutes />}></Route>
+              <Route element={<PrivateRoutes />}>
+                <Route path="/user" element={<UserPage />} />
+              </Route>
 
               {/* Teacher privet routes */}
 

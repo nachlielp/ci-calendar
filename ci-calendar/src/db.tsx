@@ -42,7 +42,6 @@ export const getUserByUid = async (uid: string) => {
     const user = await db.query.users.findFirst({
       where: eq(schema.users.id, uid),
     });
-    console.log("drizzle.index.getUserByUid.user", user);
     if (user === undefined) {
       throw Error(`User with UID ${uid} not found.`);
     }
@@ -98,7 +97,6 @@ interface IUserUpdate {
 export const updateUserNameAndReceiveWeeklyEmails = async (
   user: IUserUpdate
 ) => {
-  console.log("drizzle.updateUserNameAndReceiveWeeklyEmails.user", user);
   try {
     const res = await db
       .update(schema.users)
@@ -142,7 +140,6 @@ export const insertSimpleEvent = async (
       limitations: event.limitations.join(", "),
     };
     const res = await db.insert(schema.simpleEvents).values(modifiedEvent);
-    console.log("drizzle.insertEvent.res: ", res);
     if (res.rowsAffected === 1) {
       return { success: true };
     } else {
@@ -194,14 +191,12 @@ export const deleteEvent = async (eventId: string) => {
 };
 
 export const getSimpleEvents = async (from: string) => {
-  console.log("drizzle.getSimpleEvents.from", from);
   try {
     const events = await db
       .select()
       .from(schema.simpleEvents)
       .where(gt(schema.simpleEvents.startTime, from))
       .orderBy(asc(schema.simpleEvents.startTime));
-    console.log("drizzle.getEvents.events", events);
     return events;
   } catch (error) {
     console.error("drizzle.getEvents.e: ", error);

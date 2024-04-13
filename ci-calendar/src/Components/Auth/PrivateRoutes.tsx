@@ -15,7 +15,6 @@ export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }
   const { currentUser, loading } = authContext;
-  console.log("PrivateRoutes.currentUser", currentUser);
   if (loading) {
     return <div>Loading...</div>;
   }

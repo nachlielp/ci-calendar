@@ -45,7 +45,6 @@ const formItemLayout = {
 };
 
 export default function EventForm() {
-  console.log("EventForm");
   const navigate = useNavigate();
   const authContext = useAuthContext();
   if (!authContext) {
@@ -78,7 +77,6 @@ export default function EventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log("EventForm.handleSubmit.values: ", values);
     // const event: DbBasicEvent = {
     //   id: uuidv4(),
     //   createdAt: dayjs().toISOString(),

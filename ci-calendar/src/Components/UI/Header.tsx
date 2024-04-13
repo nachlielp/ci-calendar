@@ -23,12 +23,22 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  let settingsPage = "/home";
+  if (currentUser?.userType === "admin") {
+    settingsPage = "/admin";
+  } else if (currentUser?.userType === "user") {
+    settingsPage = "/user";
+  } else if (currentUser?.userType === "teacher") {
+    settingsPage = "/teacher";
+  }
+
   const currentPath = location.pathname;
 
   const handleLogOut = () => {
     logout();
     navigate("/home");
   };
+
   return (
     <div className="container mx-auto px-0">
       <div className="flex h-14 w-full shrink-0 items-center px-4 md:px-6 bg-white sticky top-0">
@@ -61,18 +71,12 @@ export default function Header() {
         )}
         {currentUser && (
           <>
-            <div className="ml-auto  md:hidden">
+            {/* <div className="ml-auto  md:hidden">
               <SideMenu />
-            </div>
+            </div> */}
             <div className="ml-auto flex hidden md:flex">
               <ButtonLink
-                to="/user"
-                className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-              >
-                <UserOutlined />
-              </ButtonLink>
-              <ButtonLink
-                to="/settings"
+                to={settingsPage}
                 className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
               >
                 <SettingOutlined />

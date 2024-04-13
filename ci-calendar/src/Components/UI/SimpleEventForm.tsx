@@ -42,7 +42,6 @@ const formItemLayout = {
 };
 
 export default function SimpleEventForm() {
-  console.log("EventForm");
   const navigate = useNavigate();
   const authContext = useAuthContext();
   if (!authContext) {
@@ -67,8 +66,6 @@ export default function SimpleEventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log("EventForm.handleSubmit.values: ", values);
-
     //TODO: setup p_2
     const event: DbSimpleEvent = {
       id: uuidv4(),
@@ -96,8 +93,8 @@ export default function SimpleEventForm() {
       p2_total_price: addPartTwo ? values["total-price"] : "",
     };
     try {
-      console.log("EventForm.handleSubmit.event: ", event);
       const res = await authContext.createSimpleEvent(event);
+      //TODO if res returned with error, show error message and dont update state
       console.log(`EventForm.handleSubmit.res: `, res);
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);

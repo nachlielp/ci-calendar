@@ -116,7 +116,6 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
         setCurrentUser(userRes);
         navigate(`/`);
       }
-      console.log(`AuthContext.onUserLogin.insertUser user:`, userRes);
     } catch (error) {
       console.error(`AuthContext.onUserLogin.insertUser error:`, error);
     }
@@ -155,7 +154,6 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
   }
 
   async function getAllEvents(): Promise<DbSimpleEvent[]> {
-    console.log("AuthContext.getAllEvents");
     const startDate = dayjs().startOf("day").toISOString();
     try {
       const events = await getSimpleEvents(startDate);
