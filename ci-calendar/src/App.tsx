@@ -43,6 +43,7 @@ export default function App() {
               <Route element={<PrivateRoutes />}></Route>
 
               {/* Teacher privet routes */}
+
               <Route
                 element={
                   <PrivateRoutes
