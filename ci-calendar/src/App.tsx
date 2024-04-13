@@ -12,7 +12,6 @@ import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import HomePage from "./Components/HomePage";
 import Header from "./Components/Header";
-import EventForm from "./Components/EventForm";
 import { UserType } from "../drizzle/schema";
 import TestForm from "./Components/TestForm";
 import SimpleEventForm from "./Components/SimpleEventForm";
