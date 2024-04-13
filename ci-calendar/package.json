@@ -17,6 +17,7 @@
     "dayjs": "^1.11.10",
     "drizzle-orm": "^0.30.8",
     "firebase": "^10.10.0",
+    "rc-virtual-list": "^3.11.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
