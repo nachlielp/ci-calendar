@@ -5,7 +5,7 @@ import {
   UserOutlined,
   MenuFoldOutlined,
 } from "@ant-design/icons";
-import { ButtonLink } from "./LinkButton";
+import { LinkButton } from "./LinkButton";
 const SideMenu = () => {
   const [open, setOpen] = useState(false);
 
@@ -25,18 +25,18 @@ const SideMenu = () => {
         <MenuFoldOutlined />
       </Button>
       <Drawer title="Basic Drawer" onClose={onClose} open={open}>
-        <ButtonLink
+        <LinkButton
           to="/user"
           className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
         >
           <UserOutlined />
-        </ButtonLink>
-        <ButtonLink
+        </LinkButton>
+        <LinkButton
           to="/settings"
           className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
         >
           <SettingOutlined />
-        </ButtonLink>
+        </LinkButton>
       </Drawer>
     </>
   );

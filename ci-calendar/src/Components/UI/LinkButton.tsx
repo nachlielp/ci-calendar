@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { Link } from "react-router-dom";
 
-interface IButtonLinkProps {
+interface ILinkButtonProps {
   to: string;
   label?: string;
   className?: string;
@@ -12,7 +12,7 @@ interface IButtonLinkProps {
   children: React.ReactNode;
 }
 
-export const ButtonLink = ({
+export const LinkButton = ({
   to,
   label,
   className,
@@ -20,7 +20,7 @@ export const ButtonLink = ({
   shape,
   onClick,
   children,
-}: IButtonLinkProps) => {
+}: ILinkButtonProps) => {
   return (
     <Link to={to} className="flex items-center justify-center  h-full">
       <Button

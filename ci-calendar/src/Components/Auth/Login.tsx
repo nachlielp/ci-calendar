@@ -3,7 +3,7 @@ import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuthContext } from "./AuthContext";
-import { ButtonLink } from "../UI/LinkButton";
+import { LinkButton } from "../UI/LinkButton";
 enum LoginError {
   none = "",
   wrongPassword = "Password does not match email",
@@ -110,9 +110,9 @@ export default function Login() {
       </div>
 
       <div className="flex justify-center pt-4 inline-block">
-        <ButtonLink to="/reset-password">Rest Password</ButtonLink>
+        <LinkButton to="/reset-password">Rest Password</LinkButton>
         <div className="w-5"></div>
-        <ButtonLink to="/signup">Sign Up</ButtonLink>
+        <LinkButton to="/signup">Sign Up</LinkButton>
       </div>
     </Card>
   );

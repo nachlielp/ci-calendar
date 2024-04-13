@@ -51,12 +51,7 @@ export default function SimpleEventForm() {
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
-  if (
-    currentUser.userType !== UserType.admin &&
-    currentUser.userType !== UserType.teacher
-  ) {
-    navigate("/");
-  }
+
   const [form] = Form.useForm();
   const [addPartTwo, setAddPartTwo] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -72,7 +67,7 @@ export default function SimpleEventForm() {
       createdAt: dayjs().toISOString(),
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
-      description: values["event-description"],
+      description: values["event-description"] ?? "",
       types: values["event-types"],
       startTime: values["event-time"][0],
       endTime: values["event-time"][1],
@@ -94,6 +89,7 @@ export default function SimpleEventForm() {
     };
     try {
       const res = await authContext.createSimpleEvent(event);
+      navigate("/teacher");
       //TODO if res returned with error, show error message and dont update state
       console.log(`EventForm.handleSubmit.res: `, res);
     } catch (error) {

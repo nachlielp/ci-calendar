@@ -1,4 +1,4 @@
-import { ButtonLink } from "./LinkButton";
+import { LinkButton } from "./LinkButton";
 import { Button } from "antd";
 import { useAuthContext } from "../Auth/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -49,36 +49,36 @@ export default function Header() {
           </Button>
         )}
         {!currentUser && currentPath !== "/login" && (
-          <ButtonLink
+          <LinkButton
             to="/login"
             className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
           >
             <LoginOutlined />
-          </ButtonLink>
+          </LinkButton>
         )}
 
         {currentUser && <UserInfo currentUser={currentUser} />}
         <FilterModel />
         {currentPath !== "/home" && currentPath !== "/" && (
-          <ButtonLink
+          <LinkButton
             to="/home"
             className="text-black text-sm mr-6 font-semibold"
           >
             <HomeOutlined />
-          </ButtonLink>
+          </LinkButton>
         )}
         {currentUser && (
           <>
             {/* <div className="ml-auto  md:hidden">
               <SideMenu />
             </div> */}
-            <div className="ml-auto flex hidden md:flex">
-              <ButtonLink
+            <div className="ml-auto flex ">
+              <LinkButton
                 to={settingsPage}
                 className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
               >
                 <SettingOutlined />
-              </ButtonLink>
+              </LinkButton>
             </div>
           </>
         )}
