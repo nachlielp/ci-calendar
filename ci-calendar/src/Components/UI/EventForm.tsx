@@ -77,6 +77,7 @@ export default function EventForm() {
   };
 
   const handleSubmit = async (values: any) => {
+    console.log("EventForm.handleSubmit.values: ", values);
     // const event: DbBasicEvent = {
     //   id: uuidv4(),
     //   createdAt: dayjs().toISOString(),

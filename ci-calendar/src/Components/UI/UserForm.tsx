@@ -1,5 +1,4 @@
 import { Button, Checkbox, Form, type FormProps, Input, Card } from "antd";
-import { useUpdateUser } from "../../hooks/useUser";
 import { DbUser } from "../../../drizzle/schema";
 import { updateUserByUid } from "../../db";
 
