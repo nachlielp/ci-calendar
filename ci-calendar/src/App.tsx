@@ -13,7 +13,6 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import HomePage from "./Components/HomePage";
 import Header from "./Components/Header";
 import { UserType } from "../drizzle/schema";
-import TestForm from "./Components/TestForm";
 import SimpleEventForm from "./Components/SimpleEventForm";
 
 export default function App() {
@@ -52,7 +51,6 @@ export default function App() {
                 }
               >
                 <Route path="/event-form" element={<SimpleEventForm />} />
-                <Route path="/test-form" element={<TestForm />} />
               </Route>
 
               {/* Admin privet routes */}
