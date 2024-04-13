@@ -47,6 +47,8 @@ export default function Header() {
             <LoginOutlined />
           </ButtonLink>
         )}
+
+        {currentUser && <UserInfo currentUser={currentUser} />}
         {currentPath !== "/home" && currentPath !== "/" && (
           <ButtonLink
             to="/home"
@@ -55,7 +57,6 @@ export default function Header() {
             <HomeOutlined />
           </ButtonLink>
         )}
-        {currentUser && <UserInfo currentUser={currentUser} />}
         {currentUser && (
           <>
             <div className="ml-auto  md:hidden">
