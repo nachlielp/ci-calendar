@@ -1,10 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
-import Firebase, { FbEvent } from "../../Firebase";
+import Firebase from "../../Firebase";
 import { useNavigate } from "react-router-dom";
-import { insertSimpleEvent } from "../../db";
-import { DbSimpleEvent, DbUser, UserType } from "../../../drizzle/schema";
+import { DbUser, UserType } from "../../../drizzle/schema";
 import dayjs from "dayjs";
+import { IEvent } from "../UI/EventForm";
 
 export interface IUserSignup {
   email: string;
@@ -19,8 +19,8 @@ interface IAuthContextType {
   logout: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
-  createSimpleEvent: (event: DbSimpleEvent) => Promise<{ success: boolean }>;
-  getAllEvents: () => Promise<FbEvent[]>;
+  createEvent: (event: IEvent) => Promise<void>;
+  getAllEvents: () => Promise<IEvent[]>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -109,25 +109,23 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
   }, []);
 
   //TODO Update type
-  async function createSimpleEvent(
-    event: DbSimpleEvent
-  ): Promise<{ success: boolean }> {
+  async function createEvent(event: IEvent): Promise<void> {
     try {
       await firebase.addEvent(event);
-    } catch (error) {
-      console.error(`AuthContext.createSimpleEvent error:`, error);
-      throw error;
-    }
-    try {
-      const eventRes = await insertSimpleEvent(event);
-      return eventRes;
     } catch (error) {
       console.error(`AuthContext.createEvent error:`, error);
       throw error;
     }
+    // try {
+    //   const eventRes = await insertSimpleEvent(event);
+    //   return eventRes;
+    // } catch (error) {
+    //   console.error(`AuthContext.createEvent error:`, error);
+    //   throw error;
+    // }
   }
 
-  async function getAllEvents(): Promise<FbEvent[]> {
+  async function getAllEvents(): Promise<IEvent[]> {
     const startDate = dayjs().startOf("day").toISOString();
     try {
       const eventsRes = await firebase.getEventsAfter(
@@ -153,7 +151,7 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     logout,
     googleLogin,
     resetPassword,
-    createSimpleEvent,
+    createEvent,
     getAllEvents,
   };
   //

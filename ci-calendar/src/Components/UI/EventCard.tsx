@@ -1,22 +1,22 @@
 import { Card, Tag, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { DbSimpleEvent, EventType } from "../../../drizzle/schema";
+import { EventType } from "../../../drizzle/schema";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineDescription } from "react-icons/md";
 import { limitations, eventTypes } from "../../util/options";
 import dayjs from "dayjs";
 import React from "react";
-import { FbEvent } from "../../Firebase";
+import { IEvent } from "./EventForm";
 
 interface IEventCard {
-  event: FbEvent;
+  event: IEvent;
   cardWidth: number;
   screenWidth: number;
 }
 export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
   ({ event, cardWidth, screenWidth }, ref) => {
-    // console.log("EventCard.event: ", event);
+    console.log("EventCard.event: ", event);
     const subEventLen = Object.values(event.subEvents).length;
     return (
       <Card
@@ -32,7 +32,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
             <span className="block">
               {getTypes(
                 Object.values(event.subEvents).flatMap(
-                  (subEvent) => subEvent.types as EventType[]
+                  (subEvent) => subEvent.type as EventType
                 )
               ).map((type, index) => (
                 <Tag color="blue" key={`type-${index}`}>
@@ -67,10 +67,10 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
           Object.values(event.subEvents).map((subEvent, index) => (
             <>
               <span className="block mr-6">
-                {subEvent.subTitle}&nbsp;&nbsp; עם
+                {/* {subEvent.subTitle}&nbsp;&nbsp; עם
                 {subEvent.teachers.map((teacher, index) => (
                   <p key={index}>{teacher} |</p>
-                ))}
+                ))} */}
                 {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
                 {dayjs(subEvent.startTime).format("HH:mm")}
               </span>
@@ -83,7 +83,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
         <p className="flex items-center">
           <UserOutlined className="ml-2" />{" "}
           {Object.values(event.subEvents).flatMap(
-            (subEvent) => subEvent.teachers as string[]
+            (subEvent) => subEvent.teacher
           )}
         </p>
         {!isWhiteSpace(event.description) && (
@@ -94,14 +94,9 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
         )}
         <div style={{ marginTop: 16 }}>
           {event.links &&
-            event.links.map((link, index) => (
-              <Button
-                key={index}
-                type="default"
-                href={link.value}
-                className="ml-2"
-              >
-                {link.key}
+            Object.entries(event.links).map(([key, value], index) => (
+              <Button key={index} type="default" href={value} className="ml-2">
+                {key}
               </Button>
             ))}
         </div>
@@ -117,9 +112,10 @@ const getTypes = (t1: EventType[], t2?: EventType[]) => {
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getLimitation = (event: FbEvent) => {
+const getLimitation = (event: IEvent) => {
   return (
-    event.limitations
+    event.subEvents
+      .reduce((acc, curr) => [...acc, ...curr.limitations], [] as string[])
       .filter((limitation) => !!limitation)
       .map((type) => limitations.find((lt) => lt.value === type)?.label) || []
   );

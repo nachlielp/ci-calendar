@@ -11,22 +11,18 @@ import {
   InputNumber,
   Row,
   Select,
-  Switch,
   TimePicker,
 } from "antd";
-// import { v4 as uuidv4 } from "uuid";
-
-const { RangePicker } = DatePicker;
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { SetStateAction, useState } from "react";
-// import { RangePickerProps } from "antd/es/date-picker";
+import { v4 as uuidv4 } from "uuid";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { disabledDate } from "./SimpleEventForm";
 import { limitations, eventTypes, districts } from "../../util/options";
+import { checkInvalidData } from "../../util/helpers";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -43,6 +39,30 @@ const formItemLayout = {
     sm: { span: 14 },
   },
 };
+
+interface ISubEvent {
+  price: number;
+  endTime: string;
+  type: string;
+  startTime: string;
+  teacher: string;
+  limitations: string[];
+}
+
+export interface IEvent {
+  description: string;
+  subEvents: ISubEvent[];
+  address: string;
+  price: number;
+  updatedAt: string;
+  title: string;
+  links: Record<string, string>;
+  createdAt: string;
+  id: string;
+  owners: string[];
+  hideEvent: boolean;
+  district: string;
+}
 
 export default function EventForm() {
   const navigate = useNavigate();
@@ -61,47 +81,65 @@ export default function EventForm() {
     navigate("/");
   }
   const [form] = Form.useForm();
-  const [isSingleDay, setIsSingleDay] = useState(true);
-  const [isRequiredRegistration, setIsRequiredRegistration] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState(dayjs());
-  const [isSubFields, setIsSubFields] = useState(false);
 
   const handleDateChange = (date: SetStateAction<dayjs.Dayjs>) => {
     setSelectedDate(date);
   };
-  const onSwitchSingleDayChange = (checked: boolean) => {
-    setIsSingleDay(checked);
-  };
-  const onSwitchRegistrationChange = (checked: boolean) => {
-    setIsRequiredRegistration(checked);
-  };
 
   const handleSubmit = async (values: any) => {
     console.log("EventForm.handleSubmit.values: ", values);
-    // const event: DbBasicEvent = {
-    //   id: uuidv4(),
-    //   createdAt: dayjs().toISOString(),
-    //   updatedAt: dayjs().toISOString(),
-    //   title: values["event-title"],
-    //   description: values["event-description"] || "",
-    //   types: values["event-types"],
-    //   startTime: values["event-time"][0],
-    //   endTime: values["event-time"][1],
-    //   owners: [currentUser.id],
-    //   linkToEvent: values["link-to-event"],
-    //   linkToPayment: values["link-to-pay"],
-    //   limitations: values["event-limitations"],
-    //   address: values["address"],
-    //   hideEvent: false,
-    //   subEvents: values["sub-events"],
-    //   district: values["district"],
-    //   registration: values["is-registration-required"],
-    //   linkToRegistration: values["link-to-registration"] || "",
-    // };
+    const linksObject = values["links"].reduce(
+      (
+        acc: Record<string, string>,
+        item: { "link-title": string; link: string }
+      ) => {
+        acc[item["link-title"]] = item.link;
+        return acc;
+      },
+      {}
+    );
+    const subEvents = [
+      {
+        startTime: dayjs(values["event-time"][0]).toISOString(),
+        endTime: dayjs(values["event-time"][1]).toISOString(),
+        type: values["event-types"],
+        price: values["event-price"],
+        limitations: values["event-limitations"],
+        teacher: values["event-teacher"],
+      },
+    ];
+    if (values["sub-events"]) {
+      values["sub-events"].forEach((subEvent: any) =>
+        subEvents.push({
+          type: subEvent.type,
+          price: subEvent.price,
+          limitations: subEvent.limitations,
+          teacher: subEvent.teacher,
+          startTime: dayjs(subEvent.time[0]).toISOString(),
+          endTime: dayjs(subEvent.time[1]).toISOString(),
+        })
+      );
+    }
+
+    const event: IEvent = {
+      id: uuidv4(),
+      address: values["address"],
+      createdAt: dayjs().toISOString(),
+      updatedAt: dayjs().toISOString(),
+      title: values["event-title"],
+      description: values["event-description"] || "",
+      owners: [currentUser.id],
+      links: linksObject,
+      price: values["total-price"],
+      hideEvent: false,
+      subEvents: subEvents,
+      district: values["district"],
+    };
+    checkInvalidData(event);
     try {
-      // console.log("EventForm.handleSubmit.event: ", event);
-      // const res = await authContext.createEvent(event);
-      // console.log(`EventForm.handleSubmit.res: `, res);
+      await authContext.createEvent(event);
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }
@@ -124,10 +162,10 @@ export default function EventForm() {
           ],
           "event-limitations": [limitations[0].value],
         }}
-        onValuesChange={(_, allValues) => {
-          const subEvents = allValues["sub-events"] || [];
-          setIsSubFields(subEvents.length > 0);
-        }}
+        // onValuesChange={(_, allValues) => {
+        //   const subEvents = allValues["sub-events"] || [];
+        //   setIsSubFields(subEvents.length > 0);
+        // }}
       >
         <Card className="mt-4 border-4">
           <Form.Item
@@ -171,7 +209,6 @@ export default function EventForm() {
               minDate={dayjs()}
               maxDate={dayjs().add(1, "year")}
               onChange={handleDateChange}
-              // defaultValue={dayjs.tz(dayjs(), "Asia/Jerusalem")}
             />
           </Form.Item>
         </Card>
@@ -226,7 +263,7 @@ export default function EventForm() {
           </Row>
           <Row gutter={10} align="middle">
             <Col md={24} xs={24}>
-              <Form.Item label="מחיר" name="price">
+              <Form.Item label="מחיר" name="event-price">
                 <InputNumber addonAfter="₪" />
               </Form.Item>
             </Col>
@@ -237,6 +274,18 @@ export default function EventForm() {
             <>
               {fields.map(({ key, name, ...restField }) => (
                 <Card className="mt-4 border-2" key={key}>
+                  {/* <Row gutter={10} align="middle">
+                    <Col md={24} xs={24}>
+                      <Form.Item
+                        className="w-full"
+                        {...restField}
+                        label="כותרת משנית"
+                        name={[name, "title"]}
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  </Row> */}
                   <Row gutter={10} align="middle">
                     <Col md={24} xs={24}>
                       <Form.Item
@@ -345,7 +394,8 @@ export default function EventForm() {
                         label="קישור"
                         name={[name, "link"]}
                         rules={[
-                          { required: true, type: "url", warningOnly: true },
+                          { required: true, message: "שדה חובה" },
+                          { type: "url", warningOnly: true },
                         ]}
                       >
                         <Input />
@@ -374,7 +424,7 @@ export default function EventForm() {
           )}
         </Form.List>
         <Card className="mt-4 border-4">
-          <Form.Item className="mt-4" label="מחיר כולל" name="price">
+          <Form.Item className="mt-4" label="מחיר כולל" name="total-price">
             <InputNumber addonAfter="₪" />
           </Form.Item>
 

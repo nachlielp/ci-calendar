@@ -47,6 +47,7 @@ export interface FbEvent {
   links: Array<{ [key: string]: string }>;
   limitations: string[];
   owners: string[];
+  price: number;
   subEvents: {
     [key: number]: {
       startTime: string;
@@ -156,9 +157,12 @@ export default class Firebase {
   }
 
   async addEvent(eventData: Record<string, any>): Promise<void> {
+    console.log("Firebase.addEvent.eventData: ", eventData);
+
     try {
       const eventRef = doc(this.db, "events", eventData.id);
-      await setDoc(eventRef, eventData);
+      const res = await setDoc(eventRef, eventData);
+      console.log("Firebase.addEvent.res: ", res);
     } catch (error) {
       console.error("Firebase.addEvent.e: ", error);
       throw error;
