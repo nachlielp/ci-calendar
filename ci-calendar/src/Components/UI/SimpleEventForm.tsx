@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { DbSimpleEvent, UserType } from "../../../drizzle/schema";
+import { DbSimpleEvent } from "../../../drizzle/schema";
 import { useAuthContext } from "../Auth/AuthContext";
 import {
   Button,
