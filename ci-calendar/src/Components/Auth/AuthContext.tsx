@@ -25,8 +25,15 @@ interface IAuthContextType {
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
 
+// export function useAuthContext() {
+//   return useContext(AuthContext);
+// }
 export function useAuthContext() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuthContext must be used within a AuthProvider");
+  }
+  return context;
 }
 
 interface AuthProviderProps {

@@ -66,14 +66,11 @@ export interface IEvent {
 
 export default function EventForm() {
   const navigate = useNavigate();
-  const authContext = useAuthContext();
-  if (!authContext) {
-    throw new Error("AuthContext is null, make sure you're within a Provider");
-  }
-  const { currentUser } = authContext;
+  const { currentUser, createEvent } = useAuthContext();
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
+
   if (
     currentUser.userType !== UserType.admin &&
     currentUser.userType !== UserType.teacher
@@ -139,7 +136,7 @@ export default function EventForm() {
     };
     checkInvalidData(event);
     try {
-      await authContext.createEvent(event);
+      await createEvent(event);
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }

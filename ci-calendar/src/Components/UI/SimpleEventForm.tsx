@@ -43,11 +43,7 @@ const formItemLayout = {
 
 export default function SimpleEventForm() {
   const navigate = useNavigate();
-  const authContext = useAuthContext();
-  if (!authContext) {
-    throw new Error("AuthContext is null, make sure you're within a Provider");
-  }
-  const { currentUser } = authContext;
+  const { currentUser, createEvent } = useAuthContext();
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -88,10 +84,10 @@ export default function SimpleEventForm() {
       p2_total_price: addPartTwo ? values["total-price"] : "",
     };
     try {
-      const res = await authContext.createSimpleEvent(event);
+      // const res = await createEvent(event);
       navigate("/teacher");
       //TODO if res returned with error, show error message and dont update state
-      console.log(`EventForm.handleSubmit.res: `, res);
+      // console.log(`EventForm.handleSubmit.res: `, res);
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }

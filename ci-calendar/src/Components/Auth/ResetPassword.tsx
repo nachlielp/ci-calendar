@@ -3,11 +3,10 @@ import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { useAuthContext } from "./AuthContext";
 
 function ResetPassword() {
-  const authContext = useAuthContext();
-  if (!authContext) {
+  const { resetPassword } = useAuthContext();
+  if (!resetPassword) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }
-  const { resetPassword } = authContext;
   const emailRef = useRef<InputRef>(null);
 
   const [loading, setLoading] = useState<boolean>(false);

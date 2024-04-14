@@ -11,11 +11,7 @@ enum SignupError {
 }
 
 export default function Signup() {
-  const authContext = useAuthContext();
-  if (!authContext) {
-    throw new Error("AuthContext is null, make sure you're within a Provider");
-  }
-  const { currentUser, signup, googleLogin } = authContext;
+  const { currentUser, signup, googleLogin } = useAuthContext();
   const nameRef = useRef<InputRef>(null);
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);

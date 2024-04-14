@@ -13,11 +13,7 @@ import { DbUser } from "../../../drizzle/schema";
 import FilterModel from "./FilterModel";
 
 export default function Header() {
-  const authContext = useAuthContext();
-  if (!authContext) {
-    throw new Error("AuthContext is null, make sure you're within a Provider");
-  }
-  const { currentUser, logout } = authContext;
+  const { currentUser, logout } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
 

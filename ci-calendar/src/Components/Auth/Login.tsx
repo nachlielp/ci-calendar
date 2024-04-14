@@ -11,11 +11,10 @@ enum LoginError {
 }
 
 export default function Login() {
-  const authContext = useAuthContext();
-  if (!authContext) {
+  const { googleLogin, emailLogin } = useAuthContext();
+  if (!googleLogin || !emailLogin) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }
-  const { googleLogin, emailLogin } = authContext;
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);
   const [error, setError] = useState<LoginError>(LoginError.none);

@@ -11,11 +11,8 @@ export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
   requiredRoles: requiredRoles,
 }) => {
   console.log("PrivateRoutes.requiredRoles: ", requiredRoles);
-  const authContext = useAuthContext();
-  if (!authContext) {
-    throw new Error("AuthContext is null, make sure you're within a Provider");
-  }
-  const { currentUser, loading } = authContext;
+  const { currentUser, loading } = useAuthContext();
+
   if (loading) {
     return <div>Loading...</div>;
   }
