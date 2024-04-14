@@ -7,14 +7,17 @@ import { MdOutlineDescription } from "react-icons/md";
 import { limitations, eventTypes } from "../../util/options";
 import dayjs from "dayjs";
 import React from "react";
+import { FbEvent } from "../../Firebase";
 
 interface IEventCard {
-  event: DbSimpleEvent;
+  event: FbEvent;
   cardWidth: number;
   screenWidth: number;
 }
 export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
   ({ event, cardWidth, screenWidth }, ref) => {
+    // console.log("EventCard.event: ", event);
+    const subEventLen = Object.values(event.subEvents).length;
     return (
       <Card
         ref={ref}
@@ -27,12 +30,16 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
           >
             <span className="block">{event.title}&nbsp;</span>
             <span className="block">
-              {getTypes(event.types, event.p2_types).map((type, index) => (
+              {getTypes(
+                Object.values(event.subEvents).flatMap(
+                  (subEvent) => subEvent.types as EventType[]
+                )
+              ).map((type, index) => (
                 <Tag color="blue" key={`type-${index}`}>
                   {type}
                 </Tag>
               ))}
-              {getLimitation(event)?.length > 0
+              {getLimitation(event).length > 0
                 ? getLimitation(event).map((limitation, index) => (
                     <Tag key={`limitation-${index}`} color="green">
                       {limitation}
@@ -46,32 +53,38 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
       >
         <p className="flex items-center">
           <CiCalendarDate className="ml-2" />
-          {dayjs(event.startTime).format("HH:mm")}-
-          {event.p2_endTime
-            ? dayjs(event.p2_endTime).format("HH:mm")
-            : dayjs(event.endTime).format("HH:mm")}{" "}
-          {dayjs(event.startTime).format("DD-MM")}
+          {subEventLen > 0 ? (
+            <>
+              {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
+              {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
+              {dayjs(event.subEvents[0].startTime).format("DD-MM")}
+            </>
+          ) : (
+            <span>No event times available</span>
+          )}
         </p>
-        {event.p2_endTime && (
-          <>
-            <span className="block mr-6">
-              {getTypes(event.types)}&nbsp;&nbsp;
-              {dayjs(event.endTime).format("HH:mm")}&nbsp;-&nbsp;
-              {dayjs(event.startTime).format("HH:mm")}
-            </span>
-            <span className="block mr-6">
-              {getTypes(event.p2_types)}&nbsp;&nbsp;
-              {dayjs(event.p2_endTime).format("HH:mm")}-{" "}
-              {dayjs(event.p2_startTime).format("HH:mm")}
-            </span>
-          </>
-        )}
+        {subEventLen > 1 &&
+          Object.values(event.subEvents).map((subEvent, index) => (
+            <>
+              <span className="block mr-6">
+                {subEvent.subTitle}&nbsp;&nbsp; עם
+                {subEvent.teachers.map((teacher, index) => (
+                  <p key={index}>{teacher} |</p>
+                ))}
+                {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
+                {dayjs(subEvent.startTime).format("HH:mm")}
+              </span>
+            </>
+          ))}
         <p className="flex items-center">
           <FaMapMarkedAlt className="ml-2" />
           {event.address}
         </p>
         <p className="flex items-center">
-          <UserOutlined className="ml-2" /> {event.teachers}
+          <UserOutlined className="ml-2" />{" "}
+          {Object.values(event.subEvents).flatMap(
+            (subEvent) => subEvent.teachers as string[]
+          )}
         </p>
         {!isWhiteSpace(event.description) && (
           <p className="flex items-center">
@@ -80,25 +93,17 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
           </p>
         )}
         <div style={{ marginTop: 16 }}>
-          {event.linkToEvent && (
-            <Button type="default" href={event.linkToEvent} className="ml-2">
-              פרטים נוספים
-            </Button>
-          )}
-          {event.linkToRegistration && (
-            <Button
-              type="default"
-              href={event.linkToRegistration}
-              className="ml-2"
-            >
-              להרשמה
-            </Button>
-          )}
-          {event.linkToPayment && (
-            <Button type="default" href={event.linkToPayment} className="ml-2">
-              לתשלום
-            </Button>
-          )}
+          {event.links &&
+            event.links.map((link, index) => (
+              <Button
+                key={index}
+                type="default"
+                href={link.value}
+                className="ml-2"
+              >
+                {link.key}
+              </Button>
+            ))}
         </div>
       </Card>
     );
@@ -112,7 +117,7 @@ const getTypes = (t1: EventType[], t2?: EventType[]) => {
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getLimitation = (event: DbSimpleEvent) => {
+const getLimitation = (event: FbEvent) => {
   return (
     event.limitations
       .filter((limitation) => !!limitation)

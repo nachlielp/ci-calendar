@@ -17,13 +17,17 @@ import SimpleEventForm from "./Components/UI/SimpleEventForm";
 import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
 import TeacherEvents from "./Components/UI/TeacherEvents";
+import EventForm from "./Components/UI/EventForm";
 
 export default function App() {
   const [firebase, setFirebase] = useState<Firebase | null>(null);
 
   useEffect(() => {
-    const fbInstance = new Firebase();
-    setFirebase(fbInstance);
+    const initFirebase = async () => {
+      const fbInstance = new Firebase();
+      setFirebase(fbInstance);
+    };
+    initFirebase();
   }, []);
 
   if (!firebase) {
@@ -34,7 +38,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-200 flex justify-center">
       <div className="w-full sm:w-11/12 md:max-w-screen-md bg-homepage-bg">
         <BrowserRouter>
-          <AuthProvider firebase={firebase}>
+          <AuthProvider firebase={firebase!}>
             <Header />
             <Routes>
               <Route path="signup" element={<Signup />} />
@@ -43,7 +47,17 @@ export default function App() {
               <Route path="reset-password" element={<ResetPassword />} />
               <Route path="/home" element={<HomePage />} />
               {/* User privet routes */}
-              <Route element={<PrivateRoutes />}>
+              <Route
+                element={
+                  <PrivateRoutes
+                    requiredRoles={[
+                      UserType.admin,
+                      UserType.teacher,
+                      UserType.user,
+                    ]}
+                  />
+                }
+              >
                 <Route path="/user" element={<UserPage />} />
               </Route>
 
@@ -56,6 +70,7 @@ export default function App() {
                   />
                 }
               >
+                <Route path="/test" element={<EventForm />} />
                 <Route path="/teacher" element={<TeacherPage />} />
                 <Route path="/event-form" element={<SimpleEventForm />} />
                 <Route path="/edit-events" element={<TeacherEvents />} />

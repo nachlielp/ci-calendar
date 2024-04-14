@@ -26,6 +26,7 @@ export interface DbUser {
   receiveWeeklyEmails: boolean;
   linkToImage: string;
   linkToPage: string;
+  // events: string[];
 }
 
 export enum EventType {

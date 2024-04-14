@@ -12,6 +12,9 @@ function TeacherPage() {
       <LinkButton to="/event-form" className="w-24 h-24 m-4">
         הוסף אירוע
       </LinkButton>
+      <LinkButton to="/test" className="w-24 h-24 m-4">
+        test{" "}
+      </LinkButton>
     </div>
   );
 }

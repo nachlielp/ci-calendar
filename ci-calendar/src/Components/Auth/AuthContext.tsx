@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
-import Firebase from "../../Firebase";
+import Firebase, { FbEvent } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
 import {
   getSimpleEvents,
@@ -29,10 +29,9 @@ interface IAuthContextType {
   emailLogin: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
-  githubLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
   createSimpleEvent: (event: DbSimpleEvent) => Promise<{ success: boolean }>;
-  getAllEvents: () => Promise<DbSimpleEvent[]>;
+  getAllEvents: () => Promise<FbEvent[]>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -56,7 +55,10 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       signupData.email,
       signupData.password
     );
-    await createUserInDb({ ...signupRes.user, displayName: signupData.name });
+    await getOrCreateDbUserByUser({
+      ...signupRes.user,
+      displayName: signupData.name,
+    });
     return signupRes;
   }
   async function emailLogin(email: string, password: string) {
@@ -67,65 +69,41 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     return firebase.logout();
   }
   async function googleLogin() {
-    await firebase.loginWithGoogle();
+    const res = await firebase.loginWithGoogle();
+    console.log("AuthContext.googleLogin.res: ", res);
   }
-  async function githubLogin() {
-    const res = await firebase.loginWithGithub();
-    if (res) {
-      onUserLogin(res);
-    }
-  }
+
   function resetPassword(email: string) {
     return firebase.resetPassword(email);
   }
 
   async function getOrCreateDbUserByUser(user: User) {
     try {
-      const userRes = await getUserByUid(user.uid);
-      if (userRes === undefined) {
-        await createUserInDb(user);
+      const userRes = await firebase.getUserByUid(user.uid);
+      console.log(`AuthContext.getOrCreateDbUserByUser.userRes:`, userRes);
+      if (userRes === null) {
+        console.log(`AuthContext.getOrCreateDbUserByUser.userRes:`, userRes);
+        await firebase.addUser(user);
       }
-      const userType = userRes?.userType as UserType;
       if (userRes) {
-        const userObj: DbUser = { ...userRes, userType: userType };
-        setCurrentUser(userObj);
+        const dbUser: DbUser = {
+          id: userRes.id,
+          name: userRes.name,
+          userType: userRes.userType as UserType,
+          email: userRes.email,
+          bio: userRes.bio || "",
+          receiveWeeklyEmails: userRes.receiveWeeklyEmails || false,
+          linkToImage: userRes.linkToImage || "",
+          linkToPage: userRes.linkToPage || "",
+          createdAt: userRes.createdAt,
+          updatedAt: userRes.updatedAt,
+        };
+        console.log(`AuthContext.getOrCreateDbUserByUser.dbUser:`, dbUser);
+        setCurrentUser(dbUser);
         navigate(`/`);
       }
     } catch (error) {
-      console.error(`AuthContext.onUserLogin error:`, error);
-    }
-  }
-
-  async function createUserInDb(user: User) {
-    try {
-      const userObj: DbUser = {
-        id: user.uid,
-        name: user.displayName || "",
-        userType: UserType.user,
-        email: user.email || "",
-        bio: "",
-        receiveWeeklyEmails: false,
-        linkToImage: "",
-        linkToPage: "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      const userRes = await insertUser(userObj);
-
-      if (userRes) {
-        setCurrentUser(userRes);
-        navigate(`/`);
-      }
-    } catch (error) {
-      console.error(`AuthContext.onUserLogin.insertUser error:`, error);
-    }
-  }
-
-  async function onUserLogin(res: UserCredential) {
-    try {
-      await getOrCreateDbUserByUser(res.user);
-    } catch (error) {
-      console.error(`AuthContext.onUserLogin error:`, error);
+      console.error(`AuthContext.getOrCreateDbUserByUser error:`, error);
     }
   }
 
@@ -141,9 +119,16 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     return unsubscribe;
   }, []);
 
+  //TODO Update type
   async function createSimpleEvent(
     event: DbSimpleEvent
   ): Promise<{ success: boolean }> {
+    try {
+      await firebase.addEvent(event);
+    } catch (error) {
+      console.error(`AuthContext.createSimpleEvent error:`, error);
+      throw error;
+    }
     try {
       const eventRes = await insertSimpleEvent(event);
       return eventRes;
@@ -153,36 +138,19 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     }
   }
 
-  async function getAllEvents(): Promise<DbSimpleEvent[]> {
+  async function getAllEvents(): Promise<FbEvent[]> {
     const startDate = dayjs().startOf("day").toISOString();
     try {
-      const events = await getSimpleEvents(startDate);
-      if (events) {
-        return events.map((event) => ({
-          ...event,
-          types:
-            event.types.split(",").map((type) => type.trim() as EventType) ||
-            [],
-          p2_types:
-            event.p2_types
-              ?.split(",")
-              .map((type) => type.trim() as EventType) || [],
-          owners: event.owners.split(",") || [],
-          teachers: event.teachers || "",
-          limitations: event.limitations?.split(",") || [],
-          linkToEvent: event.linkToEvent || "",
-          linkToPayment: event.linkToPayment || "",
-          district: event.district as District,
-          hideEvent: event.hideEvent || false,
-          linkToRegistration: event.linkToRegistration || "",
-          price: event.price || NaN,
-          p2_startTime: event.p2_startTime || "",
-          p2_endTime: event.p2_endTime || "",
-          p2_price: event.p2_price || NaN,
-          p2_total_price: event.p2_total_price || NaN,
-        }));
-      }
-      return [];
+      const eventsRes = await firebase.getEventsAfter(
+        dayjs().subtract(7, "day").toDate()
+      );
+    } catch (error) {
+      console.error(`AuthContext.getAllEvents error:`, error);
+      throw error;
+    }
+    try {
+      const fbEvents = await firebase.getAllEvents();
+      return fbEvents;
     } catch (error) {
       console.error(`AuthContext.getAllEvents error:`, error);
       throw error;
@@ -195,7 +163,6 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     emailLogin,
     logout,
     googleLogin,
-    githubLogin,
     resetPassword,
     createSimpleEvent,
     getAllEvents,

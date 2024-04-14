@@ -10,6 +10,7 @@ interface PrivateRoutesProps {
 export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
   requiredRoles: requiredRoles,
 }) => {
+  console.log("PrivateRoutes.requiredRoles: ", requiredRoles);
   const authContext = useAuthContext();
   if (!authContext) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
@@ -22,7 +23,7 @@ export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
   if (!currentUser) {
     return <Navigate to="/login" />;
   }
-
+  console.log("PrivateRoutes.currentUser: ", currentUser);
   if (requiredRoles && !requiredRoles.includes(currentUser.userType)) {
     return <Navigate to="/" />;
   }

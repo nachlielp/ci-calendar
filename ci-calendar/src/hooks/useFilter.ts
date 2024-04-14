@@ -1,12 +1,19 @@
 import { useSearchParams } from "react-router-dom";
-import { DbSimpleEvent } from "../../drizzle/schema";
+import { FbEvent } from "../Firebase";
 
-export const useFilter = (events: DbSimpleEvent[]) => {
+export const useFilter = (events: FbEvent[]) => {
   const [searchParams] = useSearchParams();
   const eventTypes = searchParams.getAll("eventType");
   const districts = searchParams.getAll("district");
 
   const filteredEvents = events.filter((event) => {
+    const eventTypeList = Array.from(
+      new Set(
+        Object.values(event.subEvents).flatMap(
+          (subEvent: { types: string[] }) => subEvent.types
+        )
+      )
+    );
     if (eventTypes.length === 0 && districts.length === 0) {
       return true;
     }
@@ -14,11 +21,11 @@ export const useFilter = (events: DbSimpleEvent[]) => {
       return hasOverlap(districts, [event.district]);
     }
     if (districts.length === 0) {
-      return hasOverlap(eventTypes, [...event.types, ...event.p2_types]);
+      return hasOverlap(eventTypes, eventTypeList);
     }
     return (
       hasOverlap(districts, [event.district]) &&
-      hasOverlap(eventTypes, [...event.types, ...event.p2_types])
+      hasOverlap(eventTypes, eventTypeList)
     );
   });
   return filteredEvents;

@@ -1,11 +1,12 @@
 import React from "react";
 import VirtualList from "rc-virtual-list";
-import { DbSimpleEvent } from "../../../drizzle/schema";
 import { EventCard } from "./EventCard";
 import { useWindowResize } from "../../hooks/useWindowResize";
+import { FbEvent } from "../../Firebase";
+import ErrorBoundary from "../ErrorBoudary";
 
 interface IEventsList {
-  events: DbSimpleEvent[];
+  events: FbEvent[];
 }
 const EventsList: React.FC<IEventsList> = ({ events }) => {
   const { height, width } = useWindowResize();
@@ -19,13 +20,15 @@ const EventsList: React.FC<IEventsList> = ({ events }) => {
       itemHeight={47}
       itemKey="id"
     >
-      {(event: DbSimpleEvent) => (
-        <EventCard
-          key={event.id}
-          event={event}
-          cardWidth={adjustedItemWidth}
-          screenWidth={width}
-        />
+      {(event: FbEvent) => (
+        <ErrorBoundary>
+          <EventCard
+            key={event.id}
+            event={event}
+            cardWidth={adjustedItemWidth}
+            screenWidth={width}
+          />
+        </ErrorBoundary>
       )}
     </VirtualList>
   );
