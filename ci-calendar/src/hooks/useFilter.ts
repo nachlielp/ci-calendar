@@ -1,12 +1,15 @@
 import { useSearchParams } from "react-router-dom";
 import { IEvent } from "../Components/UI/EventForm";
 
-export const useFilter = (events: IEvent[]) => {
+export const useFilter = (events: IEvent[], uid?: string) => {
   const [searchParams] = useSearchParams();
   const eventTypes = searchParams.getAll("eventType");
   const districts = searchParams.getAll("district");
-
-  const filteredEvents = events.filter((event) => {
+  let filteredEvents = events;
+  if (uid) {
+    filteredEvents = events.filter((event) => event.owners.includes(uid));
+  }
+  filteredEvents = events.filter((event) => {
     const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
     if (eventTypes.length === 0 && districts.length === 0) {
       return true;

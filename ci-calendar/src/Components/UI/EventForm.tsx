@@ -22,7 +22,6 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { limitations, eventTypes, districts } from "../../util/options";
-import { checkInvalidData } from "../../util/helpers";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -134,7 +133,6 @@ export default function EventForm() {
       subEvents: subEvents,
       district: values["district"],
     };
-    // checkInvalidData(event);
     try {
       await createEvent(event);
     } catch (error) {
@@ -159,10 +157,6 @@ export default function EventForm() {
           ],
           "event-limitations": [limitations[0].value],
         }}
-        // onValuesChange={(_, allValues) => {
-        //   const subEvents = allValues["sub-events"] || [];
-        //   setIsSubFields(subEvents.length > 0);
-        // }}
       >
         <Card className="mt-4 border-4">
           <Form.Item
@@ -271,18 +265,6 @@ export default function EventForm() {
             <>
               {fields.map(({ key, name, ...restField }) => (
                 <Card className="mt-4 border-2" key={key}>
-                  {/* <Row gutter={10} align="middle">
-                    <Col md={24} xs={24}>
-                      <Form.Item
-                        className="w-full"
-                        {...restField}
-                        label="כותרת משנית"
-                        name={[name, "title"]}
-                      >
-                        <Input />
-                      </Form.Item>
-                    </Col>
-                  </Row> */}
                   <Row gutter={10} align="middle">
                     <Col md={24} xs={24}>
                       <Form.Item

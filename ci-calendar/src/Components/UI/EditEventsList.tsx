@@ -5,11 +5,18 @@ import { IEvent } from "./EventForm";
 import { EventCard } from "./EventCard";
 import { useFilter } from "../../hooks/useFilter";
 import { useEventsContext } from "../EventsProvider";
+import { useAuthContext } from "../Auth/AuthContext";
 
 const EditEventsList = () => {
   const { height, width } = useWindowResize();
   const { events } = useEventsContext();
-  const filteredEvents = useFilter(events);
+  const { currentUser } = useAuthContext();
+  let filteredEvents;
+  if (currentUser?.userType === "admin") {
+    filteredEvents = useFilter(events);
+  } else {
+    filteredEvents = useFilter(events, currentUser?.id);
+  }
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);
   return (
