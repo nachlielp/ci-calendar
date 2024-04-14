@@ -16,7 +16,6 @@ import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
 import EventForm from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
-import EditEventsList from "./Components/UI/EditEventsList";
 import EditEventsContainer from "./Components/UI/EditEventsContainer";
 
 export default function App() {
