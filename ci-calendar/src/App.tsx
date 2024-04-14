@@ -10,13 +10,14 @@ import Signup from "./Components/Auth/Signup";
 import Login from "./Components/Auth/Login";
 import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
-import HomePage from "./Components/HomePage";
 import Header from "./Components/UI/Header";
 import { UserType } from "../drizzle/schema";
 import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
-import TeacherEvents from "./Components/UI/TeacherEvents";
 import EventForm from "./Components/UI/EventForm";
+import EventsList from "./Components/UI/EventsList";
+import EditEventsList from "./Components/UI/EditEventsList";
+import EditEventsContainer from "./Components/UI/EditEventsContainer";
 
 export default function App() {
   const [firebase, setFirebase] = useState<Firebase | null>(null);
@@ -44,7 +45,7 @@ export default function App() {
               <Route path="login" element={<Login />} />
 
               <Route path="reset-password" element={<ResetPassword />} />
-              <Route path="/home" element={<HomePage />} />
+              <Route path="/home" element={<EventsList />} />
               {/* User privet routes */}
               <Route
                 element={
@@ -72,7 +73,7 @@ export default function App() {
                 <Route path="/test" element={<EventForm />} />
                 <Route path="/teacher" element={<TeacherPage />} />
                 <Route path="/event-form" element={<EventForm />} />
-                <Route path="/edit-events" element={<TeacherEvents />} />
+                <Route path="/edit-events" element={<EditEventsContainer />} />
               </Route>
 
               {/* Admin privet routes */}
@@ -81,7 +82,7 @@ export default function App() {
               >
                 {/* <Route path="/event-form" element={<EventForm />} /> */}
               </Route>
-              <Route path="*" element={<HomePage />} />
+              <Route path="*" element={<EventsList />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

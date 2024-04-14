@@ -19,6 +19,7 @@ interface IAuthContextType {
   googleLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
   createEvent: (event: IEvent) => Promise<void>;
+  deleteEvent: (eventId: string) => Promise<void>;
   getAllEvents: () => Promise<IEvent[]>;
 }
 
@@ -91,7 +92,6 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
           createdAt: userRes.createdAt,
           updatedAt: userRes.updatedAt,
         };
-        console.log(`AuthContext.getOrCreateDbUserByUser.dbUser:`, dbUser);
         setCurrentUser(dbUser);
         navigate(`/`);
       }
@@ -120,13 +120,6 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       console.error(`AuthContext.createEvent error:`, error);
       throw error;
     }
-    // try {
-    //   const eventRes = await insertSimpleEvent(event);
-    //   return eventRes;
-    // } catch (error) {
-    //   console.error(`AuthContext.createEvent error:`, error);
-    //   throw error;
-    // }
   }
 
   async function getAllEvents(): Promise<IEvent[]> {
@@ -147,6 +140,10 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       throw error;
     }
   }
+
+  async function deleteEvent(eventId: string) {
+    await firebase.deleteEvent(eventId);
+  }
   const value = {
     currentUser,
     loading,
@@ -157,6 +154,7 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     resetPassword,
     createEvent,
     getAllEvents,
+    deleteEvent,
   };
   //
   return (

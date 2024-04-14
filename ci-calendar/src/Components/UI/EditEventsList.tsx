@@ -1,15 +1,14 @@
-import React from "react";
 import VirtualList from "rc-virtual-list";
-import { EventCard } from "./EventCard";
 import { useWindowResize } from "../../hooks/useWindowResize";
 import ErrorBoundary from "./ErrorBoundary";
 import { IEvent } from "./EventForm";
+import { EventCard } from "./EventCard";
 import { useFilter } from "../../hooks/useFilter";
-import { useEvents } from "../../hooks/useEvent";
+import { useEventsContext } from "../EventsProvider";
 
-const EventsList: React.FC = () => {
+const EditEventsList = () => {
   const { height, width } = useWindowResize();
-  const events = useEvents();
+  const { events } = useEventsContext();
   const filteredEvents = useFilter(events);
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);
@@ -28,12 +27,11 @@ const EventsList: React.FC = () => {
             event={event}
             cardWidth={adjustedItemWidth}
             screenWidth={width}
-            isEdit={false}
+            isEdit={true}
           />
         </ErrorBoundary>
       )}
     </VirtualList>
   );
 };
-
-export default EventsList;
+export default EditEventsList;

@@ -8,15 +8,21 @@ import { limitations, eventTypes } from "../../util/options";
 import dayjs from "dayjs";
 import React from "react";
 import { IEvent } from "./EventForm";
+import DeleteEvent from "./DeleteEvent";
+import EditEvent from "./EditEvent";
 
 interface IEventCard {
   event: IEvent;
   cardWidth: number;
   screenWidth: number;
+  isEdit: boolean;
 }
 export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
-  ({ event, cardWidth, screenWidth }, ref) => {
+  ({ event, cardWidth, screenWidth, isEdit }, ref) => {
     const subEventLen = Object.values(event.subEvents).length;
+    const footer = isEdit
+      ? [<DeleteEvent eventId={event.id} />, <EditEvent />]
+      : [];
     return (
       <Card
         ref={ref}
@@ -49,6 +55,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
           </span>
         }
         style={{ width: cardWidth }}
+        actions={footer}
       >
         <p className="flex items-center">
           <CiCalendarDate className="ml-2" />

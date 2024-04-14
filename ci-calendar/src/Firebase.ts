@@ -22,6 +22,7 @@ import {
   orderBy,
   getDocs,
   where,
+  deleteDoc,
 } from "firebase/firestore";
 import { UserType } from "../drizzle/schema";
 interface FirebaseConfig {
@@ -138,6 +139,16 @@ export default class Firebase {
       console.log("Firebase.addEvent.res: ", res);
     } catch (error) {
       console.error("Firebase.addEvent.e: ", error);
+      throw error;
+    }
+  }
+  async deleteEvent(eventId: string): Promise<void> {
+    console.log("Firebase.deleteEvent.eventId: ", eventId);
+    try {
+      const eventRef = doc(this.db, "events", eventId);
+      await deleteDoc(eventRef);
+    } catch (error) {
+      console.error("Firebase.deleteEvent.e: ", error);
       throw error;
     }
   }

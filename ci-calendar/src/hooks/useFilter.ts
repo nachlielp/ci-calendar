@@ -7,11 +7,7 @@ export const useFilter = (events: IEvent[]) => {
   const districts = searchParams.getAll("district");
 
   const filteredEvents = events.filter((event) => {
-    const eventTypeList = Array.from(
-      new Set(
-        event.subEvents.flatMap((subEvent: { type: string }) => subEvent.type)
-      )
-    );
+    const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
     if (eventTypes.length === 0 && districts.length === 0) {
       return true;
     }

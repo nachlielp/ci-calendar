@@ -134,7 +134,7 @@ export default function EventForm() {
       subEvents: subEvents,
       district: values["district"],
     };
-    checkInvalidData(event);
+    // checkInvalidData(event);
     try {
       await createEvent(event);
     } catch (error) {
