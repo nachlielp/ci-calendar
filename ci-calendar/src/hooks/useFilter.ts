@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
-import { FbEvent } from "../Firebase";
+import { IEvent } from "../Components/UI/EventForm";
 
-export const useFilter = (events: FbEvent[]) => {
+export const useFilter = (events: IEvent[]) => {
   const [searchParams] = useSearchParams();
   const eventTypes = searchParams.getAll("eventType");
   const districts = searchParams.getAll("district");
@@ -9,9 +9,7 @@ export const useFilter = (events: FbEvent[]) => {
   const filteredEvents = events.filter((event) => {
     const eventTypeList = Array.from(
       new Set(
-        Object.values(event.subEvents).flatMap(
-          (subEvent: { types: string[] }) => subEvent.types
-        )
+        event.subEvents.flatMap((subEvent: { type: string }) => subEvent.type)
       )
     );
     if (eventTypes.length === 0 && districts.length === 0) {

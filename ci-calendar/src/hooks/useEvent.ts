@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAuthContext } from "../Components/Auth/AuthContext";
-import { FbEvent } from "../Firebase";
+import { IEvent } from "../Components/UI/EventForm";
 
 export const useEvents = () => {
-  const [events, setEvents] = useState<FbEvent[]>([]);
+  const [events, setEvents] = useState<IEvent[]>([]);
   const auth = useAuthContext();
   if (!auth) {
     throw new Error("Auth context not found");

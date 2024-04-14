@@ -13,7 +13,6 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import HomePage from "./Components/HomePage";
 import Header from "./Components/UI/Header";
 import { UserType } from "../drizzle/schema";
-import SimpleEventForm from "./Components/UI/SimpleEventForm";
 import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
 import TeacherEvents from "./Components/UI/TeacherEvents";
@@ -72,7 +71,7 @@ export default function App() {
               >
                 <Route path="/test" element={<EventForm />} />
                 <Route path="/teacher" element={<TeacherPage />} />
-                <Route path="/event-form" element={<SimpleEventForm />} />
+                <Route path="/event-form" element={<EventForm />} />
                 <Route path="/edit-events" element={<TeacherEvents />} />
               </Route>
 

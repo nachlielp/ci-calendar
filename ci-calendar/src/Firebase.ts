@@ -34,33 +34,6 @@ interface FirebaseConfig {
   measurementId: string;
 }
 
-//Todo rename
-export interface FbEvent {
-  id: string;
-  title: string;
-  createdAt: string;
-  updatedAt: string;
-  address: string;
-  description: string;
-  district: string;
-  hideEvent: boolean;
-  links: Array<{ [key: string]: string }>;
-  limitations: string[];
-  owners: string[];
-  price: number;
-  subEvents: {
-    [key: number]: {
-      startTime: string;
-      endTime: string;
-      price: number;
-      teachers: string[];
-      types: string[];
-      subTitle: string;
-      restrictions: string[];
-    };
-  };
-}
-
 export default class Firebase {
   path!: string;
   firebaseConfig: FirebaseConfig;

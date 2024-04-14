@@ -91,9 +91,9 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
         )}
         <div style={{ marginTop: 16 }}>
           {event.links &&
-            Object.entries(event.links).map(([key, value], index) => (
+            Object.entries(event.links).map(([key, value]) => (
               <Button
-                key={`${key}-${value}`} // Using a combination of key and value for uniqueness
+                key={`${key}-${value}`}
                 type="default"
                 href={value}
                 className="ml-2"

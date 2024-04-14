@@ -3,7 +3,6 @@ import { User, UserCredential } from "firebase/auth";
 import Firebase from "../../Firebase";
 import { useNavigate } from "react-router-dom";
 import { DbUser, UserType } from "../../../drizzle/schema";
-import dayjs from "dayjs";
 import { IEvent } from "../UI/EventForm";
 
 export interface IUserSignup {

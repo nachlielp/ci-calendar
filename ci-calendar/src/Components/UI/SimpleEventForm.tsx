@@ -43,7 +43,7 @@ const formItemLayout = {
 
 export default function SimpleEventForm() {
   const navigate = useNavigate();
-  const { currentUser, createEvent } = useAuthContext();
+  const { currentUser } = useAuthContext();
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -84,6 +84,7 @@ export default function SimpleEventForm() {
       p2_total_price: addPartTwo ? values["total-price"] : "",
     };
     try {
+      console.log(`EventForm.handleSubmit.event: `, event);
       // const res = await createEvent(event);
       navigate("/teacher");
       //TODO if res returned with error, show error message and dont update state

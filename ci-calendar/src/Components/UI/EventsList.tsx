@@ -2,11 +2,11 @@ import React from "react";
 import VirtualList from "rc-virtual-list";
 import { EventCard } from "./EventCard";
 import { useWindowResize } from "../../hooks/useWindowResize";
-import { FbEvent } from "../../Firebase";
 import ErrorBoundary from "../ErrorBoudary";
+import { IEvent } from "./EventForm";
 
 interface IEventsList {
-  events: FbEvent[];
+  events: IEvent[];
 }
 const EventsList: React.FC<IEventsList> = ({ events }) => {
   const { height, width } = useWindowResize();
@@ -20,7 +20,7 @@ const EventsList: React.FC<IEventsList> = ({ events }) => {
       itemHeight={47}
       itemKey="id"
     >
-      {(event: FbEvent) => (
+      {(event: IEvent) => (
         <ErrorBoundary>
           <EventCard
             key={event.id}
