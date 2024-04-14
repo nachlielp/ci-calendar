@@ -55,6 +55,7 @@ export interface FbEvent {
       teachers: string[];
       types: string[];
       subTitle: string;
+      restrictions: string[];
     };
   };
 }

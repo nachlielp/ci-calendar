@@ -2,19 +2,8 @@ import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
 import Firebase, { FbEvent } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
-import {
-  getSimpleEvents,
-  getUserByUid,
-  insertSimpleEvent,
-  insertUser,
-} from "../../db";
-import {
-  DbSimpleEvent,
-  DbUser,
-  District,
-  EventType,
-  UserType,
-} from "../../../drizzle/schema";
+import { insertSimpleEvent } from "../../db";
+import { DbSimpleEvent, DbUser, UserType } from "../../../drizzle/schema";
 import dayjs from "dayjs";
 
 export interface IUserSignup {
