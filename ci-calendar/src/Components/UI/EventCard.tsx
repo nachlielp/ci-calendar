@@ -16,7 +16,6 @@ interface IEventCard {
 }
 export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
   ({ event, cardWidth, screenWidth }, ref) => {
-    console.log("EventCard.event: ", event);
     const subEventLen = Object.values(event.subEvents).length;
     return (
       <Card
@@ -35,13 +34,13 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
                   (subEvent) => subEvent.type as EventType
                 )
               ).map((type, index) => (
-                <Tag color="blue" key={`type-${index}`}>
+                <Tag color="blue" key={`${type}-${index}`}>
                   {type}
                 </Tag>
               ))}
               {getLimitation(event).length > 0
                 ? getLimitation(event).map((limitation, index) => (
-                    <Tag key={`limitation-${index}`} color="green">
+                    <Tag key={`${limitation}-${index}`} color="green">
                       {limitation}
                     </Tag>
                   ))
@@ -65,16 +64,14 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
         </p>
         {subEventLen > 1 &&
           Object.values(event.subEvents).map((subEvent, index) => (
-            <>
-              <span className="block mr-6">
-                {/* {subEvent.subTitle}&nbsp;&nbsp; עם
+            <span className="block mr-6" key={index}>
+              {/* {subEvent.subTitle}&nbsp;&nbsp; עם
                 {subEvent.teachers.map((teacher, index) => (
                   <p key={index}>{teacher} |</p>
                 ))} */}
-                {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
-                {dayjs(subEvent.startTime).format("HH:mm")}
-              </span>
-            </>
+              {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
+              {dayjs(subEvent.startTime).format("HH:mm")}
+            </span>
           ))}
         <p className="flex items-center">
           <FaMapMarkedAlt className="ml-2" />
@@ -95,7 +92,12 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
         <div style={{ marginTop: 16 }}>
           {event.links &&
             Object.entries(event.links).map(([key, value], index) => (
-              <Button key={index} type="default" href={value} className="ml-2">
+              <Button
+                key={`${key}-${value}`} // Using a combination of key and value for uniqueness
+                type="default"
+                href={value}
+                className="ml-2"
+              >
                 {key}
               </Button>
             ))}

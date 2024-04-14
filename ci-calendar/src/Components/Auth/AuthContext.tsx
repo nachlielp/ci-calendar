@@ -69,9 +69,7 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
   async function getOrCreateDbUserByUser(user: User) {
     try {
       const userRes = await firebase.getUserByUid(user.uid);
-      console.log(`AuthContext.getOrCreateDbUserByUser.userRes:`, userRes);
       if (userRes === null) {
-        console.log(`AuthContext.getOrCreateDbUserByUser.userRes:`, userRes);
         await firebase.addUser(user);
       }
       if (userRes) {
@@ -126,11 +124,11 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
   }
 
   async function getAllEvents(): Promise<IEvent[]> {
-    const startDate = dayjs().startOf("day").toISOString();
+    // const startDate = dayjs().startOf("day").toISOString();
     try {
-      const eventsRes = await firebase.getEventsAfter(
-        dayjs().subtract(7, "day").toDate()
-      );
+      // const eventsRes = await firebase.getEventsAfter(
+      //   dayjs().subtract(7, "day").toDate()
+      // );
     } catch (error) {
       console.error(`AuthContext.getAllEvents error:`, error);
       throw error;
