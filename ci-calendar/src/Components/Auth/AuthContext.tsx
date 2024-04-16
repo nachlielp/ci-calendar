@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
-import { DbUser, UserType } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
 import {
   signinGoogle,
@@ -13,7 +12,7 @@ import {
   resetEmailPassword,
   removeDocument,
 } from "../../firebase.service";
-import { IEvently } from "../../util/interfaces";
+import { DbUser, IEvently, UserType } from "../../util/interfaces";
 
 export interface IUserSignup {
   email: string;

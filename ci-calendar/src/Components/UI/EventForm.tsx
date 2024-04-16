@@ -21,8 +21,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { tagOptions, eventTypes, districtOptions } from "../../util/options";
-import { UserType } from "../../Firebase";
-import { IEvently } from "../../util/interfaces";
+import { IEvently, UserType } from "../../util/interfaces";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);

@@ -34,3 +34,28 @@ export interface IEvently {
   links: ILinks[];
   subEvents: ISubEvent[];
 }
+export enum District {
+  north = "north",
+  south = "south",
+  center = "center",
+  jerusalem = "jerusalem",
+}
+
+export enum UserType {
+  admin = "admin",
+  teacher = "teacher",
+  user = "user",
+}
+export interface DbUser {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  userType: UserType;
+  name: string;
+  email: string;
+  bio: string;
+  newsletter: boolean;
+  image: string;
+  page: string;
+  // events: string[];
+}

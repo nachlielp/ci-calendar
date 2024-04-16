@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { UserType } from "./Firebase";
 
 import { AuthProvider } from "./Components/Auth/AuthContext";
 import Signup from "./Components/Auth/Signup";
@@ -13,7 +12,7 @@ import TeacherPage from "./Components/TeacherPage";
 import EventForm from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
 import { firebaseService } from "./firebase.service";
-import { IEvently } from "./util/interfaces";
+import { IEvently, UserType } from "./util/interfaces";
 
 export default function App() {
   const [events, setEvents] = useState<IEvently[]>([]);

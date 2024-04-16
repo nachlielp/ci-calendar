@@ -10,7 +10,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import FilterModel from "./FilterModel";
-import { DbUser } from "../../Firebase";
+import { DbUser } from "../../util/interfaces";
 
 export default function Header() {
   const { currentUser, logoutContext } = useAuthContext();
