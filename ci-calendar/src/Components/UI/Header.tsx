@@ -9,11 +9,11 @@ import {
   LoginOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { DbUser } from "../../../drizzle/schema";
 import FilterModel from "./FilterModel";
+import { DbUser } from "../../Firebase";
 
 export default function Header() {
-  const { currentUser, logout } = useAuthContext();
+  const { currentUser, logoutContext } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,7 +29,7 @@ export default function Header() {
   const currentPath = location.pathname;
 
   const handleLogOut = () => {
-    logout();
+    logoutContext();
     navigate("/home");
   };
 

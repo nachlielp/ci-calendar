@@ -1,6 +1,5 @@
 import { Button, Checkbox, Form, type FormProps, Input, Card } from "antd";
-import { DbUser } from "../../../drizzle/schema";
-import { updateUserByUid } from "../../db";
+import { DbUser } from "../../Firebase";
 
 type FieldType = {
   name?: string;
@@ -13,15 +12,15 @@ interface IUserForm {
 export default function UserForm({ user }: IUserForm) {
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     const receiveWeeklyEmails = values.mailingList?.toString() === "true";
-    try {
-      const res = await updateUserByUid(user.id, {
-        name: values.name,
-        receiveWeeklyEmails: receiveWeeklyEmails,
-      });
-      console.log("UserForm.onFinish.res: ", res);
-    } catch (error) {
-      console.error("UserForm.onFinish.error: ", error);
-    }
+    // try {
+    //   const res = await updateUserByUid(user.id, {
+    //     name: values.name,
+    //     receiveWeeklyEmails: receiveWeeklyEmails,
+    //   });
+    //   console.log("UserForm.onFinish.res: ", res);
+    // } catch (error) {
+    //   console.error("UserForm.onFinish.error: ", error);
+    // }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (

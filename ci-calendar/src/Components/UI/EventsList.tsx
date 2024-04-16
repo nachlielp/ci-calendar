@@ -7,9 +7,12 @@ import { IEvent } from "./EventForm";
 import { useFilter } from "../../hooks/useFilter";
 import { useEvents } from "../../hooks/useEvent";
 
-const EventsList: React.FC = () => {
+interface IEventsList {
+  events: IEvent[];
+}
+const EventsList: React.FC<IEventsList> = ({ events }) => {
   const { height, width } = useWindowResize();
-  const events = useEvents();
+  // const events = useEvents();
   const filteredEvents = useFilter(events);
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);

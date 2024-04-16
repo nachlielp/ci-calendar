@@ -1,9 +1,20 @@
 import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
-import Firebase from "../../Firebase";
+import Firebase, { DbUser, UserType } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
-import { DbUser, UserType } from "../../../drizzle/schema";
 import { IEvent } from "../UI/EventForm";
+import {
+  firebaseService,
+  signinGoogle,
+  logout,
+  onAuthChanged,
+  getDocuments,
+  addDocument,
+  getDocument,
+  signupEmail,
+  signinEmail,
+  resetEmailPassword,
+} from "../../firebase.service";
 
 export interface IUserSignup {
   email: string;
@@ -15,7 +26,7 @@ interface IAuthContextType {
   loading: boolean;
   signup: (signupData: IUserSignup) => Promise<UserCredential>;
   emailLogin: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logoutContext: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
   createEvent: (event: IEvent) => Promise<void>;
@@ -37,62 +48,75 @@ export function useAuthContext() {
 }
 
 interface AuthProviderProps {
-  firebase: Firebase;
+  // firebase: Firebase;
   children: any;
 }
 
-export function AuthProvider({ firebase, children }: AuthProviderProps) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<DbUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  useEffect(() => {
+    // Optionally handle automatic session persistence here
+    // const unsubscribe = firebaseService.subscribe("users", (users: User) => {
+    //   console.log("AuthContext.useEffect.users: ", users);
+    // });
+  }, [currentUser]);
 
   async function signup(signupData: IUserSignup) {
-    const signupRes = await firebase.signUpWithEmail(
-      signupData.email,
-      signupData.password
-    );
+    const signupRes = await signupEmail(signupData.email, signupData.password);
     await getOrCreateDbUserByUser({
       ...signupRes.user,
       displayName: signupData.name,
     });
     return signupRes;
   }
+
   async function emailLogin(email: string, password: string) {
-    await firebase.signInWithEmail(email, password);
+    const signinRes = await signinEmail(email, password);
+    await getOrCreateDbUserByUser(signinRes.user);
   }
-  function logout() {
+
+  async function logoutContext() {
     setCurrentUser(null);
-    return firebase.logout();
+    try {
+      await logout();
+    } catch (error) {
+      console.error(`AuthContext.logout error:`, error);
+      throw error;
+    }
   }
+
   async function googleLogin() {
-    const res = await firebase.loginWithGoogle();
-    console.log("AuthContext.googleLogin.res: ", res);
+    signinGoogle();
   }
 
   function resetPassword(email: string) {
-    return firebase.resetPassword(email);
+    resetEmailPassword(email);
   }
 
   async function getOrCreateDbUserByUser(user: User) {
     try {
-      const userRes = await firebase.getUserByUid(user.uid);
+      const userRes = await getDocument("users", user.uid);
       if (userRes === null) {
-        await firebase.addUser(user);
-      }
-      if (userRes) {
-        const dbUser: DbUser = {
-          id: userRes.id,
-          name: userRes.name,
-          userType: userRes.userType as UserType,
-          email: userRes.email,
-          bio: userRes.bio || "",
-          receiveWeeklyEmails: userRes.receiveWeeklyEmails || false,
-          linkToImage: userRes.linkToImage || "",
-          linkToPage: userRes.linkToPage || "",
-          createdAt: userRes.createdAt,
-          updatedAt: userRes.updatedAt,
+        const newUser: DbUser = {
+          id: user.uid,
+          name: user.displayName || "",
+          userType: UserType.user,
+          email: user.email || "",
+          bio: "",
+          newsletter: false,
+          image: "",
+          page: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
-        setCurrentUser(dbUser);
+        await addDocument("users", newUser);
+        setCurrentUser(newUser);
+        navigate(`/`);
+      } else {
+        userRes.userType = userRes.userType as UserType;
+        setCurrentUser(userRes as unknown as DbUser);
         navigate(`/`);
       }
     } catch (error) {
@@ -101,25 +125,33 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
   }
 
   useEffect(() => {
-    const unsubscribe = firebase.auth.onAuthStateChanged(async (user) => {
-      setLoading(false);
-      if (user) {
-        await getOrCreateDbUserByUser(user);
-      } else {
-        setCurrentUser(null);
-      }
-    });
-    return unsubscribe;
+    const initAuth = async () => {
+      unsubscribe = await onAuthChanged(async (user: User) => {
+        setLoading(false);
+        if (user) {
+          await getOrCreateDbUserByUser(user);
+        } else {
+          setCurrentUser(null);
+        }
+      });
+    };
+    initAuth();
+
+    let unsubscribe = () => {};
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   //TODO Update type
   async function createEvent(event: IEvent): Promise<void> {
-    try {
-      await firebase.addEvent(event);
-    } catch (error) {
-      console.error(`AuthContext.createEvent error:`, error);
-      throw error;
-    }
+    return {} as unknown as void;
+    // try {
+    //   await firebase.addEvent(event);
+    // } catch (error) {
+    //   console.error(`AuthContext.createEvent error:`, error);
+    //   throw error;
+    // }
   }
 
   async function getAllEvents(): Promise<IEvent[]> {
@@ -133,23 +165,24 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
       throw error;
     }
     try {
-      const fbEvents = await firebase.getAllEvents();
-      return fbEvents;
+      // const fbEvents = await firebase.getAllEvents();
+      // return fbEvents;
     } catch (error) {
       console.error(`AuthContext.getAllEvents error:`, error);
       throw error;
     }
+    return {} as IEvent[];
   }
 
   async function deleteEvent(eventId: string) {
-    await firebase.deleteEvent(eventId);
+    // await firebase.deleteEvent(eventId);
   }
   const value = {
     currentUser,
     loading,
     signup,
     emailLogin,
-    logout,
+    logoutContext,
     googleLogin,
     resetPassword,
     createEvent,
@@ -157,9 +190,5 @@ export function AuthProvider({ firebase, children }: AuthProviderProps) {
     deleteEvent,
   };
   //
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

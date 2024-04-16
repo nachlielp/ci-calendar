@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Firebase from "./Firebase";
+import { UserType } from "./Firebase";
 
-// import RetentionTimer from "./Components/RetentionTimer";
-// import History from "./Components/History";
-// import MeditationTimer from "./Components/MeditationTimer";
 import { AuthProvider } from "./Components/Auth/AuthContext";
 import Signup from "./Components/Auth/Signup";
 import Login from "./Components/Auth/Login";
 import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import Header from "./Components/UI/Header";
-import { UserType } from "../drizzle/schema";
 import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
-import EventForm from "./Components/UI/EventForm";
+import EventForm, { IEvent } from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
 import EditEventsContainer from "./Components/UI/EditEventsContainer";
+import { firebaseService } from "./firebase.service";
 
 export default function App() {
-  const [firebase, setFirebase] = useState<Firebase | null>(null);
-
+  const [events, setEvents] = useState<IEvent[]>([]);
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const initFirebase = async () => {
-      const fbInstance = new Firebase();
-      setFirebase(fbInstance);
+    const initTFirebase = async () => {
+      firebaseService.initFirebaseJS();
+      firebaseService.subscribe("events", (events: any) => {
+        setEvents(events);
+        setLoading(false);
+      });
     };
-    initFirebase();
+    initTFirebase();
   }, []);
 
-  if (!firebase) {
+  if (loading) {
+    //TODO handel loading
     return <div>Loading...</div>;
   }
 
@@ -37,14 +38,14 @@ export default function App() {
     <div className="min-h-screen bg-gray-200 flex justify-center">
       <div className="w-full sm:w-11/12 md:max-w-screen-md bg-homepage-bg">
         <BrowserRouter>
-          <AuthProvider firebase={firebase!}>
+          <AuthProvider>
             <Header />
             <Routes>
               <Route path="signup" element={<Signup />} />
               <Route path="login" element={<Login />} />
 
               <Route path="reset-password" element={<ResetPassword />} />
-              <Route path="/home" element={<EventsList />} />
+              <Route path="/home" element={<EventsList events={events} />} />
               {/* User privet routes */}
               <Route
                 element={
@@ -81,7 +82,7 @@ export default function App() {
               >
                 {/* <Route path="/event-form" element={<EventForm />} /> */}
               </Route>
-              <Route path="*" element={<EventsList />} />
+              <Route path="*" element={<EventsList events={events} />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

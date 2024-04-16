@@ -53,9 +53,9 @@ export interface DbUser {
   name: string;
   email: string;
   bio: string;
-  receiveWeeklyEmails: boolean;
-  linkToImage: string;
-  linkToPage: string;
+  newsletter: boolean;
+  image: string;
+  page: string;
   // events: string[];
 }
 
