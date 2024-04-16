@@ -24,7 +24,6 @@ import {
   where,
   deleteDoc,
 } from "firebase/firestore";
-import { UserType } from "../drizzle/schema";
 interface FirebaseConfig {
   apiKey: string;
   authDomain: string;
@@ -33,6 +32,31 @@ interface FirebaseConfig {
   messagingSenderId: string;
   appId: string;
   measurementId: string;
+}
+export enum District {
+  north = "north",
+  south = "south",
+  center = "center",
+  jerusalem = "jerusalem",
+}
+
+export enum UserType {
+  admin = "admin",
+  teacher = "teacher",
+  user = "user",
+}
+export interface DbUser {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  userType: UserType;
+  name: string;
+  email: string;
+  bio: string;
+  receiveWeeklyEmails: boolean;
+  linkToImage: string;
+  linkToPage: string;
+  // events: string[];
 }
 
 export default class Firebase {
