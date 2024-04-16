@@ -1,5 +1,4 @@
 import { Card, Tag, Button } from "antd";
-import { UserOutlined } from "@ant-design/icons";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineDescription } from "react-icons/md";
@@ -9,6 +8,8 @@ import React from "react";
 import DeleteEvent from "./DeleteEvent";
 import EditEvent from "./EditEvent";
 import { EventlyType, IEvently } from "../../util/interfaces";
+import { TbPoint } from "react-icons/tb";
+import { VscDebugBreakpointLog } from "react-icons/vsc";
 
 interface IEventCard {
   event: IEvently;
@@ -43,13 +44,13 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
                   {type}
                 </Tag>
               ))}
-              {getTags(event).length > 0
+              {/* {getTags(event).length > 0
                 ? getTags(event).map((tags, index) => (
                     <Tag key={`${tags}-${index}`} color="green">
                       {tags}
                     </Tag>
                   ))
-                : ""}
+                : ""} */}
             </span>
           </span>
         }
@@ -71,34 +72,58 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
         {subEventLen > 1 &&
           Object.values(event.subEvents).map((subEvent, index) => (
             <span className="block mr-6" key={index}>
-              {/* {subEvent.subTitle}&nbsp;&nbsp; עם
-                {subEvent.teachers.map((teacher, index) => (
-                  <p key={index}>{teacher} |</p>
-                ))} */}
-              {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
-              {dayjs(subEvent.startTime).format("HH:mm")}
+              <VscDebugBreakpointLog className="inline-block mb-1" />
+              {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
+              {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
+              {getType(subEvent.type as EventlyType)}
+              {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
+              {subEvent.tags && (
+                <span>
+                  &nbsp;
+                  {subEvent.tags.map((tag) => (
+                    <Tag key={tag} color="green">
+                      {getTag(tag)}
+                    </Tag>
+                  ))}
+                </span>
+              )}
             </span>
           ))}
         <p className="flex items-center">
           <FaMapMarkedAlt className="ml-2" />
           {event.address}
         </p>
-        <p className="flex items-center">
-          <UserOutlined className="ml-2" />{" "}
-          {Object.values(event.subEvents).flatMap(
-            (subEvent) => subEvent.teacher
-          )}
-        </p>
+
         {!isWhiteSpace(event.description) && (
           <p className="flex items-center">
             <MdOutlineDescription className="ml-2" />
             {event.description}
           </p>
         )}
+        {event.price.length > 0 && (
+          <div className="flex items-center">
+            <span className="text-2xl align-top relative top-[-14px]">
+              &#8362;
+            </span>
+            &nbsp;&nbsp;
+            <ul>
+              {event.price.map((price, index) => (
+                <li key={`${price.title}-${index}`}>
+                  {price.title} - {price.sum}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div style={{ marginTop: 16 }}>
           {event.links.length > 0 &&
             event.links.map((link) => (
-              <Button key={link.title} type="default" href={link.link}>
+              <Button
+                key={link.title}
+                type="default"
+                href={link.link}
+                target="_blank"
+              >
                 {link.title}
               </Button>
             ))}
@@ -115,14 +140,20 @@ const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getTags = (event: IEvently) => {
-  return (
-    event.subEvents
-      .reduce((acc, curr) => [...acc, ...curr.tags], [] as string[])
-      .filter((tags) => !!tags)
-      .map((type) => tagOptions.find((tag) => tag.value === type)?.label) || []
-  );
+const getType = (type: EventlyType) => {
+  return eventTypes.find((et) => et.value === type)?.label;
 };
+const getTag = (tag: string) => {
+  return tagOptions.find((t) => t.value === tag)?.label;
+};
+// const getTags = (event: IEvently) => {
+//   return (
+//     event.subEvents
+//       .reduce((acc, curr) => [...acc, ...curr.tags], [] as string[])
+//       .filter((tags) => !!tags)
+//       .map((type) => tagOptions.find((tag) => tag.value === type)?.label) || []
+//   );
+// };
 
 const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;

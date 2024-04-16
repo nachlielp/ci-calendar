@@ -13,7 +13,7 @@ interface ISubEvent {
   tags: string[];
 }
 interface IPrice {
-  price: number;
+  sum: number;
   title: string;
 }
 interface ILinks {
