@@ -3,9 +3,7 @@ import VirtualList from "rc-virtual-list";
 import { EventCard } from "./EventCard";
 import { useWindowResize } from "../../hooks/useWindowResize";
 import ErrorBoundary from "./ErrorBoundary";
-import { IEvent } from "./EventForm";
 import { useFilter } from "../../hooks/useFilter";
-import { Empty } from "antd";
 import { IEvently } from "../../util/interfaces";
 
 interface IEventsList {

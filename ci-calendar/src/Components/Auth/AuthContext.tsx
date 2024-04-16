@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
 import { DbUser, UserType } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
-import { IEvent } from "../UI/EventForm";
 import {
   signinGoogle,
   logout,
@@ -14,6 +13,7 @@ import {
   resetEmailPassword,
   removeDocument,
 } from "../../firebase.service";
+import { IEvently } from "../../util/interfaces";
 
 export interface IUserSignup {
   email: string;
@@ -28,9 +28,9 @@ interface IAuthContextType {
   logoutContext: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
-  createEvent: (event: IEvent) => Promise<void>;
+  createEvent: (event: IEvently) => Promise<void>;
   deleteEvently: (eventId: string) => Promise<void>;
-  getAllEvents: () => Promise<IEvent[]>;
+  getAllEvents: () => Promise<IEvently[]>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -143,9 +143,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   //TODO Update type
-  async function createEvent(event: IEvent): Promise<void> {
-    console.log("AuthContext.createEvent.event: ", event);
-    return {} as unknown as void;
+  async function createEvent(event: IEvently): Promise<void> {
+    await addDocument("events", event);
     // try {
     //   await firebase.addEvent(event);
     // } catch (error) {
@@ -154,7 +153,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // }
   }
 
-  async function getAllEvents(): Promise<IEvent[]> {
+  async function getAllEvents(): Promise<IEvently[]> {
     // const startDate = dayjs().startOf("day").toISOString();
     try {
       // const eventsRes = await firebase.getEventsAfter(
@@ -171,7 +170,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error(`AuthContext.getAllEvents error:`, error);
       throw error;
     }
-    return {} as IEvent[];
+    return {} as IEvently[];
   }
 
   async function deleteEvently(eventId: string) {

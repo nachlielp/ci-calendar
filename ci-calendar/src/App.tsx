@@ -10,13 +10,14 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import Header from "./Components/UI/Header";
 import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
-import EventForm, { IEvent } from "./Components/UI/EventForm";
+import EventForm from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
 import { firebaseService } from "./firebase.service";
 import { IEvently } from "./util/interfaces";
 
 export default function App() {
   const [events, setEvents] = useState<IEvently[]>([]);
+  console.log("App.events: ", events);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const initTFirebase = async () => {
@@ -73,7 +74,6 @@ export default function App() {
                   />
                 }
               >
-                <Route path="/test" element={<EventForm />} />
                 <Route path="/teacher" element={<TeacherPage />} />
                 <Route path="/event-form" element={<EventForm />} />
                 <Route

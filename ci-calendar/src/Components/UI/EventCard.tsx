@@ -6,7 +6,6 @@ import { MdOutlineDescription } from "react-icons/md";
 import { tagOptions, eventTypes } from "../../util/options";
 import dayjs from "dayjs";
 import React from "react";
-import { IEvent } from "./EventForm";
 import DeleteEvent from "./DeleteEvent";
 import EditEvent from "./EditEvent";
 import { EventlyType, IEvently } from "../../util/interfaces";

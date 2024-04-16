@@ -22,6 +22,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { tagOptions, eventTypes, districtOptions } from "../../util/options";
 import { UserType } from "../../Firebase";
+import { IEvently } from "../../util/interfaces";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -38,30 +39,6 @@ const formItemLayout = {
     sm: { span: 14 },
   },
 };
-
-interface ISubEvent {
-  price: number;
-  endTime: string;
-  type: string;
-  startTime: string;
-  teacher: string;
-  limitations: string[];
-}
-
-export interface IEvent {
-  description: string;
-  subEvents: ISubEvent[];
-  address: string;
-  price: number;
-  updatedAt: string;
-  title: string;
-  links: Record<string, string>;
-  createdAt: string;
-  id: string;
-  owners: string[];
-  hideEvent: boolean;
-  district: string;
-}
 
 export default function EventForm() {
   const navigate = useNavigate();
@@ -86,40 +63,29 @@ export default function EventForm() {
 
   const handleSubmit = async (values: any) => {
     console.log("EventForm.handleSubmit.values: ", values);
-    const linksObject = values["links"].reduce(
-      (
-        acc: Record<string, string>,
-        item: { "link-title": string; link: string }
-      ) => {
-        acc[item["link-title"]] = item.link;
-        return acc;
-      },
-      {}
-    );
+
     const subEvents = [
       {
         startTime: dayjs(values["event-time"][0]).toISOString(),
         endTime: dayjs(values["event-time"][1]).toISOString(),
         type: values["event-types"],
-        price: values["event-price"],
-        limitations: values["event-limitations"],
-        teacher: values["event-teacher"],
+        tags: values["event-tags"] || [],
+        teacher: values["event-teacher"] || "",
       },
     ];
     if (values["sub-events"]) {
       values["sub-events"].forEach((subEvent: any) =>
         subEvents.push({
           type: subEvent.type,
-          price: subEvent.price,
-          limitations: subEvent.limitations,
-          teacher: subEvent.teacher,
+          tags: subEvent.tags || [],
+          teacher: subEvent.teacher || "",
           startTime: dayjs(subEvent.time[0]).toISOString(),
           endTime: dayjs(subEvent.time[1]).toISOString(),
         })
       );
     }
 
-    const event: IEvent = {
+    const event: IEvently = {
       id: uuidv4(),
       address: values["address"],
       createdAt: dayjs().toISOString(),
@@ -127,12 +93,13 @@ export default function EventForm() {
       title: values["event-title"],
       description: values["event-description"] || "",
       owners: [currentUser.id],
-      links: linksObject,
-      price: values["total-price"],
-      hideEvent: false,
+      links: values["links"] || [],
+      price: values["prices"] || [],
+      hide: false,
       subEvents: subEvents,
       district: values["district"],
     };
+    console.log("EventForm.handleSubmit.event: ", event);
     try {
       await createEvent(event);
     } catch (error) {
@@ -155,7 +122,7 @@ export default function EventForm() {
             dayjs.tz(dayjs(selectedDate).hour(0).minute(0), "Asia/Jerusalem"),
             dayjs.tz(dayjs(selectedDate).hour(0).minute(0), "Asia/Jerusalem"),
           ],
-          "event-limitations": [tagOptions[0].value],
+          "event-tags": [tagOptions[0].value],
         }}
       >
         <Card className="mt-4 border-4">
@@ -243,19 +210,8 @@ export default function EventForm() {
           </Row>
           <Row gutter={10} align="middle">
             <Col md={24} xs={24}>
-              <Form.Item
-                label="מגבלות"
-                name="event-limitations"
-                className="w-full"
-              >
+              <Form.Item label="תגיות" name="event-tags" className="w-full">
                 <Select options={tagOptions} mode="multiple" />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={10} align="middle">
-            <Col md={24} xs={24}>
-              <Form.Item label="מחיר" name="event-price">
-                <InputNumber addonAfter="₪" />
               </Form.Item>
             </Col>
           </Row>
@@ -312,18 +268,11 @@ export default function EventForm() {
                     <Col md={24} xs={24}>
                       <Form.Item
                         {...restField}
-                        label="מגבלות"
-                        name={[name, "limitations"]}
+                        label="תגיות"
+                        name={[name, "tags"]}
                         className="w-full"
                       >
                         <Select options={tagOptions} mode="multiple" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row gutter={10} align="middle">
-                    <Col md={24} xs={24}>
-                      <Form.Item label="מחיר" name={[name, "price"]}>
-                        <InputNumber addonAfter="₪" />
                       </Form.Item>
                     </Col>
                   </Row>
@@ -358,7 +307,7 @@ export default function EventForm() {
                         {...restField}
                         className="mt-4"
                         label="כותרת קישור"
-                        name={[name, "link-title"]}
+                        name={[name, "title"]}
                         rules={[{ required: true, message: "שדה חובה" }]}
                       >
                         <Input />
@@ -402,11 +351,63 @@ export default function EventForm() {
             </>
           )}
         </Form.List>
-        <Card className="mt-4 border-4">
-          <Form.Item className="mt-4" label="מחיר כולל" name="total-price">
-            <InputNumber addonAfter="₪" />
-          </Form.Item>
+        <Form.List name="prices">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Card className="mt-4 border-2" key={key}>
+                  <Row gutter={10} align="middle">
+                    <Col md={24} xs={24}>
+                      <Form.Item
+                        {...restField}
+                        className="mt-4"
+                        label="כותרת מחיר"
+                        name={[name, "title"]}
+                        rules={[{ required: true, message: "שדה חובה" }]}
+                      >
+                        <Input />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row gutter={10} align="middle">
+                    <Col md={24} xs={24}>
+                      <Form.Item
+                        {...restField}
+                        className="mt-4"
+                        label="מחיר"
+                        name={[name, "sum"]}
+                        rules={[
+                          { required: true, message: "שדה חובה" },
+                          { type: "number", warningOnly: true },
+                        ]}
+                      >
+                        <InputNumber />
+                      </Form.Item>
+                    </Col>
+                  </Row>
 
+                  <div className="flex items-center justify-center">
+                    <Button onClick={() => remove(name)}>
+                      <span className="text-red-500">
+                        <MinusCircleOutlined />
+                        הסר מחיר
+                      </span>
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+              <div className="flex items-center justify-center mt-2">
+                <Button className="w-1/2" onClick={() => add()} block>
+                  <span>
+                    <PlusOutlined /> הוסף מחיר
+                  </span>
+                </Button>
+              </div>
+            </>
+          )}
+        </Form.List>
+
+        <Card className="mt-4 border-4">
           <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
             <Button type="primary" htmlType="submit">
               Submit
