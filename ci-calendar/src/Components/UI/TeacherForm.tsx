@@ -13,6 +13,7 @@ import {
 import { useAuthContext } from "../Auth/AuthContext";
 import { useState } from "react";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { CloudinaryUpload } from "./CloudinaryUpload";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -133,7 +134,7 @@ export default function TeacherForm() {
           <Input type="url" />
         </Form.Item> */}
         <Form.Item<FieldType> label="תמונה" name="image">
-          <Upload
+          {/* <Upload
             name="avatar"
             listType="picture-circle"
             className="avatar-uploader"
@@ -147,7 +148,8 @@ export default function TeacherForm() {
             ) : (
               uploadButton
             )}
-          </Upload>
+          </Upload> */}
+          <CloudinaryUpload />
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>

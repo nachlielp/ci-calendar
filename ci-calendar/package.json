@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.6",
+    "@cloudinary/react": "^1.13.0",
+    "@cloudinary/url-gen": "^1.19.0",
     "@libsql/client": "^0.6.0",
     "antd": "^5.16.1",
     "axios": "^1.6.8",
