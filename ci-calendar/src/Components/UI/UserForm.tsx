@@ -1,5 +1,6 @@
 import { Button, Checkbox, Form, type FormProps, Input, Card } from "antd";
 import { DbUser } from "../../util/interfaces";
+import { useAuthContext } from "../Auth/AuthContext";
 
 type FieldType = {
   name?: string;
@@ -10,18 +11,16 @@ interface IUserForm {
   user: DbUser;
 }
 export default function UserForm({ user }: IUserForm) {
+  const { updateUser } = useAuthContext();
+
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    console.log("UserForm.onFinish.values: ", user, values);
-    // const newsletter = values.mailingList?.toString() === "true";
-    // try {
-    //   const res = await updateUserByUid(user.id, {
-    //     name: values.name,
-    //     receiveWeeklyEmails: receiveWeeklyEmails,
-    //   });
-    //   console.log("UserForm.onFinish.res: ", res);
-    // } catch (error) {
-    //   console.error("UserForm.onFinish.error: ", error);
-    // }
+    user.name = values.name || user.name;
+    user.newsletter = values.mailingList?.toString() === "true";
+    try {
+      await updateUser(user);
+    } catch (error) {
+      console.error("UserForm.onFinish.error: ", error);
+    }
   };
 
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
@@ -35,6 +34,10 @@ export default function UserForm({ user }: IUserForm) {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
         autoComplete="off"
+        initialValues={{
+          name: user.name,
+          mailingList: user.newsletter,
+        }}
       >
         <Form.Item<FieldType>
           label="שם מלא"

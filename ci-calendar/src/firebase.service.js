@@ -39,7 +39,7 @@ export const firebaseService = {
   addDocument,
   updateDocument,
   removeDocument,
-  subscribe,
+  subscribe: subscribeToCollection,
   signinGoogle,
   logout,
 };
@@ -211,7 +211,7 @@ export async function getDocuments(collectionName, filters) {
   return docs;
 }
 
-export async function subscribe(collectionName, cb) {
+export async function subscribeToCollection(collectionName, cb) {
   const db = await getDb();
   const unsubscribe = onSnapshot(
     collection(db, collectionName),
@@ -224,4 +224,28 @@ export async function subscribe(collectionName, cb) {
     }
   );
   return unsubscribe;
+}
+
+export async function subscribeToDoc(docPath, cb) {
+  const db = await getDb();
+  try {
+    const docRef = doc(db, docPath);
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          cb({ id: docSnapshot.id, ...docSnapshot.data() });
+        } else {
+          console.log("No such document!");
+        }
+      },
+      (error) => {
+        console.error("Subscribe to document error: ", error);
+      }
+    );
+    return unsubscribe;
+  } catch (error) {
+    console.error("firebaseService.subscribeToDoc.error: ", error);
+    throw error;
+  }
 }

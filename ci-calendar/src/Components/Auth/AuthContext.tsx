@@ -11,6 +11,8 @@ import {
   signinEmail,
   resetEmailPassword,
   removeDocument,
+  updateDocument,
+  subscribeToDoc,
 } from "../../firebase.service";
 import { DbUser, IEvently, UserType } from "../../util/interfaces";
 
@@ -29,7 +31,7 @@ interface IAuthContextType {
   resetPassword: (email: string) => Promise<void>;
   createEvent: (event: IEvently) => Promise<void>;
   deleteEvently: (eventId: string) => Promise<void>;
-  getAllEvents: () => Promise<IEvently[]>;
+  updateUser: (user: DbUser) => Promise<void>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -54,12 +56,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<DbUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+
   useEffect(() => {
-    // Optionally handle automatic session persistence here
-    // const unsubscribe = firebaseService.subscribe("users", (users: User) => {
-    //   console.log("AuthContext.useEffect.users: ", users);
-    // });
-  }, [currentUser]);
+    const initAuth = async () => {
+      unsubscribe = await onAuthChanged(async (user: User) => {
+        setLoading(false);
+        if (user) {
+          await getOrCreateDbUserByUser(user);
+        } else {
+          setCurrentUser(null);
+        }
+      });
+    };
+    initAuth();
+
+    let unsubscribe = () => {};
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   async function signup(signupData: IUserSignup) {
     const signupRes = await signupEmail(signupData.email, signupData.password);
@@ -111,10 +126,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         };
         await addDocument("users", newUser);
         setCurrentUser(newUser);
+        subscribeToUserChanges(newUser.id);
         navigate(`/`);
       } else {
         userRes.userType = userRes.userType as UserType;
         setCurrentUser(userRes as unknown as DbUser);
+        subscribeToUserChanges(userRes.id);
         navigate(`/`);
       }
     } catch (error) {
@@ -122,59 +139,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  useEffect(() => {
-    const initAuth = async () => {
-      unsubscribe = await onAuthChanged(async (user: User) => {
-        setLoading(false);
-        if (user) {
-          await getOrCreateDbUserByUser(user);
-        } else {
-          setCurrentUser(null);
-        }
-      });
-    };
-    initAuth();
-
-    let unsubscribe = () => {};
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
+  async function updateUser(user: DbUser) {
+    await updateDocument("users", user.id, user);
+  }
   //TODO Update type
   async function createEvent(event: IEvently): Promise<void> {
     await addDocument("events", event);
-    // try {
-    //   await firebase.addEvent(event);
-    // } catch (error) {
-    //   console.error(`AuthContext.createEvent error:`, error);
-    //   throw error;
-    // }
-  }
-
-  async function getAllEvents(): Promise<IEvently[]> {
-    // const startDate = dayjs().startOf("day").toISOString();
-    try {
-      // const eventsRes = await firebase.getEventsAfter(
-      //   dayjs().subtract(7, "day").toDate()
-      // );
-    } catch (error) {
-      console.error(`AuthContext.getAllEvents error:`, error);
-      throw error;
-    }
-    try {
-      // const fbEvents = await firebase.getAllEvents();
-      // return fbEvents;
-    } catch (error) {
-      console.error(`AuthContext.getAllEvents error:`, error);
-      throw error;
-    }
-    return {} as IEvently[];
   }
 
   async function deleteEvently(eventId: string) {
     console.log("AuthContext.deleteEvent.eventId: ", eventId);
     await removeDocument("events", eventId);
+  }
+
+  function subscribeToUserChanges(userId: string) {
+    const unsubscribe = subscribeToDoc(
+      `users/${userId}`,
+      (updatedUser: DbUser) => {
+        console.log(
+          `AuthContext.subscribeToUserChanges.updatedUser: `,
+          updatedUser
+        );
+        setCurrentUser(updatedUser);
+      }
+    );
+    return unsubscribe;
   }
   const value = {
     currentUser,
@@ -185,8 +174,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     googleLogin,
     resetPassword,
     createEvent,
-    getAllEvents,
     deleteEvently,
+    updateUser,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
