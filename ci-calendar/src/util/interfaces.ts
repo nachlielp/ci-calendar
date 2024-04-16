@@ -57,5 +57,4 @@ export interface DbUser {
   newsletter: boolean;
   image: string;
   page: string;
-  // events: string[];
 }

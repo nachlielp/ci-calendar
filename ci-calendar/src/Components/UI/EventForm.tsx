@@ -101,6 +101,7 @@ export default function EventForm() {
     console.log("EventForm.handleSubmit.event: ", event);
     try {
       await createEvent(event);
+      navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }
@@ -406,13 +407,14 @@ export default function EventForm() {
           )}
         </Form.List>
 
-        <Card className="mt-4 border-4">
-          <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Card>
+        <Form.Item
+          wrapperCol={{ span: 24 }}
+          className="mt-4 flex justify-center"
+        >
+          <Button type="primary" htmlType="submit">
+            צור אירוע
+          </Button>
+        </Form.Item>
       </Form>
     </Card>
   );

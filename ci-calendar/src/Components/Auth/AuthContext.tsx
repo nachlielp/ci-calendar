@@ -148,7 +148,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function deleteEvently(eventId: string) {
-    console.log("AuthContext.deleteEvent.eventId: ", eventId);
     await removeDocument("events", eventId);
   }
 
@@ -156,10 +155,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = subscribeToDoc(
       `users/${userId}`,
       (updatedUser: DbUser) => {
-        console.log(
-          `AuthContext.subscribeToUserChanges.updatedUser: `,
-          updatedUser
-        );
         setCurrentUser(updatedUser);
       }
     );
