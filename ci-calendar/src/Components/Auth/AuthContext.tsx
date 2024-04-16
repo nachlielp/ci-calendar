@@ -1,14 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
 import { User, UserCredential } from "firebase/auth";
-import Firebase, { DbUser, UserType } from "../../Firebase";
+import { DbUser, UserType } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
 import { IEvent } from "../UI/EventForm";
 import {
-  firebaseService,
   signinGoogle,
   logout,
   onAuthChanged,
-  getDocuments,
   addDocument,
   getDocument,
   signupEmail,
@@ -91,8 +89,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signinGoogle();
   }
 
-  function resetPassword(email: string) {
-    resetEmailPassword(email);
+  function resetPassword(email: string): Promise<void> {
+    return resetEmailPassword(email);
   }
 
   async function getOrCreateDbUserByUser(user: User) {
@@ -145,6 +143,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   //TODO Update type
   async function createEvent(event: IEvent): Promise<void> {
+    console.log("AuthContext.createEvent.event: ", event);
     return {} as unknown as void;
     // try {
     //   await firebase.addEvent(event);
@@ -175,6 +174,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function deleteEvent(eventId: string) {
+    console.log("AuthContext.deleteEvent.eventId: ", eventId);
     // await firebase.deleteEvent(eventId);
   }
   const value = {

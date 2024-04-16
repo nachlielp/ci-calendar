@@ -5,7 +5,6 @@ import { useWindowResize } from "../../hooks/useWindowResize";
 import ErrorBoundary from "./ErrorBoundary";
 import { IEvent } from "./EventForm";
 import { useFilter } from "../../hooks/useFilter";
-import { useEvents } from "../../hooks/useEvent";
 
 interface IEventsList {
   events: IEvent[];
