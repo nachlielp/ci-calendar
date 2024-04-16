@@ -13,7 +13,7 @@ import EventForm from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
 import { firebaseService } from "./firebase.service";
 import { IEvently, UserType } from "./util/interfaces";
-import TeacherForm from "./Components/UI/TeacherForm";
+import BioPage from "./Components/UI/BioPage";
 
 export default function App() {
   const [events, setEvents] = useState<IEvently[]>([]);
@@ -79,7 +79,7 @@ export default function App() {
                   path="/edit-events"
                   element={<EventsList events={events} isEdit={true} />}
                 />
-                <Route path="/bio" element={<TeacherForm />} />
+                <Route path="/bio" element={<BioPage />} />
               </Route>
 
               {/* Admin privet routes */}
