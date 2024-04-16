@@ -12,11 +12,11 @@ import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
 import EventForm, { IEvent } from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
-import EditEventsContainer from "./Components/UI/EditEventsContainer";
 import { firebaseService } from "./firebase.service";
+import { IEvently } from "./util/interfaces";
 
 export default function App() {
-  const [events, setEvents] = useState<IEvent[]>([]);
+  const [events, setEvents] = useState<IEvently[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const initTFirebase = async () => {
@@ -45,7 +45,10 @@ export default function App() {
               <Route path="login" element={<Login />} />
 
               <Route path="reset-password" element={<ResetPassword />} />
-              <Route path="/home" element={<EventsList events={events} />} />
+              <Route
+                path="/home"
+                element={<EventsList events={events} isEdit={false} />}
+              />
               {/* User privet routes */}
               <Route
                 element={
@@ -73,7 +76,10 @@ export default function App() {
                 <Route path="/test" element={<EventForm />} />
                 <Route path="/teacher" element={<TeacherPage />} />
                 <Route path="/event-form" element={<EventForm />} />
-                <Route path="/edit-events" element={<EditEventsContainer />} />
+                <Route
+                  path="/edit-events"
+                  element={<EventsList events={events} isEdit={true} />}
+                />
               </Route>
 
               {/* Admin privet routes */}
@@ -82,7 +88,10 @@ export default function App() {
               >
                 {/* <Route path="/event-form" element={<EventForm />} /> */}
               </Route>
-              <Route path="*" element={<EventsList events={events} />} />
+              <Route
+                path="*"
+                element={<EventsList events={events} isEdit={false} />}
+              />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

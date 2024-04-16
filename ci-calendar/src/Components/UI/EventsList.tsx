@@ -5,13 +5,15 @@ import { useWindowResize } from "../../hooks/useWindowResize";
 import ErrorBoundary from "./ErrorBoundary";
 import { IEvent } from "./EventForm";
 import { useFilter } from "../../hooks/useFilter";
+import { Empty } from "antd";
+import { IEvently } from "../../util/interfaces";
 
 interface IEventsList {
-  events: IEvent[];
+  events: IEvently[];
+  isEdit: boolean;
 }
-const EventsList: React.FC<IEventsList> = ({ events }) => {
+const EventsList: React.FC<IEventsList> = ({ events, isEdit }) => {
   const { height, width } = useWindowResize();
-  // const events = useEvents();
   const filteredEvents = useFilter(events);
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);
@@ -23,14 +25,14 @@ const EventsList: React.FC<IEventsList> = ({ events }) => {
       itemHeight={47}
       itemKey="id"
     >
-      {(event: IEvent) => (
+      {(event: IEvently) => (
         <ErrorBoundary>
           <EventCard
             key={event.id}
             event={event}
             cardWidth={adjustedItemWidth}
             screenWidth={width}
-            isEdit={false}
+            isEdit={isEdit}
           />
         </ErrorBoundary>
       )}
@@ -39,3 +41,13 @@ const EventsList: React.FC<IEventsList> = ({ events }) => {
 };
 
 export default EventsList;
+
+// const emptyEventsList = () => {
+//   return (
+//     <Empty
+//       image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
+//       imageStyle={{ height: 60 }}
+//       description={<span>אופס, נראה שיש לנו בעיה</span>}
+//     ></Empty>
+//   );
+// };

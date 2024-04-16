@@ -1,18 +1,18 @@
 import { Card, Tag, Button } from "antd";
 import { UserOutlined } from "@ant-design/icons";
-import { EventType } from "../../../drizzle/schema";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineDescription } from "react-icons/md";
-import { limitations, eventTypes } from "../../util/options";
+import { tagOptions, eventTypes } from "../../util/options";
 import dayjs from "dayjs";
 import React from "react";
 import { IEvent } from "./EventForm";
 import DeleteEvent from "./DeleteEvent";
 import EditEvent from "./EditEvent";
+import { EventlyType, IEvently } from "../../util/interfaces";
 
 interface IEventCard {
-  event: IEvent;
+  event: IEvently;
   cardWidth: number;
   screenWidth: number;
   isEdit: boolean;
@@ -37,17 +37,17 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
             <span className="block">
               {getTypes(
                 Object.values(event.subEvents).flatMap(
-                  (subEvent) => subEvent.type as EventType
+                  (subEvent) => subEvent.type as EventlyType
                 )
               ).map((type, index) => (
                 <Tag color="blue" key={`${type}-${index}`}>
                   {type}
                 </Tag>
               ))}
-              {getLimitation(event).length > 0
-                ? getLimitation(event).map((limitation, index) => (
-                    <Tag key={`${limitation}-${index}`} color="green">
-                      {limitation}
+              {getTags(event).length > 0
+                ? getTags(event).map((tags, index) => (
+                    <Tag key={`${tags}-${index}`} color="green">
+                      {tags}
                     </Tag>
                   ))
                 : ""}
@@ -97,15 +97,10 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
           </p>
         )}
         <div style={{ marginTop: 16 }}>
-          {event.links &&
-            Object.entries(event.links).map(([key, value]) => (
-              <Button
-                key={`${key}-${value}`}
-                type="default"
-                href={value}
-                className="ml-2"
-              >
-                {key}
+          {event.links.length > 0 &&
+            event.links.map((link) => (
+              <Button key={link.title} type="default" href={link.link}>
+                {link.title}
               </Button>
             ))}
         </div>
@@ -114,19 +109,19 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
   }
 );
 
-const getTypes = (t1: EventType[], t2?: EventType[]) => {
+const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
   return (
     [...t1, ...(t2 || [])]
       .filter((type) => !!type)
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getLimitation = (event: IEvent) => {
+const getTags = (event: IEvently) => {
   return (
     event.subEvents
-      .reduce((acc, curr) => [...acc, ...curr.limitations], [] as string[])
-      .filter((limitation) => !!limitation)
-      .map((type) => limitations.find((lt) => lt.value === type)?.label) || []
+      .reduce((acc, curr) => [...acc, ...curr.tags], [] as string[])
+      .filter((tags) => !!tags)
+      .map((type) => tagOptions.find((tag) => tag.value === type)?.label) || []
   );
 };
 

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Button, Checkbox, Modal } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
-import { eventTypes, districts, SelectOption } from "../../util/options";
+import { eventTypes, districtOptions, SelectOption } from "../../util/options";
 import { useSearchParams } from "react-router-dom";
 
 export default function FilterModel() {
@@ -22,7 +22,7 @@ export default function FilterModel() {
     getInitialValues("eventType", eventTypes)
   );
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>(
-    getInitialValues("district", districts)
+    getInitialValues("district", districtOptions)
   );
 
   const onOptionsChange = (type: string) => (values: string[]) => {
@@ -32,9 +32,12 @@ export default function FilterModel() {
     setSearchParams(newSearchParams, { replace: true });
   };
 
+  const clearSearchParams = () => {
+    setSearchParams("", { replace: true });
+  };
   useEffect(() => {
     setSelectedEventTypes(getInitialValues("eventType", eventTypes));
-    setSelectedDistricts(getInitialValues("district", districts));
+    setSelectedDistricts(getInitialValues("district", districtOptions));
   }, [searchParams, getInitialValues]);
 
   return (
@@ -50,7 +53,7 @@ export default function FilterModel() {
         open={modalOpen}
         onOk={() => setModalOpen(false)}
         onCancel={() => setModalOpen(false)}
-        footer={null}
+        footer={<Button onClick={clearSearchParams}>נקה </Button>}
       >
         <div>
           <b>סוג אירוע</b>
@@ -64,7 +67,7 @@ export default function FilterModel() {
           <b>אזור</b>
         </div>
         <Checkbox.Group
-          options={districts}
+          options={districtOptions}
           value={selectedDistricts}
           onChange={onOptionsChange("district")}
         />

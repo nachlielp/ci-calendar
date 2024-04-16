@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { limitations, eventTypes, districts } from "../../util/options";
+import { tagOptions, eventTypes, districtOptions } from "../../util/options";
 import { UserType } from "../../Firebase";
 
 dayjs.extend(utc);
@@ -155,7 +155,7 @@ export default function EventForm() {
             dayjs.tz(dayjs(selectedDate).hour(0).minute(0), "Asia/Jerusalem"),
             dayjs.tz(dayjs(selectedDate).hour(0).minute(0), "Asia/Jerusalem"),
           ],
-          "event-limitations": [limitations[0].value],
+          "event-limitations": [tagOptions[0].value],
         }}
       >
         <Card className="mt-4 border-4">
@@ -178,7 +178,7 @@ export default function EventForm() {
             name="district"
             rules={[{ required: true, message: "שדה חובה" }]}
           >
-            <Select options={districts} />
+            <Select options={districtOptions} />
           </Form.Item>
 
           <Form.Item
@@ -248,7 +248,7 @@ export default function EventForm() {
                 name="event-limitations"
                 className="w-full"
               >
-                <Select options={limitations} mode="multiple" />
+                <Select options={tagOptions} mode="multiple" />
               </Form.Item>
             </Col>
           </Row>
@@ -316,7 +316,7 @@ export default function EventForm() {
                         name={[name, "limitations"]}
                         className="w-full"
                       >
-                        <Select options={limitations} mode="multiple" />
+                        <Select options={tagOptions} mode="multiple" />
                       </Form.Item>
                     </Col>
                   </Row>

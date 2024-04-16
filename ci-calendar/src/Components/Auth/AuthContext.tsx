@@ -12,6 +12,7 @@ import {
   signupEmail,
   signinEmail,
   resetEmailPassword,
+  removeDocument,
 } from "../../firebase.service";
 
 export interface IUserSignup {
@@ -28,7 +29,7 @@ interface IAuthContextType {
   googleLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
   createEvent: (event: IEvent) => Promise<void>;
-  deleteEvent: (eventId: string) => Promise<void>;
+  deleteEvently: (eventId: string) => Promise<void>;
   getAllEvents: () => Promise<IEvent[]>;
 }
 
@@ -173,9 +174,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return {} as IEvent[];
   }
 
-  async function deleteEvent(eventId: string) {
+  async function deleteEvently(eventId: string) {
     console.log("AuthContext.deleteEvent.eventId: ", eventId);
-    // await firebase.deleteEvent(eventId);
+    await removeDocument("events", eventId);
   }
   const value = {
     currentUser,
@@ -187,7 +188,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     resetPassword,
     createEvent,
     getAllEvents,
-    deleteEvent,
+    deleteEvently,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

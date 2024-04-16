@@ -23,7 +23,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { PlusOutlined } from "@ant-design/icons";
-import { limitations, eventTypes, districts } from "../../util/options";
+import { tagOptions, eventTypes, districtOptions } from "../../util/options";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -109,7 +109,7 @@ export default function SimpleEventForm() {
             dayjs.tz(dayjs(selectedDate).hour(0).minute(0), "Asia/Jerusalem"),
             dayjs.tz(dayjs(selectedDate).hour(0).minute(0), "Asia/Jerusalem"),
           ],
-          "event-limitations": [limitations[0].value],
+          "event-limitations": [tagOptions[0].value],
         }}
       >
         <Card className="mt-4 border-4">
@@ -144,7 +144,7 @@ export default function SimpleEventForm() {
           </Form.Item>
 
           <Form.Item label="מגבלות" name="event-limitations">
-            <Select options={limitations} mode="multiple" />
+            <Select options={tagOptions} mode="multiple" />
           </Form.Item>
           <Form.Item className="mt-4" label="מחיר" name="price">
             <InputNumber addonAfter="₪" />
@@ -163,7 +163,7 @@ export default function SimpleEventForm() {
             name="district"
             rules={[{ required: true, message: "שדה חובה" }]}
           >
-            <Select options={districts} />
+            <Select options={districtOptions} />
           </Form.Item>
           <Form.Item
             label="תאריך"

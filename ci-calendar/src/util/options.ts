@@ -9,7 +9,7 @@ export const eventTypes: SelectOption[] = [
   { value: "conference", label: "כנס" },
 ];
 
-export const limitations: SelectOption[] = [
+export const tagOptions: SelectOption[] = [
   { value: "everyone", label: "פתוח לכולם" },
   { value: "beginner", label: "מתחילים" },
   { value: "advanced", label: "מתקדמים" },
@@ -18,7 +18,7 @@ export const limitations: SelectOption[] = [
   { value: "pre-registration", label: "הרשמה מראש" },
 ];
 
-export const districts: SelectOption[] = [
+export const districtOptions: SelectOption[] = [
   { value: "jerusalem", label: "ירושלים" },
   { value: "center", label: "מרכז" },
   { value: "north", label: "צפון" },

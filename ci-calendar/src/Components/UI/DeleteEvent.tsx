@@ -1,14 +1,12 @@
 import { ExclamationCircleFilled } from "@ant-design/icons";
 import { Button, Modal, Space } from "antd";
 import { useAuthContext } from "../Auth/AuthContext";
-import { useEventsContext } from "../EventsProvider";
 
 const { confirm } = Modal;
 
 const showDeleteConfirm = (
   eventId: string,
-  deleteEvent: (id: string) => void,
-  removeEvent: (id: string) => void
+  deleteEvently: (id: string) => void
 ) => {
   confirm({
     title: "מחק ארוע",
@@ -18,8 +16,7 @@ const showDeleteConfirm = (
     okType: "danger",
     cancelText: "בטל",
     onOk() {
-      deleteEvent(eventId);
-      removeEvent(eventId);
+      deleteEvently(eventId);
     },
     onCancel() {
       console.log(
@@ -33,13 +30,10 @@ interface IDeleteEventProps {
   eventId: string;
 }
 const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
-  const { deleteEvent } = useAuthContext();
-  const { removeEvent } = useEventsContext();
+  const { deleteEvently } = useAuthContext();
   return (
     <Space wrap>
-      <Button
-        onClick={() => showDeleteConfirm(eventId, deleteEvent, removeEvent)}
-      >
+      <Button onClick={() => showDeleteConfirm(eventId, deleteEvently)}>
         מחק ארוע
       </Button>
     </Space>
