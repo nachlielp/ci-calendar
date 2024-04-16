@@ -8,7 +8,6 @@ import React from "react";
 import DeleteEvent from "./DeleteEvent";
 import EditEvent from "./EditEvent";
 import { EventlyType, IEvently } from "../../util/interfaces";
-import { TbPoint } from "react-icons/tb";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 
 interface IEventCard {

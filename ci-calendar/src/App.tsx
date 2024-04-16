@@ -16,7 +16,6 @@ import { IEvently, UserType } from "./util/interfaces";
 
 export default function App() {
   const [events, setEvents] = useState<IEvently[]>([]);
-  console.log("App.events: ", events);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const initTFirebase = async () => {
