@@ -18,8 +18,9 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "typeRoots": ["./src/types"]
   },
-  "include": ["src", "firebase.service.js"],
+  "include": ["src/**/*", "firebase.service.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
