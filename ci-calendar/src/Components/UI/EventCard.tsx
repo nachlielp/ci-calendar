@@ -56,6 +56,9 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
               {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
               {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
               {dayjs(event.subEvents[0].startTime).format("DD-MM")}
+              {event.subEvents[0].teacher && (
+                <span>&nbsp;עם {event.subEvents[0].teacher}</span>
+              )}
             </>
           ) : (
             <span>No event times available</span>

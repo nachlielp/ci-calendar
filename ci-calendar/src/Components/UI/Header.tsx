@@ -17,7 +17,7 @@ export default function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  let settingsPage = "/home";
+  let settingsPage = "/";
   if (currentUser?.userType === "admin") {
     settingsPage = "/admin";
   } else if (currentUser?.userType === "user") {
@@ -30,7 +30,7 @@ export default function Header() {
 
   const handleLogOut = () => {
     logoutContext();
-    navigate("/home");
+    navigate("/");
   };
 
   return (
@@ -55,11 +55,8 @@ export default function Header() {
 
         {currentUser && <UserInfo currentUser={currentUser} />}
         <FilterModel />
-        {currentPath !== "/home" && currentPath !== "/" && (
-          <LinkButton
-            to="/home"
-            className="text-black text-sm mr-6 font-semibold"
-          >
+        {currentPath !== "/" && currentPath !== "/" && (
+          <LinkButton to="/" className="text-black text-sm mr-6 font-semibold">
             <HomeOutlined />
           </LinkButton>
         )}

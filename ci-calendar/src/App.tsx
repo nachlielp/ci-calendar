@@ -38,7 +38,7 @@ export default function App() {
 
               <Route path="reset-password" element={<ResetPassword />} />
               <Route
-                path="/home"
+                path="/"
                 element={<EventsList events={events} isEdit={false} />}
               />
               {/* User privet routes */}
