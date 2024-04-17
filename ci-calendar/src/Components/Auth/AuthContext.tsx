@@ -32,6 +32,8 @@ interface IAuthContextType {
   createEvent: (event: IEvently) => Promise<void>;
   deleteEvently: (eventId: string) => Promise<void>;
   updateUser: (user: DbUser) => Promise<void>;
+  getEvent: (eventId: string) => Promise<IEvently | null>;
+  updateEvent: (eventId: string, event: IEvently) => Promise<void>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -151,6 +153,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await removeDocument("events", eventId);
   }
 
+  async function getEvent(eventId: string) {
+    const eventDoc = await getDocument("events", eventId);
+    if (eventDoc) {
+      return eventDoc as IEvently;
+    }
+    return null;
+  }
+
+  async function updateEvent(eventId: string, event: IEvently) {
+    await updateDocument("events", eventId, event);
+  }
+
   function subscribeToUserChanges(userId: string) {
     const unsubscribe = subscribeToDoc(
       `users/${userId}`,
@@ -171,6 +185,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     createEvent,
     deleteEvently,
     updateUser,
+    getEvent,
+    updateEvent,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

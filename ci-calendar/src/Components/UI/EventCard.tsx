@@ -20,7 +20,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
   ({ event, cardWidth, screenWidth, isEdit }, ref) => {
     const subEventLen = Object.values(event.subEvents).length;
     const footer = isEdit
-      ? [<DeleteEvent eventId={event.id} />, <EditEvent />]
+      ? [<DeleteEvent eventId={event.id} />, <EditEvent eventId={event.id} />]
       : [];
     return (
       <Card

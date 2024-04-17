@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuthContext } from "../Auth/AuthContext";
 import {
   Button,
@@ -14,7 +14,7 @@ import {
 } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { SetStateAction, useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import dayjs from "dayjs";
@@ -39,18 +39,27 @@ const formItemLayout = {
   },
 };
 
-const initialValues = {
-  "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
-  "event-time": [
-    dayjs.tz(dayjs().hour(0).minute(0), "Asia/Jerusalem"),
-    dayjs.tz(dayjs().hour(0).minute(0), "Asia/Jerusalem"),
-  ],
-  "event-tags": [tagOptions[0].value],
-};
-
-export default function EventForm() {
+export default function EditEventForm() {
   const navigate = useNavigate();
-  const { currentUser, createEvent } = useAuthContext();
+  const { getEvent, currentUser, updateEvent } = useAuthContext();
+  const { eventId } = useParams<{ eventId: string }>();
+  const [eventData, setEventData] = useState<IEvently | null>(null);
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (eventId) {
+        const eventData = await getEvent(eventId);
+        setEventData(eventData);
+      }
+    };
+    fetchEvent();
+  }, [eventId, getEvent]);
+
+  if (!eventData) return <div>Loading...</div>;
+
+  const initValues = eventToFormValues(eventData);
+
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -61,9 +70,10 @@ export default function EventForm() {
   ) {
     navigate("/");
   }
-  const [form] = Form.useForm();
 
   const handleSubmit = async (values: any) => {
+    console.log("EventForm.handleSubmit.values: ", values);
+
     const subEvents = [
       {
         startTime: dayjs(values["event-time"][0]).toISOString(),
@@ -86,9 +96,9 @@ export default function EventForm() {
     }
 
     const event: IEvently = {
-      id: uuidv4(),
+      id: eventData.id,
       address: values["address"],
-      createdAt: dayjs().toISOString(),
+      createdAt: eventData.createdAt,
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
       description: values["event-description"] || "",
@@ -99,8 +109,9 @@ export default function EventForm() {
       subEvents: subEvents,
       district: values["district"],
     };
+    console.log("EventForm.handleSubmit.event: ", event);
     try {
-      await createEvent(event);
+      await updateEvent(event.id, event);
       navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
@@ -116,7 +127,7 @@ export default function EventForm() {
         variant="filled"
         labelCol={{ span: 6, offset: 0 }}
         wrapperCol={{ span: 16, offset: 0 }}
-        initialValues={initialValues}
+        initialValues={initValues}
       >
         <Card className="mt-4 border-4">
           <Form.Item
@@ -404,10 +415,100 @@ export default function EventForm() {
           className="mt-4 flex justify-center"
         >
           <Button type="primary" htmlType="submit">
-            צור אירוע
+            עדכן אירוע
           </Button>
         </Form.Item>
       </Form>
     </Card>
   );
 }
+
+function eventToFormValues(event: IEvently) {
+  const formValues = {
+    "event-title": event.title,
+    "event-description": event.description,
+    address: event.address,
+    district: event.district,
+    "event-types": event.subEvents[0]?.type,
+    "event-tags": event.subEvents[0]?.tags,
+    "event-teacher": event.subEvents[0]?.teacher,
+    "event-date": dayjs.tz(
+      dayjs(event.subEvents[0]?.startTime),
+      "Asia/Jerusalem"
+    ),
+    "event-time": [
+      dayjs(event.subEvents[0]?.startTime).tz("Asia/Jerusalem"),
+      dayjs(event.subEvents[0]?.endTime).tz("Asia/Jerusalem"),
+    ],
+    "sub-events": event.subEvents.slice(1).map((subEvent) => ({
+      type: subEvent.type,
+      tags: subEvent.tags,
+      teacher: subEvent.teacher,
+      time: [
+        dayjs(subEvent.startTime).tz("Asia/Jerusalem"),
+        dayjs(subEvent.endTime).tz("Asia/Jerusalem"),
+      ],
+    })),
+    links: event.links.map((link) => ({
+      title: link.title,
+      link: link.link,
+    })),
+    prices: event.price.map((price) => ({
+      title: price.title,
+      sum: price.sum,
+    })),
+  };
+
+  return formValues;
+}
+
+// const testFormData = {
+//   id: "e86221b0-444c-4432-903a-38f06fdc4eb1",
+//   address: 'סטודיו נעים סניף שלמה 39 ת"א',
+//   createdAt: "2024-04-17T05:26:18.918Z",
+//   updatedAt: "2024-04-17T05:26:18.918Z",
+//   title: "שיעור שבועי עם רועי שקד בדגש סומטי וטכני",
+//   description: "תיאור כולשהו של האירוע",
+//   owners: ["sCOY7FqMVMTGrz8ZYCawYIdE0bM2"],
+//   links: [
+//     {
+//       title: "פרטים נוספים",
+//       link: "https://www.naim.org.il/contact-impro/",
+//     },
+//   ],
+//   price: [
+//     {
+//       title: " שיעור",
+//       sum: 50,
+//     },
+//     {
+//       title: "גאם",
+//       sum: 30,
+//     },
+//   ],
+//   hide: false,
+//   subEvents: [
+//     {
+//       startTime: "2024-04-19T03:00:02.800Z",
+//       endTime: "2024-04-19T04:00:02.800Z",
+//       type: "class",
+//       tags: ["everyone", "pre-registration"],
+//       teacher: "רועי שקד",
+//     },
+//     {
+//       type: "jame",
+//       tags: ["everyone"],
+//       teacher: "",
+//       startTime: "2024-04-19T04:00:00.000Z",
+//       endTime: "2024-04-19T08:00:00.000Z",
+//     },
+//     {
+//       type: "class",
+//       tags: [],
+//       teacher: "",
+//       startTime: "2024-04-17T08:00:00.000Z",
+//       endTime: "2024-04-17T12:00:00.000Z",
+//     },
+//   ],
+//   district: "center",
+// };
