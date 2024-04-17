@@ -39,7 +39,7 @@ export const firebaseService = {
   addDocument,
   updateDocument,
   removeDocument,
-  subscribe: subscribeToCollection,
+  subscribeToCollection,
   signinGoogle,
   logout,
 };
@@ -178,12 +178,6 @@ export async function removeDocument(collectionName, id) {
     throw error;
   }
 }
-
-// interface DocumentFilters {
-//   userId?;
-//   afterDate?;
-//   beforeDate?;
-// }
 
 export let gLastDocForPaging = null;
 

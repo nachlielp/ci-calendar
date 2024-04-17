@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
 import { firebaseService } from "../firebase.service";
-import { IEvently } from "../util/interfaces";
+import { DbUser } from "../util/interfaces";
 
-export const useEvents = () => {
-  const [events, setEvents] = useState<IEvently[]>([]);
+export const useUsers = () => {
+  const [users, setUsers] = useState<DbUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const initTFirebase = async () => {
       firebaseService.initFirebaseJS();
-      firebaseService.subscribeToCollection("events", (events: any) => {
-        setEvents(events);
+      firebaseService.subscribeToCollection("users", (users: any) => {
+        setUsers(users);
         setLoading(false);
       });
     };
     initTFirebase();
   }, []);
-  return { events, loading };
+  return { users, loading };
 };

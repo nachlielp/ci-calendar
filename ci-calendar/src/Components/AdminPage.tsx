@@ -13,7 +13,7 @@ function AdminPage() {
         הוסף אירוע
       </LinkButton>
       <LinkButton to="/manage-users" className="w-24 h-24 m-4">
-        הגדרת משתמשים
+        הגדרת <br /> משתמשים
       </LinkButton>
     </div>
   );

@@ -24,7 +24,7 @@ export const LinkButton = ({
   return (
     <Link to={to} className="flex items-center justify-center  h-full">
       <Button
-        className={`flex items-center justify-center ${className}`} // Add flexbox utilities
+        className={`flex items-center justify-center flex-wrap  ${className}`} // Add flexbox utilities
         disabled={disabled}
         shape={shape}
         onClick={onClick}
