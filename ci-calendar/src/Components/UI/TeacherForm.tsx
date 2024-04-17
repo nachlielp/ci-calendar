@@ -67,8 +67,8 @@ export default function TeacherForm() {
           mailingList: currentUser.newsletter,
           bio: currentUser.bio,
           img: currentUser.img,
-          pageUrl: currentUser.pageUrl.link,
-          pageUrlTitle: currentUser.pageUrl.title,
+          pageUrl: currentUser.pageUrl?.link,
+          pageUrlTitle: currentUser.pageUrl?.title,
           phoneNumber: currentUser.phoneNumber,
         }}
       >
