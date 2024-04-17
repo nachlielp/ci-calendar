@@ -1,3 +1,4 @@
+import { EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 
@@ -12,7 +13,11 @@ const EditEvent: React.FC<EditEventProps> = ({ eventId }) => {
     navigate(`/edit-event/${eventId}`);
   };
 
-  return <Button onClick={handleEdit}>Edit</Button>;
+  return (
+    <Button onClick={handleEdit}>
+      <EditOutlined />
+    </Button>
+  );
 };
 
 export default EditEvent;

@@ -1,4 +1,4 @@
-import { ExclamationCircleFilled } from "@ant-design/icons";
+import { DeleteOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Button, Modal, Space } from "antd";
 import { useAuthContext } from "../Auth/AuthContext";
 
@@ -34,7 +34,7 @@ const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
   return (
     <Space wrap>
       <Button onClick={() => showDeleteConfirm(eventId, deleteEvently)}>
-        מחק ארוע
+        <DeleteOutlined />
       </Button>
     </Space>
   );

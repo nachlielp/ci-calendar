@@ -14,7 +14,6 @@ import {
 } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { SetStateAction, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import dayjs from "dayjs";

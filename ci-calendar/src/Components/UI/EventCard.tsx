@@ -43,13 +43,6 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
                   {type}
                 </Tag>
               ))}
-              {/* {getTags(event).length > 0
-                ? getTags(event).map((tags, index) => (
-                    <Tag key={`${tags}-${index}`} color="green">
-                      {tags}
-                    </Tag>
-                  ))
-                : ""} */}
             </span>
           </span>
         }
@@ -133,8 +126,14 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
 );
 
 const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
+  let types = Array.from(new Set([...t1, ...(t2 || [])]));
+  t2?.forEach((element) => {
+    if (!types.includes(element)) {
+      types.push(element);
+    }
+  });
   return (
-    [...t1, ...(t2 || [])]
+    types
       .filter((type) => !!type)
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
