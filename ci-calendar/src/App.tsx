@@ -17,20 +17,11 @@ import BioPage from "./Components/UI/BioPage";
 import EditEventForm from "./Components/UI/EditEventForm";
 import Loading from "./Components/UI/Loading";
 import AdminPage from "./Components/AdminPage";
+import ManageUsers from "./Components/UI/ManageUsers";
+import { useEvents } from "./hooks/useEvents";
 
 export default function App() {
-  const [events, setEvents] = useState<IEvently[]>([]);
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    const initTFirebase = async () => {
-      firebaseService.initFirebaseJS();
-      firebaseService.subscribe("events", (events: any) => {
-        setEvents(events);
-        setLoading(false);
-      });
-    };
-    initTFirebase();
-  }, []);
+  const { events, loading } = useEvents();
 
   if (loading) {
     return <Loading />;
@@ -94,6 +85,7 @@ export default function App() {
                 element={<PrivateRoutes requiredRoles={[UserType.admin]} />}
               >
                 <Route path="/admin" element={<AdminPage />} />
+                <Route path="/manage-users" element={<ManageUsers />} />
               </Route>
               <Route
                 path="*"
