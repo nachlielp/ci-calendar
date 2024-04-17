@@ -116,13 +116,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (userRes === null) {
         const newUser: DbUser = {
           id: user.uid,
-          name: user.displayName || "",
+          fullName: user.displayName || "",
           userType: UserType.user,
           email: user.email || "",
           bio: "",
           newsletter: false,
-          image: "",
-          page: "",
+          img: "",
+          pageUrl: "",
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };

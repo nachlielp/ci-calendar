@@ -92,7 +92,9 @@ const UserInfo = ({ currentUser }: IUserInfoProps) => {
     <div>
       {currentUser && (
         <div className="mr-2 md:mr-6 md:ml-6">
-          <p className="text-black text-sm font-semibold">{currentUser.name}</p>
+          <p className="text-black text-sm font-semibold">
+            {currentUser.fullName}
+          </p>
           <p className="text-gray-400 text-xs font-semibold">
             {currentUser.email}
           </p>

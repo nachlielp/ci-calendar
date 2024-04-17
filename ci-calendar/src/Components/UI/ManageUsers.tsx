@@ -9,7 +9,7 @@ const searchResult = (query: string, users: DbUser[]) => {
   return users
     .filter(
       (user) =>
-        user.name.toLowerCase().includes(query.toLowerCase()) ||
+        user.fullName.toLowerCase().includes(query.toLowerCase()) ||
         user.email.toLowerCase().includes(query.toLowerCase())
     )
     .map((user) => ({
@@ -17,7 +17,7 @@ const searchResult = (query: string, users: DbUser[]) => {
       label: (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span>
-            {user.name} - {user.email}
+            {user.fullName} - {user.email}
           </span>
         </div>
       ),
@@ -42,7 +42,7 @@ function ManageUsers() {
     const user = users.find((user) => user.id === value);
     if (user) {
       setSelectedUser(user);
-      setInputValue(user.name);
+      setInputValue(user.fullName);
     }
   };
 
@@ -122,7 +122,7 @@ function ManageUsers() {
         </AutoComplete>
         {selectedUser && (
           <div>
-            <p>{selectedUser.name}</p>
+            <p>{selectedUser.fullName}</p>
             <p>{selectedUser.email}</p>
             <p>{selectedUser.userType}</p>
           </div>

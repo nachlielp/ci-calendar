@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import React from "react";
 import DeleteEvent from "./DeleteEvent";
 import EditEvent from "./EditEvent";
-import { EventlyType, IEvently } from "../../util/interfaces";
+import { IEventi, IEvently } from "../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 
 interface IEventCard {
@@ -36,7 +36,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
             <span className="block">
               {getTypes(
                 Object.values(event.subEvents).flatMap(
-                  (subEvent) => subEvent.type as EventlyType
+                  (subEvent) => subEvent.type as IEventi
                 )
               ).map((type, index) => (
                 <Tag color="blue" key={`${type}-${index}`}>
@@ -67,7 +67,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
               <VscDebugBreakpointLog className="inline-block mb-1" />
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
-              {getType(subEvent.type as EventlyType)}
+              {getType(subEvent.type as IEventi)}
               {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
               {subEvent.tags && (
                 <span>
@@ -125,7 +125,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
   }
 );
 
-const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
+const getTypes = (t1: IEventi[], t2?: IEventi[]) => {
   let types = Array.from(new Set([...t1, ...(t2 || [])]));
   t2?.forEach((element) => {
     if (!types.includes(element)) {
@@ -138,7 +138,7 @@ const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getType = (type: EventlyType) => {
+const getType = (type: IEventi) => {
   return eventTypes.find((et) => et.value === type)?.label;
 };
 const getTag = (tag: string) => {

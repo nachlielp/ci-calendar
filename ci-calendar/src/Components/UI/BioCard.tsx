@@ -6,21 +6,26 @@ function BioCard() {
   const { currentUser } = useAuthContext();
   if (!currentUser) throw new Error("BioCard: No user found");
 
+  const imgComponent = currentUser.img ? (
+    <img alt="example" src={currentUser.img} />
+  ) : (
+    ""
+  );
   return (
     <div className="flex justify-center items-center w-full ">
       <Card
         className=" mt-6  w-full"
         hoverable
         style={{ width: 340 }}
-        cover={<img alt="example" src={currentUser.image} />}
+        cover={imgComponent}
       >
-        <Meta title={currentUser.name} description={currentUser.bio} />
-        {currentUser.page && (
+        <Meta title={currentUser.fullName} description={currentUser.bio} />
+        {currentUser.pageUrl && (
           <Button
             className="mt-5 w-full"
-            key={currentUser.page}
+            key={currentUser.pageUrl.link}
             type="default"
-            href={currentUser.page}
+            href={currentUser.pageUrl.link}
             target="_blank"
           >
             דף פרופיל

@@ -15,26 +15,34 @@ type FieldType = {
   name?: string;
   mailingList?: string;
   bio?: string;
-  image?: string;
-  page?: string;
+  img?: string;
+  pageUrl?: string;
+  pageUrlTitle?: string;
   upload?: string;
+  phoneNumber?: string;
 };
 
 export default function TeacherForm() {
   const { currentUser, updateUser } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
-  const [imageUrl, setImageUrl] = useState<string>(currentUser.image);
+  const [imageUrl, setImageUrl] = useState<string>(currentUser.img);
 
   const uploadNewImage = (url: string) => {
     setImageUrl(url);
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    currentUser.name = values.name || currentUser.name;
+    currentUser.fullName = values.name || currentUser.fullName;
     currentUser.newsletter = values.mailingList?.toString() === "true";
+    currentUser.subscribedForUpdatesAt = currentUser.newsletter
+      ? new Date().toISOString()
+      : "";
     currentUser.bio = values.bio || currentUser.bio;
-    currentUser.image = imageUrl || currentUser.image;
-    currentUser.page = values.page || currentUser.page;
+    currentUser.img = imageUrl || currentUser.img;
+    currentUser.pageUrl = {
+      link: values.pageUrl || currentUser.pageUrl.link,
+      title: values.pageUrlTitle || currentUser.pageUrl.title,
+    };
     try {
       await updateUser(currentUser);
     } catch (error) {
@@ -55,11 +63,13 @@ export default function TeacherForm() {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         initialValues={{
-          name: currentUser.name,
+          name: currentUser.fullName,
           mailingList: currentUser.newsletter,
           bio: currentUser.bio,
-          image: currentUser.image,
-          page: currentUser.page,
+          img: currentUser.img,
+          pageUrl: currentUser.pageUrl.link,
+          pageUrlTitle: currentUser.pageUrl.title,
+          phoneNumber: currentUser.phoneNumber,
         }}
       >
         <Form.Item<FieldType>
@@ -80,8 +90,26 @@ export default function TeacherForm() {
 
         <Form.Item<FieldType>
           label="קישור לדף פרופיל"
-          name="page"
+          name="pageUrl"
           rules={[{ type: "url", warningOnly: true }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="כותרת קישור לדף פרופיל"
+          name="pageUrlTitle"
+          rules={[
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (getFieldValue("pageUrl") && !value) {
+                  return Promise.reject(
+                    new Error("נא להזין כותרת קישור לדף פרופיל")
+                  );
+                }
+                return Promise.resolve();
+              },
+            }),
+          ]}
         >
           <Input />
         </Form.Item>
@@ -90,7 +118,20 @@ export default function TeacherForm() {
           <Input.TextArea rows={6} />
         </Form.Item>
 
-        <Form.Item<FieldType> label="תמונה" name="image">
+        <Form.Item<FieldType>
+          label="מספר פלאפון"
+          name="phoneNumber"
+          rules={[
+            { required: true, message: "נא להזין מספר טלפון" },
+            {
+              pattern: /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
+              message: "נא להזין מספר טלפון ישראלי תקני",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item<FieldType> label="תמונה" name="img">
           <Image width={200} src={imageUrl} />
         </Form.Item>
         <Form.Item<FieldType> label="תמונה" name="upload">

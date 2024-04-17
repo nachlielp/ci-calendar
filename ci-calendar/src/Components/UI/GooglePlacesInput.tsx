@@ -48,24 +48,24 @@ export interface IGooglePlaceOption {
   label: string;
   value: {
     place_id: string;
-    // description: string;
-    // matched_substrings: Array<{
-    //   length: number;
-    //   offset: number;
-    // }>;
-    // reference: string;
-    // structured_formatting: {
-    //   main_text: string;
-    //   main_text_matched_substrings: Array<{
-    //     length: number;
-    //     offset: number;
-    //   }>;
-    //   secondary_text: string;
-    // };
-    // terms: Array<{
-    //   offset: number;
-    //   value: string;
-    // }>;
-    // types: string[];
+    description: string;
+    matched_substrings: Array<{
+      length: number;
+      offset: number;
+    }>;
+    reference: string;
+    structured_formatting: {
+      main_text: string;
+      main_text_matched_substrings: Array<{
+        length: number;
+        offset: number;
+      }>;
+      secondary_text: string;
+    };
+    terms: Array<{
+      offset: number;
+      value: string;
+    }>;
+    types: string[];
   };
 }
