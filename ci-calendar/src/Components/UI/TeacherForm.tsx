@@ -22,7 +22,10 @@ type FieldType = {
   phoneNumber?: string;
 };
 
-export default function TeacherForm() {
+interface ITeacherFormProps {
+  handleSubmit: () => void;
+}
+export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
   const { currentUser, updateUser } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
   const [imageUrl, setImageUrl] = useState<string>(currentUser.img);
@@ -32,19 +35,25 @@ export default function TeacherForm() {
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    currentUser.fullName = values.name || currentUser.fullName;
-    currentUser.newsletter = values.mailingList?.toString() === "true";
-    currentUser.subscribedForUpdatesAt = currentUser.newsletter
-      ? new Date().toISOString()
-      : "";
-    currentUser.bio = values.bio || currentUser.bio;
-    currentUser.img = imageUrl || currentUser.img;
+    console.log("TeacherForm.onFinish.values: ", values);
+    const { name, mailingList, bio, img, pageUrl, pageUrlTitle, phoneNumber } =
+      values;
+    currentUser.fullName = name || currentUser.fullName;
+    currentUser.newsletter = mailingList?.toString() === "true";
+    currentUser.subscribedForUpdatesAt =
+      !currentUser.newsletter && mailingList?.toString() === "true"
+        ? new Date().toISOString()
+        : "";
+    currentUser.bio = bio || "";
+    currentUser.img = imageUrl || "";
     currentUser.pageUrl = {
-      link: values.pageUrl || currentUser.pageUrl.link,
-      title: values.pageUrlTitle || currentUser.pageUrl.title,
+      link: pageUrl || "",
+      title: pageUrlTitle || "",
     };
+    currentUser.phoneNumber = phoneNumber || "";
     try {
       await updateUser(currentUser);
+      handleSubmit();
     } catch (error) {
       console.error("UserForm.onFinish.error: ", error);
     }
@@ -122,7 +131,6 @@ export default function TeacherForm() {
           label="מספר פלאפון"
           name="phoneNumber"
           rules={[
-            { required: true, message: "נא להזין מספר טלפון" },
             {
               pattern: /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
               message: "נא להזין מספר טלפון ישראלי תקני",
@@ -132,7 +140,16 @@ export default function TeacherForm() {
           <Input />
         </Form.Item>
         <Form.Item<FieldType> label="תמונה" name="img">
-          <Image width={200} src={imageUrl} />
+          <div className="flex flex-col items-center space-y-2">
+            <Image width={200} src={imageUrl} />
+            <Button
+              type="default"
+              onClick={() => setImageUrl("")}
+              className="bg-red-400 text-white"
+            >
+              Clear
+            </Button>
+          </div>
         </Form.Item>
         <Form.Item<FieldType> label="תמונה" name="upload">
           <CloudinaryUpload uploadNewImage={uploadNewImage} />

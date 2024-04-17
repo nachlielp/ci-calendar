@@ -7,7 +7,7 @@ function BioCard() {
   if (!currentUser) throw new Error("BioCard: No user found");
 
   const imgComponent = currentUser.img ? (
-    <img alt="example" src={currentUser.img} />
+    <img alt="example" src={currentUser.img} key={currentUser.img} />
   ) : (
     ""
   );
@@ -20,7 +20,7 @@ function BioCard() {
         cover={imgComponent}
       >
         <Meta title={currentUser.fullName} description={currentUser.bio} />
-        {currentUser.pageUrl && (
+        {currentUser.pageUrl.link && (
           <Button
             className="mt-5 w-full"
             key={currentUser.pageUrl.link}

@@ -5,6 +5,9 @@ import BioCard from "./BioCard";
 
 function BioPage() {
   const [editProfile, setEditProfile] = useState(false);
+  const handleSubmitEdit = () => {
+    setEditProfile(false);
+  };
   return (
     <div>
       <div className="flex justify-center mt-2">
@@ -14,7 +17,11 @@ function BioPage() {
           <Button onClick={() => setEditProfile(true)}>עריכת פרופיל</Button>
         )}
       </div>
-      {editProfile ? <TeacherForm /> : <BioCard />}
+      {editProfile ? (
+        <TeacherForm handleSubmit={handleSubmitEdit} />
+      ) : (
+        <BioCard />
+      )}
     </div>
   );
 }
