@@ -20,7 +20,9 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { tagOptions, eventTypes, districtOptions } from "../../util/options";
-import { IEvently, UserType } from "../../util/interfaces";
+import { IAddress, IEvently, UserType } from "../../util/interfaces";
+import GooglePlacesInput, { IGooglePlaceOption } from "./GooglePlacesInput";
+import { useState } from "react";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -46,6 +48,7 @@ const initialValues = {
 export default function EventForm() {
   const navigate = useNavigate();
   const { currentUser, createEvent } = useAuthContext();
+  const [address, setAddress] = useState<IAddress>();
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -58,6 +61,14 @@ export default function EventForm() {
   }
   const [form] = Form.useForm();
 
+  const handleAddressSelect = (place: IGooglePlaceOption) => {
+    const selectedAddress = {
+      label: place.label,
+      place_id: place.value.place_id,
+    };
+    setAddress(selectedAddress);
+    form.setFieldValue("address", selectedAddress);
+  };
   const handleSubmit = async (values: any) => {
     const subEvents = [
       {
@@ -79,10 +90,13 @@ export default function EventForm() {
         })
       );
     }
-
+    if (!address) {
+      return;
+    }
+    console.log("EventForm.handleSubmit.address: ", address);
     const event: IEvently = {
       id: uuidv4(),
-      address: values["address"],
+      address: address,
       createdAt: dayjs().toISOString(),
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
@@ -142,7 +156,11 @@ export default function EventForm() {
             name="address"
             rules={[{ required: true, message: "שדה חובה" }]}
           >
-            <Input />
+            <GooglePlacesInput
+              onPlaceSelect={(place: IGooglePlaceOption) => {
+                handleAddressSelect(place);
+              }}
+            />
           </Form.Item>
 
           <Form.Item

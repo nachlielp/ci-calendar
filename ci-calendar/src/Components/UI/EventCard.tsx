@@ -83,7 +83,7 @@ export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
           ))}
         <p className="flex items-center">
           <FaMapMarkedAlt className="ml-2" />
-          {event.address}
+          {event.address.label}
         </p>
 
         {!isWhiteSpace(event.description) && (

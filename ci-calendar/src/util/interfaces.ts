@@ -20,11 +20,15 @@ interface ILinks {
   link: string;
   title: string;
 }
+export interface IAddress {
+  place_id: string;
+  label: string;
+}
 export interface IEvently {
   id: string;
   title: string;
   description: string;
-  address: string;
+  address: IAddress;
   createdAt: string;
   updatedAt: string;
   owners: string[];

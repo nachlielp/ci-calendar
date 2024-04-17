@@ -17,6 +17,7 @@ import Loading from "./Components/UI/Loading";
 import AdminPage from "./Components/AdminPage";
 import ManageUsers from "./Components/UI/ManageUsers";
 import { useEvents } from "./hooks/useEvents";
+import TestPage from "./Components/TestPage";
 
 export default function App() {
   const { events, loading } = useEvents();
@@ -75,7 +76,6 @@ export default function App() {
                   element={<EditEventForm />}
                 />
                 <Route path="/bio" element={<BioPage />} />
-                <Route path="/test" element={<EditEventForm />} />
               </Route>
 
               {/* Admin privet routes */}
@@ -84,6 +84,7 @@ export default function App() {
               >
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/manage-users" element={<ManageUsers />} />
+                <Route path="/test" element={<TestPage />} />
               </Route>
               <Route
                 path="*"
