@@ -21,6 +21,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { tagOptions, eventTypes, districtOptions } from "../../util/options";
 import { IEvently, UserType } from "../../util/interfaces";
+import Loading from "./Loading";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -55,7 +56,7 @@ export default function EditEventForm() {
     fetchEvent();
   }, [eventId, getEvent]);
 
-  if (!eventData) return <div>Loading...</div>;
+  if (!eventData) return <Loading />;
 
   const initValues = eventToFormValues(eventData);
 
