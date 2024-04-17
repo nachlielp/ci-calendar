@@ -20,8 +20,9 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { tagOptions, eventTypes, districtOptions } from "../../util/options";
-import { IEvently, UserType } from "../../util/interfaces";
+import { IAddress, IEvently, UserType } from "../../util/interfaces";
 import Loading from "./Loading";
+import GooglePlacesInput, { IGooglePlaceOption } from "./GooglePlacesInput";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -44,6 +45,7 @@ export default function EditEventForm() {
   const { getEvent, currentUser, updateEvent } = useAuthContext();
   const { eventId } = useParams<{ eventId: string }>();
   const [eventData, setEventData] = useState<IEvently | null>(null);
+  const [newAddress, setNewAddress] = useState<IAddress | null>(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -58,7 +60,16 @@ export default function EditEventForm() {
 
   if (!eventData) return <Loading />;
 
-  const initValues = eventToFormValues(eventData);
+  const { currentFormValues, address } = eventToFormValues(eventData);
+
+  const handleAddressSelect = (place: IGooglePlaceOption) => {
+    const selectedAddress = {
+      label: place.label,
+      place_id: place.value.place_id,
+    };
+    setNewAddress(selectedAddress);
+    form.setFieldValue("address", selectedAddress);
+  };
 
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
@@ -97,7 +108,7 @@ export default function EditEventForm() {
 
     const event: IEvently = {
       id: eventData.id,
-      address: values["address"],
+      address: newAddress || address,
       createdAt: eventData.createdAt,
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
@@ -109,7 +120,6 @@ export default function EditEventForm() {
       subEvents: subEvents,
       district: values["district"],
     };
-    console.log("EventForm.handleSubmit.event: ", event);
     try {
       await updateEvent(event.id, event);
       navigate("/");
@@ -127,7 +137,7 @@ export default function EditEventForm() {
         variant="filled"
         labelCol={{ span: 6, offset: 0 }}
         wrapperCol={{ span: 16, offset: 0 }}
-        initialValues={initValues}
+        initialValues={currentFormValues}
       >
         <Card className="mt-4 border-4">
           <Form.Item
@@ -158,7 +168,12 @@ export default function EditEventForm() {
             name="address"
             rules={[{ required: true, message: "שדה חובה" }]}
           >
-            <Input />
+            <GooglePlacesInput
+              onPlaceSelect={(place: IGooglePlaceOption) => {
+                handleAddressSelect(place);
+              }}
+              defaultValue={address}
+            />
           </Form.Item>
 
           <Form.Item
@@ -424,7 +439,7 @@ export default function EditEventForm() {
 }
 
 function eventToFormValues(event: IEvently) {
-  const formValues = {
+  const currentFormValues = {
     "event-title": event.title,
     "event-description": event.description,
     address: event.address,
@@ -459,7 +474,7 @@ function eventToFormValues(event: IEvently) {
     })),
   };
 
-  return formValues;
+  return { currentFormValues, address: event.address };
 }
 
 // const testFormData = {
