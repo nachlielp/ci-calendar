@@ -121,8 +121,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
           email: user.email || "",
           bio: "",
           newsletter: false,
+          subscribedForUpdatesAt: "",
+          phoneNumber: "",
           img: "",
-          pageUrl: "",
+          pageUrl: {
+            link: "",
+            title: "",
+          },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
