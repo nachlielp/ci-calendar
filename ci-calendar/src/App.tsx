@@ -16,6 +16,7 @@ import { IEvently, UserType } from "./util/interfaces";
 import BioPage from "./Components/UI/BioPage";
 import EditEventForm from "./Components/UI/EditEventForm";
 import Loading from "./Components/UI/Loading";
+import AdminPage from "./Components/AdminPage";
 
 export default function App() {
   const [events, setEvents] = useState<IEvently[]>([]);
@@ -92,7 +93,7 @@ export default function App() {
               <Route
                 element={<PrivateRoutes requiredRoles={[UserType.admin]} />}
               >
-                {/* <Route path="/event-form" element={<EventForm />} /> */}
+                <Route path="/admin" element={<AdminPage />} />
               </Route>
               <Route
                 path="*"

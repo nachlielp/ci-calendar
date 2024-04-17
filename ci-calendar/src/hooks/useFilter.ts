@@ -9,7 +9,7 @@ export const useFilter = (events: IEvently[], uid?: string) => {
   if (uid) {
     filteredEvents = events.filter((event) => event.owners.includes(uid));
   }
-  filteredEvents = events.filter((event) => {
+  filteredEvents = filteredEvents.filter((event) => {
     const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
     if (eventTypes.length === 0 && districts.length === 0) {
       return true;

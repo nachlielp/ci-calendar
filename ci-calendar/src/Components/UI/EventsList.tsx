@@ -5,6 +5,9 @@ import { useWindowResize } from "../../hooks/useWindowResize";
 import ErrorBoundary from "./ErrorBoundary";
 import { useFilter } from "../../hooks/useFilter";
 import { IEvently } from "../../util/interfaces";
+import { useAuthContext } from "../Auth/AuthContext";
+import Loading from "./Loading";
+import EmptyList from "./Empty";
 
 interface IEventsList {
   events: IEvently[];
@@ -12,9 +15,18 @@ interface IEventsList {
 }
 const EventsList: React.FC<IEventsList> = ({ events, isEdit }) => {
   const { height, width } = useWindowResize();
-  const filteredEvents = useFilter(events);
+  const { currentUser } = useAuthContext();
+  const isAdmin = currentUser?.userType === "admin";
+  let filteredEvents = useFilter(events);
+  if (isEdit && !isAdmin) {
+    filteredEvents = useFilter(events, currentUser?.id);
+  } else {
+    filteredEvents = useFilter(events);
+  }
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);
+  if (!filteredEvents.length && isEdit && !isAdmin) return <EmptyList />;
+  if (!filteredEvents) return <Loading />;
   return (
     <VirtualList
       className="flex justify-center items-center w-full"

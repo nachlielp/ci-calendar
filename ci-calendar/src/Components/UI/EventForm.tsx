@@ -40,10 +40,6 @@ const formItemLayout = {
 
 const initialValues = {
   "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
-  "event-time": [
-    dayjs.tz(dayjs().hour(0).minute(0), "Asia/Jerusalem"),
-    dayjs.tz(dayjs().hour(0).minute(0), "Asia/Jerusalem"),
-  ],
   "event-tags": [tagOptions[0].value],
 };
 
