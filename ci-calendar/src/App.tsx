@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { AuthProvider } from "./Components/Auth/AuthContext";
@@ -11,8 +10,7 @@ import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
 import EventForm from "./Components/UI/EventForm";
 import EventsList from "./Components/UI/EventsList";
-import { firebaseService } from "./firebase.service";
-import { IEvently, UserType } from "./util/interfaces";
+import { UserType } from "./util/interfaces";
 import BioPage from "./Components/UI/BioPage";
 import EditEventForm from "./Components/UI/EditEventForm";
 import Loading from "./Components/UI/Loading";
