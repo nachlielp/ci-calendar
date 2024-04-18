@@ -1,5 +1,5 @@
-import type { BadgeProps, CalendarProps } from "antd";
-import { Badge, Calendar, Card } from "antd";
+import type { CalendarProps } from "antd";
+import { Calendar, Card } from "antd";
 import type { Dayjs } from "dayjs";
 import { useWindowSize } from "../../hooks/useWindowSize";
 
