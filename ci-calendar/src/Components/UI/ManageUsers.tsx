@@ -2,7 +2,7 @@ import { AutoComplete, Button, Card, Input, SelectProps } from "antd";
 import { useState } from "react";
 import { DbUser, UserType } from "../../util/interfaces";
 import { useUsers } from "../../hooks/useUsers";
-import { useWindowResize } from "../../hooks/useWindowResize";
+import { useWindowSize } from "../../hooks/useWindowSize";
 import { useAuthContext } from "../Auth/AuthContext";
 
 const searchResult = (query: string, users: DbUser[]) => {
@@ -29,7 +29,7 @@ function ManageUsers() {
   const [selectedUser, setSelectedUser] = useState<DbUser | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
   const { users } = useUsers();
-  const { width } = useWindowResize();
+  const { width } = useWindowSize();
   const { updateUser } = useAuthContext();
 
   const handleSearch = (value: string) => {

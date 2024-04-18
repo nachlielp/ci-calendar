@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { SelectOption } from "../util/options";
 
-interface IUseParamsProps {
+interface IUseParamsHandlerProps {
   title: string;
   options: SelectOption[];
 }
 
-interface IUseParams {
+interface IUseParamsHandler {
   currentValues: string[];
   onOptionsChange: (type: string) => (values: string[]) => void;
   clearSearchParams: (titles: string[]) => void;
@@ -15,7 +15,7 @@ interface IUseParams {
 export const useParamsHandler = ({
   title,
   options,
-}: IUseParamsProps): IUseParams => {
+}: IUseParamsHandlerProps): IUseParamsHandler => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentValues, setCurrentValues] = useState<string[]>([]);
 

@@ -1,7 +1,7 @@
 import React from "react";
 import VirtualList from "rc-virtual-list";
 import { EventCard } from "./EventCard";
-import { useWindowResize } from "../../hooks/useWindowResize";
+import { useWindowSize } from "../../hooks/useWindowSize";
 import ErrorBoundary from "./ErrorBoundary";
 import { useFilter } from "../../hooks/useFilter";
 import { IEvently } from "../../util/interfaces";
@@ -9,12 +9,12 @@ import { useAuthContext } from "../Auth/AuthContext";
 import Loading from "./Loading";
 import EmptyList from "./Empty";
 
-interface IEventsList {
+interface IEventsListProps {
   events: IEvently[];
   isEdit: boolean;
 }
-const EventsList: React.FC<IEventsList> = ({ events, isEdit }) => {
-  const { height, width } = useWindowResize();
+const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
+  const { height, width } = useWindowSize();
   const { currentUser } = useAuthContext();
   const isAdmin = currentUser?.userType === "admin";
   let filteredEvents = useFilter(events);

@@ -9,7 +9,6 @@ import Header from "./Components/UI/Header";
 import UserPage from "./Components/UserPage";
 import TeacherPage from "./Components/TeacherPage";
 import EventForm from "./Components/UI/EventForm";
-import EventsList from "./Components/UI/EventsList";
 import { UserType } from "./util/interfaces";
 import BioPage from "./Components/UI/BioPage";
 import EditEventForm from "./Components/UI/EditEventForm";
@@ -18,6 +17,7 @@ import AdminPage from "./Components/AdminPage";
 import ManageUsers from "./Components/UI/ManageUsers";
 import { useEvents } from "./hooks/useEvents";
 import TestPage from "./Components/TestPage";
+import EventsDisplay from "./Components/UI/EventsDisplay";
 
 export default function App() {
   const { events, loading } = useEvents();
@@ -39,7 +39,7 @@ export default function App() {
               <Route path="reset-password" element={<ResetPassword />} />
               <Route
                 path="/"
-                element={<EventsList events={events} isEdit={false} />}
+                element={<EventsDisplay events={events} isEdit={false} />}
               />
               {/* User privet routes */}
               <Route
@@ -69,7 +69,7 @@ export default function App() {
                 <Route path="/event-form" element={<EventForm />} />
                 <Route
                   path="/edit-events-list"
-                  element={<EventsList events={events} isEdit={true} />}
+                  element={<EventsDisplay events={events} isEdit={true} />}
                 />
                 <Route
                   path="/edit-event/:eventId"
@@ -88,7 +88,7 @@ export default function App() {
               </Route>
               <Route
                 path="*"
-                element={<EventsList events={events} isEdit={false} />}
+                element={<EventsDisplay events={events} isEdit={false} />}
               />
             </Routes>
           </AuthProvider>
