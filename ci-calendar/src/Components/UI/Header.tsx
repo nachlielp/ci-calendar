@@ -9,6 +9,11 @@ import {
   LoginOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
+import { TfiLayoutAccordionMerged } from "react-icons/tfi";
+//<TfiLayoutAccordionMerged /> to calendar
+import { TfiLayoutMenuV } from "react-icons/tfi";
+//<TfiLayoutMenuV /> to list
+
 import FilterModel from "./FilterModel";
 import { DbUser } from "../../util/interfaces";
 
@@ -25,7 +30,6 @@ export default function Header() {
   } else if (currentUser?.userType === "teacher") {
     settingsPage = "/teacher";
   }
-  console.log("Header.currentUser", currentUser);
 
   const currentPath = location.pathname;
 
@@ -56,7 +60,7 @@ export default function Header() {
 
         {currentUser && <UserInfo currentUser={currentUser} />}
         <FilterModel />
-        {currentPath !== "/" && currentPath !== "/" && (
+        {currentPath !== "/" && (
           <LinkButton to="/" className="text-black text-sm mr-6 font-semibold">
             <HomeOutlined />
           </LinkButton>
@@ -85,7 +89,6 @@ interface IUserInfoProps {
   currentUser: DbUser;
 }
 const UserInfo = ({ currentUser }: IUserInfoProps) => {
-  // console.log("Header.currentUser", currentUser);
   return (
     <div>
       {currentUser && (
