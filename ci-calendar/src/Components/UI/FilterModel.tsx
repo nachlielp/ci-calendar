@@ -1,44 +1,26 @@
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Checkbox, Modal } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
-import { eventTypes, districtOptions, SelectOption } from "../../util/options";
-import { useSearchParams } from "react-router-dom";
+import { eventTypes, districtOptions } from "../../util/options";
+import { useParamsHandler } from "../../hooks/useParamsHandler";
 
 export default function FilterModel() {
   const [modalOpen, setModalOpen] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const getInitialValues = useCallback(
-    (paramName: string, options: SelectOption[]) => {
-      const params = searchParams.getAll(paramName);
-      return options
-        .filter((option) => params.includes(option.value))
-        .map((option) => option.value);
-    },
-    [searchParams]
-  );
+  const {
+    currentValues: currentEventTypeValues,
+    onOptionsChange: onEventTypeOptionsChange,
+    clearSearchParams,
+  } = useParamsHandler({ title: "eventType", options: eventTypes });
 
-  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>(
-    getInitialValues("eventType", eventTypes)
-  );
-  const [selectedDistricts, setSelectedDistricts] = useState<string[]>(
-    getInitialValues("district", districtOptions)
-  );
+  const {
+    currentValues: currentDistrictValues,
+    onOptionsChange: onDistrictOptionsChange,
+  } = useParamsHandler({ title: "district", options: districtOptions });
 
-  const onOptionsChange = (type: string) => (values: string[]) => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete(type);
-    values.forEach((value) => newSearchParams.append(type, value));
-    setSearchParams(newSearchParams, { replace: true });
+  const clearAllSearchParams = () => {
+    clearSearchParams(["eventType", "district"]);
   };
-
-  const clearSearchParams = () => {
-    setSearchParams("", { replace: true });
-  };
-  useEffect(() => {
-    setSelectedEventTypes(getInitialValues("eventType", eventTypes));
-    setSelectedDistricts(getInitialValues("district", districtOptions));
-  }, [searchParams, getInitialValues]);
 
   return (
     <>
@@ -53,23 +35,23 @@ export default function FilterModel() {
         open={modalOpen}
         onOk={() => setModalOpen(false)}
         onCancel={() => setModalOpen(false)}
-        footer={<Button onClick={clearSearchParams}>נקה </Button>}
+        footer={<Button onClick={clearAllSearchParams}>נקה </Button>}
       >
         <div>
           <b>סוג אירוע</b>
         </div>
         <Checkbox.Group
           options={eventTypes}
-          value={selectedEventTypes}
-          onChange={onOptionsChange("eventType")}
+          value={currentEventTypeValues}
+          onChange={onEventTypeOptionsChange("eventType")}
         />
         <div>
           <b>אזור</b>
         </div>
         <Checkbox.Group
           options={districtOptions}
-          value={selectedDistricts}
-          onChange={onOptionsChange("district")}
+          value={currentDistrictValues}
+          onChange={onDistrictOptionsChange("district")}
         />
       </Modal>
       <br />
