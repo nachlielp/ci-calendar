@@ -25,6 +25,7 @@ export default function Header() {
   } else if (currentUser?.userType === "teacher") {
     settingsPage = "/teacher";
   }
+  console.log("Header.currentUser", currentUser);
 
   const currentPath = location.pathname;
 
