@@ -24,3 +24,8 @@ export const districtOptions: SelectOption[] = [
   { value: "north", label: "צפון" },
   { value: "south", label: "דרום" },
 ];
+
+export const viewOptions: SelectOption[] = [
+  { value: "calendar", label: "calendar" },
+  { value: "list", label: "list" },
+];

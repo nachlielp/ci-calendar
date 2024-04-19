@@ -10,17 +10,18 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import { TfiLayoutAccordionMerged } from "react-icons/tfi";
-//<TfiLayoutAccordionMerged /> to calendar
-import { TfiLayoutMenuV } from "react-icons/tfi";
-//<TfiLayoutMenuV /> to list
 
 import FilterModel from "./FilterModel";
 import { DbUser } from "../../util/interfaces";
+import { useParamsHandler } from "../../hooks/useParamsHandler";
+import { viewOptions } from "../../util/options";
 
 export default function Header() {
   const { currentUser, logoutContext } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentValues, onOptionsChange, clearSearchParams } =
+    useParamsHandler({ title: "view", options: viewOptions });
 
   let settingsPage = "/";
   if (currentUser?.userType === "admin") {
@@ -34,10 +35,18 @@ export default function Header() {
   const currentPath = location.pathname;
 
   const handleLogOut = () => {
+    onOptionsChange("view")(["list"]);
     logoutContext();
     navigate("/");
   };
 
+  const handleViewChange = () => {
+    if (currentValues.length === 0) {
+      onOptionsChange("view")(["calendar"]);
+    } else {
+      clearSearchParams(["view"]);
+    }
+  };
   return (
     <div className="container mx-auto px-0">
       <div className="flex h-14 w-full shrink-0 items-center px-4 md:px-6 bg-white sticky top-0">
@@ -60,25 +69,24 @@ export default function Header() {
 
         {currentUser && <UserInfo currentUser={currentUser} />}
         <FilterModel />
-        {currentPath !== "/" && (
+        {currentPath !== "/" ? (
           <LinkButton to="/" className="text-black text-sm mr-6 font-semibold">
             <HomeOutlined />
           </LinkButton>
+        ) : (
+          <Button onClick={handleViewChange}>
+            <TfiLayoutAccordionMerged />
+          </Button>
         )}
         {currentUser && (
-          <>
-            {/* <div className="ml-auto  md:hidden">
-              <SideMenu />
-            </div> */}
-            <div className="ml-auto flex ">
-              <LinkButton
-                to={settingsPage}
-                className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-              >
-                <SettingOutlined />
-              </LinkButton>
-            </div>
-          </>
+          <div className="ml-auto flex ">
+            <LinkButton
+              to={settingsPage}
+              className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+            >
+              <SettingOutlined />
+            </LinkButton>
+          </div>
         )}
       </div>
     </div>

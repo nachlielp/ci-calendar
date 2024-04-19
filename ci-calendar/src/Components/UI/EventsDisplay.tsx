@@ -3,6 +3,7 @@ import { IEvently } from "../../util/interfaces";
 import CalendarView from "./CalendarView";
 import EventsList from "./EventsList";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 interface IEventsDisplayProps {
   events: IEvently[];
@@ -11,6 +12,8 @@ interface IEventsDisplayProps {
 
 function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
+  const [searchParams] = useSearchParams();
+  const view = searchParams.get("view");
   const onSelect = (value: Dayjs) => {
     setSelectedDay(value);
   };
@@ -18,11 +21,9 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
     dayjs(event.subEvents[0].startTime).isSame(selectedDay, "day")
   );
 
-  const flag = true;
-
   return (
     <>
-      {flag ? (
+      {view === "calendar" ? (
         <>
           <CalendarView
             events={events}
