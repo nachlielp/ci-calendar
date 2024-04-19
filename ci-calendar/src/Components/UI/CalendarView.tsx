@@ -14,23 +14,10 @@ interface CalendarViewProps {
 export default function CalendarView({ events, onSelect }: CalendarViewProps) {
   const { width } = useWindowSize();
   const setWidth = width > 600 ? 500 : width * 0.9;
-  const dateCellRender = (value: Dayjs) => {
-    return (
-      <div className="day-cell p-2 relative">
-        {/* {eventsOnDay(value, events) && (
-        )} */}
-      </div>
-    );
+  const dateCellRender = () => {
+    return <div className="day-cell p-2 relative"></div>;
   };
-  // const dateCellRender = (value: Dayjs) => {
-  //   return (
-  //     <div className="day-cell p-2 relative">
-  //       {eventsOnDay(value, events) && (
-  //         <span className="absolute bottom-1 right-1 mr-[3px] h-2 w-2 bg-blue-500 rounded-full"></span>
-  //       )}
-  //     </div>
-  //   );
-  // };
+  // const dateCellRender
 
   const disabledDate = (current: Dayjs) => {
     const lastMonth = dayjs().subtract(1, "month").startOf("month");
@@ -42,8 +29,8 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
     return isOutOfRange || hasNoEvents;
   };
   //Render each cell in the calendar
-  const cellRender: CalendarProps<Dayjs>["cellRender"] = (current, info) => {
-    if (info.type === "date") return dateCellRender(current);
+  const cellRender: CalendarProps<Dayjs>["cellRender"] = (_, info) => {
+    if (info.type === "date") return dateCellRender();
     return info.originNode;
   };
   const customHeaderRender = ({ value, onChange }: any) => {
