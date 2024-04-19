@@ -3,7 +3,7 @@ import VirtualList from "rc-virtual-list";
 import { EventCard } from "./EventCard";
 import { useWindowSize } from "../../hooks/useWindowSize";
 import ErrorBoundary from "./ErrorBoundary";
-import { useFilter } from "../../hooks/useFilter";
+import { useEventsFilter } from "../../hooks/useEventsFilter";
 import { IEvently } from "../../util/interfaces";
 import { useAuthContext } from "../Auth/AuthContext";
 import Loading from "./Loading";
@@ -17,11 +17,11 @@ const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
   const { height, width } = useWindowSize();
   const { currentUser } = useAuthContext();
   const isAdmin = currentUser?.userType === "admin";
-  let filteredEvents = useFilter(events);
+  let filteredEvents = useEventsFilter({ events });
   if (isEdit && !isAdmin) {
-    filteredEvents = useFilter(events, currentUser?.id);
+    filteredEvents = useEventsFilter({ events, uid: currentUser?.id });
   } else {
-    filteredEvents = useFilter(events);
+    filteredEvents = useEventsFilter({ events });
   }
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);
