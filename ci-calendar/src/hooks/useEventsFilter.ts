@@ -1,7 +1,12 @@
 import { useSearchParams } from "react-router-dom";
 import { IEvently } from "../util/interfaces";
 
-export const useFilter = (events: IEvently[], uid?: string) => {
+interface IUseEventsFilterProps {
+  events: IEvently[];
+  uid?: string;
+}
+
+export const useEventsFilter = ({ events, uid }: IUseEventsFilterProps) => {
   const [searchParams] = useSearchParams();
   const eventTypes = searchParams.getAll("eventType");
   const districts = searchParams.getAll("district");
