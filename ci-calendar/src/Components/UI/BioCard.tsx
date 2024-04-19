@@ -20,7 +20,7 @@ function BioCard() {
         cover={imgComponent}
       >
         <Meta title={currentUser.fullName} description={currentUser.bio} />
-        {currentUser.pageUrl.link && (
+        {currentUser.pageUrl?.link && (
           <Button
             className="mt-5 w-full"
             key={currentUser.pageUrl.link}

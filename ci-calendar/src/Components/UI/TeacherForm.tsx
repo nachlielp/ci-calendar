@@ -35,7 +35,6 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    console.log("TeacherForm.onFinish.values: ", values);
     const { name, mailingList, bio, pageUrl, pageUrlTitle, phoneNumber } =
       values;
     currentUser.fullName = name || currentUser.fullName;

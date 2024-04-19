@@ -65,7 +65,10 @@ export default function UserForm({ user }: IUserFormProps) {
           label="מספר פלאפון"
           name="phoneNumber"
           rules={[
-            { required: true, message: "נא להזין מספר טלפון" },
+            ({ getFieldValue }) => ({
+              required: getFieldValue("mailingList"),
+              message: "נא להזין מספר טלפון",
+            }),
             {
               pattern: /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
               message: "נא להזין מספר טלפון ישראלי תקני",

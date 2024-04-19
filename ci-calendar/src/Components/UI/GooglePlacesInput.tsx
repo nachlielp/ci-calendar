@@ -12,7 +12,6 @@ const GooglePlacesInput = ({
   onPlaceSelect,
 }: IGooglePlacesInputProps) => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
-  console.log("GooglePlacesInput");
   useEffect(() => {
     if (defaultValue) {
       const defaultOption = {

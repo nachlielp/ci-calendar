@@ -48,6 +48,7 @@ export default function EditEventForm() {
   const [newAddress, setNewAddress] = useState<IAddress | null>(null);
   const [form] = Form.useForm();
 
+  //TODO move to custom hook
   useEffect(() => {
     const fetchEvent = async () => {
       if (eventId) {
