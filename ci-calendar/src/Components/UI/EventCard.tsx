@@ -10,13 +10,13 @@ import EditEvent from "./EditEvent";
 import { IEventi, IEvently } from "../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 
-interface IEventCard {
+interface IEventCardProps {
   event: IEvently;
   cardWidth: number;
   screenWidth: number;
   isEdit: boolean;
 }
-export const EventCard = React.forwardRef<HTMLDivElement, IEventCard>(
+export const EventCard = React.forwardRef<HTMLDivElement, IEventCardProps>(
   ({ event, cardWidth, screenWidth, isEdit }, ref) => {
     const subEventLen = Object.values(event.subEvents).length;
     const footer = isEdit

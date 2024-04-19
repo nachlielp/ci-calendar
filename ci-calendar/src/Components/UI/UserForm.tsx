@@ -8,10 +8,10 @@ type FieldType = {
   phoneNumber?: string;
 };
 
-interface IUserForm {
+interface IUserFormProps {
   user: DbUser;
 }
-export default function UserForm({ user }: IUserForm) {
+export default function UserForm({ user }: IUserFormProps) {
   const { updateUser } = useAuthContext();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {

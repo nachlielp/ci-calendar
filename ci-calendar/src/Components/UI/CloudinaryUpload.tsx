@@ -15,12 +15,12 @@ interface Cloudinary {
   ) => void;
 }
 
-interface ICloudinaryUpload {
+interface ICloudinaryUploadProps {
   uploadNewImage: (url: string) => void;
 }
 export default function CloudinaryUpload({
   uploadNewImage,
-}: ICloudinaryUpload) {
+}: ICloudinaryUploadProps) {
   const cloudinaryRef = useRef<Cloudinary>();
   const widgetRef = useRef<any>();
   useEffect(() => {

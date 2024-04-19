@@ -50,7 +50,6 @@ export function useAuthContext() {
 }
 
 interface AuthProviderProps {
-  // firebase: Firebase;
   children: any;
 }
 
