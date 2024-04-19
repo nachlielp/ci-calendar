@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import { IAddress } from "../../util/interfaces";
 
-interface IGooglePlacesInput {
+interface IGooglePlacesInputProps {
   onPlaceSelect: (e: IGooglePlaceOption) => void;
   defaultValue?: IAddress;
 }
@@ -10,7 +10,7 @@ interface IGooglePlacesInput {
 const GooglePlacesInput = ({
   defaultValue,
   onPlaceSelect,
-}: IGooglePlacesInput) => {
+}: IGooglePlacesInputProps) => {
   const [selectedOption, setSelectedOption] = useState<any>(null);
   console.log("GooglePlacesInput");
   useEffect(() => {
