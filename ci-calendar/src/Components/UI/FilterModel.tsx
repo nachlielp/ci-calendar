@@ -25,7 +25,7 @@ export default function FilterModel() {
   return (
     <>
       <Button
-        type="primary"
+        type={currentDistrictValues.length ? "primary" : "default"}
         onClick={() => setModalOpen(true)}
         className="flex items-center justify-center mr-4"
       >

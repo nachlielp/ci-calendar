@@ -20,8 +20,11 @@ export default function Header() {
   const { currentUser, logoutContext } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const { currentValues, onOptionsChange, clearSearchParams } =
-    useParamsHandler({ title: "view", options: viewOptions });
+  const {
+    currentValues: viewCurrentValues,
+    onOptionsChange,
+    clearSearchParams,
+  } = useParamsHandler({ title: "view", options: viewOptions });
 
   let settingsPage = "/";
   if (currentUser?.userType === "admin") {
@@ -41,7 +44,7 @@ export default function Header() {
   };
 
   const handleViewChange = () => {
-    if (currentValues.length === 0) {
+    if (viewCurrentValues.length === 0) {
       onOptionsChange("view")(["calendar"]);
     } else {
       clearSearchParams(["view"]);
@@ -74,7 +77,10 @@ export default function Header() {
             <HomeOutlined />
           </LinkButton>
         ) : (
-          <Button onClick={handleViewChange}>
+          <Button
+            onClick={handleViewChange}
+            type={viewCurrentValues.length ? "primary" : "default"}
+          >
             <TfiLayoutAccordionMerged />
           </Button>
         )}
