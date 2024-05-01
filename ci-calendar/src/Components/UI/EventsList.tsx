@@ -8,6 +8,7 @@ import { IEvently } from "../../util/interfaces";
 import { useAuthContext } from "../Auth/AuthContext";
 import Loading from "./Loading";
 import EmptyList from "./Empty";
+import dayjs from "dayjs";
 
 interface IEventsListProps {
   events: IEvently[];
@@ -23,6 +24,15 @@ const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
   } else {
     filteredEvents = useEventsFilter({ events });
   }
+  filteredEvents.sort((a, b) => {
+    if (dayjs(a.subEvents[0].startTime).isBefore(b.subEvents[0].startTime)) {
+      return -1;
+    }
+    if (dayjs(a.subEvents[0].startTime).isAfter(b.subEvents[0].startTime)) {
+      return 1;
+    }
+    return 0;
+  });
   const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.5, 500);
   if (!filteredEvents.length && isEdit && !isAdmin) return <EmptyList />;
