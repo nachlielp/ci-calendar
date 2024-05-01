@@ -10,7 +10,10 @@ function AdminPage() {
         עריכת אירועים
       </LinkButton>
       <LinkButton to="/event-form" className="w-24 h-24 m-4">
-        הוסף אירוע
+        הוסף אירוע <br /> חד יומי
+      </LinkButton>
+      <LinkButton to="/multi-day-event-form" className="w-24 h-24 m-4">
+        הוסף ארוע <br /> רב יומי
       </LinkButton>
       <LinkButton to="/manage-users" className="w-24 h-24 m-4">
         הגדרת <br /> משתמשים

@@ -18,6 +18,7 @@ import ManageUsers from "./Components/UI/ManageUsers";
 import { useEvents } from "./hooks/useEvents";
 import TestPage from "./Components/TestPage";
 import EventsDisplay from "./Components/UI/EventsDisplay";
+import MultiDayEventForm from "./Components/UI/MultiDayEventForm";
 
 export default function App() {
   const { events, loading } = useEvents();
@@ -67,6 +68,10 @@ export default function App() {
               >
                 <Route path="/teacher" element={<TeacherPage />} />
                 <Route path="/event-form" element={<EventForm />} />
+                <Route
+                  path="/multi-day-event-form"
+                  element={<MultiDayEventForm />}
+                />
                 <Route
                   path="/edit-events-list"
                   element={<EventsDisplay events={events} isEdit={true} />}
