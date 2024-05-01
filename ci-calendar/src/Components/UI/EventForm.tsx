@@ -94,7 +94,6 @@ export default function EventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log("EventForm.handleSubmit.values: ", values);
     const subEventsTemplate = [
       {
         startTime: dayjs(values["event-time"][0]),
