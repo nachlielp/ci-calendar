@@ -357,6 +357,7 @@ export default function EventForm() {
               >
                 <TimePicker.RangePicker
                   format="HH:mm"
+                  minuteStep={5}
                   changeOnScroll
                   needConfirm={false}
                 />
@@ -407,6 +408,7 @@ export default function EventForm() {
                         className="w-full"
                       >
                         <TimePicker.RangePicker
+                          minuteStep={5}
                           format="HH:mm"
                           changeOnScroll
                           needConfirm={false}
