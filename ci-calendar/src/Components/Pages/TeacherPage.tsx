@@ -13,7 +13,7 @@ function TeacherPage() {
         הוסף אירוע <br /> חד יומי
       </LinkButton>
       <LinkButton to="/multi-day-event-form" className="w-24 h-24 m-4">
-        הוסף ארוע - רב יומי
+        הוסף ארוע <br /> רב יומי
       </LinkButton>
     </div>
   );
