@@ -7,7 +7,8 @@ import dayjs from "dayjs";
 import React from "react";
 import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
-import { IEventi, IEvently } from "../../../util/interfaces";
+import { IEventi, IEventiPart, IEvently } from "../../../util/interfaces";
+import { VscDebugBreakpointLog } from "react-icons/vsc";
 
 interface IMultiDayEventCardProps {
   event: IEvently;
@@ -19,7 +20,8 @@ export const MultiDayEventCard = React.forwardRef<
   HTMLDivElement,
   IMultiDayEventCardProps
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
-  const subEventLen = Object.values(event.subEvents).length;
+  const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
+
   const footer = isEdit
     ? [<DeleteEvent eventId={event.id} />, <EditEvent eventId={event.id} />]
     : [];
@@ -48,26 +50,32 @@ export const MultiDayEventCard = React.forwardRef<
         {dayjs(event.dates["startDate"]).format("DD-MM")} &nbsp;עד&nbsp;
         {dayjs(event.dates["endDate"]).format("DD-MM")}
       </p>
-      {/* {subEventLen > 1 &&
-        Object.values(event.subEvents).map((subEvent, index) => (
-          <span className="block mr-6" key={index}>
-            <VscDebugBreakpointLog className="inline-block mb-1" />
-            {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
-            {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
-            {getType(subEvent.type as IEventi)}
-            {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
-            {subEvent.tags && (
-              <span>
-                &nbsp;
-                {subEvent.tags.map((tag) => (
-                  <Tag key={tag} color="green">
-                    {getTag(tag)}
-                  </Tag>
-                ))}
-              </span>
-            )}
-          </span>
-        ))} */}
+
+      {Object.entries(groupedSubEvents).map(([date, subEvents]) => (
+        <div key={date}>
+          <p className="mr-6">{dayjs(date).format("DD-MM")}</p>
+          {subEvents.map((subEvent, index) => (
+            <span className="block mr-6" key={index}>
+              <VscDebugBreakpointLog className="inline-block mb-1" />
+              {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
+              {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
+              {getType(subEvent.type as IEventi)}
+              {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
+              {subEvent.tags && (
+                <span>
+                  &nbsp;
+                  {subEvent.tags.map((tag) => (
+                    <Tag key={tag} color="green">
+                      {getTag(tag)}
+                    </Tag>
+                  ))}
+                </span>
+              )}
+            </span>
+          ))}
+        </div>
+      ))}
+
       <p className="flex items-center">
         <FaMapMarkedAlt className="ml-2" />
         {event.address.label}
@@ -111,19 +119,19 @@ export const MultiDayEventCard = React.forwardRef<
   );
 });
 
-const getTypes = (t1: IEventi[], t2?: IEventi[]) => {
-  let types = Array.from(new Set([...t1, ...(t2 || [])]));
-  t2?.forEach((element) => {
-    if (!types.includes(element)) {
-      types.push(element);
-    }
-  });
-  return (
-    types
-      .filter((type) => !!type)
-      .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
-  );
-};
+// const getTypes = (t1: IEventi[], t2?: IEventi[]) => {
+//   let types = Array.from(new Set([...t1, ...(t2 || [])]));
+//   t2?.forEach((element) => {
+//     if (!types.includes(element)) {
+//       types.push(element);
+//     }
+//   });
+//   return (
+//     types
+//       .filter((type) => !!type)
+//       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
+//   );
+// };
 const getType = (type: string) => {
   return eventTypes.find((et) => et.value === type)?.label;
 };
@@ -138,7 +146,30 @@ const getTag = (tag: string) => {
 //       .map((type) => tagOptions.find((tag) => tag.value === type)?.label) || []
 //   );
 // };
-
 const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
+};
+const groupAndSortSubEvents = (subEvents: IEventiPart[]) => {
+  const eventsArray = Object.values(subEvents);
+
+  const groupedByDate = eventsArray.reduce(
+    (acc: Record<string, IEventiPart[]>, event: IEventiPart) => {
+      const dateKey = dayjs(event.startTime).format("YYYY-MM-DD");
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
+      }
+      acc[dateKey].push(event);
+      return acc;
+    },
+    {}
+  );
+
+  Object.keys(groupedByDate).forEach((date) => {
+    groupedByDate[date].sort(
+      (a: IEventiPart, b: IEventiPart) =>
+        dayjs(a.startTime).hour() - dayjs(b.startTime).hour()
+    );
+  });
+
+  return groupedByDate;
 };

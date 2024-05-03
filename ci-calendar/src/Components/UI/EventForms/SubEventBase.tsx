@@ -87,7 +87,9 @@ export default function SubEventBase({ day, remove }: IBaseEventFormProps) {
           </Col>
         </Row>
       </Card>
+
       <SubEventsForm day={day.toString()} />
+
       <div className="flex items-center justify-center mt-4">
         <Button onClick={() => remove(day)}>
           <span className="text-red-500">

@@ -1,33 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../Auth/AuthContext";
-import {
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Select,
-  Switch,
-  TimePicker,
-} from "antd";
+import { Button, Card, Form } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import "../../../styles/overrides.css";
 import { v4 as uuidv4 } from "uuid";
 
 import dayjs, { Dayjs } from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { tagOptions, eventTypes, districtOptions } from "../../../util/options";
-import { IAddress, IEvently, UserType } from "../../../util/interfaces";
-import GooglePlacesInput, {
-  IGooglePlaceOption,
-} from "../Other/GooglePlacesInput";
+import { tagOptions } from "../../../util/options";
+import {
+  IAddress,
+  IEventiPart,
+  IEvently,
+  UserType,
+} from "../../../util/interfaces";
+import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import { useState } from "react";
-import SubEventsForm from "./SubEventsForm";
 import SubEventBase from "./SubEventBase";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
@@ -89,28 +79,46 @@ export default function MultiDayEventForm() {
     setDates(dates);
   };
   const handleSubmit = async (values: any) => {
-    console.log(values);
-    // const subEventsTemplate = [
-    //   {
-    //     startTime: dayjs(values["event-time"][0]),
-    //     endTime: dayjs(values["event-time"][1]),
-    //     type: values["event-types"],
-    //     tags: values["event-tags"] || [],
-    //     teacher: values["event-teacher"] || "",
-    //   },
-    // ];
+    console.log("MultiDayEventForm.handleSubmit.values: ", values);
 
-    // if (values["sub-events"]) {
-    //   values["sub-events"].forEach((subEvent: any) =>
-    //     subEventsTemplate.push({
-    //       type: subEvent.type,
-    //       tags: subEvent.tags || [],
-    //       teacher: subEvent.teacher || "",
-    //       startTime: dayjs(subEvent.time[0]),
-    //       endTime: dayjs(subEvent.time[1]),
-    //     })
-    //   );
-    // }
+    const subEventsTemplate: IEventiPart[] = [];
+
+    values.days.forEach((day: any) => {
+      const startTime: string = dayjs(day["event-date-base"])
+        .hour(dayjs(day["event-time-base"][0]).hour())
+        .minute(dayjs(day["event-time-base"][0]).minute())
+        .toISOString();
+      const endTime: string = dayjs(day["event-date-base"])
+        .hour(dayjs(day["event-time-base"][1]).hour())
+        .minute(dayjs(day["event-time-base"][1]).minute())
+        .toISOString();
+      subEventsTemplate.push({
+        startTime: startTime,
+        endTime: endTime,
+        type: day["event-type-base"],
+        tags: day["event-tags-base"] || [],
+        teacher: day["event-teacher-base"] || "",
+      });
+
+      // Additional sub-events for each day
+      day["sub-events"]?.forEach((subEvent: any) => {
+        const startTime: string = dayjs(day["event-date-base"])
+          .hour(dayjs(subEvent.time[0]).hour())
+          .minute(dayjs(subEvent.time[0]).minute())
+          .toISOString();
+        const endTime: string = dayjs(day["event-date-base"])
+          .hour(dayjs(subEvent.time[1]).hour())
+          .minute(dayjs(subEvent.time[1]).minute())
+          .toISOString();
+        subEventsTemplate.push({
+          type: subEvent.type,
+          tags: subEvent.tags || [],
+          teacher: subEvent.teacher || "",
+          startTime: startTime,
+          endTime: endTime,
+        });
+      });
+    });
 
     if (!address || !dates) {
       return;
@@ -133,11 +141,11 @@ export default function MultiDayEventForm() {
         links: values["links"] || [],
         price: values["prices"] || [],
         hide: false,
-        subEvents: [],
+        subEvents: subEventsTemplate,
         district: values["district"],
       };
-
-      // await createEvent(event);
+      console.log("MultiDayEventForm.handleSubmit.event: ", event);
+      await createEvent(event);
 
       // navigate("/");
     } catch (error) {

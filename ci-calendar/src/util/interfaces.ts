@@ -5,7 +5,7 @@ export enum IEventi {
   conference = "conference",
 }
 
-interface IEventiPart {
+export interface IEventiPart {
   endTime: string;
   type: string;
   startTime: string;
