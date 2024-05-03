@@ -165,21 +165,22 @@ export default function MultiDayEventForm() {
         />
 
         {schedule && (
-          <SubEventBase key={1} remove={() => {}} day={1} />
-          // <Form.List name="days">
-          //   {(days, { add, remove }) => (
-          //     <>
-          //       {days.map(({ key, name, ...restField }) => (
-          //         <SubEventBase key={key} remove={remove} day={name} />
-          //       ))}
-          //       <div className="flex items-center justify-center mt-2">
-          //         <Button onClick={() => add()} block>
-          //           <PlusOutlined /> הוסף יום
-          //         </Button>
-          //       </div>
-          //     </>
-          //   )}
-          // </Form.List>
+          <Form.List name="days">
+            {(days, { add, remove }) => (
+              <>
+                {days.map(({ key, name, ...restField }) => (
+                  <div key={key}>
+                    <SubEventBase day={name} {...restField} remove={remove} />
+                  </div>
+                ))}
+                <div className="flex items-center justify-center mt-2">
+                  <Button onClick={() => add()} block>
+                    <PlusOutlined /> הוסף יום
+                  </Button>
+                </div>
+              </>
+            )}
+          </Form.List>
         )}
         <AddLinksForm />
         <AddPricesForm />

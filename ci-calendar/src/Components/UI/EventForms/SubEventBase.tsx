@@ -15,16 +15,16 @@ import SubEventsForm from "./SubEventsForm";
 import { MinusCircleOutlined } from "@ant-design/icons";
 
 interface IBaseEventFormProps {
-  remove: (index: number | number[]) => void;
   day: number;
+  remove: (index: number | number[]) => void;
 }
 
-export default function SubEventBase({ remove, day }: IBaseEventFormProps) {
+export default function SubEventBase({ day, remove }: IBaseEventFormProps) {
   return (
     <Card className="mt-4 border-4">
       <Form.Item
         label="תאריך"
-        name="event-date-base"
+        name={[day, "event-date-base"]}
         rules={[{ required: true, message: "שדה חובה" }]}
       >
         <DatePicker
@@ -39,7 +39,7 @@ export default function SubEventBase({ remove, day }: IBaseEventFormProps) {
             <Form.Item
               className="w-full"
               label="סוג האירוע"
-              name="event-type-base"
+              name={[day, "event-type-base"]}
               rules={[{ required: true, message: "שדה חובה" }]}
             >
               <Select options={eventTypes} />
@@ -51,7 +51,7 @@ export default function SubEventBase({ remove, day }: IBaseEventFormProps) {
           <Col md={24} xs={24}>
             <Form.Item
               label="שעות "
-              name="event-time-base"
+              name={[day, "event-time-base"]}
               rules={[{ required: true, message: "שדה חובה" }]}
               className="w-full"
             >
@@ -68,7 +68,7 @@ export default function SubEventBase({ remove, day }: IBaseEventFormProps) {
           <Col md={24} xs={24}>
             <Form.Item
               label="מורה"
-              name="event-teacher-base"
+              name={[day, "event-teacher-base"]}
               className="w-full"
             >
               <Input />
@@ -77,14 +77,18 @@ export default function SubEventBase({ remove, day }: IBaseEventFormProps) {
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="תגיות" name="event-tags-base" className="w-full">
+            <Form.Item
+              label="תגיות"
+              name={[day, "event-tags-base"]}
+              className="w-full"
+            >
               <Select options={tagOptions} mode="multiple" />
             </Form.Item>
           </Col>
         </Row>
       </Card>
       <SubEventsForm day={day.toString()} />
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center mt-4">
         <Button onClick={() => remove(day)}>
           <span className="text-red-500">
             <MinusCircleOutlined /> הסר יום
