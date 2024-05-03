@@ -1,14 +1,15 @@
 import React from "react";
 import VirtualList from "rc-virtual-list";
-import { EventCard } from "./EventCard";
-import { useWindowSize } from "../../hooks/useWindowSize";
-import ErrorBoundary from "./ErrorBoundary";
-import { useEventsFilter } from "../../hooks/useEventsFilter";
-import { IEvently } from "../../util/interfaces";
-import { useAuthContext } from "../Auth/AuthContext";
-import Loading from "./Loading";
-import EmptyList from "./Empty";
+import { SingleDayEventCard } from "./SingleDayEventCard";
+import { useWindowSize } from "../../../hooks/useWindowSize";
+import ErrorBoundary from "../Other/ErrorBoundary";
+import { useEventsFilter } from "../../../hooks/useEventsFilter";
+import { IEvently } from "../../../util/interfaces";
+import { useAuthContext } from "../../Auth/AuthContext";
+import Loading from "../Other/Loading";
+import EmptyList from "../Other/Empty";
 import dayjs from "dayjs";
+import { MultiDayEventCard } from "./MultiDayEventCard";
 
 interface IEventsListProps {
   events: IEvently[];
@@ -25,10 +26,10 @@ const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
     filteredEvents = useEventsFilter({ events });
   }
   filteredEvents.sort((a, b) => {
-    if (dayjs(a.subEvents[0].startTime).isBefore(b.subEvents[0].startTime)) {
+    if (dayjs(a.dates["startDate"]).isBefore(b.dates["startDate"])) {
       return -1;
     }
-    if (dayjs(a.subEvents[0].startTime).isAfter(b.subEvents[0].startTime)) {
+    if (dayjs(a.dates["startDate"]).isAfter(b.dates["startDate"])) {
       return 1;
     }
     return 0;
@@ -47,13 +48,23 @@ const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
     >
       {(event: IEvently) => (
         <ErrorBoundary>
-          <EventCard
-            key={event.id}
-            event={event}
-            cardWidth={adjustedItemWidth}
-            screenWidth={width}
-            isEdit={isEdit}
-          />
+          {event.dates["startDate"] === event.dates["endDate"] ? (
+            <SingleDayEventCard
+              key={event.id}
+              event={event}
+              cardWidth={adjustedItemWidth}
+              screenWidth={width}
+              isEdit={isEdit}
+            />
+          ) : (
+            <MultiDayEventCard
+              key={event.id}
+              event={event}
+              cardWidth={adjustedItemWidth}
+              screenWidth={width}
+              isEdit={isEdit}
+            />
+          )}
         </ErrorBoundary>
       )}
     </VirtualList>

@@ -1,6 +1,6 @@
 import { Empty } from "antd";
 
-function EmptyList() {
+export default function EmptyList() {
   return (
     <div
       className={`flex flex-col items-center justify-center h-screen bg-homepage-bg `}
@@ -11,5 +11,3 @@ function EmptyList() {
     </div>
   );
 }
-
-export default EmptyList;

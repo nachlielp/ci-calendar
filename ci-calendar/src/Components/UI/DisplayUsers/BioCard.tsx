@@ -1,5 +1,5 @@
 import { Button, Card } from "antd";
-import { useAuthContext } from "../Auth/AuthContext";
+import { useAuthContext } from "../../Auth/AuthContext";
 import Meta from "antd/es/card/Meta";
 
 function BioCard() {

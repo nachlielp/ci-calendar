@@ -1,5 +1,5 @@
-import { useAuthContext } from "./Auth/AuthContext";
-import UserForm from "./UI/UserForm";
+import { useAuthContext } from "../Auth/AuthContext";
+import UserForm from "../UI/UserForms/UserForm";
 
 export default function UserPage() {
   //TODO import currentUser directly

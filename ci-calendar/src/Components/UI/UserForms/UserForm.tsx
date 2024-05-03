@@ -1,6 +1,6 @@
 import { Button, Checkbox, Form, type FormProps, Input, Card } from "antd";
-import { DbUser } from "../../util/interfaces";
-import { useAuthContext } from "../Auth/AuthContext";
+import { DbUser } from "../../../util/interfaces";
+import { useAuthContext } from "../../Auth/AuthContext";
 
 type FieldType = {
   name?: string;

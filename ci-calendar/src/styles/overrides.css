@@ -1,0 +1,7 @@
+:where(.css-dev-only-do-not-override-1kuana8).ant-steps.ant-steps-vertical {
+  @apply flex flex-row !important;
+}
+
+.ant-picker-panels > *:nth-child(2) {
+  display: none;
+}

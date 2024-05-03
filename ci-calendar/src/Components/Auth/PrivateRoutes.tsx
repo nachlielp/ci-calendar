@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuthContext } from "./AuthContext";
 import { UserType } from "../../util/interfaces";
-import Loading from "../UI/Loading";
+import Loading from "../UI/Other/Loading";
 
 interface PrivateRoutesProps {
   requiredRoles?: UserType[];

@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { useState } from "react";
-import TeacherForm from "./TeacherForm";
+import TeacherForm from "../UserForms/TeacherForm";
 import BioCard from "./BioCard";
 
 function BioPage() {

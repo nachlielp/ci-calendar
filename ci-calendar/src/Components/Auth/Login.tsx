@@ -3,7 +3,7 @@ import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuthContext } from "./AuthContext";
-import { LinkButton } from "../UI/LinkButton";
+import { LinkButton } from "../UI/Other/LinkButton";
 enum LoginError {
   none = "",
   wrongPassword = "Password does not match email",

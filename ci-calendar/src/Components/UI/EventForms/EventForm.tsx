@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../Auth/AuthContext";
+import { useAuthContext } from "../../Auth/AuthContext";
 import {
   Button,
   Card,
@@ -27,9 +27,11 @@ import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { tagOptions, eventTypes, districtOptions } from "../../util/options";
-import { IAddress, IEvently, UserType } from "../../util/interfaces";
-import GooglePlacesInput, { IGooglePlaceOption } from "./GooglePlacesInput";
+import { tagOptions, eventTypes, districtOptions } from "../../../util/options";
+import { IAddress, IEvently, UserType } from "../../../util/interfaces";
+import GooglePlacesInput, {
+  IGooglePlaceOption,
+} from "../Other/GooglePlacesInput";
 import { useState } from "react";
 
 dayjs.extend(utc);
@@ -53,7 +55,7 @@ const initialValues = {
   "event-tags": [tagOptions[0].value],
 };
 
-export default function MultiDayEventForm() {
+export default function EventForm() {
   const [repeatOption, setRepeatOption] = useState<Frequency>(Frequency.none);
   const [eventDate, setEventDate] = useState(dayjs());
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
@@ -124,6 +126,11 @@ export default function MultiDayEventForm() {
       if (repeatOption === Frequency.none) {
         const event: IEvently = {
           id: uuidv4(),
+          dates: {
+            startDate: eventDate.toISOString(),
+            endDate: eventDate.toISOString(),
+          },
+          type: "",
           address: address,
           createdAt: dayjs().toISOString(),
           updatedAt: dayjs().toISOString(),
@@ -163,6 +170,11 @@ export default function MultiDayEventForm() {
           }));
 
           const event: IEvently = {
+            type: "",
+            dates: {
+              startDate: date.toISOString(),
+              endDate: date.toISOString(),
+            },
             id: uuidv4(),
             address: address,
             createdAt: dayjs().toISOString(),

@@ -1,4 +1,4 @@
-import { LinkButton } from "./UI/LinkButton";
+import { LinkButton } from "../UI/Other/LinkButton";
 
 function TeacherPage() {
   return (

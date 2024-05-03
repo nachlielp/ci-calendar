@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button, Checkbox, Modal } from "antd";
 import { FilterOutlined } from "@ant-design/icons";
-import { eventTypes, districtOptions } from "../../util/options";
-import { useParamsHandler } from "../../hooks/useParamsHandler";
+import { eventTypes, districtOptions } from "../../../util/options";
+import { useParamsHandler } from "../../../hooks/useParamsHandler";
 
 export default function FilterModel() {
   const [modalOpen, setModalOpen] = useState(false);

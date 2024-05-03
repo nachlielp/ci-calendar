@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../Auth/AuthContext";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAuthContext } from "../../Auth/AuthContext";
 import {
   Button,
   Card,
@@ -8,29 +8,23 @@ import {
   Form,
   Input,
   InputNumber,
-  List,
   Row,
   Select,
   TimePicker,
-  Tooltip,
 } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import {
-  InfoCircleOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
-import VirtualList from "rc-virtual-list";
-
-import { v4 as uuidv4 } from "uuid";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { useEffect, useState } from "react";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { tagOptions, eventTypes, districtOptions } from "../../util/options";
-import { IAddress, IEvently, UserType } from "../../util/interfaces";
-import GooglePlacesInput, { IGooglePlaceOption } from "./GooglePlacesInput";
-import { useState } from "react";
+import { tagOptions, eventTypes, districtOptions } from "../../../util/options";
+import { IAddress, IEvently, UserType } from "../../../util/interfaces";
+import Loading from "../Other/Loading";
+import GooglePlacesInput, {
+  IGooglePlaceOption,
+} from "../Other/GooglePlacesInput";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -48,18 +42,38 @@ const formItemLayout = {
   },
 };
 
-const initialValues = {
-  "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
-  "event-tags": [tagOptions[0].value],
-};
-
-export default function EventForm() {
-  const [repeatOption, setRepeatOption] = useState<Frequency>(Frequency.none);
-  const [eventDate, setEventDate] = useState(dayjs());
-  const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
+export default function EditSingleDayEventForm() {
   const navigate = useNavigate();
-  const { currentUser, createEvent } = useAuthContext();
-  const [address, setAddress] = useState<IAddress>();
+  const { getEvent, currentUser, updateEvent } = useAuthContext();
+  const { eventId } = useParams<{ eventId: string }>();
+  const [eventData, setEventData] = useState<IEvently | null>(null);
+  const [newAddress, setNewAddress] = useState<IAddress | null>(null);
+  const [form] = Form.useForm();
+
+  //TODO move to custom hook
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (eventId) {
+        const eventData = await getEvent(eventId);
+        setEventData(eventData);
+      }
+    };
+    fetchEvent();
+  }, [eventId, getEvent]);
+
+  if (!eventData) return <Loading />;
+
+  const { currentFormValues, address } = eventToFormValues(eventData);
+
+  const handleAddressSelect = (place: IGooglePlaceOption) => {
+    const selectedAddress = {
+      label: place.label,
+      place_id: place.value.place_id,
+    };
+    setNewAddress(selectedAddress);
+    form.setFieldValue("address", selectedAddress);
+  };
+
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -70,119 +84,55 @@ export default function EventForm() {
   ) {
     navigate("/");
   }
-  const [form] = Form.useForm();
-
-  const handleAddressSelect = (place: IGooglePlaceOption) => {
-    const selectedAddress = {
-      label: place.label,
-      place_id: place.value.place_id,
-    };
-    setAddress(selectedAddress);
-    form.setFieldValue("address", selectedAddress);
-  };
-
-  const handleRepeatChange = () => {
-    setRepeatOption(form.getFieldValue("event-repeat"));
-  };
-
-  const handleDateChange = (date: dayjs.Dayjs) => {
-    setEventDate(date);
-  };
-
-  const handleEndDateChange = (date: dayjs.Dayjs) => {
-    setEndDate(date);
-  };
 
   const handleSubmit = async (values: any) => {
-    const subEventsTemplate = [
+    console.log("EventForm.handleSubmit.values: ", values);
+
+    const subEvents = [
       {
-        startTime: dayjs(values["event-time"][0]),
-        endTime: dayjs(values["event-time"][1]),
+        startTime: dayjs(values["event-time"][0]).toISOString(),
+        endTime: dayjs(values["event-time"][1]).toISOString(),
         type: values["event-types"],
         tags: values["event-tags"] || [],
         teacher: values["event-teacher"] || "",
       },
     ];
-
     if (values["sub-events"]) {
       values["sub-events"].forEach((subEvent: any) =>
-        subEventsTemplate.push({
+        subEvents.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
           teacher: subEvent.teacher || "",
-          startTime: dayjs(subEvent.time[0]),
-          endTime: dayjs(subEvent.time[1]),
+          startTime: dayjs(subEvent.time[0]).toISOString(),
+          endTime: dayjs(subEvent.time[1]).toISOString(),
         })
       );
     }
 
-    if (!address) {
-      return;
-    }
-
+    const event: IEvently = {
+      dates: {
+        startDate: dayjs(values["event-date"][0]).toISOString(),
+        endDate: dayjs(values["event-date"][1]).toISOString(),
+      },
+      type: "",
+      id: eventData.id,
+      address: newAddress || address,
+      createdAt: eventData.createdAt,
+      updatedAt: dayjs().toISOString(),
+      title: values["event-title"],
+      description: values["event-description"] || "",
+      owners: [currentUser.id],
+      links: values["links"] || [],
+      price: values["prices"] || [],
+      hide: false,
+      subEvents: subEvents,
+      district: values["district"],
+    };
     try {
-      if (repeatOption === Frequency.none) {
-        const event: IEvently = {
-          id: uuidv4(),
-          address: address,
-          createdAt: dayjs().toISOString(),
-          updatedAt: dayjs().toISOString(),
-          title: values["event-title"],
-          description: values["event-description"] || "",
-          owners: [currentUser.id],
-          links: values["links"] || [],
-          price: values["prices"] || [],
-          hide: false,
-          subEvents: subEventsTemplate.map((subEvent) => ({
-            ...subEvent,
-            startTime: subEvent.startTime.toISOString(),
-            endTime: subEvent.endTime.toISOString(),
-          })),
-          district: values["district"],
-        };
-        await createEvent(event);
-      } else if (endDate) {
-        const dates = listOfDates(
-          eventDate,
-          endDate,
-          repeatOption,
-          form.getFieldValue("event-repeat-week-interval")
-        );
-
-        for (const date of dates) {
-          const subEvents = subEventsTemplate.map((subEvent) => ({
-            ...subEvent,
-            startTime: date
-              .hour(subEvent.startTime.hour())
-              .minute(subEvent.startTime.minute())
-              .toISOString(),
-            endTime: date
-              .hour(subEvent.endTime.hour())
-              .minute(subEvent.endTime.minute())
-              .toISOString(),
-          }));
-
-          const event: IEvently = {
-            id: uuidv4(),
-            address: address,
-            createdAt: dayjs().toISOString(),
-            updatedAt: dayjs().toISOString(),
-            title: values["event-title"],
-            description: values["event-description"] || "",
-            owners: [currentUser.id],
-            links: values["links"] || [],
-            price: values["prices"] || [],
-            hide: false,
-            subEvents: subEvents,
-            district: values["district"],
-          };
-          await createEvent(event);
-        }
-      }
+      await updateEvent(event.id, event);
       navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
-      throw error;
     }
   };
 
@@ -195,7 +145,7 @@ export default function EventForm() {
         variant="filled"
         labelCol={{ span: 6, offset: 0 }}
         wrapperCol={{ span: 16, offset: 0 }}
-        initialValues={initialValues}
+        initialValues={currentFormValues}
       >
         <Card className="mt-4 border-4">
           <Form.Item
@@ -230,6 +180,7 @@ export default function EventForm() {
               onPlaceSelect={(place: IGooglePlaceOption) => {
                 handleAddressSelect(place);
               }}
+              defaultValue={address}
             />
           </Form.Item>
 
@@ -242,94 +193,8 @@ export default function EventForm() {
               format={"DD/MM"}
               minDate={dayjs()}
               maxDate={dayjs().add(1, "year")}
-              onChange={handleDateChange}
             />
           </Form.Item>
-
-          <Form.Item
-            className="mt-4"
-            label={
-              <Tooltip title={repeatTooltip}>
-                חזרה &nbsp;
-                <InfoCircleOutlined />
-              </Tooltip>
-            }
-            name="event-repeat"
-            rules={[{ required: true, message: "שדה חובה" }]}
-          >
-            <Select
-              options={repeatOptions}
-              defaultValue={Frequency.none}
-              onChange={handleRepeatChange}
-            />
-          </Form.Item>
-
-          {repeatOption === Frequency.byWeek && (
-            <Form.Item
-              label="שבועות"
-              name="event-repeat-week-interval"
-              className="mt-4"
-              rules={[{ required: true, message: "שדה חובה" }]}
-            >
-              <InputNumber min={1} precision={0} />
-            </Form.Item>
-          )}
-          {repeatOption === Frequency.monthly && (
-            <Form.Item
-              label="תדירות"
-              name="event-repeat-week-frequency"
-              className="mt-4"
-            >
-              <Input placeholder={formatMonthlyDate(eventDate)} disabled />
-            </Form.Item>
-          )}
-          {repeatOption !== "none" && (
-            <>
-              <Form.Item
-                label="סיום חזרה"
-                name="event-repeat-end-date"
-                className="mt-4"
-                rules={[{ required: true, message: "שדה חובה" }]}
-              >
-                <DatePicker
-                  format={"DD/MM"}
-                  minDate={eventDate}
-                  maxDate={dayjs().add(1, "year")}
-                  onChange={handleEndDateChange}
-                />
-              </Form.Item>
-              <Form.Item
-                label="תאריכים"
-                name="event-list-of-dates"
-                className="mt-4"
-              >
-                {endDate && (
-                  <List>
-                    <VirtualList
-                      data={listOfDates(
-                        eventDate,
-                        endDate,
-                        repeatOption,
-                        form.getFieldValue("event-repeat-week-interval")
-                      )}
-                      height={200}
-                      itemHeight={47}
-                      itemKey="email"
-                    >
-                      {(date: dayjs.Dayjs, index: number) => (
-                        <List.Item key={index} className="mr-4">
-                          <List.Item.Meta
-                            key={index}
-                            title={date.format("DD/MM")}
-                          />
-                        </List.Item>
-                      )}
-                    </VirtualList>
-                  </List>
-                )}
-              </Form.Item>
-            </>
-          )}
         </Card>
 
         <Card className="mt-4 border-2">
@@ -356,7 +221,6 @@ export default function EventForm() {
               >
                 <TimePicker.RangePicker
                   format="HH:mm"
-                  minuteStep={5}
                   changeOnScroll
                   needConfirm={false}
                 />
@@ -407,7 +271,6 @@ export default function EventForm() {
                         className="w-full"
                       >
                         <TimePicker.RangePicker
-                          minuteStep={5}
                           format="HH:mm"
                           changeOnScroll
                           needConfirm={false}
@@ -575,7 +438,7 @@ export default function EventForm() {
           className="mt-4 flex justify-center"
         >
           <Button type="primary" htmlType="submit">
-            צור אירוע
+            עדכן אירוע
           </Button>
         </Form.Item>
       </Form>
@@ -583,125 +446,92 @@ export default function EventForm() {
   );
 }
 
-enum Frequency {
-  none = "none",
-  weekly = "weekly",
-  byWeek = "by-week",
-  monthly = "monthly",
+function eventToFormValues(event: IEvently) {
+  const currentFormValues = {
+    "event-title": event.title,
+    "event-description": event.description,
+    address: event.address,
+    district: event.district,
+    "event-types": event.subEvents[0]?.type,
+    "event-tags": event.subEvents[0]?.tags,
+    "event-teacher": event.subEvents[0]?.teacher,
+    "event-date": dayjs.tz(
+      dayjs(event.subEvents[0]?.startTime),
+      "Asia/Jerusalem"
+    ),
+    "event-time": [
+      dayjs(event.subEvents[0]?.startTime).tz("Asia/Jerusalem"),
+      dayjs(event.subEvents[0]?.endTime).tz("Asia/Jerusalem"),
+    ],
+    "sub-events": event.subEvents.slice(1).map((subEvent) => ({
+      type: subEvent.type,
+      tags: subEvent.tags,
+      teacher: subEvent.teacher,
+      time: [
+        dayjs(subEvent.startTime).tz("Asia/Jerusalem"),
+        dayjs(subEvent.endTime).tz("Asia/Jerusalem"),
+      ],
+    })),
+    links: event.links.map((link) => ({
+      title: link.title,
+      link: link.link,
+    })),
+    prices: event.price.map((price) => ({
+      title: price.title,
+      sum: price.sum,
+    })),
+  };
+
+  return { currentFormValues, address: event.address };
 }
 
-const repeatOptions = [
-  { value: Frequency.none, label: "אף פעם" },
-  { value: Frequency.weekly, label: "כל  שבוע" },
-  { value: Frequency.byWeek, label: "כל כמה שבועות" },
-  { value: Frequency.monthly, label: "כל חודש" },
-];
-
-const repeatTooltip = (
-  <>
-    <p>* כל כמה שבועות - לדוגמה, כל שבועים ביום שלישי </p>
-    <br />
-    <p>* כל חודש - לדוגמה, השבת השניה של כל חודש</p>
-  </>
-);
-
-function getDayAndWeekOfMonth(date: dayjs.Dayjs) {
-  const dayOfWeek = date.day(); // 0 (Sunday) to 6 (Saturday)
-  const dayOfMonth = date.date();
-  const weekOfMonth = Math.ceil(dayOfMonth / 7);
-
-  return { dayOfWeek, weekOfMonth };
-}
-
-function listOfDates(
-  startDate: dayjs.Dayjs,
-  endDate: dayjs.Dayjs,
-  repeatOption: Frequency,
-  repeatInterval?: number
-) {
-  const dates = [];
-  let date = startDate;
-  if (repeatOption === Frequency.weekly) {
-    while (!date.isAfter(endDate.add(1, "day"))) {
-      dates.push(date);
-      date = date.add(1, "week");
-    }
-  } else if (repeatOption === Frequency.byWeek && repeatInterval) {
-    while (!date.isAfter(endDate.add(1, "day"))) {
-      dates.push(date);
-      date = date.add(repeatInterval, "week");
-    }
-  } else if (repeatOption === Frequency.monthly) {
-    const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(startDate);
-    while (!date.isAfter(endDate)) {
-      dates.push(date);
-      date = date.add(1, "month");
-      date = moveToSameWeekAndDay(date, dayOfWeek, weekOfMonth);
-    }
-  }
-  return dates;
-}
-
-function moveToSameWeekAndDay(
-  date: dayjs.Dayjs,
-  dayOfWeek: number,
-  weekOfMonth: number
-): dayjs.Dayjs {
-  const monthStart = date.startOf("month");
-  let adjustedDate = monthStart.add((weekOfMonth - 1) * 7, "day");
-  while (adjustedDate.day() !== dayOfWeek) {
-    adjustedDate = adjustedDate.add(1, "day");
-  }
-  if (adjustedDate.month() !== monthStart.month()) {
-    adjustedDate = adjustedDate.subtract(1, "week");
-  }
-  return adjustedDate;
-}
-
-const formatMonthlyDate = (date: dayjs.Dayjs) => {
-  const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(date);
-  let day;
-  switch (dayOfWeek) {
-    case 0:
-      day = "ראשון";
-      break;
-    case 1:
-      day = "שני";
-      break;
-    case 2:
-      day = "שלישי";
-      break;
-    case 3:
-      day = "רביעי";
-      break;
-    case 4:
-      day = "חמישי";
-      break;
-    case 5:
-      day = "שישי";
-      break;
-    case 6:
-      day = "שבת";
-      break;
-  }
-
-  let frequency;
-  switch (weekOfMonth) {
-    case 1:
-      frequency = "ראשונה";
-      break;
-    case 2:
-      frequency = "שניה";
-      break;
-    case 3:
-      frequency = "שלישית";
-      break;
-    case 4:
-      frequency = "רביעית";
-      break;
-    default:
-      frequency = "חמישית";
-      break;
-  }
-  return `יום ${day} ה${frequency} בחודש`;
-};
+// const testFormData = {
+//   id: "e86221b0-444c-4432-903a-38f06fdc4eb1",
+//   address: 'סטודיו נעים סניף שלמה 39 ת"א',
+//   createdAt: "2024-04-17T05:26:18.918Z",
+//   updatedAt: "2024-04-17T05:26:18.918Z",
+//   title: "שיעור שבועי עם רועי שקד בדגש סומטי וטכני",
+//   description: "תיאור כולשהו של האירוע",
+//   owners: ["sCOY7FqMVMTGrz8ZYCawYIdE0bM2"],
+//   links: [
+//     {
+//       title: "פרטים נוספים",
+//       link: "https://www.naim.org.il/contact-impro/",
+//     },
+//   ],
+//   price: [
+//     {
+//       title: " שיעור",
+//       sum: 50,
+//     },
+//     {
+//       title: "גאם",
+//       sum: 30,
+//     },
+//   ],
+//   hide: false,
+//   subEvents: [
+//     {
+//       startTime: "2024-04-19T03:00:02.800Z",
+//       endTime: "2024-04-19T04:00:02.800Z",
+//       type: "class",
+//       tags: ["everyone", "pre-registration"],
+//       teacher: "רועי שקד",
+//     },
+//     {
+//       type: "jame",
+//       tags: ["everyone"],
+//       teacher: "",
+//       startTime: "2024-04-19T04:00:00.000Z",
+//       endTime: "2024-04-19T08:00:00.000Z",
+//     },
+//     {
+//       type: "class",
+//       tags: [],
+//       teacher: "",
+//       startTime: "2024-04-17T08:00:00.000Z",
+//       endTime: "2024-04-17T12:00:00.000Z",
+//     },
+//   ],
+//   district: "center",
+// };

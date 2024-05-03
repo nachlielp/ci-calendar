@@ -7,9 +7,9 @@ import {
   Card,
   Image,
 } from "antd";
-import { useAuthContext } from "../Auth/AuthContext";
+import { useAuthContext } from "../../Auth/AuthContext";
 import { useState } from "react";
-import CloudinaryUpload from "./CloudinaryUpload";
+import CloudinaryUpload from "../Other/CloudinaryUpload";
 
 type FieldType = {
   name?: string;

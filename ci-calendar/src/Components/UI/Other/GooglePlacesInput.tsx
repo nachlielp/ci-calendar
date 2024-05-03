@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
-import { IAddress } from "../../util/interfaces";
+import { IAddress } from "../../../util/interfaces";
 
 interface IGooglePlacesInputProps {
   onPlaceSelect: (e: IGooglePlaceOption) => void;

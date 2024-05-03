@@ -1,24 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import "./styles/overrides.css";
 import { AuthProvider } from "./Components/Auth/AuthContext";
 import Signup from "./Components/Auth/Signup";
 import Login from "./Components/Auth/Login";
 import ResetPassword from "./Components/Auth/ResetPassword";
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
-import Header from "./Components/UI/Header";
-import UserPage from "./Components/UserPage";
-import TeacherPage from "./Components/TeacherPage";
-import EventForm from "./Components/UI/EventForm";
+import Header from "./Components/UI/Other/Header";
+import UserPage from "./Components/Pages/UserPage";
+import TeacherPage from "./Components/Pages/TeacherPage";
+import EventForm from "./Components/UI/EventForms/EventForm";
 import { UserType } from "./util/interfaces";
-import BioPage from "./Components/UI/BioPage";
-import EditEventForm from "./Components/UI/EditEventForm";
-import Loading from "./Components/UI/Loading";
-import AdminPage from "./Components/AdminPage";
-import ManageUsers from "./Components/UI/ManageUsers";
+import BioPage from "./Components/UI/DisplayUsers/BioPage";
+import EditSingleDayEventForm from "./Components/UI/EventForms/EditSingleDayEventForm";
+import Loading from "./Components/UI/Other/Loading";
+import AdminPage from "./Components/Pages/AdminPage";
+import ManageUsers from "./Components/UI/Other/ManageUsers";
 import { useEvents } from "./hooks/useEvents";
-import TestPage from "./Components/TestPage";
-import EventsDisplay from "./Components/UI/EventsDisplay";
-import MultiDayEventForm from "./Components/UI/MultiDayEventForm";
+import TestPage from "./Components/Pages/TestPage";
+import EventsDisplay from "./Components/UI/Other/EventsDisplay";
+import MultiDayEventForm from "./Components/UI/EventForms/MultiDayEventForm";
 
 export default function App() {
   const { events, loading } = useEvents();
@@ -78,7 +78,7 @@ export default function App() {
                 />
                 <Route
                   path="/edit-event/:eventId"
-                  element={<EditEventForm />}
+                  element={<EditSingleDayEventForm />}
                 />
                 <Route path="/bio" element={<BioPage />} />
               </Route>

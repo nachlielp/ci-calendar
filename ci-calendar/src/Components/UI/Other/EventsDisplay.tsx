@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from "dayjs";
-import { IEvently } from "../../util/interfaces";
+import { IEvently } from "../../../util/interfaces";
 import CalendarView from "./CalendarView";
-import EventsList from "./EventsList";
+import EventsList from "../DisplayEvents/EventsList";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -18,7 +18,7 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
     setSelectedDay(value);
   };
   const todaysEvents = events.filter((event) =>
-    dayjs(event.subEvents[0].startTime).isSame(selectedDay, "day")
+    dayjs(event.dates["startDate"]).isSame(selectedDay, "day")
   );
 
   return (

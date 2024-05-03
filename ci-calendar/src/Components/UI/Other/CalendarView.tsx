@@ -1,8 +1,8 @@
 import type { CalendarProps } from "antd";
 import { Calendar, Card } from "antd";
 import type { Dayjs } from "dayjs";
-import { useWindowSize } from "../../hooks/useWindowSize";
-import { IEvently } from "../../util/interfaces";
+import { useWindowSize } from "../../../hooks/useWindowSize";
+import { IEvently } from "../../../util/interfaces";
 import dayjs from "dayjs";
 
 interface CalendarViewProps {

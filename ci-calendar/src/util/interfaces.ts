@@ -35,8 +35,10 @@ export interface IEvently {
   updatedAt: string;
   owners: string[];
   hide: boolean;
+  dates: { startDate: string; endDate: string };
   //TODO add loc info to district
   district: string;
+  type: string;
   price: IPrice[];
   links: ILink[];
   subEvents: IEventiPart[];

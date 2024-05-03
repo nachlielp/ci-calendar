@@ -7,6 +7,7 @@ export const eventTypes: SelectOption[] = [
   { value: "class", label: "שיעור" },
   { value: "workshop", label: "סדנה" },
   { value: "conference", label: "כנס" },
+  { value: "retreat", label: "ריטריט" },
 ];
 
 export const tagOptions: SelectOption[] = [
