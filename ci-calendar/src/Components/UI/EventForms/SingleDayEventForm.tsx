@@ -55,7 +55,7 @@ const initialValues = {
   "event-tags": [tagOptions[0].value],
 };
 
-export default function EventForm() {
+export default function SingleDayEventForm() {
   const [repeatOption, setRepeatOption] = useState<Frequency>(Frequency.none);
   const [eventDate, setEventDate] = useState(dayjs());
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);

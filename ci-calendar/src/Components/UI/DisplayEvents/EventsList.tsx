@@ -1,4 +1,3 @@
-import React from "react";
 import VirtualList from "rc-virtual-list";
 import { SingleDayEventCard } from "./SingleDayEventCard";
 import { useWindowSize } from "../../../hooks/useWindowSize";
@@ -15,7 +14,7 @@ interface IEventsListProps {
   events: IEvently[];
   isEdit: boolean;
 }
-const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
+export default function EventsList({ events, isEdit }: IEventsListProps) {
   const { height, width } = useWindowSize();
   const { currentUser } = useAuthContext();
   const isAdmin = currentUser?.userType === "admin";
@@ -69,9 +68,7 @@ const EventsList: React.FC<IEventsListProps> = ({ events, isEdit }) => {
       )}
     </VirtualList>
   );
-};
-
-export default EventsList;
+}
 
 // const emptyEventsList = () => {
 //   return (

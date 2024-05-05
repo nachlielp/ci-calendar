@@ -8,7 +8,7 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes";
 import Header from "./Components/UI/Other/Header";
 import UserPage from "./Components/Pages/UserPage";
 import TeacherPage from "./Components/Pages/TeacherPage";
-import EventForm from "./Components/UI/EventForms/EventForm";
+import EventForm from "./Components/UI/EventForms/SingleDayEventForm";
 import { UserType } from "./util/interfaces";
 import BioPage from "./Components/UI/DisplayUsers/BioPage";
 import EditSingleDayEventForm from "./Components/UI/EventForms/EditSingleDayEventForm";
