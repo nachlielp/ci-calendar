@@ -169,7 +169,7 @@ export default function EventForm() {
           })),
           district: values["district"],
         };
-
+        // console.log("EventForm.handleSubmit.event: ", event);
         await createEvent(event);
       } else if (endDate) {
         const dates = listOfDates(

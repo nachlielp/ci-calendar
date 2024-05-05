@@ -16,6 +16,9 @@ export const useEventsFilter = ({ events, uid }: IUseEventsFilterProps) => {
   }
   filteredEvents = filteredEvents.filter((event) => {
     const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
+    if (event.type !== "") {
+      eventTypeList.push(event.type);
+    }
     if (eventTypes.length === 0 && districts.length === 0) {
       return true;
     }
