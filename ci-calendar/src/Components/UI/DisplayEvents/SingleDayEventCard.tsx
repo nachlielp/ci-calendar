@@ -70,8 +70,8 @@ export const SingleDayEventCard = React.forwardRef<
         Object.values(event.subEvents).map((subEvent, index) => (
           <span className="block mr-6" key={index}>
             <VscDebugBreakpointLog className="inline-block mb-1" />
-            {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
-            {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
+            {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
+            {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
             {getType(subEvent.type as IEventi)}
             {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
             {subEvent.tags && (

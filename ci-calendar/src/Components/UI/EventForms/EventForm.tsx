@@ -96,11 +96,8 @@ export default function EventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log(values);
-    // startTime: date
-    // .hour(subEvent.startTime.hour())
-    // .minute(subEvent.startTime.minute())
-    // .toISOString(),
+    // console.log(values);
+
     const subEventsTemplate = [
       {
         startTime: dayjs(
