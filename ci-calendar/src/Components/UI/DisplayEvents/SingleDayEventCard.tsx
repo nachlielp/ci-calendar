@@ -22,7 +22,10 @@ export const SingleDayEventCard = React.forwardRef<
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
   const subEventLen = Object.values(event.subEvents).length;
   const footer = isEdit
-    ? [<DeleteEvent eventId={event.id} />, <EditEvent eventId={event.id} />]
+    ? [
+        <DeleteEvent eventId={event.id} />,
+        <EditEvent eventId={event.id} isMultiDay={false} />,
+      ]
     : [];
   return (
     <Card

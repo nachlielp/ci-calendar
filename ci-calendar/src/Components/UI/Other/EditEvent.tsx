@@ -4,13 +4,18 @@ import { useNavigate } from "react-router-dom";
 
 interface EditEventProps {
   eventId: string;
+  isMultiDay: boolean;
 }
 
-const EditEvent: React.FC<EditEventProps> = ({ eventId }) => {
+const EditEvent: React.FC<EditEventProps> = ({ eventId, isMultiDay }) => {
   const navigate = useNavigate();
 
   const handleEdit = () => {
-    navigate(`/edit-event/${eventId}`);
+    if (isMultiDay) {
+      navigate(`/edit-multi-day-event/${eventId}`);
+    } else {
+      navigate(`/edit-single-day-event/${eventId}`);
+    }
   };
 
   return (

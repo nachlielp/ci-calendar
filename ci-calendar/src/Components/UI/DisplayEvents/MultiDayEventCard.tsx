@@ -23,7 +23,10 @@ export const MultiDayEventCard = React.forwardRef<
   const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
 
   const footer = isEdit
-    ? [<DeleteEvent eventId={event.id} />, <EditEvent eventId={event.id} />]
+    ? [
+        <DeleteEvent eventId={event.id} />,
+        <EditEvent eventId={event.id} isMultiDay={true} />,
+      ]
     : [];
 
   return (

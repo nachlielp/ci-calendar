@@ -19,6 +19,7 @@ import { useEvents } from "./hooks/useEvents";
 import TestPage from "./Components/Pages/TestPage";
 import EventsDisplay from "./Components/UI/Other/EventsDisplay";
 import MultiDayEventForm from "./Components/UI/EventForms/MultiDayEventForm";
+import EditMultiDayEventForm from "./Components/UI/EventForms/EditMultiDayEventForm";
 
 export default function App() {
   const { events, loading } = useEvents();
@@ -77,8 +78,12 @@ export default function App() {
                   element={<EventsDisplay events={events} isEdit={true} />}
                 />
                 <Route
-                  path="/edit-event/:eventId"
+                  path="/edit-single-day-event/:eventId"
                   element={<EditSingleDayEventForm />}
+                />
+                <Route
+                  path="/edit-multi-day-event/:eventId"
+                  element={<EditMultiDayEventForm />}
                 />
                 <Route path="/bio" element={<BioPage />} />
               </Route>
