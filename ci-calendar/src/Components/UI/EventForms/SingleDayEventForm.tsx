@@ -97,7 +97,7 @@ export default function SingleDayEventForm() {
         ),
         type: values["event-types"],
         tags: values["event-tags"] || [],
-        teacher: values["event-teacher"] || "",
+        teachers: [values["event-teacher"]] || [],
       },
     ];
 
@@ -106,7 +106,7 @@ export default function SingleDayEventForm() {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teacher: subEvent.teacher || "",
+          teachers: [subEvent.teacher] || [],
           startTime: dayjs(
             values["event-date"]
               .hour(subEvent.time[0].hour())

@@ -97,7 +97,7 @@ export default function MultiDayEventForm() {
         endTime: endTime,
         type: day["event-type-base"],
         tags: day["event-tags-base"] || [],
-        teacher: day["event-teacher-base"] || "",
+        teachers: [day["event-teacher-base"]] || [],
       });
 
       // Additional sub-events for each day
@@ -113,7 +113,7 @@ export default function MultiDayEventForm() {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teacher: subEvent.teacher || "",
+          teachers: [subEvent.teacher] || [],
           startTime: startTime,
           endTime: endTime,
         });

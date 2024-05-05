@@ -61,8 +61,8 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
             {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
             {dayjs(event.subEvents[0].startTime).format("DD-MM")}
-            {event.subEvents[0].teacher && (
-              <span>&nbsp;עם {event.subEvents[0].teacher}</span>
+            {event.subEvents[0].teachers.length > 0 && (
+              <span>&nbsp;עם {event.subEvents[0].teachers.join(", ")}</span>
             )}
           </>
         ) : (
@@ -76,7 +76,9 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
             {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
             {getType(subEvent.type as IEventi)}
-            {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
+            {subEvent.teachers.length > 0 && (
+              <span>&nbsp;עם {subEvent.teachers.join(", ")}</span>
+            )}
             {subEvent.tags && (
               <span>
                 &nbsp;

@@ -11,7 +11,7 @@ import {
   List,
   TimePicker,
 } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import VirtualList from "rc-virtual-list";
 import GooglePlacesInput, {
   IGooglePlaceOption,
@@ -25,6 +25,7 @@ import {
   repeatOptions,
   repeatEventTooltip,
 } from "./SingleDayEventForm";
+import { useState } from "react";
 
 interface ISingleDayEventBaseFormProps {
   form: any;
@@ -49,6 +50,20 @@ export default function SingleDayEventBaseForm({
   endDate,
   idEdit,
 }: ISingleDayEventBaseFormProps) {
+  const [teachers, setTeachers] = useState<string[]>([]);
+
+  const handleAddTeacher = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && event.currentTarget.value) {
+      setTeachers([...teachers, event.currentTarget.value]);
+      event.currentTarget.value = ""; // Clear input after adding
+    }
+  };
+
+  const handleRemoveTeacher = (index: number) => {
+    const newTeachers = [...teachers];
+    newTeachers.splice(index, 1);
+    setTeachers(newTeachers);
+  };
   return (
     <>
       <Card className="mt-4 border-4">
@@ -217,8 +232,44 @@ export default function SingleDayEventBaseForm({
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="מורה" name="event-teacher" className="w-full">
+            {/* <Form.Item label="מורה" name="event-teacher" className="w-full">
               <Input />
+            </Form.Item> */}
+            <Form.Item label="מורה" name="event-teacher" className="w-full">
+              <Input
+                placeholder="הקלד ולחץ Enter להוספה"
+                onKeyDown={handleAddTeacher}
+              />{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  const input =
+                    document.querySelector<HTMLInputElement>("#teacher-input");
+                  if (input && input.value) {
+                    setTeachers([...teachers, input.value]);
+                    input.value = ""; // Clear input after adding
+                  }
+                }}
+                className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Enter
+              </button>
+              {teachers.length && (
+                <List
+                  dataSource={teachers}
+                  renderItem={(teacher, index) => (
+                    <List.Item
+                      actions={[
+                        <MinusCircleOutlined
+                          onClick={() => handleRemoveTeacher(index)}
+                        />,
+                      ]}
+                    >
+                      {teacher}
+                    </List.Item>
+                  )}
+                />
+              )}
             </Form.Item>
           </Col>
         </Row>

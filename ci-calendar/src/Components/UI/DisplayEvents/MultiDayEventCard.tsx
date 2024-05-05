@@ -63,7 +63,9 @@ export const MultiDayEventCard = React.forwardRef<
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
               {getType(subEvent.type as IEventi)}
-              {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
+              {subEvent.teachers.length > 0 && (
+                <span>&nbsp;עם {subEvent.teachers.join(", ")}</span>
+              )}
               {subEvent.tags && (
                 <span>
                   &nbsp;

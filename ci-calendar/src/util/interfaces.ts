@@ -10,7 +10,7 @@ export interface IEventiPart {
   type: string;
   startTime: string;
   //TODO add user option, or just name
-  teacher: string;
+  teachers: string[];
   tags: string[];
 }
 interface IPrice {

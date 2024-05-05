@@ -89,7 +89,7 @@ export default function EditMultiDayEventForm() {
         endTime: endTime,
         type: day["event-type-base"],
         tags: day["event-tags-base"] || [],
-        teacher: day["event-teacher-base"] || "",
+        teachers: [day["event-teachers-base"]] || [],
       });
 
       // Additional sub-events for each day
@@ -105,7 +105,7 @@ export default function EditMultiDayEventForm() {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teacher: subEvent.teacher || "",
+          teachers: [subEvent.teachers] || [],
           startTime: startTime,
           endTime: endTime,
         });
@@ -207,7 +207,7 @@ const eventToFormValues = (event: IEvently) => {
       "event-date-base": dayjs(subEvent.startTime),
       "event-type-base": subEvent.type,
       "event-time-base": [dayjs(subEvent.startTime), dayjs(subEvent.endTime)],
-      "event-teacher-base": subEvent.teacher,
+      "event-teacher-base": subEvent.teachers,
       "event-tags-base": subEvent.tags,
     });
   });
@@ -217,7 +217,7 @@ const eventToFormValues = (event: IEvently) => {
     const otherSubEvents = subEvents.slice(1).map((subEvent) => ({
       type: subEvent["event-type-base"],
       time: subEvent["event-time-base"],
-      teacher: subEvent["event-teacher-base"],
+      teachers: subEvent["event-teacher-base"],
       tags: subEvent["event-tags-base"],
     }));
 
@@ -225,7 +225,7 @@ const eventToFormValues = (event: IEvently) => {
       "event-date-base": baseEvent["event-date-base"],
       "event-type-base": baseEvent["event-type-base"],
       "event-time-base": baseEvent["event-time-base"],
-      "event-teacher-base": baseEvent["event-teacher-base"],
+      "event-teachers-base": baseEvent["event-teachers-base"],
       "event-tags-base": baseEvent["event-tags-base"],
       "sub-events": otherSubEvents,
     };
@@ -245,6 +245,5 @@ const eventToFormValues = (event: IEvently) => {
     prices: event.price,
     days: days,
   };
-
   return { currentFormValues, address: event.address };
 };

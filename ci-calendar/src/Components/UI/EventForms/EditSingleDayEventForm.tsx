@@ -100,7 +100,7 @@ export default function EditSingleDayEventForm() {
         ).toISOString(),
         type: values["event-types"] || "",
         tags: values["event-tags"] || [],
-        teacher: values["event-teacher"] || "",
+        teachers: values["event-teachers"] || [],
       },
     ];
     if (values["sub-events"]) {
@@ -108,7 +108,7 @@ export default function EditSingleDayEventForm() {
         subEvents.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teacher: subEvent.teacher || "",
+          teachers: subEvent.teachers || [],
           startTime: dayjs(
             subEvent.time[0]
               .hour(subEvent.time[0].hour())
@@ -196,7 +196,7 @@ function eventToFormValues(event: IEvently) {
     district: event.district,
     "event-types": event.subEvents[0]?.type,
     "event-tags": event.subEvents[0]?.tags,
-    "event-teacher": event.subEvents[0]?.teacher,
+    "event-teachers": event.subEvents[0]?.teachers,
     "event-date": dayjs.tz(
       dayjs(event.subEvents[0]?.startTime),
       "Asia/Jerusalem"
@@ -208,7 +208,7 @@ function eventToFormValues(event: IEvently) {
     "sub-events": event.subEvents.slice(1).map((subEvent) => ({
       type: subEvent.type,
       tags: subEvent.tags,
-      teacher: subEvent.teacher,
+      teachers: subEvent.teachers,
       time: [
         dayjs(subEvent.startTime).tz("Asia/Jerusalem"),
         dayjs(subEvent.endTime).tz("Asia/Jerusalem"),
@@ -223,6 +223,6 @@ function eventToFormValues(event: IEvently) {
       sum: price.sum,
     })),
   };
-
+  console.log("currentFormValues: ", currentFormValues);
   return { currentFormValues, address: event.address };
 }
