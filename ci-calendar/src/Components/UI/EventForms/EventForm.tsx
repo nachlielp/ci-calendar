@@ -96,10 +96,25 @@ export default function EventForm() {
   };
 
   const handleSubmit = async (values: any) => {
+    console.log(values);
+    // startTime: date
+    // .hour(subEvent.startTime.hour())
+    // .minute(subEvent.startTime.minute())
+    // .toISOString(),
     const subEventsTemplate = [
       {
-        startTime: dayjs(values["event-time"][0]),
-        endTime: dayjs(values["event-time"][1]),
+        startTime: dayjs(
+          values["event-date"]
+            .hour(values["event-time"][0].hour())
+            .minute(values["event-time"][0].minute())
+            .toISOString()
+        ),
+        endTime: dayjs(
+          values["event-date"]
+            .hour(values["event-time"][1].hour())
+            .minute(values["event-time"][1].minute())
+            .toISOString()
+        ),
         type: values["event-types"],
         tags: values["event-tags"] || [],
         teacher: values["event-teacher"] || "",
@@ -112,8 +127,18 @@ export default function EventForm() {
           type: subEvent.type,
           tags: subEvent.tags || [],
           teacher: subEvent.teacher || "",
-          startTime: dayjs(subEvent.time[0]),
-          endTime: dayjs(subEvent.time[1]),
+          startTime: dayjs(
+            values["event-date"]
+              .hour(subEvent.time[0].hour())
+              .minute(subEvent.time[0].minute())
+              .toISOString()
+          ),
+          endTime: dayjs(
+            values["event-date"]
+              .hour(subEvent.time[1].hour())
+              .minute(subEvent.time[1].minute())
+              .toISOString()
+          ),
         })
       );
     }
@@ -147,6 +172,7 @@ export default function EventForm() {
           })),
           district: values["district"],
         };
+
         await createEvent(event);
       } else if (endDate) {
         const dates = listOfDates(
