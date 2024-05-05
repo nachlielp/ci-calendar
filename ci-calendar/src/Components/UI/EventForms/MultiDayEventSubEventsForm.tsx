@@ -19,7 +19,10 @@ interface IBaseEventFormProps {
   remove: (index: number | number[]) => void;
 }
 
-export default function SubEventBase({ day, remove }: IBaseEventFormProps) {
+export default function MultiDayEventSubEventsForm({
+  day,
+  remove,
+}: IBaseEventFormProps) {
   return (
     <Card className="mt-4 border-4">
       <Form.Item

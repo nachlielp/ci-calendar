@@ -7,7 +7,7 @@ interface ISubEventsFormProps {
 }
 export default function SubEventsForm({ day }: ISubEventsFormProps) {
   return (
-    <Form.List name={[day, "sub-events"]}>
+    <Form.List name={day ? [day, "sub-events"] : "sub-events"}>
       {(subEvents, { add, remove }) => (
         <>
           {subEvents.map(({ key, name }) => (

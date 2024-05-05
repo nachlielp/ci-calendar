@@ -18,7 +18,7 @@ import {
 } from "../../../util/interfaces";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import { useState } from "react";
-import SubEventBase from "./SubEventBase";
+import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
@@ -178,7 +178,11 @@ export default function MultiDayEventForm() {
               <>
                 {days.map(({ key, name, ...restField }) => (
                   <div key={key}>
-                    <SubEventBase day={name} {...restField} remove={remove} />
+                    <MultiDayEventSubEventsForm
+                      day={name}
+                      {...restField}
+                      remove={remove}
+                    />
                   </div>
                 ))}
                 <div className="flex items-center justify-center mt-2">
