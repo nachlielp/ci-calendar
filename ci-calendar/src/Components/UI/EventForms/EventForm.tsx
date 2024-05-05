@@ -269,11 +269,7 @@ export default function EventForm() {
             name="event-repeat"
             rules={[{ required: true, message: "שדה חובה" }]}
           >
-            <Select
-              options={repeatOptions}
-              defaultValue={Frequency.none}
-              onChange={handleRepeatChange}
-            />
+            <Select options={repeatOptions} onChange={handleRepeatChange} />
           </Form.Item>
 
           {repeatOption === Frequency.byWeek && (
