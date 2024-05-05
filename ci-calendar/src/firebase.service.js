@@ -162,7 +162,9 @@ export async function getDocument(collectionName, id) {
 export async function updateDocument(collectionName, id, document) {
   try {
     const db = await getDb();
-    await setDoc(doc(db, collectionName, id), document, { merge: true });
+    await setDoc(doc(db, collectionName, id), document, {
+      merge: true,
+    });
   } catch (error) {
     console.log(error);
     throw error;

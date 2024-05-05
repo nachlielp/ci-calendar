@@ -79,7 +79,7 @@ export default function MultiDayEventForm() {
     setDates(dates);
   };
   const handleSubmit = async (values: any) => {
-    console.log("MultiDayEventForm.handleSubmit.values: ", values);
+    // console.log("MultiDayEventForm.handleSubmit.values: ", values);
 
     const subEventsTemplate: IEventiPart[] = [];
 
@@ -144,7 +144,7 @@ export default function MultiDayEventForm() {
         subEvents: subEventsTemplate,
         district: values["district"],
       };
-      console.log("MultiDayEventForm.handleSubmit.event: ", event);
+      // console.log("MultiDayEventForm.handleSubmit.event: ", event);
       await createEvent(event);
 
       navigate("/");

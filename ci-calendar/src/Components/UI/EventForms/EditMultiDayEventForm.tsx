@@ -3,13 +3,13 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import { Button, Card, Form } from "antd";
 import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { IEvently, IAddress } from "../../../util/interfaces";
+import { IEvently, IAddress, IEventiPart } from "../../../util/interfaces";
 import Loading from "../Other/Loading";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
 import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
-import { CodeSandboxCircleFilled, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 
 export default function EditMultiDayEventForm() {
@@ -36,6 +36,10 @@ export default function EditMultiDayEventForm() {
           if (res) {
             const { currentFormValues, address } = eventToFormValues(res);
             setCurrentFormValues(currentFormValues);
+            setDates([
+              dayjs(currentFormValues["event-date"][0]),
+              dayjs(currentFormValues["event-date"][1]),
+            ]);
             setAddress(address);
             setSchedule(currentFormValues["event-schedule"]);
           }
@@ -67,17 +71,80 @@ export default function EditMultiDayEventForm() {
   };
 
   const handleSubmit = async (values: any) => {
+    // console.log("MultiDayEventForm.handleSubmit.values: ", values);
+
+    const subEventsTemplate: IEventiPart[] = [];
+
+    values.days?.forEach((day: any) => {
+      const startTime: string = dayjs(day["event-date-base"])
+        .hour(dayjs(day["event-time-base"][0]).hour())
+        .minute(dayjs(day["event-time-base"][0]).minute())
+        .toISOString();
+      const endTime: string = dayjs(day["event-date-base"])
+        .hour(dayjs(day["event-time-base"][1]).hour())
+        .minute(dayjs(day["event-time-base"][1]).minute())
+        .toISOString();
+      subEventsTemplate.push({
+        startTime: startTime,
+        endTime: endTime,
+        type: day["event-type-base"],
+        tags: day["event-tags-base"] || [],
+        teacher: day["event-teacher-base"] || "",
+      });
+
+      // Additional sub-events for each day
+      day["sub-events"]?.forEach((subEvent: any) => {
+        const startTime: string = dayjs(day["event-date-base"])
+          .hour(dayjs(subEvent.time[0]).hour())
+          .minute(dayjs(subEvent.time[0]).minute())
+          .toISOString();
+        const endTime: string = dayjs(day["event-date-base"])
+          .hour(dayjs(subEvent.time[1]).hour())
+          .minute(dayjs(subEvent.time[1]).minute())
+          .toISOString();
+        subEventsTemplate.push({
+          type: subEvent.type,
+          tags: subEvent.tags || [],
+          teacher: subEvent.teacher || "",
+          startTime: startTime,
+          endTime: endTime,
+        });
+      });
+    });
+
+    if (!address || !dates) {
+      return;
+    }
+
+    const event: IEvently = {
+      dates: {
+        startDate: dates[0].toISOString(),
+        endDate: dates[1].toISOString(),
+      },
+      type: values["main-event-type"],
+      id: eventData.id,
+      address: address,
+      createdAt: eventData.createdAt,
+      updatedAt: dayjs().toISOString(),
+      title: values["event-title"],
+      description: values["event-description"] || "",
+      owners: [currentUser.id],
+      links: values["links"] || [],
+      price: values["prices"] || [],
+      hide: false,
+      subEvents: subEventsTemplate,
+      district: values["district"],
+    };
+    // console.log("MultiDayEventForm.handleSubmit.event: ", event);
     try {
-      // Transform values here and prepare the event object
-      const updatedEvent = { ...eventData, ...values }; // Simplified, adjust according to your needs
-      await updateEvent(eventData.id, updatedEvent);
+      await updateEvent(eventData.id, event);
+
       navigate("/");
     } catch (error) {
-      console.error("EditMultiDayEventForm.handleSubmit.error: ", error);
+      console.error("EventForm.handleSubmit.error: ", error);
       throw error;
     }
   };
-  console.log("currentFormValues", currentFormValues);
   return (
     <Card className="max-w-[500px] mx-auto mt-4">
       <Form
@@ -145,7 +212,6 @@ const eventToFormValues = (event: IEvently) => {
     });
   });
 
-  // Convert the map to an array of days with their respective sub-events
   const days = Array.from(daysMap, ([_, subEvents]) => {
     const baseEvent = subEvents[0];
     const otherSubEvents = subEvents.slice(1).map((subEvent) => ({
@@ -165,7 +231,6 @@ const eventToFormValues = (event: IEvently) => {
     };
   });
 
-  console.log("days", days);
   const currentFormValues = {
     createdAt: event.createdAt,
     updatedAt: dayjs().toISOString(),
@@ -183,57 +248,3 @@ const eventToFormValues = (event: IEvently) => {
 
   return { currentFormValues, address: event.address };
 };
-// const eventToFormValues = (event: IEvently) => {
-//   const daysMap = new Map<string, any[]>();
-//   event.subEvents.forEach((subEvent) => {
-//     const startDay = dayjs(subEvent.startTime).format("YYYY-MM-DD");
-//     if (!daysMap.has(startDay)) {
-//       daysMap.set(startDay, []);
-//     }
-//     daysMap.get(startDay)!.push({
-//       "event-date-base": dayjs(subEvent.startTime),
-//       "event-type-base": subEvent.type,
-//       "event-time-base": [dayjs(subEvent.startTime), dayjs(subEvent.endTime)],
-//       "event-teacher-base": subEvent.teacher,
-//       "event-tags-base": subEvent.tags,
-//     });
-//   });
-
-//   // Convert the map to an array of days with their respective sub-events
-//   const days = Array.from(daysMap, ([day, subEvents]) => ({
-//     day,
-//     subEvents,
-//   }));
-
-//   console.log("days", days);
-//   const currentFormValues = {
-//     createdAt: event.createdAt,
-//     updatedAt: dayjs().toISOString(),
-//     "event-title": event.title,
-//     "event-description": event.description,
-//     district: event.district,
-//     address: event.address,
-//     "event-date": [dayjs(event.dates.startDate), dayjs(event.dates.endDate)],
-//     "main-event-type": event.type,
-//     "event-schedule": event.subEvents.length > 0,
-//     links: event.links,
-//     prices: event.price,
-//     days: event.subEvents.map((subEvent) => ({
-//       "event-date-base": dayjs(subEvent.startTime),
-//       "event-type-base": subEvent.type,
-//       "event-time-base": [dayjs(subEvent.startTime), dayjs(subEvent.endTime)],
-//       "event-teacher-base": subEvent.teacher,
-//       "event-tags-base": subEvent.tags,
-//       "sub-events": event.subEvents
-//         .filter((se) => se !== subEvent)
-//         .map((se) => ({
-//           type: se.type,
-//           time: [dayjs(se.startTime), dayjs(se.endTime)],
-//           teacher: se.teacher,
-//           tags: se.tags,
-//         })),
-//     })),
-//   };
-
-//   return { currentFormValues, address: event.address };
-// };
