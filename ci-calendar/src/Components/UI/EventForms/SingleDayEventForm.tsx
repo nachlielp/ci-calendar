@@ -1,37 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../Auth/AuthContext";
-import {
-  Button,
-  Card,
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  List,
-  Row,
-  Select,
-  TimePicker,
-  Tooltip,
-} from "antd";
+import { Button, Card, Form } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import {
-  InfoCircleOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
-} from "@ant-design/icons";
-import VirtualList from "rc-virtual-list";
-
 import { v4 as uuidv4 } from "uuid";
-
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { tagOptions, eventTypes, districtOptions } from "../../../util/options";
+import { tagOptions } from "../../../util/options";
 import { IAddress, IEvently, UserType } from "../../../util/interfaces";
-import GooglePlacesInput, {
-  IGooglePlaceOption,
-} from "../Other/GooglePlacesInput";
+import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import { useState } from "react";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
@@ -60,7 +37,9 @@ const initialValues = {
 };
 
 export default function SingleDayEventForm() {
-  const [repeatOption, setRepeatOption] = useState<Frequency>(Frequency.none);
+  const [repeatOption, setRepeatOption] = useState<EventFrequency>(
+    EventFrequency.none
+  );
   const [eventDate, setEventDate] = useState(dayjs());
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
   const navigate = useNavigate();
@@ -149,7 +128,7 @@ export default function SingleDayEventForm() {
     }
 
     try {
-      if (repeatOption === Frequency.none) {
+      if (repeatOption === EventFrequency.none) {
         const event: IEvently = {
           id: uuidv4(),
           dates: {
@@ -245,6 +224,7 @@ export default function SingleDayEventForm() {
           repeatOption={repeatOption}
           eventDate={eventDate}
           endDate={endDate}
+          idEdit={false}
         />
         <SubEventsForm day="" />
         <AddLinksForm />
@@ -263,7 +243,7 @@ export default function SingleDayEventForm() {
   );
 }
 
-export enum Frequency {
+export enum EventFrequency {
   none = "none",
   weekly = "weekly",
   byWeek = "by-week",
@@ -271,13 +251,13 @@ export enum Frequency {
 }
 
 export const repeatOptions = [
-  { value: Frequency.none, label: "אף פעם" },
-  { value: Frequency.weekly, label: "כל  שבוע" },
-  { value: Frequency.byWeek, label: "כל כמה שבועות" },
-  { value: Frequency.monthly, label: "כל חודש" },
+  { value: EventFrequency.none, label: "אף פעם" },
+  { value: EventFrequency.weekly, label: "כל  שבוע" },
+  { value: EventFrequency.byWeek, label: "כל כמה שבועות" },
+  { value: EventFrequency.monthly, label: "כל חודש" },
 ];
 
-export const repeatTooltip = (
+export const repeatEventTooltip = (
   <>
     <p>* כל כמה שבועות - לדוגמה, כל שבועים ביום שלישי </p>
     <br />
@@ -296,22 +276,22 @@ export function getDayAndWeekOfMonth(date: dayjs.Dayjs) {
 export function listOfDates(
   startDate: dayjs.Dayjs,
   endDate: dayjs.Dayjs,
-  repeatOption: Frequency,
+  repeatOption: EventFrequency,
   repeatInterval?: number
 ) {
   const dates = [];
   let date = startDate;
-  if (repeatOption === Frequency.weekly) {
+  if (repeatOption === EventFrequency.weekly) {
     while (!date.isAfter(endDate.add(1, "day"))) {
       dates.push(date);
       date = date.add(1, "week");
     }
-  } else if (repeatOption === Frequency.byWeek && repeatInterval) {
+  } else if (repeatOption === EventFrequency.byWeek && repeatInterval) {
     while (!date.isAfter(endDate.add(1, "day"))) {
       dates.push(date);
       date = date.add(repeatInterval, "week");
     }
-  } else if (repeatOption === Frequency.monthly) {
+  } else if (repeatOption === EventFrequency.monthly) {
     const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(startDate);
     while (!date.isAfter(endDate)) {
       dates.push(date);

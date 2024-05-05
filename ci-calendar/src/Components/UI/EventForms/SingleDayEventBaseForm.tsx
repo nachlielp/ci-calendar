@@ -19,11 +19,11 @@ import GooglePlacesInput, {
 import dayjs from "dayjs";
 import { districtOptions, eventTypes, tagOptions } from "../../../util/options";
 import {
-  Frequency,
+  EventFrequency,
   formatMonthlyDate,
   listOfDates,
   repeatOptions,
-  repeatTooltip,
+  repeatEventTooltip,
 } from "./SingleDayEventForm";
 
 interface ISingleDayEventBaseFormProps {
@@ -31,10 +31,11 @@ interface ISingleDayEventBaseFormProps {
   handleAddressSelect: (place: IGooglePlaceOption) => void;
   handleDateChange: (date: dayjs.Dayjs) => void;
   handleEndDateChange: (date: dayjs.Dayjs) => void;
-  handleRepeatChange: () => void;
+  handleRepeatChange?: () => void;
+  repeatOption?: EventFrequency;
   eventDate: dayjs.Dayjs;
   endDate: dayjs.Dayjs | null;
-  repeatOption: Frequency;
+  idEdit: boolean;
 }
 
 export default function SingleDayEventBaseForm({
@@ -43,9 +44,10 @@ export default function SingleDayEventBaseForm({
   handleDateChange,
   handleEndDateChange,
   handleRepeatChange,
+  repeatOption,
   eventDate,
   endDate,
-  repeatOption,
+  idEdit,
 }: ISingleDayEventBaseFormProps) {
   return (
     <>
@@ -94,85 +96,90 @@ export default function SingleDayEventBaseForm({
           />
         </Form.Item>
 
-        <Form.Item
-          className="mt-4"
-          label={
-            <Tooltip title={repeatTooltip}>
-              חזרה &nbsp;
-              <InfoCircleOutlined />
-            </Tooltip>
-          }
-          name="event-repeat"
-          rules={[{ required: true, message: "שדה חובה" }]}
-        >
-          <Select options={repeatOptions} onChange={handleRepeatChange} />
-        </Form.Item>
-
-        {repeatOption === Frequency.byWeek && (
-          <Form.Item
-            label="שבועות"
-            name="event-repeat-week-interval"
-            className="mt-4"
-            rules={[{ required: true, message: "שדה חובה" }]}
-          >
-            <InputNumber min={1} precision={0} />
-          </Form.Item>
-        )}
-        {repeatOption === Frequency.monthly && (
-          <Form.Item
-            label="תדירות"
-            name="event-repeat-week-frequency"
-            className="mt-4"
-          >
-            <Input placeholder={formatMonthlyDate(eventDate)} disabled />
-          </Form.Item>
-        )}
-        {repeatOption !== Frequency.none && (
+        {!idEdit && (
           <>
             <Form.Item
-              label="סיום חזרה"
-              name="event
-              זרה-repeat-end-date"
               className="mt-4"
+              label={
+                <Tooltip title={repeatEventTooltip}>
+                  חזרה &nbsp;
+                  <InfoCircleOutlined />
+                </Tooltip>
+              }
+              name="event-repeat"
               rules={[{ required: true, message: "שדה חובה" }]}
             >
-              <DatePicker
-                format={"DD/MM"}
-                minDate={eventDate}
-                maxDate={dayjs().add(1, "year")}
-                onChange={handleEndDateChange}
-              />
+              <Select options={repeatOptions} onChange={handleRepeatChange} />
             </Form.Item>
-            <Form.Item
-              label="תאריכים"
-              name="event-list-of-dates"
-              className="mt-4"
-            >
-              {endDate && (
-                <List>
-                  <VirtualList
-                    data={listOfDates(
-                      eventDate,
-                      endDate,
-                      repeatOption,
-                      form.getFieldValue("event-repeat-week-interval")
-                    )}
-                    height={200}
-                    itemHeight={47}
-                    itemKey="email"
-                  >
-                    {(date: dayjs.Dayjs, index: number) => (
-                      <List.Item key={index} className="mr-4">
-                        <List.Item.Meta
-                          key={index}
-                          title={date.format("DD/MM")}
-                        />
-                      </List.Item>
-                    )}
-                  </VirtualList>
-                </List>
-              )}
-            </Form.Item>
+            {repeatOption === EventFrequency.byWeek && (
+              <Form.Item
+                label="שבועות"
+                name="event-repeat-week-interval"
+                className="mt-4"
+                rules={[{ required: true, message: "שדה חובה" }]}
+              >
+                <InputNumber min={1} precision={0} />
+              </Form.Item>
+            )}
+            {repeatOption === EventFrequency.monthly && (
+              <Form.Item
+                label="תדירות"
+                name="event-repeat-week-frequency"
+                className="mt-4"
+              >
+                <Input placeholder={formatMonthlyDate(eventDate)} disabled />
+              </Form.Item>
+            )}
+            {repeatOption !== EventFrequency.none && (
+              <>
+                <Form.Item
+                  label="סיום חזרה"
+                  name="event
+              זרה-repeat-end-date"
+                  className="mt-4"
+                  rules={[{ required: true, message: "שדה חובה" }]}
+                >
+                  <DatePicker
+                    format={"DD/MM"}
+                    minDate={eventDate}
+                    maxDate={dayjs().add(1, "year")}
+                    onChange={handleEndDateChange}
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="תאריכים"
+                  name="event-list-of-dates"
+                  className="mt-4"
+                >
+                  {endDate && repeatOption && (
+                    <List>
+                      <VirtualList
+                        data={listOfDates(
+                          eventDate,
+                          endDate,
+                          repeatOption,
+                          form.getFieldValue("event-repeat-week-interval")
+                        )}
+                        height={200}
+                        itemHeight={47}
+                        itemKey={(item) =>
+                          item.format("DD/MM/YYYY") + item.valueOf()
+                        }
+                      >
+                        {(date: dayjs.Dayjs, index: number) => (
+                          <List.Item key={index} className="mr-4">
+                            <List.Item.Meta
+                              key={index}
+                              title={date.format("DD/MM")}
+                            />
+                          </List.Item>
+                        )}
+                      </VirtualList>
+                    </List>
+                  )}
+                </Form.Item>
+              </>
+            )}
           </>
         )}
       </Card>
