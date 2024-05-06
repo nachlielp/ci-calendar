@@ -45,6 +45,7 @@ export default function SingleDayEventForm() {
   const navigate = useNavigate();
   const { currentUser, createEvent } = useAuthContext();
   const [address, setAddress] = useState<IAddress>();
+  const [baseTeachers, setBaseTeachers] = useState<string[]>([]);
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -97,7 +98,7 @@ export default function SingleDayEventForm() {
         ),
         type: values["event-types"],
         tags: values["event-tags"] || [],
-        teachers: [values["event-teacher"]] || [],
+        teachers: baseTeachers,
       },
     ];
 
@@ -221,6 +222,7 @@ export default function SingleDayEventForm() {
           handleDateChange={handleDateChange}
           handleEndDateChange={handleEndDateChange}
           handleRepeatChange={handleRepeatChange}
+          handleTeacherChange={setBaseTeachers}
           repeatOption={repeatOption}
           eventDate={eventDate}
           endDate={endDate}

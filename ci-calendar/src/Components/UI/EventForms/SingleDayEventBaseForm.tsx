@@ -10,8 +10,13 @@ import {
   InputNumber,
   List,
   TimePicker,
+  Button,
 } from "antd";
-import { InfoCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import {
+  EnterOutlined,
+  InfoCircleOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
 import VirtualList from "rc-virtual-list";
 import GooglePlacesInput, {
   IGooglePlaceOption,
@@ -33,6 +38,7 @@ interface ISingleDayEventBaseFormProps {
   handleDateChange: (date: dayjs.Dayjs) => void;
   handleEndDateChange: (date: dayjs.Dayjs) => void;
   handleRepeatChange?: () => void;
+  handleTeacherChange: (teachers: string[]) => void;
   repeatOption?: EventFrequency;
   eventDate: dayjs.Dayjs;
   endDate: dayjs.Dayjs | null;
@@ -45,17 +51,24 @@ export default function SingleDayEventBaseForm({
   handleDateChange,
   handleEndDateChange,
   handleRepeatChange,
+  handleTeacherChange,
   repeatOption,
   eventDate,
   endDate,
   idEdit,
 }: ISingleDayEventBaseFormProps) {
+  const [inputValue, setInputValue] = useState<string>("");
   const [teachers, setTeachers] = useState<string[]>([]);
 
-  const handleAddTeacher = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter" && event.currentTarget.value) {
-      setTeachers([...teachers, event.currentTarget.value]);
-      event.currentTarget.value = ""; // Clear input after adding
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleAddTeacher = (teacher: string) => {
+    if (teacher !== "") {
+      handleTeacherChange([...teachers, teacher]);
+      setTeachers([...teachers, teacher]);
+      setInputValue("");
     }
   };
 
@@ -63,6 +76,7 @@ export default function SingleDayEventBaseForm({
     const newTeachers = [...teachers];
     newTeachers.splice(index, 1);
     setTeachers(newTeachers);
+    handleTeacherChange(newTeachers);
   };
   return (
     <>
@@ -232,29 +246,20 @@ export default function SingleDayEventBaseForm({
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            {/* <Form.Item label="מורה" name="event-teacher" className="w-full">
-              <Input />
-            </Form.Item> */}
             <Form.Item label="מורה" name="event-teacher" className="w-full">
-              <Input
-                placeholder="הקלד ולחץ Enter להוספה"
-                onKeyDown={handleAddTeacher}
-              />{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  const input =
-                    document.querySelector<HTMLInputElement>("#teacher-input");
-                  if (input && input.value) {
-                    setTeachers([...teachers, input.value]);
-                    input.value = ""; // Clear input after adding
-                  }
-                }}
-                className="ml-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Enter
-              </button>
-              {teachers.length && (
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onPressEnter={() => handleAddTeacher(inputValue)}
+                />
+                <Button
+                  icon={<EnterOutlined />}
+                  onClick={() => handleAddTeacher(inputValue)}
+                  className="ml-4 bg-blue-500 text-white font-bold py-2 px-4 rounded "
+                />
+              </div>
+              {teachers.length > 0 && (
                 <List
                   dataSource={teachers}
                   renderItem={(teacher, index) => (
