@@ -16,6 +16,7 @@ import {
   EnterOutlined,
   InfoCircleOutlined,
   MinusCircleOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import VirtualList from "rc-virtual-list";
 import GooglePlacesInput, {
@@ -57,27 +58,22 @@ export default function SingleDayEventBaseForm({
   endDate,
   idEdit,
 }: ISingleDayEventBaseFormProps) {
-  const [inputValue, setInputValue] = useState<string>("");
-  const [teachers, setTeachers] = useState<string[]>([]);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+  const onAddTeacher = () => {
+    const name = form.getFieldValue("newTeacher");
+    form.setFieldsValue({ newTeacher: "" });
+    if (!name) return;
+    const teachers = form.getFieldValue("baseTeachers") || [];
+    form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
+    form.setFieldsValue({ newTeacher: "" });
   };
 
-  const handleAddTeacher = (teacher: string) => {
-    if (teacher !== "") {
-      handleTeacherChange([...teachers, teacher]);
-      setTeachers([...teachers, teacher]);
-      setInputValue("");
-    }
+  const onRemoveTeacher = (index: number) => {
+    const teachers = form.getFieldValue("teachers") || [];
+    form.setFieldsValue({
+      teachers: teachers.filter((_: any, i: any) => i !== index),
+    });
   };
 
-  const handleRemoveTeacher = (index: number) => {
-    const newTeachers = [...teachers];
-    newTeachers.splice(index, 1);
-    setTeachers(newTeachers);
-    handleTeacherChange(newTeachers);
-  };
   return (
     <>
       <Card className="mt-4 border-4">
@@ -246,36 +242,38 @@ export default function SingleDayEventBaseForm({
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="מורה" name="event-teacher" className="w-full">
+            <Form.Item
+              name="newTeacher"
+              label="Add Teacher"
+              className="w-full  mb-2"
+            >
               <div className="flex items-center space-x-2">
-                <Input
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  onPressEnter={() => handleAddTeacher(inputValue)}
-                />
-                <Button
-                  icon={<EnterOutlined />}
-                  onClick={() => handleAddTeacher(inputValue)}
-                  className="ml-4 bg-blue-500 text-white font-bold py-2 px-4 rounded "
-                />
+                <Input onPressEnter={onAddTeacher} />
+                <Button onClick={onAddTeacher} icon={<PlusOutlined />} />
               </div>
-              {teachers.length > 0 && (
-                <List
-                  dataSource={teachers}
-                  renderItem={(teacher, index) => (
-                    <List.Item
-                      actions={[
-                        <MinusCircleOutlined
-                          onClick={() => handleRemoveTeacher(index)}
-                        />,
-                      ]}
-                    >
-                      {teacher}
-                    </List.Item>
-                  )}
-                />
-              )}
             </Form.Item>
+            <div className="mr-24">
+              <Form.List name="baseTeachers">
+                {(fields, {}) => (
+                  <>
+                    {fields.map((field, index) => (
+                      <Form.Item
+                        key={field.key}
+                        className="flex items-center justify-between mb-2"
+                      >
+                        <div className="flex items-center space-between">
+                          {form.getFieldValue(["baseTeachers", index, "name"])}
+                          &nbsp;
+                          <MinusCircleOutlined
+                            onClick={() => onRemoveTeacher(index)}
+                          />
+                        </div>
+                      </Form.Item>
+                    ))}
+                  </>
+                )}
+              </Form.List>
+            </div>
           </Col>
         </Row>
         <Row gutter={10} align="middle">

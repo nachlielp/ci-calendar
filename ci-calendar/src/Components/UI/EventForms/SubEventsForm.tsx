@@ -3,9 +3,25 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { eventTypes, tagOptions } from "../../../util/options";
 
 interface ISubEventsFormProps {
+  form: any;
   day: string;
 }
-export default function SubEventsForm({ day }: ISubEventsFormProps) {
+export default function SubEventsForm({ form, day }: ISubEventsFormProps) {
+  const onAddTeacher = () => {
+    const name = form.getFieldValue("newTeacher");
+    form.setFieldsValue({ newTeacher: "" });
+    if (!name) return;
+    const teachers = form.getFieldValue("baseTeachers") || [];
+    form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
+    form.setFieldsValue({ newTeacher: "" });
+  };
+
+  const onRemoveTeacher = (index: number) => {
+    const teachers = form.getFieldValue("teachers") || [];
+    form.setFieldsValue({
+      teachers: teachers.filter((_: any, i: any) => i !== index),
+    });
+  };
   return (
     <Form.List name={day ? [day, "sub-events"] : "sub-events"}>
       {(subEvents, { add, remove }) => (

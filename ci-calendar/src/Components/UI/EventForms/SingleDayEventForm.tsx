@@ -80,7 +80,7 @@ export default function SingleDayEventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    // console.log(values);
+    console.log(values);
 
     const subEventsTemplate = [
       {
@@ -98,7 +98,7 @@ export default function SingleDayEventForm() {
         ),
         type: values["event-types"],
         tags: values["event-tags"] || [],
-        teachers: baseTeachers,
+        teachers: values["baseTeachers"],
       },
     ];
 
@@ -154,7 +154,7 @@ export default function SingleDayEventForm() {
           district: values["district"],
         };
         // console.log("EventForm.handleSubmit.event: ", event);
-        await createEvent(event);
+        // await createEvent(event);
       } else if (endDate) {
         const dates = listOfDates(
           eventDate,
@@ -198,7 +198,7 @@ export default function SingleDayEventForm() {
           await createEvent(event);
         }
       }
-      navigate("/");
+      // navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
       throw error;
@@ -228,7 +228,7 @@ export default function SingleDayEventForm() {
           endDate={endDate}
           idEdit={false}
         />
-        <SubEventsForm day="" />
+        <SubEventsForm form={form} day="" />
         <AddLinksForm />
         <AddPricesForm />
 
