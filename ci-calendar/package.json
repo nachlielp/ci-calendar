@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "-": "^0.0.1",
     "@ant-design/icons": "^5.3.6",
     "@cloudinary/react": "^1.13.0",
     "@cloudinary/url-gen": "^1.19.0",
@@ -17,6 +18,7 @@
     "antd": "^5.16.1",
     "dayjs": "^1.11.10",
     "firebase": "^10.10.0",
+    "pnpm": "^9.1.0",
     "rc-virtual-list": "^3.11.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
