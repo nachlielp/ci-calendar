@@ -31,7 +31,6 @@ import {
   repeatOptions,
   repeatEventTooltip,
 } from "./SingleDayEventForm";
-import { useState } from "react";
 
 interface ISingleDayEventBaseFormProps {
   form: any;
@@ -39,7 +38,6 @@ interface ISingleDayEventBaseFormProps {
   handleDateChange: (date: dayjs.Dayjs) => void;
   handleEndDateChange: (date: dayjs.Dayjs) => void;
   handleRepeatChange?: () => void;
-  handleTeacherChange: (teachers: string[]) => void;
   repeatOption?: EventFrequency;
   eventDate: dayjs.Dayjs;
   endDate: dayjs.Dayjs | null;
@@ -52,26 +50,37 @@ export default function SingleDayEventBaseForm({
   handleDateChange,
   handleEndDateChange,
   handleRepeatChange,
-  handleTeacherChange,
+
   repeatOption,
   eventDate,
   endDate,
   idEdit,
 }: ISingleDayEventBaseFormProps) {
   const onAddTeacher = () => {
-    const name = form.getFieldValue("newTeacher");
-    form.setFieldsValue({ newTeacher: "" });
-    if (!name) return;
-    const teachers = form.getFieldValue("baseTeachers") || [];
-    form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
-    form.setFieldsValue({ newTeacher: "" });
+    try {
+      const name = form.getFieldValue("newTeacher");
+      form.setFieldsValue({ newTeacher: "" });
+      if (!name) return;
+      const teachers = form.getFieldValue("baseTeachers") || [];
+      form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
+      form.setFieldsValue({ newTeacher: "" });
+    } catch (error) {
+      console.error("SingleDayEventBaseForm.onAddTeacher.error: ", error);
+      throw error;
+    }
   };
 
   const onRemoveTeacher = (index: number) => {
-    const teachers = form.getFieldValue("teachers") || [];
-    form.setFieldsValue({
-      teachers: teachers.filter((_: any, i: any) => i !== index),
-    });
+    try {
+      const teachers: { name: string }[] =
+        form.getFieldValue("baseTeachers") || [];
+      form.setFieldsValue({
+        baseTeachers: teachers.filter((_: any, i: number) => i !== index),
+      });
+    } catch (error) {
+      console.error("SingleDayEventBaseForm.onRemoveTeacher.error: ", error);
+      throw error;
+    }
   };
 
   return (

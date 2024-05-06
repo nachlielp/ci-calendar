@@ -98,7 +98,7 @@ export default function SingleDayEventForm() {
         ),
         type: values["event-types"],
         tags: values["event-tags"] || [],
-        teachers: values["baseTeachers"],
+        teachers: values["baseTeachers"].map((teacher: any) => teacher.name),
       },
     ];
 
@@ -153,7 +153,7 @@ export default function SingleDayEventForm() {
           })),
           district: values["district"],
         };
-        // console.log("EventForm.handleSubmit.event: ", event);
+        console.log("EventForm.handleSubmit.event: ", event);
         // await createEvent(event);
       } else if (endDate) {
         const dates = listOfDates(
@@ -222,7 +222,6 @@ export default function SingleDayEventForm() {
           handleDateChange={handleDateChange}
           handleEndDateChange={handleEndDateChange}
           handleRepeatChange={handleRepeatChange}
-          handleTeacherChange={setBaseTeachers}
           repeatOption={repeatOption}
           eventDate={eventDate}
           endDate={endDate}

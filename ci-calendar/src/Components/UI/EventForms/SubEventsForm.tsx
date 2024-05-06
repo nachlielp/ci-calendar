@@ -8,12 +8,17 @@ interface ISubEventsFormProps {
 }
 export default function SubEventsForm({ form, day }: ISubEventsFormProps) {
   const onAddTeacher = () => {
-    const name = form.getFieldValue("newTeacher");
-    form.setFieldsValue({ newTeacher: "" });
-    if (!name) return;
-    const teachers = form.getFieldValue("baseTeachers") || [];
-    form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
-    form.setFieldsValue({ newTeacher: "" });
+    try {
+      const name = form.getFieldValue("newSubTeacher");
+      console.log("SubEventsForm.onAddTeacher.name: ", name);
+      if (!name) return;
+      const teachers = form.getFieldValue("dayTeachers") || [];
+      form.setFieldsValue({ dayTeachers: [...teachers, { name }] });
+      form.setFieldsValue({ newSubTeacher: "" }); // Clear the input after using the value
+    } catch (error) {
+      console.error("SubEventsForm.onAddTeacher.error: ", error);
+      throw error;
+    }
   };
 
   const onRemoveTeacher = (index: number) => {
@@ -61,12 +66,48 @@ export default function SubEventsForm({ form, day }: ISubEventsFormProps) {
               <Row gutter={10} align="middle">
                 <Col md={24} xs={24}>
                   <Form.Item
+                    name="newSubTeacher"
+                    label="Add Teacher"
+                    className="w-full  mb-2"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Input onPressEnter={onAddTeacher} />
+                      <Button onClick={onAddTeacher} icon={<PlusOutlined />} />
+                    </div>
+                  </Form.Item>
+                  <div className="mr-24">
+                    <Form.List name="dayTeachers">
+                      {(fields, {}) => (
+                        <>
+                          {fields.map((field, index) => (
+                            <Form.Item
+                              key={field.key}
+                              className="flex items-center justify-between mb-2"
+                            >
+                              <div className="flex items-center space-between">
+                                {form.getFieldValue([
+                                  "dayTeachers",
+                                  index,
+                                  "name",
+                                ])}
+                                &nbsp;
+                                <MinusCircleOutlined
+                                  onClick={() => onRemoveTeacher(index)}
+                                />
+                              </div>
+                            </Form.Item>
+                          ))}
+                        </>
+                      )}
+                    </Form.List>
+                  </div>
+                  {/* <Form.Item
                     name={[name, "teacher"]}
                     label="מורה"
                     className="w-full"
                   >
                     <Input />
-                  </Form.Item>
+                  </Form.Item> */}
                 </Col>
               </Row>
               <Row gutter={10} align="middle">

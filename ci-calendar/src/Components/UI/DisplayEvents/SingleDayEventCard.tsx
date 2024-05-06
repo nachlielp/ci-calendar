@@ -20,7 +20,9 @@ export const SingleDayEventCard = React.forwardRef<
   HTMLDivElement,
   ISingleDayEventCardProps
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
+  // console.log("SingleDayEventCard.event: ", event);
   const subEventLen = Object.values(event.subEvents).length;
+
   const footer = isEdit
     ? [
         <DeleteEvent eventId={event.id} />,
