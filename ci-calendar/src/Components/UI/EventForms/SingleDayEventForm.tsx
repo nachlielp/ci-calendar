@@ -9,7 +9,7 @@ import timezone from "dayjs/plugin/timezone";
 import { tagOptions } from "../../../util/options";
 import { IAddress, IEvently, UserType } from "../../../util/interfaces";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import SubEventsForm from "./SubEventsForm";
@@ -34,9 +34,20 @@ const formItemLayout = {
 const initialValues = {
   "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
   "event-tags": [tagOptions[0].value],
+  "dayTeachers": ['cba'],
+  "newTeacher": "",
+  "newSubTeacher": "abc",
 };
 
 export default function SingleDayEventForm() {
+  const [form] = Form.useForm();
+
+  useEffect(() => {
+    console.log("SubEventsForm init:", form.getFieldsValue());
+    console.log("Day Teachers:", form.getFieldValue("dayTeachers"));
+    console.log("New Sub Teacher:", form.getFieldValue("newSubTeacher"));
+}, [form]);
+
   const [repeatOption, setRepeatOption] = useState<EventFrequency>(
     EventFrequency.none
   );
@@ -45,7 +56,7 @@ export default function SingleDayEventForm() {
   const navigate = useNavigate();
   const { currentUser, createEvent } = useAuthContext();
   const [address, setAddress] = useState<IAddress>();
-  const [baseTeachers, setBaseTeachers] = useState<string[]>([]);
+
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -56,7 +67,6 @@ export default function SingleDayEventForm() {
   ) {
     navigate("/");
   }
-  const [form] = Form.useForm();
 
   const handleAddressSelect = (place: IGooglePlaceOption) => {
     const selectedAddress = {
@@ -204,7 +214,7 @@ export default function SingleDayEventForm() {
       throw error;
     }
   };
-
+ 
   return (
     <Card className="max-w-[500px] mx-auto  mt-4 ">
       <Form

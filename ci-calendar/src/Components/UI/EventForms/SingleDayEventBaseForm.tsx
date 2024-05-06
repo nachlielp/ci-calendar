@@ -13,7 +13,6 @@ import {
   Button,
 } from "antd";
 import {
-  EnterOutlined,
   InfoCircleOutlined,
   MinusCircleOutlined,
   PlusOutlined,
@@ -59,11 +58,10 @@ export default function SingleDayEventBaseForm({
   const onAddTeacher = () => {
     try {
       const name = form.getFieldValue("newTeacher");
-      form.setFieldsValue({ newTeacher: "" });
+      // form.setFieldsValue({ newTeacher: "" });
       if (!name) return;
       const teachers = form.getFieldValue("baseTeachers") || [];
       form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
-      form.setFieldsValue({ newTeacher: "" });
     } catch (error) {
       console.error("SingleDayEventBaseForm.onAddTeacher.error: ", error);
       throw error;
@@ -250,7 +248,7 @@ export default function SingleDayEventBaseForm({
           </Col>
         </Row>
         <Row gutter={10} align="middle">
-          <Col md={24} xs={24}>
+          <Col md={24} xs={24}> 
             <Form.Item
               name="newTeacher"
               label="Add Teacher"
@@ -278,6 +276,7 @@ export default function SingleDayEventBaseForm({
                           />
                         </div>
                       </Form.Item>
+                     
                     ))}
                   </>
                 )}

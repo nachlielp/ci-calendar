@@ -1,6 +1,7 @@
 import { Form, Select, Input, Button, Card, Row, Col, TimePicker } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { eventTypes, tagOptions } from "../../../util/options";
+import { useEffect } from "react";
 
 interface ISubEventsFormProps {
   form: any;
@@ -8,13 +9,14 @@ interface ISubEventsFormProps {
 }
 export default function SubEventsForm({ form, day }: ISubEventsFormProps) {
   const onAddTeacher = () => {
+    console.log("SubEventsForm.onAddTeacher.form: ", form.getFieldValue("newSubTeacher"));
     try {
       const name = form.getFieldValue("newSubTeacher");
       console.log("SubEventsForm.onAddTeacher.name: ", name);
       if (!name) return;
       const teachers = form.getFieldValue("dayTeachers") || [];
       form.setFieldsValue({ dayTeachers: [...teachers, { name }] });
-      form.setFieldsValue({ newSubTeacher: "" }); // Clear the input after using the value
+      // form.setFieldsValue({ newSubTeacher: "" }); // Clear the input after using the value
     } catch (error) {
       console.error("SubEventsForm.onAddTeacher.error: ", error);
       throw error;
@@ -27,6 +29,11 @@ export default function SubEventsForm({ form, day }: ISubEventsFormProps) {
       teachers: teachers.filter((_: any, i: any) => i !== index),
     });
   };
+
+  // useEffect(() => {
+  //   console.log("SubEventsForm init:", (form.getFieldsValue()));
+  // }, [form]);
+  
   return (
     <Form.List name={day ? [day, "sub-events"] : "sub-events"}>
       {(subEvents, { add, remove }) => (
@@ -132,7 +139,7 @@ export default function SubEventsForm({ form, day }: ISubEventsFormProps) {
             </Card>
           ))}
           <div className="flex items-center justify-center mt-2">
-            <Button className="w-1/2" onClick={() => add()} block>
+            <Button className="w-1/2" onClick={() => {add();  form.setFieldsValue({ newSubTeacher: "" })}}  block>
               <span>
                 <PlusOutlined /> הוסף תת ארוע
               </span>
