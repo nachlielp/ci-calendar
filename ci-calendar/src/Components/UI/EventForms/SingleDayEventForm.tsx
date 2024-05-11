@@ -14,6 +14,7 @@ import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import SubEventsForm from "./SubEventsForm";
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm";
+import { useTeachers } from "../../../hooks/useTeachers";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -34,19 +35,12 @@ const formItemLayout = {
 const initialValues = {
   "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
   "event-tags": [tagOptions[0].value],
-  "dayTeachers": ['cba'],
-  "newTeacher": "",
-  "newSubTeacher": "abc",
+
 };
 
 export default function SingleDayEventForm() {
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    console.log("SubEventsForm init:", form.getFieldsValue());
-    console.log("Day Teachers:", form.getFieldValue("dayTeachers"));
-    console.log("New Sub Teacher:", form.getFieldValue("newSubTeacher"));
-}, [form]);
+  const { teachers } = useTeachers();
 
   const [repeatOption, setRepeatOption] = useState<EventFrequency>(
     EventFrequency.none
@@ -90,7 +84,6 @@ export default function SingleDayEventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    console.log(values);
 
     const subEventsTemplate = [
       {
@@ -108,7 +101,7 @@ export default function SingleDayEventForm() {
         ),
         type: values["event-types"],
         tags: values["event-tags"] || [],
-        teachers: values["baseTeachers"].map((teacher: any) => teacher.name),
+        teachers: formatTeachers(values["teachers"], teachers),
       },
     ];
 
@@ -117,7 +110,7 @@ export default function SingleDayEventForm() {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teachers: [subEvent.teacher] || [],
+          teachers: formatTeachers(subEvent.teachers, teachers),
           startTime: dayjs(
             values["event-date"]
               .hour(subEvent.time[0].hour())
@@ -163,8 +156,7 @@ export default function SingleDayEventForm() {
           })),
           district: values["district"],
         };
-        console.log("EventForm.handleSubmit.event: ", event);
-        // await createEvent(event);
+        await createEvent(event);
       } else if (endDate) {
         const dates = listOfDates(
           eventDate,
@@ -208,13 +200,13 @@ export default function SingleDayEventForm() {
           await createEvent(event);
         }
       }
-      // navigate("/");
+      navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
       throw error;
     }
   };
- 
+
   return (
     <Card className="max-w-[500px] mx-auto  mt-4 ">
       <Form
@@ -236,8 +228,9 @@ export default function SingleDayEventForm() {
           eventDate={eventDate}
           endDate={endDate}
           idEdit={false}
+          teachers={teachers}
         />
-        <SubEventsForm form={form} day="" />
+        <SubEventsForm form={form} day="" teachers={teachers} />
         <AddLinksForm />
         <AddPricesForm />
 
@@ -253,6 +246,18 @@ export default function SingleDayEventForm() {
     </Card>
   );
 }
+
+export const formatTeachers = (selectedTeachers: string[], teachers: { label: string, value: string }[]) => {
+  if (!selectedTeachers) return [];
+  return selectedTeachers.map(teacher => {
+    const teacherObj = teachers.find((t) => t.value === teacher);
+    if (teacherObj) {
+      return teacherObj;
+    } else {
+      return { label: teacher, value: "NON_EXISTENT" };
+    }
+  })
+};
 
 export enum EventFrequency {
   none = "none",

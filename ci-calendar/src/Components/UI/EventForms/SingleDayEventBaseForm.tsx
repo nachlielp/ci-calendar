@@ -41,6 +41,7 @@ interface ISingleDayEventBaseFormProps {
   eventDate: dayjs.Dayjs;
   endDate: dayjs.Dayjs | null;
   idEdit: boolean;
+  teachers: { label: string, value: string }[];
 }
 
 export default function SingleDayEventBaseForm({
@@ -49,37 +50,12 @@ export default function SingleDayEventBaseForm({
   handleDateChange,
   handleEndDateChange,
   handleRepeatChange,
-
+  teachers,
   repeatOption,
   eventDate,
   endDate,
   idEdit,
 }: ISingleDayEventBaseFormProps) {
-  const onAddTeacher = () => {
-    try {
-      const name = form.getFieldValue("newTeacher");
-      // form.setFieldsValue({ newTeacher: "" });
-      if (!name) return;
-      const teachers = form.getFieldValue("baseTeachers") || [];
-      form.setFieldsValue({ baseTeachers: [...teachers, { name }] });
-    } catch (error) {
-      console.error("SingleDayEventBaseForm.onAddTeacher.error: ", error);
-      throw error;
-    }
-  };
-
-  const onRemoveTeacher = (index: number) => {
-    try {
-      const teachers: { name: string }[] =
-        form.getFieldValue("baseTeachers") || [];
-      form.setFieldsValue({
-        baseTeachers: teachers.filter((_: any, i: number) => i !== index),
-      });
-    } catch (error) {
-      console.error("SingleDayEventBaseForm.onRemoveTeacher.error: ", error);
-      throw error;
-    }
-  };
 
   return (
     <>
@@ -210,6 +186,7 @@ export default function SingleDayEventBaseForm({
                     </List>
                   )}
                 </Form.Item>
+
               </>
             )}
           </>
@@ -248,42 +225,18 @@ export default function SingleDayEventBaseForm({
           </Col>
         </Row>
         <Row gutter={10} align="middle">
-          <Col md={24} xs={24}> 
-            <Form.Item
-              name="newTeacher"
-              label="Add Teacher"
-              className="w-full  mb-2"
-            >
-              <div className="flex items-center space-x-2">
-                <Input onPressEnter={onAddTeacher} />
-                <Button onClick={onAddTeacher} icon={<PlusOutlined />} />
-              </div>
+          <Col md={24} xs={24}>
+            <Form.Item label="מורים" name="teachers" className="w-full">
+              <Select
+                mode="tags"
+                style={{ width: '100%' }}
+                placeholder="Select or type"
+                options={teachers}
+              />
             </Form.Item>
-            <div className="mr-24">
-              <Form.List name="baseTeachers">
-                {(fields, {}) => (
-                  <>
-                    {fields.map((field, index) => (
-                      <Form.Item
-                        key={field.key}
-                        className="flex items-center justify-between mb-2"
-                      >
-                        <div className="flex items-center space-between">
-                          {form.getFieldValue(["baseTeachers", index, "name"])}
-                          &nbsp;
-                          <MinusCircleOutlined
-                            onClick={() => onRemoveTeacher(index)}
-                          />
-                        </div>
-                      </Form.Item>
-                     
-                    ))}
-                  </>
-                )}
-              </Form.List>
-            </div>
           </Col>
         </Row>
+
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
             <Form.Item label="תגיות" name="event-tags" className="w-full">
@@ -295,3 +248,4 @@ export default function SingleDayEventBaseForm({
     </>
   );
 }
+
