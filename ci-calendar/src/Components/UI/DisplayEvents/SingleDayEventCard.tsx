@@ -25,9 +25,9 @@ export const SingleDayEventCard = React.forwardRef<
 
   const footer = isEdit
     ? [
-        <DeleteEvent eventId={event.id} />,
-        <EditEvent eventId={event.id} isMultiDay={false} />,
-      ]
+      <DeleteEvent eventId={event.id} />,
+      <EditEvent eventId={event.id} isMultiDay={false} />,
+    ]
     : [];
   return (
     <Card
@@ -35,9 +35,8 @@ export const SingleDayEventCard = React.forwardRef<
       className="mt-4"
       title={
         <span
-          className={`${
-            screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
-          }`}
+          className={`${screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
+            }`}
         >
           <span className="block">{event.title}&nbsp;</span>
           <span className="block">
@@ -64,7 +63,7 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
             {dayjs(event.subEvents[0].startTime).format("DD-MM")}
             {event.subEvents[0].teachers.length > 0 && (
-              <span>&nbsp;עם {event.subEvents[0].teachers.join(", ")}</span>
+              <span>&nbsp;עם {event.subEvents[0].teachers.map((teacher) => teacher.label).join(", ")}</span>
             )}
           </>
         ) : (
@@ -79,7 +78,7 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
             {getType(subEvent.type as IEventi)}
             {subEvent.teachers.length > 0 && (
-              <span>&nbsp;עם {subEvent.teachers.join(", ")}</span>
+              <span>&nbsp;עם {subEvent.teachers.map((teacher) => teacher.label).join(", ")}</span>
             )}
             {subEvent.tags && (
               <span>
