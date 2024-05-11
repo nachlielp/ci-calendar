@@ -40,7 +40,7 @@ interface ISingleDayEventBaseFormProps {
   endDate: dayjs.Dayjs | null;
   idEdit: boolean;
   teachers: { label: string, value: string }[];
-  address: IAddress;
+  address?: IAddress;
 }
 
 export default function SingleDayEventBaseForm({
