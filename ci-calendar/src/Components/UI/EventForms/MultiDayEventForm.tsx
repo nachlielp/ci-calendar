@@ -22,7 +22,7 @@ import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
-import { useTeachers } from "../../../hooks/useTeachers";
+import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
 
 dayjs.extend(utc);
@@ -50,7 +50,7 @@ export default function MultiDayEventForm() {
   const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null);
   const [schedule, setSchedule] = useState(false);
   const navigate = useNavigate();
-  const { teachers } = useTeachers();
+  const { teachers } = useTeachersList();
 
   const { currentUser, createEvent } = useAuthContext();
   const [address, setAddress] = useState<IAddress>();

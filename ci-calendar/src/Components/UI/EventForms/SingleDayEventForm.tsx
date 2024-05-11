@@ -14,7 +14,7 @@ import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import SubEventsForm from "./SubEventsForm";
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm";
-import { useTeachers } from "../../../hooks/useTeachers";
+import { useTeachersList } from "../../../hooks/useTeachersList";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -40,7 +40,7 @@ const initialValues = {
 
 export default function SingleDayEventForm() {
   const [form] = Form.useForm();
-  const { teachers } = useTeachers();
+  const { teachers } = useTeachersList();
 
   const [repeatOption, setRepeatOption] = useState<EventFrequency>(
     EventFrequency.none

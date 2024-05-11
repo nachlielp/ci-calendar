@@ -11,12 +11,12 @@ import MultiDayFormHead from "./MultiDayFormHead";
 import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
 import { PlusOutlined } from "@ant-design/icons";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
-import { useTeachers } from "../../../hooks/useTeachers";
+import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
 import { reverseFormatTeachers } from "./EditSingleDayEventForm";
 
 export default function EditMultiDayEventForm() {
-  const { teachers } = useTeachers();
+  const { teachers } = useTeachersList();
   const navigate = useNavigate();
   const { getEvent, currentUser, updateEvent } = useAuthContext();
   if (!currentUser) {

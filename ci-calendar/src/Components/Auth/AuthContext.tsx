@@ -71,7 +71,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
     initAuth();
 
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
     return () => {
       unsubscribe();
     };
@@ -129,6 +129,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          showProfile: false,
         };
         await addDocument("users", newUser);
         setCurrentUser(newUser);

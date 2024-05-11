@@ -68,4 +68,5 @@ export interface DbUser {
   newsletter: boolean;
   img: string;
   pageUrl: ILink;
+  showProfile: boolean;
 }

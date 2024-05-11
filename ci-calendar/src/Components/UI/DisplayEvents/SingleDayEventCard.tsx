@@ -9,6 +9,8 @@ import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
 import { IEventi, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
+import { useTeacherBio } from "../../../hooks/useTeacherBio";
+import BioModal from "../DisplayUsers/BioModal";
 
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -22,6 +24,8 @@ export const SingleDayEventCard = React.forwardRef<
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
   // console.log("SingleDayEventCard.event: ", event);
   const subEventLen = Object.values(event.subEvents).length;
+  const teachersIds = getEventTeachersIds(event);
+  const { teachers } = useTeacherBio({ ids: teachersIds });
 
   const footer = isEdit
     ? [
@@ -63,7 +67,17 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
             {dayjs(event.subEvents[0].startTime).format("DD-MM")}
             {event.subEvents[0].teachers.length > 0 && (
-              <span>&nbsp;עם {event.subEvents[0].teachers.map((teacher) => teacher.label).join(", ")}</span>
+              <span>&nbsp;עם {
+                event.subEvents[0].teachers.map((teacher, index, array) => {
+                  const isTeacher = teachers.find((t) => t.id === teacher.value);
+                  return (
+                    <React.Fragment key={teacher.value}>
+                      {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                      {index < array.length - 1 ? ', ' : ''}
+                    </React.Fragment>
+                  );
+                })
+              }</span>
             )}
           </>
         ) : (
@@ -166,3 +180,8 @@ const getTag = (tag: string) => {
 const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
 };
+
+export const getEventTeachersIds = (event: IEvently) => {
+  return event.subEvents.flatMap((subEvent) => subEvent.teachers).map((teacher) => teacher.value).filter((teacher) => teacher !== "NON_EXISTENT");
+};
+

@@ -14,7 +14,7 @@ import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm";
 import SubEventsForm from "./SubEventsForm";
-import { useTeachers } from "../../../hooks/useTeachers";
+import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
 
 dayjs.extend(utc);
@@ -35,7 +35,7 @@ const formItemLayout = {
 
 export default function EditSingleDayEventForm() {
   const navigate = useNavigate();
-  const { teachers } = useTeachers();
+  const { teachers } = useTeachersList();
   const { getEvent, currentUser, updateEvent } = useAuthContext();
   const { eventId } = useParams<{ eventId: string }>();
   const [eventData, setEventData] = useState<IEvently | null>(null);
