@@ -1,4 +1,4 @@
-import { Form, Select, Input, Button, Card, Row, Col, TimePicker } from "antd";
+import { Form, Select, Button, Card, Row, Col, TimePicker } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { eventTypes, tagOptions } from "../../../util/options";
 

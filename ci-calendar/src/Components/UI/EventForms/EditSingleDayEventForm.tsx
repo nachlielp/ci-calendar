@@ -14,6 +14,8 @@ import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm";
 import SubEventsForm from "./SubEventsForm";
+import { useTeachers } from "../../../hooks/useTeachers";
+import { formatTeachers } from "./SingleDayEventForm";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -33,6 +35,7 @@ const formItemLayout = {
 
 export default function EditSingleDayEventForm() {
   const navigate = useNavigate();
+  const { teachers } = useTeachers();
   const { getEvent, currentUser, updateEvent } = useAuthContext();
   const { eventId } = useParams<{ eventId: string }>();
   const [eventData, setEventData] = useState<IEvently | null>(null);
@@ -84,7 +87,7 @@ export default function EditSingleDayEventForm() {
   }
 
   const handleSubmit = async (values: any) => {
-    // console.log("EventForm.handleSubmit.values: ", values);
+    console.log("EventForm.handleSubmit.values: ", values);
 
     const subEvents = [
       {
@@ -100,7 +103,7 @@ export default function EditSingleDayEventForm() {
         ).toISOString(),
         type: values["event-types"] || "",
         tags: values["event-tags"] || [],
-        teachers: values["event-teachers"] || [],
+        teachers: formatTeachers(values["teachers"], teachers),
       },
     ];
     if (values["sub-events"]) {
@@ -108,7 +111,7 @@ export default function EditSingleDayEventForm() {
         subEvents.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teachers: subEvent.teachers || [],
+          teachers: formatTeachers(subEvent.teachers, teachers),
           startTime: dayjs(
             subEvent.time[0]
               .hour(subEvent.time[0].hour())
@@ -144,6 +147,7 @@ export default function EditSingleDayEventForm() {
       district: values["district"],
     };
     try {
+      console.log("EventForm.handleSubmit.event: ", event);
       await updateEvent(event.id, event);
       navigate("/");
     } catch (error) {
@@ -170,8 +174,9 @@ export default function EditSingleDayEventForm() {
           eventDate={eventDate}
           endDate={endDate}
           idEdit={true}
+          teachers={teachers}
         />
-        <SubEventsForm day="" />
+        <SubEventsForm day="" form={form} teachers={teachers} />
         <AddLinksForm />
         <AddPricesForm />
 
@@ -196,7 +201,7 @@ function eventToFormValues(event: IEvently) {
     district: event.district,
     "event-types": event.subEvents[0]?.type,
     "event-tags": event.subEvents[0]?.tags,
-    "event-teachers": event.subEvents[0]?.teachers,
+    "teachers": reverseFormatTeachers(event.subEvents[0]?.teachers),
     "event-date": dayjs.tz(
       dayjs(event.subEvents[0]?.startTime),
       "Asia/Jerusalem"
@@ -208,7 +213,7 @@ function eventToFormValues(event: IEvently) {
     "sub-events": event.subEvents.slice(1).map((subEvent) => ({
       type: subEvent.type,
       tags: subEvent.tags,
-      teachers: subEvent.teachers,
+      teachers: reverseFormatTeachers(subEvent.teachers),
       time: [
         dayjs(subEvent.startTime).tz("Asia/Jerusalem"),
         dayjs(subEvent.endTime).tz("Asia/Jerusalem"),
@@ -223,6 +228,11 @@ function eventToFormValues(event: IEvently) {
       sum: price.sum,
     })),
   };
-  console.log("currentFormValues: ", currentFormValues);
+  // console.log("currentFormValues: ", currentFormValues);
   return { currentFormValues, address: event.address };
 }
+
+export function reverseFormatTeachers(teachers: { label: string, value: string }[]) {
+  return teachers.map(teacher => teacher.value !== "NON_EXISTENT" ? teacher.value : teacher.label);
+}
+
