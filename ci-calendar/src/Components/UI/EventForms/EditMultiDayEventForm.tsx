@@ -28,7 +28,7 @@ export default function EditMultiDayEventForm() {
   const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null);
   const [schedule, setSchedule] = useState(false);
   const [currentFormValues, setCurrentFormValues] = useState<any>();
-  const [address, setAddress] = useState<IAddress>();
+  const [address, setAddress] = useState<IAddress | undefined>();
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -161,6 +161,7 @@ export default function EditMultiDayEventForm() {
           handleDateChange={handleDateChange}
           handleScheduleChange={handleScheduleChange}
           schedule={schedule}
+          address={address}
         />
         {schedule && (
           <Form.List name="days">

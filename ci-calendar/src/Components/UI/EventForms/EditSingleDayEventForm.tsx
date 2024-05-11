@@ -175,6 +175,7 @@ export default function EditSingleDayEventForm() {
           endDate={endDate}
           idEdit={true}
           teachers={teachers}
+          address={address}
         />
         <SubEventsForm day="" form={form} teachers={teachers} />
         <AddLinksForm />

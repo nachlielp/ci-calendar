@@ -27,6 +27,7 @@ import {
   repeatOptions,
   repeatEventTooltip,
 } from "./SingleDayEventForm";
+import { IAddress } from "../../../util/interfaces";
 
 interface ISingleDayEventBaseFormProps {
   form: any;
@@ -39,6 +40,7 @@ interface ISingleDayEventBaseFormProps {
   endDate: dayjs.Dayjs | null;
   idEdit: boolean;
   teachers: { label: string, value: string }[];
+  address: IAddress;
 }
 
 export default function SingleDayEventBaseForm({
@@ -52,8 +54,9 @@ export default function SingleDayEventBaseForm({
   eventDate,
   endDate,
   idEdit,
+  address
 }: ISingleDayEventBaseFormProps) {
-
+  console.log("SingleDayEventBaseForm.teachers: ", teachers);
   return (
     <>
       <Card className="mt-4 border-4">
@@ -85,7 +88,7 @@ export default function SingleDayEventBaseForm({
           name="address"
           rules={[{ required: true, message: "שדה חובה" }]}
         >
-          <GooglePlacesInput onPlaceSelect={handleAddressSelect} />
+          <GooglePlacesInput onPlaceSelect={handleAddressSelect} defaultValue={address} />
         </Form.Item>
 
         <Form.Item
