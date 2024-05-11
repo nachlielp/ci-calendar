@@ -10,12 +10,9 @@ import {
   InputNumber,
   List,
   TimePicker,
-  Button,
 } from "antd";
 import {
   InfoCircleOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
 } from "@ant-design/icons";
 import VirtualList from "rc-virtual-list";
 import GooglePlacesInput, {

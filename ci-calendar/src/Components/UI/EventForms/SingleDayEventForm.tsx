@@ -9,7 +9,7 @@ import timezone from "dayjs/plugin/timezone";
 import { tagOptions } from "../../../util/options";
 import { IAddress, IEvently, UserType } from "../../../util/interfaces";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import SubEventsForm from "./SubEventsForm";
