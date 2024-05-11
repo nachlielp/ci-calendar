@@ -11,8 +11,12 @@ import MultiDayFormHead from "./MultiDayFormHead";
 import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
 import { PlusOutlined } from "@ant-design/icons";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
+import { useTeachers } from "../../../hooks/useTeachers";
+import { formatTeachers } from "./SingleDayEventForm";
+import { reverseFormatTeachers } from "./EditSingleDayEventForm";
 
 export default function EditMultiDayEventForm() {
+  const { teachers } = useTeachers();
   const navigate = useNavigate();
   const { getEvent, currentUser, updateEvent } = useAuthContext();
   if (!currentUser) {
@@ -71,7 +75,7 @@ export default function EditMultiDayEventForm() {
   };
 
   const handleSubmit = async (values: any) => {
-    // console.log("MultiDayEventForm.handleSubmit.values: ", values);
+    // console.log("MultiDayEventForm.hadleSubmit.values: ", values);
 
     const subEventsTemplate: IEventiPart[] = [];
 
@@ -89,7 +93,7 @@ export default function EditMultiDayEventForm() {
         endTime: endTime,
         type: day["event-type-base"],
         tags: day["event-tags-base"] || [],
-        teachers: [day["event-teachers-base"]] || [],
+        teachers: formatTeachers(day["event-teachers-base"], teachers),
       });
 
       // Additional sub-events for each day
@@ -105,7 +109,7 @@ export default function EditMultiDayEventForm() {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teachers: [subEvent.teachers] || [],
+          teachers: formatTeachers(subEvent.teachers, teachers),
           startTime: startTime,
           endTime: endTime,
         });
@@ -135,7 +139,6 @@ export default function EditMultiDayEventForm() {
       subEvents: subEventsTemplate,
       district: values["district"],
     };
-    // console.log("MultiDayEventForm.handleSubmit.event: ", event);
     try {
       await updateEvent(eventData.id, event);
 
@@ -169,6 +172,8 @@ export default function EditMultiDayEventForm() {
                       day={name}
                       {...restField}
                       remove={remove}
+                      teachers={teachers}
+                      form={form}
                     />
                   </div>
                 ))}
@@ -207,7 +212,7 @@ const eventToFormValues = (event: IEvently) => {
       "event-date-base": dayjs(subEvent.startTime),
       "event-type-base": subEvent.type,
       "event-time-base": [dayjs(subEvent.startTime), dayjs(subEvent.endTime)],
-      "event-teacher-base": subEvent.teachers,
+      "event-teachers-base": reverseFormatTeachers(subEvent.teachers),
       "event-tags-base": subEvent.tags,
     });
   });
@@ -217,10 +222,9 @@ const eventToFormValues = (event: IEvently) => {
     const otherSubEvents = subEvents.slice(1).map((subEvent) => ({
       type: subEvent["event-type-base"],
       time: subEvent["event-time-base"],
-      teachers: subEvent["event-teacher-base"],
+      teachers: reverseFormatTeachers(subEvent["event-teachers-base"]),
       tags: subEvent["event-tags-base"],
     }));
-
     return {
       "event-date-base": baseEvent["event-date-base"],
       "event-type-base": baseEvent["event-type-base"],
@@ -230,7 +234,6 @@ const eventToFormValues = (event: IEvently) => {
       "sub-events": otherSubEvents,
     };
   });
-
   const currentFormValues = {
     createdAt: event.createdAt,
     updatedAt: dayjs().toISOString(),
@@ -245,5 +248,6 @@ const eventToFormValues = (event: IEvently) => {
     prices: event.price,
     days: days,
   };
+  // console.log("MultiDayEventForm.eventToFormValues.currentFormValues: ", currentFormValues);
   return { currentFormValues, address: event.address };
 };
