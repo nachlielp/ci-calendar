@@ -12,6 +12,7 @@ import { VscDebugBreakpointLog } from "react-icons/vsc";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import BioModal from "../DisplayUsers/BioModal";
 import RecycleEvent from "../Other/RecycleEvent";
+import HideEvent from "../Other/HideEvent";
 
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -32,7 +33,8 @@ export const SingleDayEventCard = React.forwardRef<
     ? [
       <DeleteEvent eventId={event.id} />,
       <EditEvent eventId={event.id} isMultiDay={false} />,
-      <RecycleEvent eventId={event.id} isMultiDay={false} />
+      <RecycleEvent eventId={event.id} isMultiDay={false} />,
+      <HideEvent eventId={event.id} hide={event.hide} />
     ]
     : [];
   return (
@@ -74,7 +76,7 @@ export const SingleDayEventCard = React.forwardRef<
           <span>No event times available</span>
         )}
       </p>
-      {subEventLen > 1 &&
+      {subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <span className="block mr-6" key={index}>
             <VscDebugBreakpointLog className="inline-block mb-1" />

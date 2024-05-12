@@ -9,7 +9,7 @@ export const useEvents = () => {
   useEffect(() => {
     const initTFirebase = async () => {
       firebaseService.initFirebaseJS();
-      firebaseService.subscribeToCollection("events", (events: any) => {
+      firebaseService.subscribeToCollection("events", (events: IEvently[]) => {
         setEvents(events);
         setLoading(false);
       });

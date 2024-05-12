@@ -13,6 +13,7 @@ import RecycleEvent from "../Other/RecycleEvent";
 import BioModal from "../DisplayUsers/BioModal";
 import { getEventTeachersIds } from "./SingleDayEventCard";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
+import HideEvent from "../Other/HideEvent";
 
 interface IMultiDayEventCardProps {
   event: IEvently;
@@ -33,7 +34,8 @@ export const MultiDayEventCard = React.forwardRef<
     ? [
       <DeleteEvent eventId={event.id} />,
       <EditEvent eventId={event.id} isMultiDay={true} />,
-      <RecycleEvent eventId={event.id} isMultiDay={true} />
+      <RecycleEvent eventId={event.id} isMultiDay={true} />,
+      <HideEvent eventId={event.id} hide={event.hide} />
     ]
     : [];
 
