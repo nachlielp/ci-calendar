@@ -80,16 +80,16 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
 
 
   const handleSubmit = async (values: any) => {
-    // console.log("MultiDayEventForm.hadleSubmit.values: ", values);
-
     const subEventsTemplate: IEventiPart[] = [];
 
     values.days?.forEach((day: any) => {
-      const startTime: string = dayjs(day["event-date-base"])
+      const baseDate = dayjs(day["event-date-base"]); // Clone the base date for each day
+
+      const startTime: string = baseDate.clone()
         .hour(dayjs(day["event-time-base"][0]).hour())
         .minute(dayjs(day["event-time-base"][0]).minute())
         .toISOString();
-      const endTime: string = dayjs(day["event-date-base"])
+      const endTime: string = baseDate.clone()
         .hour(dayjs(day["event-time-base"][1]).hour())
         .minute(dayjs(day["event-time-base"][1]).minute())
         .toISOString();
@@ -103,11 +103,11 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
 
       // Additional sub-events for each day
       day["sub-events"]?.forEach((subEvent: any) => {
-        const startTime: string = dayjs(day["event-date-base"])
+        const subEventStartTime: string = baseDate.clone()
           .hour(dayjs(subEvent.time[0]).hour())
           .minute(dayjs(subEvent.time[0]).minute())
           .toISOString();
-        const endTime: string = dayjs(day["event-date-base"])
+        const subEventEndTime: string = baseDate.clone()
           .hour(dayjs(subEvent.time[1]).hour())
           .minute(dayjs(subEvent.time[1]).minute())
           .toISOString();
@@ -115,8 +115,8 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
           type: subEvent.type,
           tags: subEvent.tags || [],
           teachers: formatTeachers(subEvent.teachers, teachers),
-          startTime: startTime,
-          endTime: endTime,
+          startTime: subEventStartTime,
+          endTime: subEventEndTime,
         });
       });
     });
@@ -147,11 +147,11 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
     try {
       if (editType === EventAction.recycle) {
         await createEvent(event);
+        navigate("/");
       } else {
         await updateEvent(eventData.id, event);
+        navigate("/edit-events-list");
       }
-
-      navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
       throw error;

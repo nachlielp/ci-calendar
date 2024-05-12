@@ -84,21 +84,12 @@ export default function SingleDayEventForm() {
   };
 
   const handleSubmit = async (values: any) => {
+    const baseDate = dayjs(values["event-date"]); // Clone the base date for consistent date manipulation
 
     const subEventsTemplate = [
       {
-        startTime: dayjs(
-          values["event-date"]
-            .hour(values["event-time"][0].hour())
-            .minute(values["event-time"][0].minute())
-            .toISOString()
-        ),
-        endTime: dayjs(
-          values["event-date"]
-            .hour(values["event-time"][1].hour())
-            .minute(values["event-time"][1].minute())
-            .toISOString()
-        ),
+        startTime: baseDate.clone().hour(values["event-time"][0].hour()).minute(values["event-time"][0].minute()).toISOString(),
+        endTime: baseDate.clone().hour(values["event-time"][1].hour()).minute(values["event-time"][1].minute()).toISOString(),
         type: values["event-types"],
         tags: values["event-tags"] || [],
         teachers: formatTeachers(values["teachers"], teachers),
@@ -106,25 +97,15 @@ export default function SingleDayEventForm() {
     ];
 
     if (values["sub-events"]) {
-      values["sub-events"].forEach((subEvent: any) =>
+      values["sub-events"].forEach((subEvent: any) => {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
           teachers: formatTeachers(subEvent.teachers, teachers),
-          startTime: dayjs(
-            values["event-date"]
-              .hour(subEvent.time[0].hour())
-              .minute(subEvent.time[0].minute())
-              .toISOString()
-          ),
-          endTime: dayjs(
-            values["event-date"]
-              .hour(subEvent.time[1].hour())
-              .minute(subEvent.time[1].minute())
-              .toISOString()
-          ),
-        })
-      );
+          startTime: baseDate.clone().hour(subEvent.time[0].hour()).minute(subEvent.time[0].minute()).toISOString(),
+          endTime: baseDate.clone().hour(subEvent.time[1].hour()).minute(subEvent.time[1].minute()).toISOString(),
+        });
+      });
     }
 
     if (!address) {
@@ -149,11 +130,7 @@ export default function SingleDayEventForm() {
           links: values["links"] || [],
           price: values["prices"] || [],
           hide: false,
-          subEvents: subEventsTemplate.map((subEvent) => ({
-            ...subEvent,
-            startTime: subEvent.startTime.toISOString(),
-            endTime: subEvent.endTime.toISOString(),
-          })),
+          subEvents: subEventsTemplate,
           district: values["district"],
         };
         await createEvent(event);
@@ -168,14 +145,8 @@ export default function SingleDayEventForm() {
         for (const date of dates) {
           const subEvents = subEventsTemplate.map((subEvent) => ({
             ...subEvent,
-            startTime: date
-              .hour(subEvent.startTime.hour())
-              .minute(subEvent.startTime.minute())
-              .toISOString(),
-            endTime: date
-              .hour(subEvent.endTime.hour())
-              .minute(subEvent.endTime.minute())
-              .toISOString(),
+            startTime: date.clone().hour(dayjs(subEvent.startTime).hour()).minute(dayjs(subEvent.startTime).minute()).toISOString(),
+            endTime: date.clone().hour(dayjs(subEvent.endTime).hour()).minute(dayjs(subEvent.endTime).minute()).toISOString(),
           }));
 
           const event: IEvently = {
