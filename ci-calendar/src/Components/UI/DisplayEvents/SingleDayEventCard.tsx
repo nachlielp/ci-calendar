@@ -11,6 +11,7 @@ import { IEventi, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import BioModal from "../DisplayUsers/BioModal";
+import RecycleEvent from "../Other/RecycleEvent";
 
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -31,6 +32,7 @@ export const SingleDayEventCard = React.forwardRef<
     ? [
       <DeleteEvent eventId={event.id} />,
       <EditEvent eventId={event.id} isMultiDay={false} />,
+      <RecycleEvent eventId={event.id} isMultiDay={false} />
     ]
     : [];
   return (

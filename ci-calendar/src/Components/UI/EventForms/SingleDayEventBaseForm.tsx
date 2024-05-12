@@ -56,7 +56,6 @@ export default function SingleDayEventBaseForm({
   idEdit,
   address
 }: ISingleDayEventBaseFormProps) {
-  console.log("SingleDayEventBaseForm.teachers: ", teachers);
   return (
     <>
       <Card className="mt-4 border-4">

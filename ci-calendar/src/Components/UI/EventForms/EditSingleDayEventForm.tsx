@@ -3,6 +3,7 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import { Button, Card, Form } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -16,6 +17,7 @@ import SingleDayEventBaseForm from "./SingleDayEventBaseForm";
 import SubEventsForm from "./SubEventsForm";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
+import { EventAction } from "../../../App";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -33,10 +35,10 @@ const formItemLayout = {
   },
 };
 
-export default function EditSingleDayEventForm() {
+export default function EditSingleDayEventForm({ editType }: { editType: EventAction }) {
   const navigate = useNavigate();
   const { teachers } = useTeachersList();
-  const { getEvent, currentUser, updateEvent } = useAuthContext();
+  const { getEvent, currentUser, updateEvent, createEvent } = useAuthContext();
   const { eventId } = useParams<{ eventId: string }>();
   const [eventData, setEventData] = useState<IEvently | null>(null);
   const [newAddress, setNewAddress] = useState<IAddress | null>(null);
@@ -127,13 +129,14 @@ export default function EditSingleDayEventForm() {
       );
     }
 
+    const eventId = editType === EventAction.recycle ? uuidv4() : eventData.id;
     const event: IEvently = {
       dates: {
         startDate: dayjs(values["event-date"][0]).toISOString(),
         endDate: dayjs(values["event-date"][1]).toISOString(),
       },
       type: "",
-      id: eventData.id,
+      id: eventId,
       address: newAddress || address,
       createdAt: eventData.createdAt,
       updatedAt: dayjs().toISOString(),
@@ -148,12 +151,18 @@ export default function EditSingleDayEventForm() {
     };
     try {
       console.log("EventForm.handleSubmit.event: ", event);
-      await updateEvent(event.id, event);
+      if (editType === EventAction.recycle) {
+        await createEvent(event);
+      } else {
+        await updateEvent(event.id, event);
+      }
       navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }
   };
+
+  const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
 
   return (
     <Card className="max-w-[500px] mx-auto  mt-4 ">
@@ -186,13 +195,14 @@ export default function EditSingleDayEventForm() {
           className="mt-4 flex justify-center"
         >
           <Button type="primary" htmlType="submit">
-            עדכן אירוע
+            {submitText}
           </Button>
         </Form.Item>
       </Form>
     </Card>
   );
 }
+
 
 function eventToFormValues(event: IEvently) {
   const currentFormValues = {

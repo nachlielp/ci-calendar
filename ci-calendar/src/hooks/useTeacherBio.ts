@@ -16,7 +16,6 @@ export const useTeacherBio = ({ ids }: TeacherBio) => {
             for (const id of ids) {
                 const teacher = await firebaseService.getDocument('users', id);
                 if (teacher && teacher.showProfile) {
-                    console.log("teacher: ", teacher);
                     teachers.push(teacher as DbUser);
                 }
             }

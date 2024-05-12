@@ -14,11 +14,13 @@ import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
 import { reverseFormatTeachers } from "./EditSingleDayEventForm";
+import { EventAction } from "../../../App";
+import { v4 as uuidv4 } from "uuid";
 
-export default function EditMultiDayEventForm() {
+export default function EditMultiDayEventForm({ editType }: { editType: EventAction }) {
   const { teachers } = useTeachersList();
   const navigate = useNavigate();
-  const { getEvent, currentUser, updateEvent } = useAuthContext();
+  const { getEvent, currentUser, updateEvent, createEvent } = useAuthContext();
   if (!currentUser) {
     throw new Error("currentUser is null, make sure you're within a Provider");
   }
@@ -74,6 +76,9 @@ export default function EditMultiDayEventForm() {
     setDates(dates);
   };
 
+  const submitedEventId = editType === EventAction.recycle ? uuidv4() : eventData.id;
+
+
   const handleSubmit = async (values: any) => {
     // console.log("MultiDayEventForm.hadleSubmit.values: ", values);
 
@@ -126,7 +131,7 @@ export default function EditMultiDayEventForm() {
         endDate: dates[1].toISOString(),
       },
       type: values["main-event-type"],
-      id: eventData.id,
+      id: submitedEventId,
       address: address,
       createdAt: eventData.createdAt,
       updatedAt: dayjs().toISOString(),
@@ -140,7 +145,11 @@ export default function EditMultiDayEventForm() {
       district: values["district"],
     };
     try {
-      await updateEvent(eventData.id, event);
+      if (editType === EventAction.recycle) {
+        await createEvent(event);
+      } else {
+        await updateEvent(eventData.id, event);
+      }
 
       navigate("/");
     } catch (error) {
@@ -148,6 +157,9 @@ export default function EditMultiDayEventForm() {
       throw error;
     }
   };
+
+  const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
+
   return (
     <Card className="max-w-[500px] mx-auto mt-4">
       <Form
@@ -194,7 +206,7 @@ export default function EditMultiDayEventForm() {
           className="mt-4 flex justify-center"
         >
           <Button type="primary" htmlType="submit">
-            עדכן אירוע
+            {submitText}
           </Button>
         </Form.Item>
       </Form>

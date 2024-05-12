@@ -9,6 +9,7 @@ import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
 import { IEventi, IEventiPart, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
+import RecycleEvent from "../Other/RecycleEvent";
 
 interface IMultiDayEventCardProps {
   event: IEvently;
@@ -26,6 +27,7 @@ export const MultiDayEventCard = React.forwardRef<
     ? [
       <DeleteEvent eventId={event.id} />,
       <EditEvent eventId={event.id} isMultiDay={true} />,
+      <RecycleEvent eventId={event.id} isMultiDay={true} />
     ]
     : [];
 
