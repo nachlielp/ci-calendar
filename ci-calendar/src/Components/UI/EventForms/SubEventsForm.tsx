@@ -52,6 +52,7 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
                       mode="tags"
                       style={{ width: '100%' }}
                       placeholder="Select or type"
+                      filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
                       options={teachers}
                     />
                   </Form.Item>
