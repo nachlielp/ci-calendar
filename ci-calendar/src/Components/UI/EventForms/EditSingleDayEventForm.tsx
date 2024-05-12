@@ -91,49 +91,34 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
   const handleSubmit = async (values: any) => {
     console.log("EventForm.handleSubmit.values: ", values);
 
+    const baseDate = dayjs(values["event-date"]); // Clone the base date
+
     const subEvents = [
       {
-        startTime: dayjs(
-          values["event-date"]
-            .hour(values["event-time"][0].hour())
-            .minute(values["event-time"][0].minute())
-        ).toISOString(),
-        endTime: dayjs(
-          values["event-date"]
-            .hour(values["event-time"][1].hour())
-            .minute(values["event-time"][1].minute())
-        ).toISOString(),
+        startTime: baseDate.clone().hour(values["event-time"][0].hour()).minute(values["event-time"][0].minute()).toISOString(),
+        endTime: baseDate.clone().hour(values["event-time"][1].hour()).minute(values["event-time"][1].minute()).toISOString(),
         type: values["event-types"] || "",
         tags: values["event-tags"] || [],
         teachers: formatTeachers(values["teachers"], teachers),
       },
     ];
     if (values["sub-events"]) {
-      values["sub-events"].forEach((subEvent: any) =>
+      values["sub-events"].forEach((subEvent: any) => {
         subEvents.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
           teachers: formatTeachers(subEvent.teachers, teachers),
-          startTime: dayjs(
-            subEvent.time[0]
-              .hour(subEvent.time[0].hour())
-              .minute(subEvent.time[0].minute())
-              .toISOString()
-          ).toISOString(),
-          endTime: dayjs(
-            subEvent.time[1]
-              .hour(subEvent.time[1].hour())
-              .minute(subEvent.time[1].minute())
-          ).toISOString(),
-        })
-      );
+          startTime: baseDate.clone().hour(subEvent.time[0].hour()).minute(subEvent.time[0].minute()).toISOString(),
+          endTime: baseDate.clone().hour(subEvent.time[1].hour()).minute(subEvent.time[1].minute()).toISOString(),
+        });
+      });
     }
 
     const eventId = editType === EventAction.recycle ? uuidv4() : eventData.id;
     const event: IEvently = {
       dates: {
-        startDate: dayjs(values["event-date"][0]).toISOString(),
-        endDate: dayjs(values["event-date"][1]).toISOString(),
+        startDate: baseDate.toISOString(),
+        endDate: baseDate.toISOString(),
       },
       type: "",
       id: eventId,
@@ -153,10 +138,11 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       console.log("EventForm.handleSubmit.event: ", event);
       if (editType === EventAction.recycle) {
         await createEvent(event);
+        navigate("/");
       } else {
         await updateEvent(event.id, event);
+        navigate("/edit-events-list");
       }
-      navigate("/");
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
     }

@@ -4,10 +4,11 @@ import type { Dayjs } from "dayjs";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently } from "../../../util/interfaces";
 import dayjs from "dayjs";
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween)
 
 interface CalendarViewProps {
   events: IEvently[];
-  selectedDay: Dayjs;
   onSelect: (value: Dayjs) => void;
 }
 
@@ -69,11 +70,14 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
     </div>
   );
 }
-
 function eventsOnDay(day: Dayjs, events: IEvently[]) {
-  return (
-    events.filter((event) =>
-      dayjs(event.subEvents[0].startTime).isSame(day, "day")
-    ).length > 0
+  return events.some(event =>
+    day.isBetween(
+      dayjs(event.dates.startDate).startOf('day'),
+      dayjs(event.dates.endDate).endOf('day'),
+      null,
+      '[]'
+    )
   );
 }
+
