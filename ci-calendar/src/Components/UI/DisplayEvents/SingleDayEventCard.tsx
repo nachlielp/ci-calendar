@@ -68,19 +68,7 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
             {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
             {dayjs(event.subEvents[0].startTime).format("DD-MM")}
-            {event.subEvents[0].teachers.length > 0 && (
-              <span>&nbsp;עם {
-                event.subEvents[0].teachers.map((teacher, index, array) => {
-                  const isTeacher = teachers.find((t) => t.id === teacher.value);
-                  return (
-                    <React.Fragment key={teacher.value}>
-                      {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
-                      {index < array.length - 1 ? ', ' : ''}
-                    </React.Fragment>
-                  );
-                })
-              }</span>
-            )}
+
           </>
         ) : (
           <span>No event times available</span>
@@ -94,7 +82,17 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
             {getType(subEvent.type as IEventi)}
             {subEvent.teachers.length > 0 && (
-              <span>&nbsp;עם {subEvent.teachers.map((teacher) => teacher.label).join(", ")}</span>
+              <span>&nbsp;עם {
+                subEvent.teachers.map((teacher, index, array) => {
+                  const isTeacher = teachers.find((t) => t.id === teacher.value);
+                  return (
+                    <React.Fragment key={teacher.value}>
+                      {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                      {index < array.length - 1 ? ', ' : ''}
+                    </React.Fragment>
+                  );
+                })
+              }</span>
             )}
             {subEvent.tags && (
               <span>

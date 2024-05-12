@@ -10,6 +10,9 @@ import EditEvent from "../Other/EditEvent";
 import { IEventi, IEventiPart, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 import RecycleEvent from "../Other/RecycleEvent";
+import BioModal from "../DisplayUsers/BioModal";
+import { getEventTeachersIds } from "./SingleDayEventCard";
+import { useTeacherBio } from "../../../hooks/useTeacherBio";
 
 interface IMultiDayEventCardProps {
   event: IEvently;
@@ -22,6 +25,9 @@ export const MultiDayEventCard = React.forwardRef<
   IMultiDayEventCardProps
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
   const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
+
+  const teachersIds = getEventTeachersIds(event);
+  const { teachers } = useTeacherBio({ ids: teachersIds });
 
   const footer = isEdit
     ? [
@@ -65,7 +71,17 @@ export const MultiDayEventCard = React.forwardRef<
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
               {getType(subEvent.type as IEventi)}
               {subEvent.teachers.length > 0 && (
-                <span>&nbsp;עם {subEvent.teachers.map((teacher) => teacher.label).join(", ")}</span>
+                <span>&nbsp;עם {
+                  subEvent.teachers.map((teacher, index, array) => {
+                    const isTeacher = teachers.find((t) => t.id === teacher.value);
+                    return (
+                      <React.Fragment key={teacher.value}>
+                        {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                        {index < array.length - 1 ? ', ' : ''}
+                      </React.Fragment>
+                    );
+                  })
+                }</span>
               )}
               {subEvent.tags && (
                 <span>
