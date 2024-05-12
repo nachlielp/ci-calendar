@@ -21,6 +21,12 @@ import EventsDisplay from "./Components/UI/Other/EventsDisplay";
 import MultiDayEventForm from "./Components/UI/EventForms/MultiDayEventForm";
 import EditMultiDayEventForm from "./Components/UI/EventForms/EditMultiDayEventForm";
 
+export enum EventAction {
+  edit,
+  create,
+  recycle
+}
+
 export default function App() {
   const { events, loading } = useEvents();
 
@@ -79,11 +85,19 @@ export default function App() {
                 />
                 <Route
                   path="/edit-single-day-event/:eventId"
-                  element={<EditSingleDayEventForm />}
+                  element={<EditSingleDayEventForm editType={EventAction.edit} />}
+                />
+                <Route
+                  path="/recycle-single-day-event/:eventId"
+                  element={<EditSingleDayEventForm editType={EventAction.recycle} />}
                 />
                 <Route
                   path="/edit-multi-day-event/:eventId"
-                  element={<EditMultiDayEventForm />}
+                  element={<EditMultiDayEventForm editType={EventAction.edit} />}
+                />
+                <Route
+                  path="/recycle-multi-day-event/:eventId"
+                  element={<EditMultiDayEventForm editType={EventAction.recycle} />}
                 />
                 <Route path="/bio" element={<BioPage />} />
               </Route>

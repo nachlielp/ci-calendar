@@ -34,6 +34,7 @@ interface IAuthContextType {
   updateUser: (user: DbUser) => Promise<void>;
   getEvent: (eventId: string) => Promise<IEvently | null>;
   updateEvent: (eventId: string, event: IEvently) => Promise<void>;
+  hideEvent: (eventId: string, hide: boolean) => Promise<void>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
     initAuth();
 
-    let unsubscribe = () => {};
+    let unsubscribe = () => { };
     return () => {
       unsubscribe();
     };
@@ -129,6 +130,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          showProfile: false,
         };
         await addDocument("users", newUser);
         setCurrentUser(newUser);
@@ -169,6 +171,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await updateDocument("events", eventId, event);
   }
 
+  async function hideEvent(eventId: string, hide: boolean) {
+    const event = await getEvent(eventId);
+    if (event) {
+      event.hide = hide;
+      await updateEvent(eventId, event);
+    }
+  }
+
   function subscribeToUserChanges(userId: string) {
     const unsubscribe = subscribeToDoc(
       `users/${userId}`,
@@ -191,6 +201,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     updateUser,
     getEvent,
     updateEvent,
+    hideEvent,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -9,6 +9,10 @@ import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
 import { IEventi, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
+import { useTeacherBio } from "../../../hooks/useTeacherBio";
+import BioModal from "../DisplayUsers/BioModal";
+import RecycleEvent from "../Other/RecycleEvent";
+import HideEvent from "../Other/HideEvent";
 
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -20,12 +24,18 @@ export const SingleDayEventCard = React.forwardRef<
   HTMLDivElement,
   ISingleDayEventCardProps
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
+  // console.log("SingleDayEventCard.event: ", event);
   const subEventLen = Object.values(event.subEvents).length;
+  const teachersIds = getEventTeachersIds(event);
+  const { teachers } = useTeacherBio({ ids: teachersIds });
+
   const footer = isEdit
     ? [
-        <DeleteEvent eventId={event.id} />,
-        <EditEvent eventId={event.id} isMultiDay={false} />,
-      ]
+      <DeleteEvent eventId={event.id} />,
+      <EditEvent eventId={event.id} isMultiDay={false} />,
+      <RecycleEvent eventId={event.id} isMultiDay={false} />,
+      <HideEvent eventId={event.id} hide={event.hide} />
+    ]
     : [];
   return (
     <Card
@@ -33,9 +43,8 @@ export const SingleDayEventCard = React.forwardRef<
       className="mt-4"
       title={
         <span
-          className={`${
-            screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
-          }`}
+          className={`${screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
+            }`}
         >
           <span className="block">{event.title}&nbsp;</span>
           <span className="block">
@@ -61,22 +70,32 @@ export const SingleDayEventCard = React.forwardRef<
             {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
             {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
             {dayjs(event.subEvents[0].startTime).format("DD-MM")}
-            {event.subEvents[0].teacher && (
-              <span>&nbsp;עם {event.subEvents[0].teacher}</span>
-            )}
+
           </>
         ) : (
           <span>No event times available</span>
         )}
       </p>
-      {subEventLen > 1 &&
+      {subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <span className="block mr-6" key={index}>
             <VscDebugBreakpointLog className="inline-block mb-1" />
             {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
             {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
             {getType(subEvent.type as IEventi)}
-            {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
+            {subEvent.teachers.length > 0 && (
+              <span>&nbsp;עם {
+                subEvent.teachers.map((teacher, index, array) => {
+                  const isTeacher = teachers.find((t) => t.id === teacher.value);
+                  return (
+                    <React.Fragment key={teacher.value}>
+                      {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                      {index < array.length - 1 ? ', ' : ''}
+                    </React.Fragment>
+                  );
+                })
+              }</span>
+            )}
             {subEvent.tags && (
               <span>
                 &nbsp;
@@ -163,3 +182,8 @@ const getTag = (tag: string) => {
 const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
 };
+
+export const getEventTeachersIds = (event: IEvently) => {
+  return event.subEvents.flatMap((subEvent) => subEvent.teachers).map((teacher) => teacher.value).filter((teacher) => teacher !== "NON_EXISTENT");
+};
+

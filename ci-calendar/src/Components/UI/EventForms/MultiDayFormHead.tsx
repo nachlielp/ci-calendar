@@ -4,12 +4,14 @@ import { districtOptions, eventTypes } from "../../../util/options";
 import GooglePlacesInput, {
   IGooglePlaceOption,
 } from "../Other/GooglePlacesInput";
+import { IAddress } from "../../../util/interfaces";
 
 interface IMultiDayFormHeadProps {
   handleAddressSelect: (place: IGooglePlaceOption) => void;
   handleDateChange: (dates: [Dayjs, Dayjs]) => void;
   handleScheduleChange: (checked: boolean) => void;
   schedule: boolean;
+  address?: IAddress;
 }
 
 export default function MultiDayFormHead({
@@ -17,6 +19,7 @@ export default function MultiDayFormHead({
   handleDateChange,
   handleScheduleChange,
   schedule,
+  address,
 }: IMultiDayFormHeadProps) {
   return (
     <Card className="mt-4 border-4">
@@ -44,7 +47,7 @@ export default function MultiDayFormHead({
         name="address"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
-        <GooglePlacesInput onPlaceSelect={handleAddressSelect} />
+        <GooglePlacesInput onPlaceSelect={handleAddressSelect} defaultValue={address} />
       </Form.Item>
       <Form.Item
         label="תאריכים"

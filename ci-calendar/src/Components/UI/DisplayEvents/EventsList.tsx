@@ -21,8 +21,11 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
   let filteredEvents = useEventsFilter({ events });
   if (isEdit && !isAdmin) {
     filteredEvents = useEventsFilter({ events, uid: currentUser?.id });
+  } else if (isEdit && isAdmin) {
+    filteredEvents = events
   } else {
-    filteredEvents = useEventsFilter({ events });
+    const visibleEvents = events.filter((event) => !event.hide);
+    filteredEvents = useEventsFilter({ events: visibleEvents });
   }
   filteredEvents.sort((a, b) => {
     if (dayjs(a.dates["startDate"]).isBefore(b.dates["startDate"])) {

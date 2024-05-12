@@ -4,7 +4,6 @@ import {
   Col,
   DatePicker,
   Form,
-  Input,
   Row,
   Select,
   TimePicker,
@@ -17,11 +16,15 @@ import { MinusCircleOutlined } from "@ant-design/icons";
 interface IBaseEventFormProps {
   day: number;
   remove: (index: number | number[]) => void;
+  teachers: { label: string, value: string }[];
+  form: any;
 }
 
 export default function MultiDayEventSubEventsForm({
   day,
   remove,
+  teachers,
+  form,
 }: IBaseEventFormProps) {
   return (
     <Card className="mt-4 border-4">
@@ -71,10 +74,17 @@ export default function MultiDayEventSubEventsForm({
           <Col md={24} xs={24}>
             <Form.Item
               label="מורה"
-              name={[day, "event-teacher-base"]}
+              name={[day, "event-teachers-base"]}
               className="w-full"
             >
-              <Input />
+              <Select
+                mode="tags"
+                style={{ width: '100%' }}
+                placeholder="Select or type"
+                filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
+
+                options={teachers}
+              />
             </Form.Item>
           </Col>
         </Row>
@@ -91,7 +101,7 @@ export default function MultiDayEventSubEventsForm({
         </Row>
       </Card>
 
-      <SubEventsForm day={day.toString()} />
+      <SubEventsForm day={day.toString()} form={form} teachers={teachers} />
 
       <div className="flex items-center justify-center mt-4">
         <Button onClick={() => remove(day)}>

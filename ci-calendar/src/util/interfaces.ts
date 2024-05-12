@@ -10,7 +10,7 @@ export interface IEventiPart {
   type: string;
   startTime: string;
   //TODO add user option, or just name
-  teacher: string;
+  teachers: { label: string, value: string }[];
   tags: string[];
 }
 interface IPrice {
@@ -68,4 +68,5 @@ export interface DbUser {
   newsletter: boolean;
   img: string;
   pageUrl: ILink;
+  showProfile: boolean;
 }

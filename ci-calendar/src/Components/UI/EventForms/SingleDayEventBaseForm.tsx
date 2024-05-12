@@ -11,7 +11,9 @@ import {
   List,
   TimePicker,
 } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import {
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import VirtualList from "rc-virtual-list";
 import GooglePlacesInput, {
   IGooglePlaceOption,
@@ -25,6 +27,7 @@ import {
   repeatOptions,
   repeatEventTooltip,
 } from "./SingleDayEventForm";
+import { IAddress } from "../../../util/interfaces";
 
 interface ISingleDayEventBaseFormProps {
   form: any;
@@ -36,6 +39,8 @@ interface ISingleDayEventBaseFormProps {
   eventDate: dayjs.Dayjs;
   endDate: dayjs.Dayjs | null;
   idEdit: boolean;
+  teachers: { label: string, value: string }[];
+  address?: IAddress;
 }
 
 export default function SingleDayEventBaseForm({
@@ -44,10 +49,12 @@ export default function SingleDayEventBaseForm({
   handleDateChange,
   handleEndDateChange,
   handleRepeatChange,
+  teachers,
   repeatOption,
   eventDate,
   endDate,
   idEdit,
+  address
 }: ISingleDayEventBaseFormProps) {
   return (
     <>
@@ -80,7 +87,7 @@ export default function SingleDayEventBaseForm({
           name="address"
           rules={[{ required: true, message: "שדה חובה" }]}
         >
-          <GooglePlacesInput onPlaceSelect={handleAddressSelect} />
+          <GooglePlacesInput onPlaceSelect={handleAddressSelect} defaultValue={address} />
         </Form.Item>
 
         <Form.Item
@@ -178,6 +185,7 @@ export default function SingleDayEventBaseForm({
                     </List>
                   )}
                 </Form.Item>
+
               </>
             )}
           </>
@@ -217,11 +225,18 @@ export default function SingleDayEventBaseForm({
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="מורה" name="event-teacher" className="w-full">
-              <Input />
+            <Form.Item label="מורים" name="teachers" className="w-full">
+              <Select
+                mode="tags"
+                style={{ width: '100%' }}
+                placeholder="Select or type"
+                filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                options={teachers}
+              />
             </Form.Item>
           </Col>
         </Row>
+
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
             <Form.Item label="תגיות" name="event-tags" className="w-full">
@@ -233,3 +248,4 @@ export default function SingleDayEventBaseForm({
     </>
   );
 }
+

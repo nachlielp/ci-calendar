@@ -9,6 +9,11 @@ import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
 import { IEventi, IEventiPart, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
+import RecycleEvent from "../Other/RecycleEvent";
+import BioModal from "../DisplayUsers/BioModal";
+import { getEventTeachersIds } from "./SingleDayEventCard";
+import { useTeacherBio } from "../../../hooks/useTeacherBio";
+import HideEvent from "../Other/HideEvent";
 
 interface IMultiDayEventCardProps {
   event: IEvently;
@@ -22,11 +27,16 @@ export const MultiDayEventCard = React.forwardRef<
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
   const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
 
+  const teachersIds = getEventTeachersIds(event);
+  const { teachers } = useTeacherBio({ ids: teachersIds });
+
   const footer = isEdit
     ? [
-        <DeleteEvent eventId={event.id} />,
-        <EditEvent eventId={event.id} isMultiDay={true} />,
-      ]
+      <DeleteEvent eventId={event.id} />,
+      <EditEvent eventId={event.id} isMultiDay={true} />,
+      <RecycleEvent eventId={event.id} isMultiDay={true} />,
+      <HideEvent eventId={event.id} hide={event.hide} />
+    ]
     : [];
 
   return (
@@ -35,9 +45,8 @@ export const MultiDayEventCard = React.forwardRef<
       className="mt-4"
       title={
         <span
-          className={`${
-            screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
-          }`}
+          className={`${screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
+            }`}
         >
           <span className="block">{event.title}&nbsp;</span>
           <span className="block">
@@ -63,7 +72,19 @@ export const MultiDayEventCard = React.forwardRef<
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
               {getType(subEvent.type as IEventi)}
-              {subEvent.teacher && <span>&nbsp;עם {subEvent.teacher}</span>}
+              {subEvent.teachers.length > 0 && (
+                <span>&nbsp;עם {
+                  subEvent.teachers.map((teacher, index, array) => {
+                    const isTeacher = teachers.find((t) => t.id === teacher.value);
+                    return (
+                      <React.Fragment key={teacher.value}>
+                        {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                        {index < array.length - 1 ? ', ' : ''}
+                      </React.Fragment>
+                    );
+                  })
+                }</span>
+              )}
               {subEvent.tags && (
                 <span>
                   &nbsp;

@@ -1,11 +1,14 @@
-import { Form, Select, Input, Button, Card, Row, Col, TimePicker } from "antd";
+import { Form, Select, Button, Card, Row, Col, TimePicker } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { eventTypes, tagOptions } from "../../../util/options";
 
 interface ISubEventsFormProps {
+  form: any;
   day: string;
+  teachers: { label: string, value: string }[];
 }
-export default function SubEventsForm({ day }: ISubEventsFormProps) {
+export default function SubEventsForm({ form, day, teachers }: ISubEventsFormProps) {
+
   return (
     <Form.List name={day ? [day, "sub-events"] : "sub-events"}>
       {(subEvents, { add, remove }) => (
@@ -44,12 +47,14 @@ export default function SubEventsForm({ day }: ISubEventsFormProps) {
               </Row>
               <Row gutter={10} align="middle">
                 <Col md={24} xs={24}>
-                  <Form.Item
-                    name={[name, "teacher"]}
-                    label="מורה"
-                    className="w-full"
-                  >
-                    <Input />
+                  <Form.Item label="מורים" name={[name, "teachers"]} className="w-full">
+                    <Select
+                      mode="tags"
+                      style={{ width: '100%' }}
+                      placeholder="Select or type"
+                      filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                      options={teachers}
+                    />
                   </Form.Item>
                 </Col>
               </Row>
@@ -75,7 +80,7 @@ export default function SubEventsForm({ day }: ISubEventsFormProps) {
             </Card>
           ))}
           <div className="flex items-center justify-center mt-2">
-            <Button className="w-1/2" onClick={() => add()} block>
+            <Button className="w-1/2" onClick={() => { add(); form.setFieldsValue({ newSubTeacher: "" }) }} block>
               <span>
                 <PlusOutlined /> הוסף תת ארוע
               </span>
@@ -86,3 +91,4 @@ export default function SubEventsForm({ day }: ISubEventsFormProps) {
     </Form.List>
   );
 }
+

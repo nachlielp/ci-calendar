@@ -22,6 +22,8 @@ import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
+import { useTeachersList } from "../../../hooks/useTeachersList";
+import { formatTeachers } from "./SingleDayEventForm";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -48,6 +50,8 @@ export default function MultiDayEventForm() {
   const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null);
   const [schedule, setSchedule] = useState(false);
   const navigate = useNavigate();
+  const { teachers } = useTeachersList();
+
   const { currentUser, createEvent } = useAuthContext();
   const [address, setAddress] = useState<IAddress>();
   if (!currentUser) {
@@ -97,7 +101,7 @@ export default function MultiDayEventForm() {
         endTime: endTime,
         type: day["event-type-base"],
         tags: day["event-tags-base"] || [],
-        teacher: day["event-teacher-base"] || "",
+        teachers: formatTeachers(day["event-teacher-base"], teachers),
       });
 
       // Additional sub-events for each day
@@ -113,7 +117,7 @@ export default function MultiDayEventForm() {
         subEventsTemplate.push({
           type: subEvent.type,
           tags: subEvent.tags || [],
-          teacher: subEvent.teacher || "",
+          teachers: formatTeachers(subEvent.teacher, teachers),
           startTime: startTime,
           endTime: endTime,
         });
@@ -144,7 +148,7 @@ export default function MultiDayEventForm() {
         subEvents: subEventsTemplate,
         district: values["district"],
       };
-      // console.log("MultiDayEventForm.handleSubmit.event: ", event);
+      console.log("MultiDayEventForm.handleSubmit.event: ", event);
       await createEvent(event);
 
       navigate("/");
@@ -182,6 +186,8 @@ export default function MultiDayEventForm() {
                       day={name}
                       {...restField}
                       remove={remove}
+                      teachers={teachers}
+                      form={form}
                     />
                   </div>
                 ))}

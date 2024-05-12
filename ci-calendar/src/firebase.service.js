@@ -42,6 +42,7 @@ export const firebaseService = {
   subscribeToCollection,
   signinGoogle,
   logout,
+  getTeachersAndAdminsList,
 };
 
 async function initFirebaseJS() {
@@ -242,6 +243,23 @@ export async function subscribeToDoc(docPath, cb) {
     return unsubscribe;
   } catch (error) {
     console.error("firebaseService.subscribeToDoc.error: ", error);
+    throw error;
+  }
+}
+
+export async function getTeachersAndAdminsList() {
+  try {
+    const db = await getDb();
+    const teachersRef = query(collection(db, "users"), where("userType", "in", ["teacher", "admin"]));
+    const querySnapshot = await getDocs(teachersRef);
+    const result = [];
+    querySnapshot.forEach(doc => {
+      const data = doc.data();
+      result.push({ label: data.fullName, value: doc.id });
+    });
+    return result;
+  } catch (error) {
+    console.error("firebaseService.getTeachersAndAdmins.error: ", error);
     throw error;
   }
 }

@@ -20,6 +20,7 @@ type FieldType = {
   pageUrlTitle?: string;
   upload?: string;
   phoneNumber?: string;
+  showProfile?: string;
 };
 
 interface ITeacherFormProps {
@@ -35,7 +36,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    const { name, mailingList, bio, pageUrl, pageUrlTitle, phoneNumber } =
+    const { name, mailingList, bio, pageUrl, pageUrlTitle, phoneNumber, showProfile } =
       values;
     currentUser.fullName = name || currentUser.fullName;
     currentUser.newsletter = mailingList?.toString() === "true";
@@ -50,6 +51,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
       title: pageUrlTitle || "",
     };
     currentUser.phoneNumber = phoneNumber || "";
+    currentUser.showProfile = showProfile?.toString() === "true";
     try {
       await updateUser(currentUser);
       handleSubmit();
@@ -78,6 +80,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
           pageUrl: currentUser.pageUrl?.link,
           pageUrlTitle: currentUser.pageUrl?.title,
           phoneNumber: currentUser.phoneNumber,
+          showProfile: currentUser.showProfile,
         }}
       >
         <Form.Item<FieldType>
@@ -152,6 +155,13 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
         </Form.Item>
         <Form.Item<FieldType> label="תמונה" name="upload">
           <CloudinaryUpload uploadNewImage={uploadNewImage} />
+        </Form.Item>
+        <Form.Item<FieldType>
+          label="הצגת פרופיל"
+          name="showProfile"
+          valuePropName="checked"
+        >
+          <Checkbox />
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
