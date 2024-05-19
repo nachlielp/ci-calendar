@@ -43,6 +43,7 @@ export const firebaseService = {
   signinGoogle,
   logout,
   getTeachersAndAdminsList,
+  removeMultipleDocuments,
 };
 
 async function initFirebaseJS() {
@@ -176,6 +177,18 @@ export async function removeDocument(collectionName, id) {
   try {
     const db = await getDb();
     await deleteDoc(doc(db, collectionName, id));
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function removeMultipleDocuments(collectionName, ids) {
+  try {
+    const db = await getDb();
+    ids.forEach(async id => {
+      await deleteDoc(doc(db, collectionName, id));
+    });
   } catch (error) {
     console.log(error);
     throw error;

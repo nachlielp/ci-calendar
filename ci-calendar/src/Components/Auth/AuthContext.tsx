@@ -13,6 +13,7 @@ import {
   removeDocument,
   updateDocument,
   subscribeToDoc,
+  removeMultipleDocuments,
 } from "../../firebase.service";
 import { DbUser, IEvently, UserType } from "../../util/interfaces";
 
@@ -35,6 +36,8 @@ interface IAuthContextType {
   getEvent: (eventId: string) => Promise<IEvently | null>;
   updateEvent: (eventId: string, event: IEvently) => Promise<void>;
   hideEvent: (eventId: string, hide: boolean) => Promise<void>;
+  deleteMultipleEventlys: (eventIds: string[]) => Promise<void>;
+  hideOrShowMultipleEventlys: (eventIds: string[], hide: boolean) => Promise<void>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -159,6 +162,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await removeDocument("events", eventId);
   }
 
+  async function deleteMultipleEventlys(eventIds: string[]) {
+    await removeMultipleDocuments("events", eventIds);
+  }
+
   async function getEvent(eventId: string) {
     const eventDoc = await getDocument("events", eventId);
     if (eventDoc) {
@@ -177,6 +184,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       event.hide = hide;
       await updateEvent(eventId, event);
     }
+  }
+
+  async function hideOrShowMultipleEventlys(eventIds: string[], hide: boolean) {
+    console.log("eventIds to hide: ", eventIds)
+    eventIds.forEach(async (eventId) => {
+      await hideEvent(eventId, hide);
+    });
   }
 
   function subscribeToUserChanges(userId: string) {
@@ -202,6 +216,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     getEvent,
     updateEvent,
     hideEvent,
+    deleteMultipleEventlys,
+    hideOrShowMultipleEventlys,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

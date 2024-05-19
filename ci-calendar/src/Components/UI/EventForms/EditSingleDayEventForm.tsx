@@ -127,7 +127,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
       description: values["event-description"] || "",
-      owners: [currentUser.id],
+      owners: [{ value: currentUser.id, label: currentUser.fullName }],
       links: values["links"] || [],
       price: values["prices"] || [],
       hide: false,
