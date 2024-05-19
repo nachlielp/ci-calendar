@@ -16,10 +16,10 @@ import Loading from "./Components/UI/Other/Loading";
 import AdminPage from "./Components/Pages/AdminPage";
 import ManageUsers from "./Components/UI/Other/ManageUsers";
 import { useEvents } from "./hooks/useEvents";
-import TestPage from "./Components/Pages/TestPage";
 import EventsDisplay from "./Components/UI/Other/EventsDisplay";
 import MultiDayEventForm from "./Components/UI/EventForms/MultiDayEventForm";
 import EditMultiDayEventForm from "./Components/UI/EventForms/EditMultiDayEventForm";
+import ManageEventsTable from "./Components/UI/DisplayEvents/ManageEventsTable";
 
 export enum EventAction {
   edit,
@@ -108,7 +108,7 @@ export default function App() {
               >
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/manage-users" element={<ManageUsers />} />
-                <Route path="/test" element={<TestPage />} />
+                <Route path="/manage-events" element={<ManageEventsTable events={events} />} />
               </Route>
               <Route
                 path="*"

@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import React from "react";
 import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
-import { IEventi, IEventiPart, IEvently } from "../../../util/interfaces";
+import { EventlyType, IEventiPart, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 import RecycleEvent from "../Other/RecycleEvent";
 import BioModal from "../DisplayUsers/BioModal";
@@ -71,7 +71,7 @@ export const MultiDayEventCard = React.forwardRef<
               <VscDebugBreakpointLog className="inline-block mb-1" />
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
-              {getType(subEvent.type as IEventi)}
+              {getType(subEvent.type as EventlyType)}
               {subEvent.teachers.length > 0 && (
                 <span>&nbsp;עם {
                   subEvent.teachers.map((teacher, index, array) => {

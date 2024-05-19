@@ -7,13 +7,17 @@ import dayjs from "dayjs";
 import React from "react";
 import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
-import { IEventi, IEvently } from "../../../util/interfaces";
+import { EventlyType, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import BioModal from "../DisplayUsers/BioModal";
 import RecycleEvent from "../Other/RecycleEvent";
 import HideEvent from "../Other/HideEvent";
 
+//TODO add link to google maps
+//<a href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJwa1t1RwoAxURo5lyOAPL-A0" target="_blank">
+//Open in Google Maps
+//</a>
 interface ISingleDayEventCardProps {
   event: IEvently;
   cardWidth: number;
@@ -50,7 +54,7 @@ export const SingleDayEventCard = React.forwardRef<
           <span className="block">
             {getTypes(
               Object.values(event.subEvents).flatMap(
-                (subEvent) => subEvent.type as IEventi
+                (subEvent) => subEvent.type as EventlyType
               )
             ).map((type, index) => (
               <Tag color="blue" key={`${type}-${index}`}>
@@ -82,7 +86,7 @@ export const SingleDayEventCard = React.forwardRef<
             <VscDebugBreakpointLog className="inline-block mb-1" />
             {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
             {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
-            {getType(subEvent.type as IEventi)}
+            {getType(subEvent.type as EventlyType)}
             {subEvent.teachers.length > 0 && (
               <span>&nbsp;עם {
                 subEvent.teachers.map((teacher, index, array) => {
@@ -151,7 +155,7 @@ export const SingleDayEventCard = React.forwardRef<
   );
 });
 
-const getTypes = (t1: IEventi[], t2?: IEventi[]) => {
+const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
   let types = Array.from(new Set([...t1, ...(t2 || [])]));
   t2?.forEach((element) => {
     if (!types.includes(element)) {
@@ -164,7 +168,7 @@ const getTypes = (t1: IEventi[], t2?: IEventi[]) => {
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getType = (type: IEventi) => {
+const getType = (type: EventlyType) => {
   return eventTypes.find((et) => et.value === type)?.label;
 };
 const getTag = (tag: string) => {

@@ -18,6 +18,9 @@ function AdminPage() {
       <LinkButton to="/manage-users" className="w-24 h-24 m-4">
         הגדרת <br /> משתמשים
       </LinkButton>
+      <LinkButton to="/manage-events" className="w-24 h-24 m-4">
+        test
+      </LinkButton>
     </div>
   );
 }

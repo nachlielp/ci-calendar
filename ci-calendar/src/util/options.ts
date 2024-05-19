@@ -8,6 +8,8 @@ export const eventTypes: SelectOption[] = [
   { value: "workshop", label: "סדנה" },
   { value: "conference", label: "כנס" },
   { value: "retreat", label: "ריטריט" },
+  { value: "warmup", label: "חימום" },
+  { value: "underscore", label: "אנדרסקור" },
 ];
 
 export const tagOptions: SelectOption[] = [

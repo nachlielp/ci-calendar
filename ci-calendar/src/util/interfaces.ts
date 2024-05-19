@@ -1,8 +1,15 @@
-export enum IEventi {
+export enum EventlyType {
   class = "class",
   jam = "jam",
   workshop = "workshop",
   conference = "conference",
+  underscore = "underscore",
+  retreat = "retreat",
+}
+
+export interface UserOption {
+  value: string;
+  label: string;
 }
 
 export interface IEventiPart {
@@ -10,7 +17,7 @@ export interface IEventiPart {
   type: string;
   startTime: string;
   //TODO add user option, or just name
-  teachers: { label: string, value: string }[];
+  teachers: UserOption[];
   tags: string[];
 }
 interface IPrice {
@@ -33,7 +40,7 @@ export interface IEvently {
   address: IAddress;
   createdAt: string;
   updatedAt: string;
-  owners: string[];
+  owners: UserOption[];
   hide: boolean;
   dates: { startDate: string; endDate: string };
   //TODO add loc info to district

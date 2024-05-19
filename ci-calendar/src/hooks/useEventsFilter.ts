@@ -12,7 +12,7 @@ export const useEventsFilter = ({ events, uid }: IUseEventsFilterProps) => {
   const districts = searchParams.getAll("district");
   let filteredEvents = events;
   if (uid) {
-    filteredEvents = events.filter((event) => event.owners.includes(uid));
+    filteredEvents = events.filter((event) => event.owners.find((owner) => owner.value === uid));
   }
   filteredEvents = filteredEvents.filter((event) => {
     const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
