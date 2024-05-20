@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Table, Select } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
@@ -8,6 +8,7 @@ import { SingleDayEventCard } from "./SingleDayEventCard";
 import { MultiDayEventCard } from "./MultiDayEventCard";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently } from "../../../util/interfaces";
+import { useEventsFilter } from "../../../hooks/useEventsFilter";
 const { Option } = Select;
 const columns = [
     {
@@ -41,13 +42,23 @@ const columns = [
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const { width } = useWindowSize();
-    const [filteredEvents, setFilteredEvents] = useState(events);
+    const [uid, setUid] = useState('');
+    const filteredEvents = useEventsFilter({ events, uid });
+    const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedRowKeysLength, setSelectedRowKeysLength] = useState(0);
     const [inputValue, setInputValue] = useState('');
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
-    const teachers = events
+    useEffect(() => {
+        if (inputValue === '') {
+            setTeachersEvents(filteredEvents);
+        } else {
+            setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === inputValue)));
+        }
+    }, [events, uid]);
+
+    const teachers = filteredEvents
         .map(event => event.owners)
         .flat()
         .reduce((acc, teacher) => {
@@ -55,6 +66,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             return acc;
         }, new Map())
         .values();
+
 
     const uniqueTeachers = Array.from(teachers);
 
@@ -64,28 +76,20 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         setSelectedRowKeysLength(selectedRowKeys.length);
     }, [selectedRowKeys]);
 
-    useEffect(() => {
-        if (inputValue === '') {
-            setFilteredEvents(events);
-        } else {
-            setFilteredEvents(events.filter(event => event.owners.find(owner => owner.label === inputValue)));
-        }
-    }, [events]);
-
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
         setSelectedRowKeys(newSelectedRowKeys);
     };
 
     const handleClear = () => {
         setInputValue('');
-        setFilteredEvents(events);
+        setTeachersEvents(filteredEvents);
     };
 
 
     const onSelectTeacher = (value: string) => {
         const teacher = uniqueTeachers.find(teacher => teacher.value === value);
-        setInputValue(teacher.label);
-        setFilteredEvents(events.filter(event => event.owners.find(owner => owner.value === value)));
+        teacher ? setInputValue(teacher.label) : setInputValue('');
+        teacher ? setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.value === value))) : setTeachersEvents(filteredEvents);
     };
 
     const rowSelection = {
@@ -95,8 +99,8 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const hasSelected = selectedRowKeys.length > 0;
 
-    const visableEventsToHide = events.filter(event => selectedRowKeys.includes(event.id) && !event.hide);
-    const hiddenEventsToShow = events.filter(event => selectedRowKeys.includes(event.id) && event.hide);
+    const visableEventsToHide = filteredEvents.filter(event => selectedRowKeys.includes(event.id) && !event.hide);
+    const hiddenEventsToShow = filteredEvents.filter(event => selectedRowKeys.includes(event.id) && event.hide);
 
     const handleExpand = (expanded: boolean, record: IEvently) => {
         setExpandedRowKeys(expanded ? [record.id] : []);
@@ -134,7 +138,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             <Table
                 rowSelection={rowSelection}
                 columns={columns}
-                dataSource={filteredEvents.map(event => ({ ...event, key: event.id }))}
+                dataSource={teachersEvents.map(event => ({ ...event, key: event.id }))}
                 pagination={false}
                 expandable={{
                     expandedRowRender: (event) => (
