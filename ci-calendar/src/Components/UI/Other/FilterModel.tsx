@@ -45,7 +45,7 @@ export default function FilterModel() {
           <b>סוג אירוע</b>
         </div>
         <Checkbox.Group
-          options={eventTypes}
+          options={eventTypes.filter(eventType => eventType.value !== "warmup")}
           value={currentEventTypeValues}
           onChange={onEventTypeOptionsChange("eventType")}
         />
