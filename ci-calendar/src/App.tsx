@@ -79,10 +79,11 @@ export default function App() {
                   path="/multi-day-event-form"
                   element={<MultiDayEventForm />}
                 />
-                <Route
+                {/* <Route
                   path="/edit-events-list"
                   element={<EventsDisplay events={events} isEdit={true} />}
-                />
+                /> */}
+                <Route path="/manage-events" element={<ManageEventsTable events={events} />} />
                 <Route
                   path="/edit-single-day-event/:eventId"
                   element={<EditSingleDayEventForm editType={EventAction.edit} />}

@@ -7,8 +7,9 @@ import ShowMultipleEvents from "../Other/ShowMultipleEvents";
 import { SingleDayEventCard } from "./SingleDayEventCard";
 import { MultiDayEventCard } from "./MultiDayEventCard";
 import { useWindowSize } from "../../../hooks/useWindowSize";
-import { IEvently } from "../../../util/interfaces";
+import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
+import { useAuthContext } from "../../Auth/AuthContext";
 const { Option } = Select;
 const columns = [
     {
@@ -42,9 +43,11 @@ const columns = [
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const { width } = useWindowSize();
+    const { currentUser } = useAuthContext()
+    const uid = currentUser?.userType === 'teacher' ? currentUser.id : '';
     // const [uid, setUid] = useState('');
     // const filteredEvents = useEventsFilter({ events, uid });
-    const filteredEvents = useEventsFilter({ events });
+    const filteredEvents = useEventsFilter({ events, uid });
     const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedRowKeysLength, setSelectedRowKeysLength] = useState(0);
@@ -110,24 +113,26 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     return (
         <div className=" m-4">
             <div className="flex flex-row justify-end mb-4 mr-4">
-                <Select
-                    style={{ width: "20%" }}
-                    value={inputValue}
-                    onChange={onSelectTeacher}
-                    placeholder="שם משתמשים או כתובת מייל"
-                    allowClear
-                    onClear={handleClear}
-                    showSearch
-                    filterOption={(input, option) =>
-                        (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
-                    }
-                >
-                    {uniqueTeachers.map(teacher => (
-                        <Option key={teacher.value} value={teacher.value}>
-                            {teacher.label}
-                        </Option>
-                    ))}
-                </Select>
+                {currentUser && currentUser.userType === UserType.admin &&
+                    <Select
+                        style={{ width: "20%" }}
+                        value={inputValue}
+                        onChange={onSelectTeacher}
+                        placeholder="שם משתמשים או כתובת מייל"
+                        allowClear
+                        onClear={handleClear}
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                    >
+                        {uniqueTeachers.map(teacher => (
+                            <Option key={teacher.value} value={teacher.value}>
+                                {teacher.label}
+                            </Option>
+                        ))}
+                    </Select>
+                }
                 <span className="mr-4 ml-4 ">
                     {hasSelected ? `נבחרו ${selectedRowKeysLength} אירועים` : ''}
                 </span>

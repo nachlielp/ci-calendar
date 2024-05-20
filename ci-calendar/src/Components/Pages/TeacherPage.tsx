@@ -6,7 +6,10 @@ function TeacherPage() {
       <LinkButton to="/bio" className="w-24 h-24 m-4">
         פרופיל אישי
       </LinkButton>
-      <LinkButton to="/edit-events-list" className="w-24 h-24 m-4">
+      {/* <LinkButton to="/edit-events-list" className="w-24 h-24 m-4">
+        הארועים שלי
+      </LinkButton> */}
+      <LinkButton to="/manage-events" className="w-24 h-24 m-4">
         הארועים שלי
       </LinkButton>
       <LinkButton to="/event-form" className="w-24 h-24 m-4">
