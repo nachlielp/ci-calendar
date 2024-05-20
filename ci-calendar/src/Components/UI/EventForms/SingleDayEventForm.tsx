@@ -63,7 +63,6 @@ export default function SingleDayEventForm() {
   }
 
   const handleAddressSelect = (place: IGooglePlaceOption) => {
-    console.log("place: ", place);
     const selectedAddress = {
       label: place.label,
       place_id: place.value.place_id,

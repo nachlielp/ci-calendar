@@ -78,8 +78,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         } else if (teacherName === "" && value !== undefined && teacher) {
             setSelectedRowKeysFuture(selectedRowKeysFuture.filter(key => filteredEvents.some(event => event.id === key && event.owners.some(owner => owner.value === value))));
             setSelectedRowKeysPast(selectedRowKeysPast.filter(key => filteredEvents.some(event => event.id === key && event.owners.some(owner => owner.value === value))));
-            console.log("selectedRowKeysFuture", selectedRowKeysFuture)
-            console.log("selectedRowKeysPast", selectedRowKeysPast)
         }
     };
 
