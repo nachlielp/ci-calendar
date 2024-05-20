@@ -21,8 +21,8 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const [showFuture, setShowFuture] = useState(true);
     const filteredEvents = useEventsFilter({ events, showFuture, uid });
     const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
-    const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-    const [selectedRowKeysLength, setSelectedRowKeysLength] = useState(0);
+    const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<React.Key[]>([]);
+    const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
@@ -33,10 +33,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === inputValue)));
         }
     }, [events, showFuture]);
-
-    useEffect(() => {
-        setSelectedRowKeysLength(selectedRowKeys.length);
-    }, [selectedRowKeys]);
 
     const teachers = filteredEvents
         .map(event => event.owners)
@@ -54,7 +50,15 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
-        setSelectedRowKeys(newSelectedRowKeys);
+        if (showFuture) {
+            setSelectedRowKeysFuture(newSelectedRowKeys);
+        } else {
+            setSelectedRowKeysPast(newSelectedRowKeys);
+        }
+    };
+
+    const togglePastFuture = () => {
+        setShowFuture(prev => !prev);
     };
 
     const handleClear = () => {
@@ -70,14 +74,18 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     };
 
     const rowSelection = {
-        selectedRowKeys,
+        selectedRowKeys: showFuture ? selectedRowKeysFuture : selectedRowKeysPast,
         onChange: onSelectChange,
     };
 
-    const hasSelected = selectedRowKeys.length > 0;
+    const hasSelected = selectedRowKeysFuture.length > 0;
 
-    const visableEventsToHide = filteredEvents.filter(event => selectedRowKeys.includes(event.id) && !event.hide);
-    const hiddenEventsToShow = filteredEvents.filter(event => selectedRowKeys.includes(event.id) && event.hide);
+    const visableEventsToHide = showFuture ?
+        filteredEvents.filter(event => selectedRowKeysFuture.includes(event.id) && !event.hide) :
+        filteredEvents.filter(event => selectedRowKeysPast.includes(event.id) && !event.hide);
+    const hiddenEventsToShow = showFuture ?
+        filteredEvents.filter(event => selectedRowKeysFuture.includes(event.id) && event.hide) :
+        filteredEvents.filter(event => selectedRowKeysPast.includes(event.id) && event.hide);
 
     const handleExpand = (expanded: boolean, record: IEvently) => {
         setExpandedRowKeys(expanded ? [record.id] : []);
@@ -139,18 +147,18 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                     </Select>
                 }
                 <span className="mr-4 ml-4 ">
-                    {hasSelected ? `נבחרו ${selectedRowKeysLength} אירועים` : ''}
+                    {hasSelected ? `נבחרו ${showFuture ? selectedRowKeysFuture.length : selectedRowKeysPast.length} אירועים` : ''}
                 </span>
                 <Switch
                     className="mr-4"
                     checkedChildren={'עתידי'}
                     unCheckedChildren={'עבר'}
                     defaultChecked={showFuture}
-                    onChange={() => setShowFuture(prev => !prev)}
+                    onChange={togglePastFuture}
                 />
-                <DeleteMultipleEvents eventIds={selectedRowKeys.map(String)} className="mr-4" disabled={selectedRowKeysLength === 0} />
-                <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={selectedRowKeysLength === 0} />
-                <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={selectedRowKeysLength === 0} />
+                <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
             </div>
 
             <Table
