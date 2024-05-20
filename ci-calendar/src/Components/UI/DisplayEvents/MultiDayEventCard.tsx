@@ -102,7 +102,8 @@ export const MultiDayEventCard = React.forwardRef<
 
       <p className="flex items-center">
         <FaMapMarkedAlt className="ml-2" />
-        {event.address.label}
+        <a href={`https://www.google.com/maps/place/?q=place_id:${event.address.place_id}`} target="_blank">{event.address.label}</a>
+
       </p>
 
       {!isWhiteSpace(event.description) && (
