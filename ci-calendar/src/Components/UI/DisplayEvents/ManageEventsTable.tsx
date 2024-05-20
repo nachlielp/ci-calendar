@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Table, Select } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
@@ -42,8 +42,9 @@ const columns = [
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const { width } = useWindowSize();
-    const [uid, setUid] = useState('');
-    const filteredEvents = useEventsFilter({ events, uid });
+    // const [uid, setUid] = useState('');
+    // const filteredEvents = useEventsFilter({ events, uid });
+    const filteredEvents = useEventsFilter({ events });
     const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedRowKeysLength, setSelectedRowKeysLength] = useState(0);
@@ -56,7 +57,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         } else {
             setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === inputValue)));
         }
-    }, [events, uid]);
+    }, [events]);
 
     const teachers = filteredEvents
         .map(event => event.owners)
