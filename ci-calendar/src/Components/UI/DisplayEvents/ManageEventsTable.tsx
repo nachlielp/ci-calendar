@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Select } from "antd";
+import { Table, Select, Switch } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
@@ -45,9 +45,9 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const { width } = useWindowSize();
     const { currentUser } = useAuthContext()
     const uid = currentUser?.userType === 'teacher' ? currentUser.id : '';
-    // const [uid, setUid] = useState('');
-    // const filteredEvents = useEventsFilter({ events, uid });
-    const filteredEvents = useEventsFilter({ events, uid });
+
+    const [showFuture, setShowFuture] = useState(true);
+    const filteredEvents = useEventsFilter({ events, uid, showFuture });
     const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedRowKeysLength, setSelectedRowKeysLength] = useState(0);
@@ -60,7 +60,11 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         } else {
             setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === inputValue)));
         }
-    }, [events]);
+    }, [events, showFuture]);
+
+    useEffect(() => {
+        setSelectedRowKeysLength(selectedRowKeys.length);
+    }, [selectedRowKeys]);
 
     const teachers = filteredEvents
         .map(event => event.owners)
@@ -76,9 +80,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const adjustedItemWidth = Math.min(width / 1.5, 500);
 
-    useEffect(() => {
-        setSelectedRowKeysLength(selectedRowKeys.length);
-    }, [selectedRowKeys]);
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
         setSelectedRowKeys(newSelectedRowKeys);
@@ -136,6 +137,12 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                 <span className="mr-4 ml-4 ">
                     {hasSelected ? `נבחרו ${selectedRowKeysLength} אירועים` : ''}
                 </span>
+                <Switch
+                    checkedChildren={'עתידי'}
+                    unCheckedChildren={'עבר'}
+                    defaultChecked={showFuture}
+                    onChange={() => setShowFuture(prev => !prev)}
+                />
                 <DeleteMultipleEvents eventIds={selectedRowKeys.map(String)} className="mr-4" disabled={selectedRowKeysLength === 0} />
                 <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={selectedRowKeysLength === 0} />
                 <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={selectedRowKeysLength === 0} />

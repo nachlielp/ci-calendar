@@ -1,16 +1,30 @@
 import { useSearchParams } from "react-router-dom";
 import { IEvently } from "../util/interfaces";
+import dayjs from "dayjs";
 
 interface IUseEventsFilterProps {
   events: IEvently[];
   uid?: string;
+  showFuture?: boolean;
 }
 
-export const useEventsFilter = ({ events, uid }: IUseEventsFilterProps) => {
+export const useEventsFilter = ({ events, uid, showFuture }: IUseEventsFilterProps) => {
   const [searchParams] = useSearchParams();
   const eventTypes = searchParams.getAll("eventType");
   const districts = searchParams.getAll("district");
+
   let filteredEvents = events;
+
+  if (showFuture !== undefined) {
+    const now = dayjs();
+    const startOfToday = dayjs().startOf('day');
+    if (showFuture) {
+      filteredEvents = events.filter((event) => dayjs(event.dates['endDate']) >= startOfToday);
+    } else {
+      filteredEvents = events.filter((event) => dayjs(event.dates['startDate']) < now);
+    }
+  }
+
   if (uid && uid !== "") {
     filteredEvents = events.filter((event) => event.owners.find((owner) => owner.value === uid));
   }
