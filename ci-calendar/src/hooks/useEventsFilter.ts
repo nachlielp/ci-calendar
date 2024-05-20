@@ -9,7 +9,6 @@ interface IUseEventsFilterProps {
 }
 
 export const useEventsFilter = ({ events, showFuture, uid }: IUseEventsFilterProps) => {
-  console.log("uid", uid);
   const [searchParams] = useSearchParams();
   const eventTypes = searchParams.getAll("eventType");
   const districts = searchParams.getAll("district");

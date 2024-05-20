@@ -6,7 +6,7 @@ function AdminPage() {
       <LinkButton to="/bio" className="w-24 h-24 m-4">
         פרופיל אישי
       </LinkButton>
-      <LinkButton to="/edit-events-list" className="w-24 h-24 m-4">
+      <LinkButton to="/manage-events" className="w-24 h-24 m-4">
         עריכת אירועים
       </LinkButton>
       <LinkButton to="/event-form" className="w-24 h-24 m-4">
@@ -17,9 +17,6 @@ function AdminPage() {
       </LinkButton>
       <LinkButton to="/manage-users" className="w-24 h-24 m-4">
         הגדרת <br /> משתמשים
-      </LinkButton>
-      <LinkButton to="/manage-events" className="w-24 h-24 m-4">
-        test
       </LinkButton>
     </div>
   );
