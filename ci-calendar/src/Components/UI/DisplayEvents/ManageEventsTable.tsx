@@ -20,11 +20,12 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const [showFuture, setShowFuture] = useState(true);
     const filteredEvents = useEventsFilter({ events, showFuture, uid });
-    const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
+    const [teachersEvents, setTeachersEvents] = useState<IEvently[]>([]);
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<React.Key[]>([]);
     const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>([]);
     const [teacherName, setTeacherName] = useState('');
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
+
 
     useEffect(() => {
         if (teacherName === '') {
@@ -131,6 +132,11 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         }
     ];
 
+    const filteredColumns = currentUser && currentUser.userType === 'teacher'
+        ? columns.filter(column => column.key !== 'owners')
+        : columns;
+
+
     return (
         <div className=" m-4">
             <div className="flex flex-row justify-end mb-4 mr-4">
@@ -171,7 +177,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
             <Table
                 rowSelection={rowSelection}
-                columns={columns}
+                columns={filteredColumns}
                 dataSource={teachersEvents.map(event => ({ ...event, key: event.id }))}
                 pagination={false}
                 expandable={{
