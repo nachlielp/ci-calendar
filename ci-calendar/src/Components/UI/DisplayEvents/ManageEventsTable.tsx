@@ -19,7 +19,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const uid = currentUser?.userType === 'teacher' ? currentUser.id : '';
 
     const [showFuture, setShowFuture] = useState(true);
-    const filteredEvents = useEventsFilter({ events, uid, showFuture });
+    const filteredEvents = useEventsFilter({ events, showFuture, uid });
     const [teachersEvents, setTeachersEvents] = useState(filteredEvents);
     const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
     const [selectedRowKeysLength, setSelectedRowKeysLength] = useState(0);
