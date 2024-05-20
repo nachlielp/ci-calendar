@@ -35,7 +35,7 @@ interface IDeleteEventProps {
 export default function DeleteMultipleEvents({ eventIds, className, disabled }: IDeleteEventProps) {
     const { deleteMultipleEventlys } = useAuthContext();
     return (
-        <Space wrap className={className}>
+        <Space wrap className={`${className}`}>
             <Button onClick={() => showDeleteConfirm(eventIds, deleteMultipleEventlys)} disabled={disabled}>
                 <DeleteOutlined />
             </Button>

@@ -11,37 +11,9 @@ import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import { useAuthContext } from "../../Auth/AuthContext";
 const { Option } = Select;
-const columns = [
-    {
-        title: 'בעלים',
-        dataIndex: 'owners',
-        key: 'owners',
-        render: (owners: { label: string }[]) => owners.map(owner => owner.label).join(', '),
-    },
-    {
-        title: 'תאריך',
-        dataIndex: 'dates',
-        key: 'dates',
-        render: (dates: { startDate: string, endDate: string }) => {
-            const startDate = new Date(dates.startDate).toLocaleDateString();
-            const endDate = new Date(dates.endDate).toLocaleDateString();
-            return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
-        },
-    },
-    {
-        title: 'כותרת',
-        dataIndex: 'title',
-        key: 'title',
-    },
-    {
-        title: 'מצב',
-        dataIndex: 'hide',
-        key: 'hide',
-        render: (hide: boolean) => hide ? <EyeInvisibleOutlined /> : <EyeOutlined />,
-    }
-];
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
+
     const { width } = useWindowSize();
     const { currentUser } = useAuthContext()
     const uid = currentUser?.userType === 'teacher' ? currentUser.id : '';
@@ -111,6 +83,38 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         setExpandedRowKeys(expanded ? [record.id] : []);
     };
 
+    const columns = [
+        {
+            title: 'בעלים',
+            dataIndex: 'owners',
+            key: 'owners',
+            render: (owners: { label: string }[]) => {
+                return owners.map(owner => owner.label).join(', ');
+            },
+        },
+        {
+            title: 'תאריך',
+            dataIndex: 'dates',
+            key: 'dates',
+            render: (dates: { startDate: string, endDate: string }) => {
+                const startDate = new Date(dates.startDate).toLocaleDateString();
+                const endDate = new Date(dates.endDate).toLocaleDateString();
+                return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
+            },
+        },
+        {
+            title: 'כותרת',
+            dataIndex: 'title',
+            key: 'title',
+        },
+        {
+            title: 'מצב',
+            dataIndex: 'hide',
+            key: 'hide',
+            render: (hide: boolean) => hide ? <EyeInvisibleOutlined /> : <EyeOutlined />,
+        }
+    ];
+
     return (
         <div className=" m-4">
             <div className="flex flex-row justify-end mb-4 mr-4">
@@ -138,6 +142,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                     {hasSelected ? `נבחרו ${selectedRowKeysLength} אירועים` : ''}
                 </span>
                 <Switch
+                    className="mr-4"
                     checkedChildren={'עתידי'}
                     unCheckedChildren={'עבר'}
                     defaultChecked={showFuture}

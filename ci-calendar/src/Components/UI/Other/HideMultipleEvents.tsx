@@ -8,7 +8,7 @@ export default function HideMultipleEvents({ eventIds, className, disabled }: { 
         hideOrShowMultipleEventlys(eventIds, true);
     };
     return (
-        <div className={`${className} mt-1`}>
+        <div className={`${className}`}>
             <Button onClick={handleHide} disabled={disabled}><EyeInvisibleOutlined /></Button>
         </div>
     );
