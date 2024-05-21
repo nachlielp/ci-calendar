@@ -30,7 +30,7 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
   const adjustedItemWidth = Math.min(width / 1.5, 500);
   if (!filteredEvents.length && isEdit && !isAdmin) return <EmptyList />;
   if (!filteredEvents) return <Loading />;
-  console.log("EventsList.filteredEvents: ", filteredEvents)
+
   return (
     <div className="flex flex-col items-center w-full">
       {filteredEvents.map((event) => (
