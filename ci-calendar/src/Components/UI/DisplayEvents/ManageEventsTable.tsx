@@ -27,7 +27,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const [teacherName, setTeacherName] = useState('');
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
-
     useEffect(() => {
         if (teacherName === '') {
             setTeachersEvents(filteredEvents);
@@ -87,8 +86,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         selectedRowKeys: showFuture ? selectedRowKeysFuture : selectedRowKeysPast,
         onChange: onSelectChange,
     };
-
-    const hasSelected = selectedRowKeysFuture.length > 0;
 
     const visableEventsToHide = showFuture ?
         filteredEvents.filter(event => selectedRowKeysFuture.includes(event.id) && !event.hide) :
@@ -162,8 +159,9 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                         ))}
                     </Select>
                 }
-                <span className="mr-4 ml-4 ">
-                    {hasSelected ? `נבחרו ${showFuture ? selectedRowKeysFuture.length : selectedRowKeysPast.length} אירועים` : ''}
+                <span id="selected-events-count" className="mr-4 ml-4 ">
+                    {showFuture && selectedRowKeysFuture.length > 0 && `נבחרו ${selectedRowKeysFuture.length} אירועים`}
+                    {!showFuture && selectedRowKeysPast.length > 0 && `נבחרו ${selectedRowKeysPast.length} אירועים`}
                 </span>
                 <Switch
                     className="mr-4"
