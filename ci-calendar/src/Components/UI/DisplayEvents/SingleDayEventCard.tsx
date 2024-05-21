@@ -65,14 +65,14 @@ export const SingleDayEventCard = React.forwardRef<
   //   window.open(mapUrl, '_system');
   // }
 
-  function openGoogleMaps(placeId: string) {
-    const url = `comgooglemaps://?q=place_id:${placeId}`;
+  function openGoogleMaps(placeId: string, address: string) {
+    const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
     const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
     if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
       setTimeout(function () {
         window.location.href = fallbackUrl;
       }, 25);
-      window.location.href = url;
+      window.location.href = iosUrl;
     } else {
       window.open(fallbackUrl, '_blank');
     }
@@ -167,7 +167,7 @@ export const SingleDayEventCard = React.forwardRef<
         {/* <a href={getMapsLink(event.address.place_id)} target="_blank" rel="noopener noreferrer">
           {event.address.label}
         </a> */}
-        <button onClick={() => openGoogleMaps(event.address.place_id)}>Open in Google Maps</button>
+        <button onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}>Open in Google Maps</button>
         {/* <a href={`http://maps.apple.com/?daddr=1600+Amphitheatre+Pkwy,+Mountain+View+CA`} target="_blank" rel="noopener noreferrer">TEST</a> */}
       </p>
 
