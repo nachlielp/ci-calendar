@@ -24,46 +24,6 @@ export const SingleDayEventCard = React.forwardRef<
   HTMLDivElement,
   ISingleDayEventCardProps
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
-  // console.log("SingleDayEventCard.event: ", event);
-
-  // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  // const getMapsLink = (placeId: string) => {
-  //   if (isMobile) {
-  //     return `geo:0,0?q=place_id:${placeId}`;
-  //   }
-  //   return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
-  // };
-
-  // function navigate(lat: any, lng: any) {
-  //   // If it's an iPhone..
-  //   if ((navigator.platform.indexOf("iPhone") !== -1) || (navigator.platform.indexOf("iPod") !== -1)) {
-  //     function iOSversion() {
-  //       if (/iP(hone|od|ad)/.test(navigator.platform)) {
-  //         // supports iOS 2.0 and later
-  //         var v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
-  //         if (v) {
-  //           return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || "0", 10)];
-  //         }
-  //         return [0, 0, 0];
-  //       }
-  //     }
-  //     var ver = iOSversion() || [0];
-
-  //     var protocol = 'http://';
-  //     if (ver[0] >= 6) {
-  //       protocol = 'maps://';
-  //     }
-  //     window.location.href = protocol + 'maps.apple.com/maps?daddr=' + lat + ',' + lng + '&amp;ll=';
-  //   }
-  //   else {
-  //     window.open('http://maps.google.com?daddr=' + lat + ',' + lng + '&amp;ll=');
-  //   }
-  // }
-
-  // const openWindow = (mapUrl: string) => {
-  //   window.open(mapUrl, '_system');
-  // }
 
   function openGoogleMaps(placeId: string, address: string) {
     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
@@ -72,7 +32,8 @@ export const SingleDayEventCard = React.forwardRef<
       setTimeout(function () {
         window.location.href = fallbackUrl;
       }, 25);
-      window.location.href = iosUrl;
+      window.open(iosUrl, '_blank');
+      // window.location.href = iosUrl;
     } else {
       window.open(fallbackUrl, '_blank');
     }
