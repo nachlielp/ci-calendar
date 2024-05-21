@@ -26,14 +26,44 @@ export const SingleDayEventCard = React.forwardRef<
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
   // console.log("SingleDayEventCard.event: ", event);
 
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  const getMapsLink = (placeId: string) => {
-    if (isMobile) {
-      return `geo:0,0?q=place_id:${placeId}`;
-    }
-    return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
-  };
+  // const getMapsLink = (placeId: string) => {
+  //   if (isMobile) {
+  //     return `geo:0,0?q=place_id:${placeId}`;
+  //   }
+  //   return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+  // };
+
+  // function navigate(lat: any, lng: any) {
+  //   // If it's an iPhone..
+  //   if ((navigator.platform.indexOf("iPhone") !== -1) || (navigator.platform.indexOf("iPod") !== -1)) {
+  //     function iOSversion() {
+  //       if (/iP(hone|od|ad)/.test(navigator.platform)) {
+  //         // supports iOS 2.0 and later
+  //         var v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
+  //         if (v) {
+  //           return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || "0", 10)];
+  //         }
+  //         return [0, 0, 0];
+  //       }
+  //     }
+  //     var ver = iOSversion() || [0];
+
+  //     var protocol = 'http://';
+  //     if (ver[0] >= 6) {
+  //       protocol = 'maps://';
+  //     }
+  //     window.location.href = protocol + 'maps.apple.com/maps?daddr=' + lat + ',' + lng + '&amp;ll=';
+  //   }
+  //   else {
+  //     window.open('http://maps.google.com?daddr=' + lat + ',' + lng + '&amp;ll=');
+  //   }
+  // }
+
+  const openWindow = (mapUrl: string) => {
+    window.open(mapUrl, '_system');
+  }
   const subEventLen = Object.values(event.subEvents).length;
   const teachersIds = getEventTeachersIds(event);
   const { teachers } = useTeacherBio({ ids: teachersIds });
@@ -119,10 +149,13 @@ export const SingleDayEventCard = React.forwardRef<
         ))}
       <p className="flex items-center">
         <FaMapMarkedAlt className="ml-2" />
-        {/* <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a> */}
-        <a href={getMapsLink(event.address.place_id)} target="_blank" rel="noopener noreferrer">
+        <a href={`https://www.google.com/maps/place/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a>
+        {/* <a href={getMapsLink(event.address.place_id)} target="_blank" rel="noopener noreferrer">
           {event.address.label}
-        </a>      </p>
+        </a> */}
+        <button onClick={() => openWindow(`https://www.google.com/maps/place/?q=place_id:${event.address.place_id}`)}>Open in Google Maps</button>
+        {/* <a href={`http://maps.apple.com/?daddr=1600+Amphitheatre+Pkwy,+Mountain+View+CA`} target="_blank" rel="noopener noreferrer">TEST</a> */}
+      </p>
 
       {!isWhiteSpace(event.description) && (
         <p className="flex items-center">
