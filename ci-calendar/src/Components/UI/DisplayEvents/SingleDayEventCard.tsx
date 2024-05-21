@@ -28,7 +28,7 @@ export const SingleDayEventCard = React.forwardRef<
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-  const getMapsLink = (placeId: string, label: string) => {
+  const getMapsLink = (placeId: string) => {
     if (isMobile) {
       return `geo:0,0?q=place_id:${placeId}`;
     }
