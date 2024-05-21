@@ -10,6 +10,7 @@ import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import { useAuthContext } from "../../Auth/AuthContext";
+import dayjs from "dayjs";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
@@ -118,6 +119,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                 const endDate = new Date(dates.endDate).toLocaleDateString();
                 return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
             },
+            sorter: (a: IEvently, b: IEvently) => dayjs(a.dates["startDate"]).diff(dayjs(b.dates["startDate"]), 'day'),
         },
         {
             title: 'כותרת',
