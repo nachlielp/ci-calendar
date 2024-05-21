@@ -135,6 +135,7 @@ export const SingleDayEventCard = React.forwardRef<
         </a> */}
         <button onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}>Open in Google Maps</button>
         {/* <a href={`http://maps.apple.com/?daddr=1600+Amphitheatre+Pkwy,+Mountain+View+CA`} target="_blank" rel="noopener noreferrer">TEST</a> */}
+        <a href={`http://maps.google.com/maps?daddr=${encodeURIComponent(event.address.label)}`} target="_blank" rel="noopener noreferrer">TEST @</a>
       </p>
 
       {!isWhiteSpace(event.description) && (
