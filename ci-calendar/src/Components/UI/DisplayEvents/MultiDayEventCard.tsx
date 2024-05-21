@@ -29,6 +29,25 @@ export const MultiDayEventCard = React.forwardRef<
 
   const teachersIds = getEventTeachersIds(event);
   const { teachers } = useTeacherBio({ ids: teachersIds });
+  function openGoogleMaps(placeId: string, address: string) {
+    const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
+    const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
+    const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+
+    if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
+      setTimeout(function () {
+        window.location.href = fallbackUrl;
+      }, 25);
+      window.open(iosUrl, '_blank');
+    } else if (/Android/.test(navigator.userAgent)) {
+      setTimeout(function () {
+        window.location.href = fallbackUrl;
+      }, 25);
+      window.open(androidUrl, '_blank');
+    } else {
+      window.open(fallbackUrl, '_blank');
+    }
+  }
 
   const footer = isEdit
     ? [
@@ -102,8 +121,11 @@ export const MultiDayEventCard = React.forwardRef<
 
       <p className="flex items-center">
         <FaMapMarkedAlt className="ml-2" />
-        <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a>
+        <button onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}>{event.address.label}</button>
+
+        {/* <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a> */}
       </p>
+
       {!isWhiteSpace(event.description) && (
         <p className="flex items-center">
           <MdOutlineDescription className="ml-2" />
