@@ -14,10 +14,6 @@ import BioModal from "../DisplayUsers/BioModal";
 import RecycleEvent from "../Other/RecycleEvent";
 import HideEvent from "../Other/HideEvent";
 
-//TODO add link to google maps
-//<a href="https://www.google.com/maps/search/?api=1&query=Google&query_place_id=ChIJwa1t1RwoAxURo5lyOAPL-A0" target="_blank">
-//Open in Google Maps
-//</a>
 interface ISingleDayEventCardProps {
   event: IEvently;
   cardWidth: number;
@@ -29,6 +25,15 @@ export const SingleDayEventCard = React.forwardRef<
   ISingleDayEventCardProps
 >(({ event, cardWidth, screenWidth, isEdit }, ref) => {
   // console.log("SingleDayEventCard.event: ", event);
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  const getMapsLink = (placeId: string, label: string) => {
+    if (isMobile) {
+      return `geo:0,0?q=place_id:${placeId}`;
+    }
+    return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+  };
   const subEventLen = Object.values(event.subEvents).length;
   const teachersIds = getEventTeachersIds(event);
   const { teachers } = useTeacherBio({ ids: teachersIds });
@@ -114,7 +119,10 @@ export const SingleDayEventCard = React.forwardRef<
         ))}
       <p className="flex items-center">
         <FaMapMarkedAlt className="ml-2" />
-        <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a>      </p>
+        {/* <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a> */}
+        <a href={getMapsLink(event.address.place_id, event.address.label)} target="_blank" rel="noopener noreferrer">
+          {event.address.label}
+        </a>      </p>
 
       {!isWhiteSpace(event.description) && (
         <p className="flex items-center">
