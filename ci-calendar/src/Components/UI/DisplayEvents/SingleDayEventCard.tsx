@@ -120,7 +120,7 @@ export const SingleDayEventCard = React.forwardRef<
       <p className="flex items-center">
         <FaMapMarkedAlt className="ml-2" />
         {/* <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a> */}
-        <a href={getMapsLink(event.address.place_id, event.address.label)} target="_blank" rel="noopener noreferrer">
+        <a href={getMapsLink(event.address.place_id)} target="_blank" rel="noopener noreferrer">
           {event.address.label}
         </a>      </p>
 
