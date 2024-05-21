@@ -15,6 +15,13 @@ interface IEventsDisplayProps {
 }
 
 function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
+  const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
+
+  useEffect(() => {
+    const futureEvents = events.filter((event) => dayjs(event.dates["endDate"]).isAfter(dayjs().startOf('day')));
+    setFutureEvents(futureEvents);
+  }, [events]);
+
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
 
   const [todaysEvents, setTodaysEvents] = useState<IEvently[]>([]);
@@ -24,7 +31,7 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
     setSelectedDay(value);
   };
 
-  const visibleEvents = events.filter((event) => !event.hide);
+  const visibleEvents = futureEvents.filter((event) => !event.hide);
   const filteredEvents = useEventsFilter({ events: visibleEvents });
 
 
@@ -44,7 +51,7 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
           <EventsList events={todaysEvents} isEdit={isEdit} />
         </>
       ) : (
-        <EventsList events={events} isEdit={isEdit} />
+        <EventsList events={futureEvents} isEdit={isEdit} />
       )}
     </>
   );
