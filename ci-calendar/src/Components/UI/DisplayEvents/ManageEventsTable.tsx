@@ -68,6 +68,11 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     };
 
 
+    const handleDelete = () => {
+        setSelectedRowKeysFuture([]);
+        setSelectedRowKeysPast([]);
+        setExpandedRowKeys([]);
+    }
     const onSelectTeacher = (value: string) => {
         const teacher = uniqueTeachers.find(teacher => teacher.value === value);
         teacher ? setTeacherName(teacher.label) : setTeacherName('');
@@ -170,7 +175,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                     defaultChecked={showFuture}
                     onChange={togglePastFuture}
                 />
-                <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={handleDelete} />
                 <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                 <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
             </div>

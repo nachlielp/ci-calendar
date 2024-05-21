@@ -6,7 +6,8 @@ const { confirm } = Modal;
 
 const showDeleteConfirm = (
     eventIds: string[],
-    deleteMultipleEventlys: (ids: string[]) => Promise<void>
+    deleteMultipleEventlys: (ids: string[]) => Promise<void>,
+    onDelete: () => void
 ) => {
     confirm({
         title: "מחק ארוע",
@@ -17,6 +18,7 @@ const showDeleteConfirm = (
         cancelText: "בטל",
         onOk() {
             deleteMultipleEventlys(eventIds);
+            onDelete();
         },
         onCancel() {
             console.log(
@@ -31,12 +33,13 @@ interface IDeleteEventProps {
     eventIds: string[];
     className?: string;
     disabled?: boolean;
+    onDelete: () => void;
 }
-export default function DeleteMultipleEvents({ eventIds, className, disabled }: IDeleteEventProps) {
+export default function DeleteMultipleEvents({ eventIds, className, disabled, onDelete }: IDeleteEventProps) {
     const { deleteMultipleEventlys } = useAuthContext();
     return (
         <Space wrap className={`${className}`}>
-            <Button onClick={() => showDeleteConfirm(eventIds, deleteMultipleEventlys)} disabled={disabled}>
+            <Button onClick={() => showDeleteConfirm(eventIds, deleteMultipleEventlys, onDelete)} disabled={disabled}>
                 <DeleteOutlined />
             </Button>
         </Space>
