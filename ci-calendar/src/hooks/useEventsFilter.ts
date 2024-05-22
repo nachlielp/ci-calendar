@@ -1,56 +1,64 @@
 import { useSearchParams } from "react-router-dom";
 import { IEvently } from "../util/interfaces";
 import dayjs from "dayjs";
+import { useMemo } from "react";
 
 interface IUseEventsFilterProps {
   events: IEvently[];
   showFuture?: boolean;
-  uid?: string;
+  uids?: string[];
 }
 
-export const useEventsFilter = ({ events, showFuture, uid }: IUseEventsFilterProps) => {
+export const useEventsFilter = ({ events, showFuture, uids }: IUseEventsFilterProps) => {
   const [searchParams] = useSearchParams();
-  const eventTypes = searchParams.getAll("eventType");
-  const districts = searchParams.getAll("district");
 
-  let filteredEvents = events;
+  const filteredEvents = useMemo(() => {
+    const eventTypes = searchParams.getAll("eventType");
+    const districts = searchParams.getAll("district");
 
-  if (uid && uid !== "") {
-    filteredEvents = events.filter((event) => event.owners.find((owner) => owner.value === uid));
-  }
+    let filtered = events;
 
-  if (showFuture !== undefined) {
-    const now = dayjs();
-    const startOfToday = dayjs().startOf('day');
-    if (showFuture) {
-      filteredEvents = filteredEvents.filter((event) => dayjs(event.dates['endDate']) >= startOfToday);
-    } else {
-      filteredEvents = filteredEvents.filter((event) => dayjs(event.dates['startDate']) < now);
+    if (uids && uids.length > 0) {
+      filtered = filtered.filter((event) => event.owners.find((owner) => uids.includes(owner.value)));
     }
-  }
 
-  filteredEvents = filteredEvents.filter((event) => {
-    const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
-    if (event.type !== "") {
-      eventTypeList.push(event.type);
+    if (showFuture !== undefined) {
+      const now = dayjs();
+      const startOfToday = dayjs().startOf('day');
+      if (showFuture) {
+        filtered = filtered.filter((event) => dayjs(event.dates['endDate']) >= startOfToday);
+      } else {
+        filtered = filtered.filter((event) => dayjs(event.dates['startDate']) < now);
+      }
     }
-    if (eventTypes.length === 0 && districts.length === 0) {
-      return true;
-    }
-    if (eventTypes.length === 0) {
-      return hasOverlap(districts, [event.district]);
-    }
-    if (districts.length === 0) {
-      return hasOverlap(eventTypes, eventTypeList);
-    }
-    return (
-      hasOverlap(districts, [event.district]) &&
-      hasOverlap(eventTypes, eventTypeList)
-    );
-  });
+
+    filtered = filtered.filter((event) => {
+      const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
+      if (event.type !== "") {
+        eventTypeList.push(event.type);
+      }
+      if (eventTypes.length === 0 && districts.length === 0) {
+        return true;
+      }
+      if (eventTypes.length === 0) {
+        return hasOverlap(districts, [event.district]);
+      }
+      if (districts.length === 0) {
+        return hasOverlap(eventTypes, eventTypeList);
+      }
+      return (
+        hasOverlap(districts, [event.district]) &&
+        hasOverlap(eventTypes, eventTypeList)
+      );
+    });
+
+    return filtered;
+  }, [events, showFuture, searchParams, uids]);
+
   return filteredEvents;
 };
 
 function hasOverlap(arr1: any[], arr2: any[]): boolean {
   return arr1.some((element) => arr2.includes(element));
 }
+

@@ -18,7 +18,7 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
   const isAdmin = currentUser?.userType === "admin";
   let filteredEvents = useEventsFilter({ events });
   if (isEdit && !isAdmin) {
-    filteredEvents = useEventsFilter({ events, uid: currentUser?.id });
+    filteredEvents = useEventsFilter({ events, uids: currentUser ? [currentUser.id] : [] });
   } else if (isEdit && isAdmin) {
     filteredEvents = events
   } else {

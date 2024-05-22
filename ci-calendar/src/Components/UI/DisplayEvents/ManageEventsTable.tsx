@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Table, Select, Switch } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
@@ -17,10 +17,9 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const { width } = useWindowSize();
     const { currentUser } = useAuthContext()
-    const uid = currentUser?.userType === 'teacher' ? currentUser.id : '';
-
+    const uid = useMemo(() => currentUser?.userType === 'teacher' ? [currentUser.id] : [], [currentUser]);
     const [showFuture, setShowFuture] = useState(true);
-    const filteredEvents = useEventsFilter({ events, showFuture, uid });
+    const filteredEvents = useEventsFilter({ events, showFuture, uids: uid });
     const [teachersEvents, setTeachersEvents] = useState<IEvently[]>([]);
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<React.Key[]>([]);
     const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>([]);
@@ -30,11 +29,14 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     useEffect(() => {
         if (teacherName === '') {
             setTeachersEvents(filteredEvents);
+            console.log("no teacher");
         } else {
             setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === teacherName)));
+            console.log("teacher");
         }
-    }, [events, showFuture]);
+    }, [filteredEvents, teacherName]);
 
+    //TODuse reducer 
     const teachers = filteredEvents
         .map(event => event.owners)
         .flat()
