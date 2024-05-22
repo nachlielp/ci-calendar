@@ -28,7 +28,6 @@ export enum EventAction {
 }
 
 export default function App() {
-  (console as any).re.log('remote log test');
   const { events, loading } = useEvents();
 
   if (loading) {
