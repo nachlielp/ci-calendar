@@ -29,10 +29,8 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     useEffect(() => {
         if (teacherName === '') {
             setTeachersEvents(filteredEvents);
-            console.log("no teacher");
         } else {
             setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === teacherName)));
-            console.log("teacher");
         }
     }, [filteredEvents, teacherName]);
 
