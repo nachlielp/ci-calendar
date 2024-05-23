@@ -11,7 +11,7 @@ import { EventlyType, IEventiPart, IEvently } from "../../../util/interfaces";
 import { VscDebugBreakpointLog } from "react-icons/vsc";
 import RecycleEvent from "../Other/RecycleEvent";
 import BioModal from "../DisplayUsers/BioModal";
-import { getEventTeachersIds } from "./SingleDayEventCard";
+import { formatHebrewDate, getEventTeachersIds } from "./SingleDayEventCard";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import HideEvent from "../Other/HideEvent";
 
@@ -78,14 +78,14 @@ export const MultiDayEventCard = React.forwardRef<
       <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
         <CiCalendarDate className="text-lg align-middle" />
         <p>
-          {dayjs(event.dates["startDate"]).format("DD-MM")} &nbsp;עד&nbsp;
-          {dayjs(event.dates["endDate"]).format("DD-MM")}
+          <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;עד ה-
+          <b>{formatHebrewDate(event.subEvents[event.subEvents.length - 1].endTime)}</b>
         </p>
       </div>
 
       {Object.entries(groupedSubEvents).map(([date, subEvents]) => (
         <div key={date}>
-          <p className="mr-6">{dayjs(date).format("DD-MM")}</p>
+          <p className="mr-6">{formatHebrewDate(date)}</p>
           {subEvents.map((subEvent, index) => (
             <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
               <VscDebugBreakpointLog className="text-blue-500 text-lg align-middle" />
