@@ -205,7 +205,6 @@ export const getEventTeachersIds = (event: IEvently) => {
 export const formatHebrewDate = (date: string) => {
   const day = dayjs(date).locale("he").format("D");
   const month = dayjs(date).locale("he").format("MM");
-  console.log(month);
   const hebrewMonth = hebrewMonths.find((m: SelectOption) => m.value === month)?.label;
   return `${day} ב${hebrewMonth}`;
 };

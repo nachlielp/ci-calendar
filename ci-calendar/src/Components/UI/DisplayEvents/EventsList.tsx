@@ -26,7 +26,6 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
     filteredEvents = useEventsFilter({ events: visibleEvents });
   }
 
-  // const adjustedHeight = Math.max(height - 100, 300);
   const adjustedItemWidth = Math.min(width / 1.2, 500);
   if (!filteredEvents.length && isEdit && !isAdmin) return <EmptyList />;
   if (!filteredEvents) return <Loading />;
