@@ -12,12 +12,11 @@ import HideEvent from "../Other/HideEvent";
 import BioModal from "../DisplayUsers/BioModal";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import { EventlyType, IEvently } from "../../../util/interfaces";
-import { tagOptions, eventTypes } from "../../../util/options";
+import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
 
 interface ISingleDayEventCardProps {
   event: IEvently;
   cardWidth: number;
-  screenWidth: number;
   isEdit: boolean;
 }
 
@@ -85,9 +84,9 @@ export const SingleDayEventCard = React.forwardRef<
         <p>
           {subEventLen > 0 ? (
             <>
+              <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
               {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
               {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
-              {dayjs(event.subEvents[0].startTime).format("DD-MM")}
             </>
           ) : (
             <span>No event times available</span>
@@ -203,3 +202,11 @@ const isWhiteSpace = (str: string) => {
 export const getEventTeachersIds = (event: IEvently) => {
   return event.subEvents.flatMap((subEvent) => subEvent.teachers).map((teacher) => teacher.value).filter((teacher) => teacher !== "NON_EXISTENT");
 };
+export const formatHebrewDate = (date: string) => {
+  const day = dayjs(date).locale("he").format("D");
+  const month = dayjs(date).locale("he").format("MM");
+  console.log(month);
+  const hebrewMonth = hebrewMonths.find((m: SelectOption) => m.value === month)?.label;
+  return `${day} ב${hebrewMonth}`;
+};
+
