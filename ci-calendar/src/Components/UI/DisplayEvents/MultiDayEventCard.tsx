@@ -1,10 +1,10 @@
+import React from "react";
 import { Card, Tag, Button } from "antd";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { MdOutlineDescription } from "react-icons/md";
 import { tagOptions, eventTypes } from "../../../util/options";
 import dayjs from "dayjs";
-import React from "react";
 import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
 import { EventlyType, IEventiPart, IEvently } from "../../../util/interfaces";
@@ -21,6 +21,7 @@ interface IMultiDayEventCardProps {
   screenWidth: number;
   isEdit: boolean;
 }
+
 export const MultiDayEventCard = React.forwardRef<
   HTMLDivElement,
   IMultiDayEventCardProps
@@ -29,6 +30,7 @@ export const MultiDayEventCard = React.forwardRef<
 
   const teachersIds = getEventTeachersIds(event);
   const { teachers } = useTeacherBio({ ids: teachersIds });
+
   function openGoogleMaps(placeId: string, address: string) {
     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
     const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
@@ -54,7 +56,7 @@ export const MultiDayEventCard = React.forwardRef<
       <DeleteEvent eventId={event.id} />,
       <EditEvent eventId={event.id} isMultiDay={true} />,
       <RecycleEvent eventId={event.id} isMultiDay={true} />,
-      <HideEvent eventId={event.id} hide={event.hide} />
+      <HideEvent eventId={event.id} hide={event.hide} />,
     ]
     : [];
 
@@ -62,82 +64,85 @@ export const MultiDayEventCard = React.forwardRef<
     <Card
       ref={ref}
       className="mt-4"
-      title={
-        <span
-          className={`${screenWidth < 768 ? "flex flex-col" : "flex flex-row items-center"
-            }`}
-        >
-          <span className="block">{event.title}&nbsp;</span>
-          <span className="block">
-            <Tag color="blue">{getType(event.type)}</Tag>
-          </span>
-        </span>
-      }
+
       style={{ width: cardWidth }}
       actions={footer}
     >
-      <p className="flex items-center">
-        <CiCalendarDate className="ml-2" />
-        {dayjs(event.dates["startDate"]).format("DD-MM")} &nbsp;עד&nbsp;
-        {dayjs(event.dates["endDate"]).format("DD-MM")}
-      </p>
+      <div className="flex flex-col sm:flex-col sm:items-right">
+        <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
+        <div className="block w-full sm:w-auto">
+          <Tag color="blue" className="ml-1 mt-1 sm:mt-0">{getType(event.type)}</Tag>
+        </div>
+      </div>
+
+      <br />
+      <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
+        <CiCalendarDate className="text-lg align-middle" />
+        <p>
+          {dayjs(event.dates["startDate"]).format("DD-MM")} &nbsp;עד&nbsp;
+          {dayjs(event.dates["endDate"]).format("DD-MM")}
+        </p>
+      </div>
 
       {Object.entries(groupedSubEvents).map(([date, subEvents]) => (
         <div key={date}>
           <p className="mr-6">{dayjs(date).format("DD-MM")}</p>
           {subEvents.map((subEvent, index) => (
-            <span className="block mr-6" key={index}>
-              <VscDebugBreakpointLog className="inline-block mb-1" />
-              {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
-              {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
-              {getType(subEvent.type as EventlyType)}
-              {subEvent.teachers.length > 0 && (
-                <span>&nbsp;עם {
-                  subEvent.teachers.map((teacher, index, array) => {
-                    const isTeacher = teachers.find((t) => t.id === teacher.value);
-                    return (
-                      <React.Fragment key={teacher.value}>
-                        {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
-                        {index < array.length - 1 ? ', ' : ''}
-                      </React.Fragment>
-                    );
-                  })
-                }</span>
-              )}
-              {subEvent.tags && (
-                <span>
-                  &nbsp;
-                  {subEvent.tags.map((tag) => (
-                    <Tag key={tag} color="green">
-                      {getTag(tag)}
-                    </Tag>
-                  ))}
-                </span>
-              )}
-            </span>
+            <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
+              <VscDebugBreakpointLog className="text-blue-500 text-lg align-middle" />
+              <span>
+                {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
+                {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
+                {getType(subEvent.type as EventlyType)}
+                {subEvent.teachers.length > 0 && (
+                  <span>&nbsp;עם {
+                    subEvent.teachers.map((teacher, index, array) => {
+                      const isTeacher = teachers.find((t) => t.id === teacher.value);
+                      return (
+                        <React.Fragment key={teacher.value}>
+                          {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                          {index < array.length - 1 ? ', ' : ''}
+                        </React.Fragment>
+                      );
+                    })
+                  }</span>
+                )}
+                {subEvent.tags && (
+                  <span>
+                    &nbsp;
+                    {subEvent.tags.map((tag) => (
+                      <Tag key={tag} color="green">
+                        {getTag(tag)}
+                      </Tag>
+                    ))}
+                  </span>
+                )}
+              </span>
+            </div>
           ))}
         </div>
       ))}
 
-      <p className="flex items-center">
-        <FaMapMarkedAlt className="ml-2" />
-        <button onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}>{event.address.label}</button>
-
-        {/* <a href={`https://maps.google.com/?q=place_id:${event.address.place_id}`} target="_blank" rel="noopener noreferrer">{event.address.label}</a> */}
-      </p>
+      <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
+        <FaMapMarkedAlt className="text-lg align-middle" />
+        <button
+          onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
+          className="text-blue-500 underline text-right"
+        >
+          {event.address.label}
+        </button>
+      </div>
 
       {!isWhiteSpace(event.description) && (
-        <p className="flex items-center">
-          <MdOutlineDescription className="ml-2" />
-          {event.description}
-        </p>
+        <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
+          <MdOutlineDescription className="text-lg align-middle" />
+          <p>{event.description}</p>
+        </div>
       )}
+
       {event.price.length > 0 && (
-        <div className="flex items-center">
-          <span className="text-2xl align-top relative top-[-14px]">
-            &#8362;
-          </span>
-          &nbsp;&nbsp;
+        <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
+          <span className="text-lg align-middle">&#8362;</span>
           <ul>
             {event.price.map((price, index) => (
               <li key={`${price.title}-${index}`}>
@@ -147,6 +152,7 @@ export const MultiDayEventCard = React.forwardRef<
           </ul>
         </div>
       )}
+
       <div style={{ marginTop: 16 }}>
         {event.links.length > 0 &&
           event.links.map((link) => (
@@ -155,6 +161,7 @@ export const MultiDayEventCard = React.forwardRef<
               type="default"
               href={link.link}
               target="_blank"
+              className="mb-2"
             >
               {link.title}
             </Button>
@@ -164,33 +171,12 @@ export const MultiDayEventCard = React.forwardRef<
   );
 });
 
-// const getTypes = (t1: IEventi[], t2?: IEventi[]) => {
-//   let types = Array.from(new Set([...t1, ...(t2 || [])]));
-//   t2?.forEach((element) => {
-//     if (!types.includes(element)) {
-//       types.push(element);
-//     }
-//   });
-//   return (
-//     types
-//       .filter((type) => !!type)
-//       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
-//   );
-// };
 const getType = (type: string) => {
   return eventTypes.find((et) => et.value === type)?.label;
 };
 const getTag = (tag: string) => {
   return tagOptions.find((t) => t.value === tag)?.label;
 };
-// const getTags = (event: IEvently) => {
-//   return (
-//     event.subEvents
-//       .reduce((acc, curr) => [...acc, ...curr.tags], [] as string[])
-//       .filter((tags) => !!tags)
-//       .map((type) => tagOptions.find((tag) => tag.value === type)?.label) || []
-//   );
-// };
 const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
 };
