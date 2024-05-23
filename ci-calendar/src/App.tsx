@@ -20,6 +20,8 @@ import EventsDisplay from "./Components/UI/Other/EventsDisplay";
 import MultiDayEventForm from "./Components/UI/EventForms/MultiDayEventForm";
 import EditMultiDayEventForm from "./Components/UI/EventForms/EditMultiDayEventForm";
 import ManageEventsTable from "./Components/UI/DisplayEvents/ManageEventsTable";
+import log from "./util/logger";
+
 
 export enum EventAction {
   edit,
@@ -28,7 +30,9 @@ export enum EventAction {
 }
 
 export default function App() {
+
   const { events, loading } = useEvents();
+  log('APP');
 
   if (loading) {
     return <Loading />;

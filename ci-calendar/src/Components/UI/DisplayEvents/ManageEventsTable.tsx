@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
+    console.log('TEST')
 
     const { width } = useWindowSize();
     const { currentUser } = useAuthContext()
