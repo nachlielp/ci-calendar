@@ -72,9 +72,15 @@ export async function signinGoogle() {
   try {
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    return user;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (isIOS) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      return user;
+    }
   } catch (error) {
     console.log("firebaseService.signinGoogle.error: ", error);
     throw error;
