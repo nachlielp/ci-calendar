@@ -33,7 +33,9 @@ export const useEventsFilter = ({ events, showFuture, uids }: IUseEventsFilterPr
     }
 
     filtered = filtered.filter((event) => {
-      const eventTypeList = event.subEvents.map((subEvent) => subEvent.type);
+      const eventTypeList = event.dates.startDate === event.dates.endDate
+        ? event.subEvents.map((subEvent) => subEvent.type)
+        : [event.type];
       if (event.type !== "") {
         eventTypeList.push(event.type);
       }
