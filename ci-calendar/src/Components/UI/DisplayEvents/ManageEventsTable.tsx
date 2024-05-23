@@ -194,7 +194,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                                     key={event.id}
                                     event={event}
                                     cardWidth={adjustedItemWidth}
-                                    screenWidth={width}
                                     isEdit={true}
                                 />
                             ) : (
@@ -202,7 +201,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                                     key={event.id}
                                     event={event}
                                     cardWidth={adjustedItemWidth}
-                                    screenWidth={width}
                                     isEdit={true}
                                 />
                             )}

@@ -18,14 +18,13 @@ import HideEvent from "../Other/HideEvent";
 interface IMultiDayEventCardProps {
   event: IEvently;
   cardWidth: number;
-  screenWidth: number;
   isEdit: boolean;
 }
 
 export const MultiDayEventCard = React.forwardRef<
   HTMLDivElement,
   IMultiDayEventCardProps
->(({ event, cardWidth, screenWidth, isEdit }, ref) => {
+>(({ event, cardWidth, isEdit }, ref) => {
   const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
 
   const teachersIds = getEventTeachersIds(event);

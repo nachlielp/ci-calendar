@@ -40,7 +40,6 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
               key={event.id}
               event={event}
               cardWidth={adjustedItemWidth}
-              screenWidth={width}
               isEdit={isEdit}
             />
           ) : (
@@ -48,7 +47,6 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
               key={event.id}
               event={event}
               cardWidth={adjustedItemWidth}
-              screenWidth={width}
               isEdit={isEdit}
             />
           )}
