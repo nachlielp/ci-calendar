@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Table, Select, Switch } from "antd";
+import { Table, Select, Switch, Breakpoint } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
@@ -110,9 +110,8 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             title: 'בעלים',
             dataIndex: 'owners',
             key: 'owners',
-            render: (owners: { label: string }[]) => {
-                return owners.map(owner => owner.label).join(', ');
-            },
+            render: (owners: { label: string }[]) => owners.map(owner => owner.label).join(', '),
+            responsive: ['xl', 'lg', 'md', 'sm'] as Breakpoint[]
         },
         {
             title: 'תאריך',
@@ -124,17 +123,20 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                 return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
             },
             sorter: (a: IEvently, b: IEvently) => dayjs(a.dates["startDate"]).diff(dayjs(b.dates["startDate"]), 'day'),
+            responsive: ['xl', 'lg', 'md', 'sm', 'xs'] as Breakpoint[]
         },
         {
             title: 'כותרת',
             dataIndex: 'title',
             key: 'title',
+            responsive: ['xl', 'lg', 'md', 'sm', 'xs'] as Breakpoint[]
         },
         {
             title: 'מצב',
             dataIndex: 'hide',
             key: 'hide',
             render: (hide: boolean) => hide ? <EyeInvisibleOutlined /> : <EyeOutlined />,
+            responsive: ['xl', 'lg', 'md', 'sm'] as Breakpoint[]
         }
     ];
 
@@ -144,50 +146,56 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
 
     return (
-        <div className={`max-w-[${tableWidth}px] mx-auto m-4`}>
-            <div className={`flex ${isPhone ? 'flex-col items-center' : 'flex-row'} justify-center mb-4 mr-4`}>                <div className="flex flex-row">
-                <div className="flex flex-row mb-4">
-                    {currentUser && currentUser.userType === UserType.admin &&
-                        <Select
-                            style={{ width: '200px' }}
-                            value={teacherName}
-                            onChange={onSelectTeacher}
-                            placeholder="סינון לפי משתמש"
-                            allowClear
-                            onClear={handleClear}
-                            showSearch
-                            filterOption={(input, option) =>
-                                (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                        >
-                            {uniqueTeachers.map(teacher => (
-                                <Option key={teacher.value} value={teacher.value}>
-                                    {teacher.label}
-                                </Option>
-                            ))}
-                        </Select>
-                    }
-                    <span id="selected-events-count" className="mr-4 ml-4 ">
-                        {showFuture && selectedRowKeysFuture.length > 0 && `נבחרו ${selectedRowKeysFuture.length} אירועים`}
-                        {!showFuture && selectedRowKeysPast.length > 0 && `נבחרו ${selectedRowKeysPast.length} אירועים`}
-                    </span>
-
-
-                    <Switch
-                        className="mr-4"
-                        checkedChildren={'עתידי'}
-                        unCheckedChildren={'עבר'}
-                        defaultChecked={showFuture}
-                        onChange={togglePastFuture}
-                    />
+        <section className={`max-w-[${tableWidth}px] mx-auto m-4`}>
+            <header className={`flex ${isPhone ? 'flex-col items-center' : 'flex-row'} justify-center mb-4 mr-4`}>
+                <div className="flex flex-row">
+                    <div className="flex flex-row mb-4">
+                        {currentUser && currentUser.userType === UserType.admin &&
+                            <Select
+                                id="select-teacher"
+                                style={{ width: '200px' }}
+                                value={teacherName}
+                                onChange={onSelectTeacher}
+                                placeholder="סינון לפי משתמש"
+                                allowClear
+                                onClear={handleClear}
+                                showSearch
+                                filterOption={(input, option) =>
+                                    (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                }
+                            >
+                                {uniqueTeachers.map(teacher => (
+                                    <Option key={teacher.value} value={teacher.value}>
+                                        {teacher.label}
+                                    </Option>
+                                ))}
+                            </Select>
+                        }
+                        <div>
+                            <Switch
+                                id="showFuture"
+                                className="mr-4 ml-4 mt-1"
+                                checkedChildren={'עתידי'}
+                                unCheckedChildren={'  עבר'}
+                                defaultChecked={showFuture}
+                                onChange={togglePastFuture}
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
                 <div className="flex flex-row">
                     <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={handleDelete} />
                     <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                     <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                 </div>
-            </div>
+                <div className="mt-4 ">
+                    <span id="selected-events-count" className="mr-4 ml-4 ">
+                        {showFuture && selectedRowKeysFuture.length > 0 && `נבחרו ${selectedRowKeysFuture.length} אירועים`}
+                        {!showFuture && selectedRowKeysPast.length > 0 && `נבחרו ${selectedRowKeysPast.length} אירועים`}
+                        {selectedRowKeysFuture.length === 0 && selectedRowKeysPast.length === 0 && <span>&nbsp;</span>}
+                    </span>
+                </div>
+            </header>
 
             <Table
                 rowSelection={rowSelection}
@@ -218,7 +226,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                     onExpand: handleExpand,
                 }}
             />
-        </div>
+        </section>
     );
 }
 
