@@ -68,6 +68,10 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
     console.log("Failed:", errorInfo);
   };
 
+  const clearImage = () => {
+    setImageUrl("");
+  };
+
   const cardWidth = width > 600 ? 500 : 300;
 
   return (
@@ -95,13 +99,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
           <Input />
         </Form.Item>
 
-        <Form.Item<FieldType>
-          label="הרשמה לרשימת תפוצה"
-          name="mailingList"
-          valuePropName="checked"
-        >
-          <Checkbox />
-        </Form.Item>
+
 
         <Form.Item<FieldType>
           label="קישור לדף פרופיל"
@@ -129,11 +127,11 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
           <Input />
         </Form.Item>
 
-        <Form.Item<FieldType> label="ביוגרפיה" name="bio">
+        <Form.Item<FieldType> label="אודות" name="bio">
           <Input.TextArea rows={6} />
         </Form.Item>
 
-        <Form.Item<FieldType>
+        {/* <Form.Item<FieldType>
           label="מספר פלאפון"
           name="phoneNumber"
           rules={[
@@ -144,21 +142,21 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
           ]}
         >
           <Input />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item<FieldType> label="תמונה" name="img">
           <div className="flex flex-col items-center space-y-2">
             <Image width={200} src={imageUrl} />
-            <Button
+            {/* <Button
               type="default"
               onClick={() => setImageUrl("")}
               className="bg-red-400 text-white"
             >
               Clear
-            </Button>
+            </Button> */}
           </div>
         </Form.Item>
-        <Form.Item<FieldType> label="תמונה" name="upload">
-          <CloudinaryUpload uploadNewImage={uploadNewImage} />
+        <Form.Item<FieldType> name="upload">
+          <CloudinaryUpload uploadNewImage={uploadNewImage} clearImage={clearImage} />
         </Form.Item>
         <Form.Item<FieldType>
           label="הצגת פרופיל"
@@ -167,7 +165,13 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
         >
           <Checkbox />
         </Form.Item>
-
+        <Form.Item<FieldType>
+          label="הרשמה לרשימת תפוצה"
+          name="mailingList"
+          valuePropName="checked"
+        >
+          <Checkbox />
+        </Form.Item>
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
           <Button type="primary" htmlType="submit">
             שמור

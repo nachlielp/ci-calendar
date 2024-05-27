@@ -2,6 +2,7 @@ import { Button } from "antd";
 import { useEffect, useRef } from "react";
 
 interface Cloudinary {
+  clearImage: (url: string) => void;
   createUploadWidget: (
     options: {
       cloud_name: string;
@@ -17,9 +18,11 @@ interface Cloudinary {
 
 interface ICloudinaryUploadProps {
   uploadNewImage: (url: string) => void;
+  clearImage: () => void;
 }
 export default function CloudinaryUpload({
   uploadNewImage,
+  clearImage,
 }: ICloudinaryUploadProps) {
   const cloudinaryRef = useRef<Cloudinary>();
   const widgetRef = useRef<any>();
@@ -48,5 +51,17 @@ export default function CloudinaryUpload({
       );
     }
   }, []);
-  return <Button onClick={() => widgetRef.current.open()}>Upload</Button>;
+  return (
+    <>
+      <Button type="primary" onClick={() => widgetRef.current.open()}>
+        Upload
+      </Button>
+      <Button
+        onClick={() => clearImage()}
+        className="bg-red-400 text-white mr-2"
+      >
+        Clear
+      </Button>
+    </>
+  );
 }
