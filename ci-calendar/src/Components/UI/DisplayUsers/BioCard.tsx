@@ -28,7 +28,7 @@ function BioCard() {
             href={currentUser.pageUrl.link}
             target="_blank"
           >
-            דף פרופיל
+            {currentUser.pageUrl.title || "דף פרופיל"}
           </Button>
         )}
       </Card>
