@@ -111,7 +111,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             dataIndex: 'owners',
             key: 'owners',
             render: (owners: { label: string }[]) => owners.map(owner => owner.label).join(', '),
-            responsive: ['xl', 'lg', 'md', 'sm'] as Breakpoint[]
+            responsive: ['xl', 'lg', 'md'] as Breakpoint[]
         },
         {
             title: 'תאריך',
@@ -136,7 +136,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             dataIndex: 'hide',
             key: 'hide',
             render: (hide: boolean) => hide ? <EyeInvisibleOutlined /> : <EyeOutlined />,
-            responsive: ['xl', 'lg', 'md', 'sm'] as Breakpoint[]
+            responsive: ['xl', 'lg', 'md'] as Breakpoint[]
         }
     ];
 
@@ -171,7 +171,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                                 ))}
                             </Select>
                         }
-                        <div>
+                        <div className="flex flex-row">
                             <Switch
                                 id="showFuture"
                                 className="mr-4 ml-4 mt-1"
