@@ -29,7 +29,6 @@ export enum EventAction {
 }
 
 export default function App() {
-  console.log("App");
   const { events, loading } = useEvents();
 
 
