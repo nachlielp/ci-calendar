@@ -22,11 +22,11 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const [teachersEvents, setTeachersEvents] = useState<IEvently[]>([]);
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<React.Key[]>([]);
     const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>([]);
-    const [teacherName, setTeacherName] = useState('');
+    const [teacherName, setTeacherName] = useState(undefined);
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
     useEffect(() => {
-        if (teacherName === '') {
+        if (teacherName === undefined) {
             setTeachersEvents(filteredEvents);
         } else {
             setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === teacherName)));
@@ -65,7 +65,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     };
 
     const handleClear = () => {
-        setTeacherName('');
+        setTeacherName(undefined);
         setTeachersEvents(filteredEvents);
     };
 
@@ -77,13 +77,13 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     }
     const onSelectTeacher = (value: string) => {
         const teacher = uniqueTeachers.find(teacher => teacher.value === value);
-        teacher ? setTeacherName(teacher.label) : setTeacherName('');
+        teacher ? setTeacherName(teacher.label) : setTeacherName(undefined);
         teacher ? setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.value === value))) : setTeachersEvents(filteredEvents);
 
-        if (teacherName !== "" && value !== undefined) {
+        if (teacherName !== undefined && value !== undefined) {
             setSelectedRowKeysFuture([]);
             setSelectedRowKeysPast([]);
-        } else if (teacherName === "" && value !== undefined && teacher) {
+        } else if (teacherName === undefined && value !== undefined && teacher) {
             setSelectedRowKeysFuture(selectedRowKeysFuture.filter(key => filteredEvents.some(event => event.id === key && event.owners.some(owner => owner.value === value))));
             setSelectedRowKeysPast(selectedRowKeysPast.filter(key => filteredEvents.some(event => event.id === key && event.owners.some(owner => owner.value === value))));
         }
@@ -152,7 +152,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                             style={{ width: '200px' }}
                             value={teacherName}
                             onChange={onSelectTeacher}
-                            placeholder="שם משתמשים או כתובת מייל"
+                            placeholder="סינון לפי משתמש"
                             allowClear
                             onClear={handleClear}
                             showSearch
