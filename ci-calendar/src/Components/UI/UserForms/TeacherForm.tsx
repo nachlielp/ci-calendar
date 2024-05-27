@@ -10,6 +10,7 @@ import {
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";
+import { useWindowSize } from "../../../hooks/useWindowSize";
 
 type FieldType = {
   name?: string;
@@ -27,6 +28,7 @@ interface ITeacherFormProps {
   handleSubmit: () => void;
 }
 export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
+  const { width } = useWindowSize();
   const { currentUser, updateUser } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
   const [imageUrl, setImageUrl] = useState<string>(currentUser.img);
@@ -66,8 +68,10 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
     console.log("Failed:", errorInfo);
   };
 
+  const cardWidth = width > 600 ? 500 : 300;
+
   return (
-    <Card className="max-w-[500px] mx-auto  mt-4">
+    <Card className={`max-w-[${cardWidth}px] mx-auto  mt-4`}>
       <Form
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
