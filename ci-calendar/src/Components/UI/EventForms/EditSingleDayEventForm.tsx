@@ -49,9 +49,14 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
   //TODO move to custom hook
   useEffect(() => {
     const fetchEvent = async () => {
-      if (eventId) {
-        const eventData = await getEvent(eventId);
-        setEventData(eventData);
+      try {
+        if (eventId) {
+          const eventData = await getEvent(eventId);
+          setEventData(eventData);
+        }
+      } catch (error) {
+        console.error("EditSingleDayEventForm.fetchEvent.error: ", error);
+        throw error;
       }
     };
     fetchEvent();
@@ -137,11 +142,21 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
     try {
       console.log("EventForm.handleSubmit.event: ", event);
       if (editType === EventAction.recycle) {
-        await createEvent(event);
-        navigate("/");
+        try {
+          await createEvent(event);
+          navigate("/");
+        } catch (error) {
+          console.error("EventForm.handleSubmit.createEvent.error: ", error);
+          throw error;
+        }
       } else {
-        await updateEvent(event.id, event);
-        navigate("/edit-events-list");
+        try {
+          await updateEvent(event.id, event);
+          navigate("/edit-events-list");
+        } catch (error) {
+          console.error("EventForm.handleSubmit.updateEvent.error: ", error);
+          throw error;
+        }
       }
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);

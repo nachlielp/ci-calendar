@@ -64,15 +64,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const initAuth = async () => {
-      unsubscribe = await onAuthChanged(async (user: User) => {
-        setLoading(false);
-        if (user) {
-          await getOrCreateDbUserByUser(user);
-        } else {
-          setCurrentUser(null);
-        }
-      });
-    };
+      try {
+        unsubscribe = await onAuthChanged(async (user: User) => {
+          setLoading(false);
+          if (user) {
+            await getOrCreateDbUserByUser(user);
+          } else {
+            setCurrentUser(null);
+          }
+        });
+      } catch (error) {
+        console.error("AuthContext.initAuth.error: ", error);
+      }
+    }
+
     initAuth();
 
     let unsubscribe = () => { };
@@ -82,17 +87,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   async function signup(signupData: IUserSignup) {
-    const signupRes = await signupEmail(signupData.email, signupData.password);
-    await getOrCreateDbUserByUser({
-      ...signupRes.user,
-      displayName: signupData.name,
-    });
-    return signupRes;
+    try {
+      const signupRes = await signupEmail(signupData.email, signupData.password);
+      await getOrCreateDbUserByUser({
+        ...signupRes.user,
+        displayName: signupData.name,
+      });
+      return signupRes;
+    } catch (error) {
+      console.error("AuthContext.signup.error: ", error);
+      throw error;
+    }
   }
 
   async function emailLogin(email: string, password: string) {
-    const signinRes = await signinEmail(email, password);
-    await getOrCreateDbUserByUser(signinRes.user);
+    try {
+      const signinRes = await signinEmail(email, password);
+      await getOrCreateDbUserByUser(signinRes.user);
+    } catch (error) {
+      console.error("AuthContext.emailLogin.error: ", error);
+      throw error;
+    }
   }
 
   async function logoutContext() {
@@ -151,45 +166,85 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function updateUser(user: DbUser) {
-    await updateDocument("users", user.id, user);
+    try {
+      await updateDocument("users", user.id, user);
+    } catch (error) {
+      console.error("AuthContext.updateUser.error: ", error);
+      throw error;
+    }
   }
   //TODO Update type
   async function createEvent(event: IEvently): Promise<void> {
-    await addDocument("events", event);
+    try {
+      await addDocument("events", event);
+    } catch (error) {
+      console.error("AuthContext.createEvent.error: ", error);
+      throw error;
+    }
   }
 
   async function deleteEvently(eventId: string) {
-    await removeDocument("events", eventId);
+    try {
+      await removeDocument("events", eventId);
+    } catch (error) {
+      console.error("AuthContext.deleteEvently.error: ", error);
+      throw error;
+    }
   }
 
   async function deleteMultipleEventlys(eventIds: string[]) {
-    await removeMultipleDocuments("events", eventIds);
+    try {
+      await removeMultipleDocuments("events", eventIds);
+    } catch (error) {
+      console.error("AuthContext.deleteMultipleEventlys.error: ", error);
+      throw error;
+    }
   }
 
   async function getEvent(eventId: string) {
-    const eventDoc = await getDocument("events", eventId);
-    if (eventDoc) {
-      return eventDoc as IEvently;
+    try {
+      const eventDoc = await getDocument("events", eventId);
+      if (eventDoc) {
+        return eventDoc as IEvently;
+      }
+      return null;
+    } catch (error) {
+      console.error("AuthContext.getEvent.error: ", error);
+      throw error;
     }
-    return null;
   }
 
   async function updateEvent(eventId: string, event: IEvently) {
-    await updateDocument("events", eventId, event);
+    try {
+      await updateDocument("events", eventId, event);
+    } catch (error) {
+      console.error("AuthContext.updateEvent.error: ", error);
+      throw error;
+    }
   }
 
   async function hideEvent(eventId: string, hide: boolean) {
-    const event = await getEvent(eventId);
-    if (event) {
-      event.hide = hide;
-      await updateEvent(eventId, event);
+    try {
+      const event = await getEvent(eventId);
+      if (event) {
+        event.hide = hide;
+        await updateEvent(eventId, event);
+      }
+    } catch (error) {
+      console.error("AuthContext.hideEvent.error: ", error);
+      throw error;
     }
   }
 
   async function hideOrShowMultipleEventlys(eventIds: string[], hide: boolean) {
     console.log("eventIds to hide: ", eventIds)
     eventIds.forEach(async (eventId) => {
-      await hideEvent(eventId, hide);
+      try {
+        await hideEvent(eventId, hide);
+      } catch (error) {
+        console.error("AuthContext.hideOrShowMultipleEventlys.error: ", error);
+        throw error;
+      }
     });
   }
 

@@ -14,9 +14,14 @@ export const useTeacherBio = ({ ids }: TeacherBio) => {
         const initTFirebase = async () => {
             let teachers: DbUser[] = [];
             for (const id of ids) {
-                const teacher = await firebaseService.getDocument('users', id);
-                if (teacher && teacher.showProfile) {
-                    teachers.push(teacher as DbUser);
+                try {
+                    const teacher = await firebaseService.getDocument('users', id);
+                    if (teacher && teacher.showProfile) {
+                        teachers.push(teacher as DbUser);
+                    }
+                } catch (error) {
+                    console.error("useTeacherBio.initTFirebase.error: ", error);
+                    throw error;
                 }
             }
             setTeachers(teachers);

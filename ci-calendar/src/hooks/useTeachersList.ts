@@ -7,9 +7,14 @@ export const useTeachersList = () => {
 
     useEffect(() => {
         const initTFirebase = async () => {
-            const teacheres = await firebaseService.getTeachersAndAdminsList();
-            setTeachers(teacheres);
-            setLoading(false);
+            try {
+                const teacheres = await firebaseService.getTeachersAndAdminsList();
+                setTeachers(teacheres);
+                setLoading(false);
+            } catch (error) {
+                console.error("useTeachersList.initTFirebase.error: ", error);
+                throw error;
+            }
         };
         initTFirebase();
     }, []);

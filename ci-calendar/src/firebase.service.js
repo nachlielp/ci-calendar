@@ -76,7 +76,7 @@ export async function signinGoogle() {
     const user = result.user;
     return user;
   } catch (error) {
-    console.log("firebaseService.signinGoogle.error: ", error);
+    console.error("firebaseService.signinGoogle.error: ", error);
     throw error;
   }
 }
@@ -86,7 +86,7 @@ export async function signupEmail(email, password, name) {
     const res = await createUserWithEmailAndPassword(auth, email, password);
     return res;
   } catch (error) {
-    console.log("firebaseService.signinEmail.error: ", error);
+    console.error("firebaseService.signinEmail.error: ", error);
     throw error;
   }
 }
@@ -96,7 +96,7 @@ export async function signinEmail(email, password) {
     const user = await signInWithEmailAndPassword(auth, email, password);
     return user;
   } catch (error) {
-    console.log("firebaseService.signinEmail.error: ", error);
+    console.error("firebaseService.signinEmail.error: ", error);
     throw error;
   }
 }
@@ -105,7 +105,7 @@ export async function resetEmailPassword(email) {
     const auth = getAuth();
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
-    console.log("firebaseService.resetPassword.error: ", error);
+    console.error("firebaseService.resetPassword.error: ", error);
     throw error;
   }
 }
@@ -115,7 +115,7 @@ export async function logout() {
     const auth = getAuth();
     await signOut(auth);
   } catch (error) {
-    console.log("firebaseService.logout.error: ", error);
+    console.error("firebaseService.logout.error: ", error);
     throw error;
   }
 }
@@ -141,7 +141,7 @@ export async function addDocument(collectionName, document) {
     await setDoc(docRef, document);
     return docRef;
   } catch (error) {
-    console.log(error);
+    console.error("firebaseService.addDocument.error: ", error);
     throw error;
   }
 }
@@ -156,7 +156,7 @@ export async function getDocument(collectionName, id) {
     }
     return docSnap.data();
   } catch (error) {
-    console.log(error);
+    console.error("firebaseService.getDocument.error: ", error);
     throw error;
   }
 }
@@ -168,7 +168,7 @@ export async function updateDocument(collectionName, id, document) {
       merge: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("firebaseService.updateDocument.error: ", error);
     throw error;
   }
 }
@@ -178,7 +178,7 @@ export async function removeDocument(collectionName, id) {
     const db = await getDb();
     await deleteDoc(doc(db, collectionName, id));
   } catch (error) {
-    console.log(error);
+    console.error("firebaseService.removeDocument.error: ", error);
     throw error;
   }
 }
@@ -190,7 +190,7 @@ export async function removeMultipleDocuments(collectionName, ids) {
       await deleteDoc(doc(db, collectionName, id));
     });
   } catch (error) {
-    console.log(error);
+    console.error("firebaseService.removeMultipleDocuments.error: ", error);
     throw error;
   }
 }
@@ -198,47 +198,57 @@ export async function removeMultipleDocuments(collectionName, ids) {
 export let gLastDocForPaging = null;
 
 export async function getDocuments(collectionName, filters) {
-  const db = await getDb();
-  let collectionRef = collection(db, collectionName);
+  try {
+    const db = await getDb();
+    let collectionRef = collection(db, collectionName);
 
-  if (filters.userId) {
-    collectionRef = query(collectionRef, where("id", "==", filters.userId));
-  }
-  if (filters.afterDate) {
-    collectionRef = query(collectionRef, where("startAt" > filters.afterDate));
-  }
-  if (filters.beforeDate) {
-    collectionRef = query(collectionRef, where("startAt" < filters.beforeDate));
-  }
+    if (filters.userId) {
+      collectionRef = query(collectionRef, where("id", "==", filters.userId));
+    }
+    if (filters.afterDate) {
+      collectionRef = query(collectionRef, where("startAt" > filters.afterDate));
+    }
+    if (filters.beforeDate) {
+      collectionRef = query(collectionRef, where("startAt" < filters.beforeDate));
+    }
 
-  const querySnapshot = await getDocs(collectionRef);
-  gLastDocForPaging = querySnapshot.docs[querySnapshot.docs.length - 1];
-  const docs = [];
-  querySnapshot.forEach((doc) => {
-    // console.log(`${doc.id} => ${JSON.stringify(doc.data())}`)
-    docs.push({ id: doc.id, ...doc.data() });
-  });
-  return docs;
+    const querySnapshot = await getDocs(collectionRef);
+    gLastDocForPaging = querySnapshot.docs[querySnapshot.docs.length - 1];
+    const docs = [];
+    querySnapshot.forEach((doc) => {
+      // console.log(`${doc.id} => ${JSON.stringify(doc.data())}`)
+      docs.push({ id: doc.id, ...doc.data() });
+    });
+    return docs;
+  } catch (error) {
+    console.error("firebaseService.getDocuments.error: ", error);
+    throw error;
+  }
 }
 
 export async function subscribeToCollection(collectionName, cb) {
-  const db = await getDb();
-  const unsubscribe = onSnapshot(
-    collection(db, collectionName),
-    (querySnapshot) => {
-      const docs = [];
-      querySnapshot.forEach((doc) => {
-        docs.push({ id: doc.id, ...doc.data() });
-      });
-      cb(docs);
-    }
-  );
-  return unsubscribe;
+  try {
+    const db = await getDb();
+    const unsubscribe = onSnapshot(
+      collection(db, collectionName),
+      (querySnapshot) => {
+        const docs = [];
+        querySnapshot.forEach((doc) => {
+          docs.push({ id: doc.id, ...doc.data() });
+        });
+        cb(docs);
+      }
+    );
+    return unsubscribe;
+  } catch (error) {
+    console.error("firebaseService.subscribeToCollection.error: ", error);
+    throw error;
+  }
 }
 
 export async function subscribeToDoc(docPath, cb) {
-  const db = await getDb();
   try {
+    const db = await getDb();
     const docRef = doc(db, docPath);
     const unsubscribe = onSnapshot(
       docRef,
