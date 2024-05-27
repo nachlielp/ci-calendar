@@ -63,6 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let unsubscribe = () => { };
     const initAuth = async () => {
       try {
         unsubscribe = await onAuthChanged(async (user: User) => {
@@ -80,7 +81,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     initAuth();
 
-    let unsubscribe = () => { };
     return () => {
       unsubscribe();
     };
