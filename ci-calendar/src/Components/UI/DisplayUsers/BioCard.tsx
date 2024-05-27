@@ -12,7 +12,7 @@ function BioCard() {
     ""
   );
   return (
-    <div className="bio-page">
+    <div className="flex justify-center items-center w-full ">
       <Card
         className=" mt-6  w-full"
         hoverable

@@ -67,8 +67,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
   };
 
   return (
-    <Card className="sm:max-w-[100px] mt-4">
-      {/* <Card className="max-w-[500px] w-full sm:max-w-5/10  mt-4"> */}
+    <Card className="max-w-[500px] mx-auto  mt-4">
       <Form
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
@@ -84,7 +83,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
           showProfile: currentUser.showProfile,
         }}
       >
-        {/* <Form.Item<FieldType>
+        <Form.Item<FieldType>
           label="שם מלא"
           name="name"
           rules={[{ required: true, message: "נא להזין שם" }]}
@@ -169,7 +168,7 @@ export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
           <Button type="primary" htmlType="submit">
             שמור
           </Button>
-        </Form.Item> */}
+        </Form.Item>
       </Form>
     </Card>
   );
