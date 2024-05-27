@@ -1,5 +1,5 @@
 import { DeleteOutlined, ExclamationCircleFilled } from "@ant-design/icons";
-import { Button, Modal, Space } from "antd";
+import { Button, Modal } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 
 const { confirm } = Modal;
