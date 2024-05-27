@@ -14,8 +14,6 @@ import dayjs from "dayjs";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
-    console.log('TEST')
-
     const { width } = useWindowSize();
     const { currentUser } = useAuthContext()
     const uid = useMemo(() => currentUser?.userType === 'teacher' ? [currentUser.id] : [], [currentUser]);
@@ -50,6 +48,9 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const adjustedItemWidth = Math.min(width / 1.5, 500);
 
+    const isPhone = width < 600;
+
+    const tableWidth = isPhone ? width * 0.9 : width * 0.5;
 
     const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
         if (showFuture) {
@@ -143,42 +144,49 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
 
     return (
-        <div className=" m-4">
-            <div className="flex flex-row justify-end mb-4 mr-4">
-                {currentUser && currentUser.userType === UserType.admin &&
-                    <Select
-                        style={{ width: "20%" }}
-                        value={teacherName}
-                        onChange={onSelectTeacher}
-                        placeholder="שם משתמשים או כתובת מייל"
-                        allowClear
-                        onClear={handleClear}
-                        showSearch
-                        filterOption={(input, option) =>
-                            (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                    >
-                        {uniqueTeachers.map(teacher => (
-                            <Option key={teacher.value} value={teacher.value}>
-                                {teacher.label}
-                            </Option>
-                        ))}
-                    </Select>
-                }
-                <span id="selected-events-count" className="mr-4 ml-4 ">
-                    {showFuture && selectedRowKeysFuture.length > 0 && `נבחרו ${selectedRowKeysFuture.length} אירועים`}
-                    {!showFuture && selectedRowKeysPast.length > 0 && `נבחרו ${selectedRowKeysPast.length} אירועים`}
-                </span>
-                <Switch
-                    className="mr-4"
-                    checkedChildren={'עתידי'}
-                    unCheckedChildren={'עבר'}
-                    defaultChecked={showFuture}
-                    onChange={togglePastFuture}
-                />
-                <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={handleDelete} />
-                <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
-                <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+        <div className={`max-w-[${tableWidth}px] mx-auto m-4`}>
+            <div className={`flex ${isPhone ? 'flex-col items-center' : 'flex-row'} justify-center mb-4 mr-4`}>                <div className="flex flex-row">
+                <div className="flex flex-row mb-4">
+                    {currentUser && currentUser.userType === UserType.admin &&
+                        <Select
+                            style={{ width: '200px' }}
+                            value={teacherName}
+                            onChange={onSelectTeacher}
+                            placeholder="שם משתמשים או כתובת מייל"
+                            allowClear
+                            onClear={handleClear}
+                            showSearch
+                            filterOption={(input, option) =>
+                                (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                        >
+                            {uniqueTeachers.map(teacher => (
+                                <Option key={teacher.value} value={teacher.value}>
+                                    {teacher.label}
+                                </Option>
+                            ))}
+                        </Select>
+                    }
+                    <span id="selected-events-count" className="mr-4 ml-4 ">
+                        {showFuture && selectedRowKeysFuture.length > 0 && `נבחרו ${selectedRowKeysFuture.length} אירועים`}
+                        {!showFuture && selectedRowKeysPast.length > 0 && `נבחרו ${selectedRowKeysPast.length} אירועים`}
+                    </span>
+
+
+                    <Switch
+                        className="mr-4"
+                        checkedChildren={'עתידי'}
+                        unCheckedChildren={'עבר'}
+                        defaultChecked={showFuture}
+                        onChange={togglePastFuture}
+                    />
+                </div>
+            </div>
+                <div className="flex flex-row">
+                    <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={handleDelete} />
+                    <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                    <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                </div>
             </div>
 
             <Table
