@@ -1,6 +1,7 @@
 import { Button, Checkbox, Form, type FormProps, Input, Card } from "antd";
 import { DbUser } from "../../../util/interfaces";
 import { useAuthContext } from "../../Auth/AuthContext";
+import { useWindowSize } from "../../../hooks/useWindowSize";
 
 type FieldType = {
   name?: string;
@@ -13,6 +14,10 @@ interface IUserFormProps {
 }
 export default function UserForm({ user }: IUserFormProps) {
   const { updateUser } = useAuthContext();
+  const { width } = useWindowSize();
+
+  const cardWidth = width > 600 ? 500 : 300;
+  // const cardWidth = 150
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     user.fullName = values.name || user.fullName;
@@ -20,7 +25,8 @@ export default function UserForm({ user }: IUserFormProps) {
     user.subscribedForUpdatesAt = user.newsletter
       ? new Date().toISOString()
       : "";
-    user.phoneNumber = values.phoneNumber || user.phoneNumber;
+    user.phoneNumber = values.phoneNumber || "";
+    console.log(user)
     try {
       await updateUser(user);
     } catch (error) {
@@ -34,55 +40,60 @@ export default function UserForm({ user }: IUserFormProps) {
     console.log("Failed:", errorInfo);
   };
   return (
-    <Card className="max-w-[500px] mx-auto  mt-4">
-      <Form
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
-        initialValues={{
-          name: user.fullName,
-          mailingList: user.newsletter,
-          phoneNumber: user.phoneNumber,
-        }}
-      >
-        <Form.Item<FieldType>
-          label="שם מלא"
-          name="name"
-          rules={[{ required: true, message: "נא להזין שם" }]}
+    <div className="flex justify-center">
+      <Card style={{ maxWidth: cardWidth, marginTop: '1rem' }} id="user-form">
+        <Form
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+          autoComplete="off"
+          initialValues={{
+            name: user.fullName,
+            mailingList: user.newsletter,
+            phoneNumber: user.phoneNumber,
+          }}
         >
-          <Input />
-        </Form.Item>
+          <Form.Item<FieldType>
+            label="שם"
+            name="name"
+            rules={[{ required: true, message: "נא להזין שם" }]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item<FieldType>
-          label="הרשמה לרשימת תפוצה"
-          name="mailingList"
-          valuePropName="checked"
-        >
-          <Checkbox />
-        </Form.Item>
+          <Form.Item<FieldType>
+            label="הרשמה לרשימת תפוצה"
+            name="mailingList"
+            valuePropName="checked"
+          >
+            <Checkbox />
+          </Form.Item>
 
-        <Form.Item<FieldType>
-          label="מספר פלאפון"
-          name="phoneNumber"
-          rules={[
-            ({ getFieldValue }) => ({
-              required: getFieldValue("mailingList"),
-              message: "נא להזין מספר טלפון",
-            }),
-            {
-              pattern: /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
-              message: "נא להזין מספר טלפון ישראלי תקני",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
-            שמור
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          <Form.Item shouldUpdate={(prevValues, currentValues) => prevValues.mailingList !== currentValues.mailingList}>
+            {({ getFieldValue }) =>
+              getFieldValue("mailingList") ? (
+                <Form.Item<FieldType>
+                  label="מספר פלאפון"
+                  name="phoneNumber"
+                  rules={[
+                    { required: true, message: "נא להזין מספר טלפון" },
+                    {
+                      pattern: /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
+                      message: "נא להזין מספר טלפון ישראלי תקני",
+                    },
+                  ]}
+                >
+                  <Input />
+                </Form.Item>
+              ) : null
+            }
+          </Form.Item>
+          <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+            <Button type="primary" htmlType="submit">
+              שמור
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
   );
 }
