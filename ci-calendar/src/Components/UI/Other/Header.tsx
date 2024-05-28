@@ -51,51 +51,52 @@ export default function Header() {
     }
   };
   return (
-    <div className="container mx-auto px-0">
-      <div className="flex h-14 w-full shrink-0 items-center px-4 md:px-6 bg-white sticky top-0">
-        {currentUser && (
-          <Button
-            className=" flex items-center justify-center text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-            onClick={handleLogOut}
-          >
-            <LogoutOutlined />
-          </Button>
-        )}
-        {!currentUser && currentPath !== "/login" && (
+    <section className="header-container">
+      {currentUser && (
+        <Button
+          // className=" flex items-center justify-center text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+          className="header-btn primary"
+          onClick={handleLogOut}
+        >
+          <LogoutOutlined />
+        </Button>
+      )}
+      {!currentUser && currentPath !== "/login" && (
+        <LinkButton
+          to="/login"
+          // className="text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+          className="header-btn primary"
+        >
+          <LoginOutlined />
+        </LinkButton>
+      )}
+
+      {currentUser && <UserInfo currentUser={currentUser} />}
+      <FilterModel />
+      {currentPath !== "/" ? (
+        // <LinkButton to="/" className="text-black text-sm mr-2 font-semibold">
+        <LinkButton to="/" className="header-btn">
+          <HomeOutlined />
+        </LinkButton>
+      ) : (
+        <Button
+          onClick={handleViewChange}
+          type={viewCurrentValues.length ? "primary" : "default"}
+        >
+          <TfiLayoutAccordionMerged />
+        </Button>
+      )}
+      {currentUser && (
+        <div className="ml-auto flex ">
           <LinkButton
-            to="/login"
+            to={settingsPage}
             className="text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
           >
-            <LoginOutlined />
+            <SettingOutlined />
           </LinkButton>
-        )}
-
-        {currentUser && <UserInfo currentUser={currentUser} />}
-        <FilterModel />
-        {currentPath !== "/" ? (
-          <LinkButton to="/" className="text-black text-sm mr-6 sm:mr-2 font-semibold">
-            <HomeOutlined />
-          </LinkButton>
-        ) : (
-          <Button
-            onClick={handleViewChange}
-            type={viewCurrentValues.length ? "primary" : "default"}
-          >
-            <TfiLayoutAccordionMerged />
-          </Button>
-        )}
-        {currentUser && (
-          <div className="ml-auto flex ">
-            <LinkButton
-              to={settingsPage}
-              className="text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-            >
-              <SettingOutlined />
-            </LinkButton>
-          </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </section>
   );
 }
 
