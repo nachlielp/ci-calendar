@@ -55,7 +55,7 @@ export default function Header() {
       <div className="flex h-14 w-full shrink-0 items-center px-4 md:px-6 bg-white sticky top-0">
         {currentUser && (
           <Button
-            className=" flex items-center justify-center text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+            className=" flex items-center justify-center text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
             onClick={handleLogOut}
           >
             <LogoutOutlined />
@@ -64,7 +64,7 @@ export default function Header() {
         {!currentUser && currentPath !== "/login" && (
           <LinkButton
             to="/login"
-            className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+            className="text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
           >
             <LoginOutlined />
           </LinkButton>
@@ -73,7 +73,7 @@ export default function Header() {
         {currentUser && <UserInfo currentUser={currentUser} />}
         <FilterModel />
         {currentPath !== "/" ? (
-          <LinkButton to="/" className="text-black text-sm mr-6 font-semibold">
+          <LinkButton to="/" className="text-black text-sm mr-6 sm:mr-2 font-semibold">
             <HomeOutlined />
           </LinkButton>
         ) : (
@@ -88,7 +88,7 @@ export default function Header() {
           <div className="ml-auto flex ">
             <LinkButton
               to={settingsPage}
-              className="text-white text-sm mr-6 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
+              className="text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
             >
               <SettingOutlined />
             </LinkButton>
