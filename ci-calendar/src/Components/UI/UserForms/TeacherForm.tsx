@@ -27,6 +27,7 @@ type FieldType = {
 interface ITeacherFormProps {
   handleSubmit: () => void;
 }
+//TODO add cropper (react-easy-crop)
 export default function TeacherForm({ handleSubmit }: ITeacherFormProps) {
   const { width } = useWindowSize();
   const { currentUser, updateUser } = useAuthContext();
