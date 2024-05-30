@@ -65,7 +65,7 @@ export const SingleDayEventCard = React.forwardRef<
       <div className="flex flex-col sm:flex-col sm:items-right">
         {isEdit ?
           <div className="block font-bold text-lg  w-full sm:w-auto">{event.title}&nbsp;</div>
-          : <SingleDayModalCard event={event} cardWidth={cardWidth} />
+          : <SingleDayModalCard event={event} />
         }
         <div className="block w-full sm:w-auto">
           {getTypes(
