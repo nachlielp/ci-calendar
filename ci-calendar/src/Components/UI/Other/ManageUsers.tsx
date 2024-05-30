@@ -79,21 +79,22 @@ function ManageUsers() {
   const cardWidth = Math.min(width * 0.9, 500);
 
   const makeAdmin = (
-    <Button disabled={selectedUser?.userType === "admin"} onClick={onMakeAdmin}>
-      הגדר כמנהל
+    <Button disabled={selectedUser?.userType === "admin"} onClick={onMakeAdmin} className="h-16">
+      הגדר<br />כמנהל
     </Button>
   );
   const makeTeacher = (
     <Button
       disabled={selectedUser?.userType === "teacher"}
       onClick={onMakeTeacher}
+      className="h-16"
     >
-      הגדר כמורה
+      הגדר<br />כמורה
     </Button>
   );
   const makeUser = (
-    <Button disabled={selectedUser?.userType === "user"} onClick={onMakeUser}>
-      הגדר כמשתמש
+    <Button disabled={selectedUser?.userType === "user"} onClick={onMakeUser} className="h-16">
+      הגדר<br />כמשתמש
     </Button>
   );
   const footer = selectedUser ? [makeAdmin, makeTeacher, makeUser] : [];
