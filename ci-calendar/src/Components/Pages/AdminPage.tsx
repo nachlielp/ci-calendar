@@ -5,10 +5,10 @@ function AdminPage() {
     <div className="flex flex-col sm:flex-row items-center justify-center mt-10">
       <div className="flex flex-row items-center justify-center">
         <LinkButton to="/bio" className="w-24 h-24 m-4">
-          פרופיל אישי
+          פרופיל <br />אישי
         </LinkButton>
         <LinkButton to="/manage-events" className="w-24 h-24 m-4">
-          עריכת אירועים
+          עריכת<br /> אירועים
         </LinkButton>
       </div>
       <div className="flex flex-row items-center justify-center">
