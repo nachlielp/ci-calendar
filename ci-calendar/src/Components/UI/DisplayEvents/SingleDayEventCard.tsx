@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, Tag, Button } from "antd";
 import dayjs from "dayjs";
 import DeleteEvent from "../Other/DeleteEvent";
@@ -10,6 +10,7 @@ import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import { EventlyType, IEvently } from "../../../util/interfaces";
 import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
 import { Icon } from "../Other/Icon";
+import SingleDayModalCard from "./SingleDayModalCard";
 // import expand from "../../../assets/expand.svg";
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -21,8 +22,6 @@ export const SingleDayEventCard = React.forwardRef<
   HTMLDivElement,
   ISingleDayEventCardProps
 >(({ event, cardWidth, isEdit }, ref) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const openGoogleMaps = (placeId: string, address: string) => {
     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
     const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
@@ -64,12 +63,10 @@ export const SingleDayEventCard = React.forwardRef<
       actions={footer}
     >
       <div className="flex flex-col sm:flex-col sm:items-right">
-        <header className="flex flex-row justify-between" onClick={() => setIsExpanded(!isExpanded)}>
-          <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
-          <Button className="no-border p-0" type="link" onClick={() => setIsExpanded(!isExpanded)}>
-            {isExpanded ? <Icon icon="collapse" className="w-6 h-6 text-black rotate-90" /> : <Icon icon="expand" className="w-6 h-6 text-black rotate-90" />}
-          </Button>
-        </header>
+        {isEdit ?
+          <div className="block font-bold text-lg  w-full sm:w-auto">{event.title}&nbsp;</div>
+          : <SingleDayModalCard event={event} cardWidth={cardWidth} />
+        }
         <div className="block w-full sm:w-auto">
           {getTypes(
             Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
@@ -90,7 +87,7 @@ export const SingleDayEventCard = React.forwardRef<
               <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
               {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
               {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-              {!isExpanded && <>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
+              {!isEdit && <>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
                 const isTeacher = teachers.find((t) => t.id === teacher.value);
                 return isTeacher ? <BioModal user={isTeacher} /> : teacher.label;
               })}</>}
@@ -101,7 +98,7 @@ export const SingleDayEventCard = React.forwardRef<
         </p>
       </div>
 
-      {isExpanded && subEventLen > 0 &&
+      {isEdit && subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
             <Icon icon="hov" className="w-3 h-3 mt-1 mr-1 align-middle" />
@@ -146,7 +143,7 @@ export const SingleDayEventCard = React.forwardRef<
         </button>
       </div>
 
-      {isExpanded && !isWhiteSpace(event.description) && (
+      {isEdit && !isWhiteSpace(event.description) && (
         <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
           <Icon icon="description" className="w-5 h-5 mt-1align-middle" />
           <p>{event.description}</p>
@@ -184,7 +181,7 @@ export const SingleDayEventCard = React.forwardRef<
   );
 });
 
-const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
+export const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
   let types = Array.from(new Set([...t1, ...(t2 || [])]));
   t2?.forEach((element) => {
     if (!types.includes(element)) {
@@ -197,13 +194,13 @@ const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
       .map((type) => eventTypes.find((et) => et.value === type)?.label) || []
   );
 };
-const getType = (type: EventlyType) => {
+export const getType = (type: EventlyType) => {
   return eventTypes.find((et) => et.value === type)?.label;
 };
-const getTag = (tag: string) => {
+export const getTag = (tag: string) => {
   return tagOptions.find((t) => t.value === tag)?.label;
 };
-const isWhiteSpace = (str: string) => {
+export const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
 };
 export const getEventTeachersIds = (event: IEvently) => {
