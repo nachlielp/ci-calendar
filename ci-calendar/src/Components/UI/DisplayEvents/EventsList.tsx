@@ -51,6 +51,9 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
           )}
         </div>
       ))}
+      <div className="flex justify-center items-center w-full h-12">
+
+      </div>
       {/* <VirtualList
         className="flex justify-center items-center w-full"
         data={filteredEvents}
