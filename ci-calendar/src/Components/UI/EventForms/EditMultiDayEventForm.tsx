@@ -147,10 +147,10 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
     try {
       if (editType === EventAction.recycle) {
         await createEvent(event);
-        navigate("/");
+        navigate("/manage-events");
       } else {
         await updateEvent(eventData.id, event);
-        navigate("/edit-events-list");
+        navigate("/manage-events");
       }
     } catch (error) {
       console.error("EventForm.handleSubmit.error: ", error);
@@ -161,7 +161,7 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
   const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
 
   return (
-    <Card className="max-w-[500px] mx-auto mt-4">
+    <Card className="max-w-[500px] mx-auto mt-4" >
       <Form
         form={form}
         variant="filled"
@@ -175,7 +175,7 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
           schedule={schedule}
           address={address}
         />
-        {schedule && (
+        {schedule && dates && (
           <Form.List name="days">
             {(days, { add, remove }) => (
               <>
@@ -187,6 +187,10 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
                       remove={remove}
                       teachers={teachers}
                       form={form}
+                      limits={{
+                        start: dates[0],
+                        end: dates[1],
+                      }}
                     />
                   </div>
                 ))}

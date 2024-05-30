@@ -144,7 +144,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       if (editType === EventAction.recycle) {
         try {
           await createEvent(event);
-          navigate("/");
+          navigate("/manage-events");
         } catch (error) {
           console.error("EventForm.handleSubmit.createEvent.error: ", error);
           throw error;
@@ -152,7 +152,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       } else {
         try {
           await updateEvent(event.id, event);
-          navigate("/edit-events-list");
+          navigate("/manage-events");
         } catch (error) {
           console.error("EventForm.handleSubmit.updateEvent.error: ", error);
           throw error;
