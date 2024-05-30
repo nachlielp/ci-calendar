@@ -1,11 +1,10 @@
 import { Button, Checkbox, Form, type FormProps, Input, Card } from "antd";
 import { DbUser } from "../../../util/interfaces";
 import { useAuthContext } from "../../Auth/AuthContext";
-import { useWindowSize } from "../../../hooks/useWindowSize";
 
 type FieldType = {
-  name?: string;
-  mailingList?: string;
+  name: string;
+  mailingList: string;
   phoneNumber?: string;
 };
 
@@ -14,10 +13,6 @@ interface IUserFormProps {
 }
 export default function UserForm({ user }: IUserFormProps) {
   const { updateUser } = useAuthContext();
-  const { width } = useWindowSize();
-
-  const cardWidth = width > 600 ? 500 : 300;
-  // const cardWidth = 150
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     user.fullName = values.name || user.fullName;
@@ -39,9 +34,10 @@ export default function UserForm({ user }: IUserFormProps) {
   ) => {
     console.log("Failed:", errorInfo);
   };
+
   return (
     <div className="flex justify-center">
-      <Card style={{ maxWidth: cardWidth, marginTop: '1rem' }} id="user-form">
+      <Card style={{ width: 300, marginTop: '1rem' }} id="user-form">
         <Form
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
