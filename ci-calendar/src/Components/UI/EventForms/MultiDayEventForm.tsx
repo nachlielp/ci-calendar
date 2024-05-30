@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { Button, Card, Form } from "antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { PlusOutlined } from "@ant-design/icons";
 import "../../../styles/overrides.css";
 import { v4 as uuidv4 } from "uuid";
 
@@ -24,6 +23,7 @@ import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
+import { Icon } from "../Other/Icon";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -192,8 +192,8 @@ export default function MultiDayEventForm() {
                   </div>
                 ))}
                 <div className="flex items-center justify-center mt-2">
-                  <Button onClick={() => add()} block>
-                    <PlusOutlined /> הוסף יום
+                  <Button className="w-1/2" onClick={() => add()} block>
+                    <Icon icon="addCircle" title="הוסף יום" />
                   </Button>
                 </div>
               </>

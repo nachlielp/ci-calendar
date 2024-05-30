@@ -1,5 +1,5 @@
 import { Card, Row, Col, Form, Input, Button } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Icon } from "../Other/Icon";
 
 export default function AddLinksForm() {
   return (
@@ -40,18 +40,15 @@ export default function AddLinksForm() {
 
               <div className="flex items-center justify-center">
                 <Button onClick={() => remove(name)}>
-                  <span className="text-red-500">
-                    <MinusCircleOutlined />
-                    הסר קישור
-                  </span>
+                  <Icon icon="doNotDisturb" title="הסר קישור" />
                 </Button>
               </div>
             </Card>
           ))}
           <div className="flex items-center justify-center mt-2">
             <Button className="w-1/2" onClick={() => add()} block>
-              <span>
-                <PlusOutlined /> הוסף קישור
+              <span className="inline-flex items-center">
+                <Icon icon="addCircle" className="mr-2" title="הוסף קישור" />
               </span>
             </Button>
           </div>

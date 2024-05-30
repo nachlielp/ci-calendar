@@ -1,6 +1,6 @@
 import { Form, Select, Button, Card, Row, Col, TimePicker } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { eventTypes, tagOptions } from "../../../util/options";
+import { Icon } from "../Other/Icon";
 
 interface ISubEventsFormProps {
   form: any;
@@ -72,18 +72,14 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
 
               <div className="flex items-center justify-center">
                 <Button onClick={() => remove(name)}>
-                  <span className="text-red-500">
-                    <MinusCircleOutlined /> הסר תת ארוע
-                  </span>
+                  <Icon icon="doNotDisturb" title="הסר תת ארוע" />
                 </Button>
               </div>
             </Card>
           ))}
           <div className="flex items-center justify-center mt-2">
             <Button className="w-1/2" onClick={() => { add(); form.setFieldsValue({ newSubTeacher: "" }) }} block>
-              <span>
-                <PlusOutlined /> הוסף תת ארוע
-              </span>
+              <Icon icon="addCircle" title="הוסף תת ארוע" />
             </Button>
           </div>
         </>

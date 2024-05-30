@@ -18,8 +18,11 @@ import visibilityOff from '../../../assets/visibilityOff.svg';
 import edit from '../../../assets/edit.svg';
 import deleteIcon from '../../../assets/delete.svg';
 import warning from '../../../assets/warning.svg';
+import doNotDisturb from '../../../assets/doNotDisturb.svg';
+import info from '../../../assets/info.svg';
+import addCircle from '../../../assets/addCircle.svg';
 
-export const Icon = ({ icon, className }: { icon: string; className?: string }) => {
+export const Icon = ({ icon, className, title }: { icon: string; className?: string, title?: string }) => {
     const icons: { [key: string]: string } = {
         expand,
         hov,
@@ -41,6 +44,9 @@ export const Icon = ({ icon, className }: { icon: string; className?: string }) 
         edit,
         deleteIcon,
         warning,
+        doNotDisturb,
+        info,
+        addCircle,
     };
-    return <img src={icons[icon]} alt="Icon" className={className} />;
+    return <div className="flex inline-flex items-center gap-2"><img src={icons[icon]} alt="Icon" className={className} />{title}</div>;
 };

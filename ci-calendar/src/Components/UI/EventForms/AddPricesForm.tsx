@@ -1,5 +1,5 @@
 import { Form, Input, Button, Card, Row, Col, InputNumber } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { Icon } from "../Other/Icon";
 
 export default function AddPricesForm() {
   return (
@@ -40,19 +40,14 @@ export default function AddPricesForm() {
 
               <div className="flex items-center justify-center">
                 <Button onClick={() => remove(name)}>
-                  <span className="text-red-500">
-                    <MinusCircleOutlined />
-                    הסר מחיר
-                  </span>
+                  <Icon icon="doNotDisturb" title="הסר מחיר" />
                 </Button>
               </div>
             </Card>
           ))}
           <div className="flex items-center justify-center mt-2">
             <Button className="w-1/2" onClick={() => add()} block>
-              <span>
-                <PlusOutlined /> הוסף מחיר
-              </span>
+              <Icon icon="addCircle" title="הוסף מחיר" />
             </Button>
           </div>
         </>

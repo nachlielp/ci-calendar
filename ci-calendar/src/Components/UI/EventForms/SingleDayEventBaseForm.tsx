@@ -11,9 +11,7 @@ import {
   List,
   TimePicker,
 } from "antd";
-import {
-  InfoCircleOutlined,
-} from "@ant-design/icons";
+
 import VirtualList from "rc-virtual-list";
 import GooglePlacesInput, {
   IGooglePlaceOption,
@@ -28,6 +26,7 @@ import {
   repeatEventTooltip,
 } from "./SingleDayEventForm";
 import { IAddress } from "../../../util/interfaces";
+import { Icon } from "../Other/Icon";
 
 interface ISingleDayEventBaseFormProps {
   form: any;
@@ -58,7 +57,7 @@ export default function SingleDayEventBaseForm({
 }: ISingleDayEventBaseFormProps) {
   return (
     <>
-      <Card className="mt-4 border-4">
+      <Card className="mt-4 border-4" title={<span className="flex flex-row gap-2">ארוע חד יומי</span>}>
         <Form.Item
           label="כותרת"
           name="event-title"
@@ -109,8 +108,9 @@ export default function SingleDayEventBaseForm({
               className="mt-4"
               label={
                 <Tooltip title={repeatEventTooltip}>
-                  חזרה &nbsp;
-                  <InfoCircleOutlined />
+                  <span>
+                    <Icon icon="info" title="חזרה" />
+                  </span>
                 </Tooltip>
               }
               name="event-repeat"

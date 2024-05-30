@@ -11,7 +11,7 @@ import {
 import dayjs from "dayjs";
 import { eventTypes, tagOptions } from "../../../util/options";
 import SubEventsForm from "./SubEventsForm";
-import { MinusCircleOutlined } from "@ant-design/icons";
+import { Icon } from "../Other/Icon";
 
 interface IBaseEventFormProps {
   day: number;
@@ -106,7 +106,7 @@ export default function MultiDayEventSubEventsForm({
       <div className="flex items-center justify-center mt-4">
         <Button onClick={() => remove(day)}>
           <span className="text-red-500">
-            <MinusCircleOutlined /> הסר יום
+            <Icon icon="doNotDisturb" title="הסר יום" />
           </span>
         </Button>
       </div>

@@ -9,13 +9,13 @@ import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
 import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
-import { PlusOutlined } from "@ant-design/icons";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
 import { reverseFormatTeachers } from "./EditSingleDayEventForm";
 import { EventAction } from "../../../App";
 import { v4 as uuidv4 } from "uuid";
+import { Icon } from "../Other/Icon";
 
 export default function EditMultiDayEventForm({ editType }: { editType: EventAction }) {
   const { teachers } = useTeachersList();
@@ -192,7 +192,7 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
                 ))}
                 <div className="flex items-center justify-center mt-2">
                   <Button onClick={() => add()} block>
-                    <PlusOutlined /> הוסף יום
+                    <Icon icon="addCircle" title="הוסף יום" />
                   </Button>
                 </div>
               </>
