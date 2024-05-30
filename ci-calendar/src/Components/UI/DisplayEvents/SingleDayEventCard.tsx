@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Tag, Button } from "antd";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
@@ -13,6 +13,7 @@ import BioModal from "../DisplayUsers/BioModal";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import { EventlyType, IEvently } from "../../../util/interfaces";
 import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
+import { ExpandAltOutlined, ShrinkOutlined } from "@ant-design/icons";
 
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -24,6 +25,8 @@ export const SingleDayEventCard = React.forwardRef<
   HTMLDivElement,
   ISingleDayEventCardProps
 >(({ event, cardWidth, isEdit }, ref) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const openGoogleMaps = (placeId: string, address: string) => {
     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
     const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
@@ -61,12 +64,16 @@ export const SingleDayEventCard = React.forwardRef<
     <Card
       ref={ref}
       className="mt-4"
-
       style={{ width: cardWidth }}
       actions={footer}
     >
       <div className="flex flex-col sm:flex-col sm:items-right">
-        <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
+        <header className="flex flex-row " onClick={() => setIsExpanded(!isExpanded)}>
+          <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
+          <Button className="no-border p-0" type="link" >
+            {isExpanded ? <ShrinkOutlined className="text-2xl rotate-90" /> : <ExpandAltOutlined className="text-2xl rotate-90" />}
+          </Button>
+        </header>
         <div className="block w-full sm:w-auto">
           {getTypes(
             Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
@@ -86,7 +93,11 @@ export const SingleDayEventCard = React.forwardRef<
             <>
               <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
               {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
-              {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}{" "}
+              {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
+              {!isExpanded && <>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
+                const isTeacher = teachers.find((t) => t.id === teacher.value);
+                return isTeacher ? <BioModal user={isTeacher} /> : teacher.label;
+              })}</>}
             </>
           ) : (
             <span>No event times available</span>
@@ -94,7 +105,7 @@ export const SingleDayEventCard = React.forwardRef<
         </p>
       </div>
 
-      {subEventLen > 0 &&
+      {isExpanded && subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
             <VscDebugBreakpointLog className="text-blue-500 text-lg align-middle" />
@@ -139,7 +150,7 @@ export const SingleDayEventCard = React.forwardRef<
         </button>
       </div>
 
-      {!isWhiteSpace(event.description) && (
+      {isExpanded && !isWhiteSpace(event.description) && (
         <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
           <MdOutlineDescription className="text-lg align-middle" />
           <p>{event.description}</p>

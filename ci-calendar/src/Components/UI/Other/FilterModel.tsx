@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Checkbox, Modal } from "antd";
-import { FilterOutlined } from "@ant-design/icons";
+import { ControlOutlined, FilterOutlined } from "@ant-design/icons";
 import { eventTypes, districtOptions } from "../../../util/options";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 
@@ -33,7 +33,7 @@ export default function FilterModel() {
         onClick={() => setModalOpen(true)}
         className="flex items-center justify-center mr-4"
       >
-        <FilterOutlined />
+        <ControlOutlined />
       </Button>
       <Modal
         open={modalOpen}

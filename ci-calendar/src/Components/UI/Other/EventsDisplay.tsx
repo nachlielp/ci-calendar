@@ -8,6 +8,13 @@ import EventsList from "../DisplayEvents/EventsList";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
+import FilterModel from "./FilterModel";
+import { Button } from "antd";
+import { TfiLayoutAccordionMerged } from "react-icons/tfi";
+import { viewOptions } from "../../../util/options";
+import { useParamsHandler } from "../../../hooks/useParamsHandler";
+import { CiCalendarDate } from "react-icons/ci";
+import { BsViewList } from "react-icons/bs";
 
 interface IEventsDisplayProps {
   events: IEvently[];
@@ -16,7 +23,11 @@ interface IEventsDisplayProps {
 
 function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
-
+  const {
+    currentValues: viewCurrentValues,
+    onOptionsChange,
+    clearSearchParams,
+  } = useParamsHandler({ title: "view", options: viewOptions });
   useEffect(() => {
     const futureEvents = events.filter((event) => dayjs(event.dates["endDate"]).isAfter(dayjs().startOf('day')));
     setFutureEvents(futureEvents);
@@ -40,8 +51,34 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
       dayjs(selectedDay).isBetween(dayjs(event.dates["startDate"]), dayjs(event.dates["endDate"]), "day", "[]"));
     setTodaysEvents(todaysEvents);
   }, [selectedDay]);
+
+  const handleViewChange = () => {
+    if (viewCurrentValues.length === 0) {
+      onOptionsChange("view")(["calendar"]);
+    } else {
+      clearSearchParams(["view"]);
+    }
+  };
   return (
     <>
+      <header className="flex flex-col justify-center items-center mt-5">
+        <h1 className="text-2xl mb-3">קונטקט ישראל</h1>
+        <main className="flex flex-row items-center">
+          <FilterModel />
+          <Button
+            onClick={handleViewChange}
+            type={viewCurrentValues.length ? "default" : "primary"}
+          >
+            <BsViewList className="text-2xl" />
+          </Button>
+          <Button
+            onClick={handleViewChange}
+            type={viewCurrentValues.length ? "primary" : "default"}
+          >
+            <CiCalendarDate className="text-2xl" />
+          </Button>
+        </main>
+      </header>
       {view === "calendar" ? (
         <>
           <CalendarView

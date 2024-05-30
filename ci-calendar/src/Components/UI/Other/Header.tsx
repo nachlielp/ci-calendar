@@ -15,6 +15,7 @@ import FilterModel from "./FilterModel";
 import { DbUser } from "../../../util/interfaces";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 import { viewOptions } from "../../../util/options";
+import { FaRegUserCircle } from "react-icons/fa";
 
 export default function Header() {
   const { currentUser, logoutContext } = useAuthContext();
@@ -65,26 +66,27 @@ export default function Header() {
         <LinkButton
           to="/login"
           // className="text-white text-sm mr-6 sm:mr-2 font-semibold bg-blue-700 p-2 border-white/10 shadow rounded-md hover:bg-blue-900 transition "
-          className="header-btn primary"
+          className="header-btn no-border"
         >
-          <LoginOutlined />
+          <FaRegUserCircle className="text-2xl" />&nbsp; התחבר/י
         </LinkButton>
       )}
 
       {currentUser && <UserInfo currentUser={currentUser} />}
-      <FilterModel />
+      {/* <FilterModel /> */}
       {currentPath !== "/" ? (
         // <LinkButton to="/" className="text-black text-sm mr-2 font-semibold">
         <LinkButton to="/" className="header-btn">
           <HomeOutlined />
         </LinkButton>
       ) : (
-        <Button
-          onClick={handleViewChange}
-          type={viewCurrentValues.length ? "primary" : "default"}
-        >
-          <TfiLayoutAccordionMerged />
-        </Button>
+        <></>
+        // <Button
+        //   onClick={handleViewChange}
+        //   type={viewCurrentValues.length ? "primary" : "default"}
+        // >
+        //   <TfiLayoutAccordionMerged />
+        // </Button>
       )}
       {currentUser && (
         <div className="ml-auto flex ">
