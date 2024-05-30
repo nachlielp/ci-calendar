@@ -1,4 +1,4 @@
-import { Button, Card } from "antd";
+import { Button, Card, Image } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 import Meta from "antd/es/card/Meta";
 
@@ -7,12 +7,19 @@ function BioCard() {
   if (!currentUser) throw new Error("BioCard: No user found");
 
   const imgComponent = currentUser.img ? (
-    <img alt="example" src={currentUser.img} key={currentUser.img} />
+    <Image
+      alt="example"
+      src={currentUser.img}
+      key={currentUser.img}
+      width={340}
+      height={340}
+      style={{ objectFit: "cover" }}
+    />
   ) : (
     ""
   );
   return (
-    <div className="flex justify-center items-center w-full ">
+    <div className="flex justify-center items-center w-full mb-10">
       <Card
         className=" mt-6  w-full"
         hoverable
