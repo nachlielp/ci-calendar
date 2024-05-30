@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Card, Tag, Button } from "antd";
-import { FaMapMarkedAlt } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
-import { MdOutlineDescription } from "react-icons/md";
-import { VscDebugBreakpointLog } from "react-icons/vsc";
 import dayjs from "dayjs";
 import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
@@ -13,8 +10,8 @@ import BioModal from "../DisplayUsers/BioModal";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import { EventlyType, IEvently } from "../../../util/interfaces";
 import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
-import { ExpandAltOutlined, ShrinkOutlined } from "@ant-design/icons";
-
+import { Icon } from "../Other/Icon";
+// import expand from "../../../assets/expand.svg";
 interface ISingleDayEventCardProps {
   event: IEvently;
   cardWidth: number;
@@ -68,10 +65,10 @@ export const SingleDayEventCard = React.forwardRef<
       actions={footer}
     >
       <div className="flex flex-col sm:flex-col sm:items-right">
-        <header className="flex flex-row " onClick={() => setIsExpanded(!isExpanded)}>
+        <header className="flex flex-row justify-between" onClick={() => setIsExpanded(!isExpanded)}>
           <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
-          <Button className="no-border p-0" type="link" >
-            {isExpanded ? <ShrinkOutlined className="text-2xl rotate-90" /> : <ExpandAltOutlined className="text-2xl rotate-90" />}
+          <Button className="no-border p-0" type="link" onClick={() => setIsExpanded(!isExpanded)}>
+            {isExpanded ? <Icon icon="collapse" className="w-6 h-6 text-black rotate-90" /> : <Icon icon="expand" className="w-6 h-6 text-black rotate-90" />}
           </Button>
         </header>
         <div className="block w-full sm:w-auto">
@@ -87,7 +84,7 @@ export const SingleDayEventCard = React.forwardRef<
 
       <br />
       <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-        <CiCalendarDate className="text-lg align-middle" />
+        <Icon icon="event" className="w-5 h-5 mt-1 align-middle" />
         <p>
           {subEventLen > 0 ? (
             <>
@@ -108,7 +105,7 @@ export const SingleDayEventCard = React.forwardRef<
       {isExpanded && subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
-            <VscDebugBreakpointLog className="text-blue-500 text-lg align-middle" />
+            <Icon icon="hov" className="w-3 h-3 mt-1 mr-1 align-middle" />
             <span>
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
@@ -141,7 +138,7 @@ export const SingleDayEventCard = React.forwardRef<
         ))}
 
       <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-        <FaMapMarkedAlt className="text-lg align-middle" />
+        <Icon icon="map" className="w-5 h-5 mt-1 align-middle" />
         <button
           onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
           className="text-blue-500 underline text-right"
@@ -152,7 +149,7 @@ export const SingleDayEventCard = React.forwardRef<
 
       {isExpanded && !isWhiteSpace(event.description) && (
         <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-          <MdOutlineDescription className="text-lg align-middle" />
+          <Icon icon="description" className="w-5 h-5 mt-1align-middle" />
           <p>{event.description}</p>
         </div>
       )}

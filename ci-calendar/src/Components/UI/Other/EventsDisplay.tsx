@@ -10,17 +10,16 @@ import { useSearchParams } from "react-router-dom";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import FilterModel from "./FilterModel";
 import { Button } from "antd";
-import { TfiLayoutAccordionMerged } from "react-icons/tfi";
 import { viewOptions } from "../../../util/options";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
-import { CiCalendarDate } from "react-icons/ci";
-import { BsViewList } from "react-icons/bs";
+import { Icon } from "./Icon";
 
 interface IEventsDisplayProps {
   events: IEvently[];
   isEdit: boolean;
 }
 
+//TODO hide scroll base on list view
 function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
   const {
@@ -65,18 +64,20 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
         <h1 className="text-2xl mb-3">קונטקט ישראל</h1>
         <main className="flex flex-row items-center">
           <FilterModel />
-          <Button
-            onClick={handleViewChange}
-            type={viewCurrentValues.length ? "default" : "primary"}
-          >
-            <BsViewList className="text-2xl" />
-          </Button>
-          <Button
-            onClick={handleViewChange}
-            type={viewCurrentValues.length ? "primary" : "default"}
-          >
-            <CiCalendarDate className="text-2xl" />
-          </Button>
+          <div className="flex flex-row">
+            <Button
+              onClick={handleViewChange}
+              className={`flex items-center justify-center  rounded-r-none  ${!viewCurrentValues.length ? 'bg-gray-300' : ''}`}
+            >
+              <Icon icon="viewDay" className="w-6 h-6 " />
+            </Button>
+            <Button
+              onClick={handleViewChange}
+              className={`flex items-center justify-center  rounded-l-none  ${viewCurrentValues.length ? 'bg-gray-300' : ''}`}
+            >
+              <Icon icon="calendar" className="w-6 h-6 " />
+            </Button>
+          </div>
         </main>
       </header>
       {view === "calendar" ? (
