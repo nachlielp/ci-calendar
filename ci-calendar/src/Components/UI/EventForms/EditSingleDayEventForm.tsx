@@ -94,7 +94,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
   }
 
   const handleSubmit = async (values: any) => {
-    console.log("EventForm.handleSubmit.values: ", values);
+    // console.log("EventForm.handleSubmit.values: ", values);
 
     const baseDate = dayjs(values["event-date"]); // Clone the base date
 
@@ -140,7 +140,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       district: values["district"],
     };
     try {
-      console.log("EventForm.handleSubmit.event: ", event);
+      // console.log("EventForm.handleSubmit.event: ", event);
       if (editType === EventAction.recycle) {
         try {
           await createEvent(event);
