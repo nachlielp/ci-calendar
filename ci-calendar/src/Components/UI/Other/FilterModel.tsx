@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Button, Checkbox, Modal } from "antd";
-import { ControlOutlined, FilterOutlined } from "@ant-design/icons";
+import { ControlOutlined } from "@ant-design/icons";
 import { eventTypes, districtOptions } from "../../../util/options";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
+import { Icon } from "./Icon";
 
 export default function FilterModel() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -25,15 +26,15 @@ export default function FilterModel() {
   return (
     <>
       <Button
-        type={
-          currentEventTypeValues.length || currentDistrictValues.length
-            ? "primary"
-            : "default"
-        }
+        // type={
+        //   currentEventTypeValues.length || currentDistrictValues.length
+        //     ? "primary"
+        //     : "default"
+        // }
         onClick={() => setModalOpen(true)}
-        className="flex items-center justify-center mr-4"
+        className={`flex items-center justify-center mr-4 ${currentEventTypeValues.length || currentDistrictValues.length ? 'bg-gray-300' : ''}`}
       >
-        <ControlOutlined />
+        <Icon icon="instantMix" className="w-6 h-6 " />
       </Button>
       <Modal
         open={modalOpen}
