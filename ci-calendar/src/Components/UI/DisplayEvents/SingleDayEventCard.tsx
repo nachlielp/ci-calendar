@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Card, Tag, Button } from "antd";
-import { CiCalendarDate } from "react-icons/ci";
 import dayjs from "dayjs";
 import DeleteEvent from "../Other/DeleteEvent";
 import EditEvent from "../Other/EditEvent";
