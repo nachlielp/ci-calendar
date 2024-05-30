@@ -176,7 +176,7 @@ export default function MultiDayEventForm() {
           schedule={schedule}
         />
 
-        {schedule && (
+        {schedule && dates && (
           <Form.List name="days">
             {(days, { add, remove }) => (
               <>
@@ -188,6 +188,10 @@ export default function MultiDayEventForm() {
                       remove={remove}
                       teachers={teachers}
                       form={form}
+                      limits={{
+                        start: dates[0],
+                        end: dates[1],
+                      }}
                     />
                   </div>
                 ))}

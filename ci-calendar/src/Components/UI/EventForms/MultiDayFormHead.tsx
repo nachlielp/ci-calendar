@@ -1,10 +1,12 @@
-import { Form, Input, Select, DatePicker, Switch, Card } from "antd";
+import { Form, Input, Select, DatePicker, Switch, Card, Tooltip } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { districtOptions, eventTypes } from "../../../util/options";
 import GooglePlacesInput, {
   IGooglePlaceOption,
 } from "../Other/GooglePlacesInput";
 import { IAddress } from "../../../util/interfaces";
+import { useState } from "react";
+import { Icon } from "../Other/Icon";
 
 interface IMultiDayFormHeadProps {
   handleAddressSelect: (place: IGooglePlaceOption) => void;
@@ -21,8 +23,16 @@ export default function MultiDayFormHead({
   schedule,
   address,
 }: IMultiDayFormHeadProps) {
+  const [isDatesSet, setIsDatesSet] = useState(false);
+
+  function onDatesChange(dates: [Dayjs, Dayjs]) {
+    if (dates[0] && dates[1]) {
+      setIsDatesSet(true);
+    }
+    handleDateChange(dates);
+  }
   return (
-    <Card className="mt-4 border-4">
+    <Card className="mt-4 border-4" title={<span className="flex flex-row gap-2">ארוע רב יומי</span>}>
       <Form.Item
         label="כותרת"
         name="event-title"
@@ -62,7 +72,7 @@ export default function MultiDayFormHead({
           mode={["date", "date"]}
           onChange={(dates: [Dayjs | null, Dayjs | null] | null) => {
             if (dates) {
-              handleDateChange(dates as [Dayjs, Dayjs]);
+              onDatesChange(dates as [Dayjs, Dayjs]);
             }
           }}
         />
@@ -75,9 +85,24 @@ export default function MultiDayFormHead({
       >
         <Select options={eventTypes} />
       </Form.Item>
-      <Form.Item label="הגדרת לוז" name="event-schedule">
-        <Switch defaultChecked={schedule} onChange={handleScheduleChange} />
+      <Form.Item
+        label={
+          <Tooltip title={repeatEventTooltip}>
+            <span>
+              <Icon icon="info" title="הגדרת לוז" />
+            </span>
+          </Tooltip>
+        }
+        name="event-schedule"
+
+      >
+        <Switch
+          defaultChecked={schedule}
+          onChange={handleScheduleChange}
+          disabled={!isDatesSet}
+        />
       </Form.Item>
     </Card>
   );
 }
+const repeatEventTooltip = "על מנת להוסיף לוז צריך להגדיר טווח תאריכים";

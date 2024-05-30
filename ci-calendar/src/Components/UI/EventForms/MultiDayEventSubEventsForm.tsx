@@ -18,6 +18,10 @@ interface IBaseEventFormProps {
   remove: (index: number | number[]) => void;
   teachers: { label: string, value: string }[];
   form: any;
+  limits: {
+    start: dayjs.Dayjs,
+    end: dayjs.Dayjs
+  };
 }
 
 export default function MultiDayEventSubEventsForm({
@@ -25,6 +29,7 @@ export default function MultiDayEventSubEventsForm({
   remove,
   teachers,
   form,
+  limits
 }: IBaseEventFormProps) {
   return (
     <Card className="mt-4 border-4">
@@ -35,8 +40,8 @@ export default function MultiDayEventSubEventsForm({
       >
         <DatePicker
           format={"DD/MM"}
-          minDate={dayjs()}
-          maxDate={dayjs().add(1, "year")}
+          minDate={limits.start}
+          maxDate={limits.end}
         />
       </Form.Item>
       <Card className="mt-4 border-2">
