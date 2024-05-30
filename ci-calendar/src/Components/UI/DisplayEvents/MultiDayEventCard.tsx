@@ -11,6 +11,7 @@ import { formatHebrewDate, getEventTeachersIds } from "./SingleDayEventCard";
 import { useTeacherBio } from "../../../hooks/useTeacherBio";
 import HideEvent from "../Other/HideEvent";
 import { Icon } from "../Other/Icon";
+import MultiDayModalCard from "./MultiDayModalCard";
 
 interface IMultiDayEventCardProps {
   event: IEvently;
@@ -65,10 +66,10 @@ export const MultiDayEventCard = React.forwardRef<
       actions={footer}
     >
       <div className="flex flex-col sm:flex-col sm:items-right">
-        <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
-        <div className="block w-full sm:w-auto">
-          <Tag color="blue" className="ml-1 mt-1 sm:mt-0">{getType(event.type)}</Tag>
-        </div>
+        {isEdit ?
+          <div className="block font-bold text-lg  w-full sm:w-auto">{event.title}&nbsp;</div>
+          : <MultiDayModalCard event={event} />
+        }
       </div>
 
       <br />
@@ -80,7 +81,7 @@ export const MultiDayEventCard = React.forwardRef<
         </p>
       </div>
 
-      {Object.entries(groupedSubEvents).map(([date, subEvents]) => (
+      {isEdit && Object.entries(groupedSubEvents).map(([date, subEvents]) => (
         <div key={date}>
           <p className="mr-6">{formatHebrewDate(date)}</p>
           {subEvents.map((subEvent, index) => (
@@ -119,7 +120,7 @@ export const MultiDayEventCard = React.forwardRef<
         </div>
       ))}
 
-      <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
+      {!isEdit && <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
         <Icon icon="map" className="w-5 h-5 mt-1 align-middle" />
         <button
           onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
@@ -128,13 +129,14 @@ export const MultiDayEventCard = React.forwardRef<
           {event.address.label}
         </button>
       </div>
-
-      {!isWhiteSpace(event.description) && (
-        <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-          <Icon icon="description" className="w-5 h-5 mt-1align-middle" />
-          <p>{event.description}</p>
-        </div>
-      )}
+      }
+      {isEdit &&
+        !isWhiteSpace(event.description) && (
+          <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
+            <Icon icon="description" className="w-5 h-5 mt-1align-middle" />
+            <p>{event.description}</p>
+          </div>
+        )}
 
       {event.price.length > 0 && (
         <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
@@ -176,7 +178,7 @@ const getTag = (tag: string) => {
 const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
 };
-const groupAndSortSubEvents = (subEvents: IEventiPart[]) => {
+export const groupAndSortSubEvents = (subEvents: IEventiPart[]) => {
   const eventsArray = Object.values(subEvents);
 
   const groupedByDate = eventsArray.reduce(
