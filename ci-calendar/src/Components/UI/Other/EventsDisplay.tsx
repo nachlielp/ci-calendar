@@ -44,7 +44,6 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const visibleEvents = futureEvents.filter((event) => !event.hide);
   const filteredEvents = useEventsFilter({ events: visibleEvents });
 
-
   useEffect(() => {
     const todaysEvents = filteredEvents.filter((event) =>
       dayjs(selectedDay).isBetween(dayjs(event.dates["startDate"]), dayjs(event.dates["endDate"]), "day", "[]"));
@@ -53,6 +52,7 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
 
   const handleViewChange = () => {
     if (viewCurrentValues.length === 0) {
+      setSelectedDay(dayjs())
       onOptionsChange("view")(["calendar"]);
     } else {
       clearSearchParams(["view"]);
