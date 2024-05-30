@@ -1,6 +1,6 @@
-import { DeleteOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Button, Modal, Space } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
+import { Icon } from "./Icon";
 
 const { confirm } = Modal;
 
@@ -9,12 +9,17 @@ const showDeleteConfirm = (
   deleteEvently: (id: string) => void
 ) => {
   confirm({
-    title: "מחק ארוע",
-    icon: <ExclamationCircleFilled />,
-    content: "האם אתה בטוח שאתה רוצה למחוק את הארוע?",
-    okText: "מחק",
+    title: <div className="text-lg text-red-500">מחק ארוע</div>,
+    icon: <Icon icon="warning" className="text-red-500 mr-2 ml-2" />,
+    content: (
+      <div >
+        האם אתה בטוח שאתה רוצה למחוק את הארוע?
+      </div>
+    ),
+    okText: "מחיקה",
     okType: "danger",
-    cancelText: "בטל",
+    cancelText: "ביטול",
+    direction: "rtl",
     onOk() {
       deleteEvently(eventId);
     },
@@ -34,7 +39,7 @@ const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
   return (
     <Space wrap>
       <Button onClick={() => showDeleteConfirm(eventId, deleteEvently)}>
-        <DeleteOutlined />
+        <Icon icon="deleteIcon" />
       </Button>
     </Space>
   );

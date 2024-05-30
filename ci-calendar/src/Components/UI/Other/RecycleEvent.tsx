@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { TbRecycle } from "react-icons/tb";
+import { Icon } from "./Icon";
 
 interface EditEventProps {
     eventId: string;
@@ -20,7 +20,7 @@ const RecycleEvent: React.FC<EditEventProps> = ({ eventId, isMultiDay }) => {
 
     return (
         <Button onClick={handleEdit}>
-            <TbRecycle />
+            <Icon icon="recycle" />
         </Button>
     );
 };

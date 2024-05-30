@@ -12,8 +12,14 @@ import event from '../../../assets/event.svg';
 import map from '../../../assets/map.svg';
 import hov from '../../../assets/hov.svg';
 import description from '../../../assets/description.svg';
+import recycle from '../../../assets/recycle.svg';
+import visibility from '../../../assets/visibility.svg';
+import visibilityOff from '../../../assets/visibilityOff.svg';
+import edit from '../../../assets/edit.svg';
+import deleteIcon from '../../../assets/delete.svg';
+import warning from '../../../assets/warning.svg';
 
-export const Icon = ({ icon, className }: { icon: string; className: string }) => {
+export const Icon = ({ icon, className }: { icon: string; className?: string }) => {
     const icons: { [key: string]: string } = {
         expand,
         hov,
@@ -29,6 +35,12 @@ export const Icon = ({ icon, className }: { icon: string; className: string }) =
         event,
         map,
         description,
+        recycle,
+        visibility,
+        visibilityOff,
+        edit,
+        deleteIcon,
+        warning,
     };
     return <img src={icons[icon]} alt="Icon" className={className} />;
 };

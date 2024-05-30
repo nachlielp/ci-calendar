@@ -1,5 +1,5 @@
-import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import { useAuthContext } from "../../Auth/AuthContext";
+import { Icon } from "./Icon";
 
 export default function HideEvent({ eventId, hide }: { eventId: string, hide: boolean }) {
     const { hideEvent } = useAuthContext();
@@ -8,7 +8,7 @@ export default function HideEvent({ eventId, hide }: { eventId: string, hide: bo
     };
     return (
         <div>
-            <button onClick={handleHide}>{hide ? <EyeInvisibleOutlined /> : <EyeOutlined />}</button>
+            <button onClick={handleHide}>{hide ? <Icon icon="visibilityOff" /> : <Icon icon="visibility" />}</button>
         </div>
     );
 }

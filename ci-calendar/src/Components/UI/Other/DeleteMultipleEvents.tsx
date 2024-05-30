@@ -1,6 +1,6 @@
-import { DeleteOutlined, ExclamationCircleFilled } from "@ant-design/icons";
 import { Button, Modal } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
+import { Icon } from "./Icon";
 
 const { confirm } = Modal;
 
@@ -10,12 +10,13 @@ const showDeleteConfirm = (
     onDelete: () => void
 ) => {
     confirm({
-        title: "מחק ארוע",
-        icon: <ExclamationCircleFilled />,
-        content: `האם אתה בטוח שאתה רוצה למחוק ${eventIds.length} ארועים?`,
-        okText: "מחק",
+        title: <div className="text-lg text-red-500">מחיקת ארועים</div>,
+        icon: <Icon icon="warning" className="text-red-500 mr-2 ml-2" />,
+        content: <div >האם אתה בטוח שאתה רוצה למחוק {eventIds.length} ארועים?</div>,
+        okText: "מחיקה",
         okType: "danger",
-        cancelText: "בטל",
+        cancelText: "ביטול",
+        direction: "rtl",
         onOk() {
             deleteMultipleEventlys(eventIds);
             onDelete();
@@ -25,7 +26,6 @@ const showDeleteConfirm = (
                 "DeleteEvent.showDeleteConfirm.onCancel: User cancelled deletion"
             );
         },
-        direction: "rtl",
     });
 };
 
@@ -39,7 +39,7 @@ export default function DeleteMultipleEvents({ eventIds, className, disabled, on
     const { deleteMultipleEventlys } = useAuthContext();
     return (
         <Button className={`${className}`} onClick={() => showDeleteConfirm(eventIds, deleteMultipleEventlys, onDelete)} disabled={disabled}>
-            <DeleteOutlined />
+            <Icon icon="deleteIcon" />
         </Button>
     );
 };

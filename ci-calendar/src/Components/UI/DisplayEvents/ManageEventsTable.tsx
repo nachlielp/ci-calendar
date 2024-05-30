@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Table, Select, Switch, Breakpoint } from "antd";
-import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
 import ShowMultipleEvents from "../Other/ShowMultipleEvents";
@@ -11,6 +10,7 @@ import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import { useAuthContext } from "../../Auth/AuthContext";
 import dayjs from "dayjs";
+import { Icon } from "../Other/Icon";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
@@ -135,7 +135,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
             title: 'מצב',
             dataIndex: 'hide',
             key: 'hide',
-            render: (hide: boolean) => hide ? <EyeInvisibleOutlined /> : <EyeOutlined />,
+            render: (hide: boolean) => hide ? <Icon icon="visibilityOff" /> : <Icon icon="visibility" />,
             responsive: ['xl', 'lg', 'md'] as Breakpoint[]
         }
     ];

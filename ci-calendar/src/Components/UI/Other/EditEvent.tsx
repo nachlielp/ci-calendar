@@ -1,6 +1,6 @@
-import { EditOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "./Icon";
 
 interface EditEventProps {
   eventId: string;
@@ -20,7 +20,7 @@ const EditEvent: React.FC<EditEventProps> = ({ eventId, isMultiDay }) => {
 
   return (
     <Button onClick={handleEdit}>
-      <EditOutlined />
+      <Icon icon="edit" />
     </Button>
   );
 };
