@@ -11,6 +11,7 @@ import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import { useAuthContext } from "../../Auth/AuthContext";
 import dayjs from "dayjs";
 import { Icon } from "../Other/Icon";
+import { SelectOption } from "../../../util/options";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
@@ -22,29 +23,18 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const [teachersEvents, setTeachersEvents] = useState<IEvently[]>([]);
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<React.Key[]>([]);
     const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>([]);
-    const [teacherName, setTeacherName] = useState(undefined);
+    const [selectedTeacher, setSelectedTeacher] = useState<SelectOption | null>(null);
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([]);
 
     useEffect(() => {
-        if (teacherName === undefined) {
+        if (selectedTeacher === null) {
             setTeachersEvents(filteredEvents);
         } else {
-            setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.label === teacherName)));
+            setTeachersEvents(filteredEvents.filter(event => event.creatorId === selectedTeacher.value));
         }
-    }, [filteredEvents, teacherName]);
+    }, [filteredEvents, selectedTeacher?.value]);
 
-    //TODuse reducer 
-    const teachers = filteredEvents
-        .map(event => event.owners)
-        .flat()
-        .reduce((acc, teacher) => {
-            acc.set(teacher.value, teacher);
-            return acc;
-        }, new Map())
-        .values();
-
-
-    const uniqueTeachers = Array.from(teachers);
+    const uniqueTeachers = getUniqueTeachers(filteredEvents);
 
     const adjustedItemWidth = Math.min(width / 1.5, 500);
 
@@ -52,7 +42,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const tableWidth = isPhone ? width * 0.9 : width * 0.5;
 
-    const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    function onSelectChange(newSelectedRowKeys: React.Key[]) {
         if (showFuture) {
             setSelectedRowKeysFuture(newSelectedRowKeys);
         } else {
@@ -60,32 +50,33 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         }
     };
 
-    const togglePastFuture = () => {
+    function togglePastFuture() {
         setShowFuture(prev => !prev);
     };
 
-    const handleClear = () => {
-        setTeacherName(undefined);
+    function onClear() {
+        setSelectedTeacher(null);
         setTeachersEvents(filteredEvents);
     };
 
 
-    const handleDelete = () => {
+    function onDelete() {
         setSelectedRowKeysFuture([]);
         setSelectedRowKeysPast([]);
         setExpandedRowKeys([]);
     }
-    const onSelectTeacher = (value: string) => {
-        const teacher = uniqueTeachers.find(teacher => teacher.value === value);
-        teacher ? setTeacherName(teacher.label) : setTeacherName(undefined);
-        teacher ? setTeachersEvents(filteredEvents.filter(event => event.owners.find(owner => owner.value === value))) : setTeachersEvents(filteredEvents);
+    function onSelectTeacher(selectedTeacherId: string) {
+        const teacher = uniqueTeachers.find(teacher => teacher.value === selectedTeacherId);
+        teacher ? setSelectedTeacher(teacher) : setSelectedTeacher(null);
 
-        if (teacherName !== undefined && value !== undefined) {
+        teacher ? setTeachersEvents(filteredEvents.filter(event => event.creatorId === selectedTeacherId)) : setTeachersEvents(filteredEvents);
+
+        if (selectedTeacher !== null && selectedTeacherId !== undefined) {
             setSelectedRowKeysFuture([]);
             setSelectedRowKeysPast([]);
-        } else if (teacherName === undefined && value !== undefined && teacher) {
-            setSelectedRowKeysFuture(selectedRowKeysFuture.filter(key => filteredEvents.some(event => event.id === key && event.owners.some(owner => owner.value === value))));
-            setSelectedRowKeysPast(selectedRowKeysPast.filter(key => filteredEvents.some(event => event.id === key && event.owners.some(owner => owner.value === value))));
+        } else if (selectedTeacher === null && selectedTeacherId !== undefined && teacher) {
+            setSelectedRowKeysFuture(selectedRowKeysFuture.filter(key => filteredEvents.some(event => event.id === key && event.creatorId === selectedTeacherId)));
+            setSelectedRowKeysPast(selectedRowKeysPast.filter(key => filteredEvents.some(event => event.id === key && event.creatorId === selectedTeacherId)));
         }
     };
 
@@ -101,16 +92,16 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         filteredEvents.filter(event => selectedRowKeysFuture.includes(event.id) && event.hide) :
         filteredEvents.filter(event => selectedRowKeysPast.includes(event.id) && event.hide);
 
-    const handleExpand = (expanded: boolean, record: IEvently) => {
+    function onExpand(expanded: boolean, record: IEvently) {
         setExpandedRowKeys(expanded ? [record.id] : []);
     };
 
     const columns = [
         {
             title: 'בעלים',
-            dataIndex: 'owners',
-            key: 'owners',
-            render: (owners: { label: string }[]) => owners.map(owner => owner.label).join(', '),
+            dataIndex: 'creatorName',
+            key: 'creatorName',
+            render: (creatorName: string) => creatorName,
             responsive: ['xl', 'lg', 'md'] as Breakpoint[]
         },
         {
@@ -141,10 +132,21 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     ];
 
     const filteredColumns = currentUser && currentUser.userType === 'teacher'
-        ? columns.filter(column => column.key !== 'owners')
+        ? columns.filter(column => column.key !== 'creatorName')
         : columns;
 
 
+    function getUniqueTeachers(events: IEvently[]): SelectOption[] {
+        const teacherMap = new Map<string, SelectOption>();
+
+        events.forEach(event => {
+            if (event.creatorId && event.creatorName) {
+                teacherMap.set(event.creatorId, { label: event.creatorName, value: event.creatorId });
+            }
+        });
+
+        return Array.from(teacherMap.values());
+    };
     return (
         <section className={`max-w-[${tableWidth}px] mx-auto m-4`}>
             <header className={`flex ${isPhone ? 'flex-col items-center' : 'flex-row'} justify-center mb-4 mr-4`}>
@@ -154,11 +156,11 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                             <Select
                                 id="select-teacher"
                                 style={{ width: '200px' }}
-                                value={teacherName}
+                                value={selectedTeacher?.value}
                                 onChange={onSelectTeacher}
                                 placeholder="סינון לפי משתמש"
                                 allowClear
-                                onClear={handleClear}
+                                onClear={onClear}
                                 showSearch
                                 filterOption={(input, option) =>
                                     (option?.children as unknown as string).toLowerCase().indexOf(input.toLowerCase()) >= 0
@@ -184,7 +186,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                     </div>
                 </div>
                 <div className="flex flex-row">
-                    <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={handleDelete} />
+                    <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={onDelete} />
                     <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                     <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                 </div>
@@ -223,7 +225,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                         </div>
                     ),
                     expandedRowKeys: expandedRowKeys,
-                    onExpand: handleExpand,
+                    onExpand: onExpand,
                 }}
             />
         </section>
