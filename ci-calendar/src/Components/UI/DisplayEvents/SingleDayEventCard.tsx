@@ -46,6 +46,28 @@ export const SingleDayEventCard = React.forwardRef<
   const teachersIds = getEventTeachersIds(event);
   const { teachers } = useTeacherBio({ ids: teachersIds });
 
+  const nonRegestoredTeacherNames = Array.from(
+    new Set(
+      Object.values(event.subEvents)
+        .flatMap(subEvent => subEvent.teachers)
+        .filter(teacher => teacher.value === "NON_EXISTENT")
+        .map(teacher => teacher.label)
+    )
+  );
+
+  const regestoredTeacherOptions = Array.from(
+    new Map(
+      Object.values(event.subEvents)
+        .flatMap(subEvent => subEvent.teachers)
+        .filter(teacher => teacher.value !== "NON_EXISTENT")
+        .map(teacher => [teacher.value, teacher]) // Use teacher.value as the key
+    ).values()
+  );
+
+  const teachersBioOrName = regestoredTeacherOptions.map(teacher => {
+    const isTeacher = teachers.find(t => t.id === teacher.value);
+    return isTeacher ? <BioModal key={teacher.value} user={isTeacher} /> : teacher.label;
+  });
   const footer = isEdit
     ? [
       <DeleteEvent eventId={event.id} />,
@@ -87,10 +109,16 @@ export const SingleDayEventCard = React.forwardRef<
               <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
               {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
               {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-              {!isEdit && <>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
-                const isTeacher = teachers.find((t) => t.id === teacher.value);
-                return isTeacher ? <BioModal user={isTeacher} /> : teacher.label;
-              })}</>}
+              {!isEdit && (
+                <>
+                  &nbsp; עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
+                    <React.Fragment key={index}>
+                      {item}
+                      {index < array.length - 1 && ', '}
+                    </React.Fragment>
+                  ))}
+                </>
+              )}
             </>
           ) : (
             <span>No event times available</span>
@@ -206,6 +234,7 @@ export const isWhiteSpace = (str: string) => {
 export const getEventTeachersIds = (event: IEvently) => {
   return event.subEvents.flatMap((subEvent) => subEvent.teachers).map((teacher) => teacher.value).filter((teacher) => teacher !== "NON_EXISTENT");
 };
+
 export const formatHebrewDate = (date: string) => {
   const day = dayjs(date).locale("he").format("D");
   const month = dayjs(date).locale("he").format("MM");
