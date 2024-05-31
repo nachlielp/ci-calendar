@@ -19,7 +19,7 @@ export const useEventsFilter = ({ events, showFuture, uids }: IUseEventsFilterPr
     let filtered = events;
 
     if (uids && uids.length > 0) {
-      filtered = filtered.filter((event) => event.owners.find((owner) => uids.includes(owner.value)));
+      filtered = filtered.filter((event) => uids.includes(event.creatorId));
     }
 
     if (showFuture !== undefined) {
