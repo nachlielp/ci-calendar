@@ -50,13 +50,6 @@ export default function BioModal({ user }: BioModalProps) {
                             {user.pageUrl.title}
                         </Button>
                     )}
-                    {/* <Card
-                        className=" mt-6  w-full"
-                        hoverable
-                        style={{ width: 340 }}
-                        cover={imgComponent}
-                    >
-                    </Card> */}
                 </div>
             </Modal>
         </>
