@@ -138,6 +138,8 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       hide: false,
       subEvents: subEvents,
       district: values["district"],
+      creatorId: currentUser.id,
+      creatorName: currentUser.fullName,
     };
     try {
       // console.log("EventForm.handleSubmit.event: ", event);

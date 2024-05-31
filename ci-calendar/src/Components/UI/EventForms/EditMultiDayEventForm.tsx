@@ -143,6 +143,8 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
       hide: false,
       subEvents: subEventsTemplate,
       district: values["district"],
+      creatorId: currentUser.id,
+      creatorName: currentUser.fullName,
     };
     try {
       if (editType === EventAction.recycle) {

@@ -49,6 +49,8 @@ export interface IEvently {
   price: IPrice[];
   links: ILink[];
   subEvents: IEventiPart[];
+  creatorId: string;
+  creatorName: string;
 }
 export enum District {
   north = "north",

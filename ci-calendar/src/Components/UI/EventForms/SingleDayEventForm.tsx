@@ -132,6 +132,8 @@ export default function SingleDayEventForm() {
           hide: false,
           subEvents: subEventsTemplate,
           district: values["district"],
+          creatorId: currentUser.id,
+          creatorName: currentUser.fullName,
         };
         await createEvent(event);
       } else if (endDate) {
@@ -167,6 +169,8 @@ export default function SingleDayEventForm() {
             hide: false,
             subEvents: subEvents,
             district: values["district"],
+            creatorId: currentUser.id,
+            creatorName: currentUser.fullName,
           };
           await createEvent(event);
         }

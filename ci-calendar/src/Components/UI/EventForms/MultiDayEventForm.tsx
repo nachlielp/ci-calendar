@@ -147,6 +147,8 @@ export default function MultiDayEventForm() {
         hide: false,
         subEvents: subEventsTemplate,
         district: values["district"],
+        creatorId: currentUser.id,
+        creatorName: currentUser.fullName,
       };
       console.log("MultiDayEventForm.handleSubmit.event: ", event);
       await createEvent(event);
