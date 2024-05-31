@@ -85,7 +85,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                                 {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
                                 {<>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
                                     const isTeacher = teachers.find((t) => t.id === teacher.value);
-                                    return isTeacher ? <BioModal user={isTeacher} /> : teacher.label;
+                                    return isTeacher ? <BioModal user={isTeacher} key={teacher.value} /> : teacher.label;
                                 })}</>}
                             </>
                         ) : (
