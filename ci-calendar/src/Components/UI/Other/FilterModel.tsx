@@ -37,21 +37,32 @@ export default function FilterModel() {
         footer={<Button onClick={clearAllSearchParams}>נקה </Button>}
       >
         <div>
-          <b>סוג אירוע</b>
+          <b className="text-lg">סוג אירוע</b>
         </div>
         <Checkbox.Group
-          options={eventTypes.filter(eventType => eventType.value !== "warmup")}
           value={currentEventTypeValues}
           onChange={onEventTypeOptionsChange("eventType")}
-        />
+        >
+          {eventTypes.filter(eventType => eventType.value !== "warmup").map(eventType => (
+            <Checkbox key={eventType.value} value={eventType.value} style={{ transform: 'scale(1.2)', margin: '6px' }}>
+              <p className="text-lg">{eventType.label}</p>
+            </Checkbox>
+          ))}
+        </Checkbox.Group>
         <div>
-          <b>אזור</b>
+          <b className="text-lg">אזור</b>
         </div>
         <Checkbox.Group
-          options={districtOptions}
+          // options={districtOptions}
           value={currentDistrictValues}
           onChange={onDistrictOptionsChange("district")}
-        />
+        >
+          {districtOptions.map(district => (
+            <Checkbox key={district.value} value={district.value} style={{ transform: 'scale(1.2)', margin: '6px' }}>
+              <p className="text-lg">{district.label}</p>
+            </Checkbox>
+          ))}
+        </Checkbox.Group>
       </Modal>
       <br />
     </>
