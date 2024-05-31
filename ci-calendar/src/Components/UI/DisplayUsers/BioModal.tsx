@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button, Card, Modal } from 'antd';
+import { Button, Typography, Modal, Image } from 'antd';
 import { DbUser } from '../../../util/interfaces';
-import Meta from 'antd/es/card/Meta';
+const { Title, Text } = Typography;
 
 interface BioModalProps {
     user: DbUser
@@ -23,7 +23,7 @@ export default function BioModal({ user }: BioModalProps) {
     };
 
     const imgComponent = user.img ? (
-        <img alt="example" src={user.img} key={user.img} />
+        <Image alt="example" src={user.img} key={user.img} width={340} height={340} style={{ objectFit: "cover", borderRadius: "5%" }} />
     ) : (
         ""
     );
@@ -35,26 +35,28 @@ export default function BioModal({ user }: BioModalProps) {
             </Button>
 
             <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
-                <div className="flex justify-center items-center w-full ">
-                    <Card
+                <div className="flex flex-col justify-center items-center w-full ">
+                    <Title level={3}>{user.fullName}</Title>
+                    {imgComponent}
+                    <Text className="m-10">{user.bio}</Text>
+                    {user.pageUrl?.link && (
+                        <Button
+                            className="mt-5 w-full"
+                            key={user.pageUrl.link}
+                            type="default"
+                            href={user.pageUrl.link}
+                            target="_blank"
+                        >
+                            {user.pageUrl.title}
+                        </Button>
+                    )}
+                    {/* <Card
                         className=" mt-6  w-full"
                         hoverable
                         style={{ width: 340 }}
                         cover={imgComponent}
                     >
-                        <Meta title={user.fullName} description={user.bio} />
-                        {user.pageUrl?.link && (
-                            <Button
-                                className="mt-5 w-full"
-                                key={user.pageUrl.link}
-                                type="default"
-                                href={user.pageUrl.link}
-                                target="_blank"
-                            >
-                                דף פרופיל
-                            </Button>
-                        )}
-                    </Card>
+                    </Card> */}
                 </div>
             </Modal>
         </>
