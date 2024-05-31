@@ -6,8 +6,8 @@ import { useAuthContext } from "./AuthContext";
 import { LinkButton } from "../UI/Other/LinkButton";
 enum LoginError {
   none = "",
-  wrongPassword = "Password does not match email",
-  default = "Failed to sign in",
+  wrongPassword = "הסימה לא מתאימה לכתובת מייל",
+  default = "שגיאת התחברות",
 }
 
 export default function Login() {
@@ -59,7 +59,7 @@ export default function Login() {
 
   return (
     <Card id="login-form" className="mx-auto max-w-sm mt-4">
-      <h1 className="text-2xl font-bold text-center mb-2">Log In</h1>
+      <h1 className="text-2xl font-bold text-center mb-2">כניסה</h1>
       <Form
         name="basic"
         labelCol={{ span: 16 }}
@@ -68,12 +68,12 @@ export default function Login() {
         onFinish={onFinish}
       >
         <Form.Item>
-          <Input type="email" placeholder="Email" ref={emailRef} required />
+          <Input type="email" placeholder="כתובת מייל" ref={emailRef} required />
         </Form.Item>
         <Form.Item>
           <Input.Password
             status={error ? "error" : undefined}
-            placeholder="Password"
+            placeholder="סיסמה"
             ref={passwordRef}
             required
           />
@@ -93,7 +93,7 @@ export default function Login() {
             disabled={loading}
             style={{ width: "100%" }}
           >
-            Log In
+            כניסה
           </Button>
         </Form.Item>
       </Form>
@@ -104,14 +104,14 @@ export default function Login() {
           disabled={loading}
           style={{ width: "100%" }}
         >
-          Sign In with Google
+          כניסה עם Google
         </Button>
       </div>
 
       <div className="flex justify-center pt-4 inline-block">
-        <LinkButton to="/reset-password">Rest Password</LinkButton>
+        <LinkButton to="/reset-password">איפוס סיסמה</LinkButton>
         <div className="w-5"></div>
-        <LinkButton to="/signup">Sign Up</LinkButton>
+        <LinkButton to="/signup">הרשמה</LinkButton>
       </div>
     </Card>
   );

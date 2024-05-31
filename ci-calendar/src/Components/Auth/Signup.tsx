@@ -6,8 +6,8 @@ import { useAuthContext } from "./AuthContext";
 
 enum SignupError {
   none = "",
-  passwordsDontMatch = "Passwords do not match",
-  passwordToShort = "Password must be at least 6 characters",
+  passwordsDontMatch = "הסיסמאות לא תואמות",
+  passwordToShort = "סיסמה חייבת להיות לפחות 6 תווים",
 }
 
 export default function Signup() {
@@ -67,10 +67,10 @@ export default function Signup() {
   };
   return (
     <Card id="signup-form" className="mx-auto max-w-sm mt-4">
-      <h1 className="text-2xl font-bold text-center mb-2">Sign Up</h1>
+      <h1 className="text-2xl font-bold text-center mb-2">הרשמה</h1>
 
       <Form
-        title="Sing Up"
+        title="הרשמה"
         name="basic"
         labelCol={{ span: 16 }}
         wrapperCol={{ span: 24 }}
@@ -78,15 +78,15 @@ export default function Signup() {
         onFinish={onFinish}
       >
         <Form.Item>
-          <Input type="text" placeholder="Name" ref={nameRef} required />
+          <Input type="text" placeholder="שם" ref={nameRef} required />
         </Form.Item>
         <Form.Item>
-          <Input type="email" placeholder="Email" ref={emailRef} required />
+          <Input type="email" placeholder="כתובת מייל" ref={emailRef} required />
         </Form.Item>
         <Form.Item>
           <Input.Password
             status={error ? "error" : undefined}
-            placeholder="Password"
+            placeholder="סיסמה"
             ref={passwordRef}
             required
           />
@@ -94,7 +94,7 @@ export default function Signup() {
         <Form.Item>
           <Input.Password
             status={error ? "error" : undefined}
-            placeholder="Password Confirmation"
+            placeholder="אימות סיסמה"
             ref={passwordConfRef}
             required
           />
@@ -115,7 +115,7 @@ export default function Signup() {
             disabled={loading}
             style={{ width: "100%" }}
           >
-            Sign up
+            הרשמה
           </Button>
         </Form.Item>
       </Form>
@@ -126,7 +126,7 @@ export default function Signup() {
           disabled={loading}
           style={{ width: "100%" }}
         >
-          Sign In with Google
+          הרשמה עם Google
         </Button>
       </div>
     </Card>
