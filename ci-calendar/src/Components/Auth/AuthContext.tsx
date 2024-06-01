@@ -14,8 +14,9 @@ import {
   updateDocument,
   subscribeToDoc,
   removeMultipleDocuments,
+  addDocumentIfNotExists,
 } from "../../firebase.service";
-import { DbUser, IEvently, UserType } from "../../util/interfaces";
+import { DbTeacher, DbUser, IEvently, UserType } from "../../util/interfaces";
 
 export interface IUserSignup {
   email: string;
@@ -38,6 +39,8 @@ interface IAuthContextType {
   hideEvent: (eventId: string, hide: boolean) => Promise<void>;
   deleteMultipleEventlys: (eventIds: string[]) => Promise<void>;
   hideOrShowMultipleEventlys: (eventIds: string[], hide: boolean) => Promise<void>;
+  addTeacher: (teacher: DbTeacher) => Promise<void>;
+  disableTeacher: (teacherId: string) => Promise<void>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -257,6 +260,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
     return unsubscribe;
   }
+
+  //TODO upsert teacher
+  async function addTeacher(teacher: DbTeacher) {
+    try {
+      await addDocumentIfNotExists("teachers", teacher.id, teacher);
+    } catch (error) {
+      console.error("AuthContext.createTeacher.error: ", error);
+      throw error;
+    }
+  }
+
+  async function disableTeacher(teacherId: string) {
+    try {
+      await updateDocument("teachers", teacherId, { allowTagging: false, showProfile: false });
+    } catch (error) {
+      console.error("AuthContext.disableTeacher.error: ", error);
+      throw error;
+    }
+  }
   const value = {
     currentUser,
     loading,
@@ -273,6 +295,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     hideEvent,
     deleteMultipleEventlys,
     hideOrShowMultipleEventlys,
+    addTeacher,
+    disableTeacher,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

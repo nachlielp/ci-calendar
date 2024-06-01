@@ -79,3 +79,16 @@ export interface DbUser {
   pageUrl: ILink;
   showProfile: boolean;
 }
+
+export interface DbTeacher {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  fullName: string;
+  img: string;
+  bio: string;
+  pageUrl: string;
+  pageTitle: string;
+  showProfile: boolean;
+  allowTagging: boolean;
+}

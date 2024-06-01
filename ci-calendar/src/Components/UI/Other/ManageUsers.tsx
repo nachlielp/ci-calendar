@@ -1,6 +1,6 @@
 import { AutoComplete, Button, Card, Input, SelectProps } from "antd";
 import { useState } from "react";
-import { DbUser, UserType } from "../../../util/interfaces";
+import { DbTeacher, DbUser, UserType } from "../../../util/interfaces";
 import { useUsers } from "../../../hooks/useUsers";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useAuthContext } from "../../Auth/AuthContext";
@@ -30,7 +30,7 @@ function ManageUsers() {
   const [inputValue, setInputValue] = useState<string>("");
   const { users } = useUsers();
   const { width } = useWindowSize();
-  const { updateUser } = useAuthContext();
+  const { updateUser, addTeacher, disableTeacher } = useAuthContext();
 
   const handleSearch = (value: string) => {
     setInputValue(value);
@@ -51,6 +51,7 @@ function ManageUsers() {
     try {
       await updateUser({ ...selectedUser, userType: UserType.admin });
       setSelectedUser({ ...selectedUser, userType: UserType.admin });
+      await onAddTeacher();
     } catch (error) {
       console.error(`ManageUsers.onMakeAdmin.error: `, error);
       throw error;
@@ -61,6 +62,7 @@ function ManageUsers() {
     try {
       await updateUser({ ...selectedUser, userType: UserType.teacher });
       setSelectedUser({ ...selectedUser, userType: UserType.teacher });
+      await onAddTeacher();
     } catch (error) {
       console.error(`ManageUsers.onMakeTeacher.error: `, error);
       throw error;
@@ -71,11 +73,29 @@ function ManageUsers() {
     try {
       await updateUser({ ...selectedUser, userType: UserType.user });
       setSelectedUser({ ...selectedUser, userType: UserType.user });
+      await disableTeacher(selectedUser.id);
     } catch (error) {
       console.error(`ManageUsers.onMakeUser.error: `, error);
       throw error;
     }
   };
+
+  async function onAddTeacher() {
+    if (!selectedUser) return;
+    const teacher: DbTeacher = {
+      id: selectedUser.id,
+      fullName: selectedUser.fullName,
+      bio: "",
+      allowTagging: true,
+      pageTitle: "",
+      pageUrl: "",
+      showProfile: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      img: "",
+    };
+    await addTeacher(teacher);
+  }
   const cardWidth = Math.min(width * 0.9, 500);
 
   const makeAdmin = (

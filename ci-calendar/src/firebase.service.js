@@ -11,6 +11,7 @@ import {
   where,
   getDocs,
   onSnapshot,
+  runTransaction,
 } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
@@ -21,6 +22,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   onAuthStateChanged,
+
 } from "firebase/auth";
 // interface IFirebaseConfig {
 //   apiKey;
@@ -44,6 +46,7 @@ export const firebaseService = {
   logout,
   getTeachersAndAdminsList,
   removeMultipleDocuments,
+  addDocumentIfNotExists,
 };
 
 async function initFirebaseJS() {
@@ -139,6 +142,24 @@ export async function addDocument(collectionName, document) {
     const db = await getDb();
     const docRef = doc(db, collectionName, document.id);
     await setDoc(docRef, document);
+    return docRef;
+  } catch (error) {
+    console.error("firebaseService.addDocument.error: ", error);
+    throw error;
+  }
+}
+
+export async function addDocumentIfNotExists(collectionName, id, document) {
+  try {
+    const db = await getDb();
+    const docRef = doc(db, collectionName, document.id);
+
+    await runTransaction(db, async (transaction) => {
+      const docSnapshot = await transaction.get(docRef);
+      if (!docSnapshot.exists()) {
+        transaction.set(docRef, document);
+      }
+    });
     return docRef;
   } catch (error) {
     console.error("firebaseService.addDocument.error: ", error);
