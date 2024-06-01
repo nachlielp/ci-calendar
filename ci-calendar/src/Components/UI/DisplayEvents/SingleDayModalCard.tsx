@@ -169,7 +169,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                                 target="_blank"
                                 className="mb-2"
                             >
-                                {link.title}
+                                <Icon icon="openInNew" className="w-5 h-5 ml-2 align-middle" title={link.title} />
                             </Button>
                         ))}
                 </div>

@@ -21,6 +21,8 @@ import warning from '../../../assets/warning.svg';
 import doNotDisturb from '../../../assets/doNotDisturb.svg';
 import info from '../../../assets/info.svg';
 import addCircle from '../../../assets/addCircle.svg';
+import openInNew from '../../../assets/openInNew.svg';
+
 
 export const Icon = ({ icon, className, title }: { icon: string; className?: string, title?: string }) => {
     const icons: { [key: string]: string } = {
@@ -47,6 +49,7 @@ export const Icon = ({ icon, className, title }: { icon: string; className?: str
         doNotDisturb,
         info,
         addCircle,
+        openInNew,
     };
     return <div className="flex inline-flex items-center gap-2"><img src={icons[icon]} alt="Icon" className={className} />{title}</div>;
 };
