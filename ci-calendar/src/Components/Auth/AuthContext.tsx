@@ -14,7 +14,6 @@ import {
   updateDocument,
   subscribeToDoc,
   removeMultipleDocuments,
-  addDocumentIfNotExists,
   getTeachersAndAdminsList,
   addOrActivateTeacher,
 } from "../../firebase.service";
