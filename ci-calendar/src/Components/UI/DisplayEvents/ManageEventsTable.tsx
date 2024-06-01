@@ -91,6 +91,9 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     const hiddenEventsToShow = showFuture ?
         filteredEvents.filter(event => selectedRowKeysFuture.includes(event.id) && event.hide) :
         filteredEvents.filter(event => selectedRowKeysPast.includes(event.id) && event.hide);
+    const selectedEventsToDelete = showFuture ?
+        filteredEvents.filter(event => selectedRowKeysFuture.includes(event.id)) :
+        filteredEvents.filter(event => selectedRowKeysPast.includes(event.id));
 
     function onExpand(expanded: boolean, record: IEvently) {
         setExpandedRowKeys(expanded ? [record.id] : []);
@@ -186,7 +189,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                     </div>
                 </div>
                 <div className="flex flex-row">
-                    <DeleteMultipleEvents eventIds={selectedRowKeysFuture.map(String)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={onDelete} />
+                    <DeleteMultipleEvents eventIds={selectedEventsToDelete.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={onDelete} />
                     <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                     <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                 </div>
