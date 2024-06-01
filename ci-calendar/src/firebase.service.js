@@ -12,6 +12,7 @@ import {
   getDocs,
   onSnapshot,
   runTransaction,
+  updateDoc,
 } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
@@ -163,6 +164,22 @@ export async function addDocumentIfNotExists(collectionName, id, document) {
     return docRef;
   } catch (error) {
     console.error("firebaseService.addDocument.error: ", error);
+    throw error;
+  }
+}
+
+export async function addOrActivateTeacher(teacher) {
+  try {
+    const db = await getDb();
+    const docRef = doc(db, "teachers", teacher.id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      await setDoc(docRef, { allowTagging: true });
+    } else {
+      await updateDoc(docRef, { allowTagging: true });
+    }
+  } catch (error) {
+    console.error("firebaseService.addOrActivateTeacher.error: ", error);
     throw error;
   }
 }

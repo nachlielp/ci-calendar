@@ -16,6 +16,7 @@ import {
   removeMultipleDocuments,
   addDocumentIfNotExists,
   getTeachersAndAdminsList,
+  addOrActivateTeacher,
 } from "../../firebase.service";
 import { DbTeacher, DbUser, IEvently, UserType } from "../../util/interfaces";
 
@@ -273,7 +274,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
   async function addTeacher(teacher: DbTeacher) {
     try {
-      await addDocumentIfNotExists("teachers", teacher.id, teacher);
+      await addOrActivateTeacher(teacher);
     } catch (error) {
       console.error("AuthContext.createTeacher.error: ", error);
       throw error;
