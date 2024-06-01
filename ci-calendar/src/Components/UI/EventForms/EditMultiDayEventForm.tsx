@@ -163,60 +163,65 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
   const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
 
   return (
-    <Card className="max-w-[500px] mx-auto mt-4" >
-      <Form
-        form={form}
-        variant="filled"
-        onFinish={handleSubmit}
-        initialValues={currentFormValues}
-      >
-        <MultiDayFormHead
-          handleAddressSelect={handleAddressSelect}
-          handleDateChange={handleDateChange}
-          handleScheduleChange={handleScheduleChange}
-          schedule={schedule}
-          address={address}
-        />
-        {schedule && dates && (
-          <Form.List name="days">
-            {(days, { add, remove }) => (
-              <>
-                {days.map(({ key, name, ...restField }) => (
-                  <div key={key}>
-                    <MultiDayEventSubEventsForm
-                      day={name}
-                      {...restField}
-                      remove={remove}
-                      teachers={teachers}
-                      form={form}
-                      limits={{
-                        start: dates[0],
-                        end: dates[1],
-                      }}
-                    />
-                  </div>
-                ))}
-                <div className="flex items-center justify-center mt-2">
-                  <Button onClick={() => add()} block>
-                    <Icon icon="addCircle" title="הוסף יום" />
-                  </Button>
-                </div>
-              </>
-            )}
-          </Form.List>
-        )}
-        <AddLinksForm />
-        <AddPricesForm />
-        <Form.Item
-          wrapperCol={{ span: 24 }}
-          className="mt-4 flex justify-center"
+    <>
+      <Card className="max-w-[500px] mx-auto mt-4" >
+        <Form
+          form={form}
+          variant="filled"
+          onFinish={handleSubmit}
+          initialValues={currentFormValues}
         >
-          <Button type="primary" htmlType="submit">
-            {submitText}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          <MultiDayFormHead
+            handleAddressSelect={handleAddressSelect}
+            handleDateChange={handleDateChange}
+            handleScheduleChange={handleScheduleChange}
+            schedule={schedule}
+            address={address}
+          />
+          {schedule && dates && (
+            <Form.List name="days">
+              {(days, { add, remove }) => (
+                <>
+                  {days.map(({ key, name, ...restField }) => (
+                    <div key={key}>
+                      <MultiDayEventSubEventsForm
+                        day={name}
+                        {...restField}
+                        remove={remove}
+                        teachers={teachers}
+                        form={form}
+                        limits={{
+                          start: dates[0],
+                          end: dates[1],
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-center mt-2">
+                    <Button onClick={() => add()} block>
+                      <Icon icon="addCircle" title="הוסף יום" />
+                    </Button>
+                  </div>
+                </>
+              )}
+            </Form.List>
+          )}
+          <AddLinksForm />
+          <AddPricesForm />
+          <Form.Item
+            wrapperCol={{ span: 24 }}
+            className="mt-4 flex justify-center"
+          >
+            <Button type="primary" htmlType="submit">
+              {submitText}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+      <div className="flex justify-center items-center w-full h-12">
+
+      </div>
+    </>
   );
 }
 

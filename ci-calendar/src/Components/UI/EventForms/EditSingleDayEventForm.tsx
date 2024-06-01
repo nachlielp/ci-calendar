@@ -168,41 +168,46 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
   const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
 
   return (
-    <Card className="max-w-[500px] mx-auto  mt-4 ">
-      <Form
-        {...formItemLayout}
-        form={form}
-        onFinish={handleSubmit}
-        variant="filled"
-        labelCol={{ span: 6, offset: 0 }}
-        wrapperCol={{ span: 16, offset: 0 }}
-        initialValues={currentFormValues}
-      >
-        <SingleDayEventBaseForm
+    <>
+      <Card className="max-w-[500px] mx-auto  mt-4 ">
+        <Form
+          {...formItemLayout}
           form={form}
-          handleAddressSelect={handleAddressSelect}
-          handleDateChange={handleDateChange}
-          handleEndDateChange={handleEndDateChange}
-          eventDate={eventDate}
-          endDate={endDate}
-          idEdit={true}
-          teachers={teachers}
-          address={address}
-        />
-        <SubEventsForm day="" form={form} teachers={teachers} />
-        <AddLinksForm />
-        <AddPricesForm />
-
-        <Form.Item
-          wrapperCol={{ span: 24 }}
-          className="mt-4 flex justify-center"
+          onFinish={handleSubmit}
+          variant="filled"
+          labelCol={{ span: 6, offset: 0 }}
+          wrapperCol={{ span: 16, offset: 0 }}
+          initialValues={currentFormValues}
         >
-          <Button type="primary" htmlType="submit">
-            {submitText}
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          <SingleDayEventBaseForm
+            form={form}
+            handleAddressSelect={handleAddressSelect}
+            handleDateChange={handleDateChange}
+            handleEndDateChange={handleEndDateChange}
+            eventDate={eventDate}
+            endDate={endDate}
+            idEdit={true}
+            teachers={teachers}
+            address={address}
+          />
+          <SubEventsForm day="" form={form} teachers={teachers} />
+          <AddLinksForm />
+          <AddPricesForm />
+
+          <Form.Item
+            wrapperCol={{ span: 24 }}
+            className="mt-4 flex justify-center"
+          >
+            <Button type="primary" htmlType="submit">
+              {submitText}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+      <div className="flex justify-center items-center w-full h-12">
+
+      </div>
+    </>
   );
 }
 

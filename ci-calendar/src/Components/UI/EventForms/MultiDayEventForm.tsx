@@ -161,62 +161,66 @@ export default function MultiDayEventForm() {
   };
 
   return (
-    <Card className="max-w-[500px] mx-auto  mt-4 ">
-      <Form
-        {...formItemLayout}
-        form={form}
-        onFinish={handleSubmit}
-        variant="filled"
-        labelCol={{ span: 6, offset: 0 }}
-        wrapperCol={{ span: 16, offset: 0 }}
-        initialValues={initialValues}
-      >
-        <MultiDayFormHead
-          handleAddressSelect={handleAddressSelect}
-          handleDateChange={handleDateChange}
-          handleScheduleChange={handleScheduleChange}
-          schedule={schedule}
-        />
-
-        {schedule && dates && (
-          <Form.List name="days">
-            {(days, { add, remove }) => (
-              <>
-                {days.map(({ key, name, ...restField }) => (
-                  <div key={key}>
-                    <MultiDayEventSubEventsForm
-                      day={name}
-                      {...restField}
-                      remove={remove}
-                      teachers={teachers}
-                      form={form}
-                      limits={{
-                        start: dates[0],
-                        end: dates[1],
-                      }}
-                    />
-                  </div>
-                ))}
-                <div className="flex items-center justify-center mt-2">
-                  <Button className="w-1/2" onClick={() => add()} block>
-                    <Icon icon="addCircle" title="הוסף יום" />
-                  </Button>
-                </div>
-              </>
-            )}
-          </Form.List>
-        )}
-        <AddLinksForm />
-        <AddPricesForm />
-        <Form.Item
-          wrapperCol={{ span: 24 }}
-          className="mt-4 flex justify-center"
+    <>
+      <Card className="max-w-[500px] mx-auto  mt-4 ">
+        <Form
+          {...formItemLayout}
+          form={form}
+          onFinish={handleSubmit}
+          variant="filled"
+          labelCol={{ span: 6, offset: 0 }}
+          wrapperCol={{ span: 16, offset: 0 }}
+          initialValues={initialValues}
         >
-          <Button type="primary" htmlType="submit">
-            צור אירוע
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
+          <MultiDayFormHead
+            handleAddressSelect={handleAddressSelect}
+            handleDateChange={handleDateChange}
+            handleScheduleChange={handleScheduleChange}
+            schedule={schedule}
+          />
+
+          {schedule && dates && (
+            <Form.List name="days">
+              {(days, { add, remove }) => (
+                <>
+                  {days.map(({ key, name, ...restField }) => (
+                    <div key={key}>
+                      <MultiDayEventSubEventsForm
+                        day={name}
+                        {...restField}
+                        remove={remove}
+                        teachers={teachers}
+                        form={form}
+                        limits={{
+                          start: dates[0],
+                          end: dates[1],
+                        }}
+                      />
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-center mt-2">
+                    <Button className="w-1/2" onClick={() => add()} block>
+                      <Icon icon="addCircle" title="הוסף יום" />
+                    </Button>
+                  </div>
+                </>
+              )}
+            </Form.List>
+          )}
+          <AddLinksForm />
+          <AddPricesForm />
+          <Form.Item
+            wrapperCol={{ span: 24 }}
+            className="mt-4 flex justify-center"
+          >
+            <Button type="primary" htmlType="submit">
+              צור אירוע
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+      <div className="flex justify-center items-center w-full h-12">
+      </div>
+    </>
   );
 }
