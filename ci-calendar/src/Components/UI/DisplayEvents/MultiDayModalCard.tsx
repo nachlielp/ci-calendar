@@ -70,8 +70,8 @@ export default function MultiDayModalCard({ event }: MultiDayModalCardProps) {
                 <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
                     <Icon icon="event" className="w-5 h-5 mt-1 align-middle" />
                     <p>
-                        <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;עד ה-
-                        <b>{formatHebrewDate(event.subEvents[event.subEvents.length - 1].endTime)}</b>
+                        <b>{formatHebrewDate(event.dates.startDate)}</b>&nbsp;עד ה-
+                        <b>{formatHebrewDate(event.dates.endDate)}</b>
                     </p>
                 </div>
 
