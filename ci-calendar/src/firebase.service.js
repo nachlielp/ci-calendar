@@ -294,7 +294,7 @@ export async function subscribeToDoc(docPath, cb) {
 export async function getTeachersAndAdminsList() {
   try {
     const db = await getDb();
-    const teachersRef = query(collection(db, "users"), where("userType", "in", ["teacher", "admin"]));
+    const teachersRef = query(collection(db, "teachers"), where("allowTagging", "==", true));
     const querySnapshot = await getDocs(teachersRef);
     const result = [];
     querySnapshot.forEach(doc => {

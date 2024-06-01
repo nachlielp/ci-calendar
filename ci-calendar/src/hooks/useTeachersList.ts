@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { firebaseService } from "../firebase.service";
+import { useAuthContext } from "../Components/Auth/AuthContext";
 
 export const useTeachersList = () => {
     const [teachers, setTeachers] = useState<{ label: string, value: string }[]>([]);
     const [loading, setLoading] = useState(true);
-
+    const { getTeachersList } = useAuthContext();
     useEffect(() => {
         const initTFirebase = async () => {
             try {
-                const teacheres = await firebaseService.getTeachersAndAdminsList();
+                const teacheres = await getTeachersList();
                 setTeachers(teacheres);
                 setLoading(false);
             } catch (error) {

@@ -153,13 +153,13 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
             >
               <Checkbox />
             </Form.Item>
-            <Form.Item<FieldType>
+            {/* <Form.Item<FieldType>
               label="אפשר תיוג"
               name="allowTagging"
               valuePropName="checked"
             >
               <Checkbox />
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
               <Button type="primary" htmlType="submit">
                 שמור

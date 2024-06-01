@@ -15,6 +15,7 @@ import {
   subscribeToDoc,
   removeMultipleDocuments,
   addDocumentIfNotExists,
+  getTeachersAndAdminsList,
 } from "../../firebase.service";
 import { DbTeacher, DbUser, IEvently, UserType } from "../../util/interfaces";
 
@@ -43,6 +44,7 @@ interface IAuthContextType {
   disableTeacher: (teacherId: string) => Promise<void>;
   updateTeacher: (teacher: DbTeacher) => Promise<void>;
   getTeacher: (teacherId: string) => Promise<DbTeacher | null>;
+  getTeachersList: () => Promise<{ label: string; value: string }[]>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -295,6 +297,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       throw error;
     }
   }
+
+  async function getTeachersList() {
+    const teachers = await getTeachersAndAdminsList();
+    return teachers;
+  }
+
   const value = {
     currentUser,
     loading,
@@ -315,6 +323,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     disableTeacher,
     updateTeacher,
     getTeacher,
+    getTeachersList,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
