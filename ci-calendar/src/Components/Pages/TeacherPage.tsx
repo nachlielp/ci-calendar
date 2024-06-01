@@ -4,8 +4,11 @@ function TeacherPage() {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center mt-10">
       <div className="flex flex-row items-center justify-center">
-        <LinkButton to="/bio" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+        <LinkButton to="/user" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
           פרופיל  אישי
+        </LinkButton>
+        <LinkButton to="/bio" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+          פרופיל ציבורי
         </LinkButton>
         <LinkButton to="/manage-events" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
           הארועים שלי

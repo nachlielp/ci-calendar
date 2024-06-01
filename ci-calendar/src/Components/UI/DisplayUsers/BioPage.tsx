@@ -18,7 +18,7 @@ function BioPage() {
         )}
       </div>
       {editProfile ? (
-        <TeacherForm handleSubmit={handleSubmitEdit} />
+        <TeacherForm showBioInTeacherPage={handleSubmitEdit} />
       ) : (
         <BioCard />
       )}

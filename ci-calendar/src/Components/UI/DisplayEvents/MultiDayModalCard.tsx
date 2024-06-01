@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, Modal, Tag } from 'antd';
 import { formatHebrewDate, getEventTeachersIds, getTag, isWhiteSpace } from './SingleDayEventCard';
-import { useTeacherBio } from '../../../hooks/useTeacherBio';
+import { useGetTeachers } from '../../../hooks/useGetTeachers';
 import { Icon } from '../Other/Icon';
 import dayjs from 'dayjs';
 import { EventlyType, IEvently } from '../../../util/interfaces';
@@ -48,7 +48,7 @@ export default function MultiDayModalCard({ event }: MultiDayModalCardProps) {
     };
 
     const teachersIds = getEventTeachersIds(event);
-    const { teachers } = useTeacherBio({ ids: teachersIds });
+    const { teachers } = useGetTeachers({ ids: teachersIds });
 
     const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
     return (
@@ -91,7 +91,7 @@ export default function MultiDayModalCard({ event }: MultiDayModalCardProps) {
                                                 const isTeacher = teachers.find((t) => t.id === teacher.value);
                                                 return (
                                                     <React.Fragment key={teacher.value}>
-                                                        {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                                                        {isTeacher ? <BioModal teacher={isTeacher} /> : teacher.label}
                                                         {index < array.length - 1 ? ', ' : ''}
                                                     </React.Fragment>
                                                 );

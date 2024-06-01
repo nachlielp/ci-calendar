@@ -8,7 +8,7 @@ import { EventlyType, IEventiPart, IEvently } from "../../../util/interfaces";
 import RecycleEvent from "../Other/RecycleEvent";
 import BioModal from "../DisplayUsers/BioModal";
 import { formatHebrewDate, getEventTeachersIds } from "./SingleDayEventCard";
-import { useTeacherBio } from "../../../hooks/useTeacherBio";
+import { useGetTeachers } from "../../../hooks/useGetTeachers";
 import HideEvent from "../Other/HideEvent";
 import { Icon } from "../Other/Icon";
 import MultiDayModalCard from "./MultiDayModalCard";
@@ -26,7 +26,7 @@ export const MultiDayEventCard = React.forwardRef<
   const groupedSubEvents = groupAndSortSubEvents(event.subEvents);
 
   const teachersIds = getEventTeachersIds(event);
-  const { teachers } = useTeacherBio({ ids: teachersIds });
+  const { teachers } = useGetTeachers({ ids: teachersIds });
 
   function openGoogleMaps(placeId: string, address: string) {
     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
@@ -97,7 +97,7 @@ export const MultiDayEventCard = React.forwardRef<
                       const isTeacher = teachers.find((t) => t.id === teacher.value);
                       return (
                         <React.Fragment key={teacher.value}>
-                          {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                          {isTeacher ? <BioModal teacher={isTeacher} /> : teacher.label}
                           {index < array.length - 1 ? ', ' : ''}
                         </React.Fragment>
                       );

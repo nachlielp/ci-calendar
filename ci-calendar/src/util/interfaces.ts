@@ -72,12 +72,8 @@ export interface DbUser {
   fullName: string;
   phoneNumber: string;
   email: string;
-  bio: string;
   subscribedForUpdatesAt: string;
   newsletter: boolean;
-  img: string;
-  pageUrl: ILink;
-  showProfile: boolean;
 }
 
 export interface DbTeacher {

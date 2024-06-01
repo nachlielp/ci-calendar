@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Button, Typography, Modal, Image } from 'antd';
-import { DbUser } from '../../../util/interfaces';
+import { DbTeacher } from '../../../util/interfaces';
 const { Title, Text } = Typography;
 
 interface BioModalProps {
-    user: DbUser
+    teacher: DbTeacher
 }
 
-export default function BioModal({ user }: BioModalProps) {
+export default function BioModal({ teacher }: BioModalProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = () => {
@@ -22,8 +22,8 @@ export default function BioModal({ user }: BioModalProps) {
         setIsModalOpen(false);
     };
 
-    const imgComponent = user.img ? (
-        <Image alt="example" src={user.img} key={user.img} width={340} height={340} style={{ objectFit: "cover", borderRadius: "5%" }} />
+    const imgComponent = teacher.img ? (
+        <Image alt="example" src={teacher.img} key={teacher.img} width={340} height={340} style={{ objectFit: "cover", borderRadius: "5%" }} />
     ) : (
         ""
     );
@@ -31,23 +31,23 @@ export default function BioModal({ user }: BioModalProps) {
     return (
         <>
             <Button type="link" onClick={showModal} style={{ color: 'blue', textDecoration: 'underline', border: 'none', padding: "2px" }}>
-                {user.fullName}
+                {teacher.fullName}
             </Button>
 
             <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
                 <div className="flex flex-col justify-center items-center w-full ">
-                    <Title level={3}>{user.fullName}</Title>
+                    <Title level={3}>{teacher.fullName}</Title>
                     {imgComponent}
-                    <Text className="m-10">{user.bio}</Text>
-                    {user.pageUrl?.link && (
+                    <Text className="m-10">{teacher.bio}</Text>
+                    {teacher.pageUrl && (
                         <Button
                             className="mt-5 w-full"
-                            key={user.pageUrl.link}
+                            key={teacher.pageUrl}
                             type="default"
-                            href={user.pageUrl.link}
+                            href={teacher.pageUrl}
                             target="_blank"
                         >
-                            {user.pageUrl.title}
+                            {teacher.pageTitle}
                         </Button>
                     )}
                 </div>

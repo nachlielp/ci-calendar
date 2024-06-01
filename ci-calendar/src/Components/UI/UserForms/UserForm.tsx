@@ -21,7 +21,6 @@ export default function UserForm({ user }: IUserFormProps) {
       ? new Date().toISOString()
       : "";
     user.phoneNumber = values.phoneNumber || "";
-    console.log(user)
     try {
       await updateUser(user);
     } catch (error) {
@@ -29,18 +28,18 @@ export default function UserForm({ user }: IUserFormProps) {
     }
   };
 
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
-    errorInfo
-  ) => {
-    console.log("Failed:", errorInfo);
-  };
+  // const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
+  //   errorInfo
+  // ) => {
+  //   console.log("Failed:", errorInfo);
+  // };
 
   return (
     <div className="flex justify-center">
       <Card style={{ width: 300, marginTop: '1rem' }} id="user-form">
         <Form
           onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
+          // onFinishFailed={onFinishFailed}
           autoComplete="off"
           initialValues={{
             name: user.fullName,

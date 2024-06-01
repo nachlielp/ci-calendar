@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, Modal, Tag } from 'antd';
 import { formatHebrewDate, getEventTeachersIds, getTag, getType, getTypes, isWhiteSpace } from './SingleDayEventCard';
-import { useTeacherBio } from '../../../hooks/useTeacherBio';
+import { useGetTeachers } from '../../../hooks/useGetTeachers';
 import { Icon } from '../Other/Icon';
 import dayjs from 'dayjs';
 import { EventlyType, IEvently } from '../../../util/interfaces';
@@ -47,7 +47,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
 
     const subEventLen = Object.values(event.subEvents).length;
     const teachersIds = getEventTeachersIds(event);
-    const { teachers } = useTeacherBio({ ids: teachersIds });
+    const { teachers } = useGetTeachers({ ids: teachersIds });
 
 
     return (
@@ -83,10 +83,10 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                                 <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
                                 {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
                                 {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-                                {<>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
+                                {/* {<>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
                                     const isTeacher = teachers.find((t) => t.id === teacher.value);
-                                    return isTeacher ? <BioModal user={isTeacher} key={teacher.value} /> : teacher.label;
-                                })}</>}
+                                    return isTeacher ? <BioModal teacher={isTeacher} key={teacher.value} /> : teacher.label;
+                                })}</>} */}
                             </>
                         ) : (
                             <span>No event times available</span>
@@ -108,7 +108,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                                             const isTeacher = teachers.find((t) => t.id === teacher.value);
                                             return (
                                                 <React.Fragment key={teacher.value}>
-                                                    {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                                                    {isTeacher ? <BioModal teacher={isTeacher} /> : teacher.label}
                                                     {index < array.length - 1 ? ', ' : ''}
                                                 </React.Fragment>
                                             );

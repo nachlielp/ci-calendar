@@ -6,7 +6,7 @@ import EditEvent from "../Other/EditEvent";
 import RecycleEvent from "../Other/RecycleEvent";
 import HideEvent from "../Other/HideEvent";
 import BioModal from "../DisplayUsers/BioModal";
-import { useTeacherBio } from "../../../hooks/useTeacherBio";
+import { useGetTeachers } from "../../../hooks/useGetTeachers";
 import { EventlyType, IEvently } from "../../../util/interfaces";
 import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
 import { Icon } from "../Other/Icon";
@@ -44,8 +44,7 @@ export const SingleDayEventCard = React.forwardRef<
 
   const subEventLen = Object.values(event.subEvents).length;
   const teachersIds = getEventTeachersIds(event);
-  const { teachers } = useTeacherBio({ ids: teachersIds });
-
+  const { teachers } = useGetTeachers({ ids: teachersIds });
   const nonRegestoredTeacherNames = Array.from(
     new Set(
       Object.values(event.subEvents)
@@ -66,7 +65,7 @@ export const SingleDayEventCard = React.forwardRef<
 
   const teachersBioOrName = regestoredTeacherOptions.map(teacher => {
     const isTeacher = teachers.find(t => t.id === teacher.value);
-    return isTeacher ? <BioModal key={teacher.value} user={isTeacher} /> : teacher.label;
+    return isTeacher ? <BioModal key={teacher.value} teacher={isTeacher} /> : teacher.label;
   });
   const footer = isEdit
     ? [
@@ -140,7 +139,7 @@ export const SingleDayEventCard = React.forwardRef<
                     const isTeacher = teachers.find((t) => t.id === teacher.value);
                     return (
                       <React.Fragment key={teacher.value}>
-                        {isTeacher ? <BioModal user={isTeacher} /> : teacher.label}
+                        {isTeacher ? <BioModal teacher={isTeacher} /> : teacher.label}
                         {index < array.length - 1 ? ', ' : ''}
                       </React.Fragment>
                     );

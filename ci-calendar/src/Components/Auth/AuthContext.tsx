@@ -41,6 +41,8 @@ interface IAuthContextType {
   hideOrShowMultipleEventlys: (eventIds: string[], hide: boolean) => Promise<void>;
   addTeacher: (teacher: DbTeacher) => Promise<void>;
   disableTeacher: (teacherId: string) => Promise<void>;
+  updateTeacher: (teacher: DbTeacher) => Promise<void>;
+  getTeacher: (teacherId: string) => Promise<DbTeacher | null>;
 }
 
 const AuthContext = React.createContext<IAuthContextType | null>(null);
@@ -140,18 +142,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           fullName: user.displayName || "",
           userType: UserType.user,
           email: user.email || "",
-          bio: "",
           newsletter: false,
           subscribedForUpdatesAt: "",
           phoneNumber: "",
-          img: "",
-          pageUrl: {
-            link: "",
-            title: "",
-          },
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          showProfile: false,
         };
         await addDocument("users", newUser);
         setCurrentUser(newUser);
@@ -261,7 +256,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe;
   }
 
-  //TODO upsert teacher
+
+  async function getTeacher(teacherId: string) {
+    try {
+      const teacherDoc = await getDocument("teachers", teacherId);
+      if (teacherDoc) {
+        return teacherDoc as DbTeacher;
+      }
+      return null;
+    } catch (error) {
+      console.error("AuthContext.getTeacher.error: ", error);
+      throw error;
+    }
+  }
   async function addTeacher(teacher: DbTeacher) {
     try {
       await addDocumentIfNotExists("teachers", teacher.id, teacher);
@@ -276,6 +283,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await updateDocument("teachers", teacherId, { allowTagging: false, showProfile: false });
     } catch (error) {
       console.error("AuthContext.disableTeacher.error: ", error);
+      throw error;
+    }
+  }
+
+  async function updateTeacher(teacher: DbTeacher) {
+    try {
+      await updateDocument("teachers", teacher.id, teacher);
+    } catch (error) {
+      console.error("AuthContext.updateTeacher.error: ", error);
       throw error;
     }
   }
@@ -297,6 +313,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     hideOrShowMultipleEventlys,
     addTeacher,
     disableTeacher,
+    updateTeacher,
+    getTeacher,
   };
   //
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
