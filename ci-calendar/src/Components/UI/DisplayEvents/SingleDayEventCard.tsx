@@ -190,7 +190,7 @@ export const SingleDayEventCard = React.forwardRef<
         </div>
       )}
 
-      <div style={{ marginTop: 16 }}>
+      {isEdit && <div style={{ marginTop: 16 }}>
         {event.links.length > 0 &&
           event.links.map((link) => (
             <Button
@@ -203,7 +203,7 @@ export const SingleDayEventCard = React.forwardRef<
               {link.title}
             </Button>
           ))}
-      </div>
+      </div>}
     </Card>
   );
 });
