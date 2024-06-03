@@ -2,26 +2,26 @@ import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./styles/overrides.css";
 import { AuthProvider } from "./Components/Auth/AuthContext";
+import Header from './Components/UI/Other/Header';
+import { PrivateRoutes } from './Components/Auth/PrivateRoutes';
+import { UserType } from "./util/interfaces";
+import { useEvents } from "./hooks/useEvents";
+import { SpeedInsights } from "@vercel/speed-insights/react"
 const Signup = lazy(() => import('./Components/Auth/Signup'));
 const Login = lazy(() => import('./Components/Auth/Login'));
 const ResetPassword = lazy(() => import('./Components/Auth/ResetPassword'));
-import { PrivateRoutes } from './Components/Auth/PrivateRoutes';
-import Header from './Components/UI/Other/Header';
 const UserPage = lazy(() => import('./Components/Pages/UserPage'));
 const TeacherPage = lazy(() => import('./Components/Pages/TeacherPage'));
 const EventForm = lazy(() => import('./Components/UI/EventForms/SingleDayEventForm'));
-import { UserType } from "./util/interfaces";
 const BioPage = lazy(() => import('./Components/UI/DisplayUsers/BioPage'));
 const EditSingleDayEventForm = lazy(() => import('./Components/UI/EventForms/EditSingleDayEventForm'));
 const Loading = lazy(() => import('./Components/UI/Other/Loading'));
 const AdminPage = lazy(() => import('./Components/Pages/AdminPage'));
 const ManageUsers = lazy(() => import('./Components/UI/Other/ManageUsers'));
-import { useEvents } from "./hooks/useEvents";
 const EventsDisplay = lazy(() => import('./Components/UI/Other/EventsDisplay'));
 const MultiDayEventForm = lazy(() => import('./Components/UI/EventForms/MultiDayEventForm'));
 const EditMultiDayEventForm = lazy(() => import('./Components/UI/EventForms/EditMultiDayEventForm'));
 const ManageEventsTable = lazy(() => import('./Components/UI/DisplayEvents/ManageEventsTable'));
-import { SpeedInsights } from "@vercel/speed-insights/react"
 
 export enum EventAction {
   edit,

@@ -13,7 +13,6 @@
     "-": "^0.0.1",
     "@cloudinary/react": "^1.13.0",
     "@cloudinary/url-gen": "^1.19.0",
-    "@libsql/client": "^0.6.0",
     "@vercel/speed-insights": "^1.0.11",
     "antd": "^5.16.1",
     "dayjs": "^1.11.10",
@@ -23,7 +22,6 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-google-places-autocomplete": "^4.0.1",
-    "react-highlight-words": "^0.20.0",
     "react-router-dom": "^6.22.3",
     "uuid": "^9.0.1",
     "vite-plugin-pwa": "^0.20.0"
@@ -31,7 +29,6 @@
   "devDependencies": {
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
-    "@types/react-highlight-words": "^0.16.7",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
