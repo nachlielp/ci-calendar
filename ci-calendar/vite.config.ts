@@ -1,6 +1,8 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa";
+import { visualizer } from "rollup-plugin-visualizer";
+
 //
 const manifestForPlugin: Partial<VitePWAOptions> = {
   registerType: "prompt",
@@ -37,10 +39,15 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
     orientation: "portrait",
   },
 };
-// https://vitejs.dev/config/
+
 export default defineConfig({
   base: "./",
-  plugins: [react(), VitePWA(manifestForPlugin)],
+  plugins: [
+    react(),
+    VitePWA(manifestForPlugin),
+    visualizer({ open: true }) // This plugin helps visualize the size of your bundles
+  ],
+
   server: {
     host: "localhost",
   },
