@@ -11,6 +11,7 @@ specifiers:
   '@types/uuid': ^9.0.8
   '@typescript-eslint/eslint-plugin': ^7.2.0
   '@typescript-eslint/parser': ^7.2.0
+  '@vercel/speed-insights': ^1.0.11
   '@vitejs/plugin-react': ^4.2.1
   antd: ^5.16.1
   autoprefixer: ^10.4.19
@@ -38,6 +39,7 @@ dependencies:
   '@cloudinary/react': 1.13.0_react@18.3.1
   '@cloudinary/url-gen': 1.19.0
   '@libsql/client': 0.6.0
+  '@vercel/speed-insights': 1.0.11_react@18.3.1
   antd: 5.17.4_nnrd3gsncyragczmpvfhocinkq
   dayjs: 1.11.11
   firebase: 10.12.2
@@ -2983,6 +2985,33 @@ packages:
   /@ungap/structured-clone/1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
+
+  /@vercel/speed-insights/1.0.11_react@18.3.1:
+    resolution: {integrity: sha512-l9hzSNmJvb2Yqpgd/BzpiT0J0aQDdtqxOf3Xm+iW4PICxVvhY1ef7Otdx4GXI+88dVkws57qMzXiShz19gXzSQ==}
+    requiresBuild: true
+    peerDependencies:
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      react: ^18 || ^19
+      svelte: ^4
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+    dependencies:
+      react: 18.3.1
+    dev: false
 
   /@vitejs/plugin-react/4.3.0_vite@5.2.12:
     resolution: {integrity: sha512-KcEbMsn4Dpk+LIbHMj7gDPRKaTMStxxWRkRmxsg/jVdFdJCZWt1SchZcf0M4t8lIKdwwMsEyzhrcOXRrDPtOBw==}
