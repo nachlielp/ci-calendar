@@ -53,22 +53,22 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
 
   return (
     <>
-      <header className="flex flex-col justify-center items-center mt-5">
-        <h1 className="text-2xl mb-3">קונטקט ישראל</h1>
-        <main className="flex flex-row items-center">
+      <header className="events-display-header">
+        <h1 className="events-display-title">קונטקט ישראל</h1>
+        <main className="events-display-main">
           <FilterModel />
-          <div className="flex flex-row">
+          <div className="events-display-buttons">
             <Button
               onClick={onViewList}
-              className={`flex items-center justify-center  rounded-r-none  ${isListView ? 'bg-gray-300' : ''}`}
+              className={`events-display-button left ${isListView ? 'events-display-button-active' : ''}`}
             >
-              <Icon icon="viewDay" className="w-6 h-6 " />
+              <Icon icon="viewDay" className="events-display-icon" />
             </Button>
             <Button
               onClick={onViewCalendar}
-              className={`flex items-center justify-center  rounded-l-none  ${!isListView ? 'bg-gray-300' : ''}`}
+              className={`events-display-button right ${!isListView ? 'events-display-button-active' : ''}`}
             >
-              <Icon icon="calendar" className="w-6 h-6 " />
+              <Icon icon="calendar" className="events-display-icon" />
             </Button>
           </div>
         </main>
