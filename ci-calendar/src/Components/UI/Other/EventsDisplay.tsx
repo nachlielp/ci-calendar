@@ -17,10 +17,10 @@ interface IEventsDisplayProps {
   isEdit: boolean;
 }
 
-//TODO hide scroll base on list view
-function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
+export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
   const [isListView, setIsListView] = useState<boolean>(true);
+
   useEffect(() => {
     const futureEvents = events.filter((event) => dayjs(event.dates["endDate"]).isAfter(dayjs().startOf('day')));
     setFutureEvents(futureEvents);
@@ -51,8 +51,9 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
     setSelectedDay(dayjs())
   }
 
+
   return (
-    <>
+    <div className="events-display">
       <header className="events-display-header">
         <h1 className="events-display-title">קונטקט ישראל</h1>
         <main className="events-display-main">
@@ -73,19 +74,21 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
           </div>
         </main>
       </header>
-      {!isListView ? (
-        <>
-          <CalendarView
-            events={filteredEvents}
-            onSelect={onSelect}
-          />
-          <EventsList events={todaysEvents} isEdit={isEdit} isEvents={!!events.length} />
-        </>
-      ) : (
-        <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} />
-      )}
-    </>
+      <div className="events-display-list">
+        {!isListView ? (
+          <>
+            <CalendarView
+              events={filteredEvents}
+              onSelect={onSelect}
+            />
+            <EventsList events={todaysEvents} isEdit={isEdit} isEvents={!!events.length} />
+          </>
+        ) : (
+          <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} />
+        )}
+      </div>
+
+
+    </div>
   );
 }
-
-export default EventsDisplay;

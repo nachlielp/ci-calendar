@@ -1,3 +1,17 @@
+.events-display {
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.events-display::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari, and Opera */
+}
+
 .events-display-header {
     display: flex;
     flex-direction: column;
@@ -19,6 +33,7 @@
     justify-content: center;
     justify-self: center;
 }
+
 
 .events-display-buttons {
     display: flex;
@@ -50,4 +65,25 @@
 .events-display-icon {
     width: 2rem;
     height: 2rem;
+}
+
+.scroll-to-top {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    /* background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000; */
+}
+
+.scroll-to-top.show {
+    opacity: 1;
 }
