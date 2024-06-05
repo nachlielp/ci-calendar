@@ -7,12 +7,14 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import Loading from "../Other/Loading";
 import EmptyList from "../Other/Empty";
 import { MultiDayEventCard } from "./MultiDayEventCard";
+import { Empty } from "antd";
 
 interface IEventsListProps {
   events: IEvently[];
   isEdit: boolean;
+  isEvents: boolean;
 }
-export default function EventsList({ events, isEdit }: IEventsListProps) {
+export default function EventsList({ events, isEdit, isEvents }: IEventsListProps) {
   const { width } = useWindowSize();
   const { currentUser } = useAuthContext();
   const isAdmin = currentUser?.userType === "admin";
@@ -31,7 +33,8 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
   if (!filteredEvents) return <Loading />;
 
   return (
-    <div className="flex flex-col items-center w-full">
+    <div className="events-list-container">
+      {!isEvents && emptyEventsList()}
       {filteredEvents.map((event) => (
         <div key={event.id} style={{ width: adjustedItemWidth }}>
           {event.dates["startDate"] === event.dates["endDate"] ? (
@@ -51,51 +54,19 @@ export default function EventsList({ events, isEdit }: IEventsListProps) {
           )}
         </div>
       ))}
-      <div className="flex justify-center items-center w-full h-12">
-
+      <div className="events-list-footer">
       </div>
-      {/* <VirtualList
-        className="flex justify-center items-center w-full"
-        data={filteredEvents}
-        height={adjustedHeight}
-        onScroll={() => {
-          console.log("onScroll")
-        }}
-        itemHeight={47}
-        itemKey="id"
-      >
-        {(event: IEvently) => (
-          <div key={event.id} style={{ width: adjustedItemWidth }}>
-            {event.dates["startDate"] === event.dates["endDate"] ? (
-              <SingleDayEventCard
-                key={event.id}
-                event={event}
-                cardWidth={adjustedItemWidth}
-                screenWidth={width}
-                isEdit={isEdit}
-              />
-            ) : (
-              <MultiDayEventCard
-                key={event.id}
-                event={event}
-                cardWidth={adjustedItemWidth}
-                screenWidth={width}
-                isEdit={isEdit}
-              />
-            )}
-          </div>
-        )}
-      </VirtualList> */}
     </div>
   );
 }
 
-// const emptyEventsList = () => {
-//   return (
-//     <Empty
-//       image="https://gw.alipayobjects.com/zos/antfincdn/ZHrcdLPrvN/empty.svg"
-//       imageStyle={{ height: 60 }}
-//       description={<span>אופס, נראה שיש לנו בעיה</span>}
-//     ></Empty>
-//   );
-// };
+const emptyEventsList = () => {
+  return (
+    <Empty
+      imageStyle={{ height: 60, marginTop: "10rem" }}
+      description={<span></ span>}
+    >
+      <span style={{ fontSize: "1.5rem" }}>אופס, נראה שיש לנו בעיה</span>
+    </Empty>
+  );
+};

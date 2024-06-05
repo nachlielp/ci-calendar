@@ -79,10 +79,10 @@ function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
             events={filteredEvents}
             onSelect={onSelect}
           />
-          <EventsList events={todaysEvents} isEdit={isEdit} />
+          <EventsList events={todaysEvents} isEdit={isEdit} isEvents={!!events.length} />
         </>
       ) : (
-        <EventsList events={futureEvents} isEdit={isEdit} />
+        <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} />
       )}
     </>
   );

@@ -3,7 +3,7 @@
 @import "./styles/signup.css";
 @import "./styles/reset-password.css";
 @import "./styles/teacher-page.css";
-
+@import "./styles/events-list.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
