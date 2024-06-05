@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuthContext } from "./AuthContext";
 import { LinkButton } from "../UI/Other/LinkButton";
+
 enum LoginError {
   none = "",
   wrongPassword = "הסימה לא מתאימה לכתובת מייל",
@@ -58,8 +59,8 @@ export default function Login() {
   };
 
   return (
-    <Card id="login-form" className="mx-auto max-w-sm mt-4">
-      <h1 className="text-2xl font-bold text-center mb-2">כניסה</h1>
+    <Card id="login-form" className="login-form">
+      <h1 className="login-title">כניסה</h1>
       <Form
         name="basic"
         labelCol={{ span: 16 }}
@@ -91,7 +92,7 @@ export default function Login() {
             type="primary"
             htmlType="submit"
             disabled={loading}
-            style={{ width: "100%" }}
+            className="login-button"
           >
             כניסה
           </Button>
@@ -102,15 +103,14 @@ export default function Login() {
           type="default"
           onClick={googleSignIn}
           disabled={loading}
-          style={{ width: "100%" }}
+          className="google-button"
         >
           כניסה עם Google
         </Button>
       </div>
 
-      <div className="flex justify-center pt-4 inline-block">
+      <div className="link-container">
         <LinkButton to="/reset-password">איפוס סיסמה</LinkButton>
-        <div className="w-5"></div>
         <LinkButton to="/signup">הרשמה</LinkButton>
       </div>
     </Card>
