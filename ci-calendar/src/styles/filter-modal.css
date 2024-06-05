@@ -1,0 +1,39 @@
+.filter-model-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.filter-model-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 3rem;
+    margin-right: 1rem;
+}
+
+.filter-model-button.active {
+    background-color: #d1d5db;
+}
+
+.filter-model-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.filter-model-title {
+    font-size: 1.125rem;
+    font-family: 'Rubik', sans-serif;
+
+}
+
+.filter-model-checkbox {
+    transform: scale(1.2);
+    margin: 6px;
+}
+
+.filter-model-checkbox-label {
+    font-size: 1.125rem;
+}

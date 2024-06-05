@@ -23,48 +23,47 @@ export default function FilterModel() {
   };
 
   return (
-    <>
+    <div className="filter-model-container">
       <Button
         onClick={() => setModalOpen(true)}
-        className={`flex items-center justify-center mr-4 ${currentEventTypeValues.length || currentDistrictValues.length ? 'bg-gray-300' : ''}`}
+        className={`filter-model-button ${currentEventTypeValues.length || currentDistrictValues.length ? 'active' : ''}`}
       >
-        <Icon icon="instantMix" className="w-6 h-6 " />
+        <Icon icon="instantMix" className="filter-model-icon" />
       </Button>
+
       <Modal
         open={modalOpen}
         onOk={() => setModalOpen(false)}
         onCancel={() => setModalOpen(false)}
-        footer={<Button onClick={clearAllSearchParams}>נקה </Button>}
+        footer={<Button onClick={clearAllSearchParams} className="default-font">נקה </Button>}
       >
         <div>
-          <b className="text-lg">סוג אירוע</b>
+          <b className="filter-model-title default-font">סוג אירוע</b>
         </div>
         <Checkbox.Group
           value={currentEventTypeValues}
           onChange={onEventTypeOptionsChange("eventType")}
         >
           {eventTypes.filter(eventType => eventType.value !== "warmup").map(eventType => (
-            <Checkbox key={eventType.value} value={eventType.value} style={{ transform: 'scale(1.2)', margin: '6px' }}>
-              <p className="text-lg">{eventType.label}</p>
+            <Checkbox key={eventType.value} value={eventType.value} className="filter-model-checkbox">
+              <p className="filter-model-checkbox-label default-font">{eventType.label}</p>
             </Checkbox>
           ))}
         </Checkbox.Group>
         <div>
-          <b className="text-lg">אזור</b>
+          <b className="filter-model-title">אזור</b>
         </div>
         <Checkbox.Group
-          // options={districtOptions}
           value={currentDistrictValues}
           onChange={onDistrictOptionsChange("district")}
         >
           {districtOptions.map(district => (
-            <Checkbox key={district.value} value={district.value} style={{ transform: 'scale(1.2)', margin: '6px' }}>
-              <p className="text-lg">{district.label}</p>
+            <Checkbox key={district.value} value={district.value} className="filter-model-checkbox">
+              <p className="filter-model-checkbox-label default-font">{district.label}</p>
             </Checkbox>
           ))}
         </Checkbox.Group>
       </Modal>
-      <br />
-    </>
+    </div>
   );
 }
