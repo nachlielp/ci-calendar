@@ -32,11 +32,11 @@ function ResetPassword() {
   };
 
   return (
-    <Card id="reset-password-form" className="mx-auto max-w-sm mt-4">
-      <h1 className="text-2xl font-bold text-center mb-2">Reset Password</h1>
+    <Card id="reset-password-form" className="reset-password-form">
+      <h1 className="reset-password-title">איפוס סיסמה</h1>
 
       <Form
-        title=" Reset Password"
+        title=" איפוס סיסמה"
         name="basic"
         labelCol={{ span: 16 }}
         wrapperCol={{ span: 24 }}
@@ -44,7 +44,7 @@ function ResetPassword() {
         onFinish={onFinish}
       >
         <Form.Item>
-          <Input type="email" placeholder="Email" ref={emailRef} required />
+          <Input type="email" placeholder="אימייל" ref={emailRef} required />
         </Form.Item>
         {message ? (
           <Form.Item>
@@ -58,9 +58,9 @@ function ResetPassword() {
             type="primary"
             htmlType="submit"
             disabled={loading}
-            style={{ width: "100%" }}
+            className="reset-password-button"
           >
-            Reset Password
+            איפוס סיסמה
           </Button>
         </Form.Item>
       </Form>
