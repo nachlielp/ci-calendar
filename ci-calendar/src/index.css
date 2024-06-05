@@ -4,6 +4,22 @@
 @import "./styles/reset-password.css";
 @import "./styles/teacher-page.css";
 @import "./styles/events-list.css";
+@import "./styles/events-display.css";
+@import "./styles/filter-modal.css";
+
+@font-face {
+    font-family: 'Rubik';
+    src: url('./assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
+}
+
+body {
+    font-family: 'Rubik', sans-serif;
+}
+
+.default-font {
+    font-family: 'Rubik', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
