@@ -1,4 +1,6 @@
 @import "./styles/header.css";
+/* @import "./styles/login.css"; */
+@import "./styles/signup.css";
 
 @tailwind base;
 @tailwind components;

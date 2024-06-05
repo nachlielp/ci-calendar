@@ -31,8 +31,6 @@ export default function Signup() {
       passwordRef.current?.input?.value !==
       passwordConfRef.current?.input?.value
     ) {
-      // console.log(`${passwordRef.current?.input?.value} !==
-      // ${passwordConfRef.current?.input?.value}`);
       return setError(SignupError.passwordsDontMatch);
     }
     try {
@@ -58,6 +56,7 @@ export default function Signup() {
     }
     setLoading(false);
   };
+
   const googleSignIn = async () => {
     try {
       await googleLogin();
@@ -65,23 +64,24 @@ export default function Signup() {
       console.error(`Signup.googleSignIn.error: ${error}`);
     }
   };
+
   return (
-    <Card id="signup-form" className="mx-auto max-w-sm mt-4">
-      <h1 className="text-2xl font-bold text-center mb-2">הרשמה</h1>
+    <Card id="signup-form" className="signup-form">
+      <h1 className="signup-title">הרשמה</h1>
 
       <Form
         title="הרשמה"
         name="basic"
         labelCol={{ span: 16 }}
         wrapperCol={{ span: 24 }}
-        style={{ maxWidth: 400 }}
+        className="signup-form-content"
         onFinish={onFinish}
       >
         <Form.Item>
-          <Input type="text" placeholder="שם" ref={nameRef} required />
+          <Input type="text" placeholder="שם" ref={nameRef} required className="signup-input" />
         </Form.Item>
         <Form.Item>
-          <Input type="email" placeholder="כתובת מייל" ref={emailRef} required />
+          <Input type="email" placeholder="כתובת מייל" ref={emailRef} required className="signup-input" />
         </Form.Item>
         <Form.Item>
           <Input.Password
@@ -89,6 +89,7 @@ export default function Signup() {
             placeholder="סיסמה"
             ref={passwordRef}
             required
+            className="signup-input"
           />
         </Form.Item>
         <Form.Item>
@@ -97,38 +98,37 @@ export default function Signup() {
             placeholder="אימות סיסמה"
             ref={passwordConfRef}
             required
+            className="signup-input"
           />
         </Form.Item>
 
-        {error ? (
+        {error && (
           <Form.Item>
-            <Alert description={error} type="error" />
+            <Alert description={error} type="error" className="signup-alert" />
           </Form.Item>
-        ) : (
-          <></>
         )}
 
-        <Form.Item>
+        <Form.Item className="button-container">
           <Button
             type="primary"
             htmlType="submit"
             disabled={loading}
-            style={{ width: "100%" }}
+            className="signup-button"
           >
             הרשמה
           </Button>
         </Form.Item>
       </Form>
-      <div>
+      <Form.Item className="button-container">
         <Button
           type="default"
           onClick={googleSignIn}
           disabled={loading}
-          style={{ width: "100%" }}
+          className="google-signin-button"
         >
           הרשמה עם Google
         </Button>
-      </div>
-    </Card>
+      </Form.Item>
+    </Card >
   );
 }
