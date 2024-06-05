@@ -40,7 +40,7 @@ export default function Header() {
           className="header-btn "
           onClick={handleLogOut}
         >
-          <Icon icon="logout" className="w-6 h-6 " />
+          <Icon icon="logout" />
         </Button>
       )}
       {!currentUser && currentPath !== "/login" && (
@@ -48,7 +48,7 @@ export default function Header() {
           to="/login"
           className="header-btn no-border"
         >
-          <Icon icon="account" className="w-6 h-6 " />
+          <Icon icon="account" />
           &nbsp; התחבר/י
         </LinkButton>
       )}
@@ -56,7 +56,7 @@ export default function Header() {
       {currentUser && <UserInfo currentUser={currentUser} />}
       {currentPath !== "/" && (
         <LinkButton to="/" className="header-btn">
-          <Icon icon="home" className="w-6 h-6 " />
+          <Icon icon="home" />
         </LinkButton>
       )}
       {currentUser && (
@@ -65,7 +65,7 @@ export default function Header() {
             to={settingsPage}
             className="header-btn "
           >
-            <Icon icon="settings" className="w-6 h-6 " />
+            <Icon icon="settings" />
           </LinkButton>
         </div>
       )}
@@ -80,11 +80,11 @@ const UserInfo = ({ currentUser }: IUserInfoProps) => {
   return (
     <div>
       {currentUser && (
-        <div className="mr-2 md:mr-6 md:ml-6">
-          <p className="text-black text-sm font-semibold">
+        <div className={`user-info-container md:user-info-container-md`}>
+          <p className={`user-name`}>
             {currentUser.fullName}
           </p>
-          <p className="text-gray-400 text-xs font-semibold">
+          <p className={`user-email`}>
             {currentUser.email}
           </p>
         </div>
