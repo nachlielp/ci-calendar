@@ -77,6 +77,7 @@ export default function Login() {
             placeholder="סיסמה"
             ref={passwordRef}
             required
+            className="default-font"
           />
         </Form.Item>
         {error ? (
@@ -92,7 +93,7 @@ export default function Login() {
             type="primary"
             htmlType="submit"
             disabled={loading}
-            className="login-button"
+            className="login-button default-font"
           >
             כניסה
           </Button>
@@ -103,15 +104,15 @@ export default function Login() {
           type="default"
           onClick={googleSignIn}
           disabled={loading}
-          className="google-button"
+          className="google-button default-font"
         >
           כניסה עם Google
         </Button>
       </div>
 
       <div className="link-container">
-        <LinkButton to="/reset-password">איפוס סיסמה</LinkButton>
-        <LinkButton to="/signup">הרשמה</LinkButton>
+        <LinkButton to="/reset-password" className="default-font">איפוס סיסמה</LinkButton>
+        <LinkButton to="/signup" className="default-font">הרשמה</LinkButton>
       </div>
     </Card>
   );

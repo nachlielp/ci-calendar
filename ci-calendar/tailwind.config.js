@@ -9,6 +9,9 @@ export default {
       colors: {
         "homepage-bg": "#fcf9e6", // You can name this key whatever you prefer
       },
+      fontFamily: {
+        sans: ["Rubik", "sans-serif"],
+      },
     },
   },
   plugins: [],
