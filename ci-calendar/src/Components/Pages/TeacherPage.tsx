@@ -1,24 +1,25 @@
 import { LinkButton } from "../UI/Other/LinkButton";
 
-function TeacherPage() {
+//TODO flex grid
+export default function TeacherPage() {
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-center mt-10">
-      <div className="flex flex-row items-center justify-center">
-        <LinkButton to="/user" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+    <div className="teacher-page-container">
+      <div className="teacher-page-row">
+        <LinkButton to="/user" className="teacher-page-button">
           פרופיל  אישי
         </LinkButton>
-        <LinkButton to="/bio" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+        <LinkButton to="/bio" className="teacher-page-button">
           פרופיל ציבורי
         </LinkButton>
-        <LinkButton to="/manage-events" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+        <LinkButton to="/manage-events" className="teacher-page-button">
           הארועים שלי
         </LinkButton>
       </div>
-      <div className="flex flex-row items-center justify-center">
-        <LinkButton to="/event-form" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+      <div className="teacher-page-row">
+        <LinkButton to="/event-form" className="teacher-page-button">
           הוסף אירוע  חד יומי
         </LinkButton>
-        <LinkButton to="/multi-day-event-form" className="w-24 h-24 m-4 font-bold text-lg flex items-center justify-center text-center break-words whitespace-normal">
+        <LinkButton to="/multi-day-event-form" className="teacher-page-button">
           הוסף ארוע  רב יומי
         </LinkButton>
       </div>
@@ -26,4 +27,3 @@ function TeacherPage() {
   );
 }
 
-export default TeacherPage;
