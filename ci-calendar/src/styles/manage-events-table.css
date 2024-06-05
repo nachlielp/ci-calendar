@@ -1,0 +1,78 @@
+.manage-events-table {
+    max-width: 100%;
+    margin: 1rem auto;
+}
+
+.manage-events-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+}
+
+.header-phone {
+    flex-direction: column;
+    align-items: center;
+}
+
+.header-desktop {
+    flex-direction: row;
+}
+
+.header-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.header-row-inner {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1rem;
+}
+
+.select-teacher {
+    width: 200px;
+}
+
+.switch-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.switch-show-future {
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-top: 0.25rem;
+}
+
+.actions-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.delete-multiple-events {
+    margin-right: 1rem;
+}
+
+.hide-multiple-events {
+    margin-right: 1rem;
+}
+
+.show-multiple-events {
+    margin-right: 1rem;
+}
+
+.selected-events-count-container {
+    margin-top: 1rem;
+}
+
+.selected-events-count {
+    margin-right: 1rem;
+    margin-left: 1rem;
+}
+
+.event-card-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}

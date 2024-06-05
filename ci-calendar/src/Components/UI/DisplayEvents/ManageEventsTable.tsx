@@ -151,14 +151,14 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         return Array.from(teacherMap.values());
     };
     return (
-        <section className={`max-w-[${tableWidth}px] mx-auto m-4`}>
-            <header className={`flex ${isPhone ? 'flex-col items-center' : 'flex-row'} justify-center mb-4 mr-4`}>
-                <div className="flex flex-row">
-                    <div className="flex flex-row mb-4">
+        <section className={`manage-events-table max-w-${tableWidth}px`}>
+            <header className={`manage-events-header ${isPhone ? 'header-phone' : 'header-desktop'}`}>
+                <div className="header-row">
+                    <div className="header-row-inner">
                         {currentUser && currentUser.userType === UserType.admin &&
                             <Select
                                 id="select-teacher"
-                                style={{ width: '200px' }}
+                                className="select-teacher"
                                 value={selectedTeacher?.value}
                                 onChange={onSelectTeacher}
                                 placeholder="סינון לפי משתמש"
@@ -176,10 +176,10 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                                 ))}
                             </Select>
                         }
-                        <div className="flex flex-row">
+                        <div className="switch-container">
                             <Switch
                                 id="showFuture"
-                                className="mr-4 ml-4 mt-1"
+                                className="switch-show-future"
                                 checkedChildren={'עתידי'}
                                 unCheckedChildren={'  עבר'}
                                 defaultChecked={showFuture}
@@ -188,13 +188,13 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-row">
-                    <DeleteMultipleEvents eventIds={selectedEventsToDelete.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={onDelete} />
-                    <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
-                    <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="mr-4" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                <div className="actions-row">
+                    <DeleteMultipleEvents eventIds={selectedEventsToDelete.map(event => event.id)} className="delete-multiple-events" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} onDelete={onDelete} />
+                    <HideMultipleEvents eventIds={visableEventsToHide.map(event => event.id)} className="hide-multiple-events" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
+                    <ShowMultipleEvents eventIds={hiddenEventsToShow.map(event => event.id)} className="show-multiple-events" disabled={showFuture ? selectedRowKeysFuture.length === 0 : selectedRowKeysPast.length === 0} />
                 </div>
-                <div className="mt-4 ">
-                    <span id="selected-events-count" className="mr-4 ml-4 ">
+                <div className="selected-events-count-container">
+                    <span id="selected-events-count" className="selected-events-count">
                         {showFuture && selectedRowKeysFuture.length > 0 && `נבחרו ${selectedRowKeysFuture.length} אירועים`}
                         {!showFuture && selectedRowKeysPast.length > 0 && `נבחרו ${selectedRowKeysPast.length} אירועים`}
                         {selectedRowKeysFuture.length === 0 && selectedRowKeysPast.length === 0 && <span>&nbsp;</span>}
@@ -209,7 +209,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                 pagination={false}
                 expandable={{
                     expandedRowRender: (event) => (
-                        <div className="flex flex-row justify-center" key={event.id}>
+                        <div className="event-card-container" key={event.id}>
                             {event.dates["startDate"] === event.dates["endDate"] ? (
                                 <SingleDayEventCard
                                     key={event.id}

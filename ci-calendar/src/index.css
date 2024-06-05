@@ -6,6 +6,7 @@
 @import "./styles/events-list.css";
 @import "./styles/events-display.css";
 @import "./styles/filter-modal.css";
+@import "./styles/manage-events-table.css";
 
 @font-face {
     font-family: 'Rubik';
