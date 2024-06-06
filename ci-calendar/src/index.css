@@ -7,6 +7,8 @@
 @import "./styles/events-display.css";
 @import "./styles/filter-modal.css";
 @import "./styles/manage-events-table.css";
+@import "./styles/multi-day-event-card.css";
+
 
 @font-face {
     font-family: 'Rubik';

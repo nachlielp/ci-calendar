@@ -60,21 +60,20 @@ export const MultiDayEventCard = React.forwardRef<
   return (
     <Card
       ref={ref}
-      className="mt-4"
-
+      className="multi-day-event-card"
       style={{ width: cardWidth }}
       actions={footer}
     >
-      <div className="flex flex-col sm:flex-col sm:items-right">
+      <div className="event-header">
         {isEdit ?
-          <div className="block font-bold text-lg  w-full sm:w-auto">{event.title}&nbsp;</div>
+          <div className="event-title">{event.title}&nbsp;</div>
           : <MultiDayModalCard event={event} />
         }
       </div>
 
       <br />
-      <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-        <Icon icon="event" className="w-5 h-5 mt-1 align-middle" />
+      <div className="event-dates">
+        <Icon icon="event" className="event-icon" />
         <p>
           <b>{formatHebrewDate(event.dates.startDate)}</b>&nbsp;עד ה-
           <b>{formatHebrewDate(event.dates.endDate)}</b>
@@ -83,10 +82,10 @@ export const MultiDayEventCard = React.forwardRef<
 
       {isEdit && Object.entries(groupedSubEvents).map(([date, subEvents]) => (
         <div key={date}>
-          <p className="mr-6">{formatHebrewDate(date)}</p>
+          <p className="sub-event-date">{formatHebrewDate(date)}</p>
           {subEvents.map((subEvent, index) => (
-            <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
-              <Icon icon="hov" className="w-3 h-3 mt-1 mr-1 align-middle" />
+            <div className="sub-event" key={index}>
+              <Icon icon="hov" className="sub-event-icon" />
               <span>
                 {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;-&nbsp;
                 {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;
@@ -120,11 +119,11 @@ export const MultiDayEventCard = React.forwardRef<
         </div>
       ))}
 
-      {!isEdit && <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-        <Icon icon="map" className="w-5 h-5 mt-1 align-middle" />
+      {!isEdit && <div className="event-location">
+        <Icon icon="map" className="event-location-icon" />
         <button
           onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
-          className="text-blue-500 underline text-right"
+          className="event-location-button"
         >
           {event.address.label}
         </button>
@@ -132,15 +131,15 @@ export const MultiDayEventCard = React.forwardRef<
       }
       {isEdit &&
         !isWhiteSpace(event.description) && (
-          <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-            <Icon icon="description" className="w-5 h-5 mt-1align-middle" />
+          <div className="event-description">
+            <Icon icon="description" className="event-description-icon" />
             <p>{event.description}</p>
           </div>
         )}
 
       {event.price.length > 0 && (
-        <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-          <span className="text-lg align-middle">&#8362;</span>
+        <div className="event-price">
+          <span className="event-price-currency">&#8362;</span>
           <ul>
             {event.price.map((price, index) => (
               <li key={`${price.title}-${index}`}>
@@ -151,7 +150,7 @@ export const MultiDayEventCard = React.forwardRef<
         </div>
       )}
 
-      {isEdit && <div style={{ marginTop: 16 }}>
+      {isEdit && <div className="event-links">
         {event.links.length > 0 &&
           event.links.map((link) => (
             <Button
@@ -159,9 +158,9 @@ export const MultiDayEventCard = React.forwardRef<
               type="default"
               href={link.link}
               target="_blank"
-              className="mb-2"
+              className="event-link-button"
             >
-              <Icon icon="openInNew" className="w-5 h-5 ml-2 align-middle" title={link.title} />
+              <Icon icon="openInNew" className="event-link-icon" title={link.title} />
             </Button>
           ))}
       </div>}
