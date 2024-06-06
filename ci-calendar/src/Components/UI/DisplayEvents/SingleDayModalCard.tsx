@@ -52,22 +52,19 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
 
     return (
         <>
-            <div className="block font-bold text-lg  w-full sm:w-auto flex flex-row items-start justify-between cursor-pointer" onClick={showModal}>
-                <div className="block font-bold text-lg  w-full sm:w-auto">{event.title}&nbsp;</div>
-                <Icon icon="expand" className="w-6 h-6 text-black rotate-90" />
+            <div className="modal-card-header" onClick={showModal}>
+                <div className="modal-card-title">{event.title}&nbsp;</div>
+                <Icon icon="expand" className="modal-card-icon" />
             </div>
 
-            <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
-                <div className="flex flex-col sm:flex-col sm:items-right">
-                    <header className="flex flex-row justify-between" >
-                        <div className="block font-bold text-lg break-words w-full sm:w-auto">{event.title}&nbsp;</div>
-
-                    </header>
-                    <div className="block w-full sm:w-auto">
+            <Modal open={isModalOpen} onCancel={handleCancel} footer={null} className='single-day-modal-card'>
+                <div className="modal-content">
+                    <div className="modal-title">{event.title}&nbsp;</div>
+                    <div className="event-tags">
                         {getTypes(
                             Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
                         ).map((type, index) => (
-                            <Tag color="blue" key={`${type}-${index}`} className="inline-block mb-1">
+                            <Tag color="blue" key={`${type}-${index}`} className="event-tag">
                                 {type}
                             </Tag>
                         ))}
@@ -75,18 +72,14 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                 </div>
 
                 <br />
-                <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-                    <Icon icon="event" className="w-5 h-5 mt-1 align-middle" />
+                <div className="modal-dates">
+                    <Icon icon="event" className="modal-icon" />
                     <p>
                         {subEventLen > 0 ? (
                             <>
                                 <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
                                 {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
                                 {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-                                {/* {<>&nbsp; עם {subEventLen > 1 && event.subEvents.map(subEvent => subEvent.teachers).flat().map(teacher => {
-                                    const isTeacher = teachers.find((t) => t.id === teacher.value);
-                                    return isTeacher ? <BioModal teacher={isTeacher} key={teacher.value} /> : teacher.label;
-                                })}</>} */}
                             </>
                         ) : (
                             <span>No event times available</span>
@@ -96,8 +89,8 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
 
                 {subEventLen > 0 &&
                     Object.values(event.subEvents).map((subEvent, index) => (
-                        <div className="grid grid-cols-[auto,1fr] gap-2 mb-2 pr-6" key={index}>
-                            <Icon icon="hov" className="w-3 h-3 mt-1 mr-1 align-middle" />
+                        <div className="sub-event" key={index}>
+                            <Icon icon="hov" className="sub-event-icon" />
                             <span>
                                 {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
                                 {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
@@ -129,26 +122,26 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                         </div>
                     ))}
 
-                <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-                    <Icon icon="map" className="w-5 h-5 mt-1 align-middle" />
+                <div className="modal-location">
+                    <Icon icon="map" className="modal-icon" />
                     <button
                         onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
-                        className="text-blue-500 underline text-right"
+                        className="modal-location-button"
                     >
                         {event.address.label}
                     </button>
                 </div>
 
                 {!isWhiteSpace(event.description) && (
-                    <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-                        <Icon icon="description" className="w-5 h-5 mt-1align-middle" />
+                    <div className="modal-description">
+                        <Icon icon="description" className="modal-icon" />
                         <p>{event.description}</p>
                     </div>
                 )}
 
                 {event.price.length > 0 && (
-                    <div className="grid grid-cols-[auto,1fr] gap-2 mb-2">
-                        <span className="text-lg align-middle">&#8362;</span>
+                    <div className="modal-price">
+                        <span className="modal-price-currency">&#8362;</span>
                         <ul>
                             {event.price.map((price, index) => (
                                 <li key={`${price.title}-${index}`}>
@@ -159,7 +152,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                     </div>
                 )}
 
-                <div style={{ marginTop: 16 }}>
+                <div className="modal-links">
                     {event.links.length > 0 &&
                         event.links.map((link) => (
                             <Button
@@ -167,9 +160,9 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
                                 type="default"
                                 href={link.link}
                                 target="_blank"
-                                className="mb-2"
+                                className="modal-link-button"
                             >
-                                <Icon icon="openInNew" className="w-5 h-5 ml-2 align-middle" title={link.title} />
+                                <Icon icon="openInNew" className="modal-link-icon" title={link.title} />
                             </Button>
                         ))}
                 </div>

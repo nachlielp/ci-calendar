@@ -58,7 +58,7 @@ export default function MultiDayModalCard({ event }: MultiDayModalCardProps) {
                 <Icon icon="expand" className="modal-card-icon" />
             </div>
 
-            <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
+            <Modal open={isModalOpen} onCancel={handleCancel} footer={null} className='multi-day-modal-card'>
                 <div className="modal-content">
                     <div className="modal-title">{event.title}&nbsp;</div>
                     <div className="modal-tag">

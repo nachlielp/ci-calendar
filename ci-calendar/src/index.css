@@ -10,6 +10,7 @@
 @import "./styles/multi-day-event-card.css";
 @import "./styles/multi-day-modal-card.css";
 @import "./styles/single-day-event-card.css";
+@import "./styles/single-day-modal-card.css";
 
 @font-face {
     font-family: 'Rubik';
