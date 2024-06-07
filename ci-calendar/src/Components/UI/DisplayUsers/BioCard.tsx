@@ -14,21 +14,23 @@ function BioCard() {
       alt="example"
       src={teacher.img}
       key={teacher.img}
-      width={340}
-      height={340}
+      width={200}
+      height={200}
       style={{ objectFit: "cover" }}
+      preview={false}
     />
   ) : (
     ""
   );
+
   return (
-    <div className="flex justify-center items-center w-full mb-10">
+    <div className="bio-card">
       {teacher && <Card
-        className=" mt-6  w-full"
+        // className=" mt-6  w-full"
         hoverable
-        style={{ width: 340 }}
-        cover={imgComponent}
+        style={{ width: 200 }}
       >
+        {imgComponent}
         <Meta title={teacher.fullName} description={teacher.bio} />
         {teacher.pageUrl && (
           <Button

@@ -3,14 +3,14 @@ import { useState } from "react";
 import TeacherForm from "../UserForms/TeacherForm";
 import BioCard from "./BioCard";
 
-function BioPage() {
+export default function BioPage() {
   const [editProfile, setEditProfile] = useState(false);
   const handleSubmitEdit = () => {
     setEditProfile(false);
   };
   return (
-    <div>
-      <div className="flex justify-center mt-2">
+    <div className="bio-page">
+      <div className="button-container">
         {editProfile ? (
           <Button onClick={() => setEditProfile(false)}>חזרה פרופיל</Button>
         ) : (
@@ -25,5 +25,3 @@ function BioPage() {
     </div>
   );
 }
-
-export default BioPage;
