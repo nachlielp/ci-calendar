@@ -32,7 +32,7 @@ export default function MultiDayEventSubEventsForm({
   limits
 }: IBaseEventFormProps) {
   return (
-    <Card className="mt-4 border-4">
+    <Card className="event-card">
       <Form.Item
         label="תאריך"
         name={[day, "event-date-base"]}
@@ -44,11 +44,11 @@ export default function MultiDayEventSubEventsForm({
           maxDate={limits.end}
         />
       </Form.Item>
-      <Card className="mt-4 border-2">
+      <Card className="sub-event-card">
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
             <Form.Item
-              className="w-full"
+              className="full-width"
               label="סוג האירוע"
               name={[day, "event-type-base"]}
               rules={[{ required: true, message: "שדה חובה" }]}
@@ -64,7 +64,7 @@ export default function MultiDayEventSubEventsForm({
               label="שעות "
               name={[day, "event-time-base"]}
               rules={[{ required: true, message: "שדה חובה" }]}
-              className="w-full"
+              className="full-width"
             >
               <TimePicker.RangePicker
                 format="HH:mm"
@@ -80,14 +80,13 @@ export default function MultiDayEventSubEventsForm({
             <Form.Item
               label="מורה"
               name={[day, "event-teachers-base"]}
-              className="w-full"
+              className="full-width"
             >
               <Select
                 mode="tags"
-                style={{ width: '100%' }}
+                className="full-width"
                 placeholder="Select or type"
                 filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
-
                 options={teachers}
               />
             </Form.Item>
@@ -98,7 +97,7 @@ export default function MultiDayEventSubEventsForm({
             <Form.Item
               label="תגיות"
               name={[day, "event-tags-base"]}
-              className="w-full"
+              className="full-width"
             >
               <Select options={tagOptions} mode="multiple" />
             </Form.Item>
@@ -108,9 +107,9 @@ export default function MultiDayEventSubEventsForm({
 
       <SubEventsForm day={day.toString()} form={form} teachers={teachers} />
 
-      <div className="flex items-center justify-center mt-4">
+      <div className="button-container">
         <Button onClick={() => remove(day)}>
-          <span className="text-red-500">
+          <span className="remove-button">
             <Icon icon="doNotDisturb" title="הסר יום" />
           </span>
         </Button>
