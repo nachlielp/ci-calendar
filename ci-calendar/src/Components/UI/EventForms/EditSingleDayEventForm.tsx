@@ -169,7 +169,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
 
   return (
     <>
-      <Card className="max-w-[500px] mx-auto  mt-4 ">
+      <Card className="event-card">
         <Form
           {...formItemLayout}
           form={form}
@@ -196,7 +196,7 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
 
           <Form.Item
             wrapperCol={{ span: 24 }}
-            className="mt-4 flex justify-center"
+            className="submit-button-container"
           >
             <Button type="primary" htmlType="submit">
               {submitText}
@@ -204,13 +204,10 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
           </Form.Item>
         </Form>
       </Card>
-      <div className="flex justify-center items-center w-full h-12">
-
-      </div>
+      <div className="footer-space"></div>
     </>
   );
 }
-
 
 function eventToFormValues(event: IEvently) {
   const currentFormValues = {
@@ -254,4 +251,3 @@ function eventToFormValues(event: IEvently) {
 export function reverseFormatTeachers(teachers: { label: string, value: string }[]) {
   return teachers.map(teacher => teacher.value !== "NON_EXISTENT" ? teacher.value : teacher.label);
 }
-

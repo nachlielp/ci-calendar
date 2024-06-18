@@ -16,7 +16,7 @@
 @import './styles/add-links-form.css';
 @import './styles/add-prices-form.css';
 @import './styles/edit-multi-day-event-form.css';
-/* @import './styles/edit-single-day-event-form.css'; */
+@import './styles/edit-single-day-event-form.css';
 
 @font-face {
     font-family: 'Rubik';
