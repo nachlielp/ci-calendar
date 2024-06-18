@@ -35,7 +35,6 @@ const formItemLayout = {
 const initialValues = {
   "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
   "event-tags": [tagOptions[0].value],
-
 };
 
 export default function SingleDayEventForm() {
@@ -183,8 +182,8 @@ export default function SingleDayEventForm() {
   };
 
   return (
-    <>
-      <Card className="max-w-[500px] mx-auto  mt-4 ">
+    <div className="single-day-event-form">
+      <Card className="event-card">
         <Form
           {...formItemLayout}
           form={form}
@@ -210,20 +209,15 @@ export default function SingleDayEventForm() {
           <AddLinksForm />
           <AddPricesForm />
 
-          <Form.Item
-            wrapperCol={{ span: 24 }}
-            className="mt-4 flex justify-center"
-          >
+          <Form.Item className="submit-button-container">
             <Button type="primary" htmlType="submit">
               צור אירוע
             </Button>
           </Form.Item>
         </Form>
       </Card>
-      <div className="flex justify-center items-center w-full h-12">
-
-      </div>
-    </>
+      <div className="footer-space"></div>
+    </div>
   );
 }
 

@@ -19,10 +19,9 @@
 @import './styles/edit-single-day-event-form.css';
 @import './styles/multi-day-event-form.css';
 @import './styles/multi-day-event-sub-events-form.css';
-/* @import './styles/single-day-event-form.css';
-@import './styles/single-day-event-sub-events-form.css'; */
+@import './styles/single-day-event-base-form.css';
+@import './styles/single-day-event-form.css';
 
-/* @import './styles/single-day-event-form.css'; */
 @font-face {
     font-family: 'Rubik';
     src: url('./assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
