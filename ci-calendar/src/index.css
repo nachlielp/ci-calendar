@@ -12,6 +12,7 @@
 @import "./styles/single-day-event-card.css";
 @import "./styles/single-day-modal-card.css";
 @import "./styles/bio-page.css";
+@import "./styles/bio-card.css";
 
 @font-face {
     font-family: 'Rubik';

@@ -2,6 +2,21 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 200px;
-    height: 200px;
+    justify-content: center;
+    width: 300px;
+    margin-top: 1rem;
+}
+
+.bio-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.bio-card-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5%;
 }
