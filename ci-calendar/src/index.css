@@ -22,6 +22,7 @@
 @import './styles/single-day-event-base-form.css';
 @import './styles/single-day-event-form.css';
 @import './styles/sub-events-form.css';
+@import './styles/calendar-view.css';
 
 @font-face {
     font-family: 'Rubik';

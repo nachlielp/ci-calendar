@@ -1,3 +1,4 @@
+
 export function checkInvalidData(obj: any, path: string = "") {
   Object.keys(obj).forEach((key) => {
     const value = obj[key];
@@ -23,4 +24,33 @@ export function checkInvalidData(obj: any, path: string = "") {
       console.error(`Invalid type for field ${currentPath}:`, value);
     }
   });
+}
+
+export function getMonthNameHebrew(month: number) {
+  switch (month) {
+    case 0:
+      return "ינואר";
+    case 1:
+      return "פברואר";
+    case 2:
+      return "מרץ";
+    case 3:
+      return "אפריל";
+    case 4:
+      return "מאי";
+    case 5:
+      return "יוני";
+    case 6:
+      return "יולי";
+    case 7:
+      return "אוגוסט";
+    case 8:
+      return "ספטמבר";
+    case 9:
+      return "אוקטובר";
+    case 10:
+      return "נובמבר";
+    case 11:
+      return "דצמבר";
+  }
 }

@@ -5,6 +5,7 @@ import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently } from "../../../util/interfaces";
 import dayjs from "dayjs";
 import isBetween from 'dayjs/plugin/isBetween';
+import { getMonthNameHebrew } from "../../../util/helpers";
 dayjs.extend(isBetween)
 
 interface CalendarViewProps {
@@ -16,9 +17,8 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
   const { width } = useWindowSize();
   const setWidth = width > 600 ? 500 : width * 0.9;
   const dateCellRender = () => {
-    return <div className="day-cell p-2 relative"></div>;
+    return <div className="calendar-view__day-cell"></div>;
   };
-  // const dateCellRender
 
   const disabledDate = (current: Dayjs) => {
     const lastMonth = dayjs().subtract(1, "month").startOf("month");
@@ -29,35 +29,42 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
     const hasNoEvents = !eventsOnDay(current, events);
     return isOutOfRange || hasNoEvents;
   };
-  //Render each cell in the calendar
+
   const cellRender: CalendarProps<Dayjs>["cellRender"] = (_, info) => {
     if (info.type === "date") return dateCellRender();
     return info.originNode;
   };
+
   const customHeaderRender = ({ value, onChange }: any) => {
     return (
-      <div className="flex justify-between px-2 py-1">
-        <button
-          className="ant-btn ant-btn-default"
-          onClick={() => onChange(value.add(1, "month"))}
-        >
-          הבא
-        </button>
-        <div>
-          <span>{value.format("MMMM YYYY")}</span>
+      <div className="calendar-view__header-buttons">
+        <div className="">
+          <button
+            className=""
+            onClick={() => onChange(value.add(1, "month"))}
+          >
+            הבא
+          </button>
         </div>
-        <button
-          className="ant-btn ant-btn-default"
-          onClick={() => onChange(value.subtract(1, "month"))}
-        >
-          קודם
-        </button>
+        <div className="">
+          <span>{getMonthNameHebrew(value.month())} {value.year()}</span>
+        </div>
+        <div className="">
+          <button
+            className=""
+            onClick={() => onChange(value.subtract(1, "month"))}
+          >
+            קודם
+          </button>
+        </div>
+
       </div>
     );
   };
+
   return (
-    <div style={{ width: setWidth }} className="mx-auto">
-      <Card className="mx-auto mt-5">
+    <div className="calendar-view" style={{ width: setWidth }}>
+      <Card className="calendar-view__card">
         <Calendar
           disabledDate={disabledDate}
           fullscreen={false}
@@ -70,6 +77,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
     </div>
   );
 }
+
 function eventsOnDay(day: Dayjs, events: IEvently[]) {
   return events.some(event =>
     day.isBetween(
@@ -80,4 +88,3 @@ function eventsOnDay(day: Dayjs, events: IEvently[]) {
     )
   );
 }
-
