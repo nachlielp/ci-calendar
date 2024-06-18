@@ -1,0 +1,22 @@
+.multi-day-form-head-card {
+    margin-top: 1rem;
+    border-width: 4px;
+}
+
+.multi-day-form-head-title {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.multi-day-form-head-item {
+    margin-top: 1rem;
+}
+
+.multi-day-form-head-full-width {
+    width: 100%;
+}
+
+.single-month {
+    width: 100%;
+}

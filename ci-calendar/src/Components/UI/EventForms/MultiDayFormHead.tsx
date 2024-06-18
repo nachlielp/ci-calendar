@@ -32,7 +32,7 @@ export default function MultiDayFormHead({
     handleDateChange(dates);
   }
   return (
-    <Card className="mt-4 border-4" title={<span className="flex flex-row gap-2">ארוע רב יומי</span>}>
+    <Card className="multi-day-form-head-card" title={<span className="multi-day-form-head-title">ארוע רב יומי</span>}>
       <Form.Item
         label="כותרת"
         name="event-title"
@@ -44,7 +44,7 @@ export default function MultiDayFormHead({
         <Input.TextArea rows={6} />
       </Form.Item>
       <Form.Item
-        className="mt-4"
+        className="multi-day-form-head-item"
         label="אזור"
         name="district"
         rules={[{ required: true, message: "שדה חובה" }]}
@@ -52,7 +52,7 @@ export default function MultiDayFormHead({
         <Select options={districtOptions} />
       </Form.Item>
       <Form.Item
-        className="mt-4"
+        className="multi-day-form-head-item"
         label="כתובת"
         name="address"
         rules={[{ required: true, message: "שדה חובה" }]}
@@ -78,7 +78,7 @@ export default function MultiDayFormHead({
         />
       </Form.Item>
       <Form.Item
-        className="w-full"
+        className="multi-day-form-head-full-width"
         label="סוג האירוע"
         name="main-event-type"
         rules={[{ required: true, message: "שדה חובה" }]}
@@ -94,7 +94,6 @@ export default function MultiDayFormHead({
           </Tooltip>
         }
         name="event-schedule"
-
       >
         <Switch
           defaultChecked={schedule}
