@@ -56,8 +56,8 @@ export default function SingleDayEventBaseForm({
   address
 }: ISingleDayEventBaseFormProps) {
   return (
-    <>
-      <Card className="mt-4 border-4" title={<span className="flex flex-row gap-2">ארוע חד יומי</span>}>
+    <div className="single-day-event-base-form">
+      <Card className="event-card" title={<span className="event-title">ארוע חד יומי</span>}>
         <Form.Item
           label="כותרת"
           name="event-title"
@@ -72,7 +72,7 @@ export default function SingleDayEventBaseForm({
           <Input.TextArea rows={6} />
         </Form.Item>
         <Form.Item
-          className="mt-4"
+          className="form-item"
           label="אזור"
           name="district"
           rules={[{ required: true, message: "שדה חובה" }]}
@@ -81,7 +81,7 @@ export default function SingleDayEventBaseForm({
         </Form.Item>
 
         <Form.Item
-          className="mt-4"
+          className="form-item"
           label="כתובת"
           name="address"
           rules={[{ required: true, message: "שדה חובה" }]}
@@ -105,7 +105,7 @@ export default function SingleDayEventBaseForm({
         {!idEdit && (
           <>
             <Form.Item
-              className="mt-4"
+              className="form-item"
               label={
                 <Tooltip title={repeatEventTooltip}>
                   <span>
@@ -122,7 +122,7 @@ export default function SingleDayEventBaseForm({
               <Form.Item
                 label="שבועות"
                 name="event-repeat-week-interval"
-                className="mt-4"
+                className="form-item"
                 rules={[{ required: true, message: "שדה חובה" }]}
               >
                 <InputNumber min={1} precision={0} />
@@ -132,7 +132,7 @@ export default function SingleDayEventBaseForm({
               <Form.Item
                 label="תדירות"
                 name="event-repeat-week-frequency"
-                className="mt-4"
+                className="form-item"
               >
                 <Input placeholder={formatMonthlyDate(eventDate)} disabled />
               </Form.Item>
@@ -141,9 +141,8 @@ export default function SingleDayEventBaseForm({
               <>
                 <Form.Item
                   label="סיום חזרה"
-                  name="event
-              זרה-repeat-end-date"
-                  className="mt-4"
+                  name="event-repeat-end-date"
+                  className="form-item"
                   rules={[{ required: true, message: "שדה חובה" }]}
                 >
                   <DatePicker
@@ -156,7 +155,7 @@ export default function SingleDayEventBaseForm({
                 <Form.Item
                   label="תאריכים"
                   name="event-list-of-dates"
-                  className="mt-4"
+                  className="form-item"
                 >
                   {endDate && repeatOption && (
                     <List>
@@ -174,7 +173,7 @@ export default function SingleDayEventBaseForm({
                         }
                       >
                         {(date: dayjs.Dayjs, index: number) => (
-                          <List.Item key={index} className="mr-4">
+                          <List.Item key={index} className="list-item">
                             <List.Item.Meta
                               key={index}
                               title={date.format("DD/MM")}
@@ -185,18 +184,17 @@ export default function SingleDayEventBaseForm({
                     </List>
                   )}
                 </Form.Item>
-
               </>
             )}
           </>
         )}
       </Card>
 
-      <Card className="mt-4 border-2">
+      <Card className="event-card">
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
             <Form.Item
-              className="w-full"
+              className="full-width"
               label="סוג האירוע"
               name="event-types"
               rules={[{ required: true, message: "שדה חובה" }]}
@@ -212,7 +210,7 @@ export default function SingleDayEventBaseForm({
               label="שעות פעילות"
               name="event-time"
               rules={[{ required: true, message: "שדה חובה" }]}
-              className="w-full"
+              className="full-width"
             >
               <TimePicker.RangePicker
                 format="HH:mm"
@@ -225,10 +223,10 @@ export default function SingleDayEventBaseForm({
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="מורים" name="teachers" className="w-full">
+            <Form.Item label="מורים" name="teachers" className="full-width">
               <Select
                 mode="tags"
-                style={{ width: '100%' }}
+                className="full-width"
                 placeholder="Select or type"
                 filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
                 options={teachers}
@@ -239,13 +237,12 @@ export default function SingleDayEventBaseForm({
 
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="תגיות" name="event-tags" className="w-full">
+            <Form.Item label="תגיות" name="event-tags" className="full-width">
               <Select options={tagOptions} mode="multiple" />
             </Form.Item>
           </Col>
         </Row>
       </Card>
-    </>
+    </div>
   );
 }
-
