@@ -13,6 +13,7 @@
 @import "./styles/single-day-modal-card.css";
 @import "./styles/bio-page.css";
 @import "./styles/bio-card.css";
+@import './styles/add-links-form.css';
 
 @font-face {
     font-family: 'Rubik';

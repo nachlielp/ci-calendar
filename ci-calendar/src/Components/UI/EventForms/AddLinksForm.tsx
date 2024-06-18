@@ -7,12 +7,12 @@ export default function AddLinksForm() {
       {(fields, { add, remove }) => (
         <>
           {fields.map(({ key, name, ...restField }) => (
-            <Card className="mt-4 border-2" key={key}>
+            <Card className="link-card" key={key}>
               <Row gutter={10} align="middle">
                 <Col md={24} xs={24}>
                   <Form.Item
                     {...restField}
-                    className="mt-4"
+                    className="link-form-item"
                     label="כותרת קישור"
                     name={[name, "title"]}
                     rules={[{ required: true, message: "שדה חובה" }]}
@@ -25,7 +25,7 @@ export default function AddLinksForm() {
                 <Col md={24} xs={24}>
                   <Form.Item
                     {...restField}
-                    className="mt-4"
+                    className="link-form-item"
                     label="קישור"
                     name={[name, "link"]}
                     rules={[
@@ -38,17 +38,17 @@ export default function AddLinksForm() {
                 </Col>
               </Row>
 
-              <div className="flex items-center justify-center">
+              <div className="button-container">
                 <Button onClick={() => remove(name)}>
                   <Icon icon="doNotDisturb" title="הסר קישור" />
                 </Button>
               </div>
             </Card>
           ))}
-          <div className="flex items-center justify-center mt-2">
-            <Button className="w-1/2" onClick={() => add()} block>
-              <span className="inline-flex items-center">
-                <Icon icon="addCircle" className="mr-2" title="הוסף קישור" />
+          <div className="add-button-container">
+            <Button className="add-button" onClick={() => add()} block>
+              <span className="add-button-content">
+                <Icon icon="addCircle" className="add-icon" title="הוסף קישור" />
               </span>
             </Button>
           </div>
