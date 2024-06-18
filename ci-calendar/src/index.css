@@ -14,6 +14,7 @@
 @import "./styles/bio-page.css";
 @import "./styles/bio-card.css";
 @import './styles/add-links-form.css';
+@import './styles/add-prices-form.css';
 
 @font-face {
     font-family: 'Rubik';

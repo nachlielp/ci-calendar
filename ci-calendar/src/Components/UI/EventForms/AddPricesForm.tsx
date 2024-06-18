@@ -7,12 +7,12 @@ export default function AddPricesForm() {
       {(fields, { add, remove }) => (
         <>
           {fields.map(({ key, name, ...restField }) => (
-            <Card className="mt-4 border-2" key={key}>
+            <Card className="price-card" key={key}>
               <Row gutter={10} align="middle">
                 <Col md={24} xs={24}>
                   <Form.Item
                     {...restField}
-                    className="mt-4"
+                    className="price-form-item"
                     label="כותרת מחיר"
                     name={[name, "title"]}
                     rules={[{ required: true, message: "שדה חובה" }]}
@@ -25,7 +25,7 @@ export default function AddPricesForm() {
                 <Col md={24} xs={24}>
                   <Form.Item
                     {...restField}
-                    className="mt-4"
+                    className="price-form-item"
                     label="מחיר"
                     name={[name, "sum"]}
                     rules={[
@@ -38,16 +38,18 @@ export default function AddPricesForm() {
                 </Col>
               </Row>
 
-              <div className="flex items-center justify-center">
+              <div className="button-container">
                 <Button onClick={() => remove(name)}>
                   <Icon icon="doNotDisturb" title="הסר מחיר" />
                 </Button>
               </div>
             </Card>
           ))}
-          <div className="flex items-center justify-center mt-2">
-            <Button className="w-1/2" onClick={() => add()} block>
-              <Icon icon="addCircle" title="הוסף מחיר" />
+          <div className="add-button-container">
+            <Button className="add-button" onClick={() => add()} block>
+              <span className="add-button-content">
+                <Icon icon="addCircle" className="add-icon" title="הוסף מחיר" />
+              </span>
             </Button>
           </div>
         </>
