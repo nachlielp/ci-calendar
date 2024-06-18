@@ -162,7 +162,7 @@ export default function MultiDayEventForm() {
 
   return (
     <>
-      <Card className="max-w-[500px] mx-auto  mt-4 ">
+      <Card className="event-card">
         <Form
           {...formItemLayout}
           form={form}
@@ -198,8 +198,8 @@ export default function MultiDayEventForm() {
                       />
                     </div>
                   ))}
-                  <div className="flex items-center justify-center mt-2">
-                    <Button className="w-1/2" onClick={() => add()} block>
+                  <div className="add-button-container">
+                    <Button className="add-button" onClick={() => add()} block>
                       <Icon icon="addCircle" title="הוסף יום" />
                     </Button>
                   </div>
@@ -211,7 +211,7 @@ export default function MultiDayEventForm() {
           <AddPricesForm />
           <Form.Item
             wrapperCol={{ span: 24 }}
-            className="mt-4 flex justify-center"
+            className="submit-button-container"
           >
             <Button type="primary" htmlType="submit">
               צור אירוע
@@ -219,8 +219,7 @@ export default function MultiDayEventForm() {
           </Form.Item>
         </Form>
       </Card>
-      <div className="flex justify-center items-center w-full h-12">
-      </div>
+      <div className="footer-space"></div>
     </>
   );
 }
