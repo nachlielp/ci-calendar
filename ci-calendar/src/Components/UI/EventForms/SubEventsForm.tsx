@@ -14,11 +14,11 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
       {(subEvents, { add, remove }) => (
         <>
           {subEvents.map(({ key, name }) => (
-            <Card className="mt-4 border-2" key={key}>
+            <Card className="sub-event-card" key={key}>
               <Row gutter={10} align="middle">
                 <Col md={24} xs={24}>
                   <Form.Item
-                    className="w-full"
+                    className="full-width"
                     name={[name, "type"]}
                     label="סוג האירוע"
                     rules={[{ required: true, message: "שדה חובה" }]}
@@ -34,7 +34,7 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
                     name={[name, "time"]}
                     label="שעות "
                     rules={[{ required: true, message: "שדה חובה" }]}
-                    className="w-full"
+                    className="full-width"
                   >
                     <TimePicker.RangePicker
                       minuteStep={5}
@@ -47,10 +47,10 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
               </Row>
               <Row gutter={10} align="middle">
                 <Col md={24} xs={24}>
-                  <Form.Item label="מורים" name={[name, "teachers"]} className="w-full">
+                  <Form.Item label="מורים" name={[name, "teachers"]} className="full-width">
                     <Select
                       mode="tags"
-                      style={{ width: '100%' }}
+                      className="full-width"
                       placeholder="Select or type"
                       filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
                       options={teachers}
@@ -63,22 +63,22 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
                   <Form.Item
                     name={[name, "tags"]}
                     label="תגיות"
-                    className="w-full"
+                    className="full-width"
                   >
                     <Select options={tagOptions} mode="multiple" />
                   </Form.Item>
                 </Col>
               </Row>
 
-              <div className="flex items-center justify-center">
+              <div className="button-container">
                 <Button onClick={() => remove(name)}>
                   <Icon icon="doNotDisturb" title="הסר תת ארוע" />
                 </Button>
               </div>
             </Card>
           ))}
-          <div className="flex items-center justify-center mt-2">
-            <Button className="w-1/2" onClick={() => { add(); form.setFieldsValue({ newSubTeacher: "" }) }} block>
+          <div className="add-button-container">
+            <Button className="add-button" onClick={() => { add(); form.setFieldsValue({ newSubTeacher: "" }) }} block>
               <Icon icon="addCircle" title="הוסף תת ארוע" />
             </Button>
           </div>
@@ -87,4 +87,3 @@ export default function SubEventsForm({ form, day, teachers }: ISubEventsFormPro
     </Form.List>
   );
 }
-

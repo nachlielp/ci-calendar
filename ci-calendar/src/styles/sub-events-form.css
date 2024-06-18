@@ -1,0 +1,28 @@
+.sub-events-form {
+    .sub-event-card {
+        margin-top: 1rem;
+        border-width: 2px;
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
+    .button-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .add-button-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+
+    .add-button {
+        width: 50%;
+    }
+}
