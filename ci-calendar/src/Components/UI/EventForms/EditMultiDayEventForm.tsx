@@ -78,7 +78,6 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
 
   const submitedEventId = editType === EventAction.recycle ? uuidv4() : eventData.id;
 
-
   const handleSubmit = async (values: any) => {
     const subEventsTemplate: IEventiPart[] = [];
 
@@ -164,7 +163,7 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
 
   return (
     <>
-      <Card className="max-w-[500px] mx-auto mt-4" >
+      <Card className="event-card">
         <Form
           form={form}
           variant="filled"
@@ -197,9 +196,11 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
                       />
                     </div>
                   ))}
-                  <div className="flex items-center justify-center mt-2">
-                    <Button onClick={() => add()} block>
-                      <Icon icon="addCircle" title="הוסף יום" />
+                  <div className="add-button-container">
+                    <Button className="add-button" onClick={() => add()} block>
+                      <span className="add-button-content">
+                        <Icon icon="addCircle" className="add-icon" title="הוסף יום" />
+                      </span>
                     </Button>
                   </div>
                 </>
@@ -210,7 +211,7 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
           <AddPricesForm />
           <Form.Item
             wrapperCol={{ span: 24 }}
-            className="mt-4 flex justify-center"
+            className="submit-button-container"
           >
             <Button type="primary" htmlType="submit">
               {submitText}
@@ -218,9 +219,7 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
           </Form.Item>
         </Form>
       </Card>
-      <div className="flex justify-center items-center w-full h-12">
-
-      </div>
+      <div className="footer-space"></div>
     </>
   );
 }
@@ -272,6 +271,5 @@ const eventToFormValues = (event: IEvently) => {
     prices: event.price,
     days: days,
   };
-  // console.log("MultiDayEventForm.eventToFormValues.currentFormValues: ", currentFormValues);
   return { currentFormValues, address: event.address };
 };
