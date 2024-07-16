@@ -10,7 +10,7 @@ import {
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useEffect, useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";
-import { useWindowSize } from "../../../hooks/useWindowSize";
+// import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useGetTeacher } from "../../../hooks/useGetTeacher";
 
 type FieldType = {
