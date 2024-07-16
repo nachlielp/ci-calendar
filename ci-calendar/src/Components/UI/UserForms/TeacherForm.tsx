@@ -79,7 +79,7 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
     setImageUrl("");
   };
 
-  const cardWidth = width > 600 ? 500 : 300;
+  // const cardWidth = width > 600 ? 500 : 300;
 
   return (
     <>
