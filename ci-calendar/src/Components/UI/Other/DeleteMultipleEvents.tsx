@@ -10,8 +10,8 @@ const showDeleteConfirm = (
     onDelete: () => void
 ) => {
     confirm({
-        title: <div className="text-lg text-red-500">מחיקת ארועים</div>,
-        icon: <Icon icon="warning" className="text-red-500 mr-2 ml-2" />,
+        title: <div style={{ fontSize: "20px", fontWeight: "bold", color: "red" }}>מחיקת ארועים</div>,
+        icon: <Icon icon="warning" />,
         content: <div >האם אתה בטוח שאתה רוצה למחוק {eventIds.length} ארועים?</div>,
         okText: "מחיקה",
         okType: "danger",

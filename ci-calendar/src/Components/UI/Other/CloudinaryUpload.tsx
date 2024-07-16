@@ -58,7 +58,7 @@ export default function CloudinaryUpload({
       </Button>
       <Button
         onClick={() => clearImage()}
-        className="bg-red-400 text-white mr-2"
+        style={{ backgroundColor: "red", color: "white", marginRight: "10px" }}
       >
         Clear
       </Button>

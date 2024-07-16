@@ -84,7 +84,7 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
   return (
     <>
       {teacher &&
-        <Card className={`max-w-[${cardWidth}px] mx-auto  mt-4`}>
+        <Card className={`teacher-form`}>
           <Form
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
@@ -139,7 +139,7 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
               <Input.TextArea rows={6} />
             </Form.Item>
             <Form.Item<FieldType> label="תמונה" name="img">
-              <div className="flex flex-col items-center space-y-2">
+              <div className="img-container">
                 <Image width={200} src={imageUrl} />
               </div>
             </Form.Item>
@@ -167,9 +167,6 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
             </Form.Item>
           </Form>
         </Card>}
-      <div className="flex justify-center items-center w-full h-12">
-
-      </div>
     </>
   );
 }

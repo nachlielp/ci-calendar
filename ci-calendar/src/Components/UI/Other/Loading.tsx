@@ -3,7 +3,7 @@ import { Spin } from "antd";
 function Loading() {
   return (
     <div
-      className={`flex flex-col items-center justify-center h-screen bg-homepage-bg `}
+      className="loading-component"
     >
       <Spin size="large">
         <div className="content" />

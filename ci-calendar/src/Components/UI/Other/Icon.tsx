@@ -51,5 +51,5 @@ export const Icon = ({ icon, className, title }: { icon: string; className?: str
         addCircle,
         openInNew,
     };
-    return <div className="flex inline-flex items-center gap-2"><img src={icons[icon]} alt="Icon" className={className} />{title}</div>;
+    return <div className="icon-component"><img src={icons[icon]} alt="Icon" className={className} />{title}</div>;
 };

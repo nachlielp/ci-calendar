@@ -3,7 +3,7 @@ import { Empty } from "antd";
 export default function EmptyList() {
   return (
     <div
-      className={`flex flex-col items-center justify-center h-screen bg-homepage-bg `}
+      className='empty-list'
     >
       <Empty>
         <div className="content" />

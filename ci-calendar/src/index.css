@@ -23,6 +23,12 @@
 @import './styles/single-day-event-form.css';
 @import './styles/sub-events-form.css';
 @import './styles/calendar-view.css';
+@import './styles/empty.scss';
+@import './styles/icon.scss';
+@import './styles/loading.scss';
+@import './styles/manage-users.scss';
+@import './styles/teacher-form.scss';
+@import './styles/user-form.scss';
 
 @font-face {
     font-family: 'Rubik';
