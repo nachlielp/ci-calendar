@@ -29,7 +29,7 @@ interface ITeacherFormProps {
 }
 //TODO add cropper (react-easy-crop)
 export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps) {
-  const { width } = useWindowSize();
+  // const { width } = useWindowSize();
   const { currentUser, updateTeacher } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
   const teacher = useGetTeacher(currentUser.id);
