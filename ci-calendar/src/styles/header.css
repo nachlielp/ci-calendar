@@ -71,3 +71,8 @@
     font-weight: 600;
     /* font-semibold */
 }
+
+.header-actions {
+    margin-left: auto;
+    display: flex;
+}

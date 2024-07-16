@@ -60,7 +60,7 @@ export default function Header() {
         </LinkButton>
       )}
       {currentUser && (
-        <div className="ml-auto flex ">
+        <div className="header-actions">
           <LinkButton
             to={settingsPage}
             className="header-btn "
@@ -80,7 +80,7 @@ const UserInfo = ({ currentUser }: IUserInfoProps) => {
   return (
     <div>
       {currentUser && (
-        <div className={`user-info-container md:user-info-container-md`}>
+        <div className={`user-info-container`}>
           <p className={`user-name`}>
             {currentUser.fullName}
           </p>

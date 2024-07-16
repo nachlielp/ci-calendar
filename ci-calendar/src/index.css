@@ -35,11 +35,6 @@
     src: url('./assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
 }
 
-/* body {
+body {
     font-family: 'Rubik', sans-serif;
-} */
-
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+}
