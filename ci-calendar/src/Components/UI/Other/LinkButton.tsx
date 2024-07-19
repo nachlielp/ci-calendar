@@ -22,7 +22,7 @@ export const LinkButton = ({
   children,
 }: ILinkButtonProps) => {
   return (
-    <Link to={to} className="">
+    <Link to={to} className="link-btn">
       <Button
         className={`${className} `} // Add flexbox utilities
         disabled={disabled}

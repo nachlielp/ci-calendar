@@ -36,20 +36,21 @@ export default function Header() {
   return (
     <section className="header-container">
       {currentUser && (
-        <Button
-          className="header-btn "
+        <button
+          className="btn-main"
           onClick={handleLogOut}
         >
           <Icon icon="logout" />
-        </Button>
+        </button>
       )}
       {!currentUser && currentPath !== "/login" && (
         <LinkButton
           to="/login"
           className="header-btn no-border"
         >
-          <Icon icon="account" />
-          &nbsp; התחבר/י
+          התחבר/י
+          &nbsp;
+          <Icon icon="account" className="icon-main" />
         </LinkButton>
       )}
 
