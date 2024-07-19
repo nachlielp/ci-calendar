@@ -1,0 +1,45 @@
+.filter-model-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .anchor-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 8rem;
+        height: 3rem;
+        background: none;
+        color: #fff;
+    }
+
+    .text {
+        font-size: 1.125rem;
+        font-weight: 500;
+        margin-right: 0.4rem;
+    }
+
+    .filter-model-button.active {
+        background-color: #d1d5db;
+    }
+
+    .filter-model-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .filter-model-title {
+        font-size: 1.125rem;
+        /* font-family: 'Rubik', sans-serif; */
+
+    }
+
+    .filter-model-checkbox {
+        transform: scale(1.2);
+        margin: 6px;
+    }
+
+    .filter-model-checkbox-label {
+        font-size: 1.125rem;
+    }
+}
