@@ -1,4 +1,4 @@
-@import "./styles/header.css";
+@import "./styles/header.scss";
 @import "./styles/login.css";
 @import "./styles/signup.css";
 @import "./styles/reset-password.css";
@@ -30,11 +30,22 @@
 @import './styles/teacher-form.scss';
 @import './styles/user-form.scss';
 
+
+@import './styles/elements/buttons.scss';
+
 @font-face {
-    font-family: 'Rubik';
-    src: url('./assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype');
+    font-family: 'Assistant';
+    src: url('./assets/fonts/Assistant-VariableFont_wght.ttf') format('truetype');
+}
+
+* {
+    font-family: 'Assistant', sans-serif !important;
 }
 
 body {
-    font-family: 'Rubik', sans-serif;
+    background-image: url('./assets/img/Background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
 }
