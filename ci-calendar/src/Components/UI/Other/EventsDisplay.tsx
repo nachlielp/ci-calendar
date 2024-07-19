@@ -54,24 +54,29 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
 
   return (
     <div className="events-display">
-      <header className="events-display-header">
-        <h1 className="events-display-title">קונטקט ישראל</h1>
-        <main className="events-display-main">
-          <FilterModel />
-          <div className="events-display-buttons">
+      <header className="header">
+        <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
+        <p className="subtitle">כל האירועים במקום אחד</p>
+        <main className="menu-container">
+          <div className="menu-btns">
             <Button
               onClick={onViewList}
-              className={`events-display-button left ${isListView ? 'events-display-button-active' : ''}`}
+              className={`btn left ${isListView ? 'active' : ''}`}
             >
-              <Icon icon="viewDay" className="events-display-icon" />
+              <div className="content left">
+                <Icon icon="viewDay" className="events-display-icon" />
+              </div>
             </Button>
             <Button
               onClick={onViewCalendar}
-              className={`events-display-button right ${!isListView ? 'events-display-button-active' : ''}`}
+              className={`btn right ${!isListView ? 'active' : ''}`}
             >
-              <Icon icon="calendar" className="events-display-icon" />
+              <div className="content right">
+                <Icon icon="calendar" className="events-display-icon" />
+              </div>
             </Button>
           </div>
+          <FilterModel />
         </main>
       </header>
       <div className="events-display-list">
