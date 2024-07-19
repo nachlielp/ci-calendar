@@ -11,6 +11,12 @@
         height: 3rem;
         background: none;
         color: #fff;
+
+        &:hover {
+            color: #fff;
+            border: 1px solid #fff;
+            background: none;
+        }
     }
 
     .text {
