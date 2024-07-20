@@ -12,10 +12,14 @@
         background: none;
         color: #fff;
 
+        &.active {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
         &:hover {
-            color: #fff;
-            border: 1px solid #fff;
-            background: none;
+            color: #fff !important; // Ensure text color remains white on hover
+            border: 1px solid #fff !important; // Ensure border is white on hover
+            background: none !important; // Ensure background is black on hover
         }
     }
 

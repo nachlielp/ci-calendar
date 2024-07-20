@@ -1,5 +1,7 @@
 .events-display {
     height: calc(100vh - 56px);
+    max-width: 500px;
+    align-self: center;
     overflow-y: auto;
     color: #fff;
     -ms-overflow-style: none;
@@ -18,6 +20,8 @@
         justify-content: center;
         align-items: center;
         margin-top: 1.25rem;
+        margin: 1.25rem 22px 0 22px;
+
     }
 
     .title {
@@ -71,24 +75,11 @@
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.5); // Adjust the opacity to control the darkness
-                    pointer-events: none; // Ensure the overlay does not interfere with interactions
-                    z-index: 0; // Ensure the overlay is behind the content
+                    background: rgba(0, 0, 0, 0.5);
+                    pointer-events: none;
+                    z-index: 0;
                     border-radius: 5px;
 
-                    &.right {
-                        border-radius: 0 5px 5px 0;
-                    }
-
-                    &.left {
-                        border-radius: 5px 0 0 5px;
-                    }
-                }
-
-                // Ensure the content is above the overlay
-                .content {
-                    position: relative;
-                    z-index: 1;
                 }
 
                 &.right {
@@ -109,10 +100,28 @@
             }
 
             &:hover {
-                color: #fff;
+                color: #220505;
                 border: 1px solid #fff;
                 background: none;
             }
+        }
+    }
+
+    .selected-filters {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: end;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+
+        .filter-tag {
+            padding: 0.2rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
     }
 

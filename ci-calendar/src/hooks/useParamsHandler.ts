@@ -11,7 +11,9 @@ interface IUseParamsHandler {
   currentValues: string[];
   onOptionsChange: (type: string) => (values: string[]) => void;
   clearSearchParams: (titles: string[]) => void;
+  removeOption: (type: string, value: string) => void;
 }
+
 export const useParamsHandler = ({
   title,
   options,
@@ -34,6 +36,14 @@ export const useParamsHandler = ({
     values.forEach((value) => newSearchParams.append(type, value));
     setSearchParams(newSearchParams, { replace: true });
   };
+
+  const removeOption = (type: string, value: string) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    const values = newSearchParams.getAll(type).filter((v) => v !== value);
+    newSearchParams.delete(type);
+    values.forEach((v) => newSearchParams.append(type, v));
+    setSearchParams(newSearchParams, { replace: true });
+  };
   // Clearing based on instance search params rewrites other instances' search params
   // so i pass all of the titles to clear
   const clearSearchParams = (titles: string[]) => {
@@ -46,5 +56,5 @@ export const useParamsHandler = ({
     setCurrentValues(initialValues);
   }, [searchParams, getInitialValues]);
 
-  return { currentValues, onOptionsChange, clearSearchParams };
+  return { currentValues, onOptionsChange, clearSearchParams, removeOption };
 };

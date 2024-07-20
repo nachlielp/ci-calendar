@@ -1,3 +1,4 @@
+import { SelectOption } from "./options";
 
 export function checkInvalidData(obj: any, path: string = "") {
   Object.keys(obj).forEach((key) => {
@@ -54,3 +55,7 @@ export function getMonthNameHebrew(month: number) {
       return "דצמבר";
   }
 }
+
+export function getLabelByValue(value: string, options: SelectOption[]) {
+  return options.find((option) => option.value === value)?.label;
+}     

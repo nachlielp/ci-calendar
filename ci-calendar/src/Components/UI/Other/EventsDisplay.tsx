@@ -1,16 +1,18 @@
 import dayjs, { Dayjs } from "dayjs";
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween)
-
+import { getLabelByValue } from "../../../util/helpers";
 import { IEvently } from "../../../util/interfaces";
 import CalendarView from "./CalendarView";
 import EventsList from "../DisplayEvents/EventsList";
 import { useEffect, useState } from "react";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import FilterModel from "./FilterModel";
-import { Button } from "antd";
+import { Button, Tag } from "antd";
+import { useParamsHandler } from "../../../hooks/useParamsHandler";
 
 import { Icon } from "./Icon";
+import { districtOptions, eventTypes } from "../../../util/options";
 
 interface IEventsDisplayProps {
   events: IEvently[];
@@ -20,6 +22,17 @@ interface IEventsDisplayProps {
 export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
   const [isListView, setIsListView] = useState<boolean>(true);
+
+  const {
+    currentValues: currentEventFilters,
+    removeOption: onRemoveEventFilter,
+  } = useParamsHandler({ title: "eventType", options: eventTypes });
+
+  const {
+    currentValues: currentDistrictValues,
+    removeOption: onRemoveDistrictFilter,
+  } = useParamsHandler({ title: "district", options: districtOptions });
+
 
   useEffect(() => {
     const futureEvents = events.filter((event) => dayjs(event.dates["endDate"]).isAfter(dayjs().startOf('day')));
@@ -63,23 +76,29 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
               onClick={onViewList}
               className={`btn left ${isListView ? 'active' : ''}`}
             >
-              <div className="content left">
-                <Icon icon="viewDay" className="events-display-icon" />
-              </div>
+              <Icon icon="viewDay" className="events-display-icon" />
             </Button>
             <Button
               onClick={onViewCalendar}
               className={`btn right ${!isListView ? 'active' : ''}`}
             >
-              <div className="content right">
-                <Icon icon="calendar" className="events-display-icon" />
-              </div>
+              <Icon icon="calendar" className="events-display-icon" />
             </Button>
           </div>
           <FilterModel />
         </main>
+        <article className="selected-filters">
+          {currentEventFilters?.map((eventType: any) => (
+            <Tag className="filter-tag" color="#913e2f" key={eventType} closable onClose={() => onRemoveEventFilter("eventType", eventType)}>{getLabelByValue(eventType, eventTypes)}</Tag>
+          ))}
+          {
+            currentDistrictValues?.map((district: any) => (
+              <Tag className="filter-tag" color="#913e2f" key={district} closable onClose={() => onRemoveDistrictFilter("district", district)}>{getLabelByValue(district, districtOptions)}</Tag>
+            ))
+          }
+        </article>
       </header>
-      <div className="events-display-list">
+      <section className="events-display-list">
         {!isListView ? (
           <>
             <CalendarView
@@ -91,7 +110,7 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
         ) : (
           <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} />
         )}
-      </div>
+      </section>
 
 
     </div>
