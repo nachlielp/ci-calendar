@@ -13,6 +13,7 @@ import { useParamsHandler } from "../../../hooks/useParamsHandler";
 
 import { Icon } from "./Icon";
 import { districtOptions, eventTypes } from "../../../util/options";
+import FilterDrawer from "./FilterDrawer";
 
 interface IEventsDisplayProps {
   events: IEvently[];
@@ -85,7 +86,8 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
               <Icon icon="calendar" className="events-display-icon" />
             </Button>
           </div>
-          <FilterModel />
+          {/* <FilterModel /> */}
+          <FilterDrawer />
         </main>
         <article className="selected-filters">
           {currentEventFilters?.map((eventType: any) => (
