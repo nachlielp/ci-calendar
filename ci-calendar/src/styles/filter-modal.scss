@@ -1,0 +1,55 @@
+.filter-model-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .anchor-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 8rem;
+        height: 3rem;
+        background: none;
+        color: #fff;
+
+        &.active {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        &:hover {
+            color: #fff !important; // Ensure text color remains white on hover
+            border: 1px solid #fff !important; // Ensure border is white on hover
+            background: none !important; // Ensure background is black on hover
+        }
+    }
+
+    .text {
+        font-size: 1.125rem;
+        font-weight: 500;
+        margin-right: 0.4rem;
+    }
+
+    .filter-model-button.active {
+        background-color: #d1d5db;
+    }
+
+    .filter-model-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .filter-model-title {
+        font-size: 1.125rem;
+        /* font-family: 'Rubik', sans-serif; */
+
+    }
+
+    .filter-model-checkbox {
+        transform: scale(1.2);
+        margin: 6px;
+    }
+
+    .filter-model-checkbox-label {
+        font-size: 1.125rem;
+    }
+}

@@ -38,9 +38,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-200 flex justify-center">
+    <div className="app">
       <SpeedInsights />
-      <div className="w-full sm:w-11/12 md:max-w-screen-md bg-homepage-bg">
+      <div className="app-content">
         <BrowserRouter>
           <AuthProvider>
             <Header />

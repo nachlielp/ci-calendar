@@ -22,12 +22,17 @@ export default function FilterModel() {
     clearSearchParams(["eventType", "district"]);
   };
 
+  const isSelectedFilter = currentEventTypeValues.length || currentDistrictValues.length;
+
   return (
     <div className="filter-model-container">
       <Button
         onClick={() => setModalOpen(true)}
-        className={`filter-model-button ${currentEventTypeValues.length || currentDistrictValues.length ? 'active' : ''}`}
+        className={`anchor-btn ${isSelectedFilter && 'active'}`}
       >
+        <p className="text">
+          סינון
+        </p>
         <Icon icon="instantMix" className="filter-model-icon" />
       </Button>
 
