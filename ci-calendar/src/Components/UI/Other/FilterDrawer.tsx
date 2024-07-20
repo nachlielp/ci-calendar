@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Checkbox, Drawer, Tag } from "antd";
+import { Button, Drawer, Tag } from "antd";
 import { eventTypes, districtOptions } from "../../../util/options";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 import { Icon } from "./Icon";
