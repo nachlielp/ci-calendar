@@ -1,10 +1,51 @@
-.filter-drawer {
-    border-radius: 10px 10px 0 0;
+.ant-drawer {
     width: 100vw;
+}
+
+.filter-drawer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px 10px 0 0;
+    // position: fixed;
+    // left: 0; // Ensure the drawer starts from the left edge
+    // right: 0; // Ensure the drawer ends at the right edge
+
+    .anchor-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 8rem;
+        height: 3rem;
+        background: none;
+        color: #fff;
+
+        &.active {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        &:hover {
+            color: #fff !important; // Ensure text color remains white on hover
+            border: 1px solid #fff !important; // Ensure border is white on hover
+            background: none !important; // Ensure background is black on hover
+        }
+
+        .text {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-right: 0.4rem;
+        }
+
+        .filter-drawer-icon {
+            width: 2rem;
+            height: 2rem;
+        }
+    }
 
     .ant-drawer-header {
         border-bottom: none;
         border-radius: 10px 10px 0 0;
+        width: 100%;
 
         .ant-drawer-header-title {
             display: flex;
@@ -15,5 +56,61 @@
                 margin: 0;
             }
         }
+    }
+
+    .ant-drawer-body {
+        padding: 0 20px 20px 20px;
+
+        .filter-tags-container {
+            .sub-title {
+                font-size: 16px;
+                font-weight: 600;
+                margin: 0 0 16px 0;
+            }
+
+            .filter-model-tags {
+                margin: 0 0 16px 0;
+
+            }
+
+            .tag {
+                border-radius: 20px;
+                padding: 5px 20px;
+                margin: 5px;
+                font-size: 16px;
+                font-weight: 400;
+            }
+
+            .selected {
+                background: #BC3528;
+                color: #fff;
+            }
+
+            .un-selected {
+                background: #fff;
+                color: #000;
+                border: 1px solid #000;
+            }
+        }
+    }
+
+    .ant-drawer-footer {
+        width: 90%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid #989898;
+
+        .footer-btn {
+            font-size: 1rem;
+            font-weight: 400;
+            border: none;
+            border-bottom: 1px solid #000;
+            border-radius: 0;
+            text-decoration: underline !important;
+            box-shadow: none;
+            color: #000;
+        }
+
     }
 }

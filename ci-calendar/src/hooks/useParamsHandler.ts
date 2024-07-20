@@ -11,6 +11,7 @@ interface IUseParamsHandler {
   currentValues: string[];
   onOptionsChange: (type: string) => (values: string[]) => void;
   clearSearchParams: (titles: string[]) => void;
+  selectOption: (type: string, value: string) => void;
   removeOption: (type: string, value: string) => void;
 }
 
@@ -37,6 +38,18 @@ export const useParamsHandler = ({
     setSearchParams(newSearchParams, { replace: true });
   };
 
+  const selectOption = (type: string, value: string) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    const existingValues = newSearchParams.getAll(type);
+
+    // Check if the value already exists to avoid duplicates
+    if (!existingValues.includes(value)) {
+      newSearchParams.append(type, value);
+    }
+
+    setSearchParams(newSearchParams, { replace: true });
+  };
+
   const removeOption = (type: string, value: string) => {
     const newSearchParams = new URLSearchParams(searchParams);
     const values = newSearchParams.getAll(type).filter((v) => v !== value);
@@ -56,5 +69,5 @@ export const useParamsHandler = ({
     setCurrentValues(initialValues);
   }, [searchParams, getInitialValues]);
 
-  return { currentValues, onOptionsChange, clearSearchParams, removeOption };
+  return { currentValues, onOptionsChange, clearSearchParams, removeOption, selectOption };
 };
