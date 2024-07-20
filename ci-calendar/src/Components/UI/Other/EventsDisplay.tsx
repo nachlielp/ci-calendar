@@ -7,7 +7,7 @@ import CalendarView from "./CalendarView";
 import EventsList from "../DisplayEvents/EventsList";
 import { useEffect, useState } from "react";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
-import FilterModel from "./FilterModel";
+// import FilterModel from "./FilterModel";
 import { Button, Tag } from "antd";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 

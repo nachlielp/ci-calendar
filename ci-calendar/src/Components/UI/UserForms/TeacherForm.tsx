@@ -10,7 +10,7 @@ import {
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useEffect, useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";
-import { useWindowSize } from "../../../hooks/useWindowSize";
+// import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useGetTeacher } from "../../../hooks/useGetTeacher";
 
 type FieldType = {
@@ -29,7 +29,7 @@ interface ITeacherFormProps {
 }
 //TODO add cropper (react-easy-crop)
 export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps) {
-  const { width } = useWindowSize();
+  // const { width } = useWindowSize();
   const { currentUser, updateTeacher } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
   const teacher = useGetTeacher(currentUser.id);
@@ -79,7 +79,7 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
     setImageUrl("");
   };
 
-  const cardWidth = width > 600 ? 500 : 300;
+  // const cardWidth = width > 600 ? 500 : 300;
 
   return (
     <>
