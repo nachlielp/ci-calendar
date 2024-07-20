@@ -38,18 +38,90 @@
         height: 2rem;
     }
 
-    .filter-model-title {
-        font-size: 1.125rem;
-        /* font-family: 'Rubik', sans-serif; */
 
+    // .filter-model-title {
+    //     font-size: 1.125rem;
+    //     /* font-family: 'Rubik', sans-serif; */
+
+    // }
+
+    // .filter-model-checkbox {
+    //     transform: scale(1.2);
+    //     margin: 6px;
+    // }
+
+    // .filter-model-checkbox-label {
+    //     font-size: 1.125rem;
+    // }
+}
+
+.filter-model {
+
+    .ant-modal-header {
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+        width: 100%;
+
+        .ant-drawer-header-title {
+            display: flex;
+            flex-direction: row-reverse !important;
+            margin: 0;
+
+            .filter-drawer-title {
+                margin: 0;
+            }
+        }
     }
 
-    .filter-model-checkbox {
-        transform: scale(1.2);
-        margin: 6px;
+    .filter-tags-container {
+        .sub-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 16px 0;
+        }
+
+        .filter-model-tags {
+            margin: 0 0 16px 0;
+
+        }
+
+        .tag {
+            border-radius: 20px;
+            padding: 5px 20px;
+            margin: 5px;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .selected {
+            background: #BC3528;
+            color: #fff;
+        }
+
+        .un-selected {
+            background: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
     }
 
-    .filter-model-checkbox-label {
-        font-size: 1.125rem;
+    .ant-modal-footer {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-top: 1px solid #989898;
+
+        .footer-btn {
+            font-size: 1rem;
+            font-weight: 400;
+            border: none;
+            border-bottom: 1px solid #000;
+            border-radius: 0;
+            text-decoration: underline !important;
+            box-shadow: none;
+            color: #000;
+        }
+
     }
 }
