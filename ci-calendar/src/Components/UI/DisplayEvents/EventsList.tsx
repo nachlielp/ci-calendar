@@ -8,6 +8,7 @@ import Loading from "../Other/Loading";
 import EmptyList from "../Other/Empty";
 import { MultiDayEventCard } from "./MultiDayEventCard";
 import { Empty } from "antd";
+import SingleDayModalCard from "./SingleDayModalCard";
 
 interface IEventsListProps {
   events: IEvently[];
@@ -38,12 +39,17 @@ export default function EventsList({ events, isEdit, isEvents }: IEventsListProp
       {filteredEvents.map((event) => (
         <div key={event.id} style={{ width: adjustedItemWidth }}>
           {event.dates["startDate"] === event.dates["endDate"] ? (
-            <SingleDayEventCard
-              key={event.id}
-              event={event}
-              cardWidth={adjustedItemWidth}
-              isEdit={isEdit}
+            <SingleDayModalCard event={event}
+              anchorEl={
+                <SingleDayEventCard
+                  key={event.id}
+                  event={event}
+                  cardWidth={adjustedItemWidth}
+                  isEdit={isEdit}
+                />
+              }
             />
+
           ) : (
             <MultiDayEventCard
               key={event.id}

@@ -87,11 +87,12 @@ export const SingleDayEventCard = React.forwardRef<
       <div className="event-header">
         {isEdit ?
           <div className="event-title">{event.title}&nbsp;</div>
-          : <SingleDayModalCard event={event} />
+          :
+          <h2 className="modal-card-title">{event.title}&nbsp;</h2>
         }
       </div>
 
-      <br />
+
       <article className="event-dates">
         <Icon icon="calendar" className="event-icon" />
         <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>

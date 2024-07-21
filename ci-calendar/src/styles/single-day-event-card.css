@@ -1,10 +1,14 @@
 .single-day-event-card {
     margin-top: 1rem;
+    /* display: flex;
+    flex-direction: column;
+    gap: 16px; */
 
     .event-header {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
+        margin-bottom: 16px;
     }
 
     .event-title {
@@ -42,14 +46,21 @@
         }
     }
 
-    .event-icon {
-        margin-left: 4px;
+    .icon-component {
+        align-self: start;
 
-        .injected-svg {
-            width: 16px;
-            height: 16px;
+        .event-icon {
+            margin-left: 4px;
+            margin-top: 6px;
+
+
+            .injected-svg {
+                width: 16px;
+                height: 16px;
+            }
         }
     }
+
 
 
     .event-tags {
