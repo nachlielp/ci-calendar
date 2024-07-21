@@ -30,9 +30,9 @@ export default function BioModal({ teacher }: BioModalProps) {
 
     return (
         <>
-            <Button type="link" onClick={showModal} style={{ color: 'blue', textDecoration: 'underline', border: 'none', padding: "2px" }}>
+            <label className="bio-modal-label" onClick={showModal} style={{ color: 'blue', textDecoration: 'underline', border: 'none', }}>
                 {teacher.fullName}
-            </Button>
+            </label>
 
             <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
                 <div className="flex flex-col justify-center items-center w-full ">

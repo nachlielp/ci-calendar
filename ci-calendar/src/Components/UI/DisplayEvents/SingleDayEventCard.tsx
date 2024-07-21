@@ -67,6 +67,7 @@ export const SingleDayEventCard = React.forwardRef<
     const isTeacher = teachers.find(t => t.id === teacher.value);
     return isTeacher ? <BioModal key={teacher.value} teacher={isTeacher} /> : teacher.label;
   });
+
   const footer = isEdit
     ? [
       <DeleteEvent eventId={event.id} />,
@@ -88,43 +89,18 @@ export const SingleDayEventCard = React.forwardRef<
           <div className="event-title">{event.title}&nbsp;</div>
           : <SingleDayModalCard event={event} />
         }
-        <div className="event-tags">
-          {getTypes(
-            Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
-          ).map((type, index) => (
-            <Tag color="blue" key={`${type}-${index}`} className="event-tag">
-              {type}
-            </Tag>
-          ))}
-        </div>
       </div>
 
       <br />
-      <div className="event-dates">
-        <Icon icon="event" className="event-icon" />
-        <p>
-          {subEventLen > 0 ? (
-            <>
-              <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
-              {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
-              {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-              {!isEdit && (
-                <>
-                  &nbsp; עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
-                    <React.Fragment key={index}>
-                      {item}
-                      {index < array.length - 1 && ', '}
-                    </React.Fragment>
-                  ))}
-                </>
-              )}
-            </>
-          ) : (
-            <span>No event times available</span>
-          )}
-        </p>
-      </div>
-
+      <article className="event-dates">
+        <Icon icon="calendar" className="event-icon" />
+        <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>
+        <Icon icon="schedule" className="event-icon" />
+        <label className="event-label">
+          {dayjs(event.subEvents[0].startTime).format("HH:mm")}&nbsp;-&nbsp;
+          {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
+        </label>
+      </article>
       {isEdit && subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <div className="sub-event" key={index}>
@@ -158,17 +134,35 @@ export const SingleDayEventCard = React.forwardRef<
               )}
             </span>
           </div>
-        ))}
+        ))
+      }
 
-      <div className="event-location">
-        <Icon icon="map" className="event-location-icon" />
-        <button
+      <article className="event-location">
+        <Icon icon="pinDrop" className="event-icon" />
+        <label className="event-label">
+          {event.address.label}
+        </label>
+        {/* <button
           onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
           className="event-location-button"
         >
           {event.address.label}
-        </button>
-      </div>
+        </button> */}
+      </article>
+
+      {!isEdit && (
+        <article className="event-teachers">
+          <Icon icon="person" className="event-icon" />
+          <label className="event-label">
+            עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
+              <React.Fragment key={index}>
+                {item}
+                {index < array.length - 1 && ', '}
+              </React.Fragment>
+            ))}
+          </label>
+        </article>
+      )}
 
       {isEdit && !isWhiteSpace(event.description) && (
         <div className="event-description">
@@ -177,7 +171,7 @@ export const SingleDayEventCard = React.forwardRef<
         </div>
       )}
 
-      {event.price.length > 0 && (
+      {/* {event.price.length > 0 && (
         <div className="event-price">
           <span className="event-price-currency">&#8362;</span>
           <ul>
@@ -188,7 +182,17 @@ export const SingleDayEventCard = React.forwardRef<
             ))}
           </ul>
         </div>
-      )}
+      )} */}
+
+      <article className="event-tags">
+        {getTypes(
+          Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
+        ).map((type, index) => (
+          <Tag color="blue" key={`${type}-${index}`} className="event-tag">
+            {type}
+          </Tag>
+        ))}
+      </article>
 
       {isEdit && <div style={{ marginTop: 16 }}>
         {event.links.length > 0 &&
@@ -238,6 +242,26 @@ export const formatHebrewDate = (date: string) => {
   const day = dayjs(date).locale("he").format("D");
   const month = dayjs(date).locale("he").format("MM");
   const hebrewMonth = hebrewMonths.find((m: SelectOption) => m.value === month)?.label;
-  return `${day} ב${hebrewMonth}`;
+  return `${hebrewDay(date)}, ${day} ב${hebrewMonth}`;
 };
 
+export const hebrewDay = (date: string) => {
+  switch (dayjs(date).locale("he").format("dd")) {
+    case "Su":
+      return "יום ראשון";
+    case "Mo":
+      return "יום שני";
+    case "Tu":
+      return "יום שלישי";
+    case "We":
+      return "יום רביעי";
+    case "Th":
+      return "יום חמישי";
+    case "Fr":
+      return "יום שישי";
+    case "Sa":
+      return "יום שבת";
+    default:
+      return "";
+  }
+};

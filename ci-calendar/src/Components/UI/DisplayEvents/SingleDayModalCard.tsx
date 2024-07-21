@@ -53,7 +53,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
     return (
         <>
             <div className="modal-card-header" onClick={showModal}>
-                <div className="modal-card-title">{event.title}&nbsp;</div>
+                <h2 className="modal-card-title">{event.title}&nbsp;</h2>
                 <Icon icon="expand" className="modal-card-icon" />
             </div>
 
