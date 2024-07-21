@@ -1,9 +1,12 @@
+import { useState } from "react";
 import type { CalendarProps } from "antd";
 import { Calendar, Card } from "antd";
 import type { Dayjs } from "dayjs";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently } from "../../../util/interfaces";
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
+import 'dayjs/locale/he';
+dayjs.locale('he');
 import isBetween from 'dayjs/plugin/isBetween';
 import { getMonthNameHebrew } from "../../../util/helpers";
 dayjs.extend(isBetween)
@@ -15,9 +18,25 @@ interface CalendarViewProps {
 
 export default function CalendarView({ events, onSelect }: CalendarViewProps) {
   const { width } = useWindowSize();
-  const setWidth = width > 600 ? 500 : width * 0.9;
-  const dateCellRender = () => {
-    return <div className="calendar-view__day-cell"></div>;
+  const [selectedDay, setSelectedDay] = useState<Dayjs | null>(null);
+  const setWidth = width > 6000 ? 500 : width * 0.9;
+
+  const dateCellRender = (current: Dayjs) => {
+    const eventCount = eventsOnDay(current, events).length;
+    const isToday = current.isSame(dayjs(), 'day');
+    const isDisabled = !eventsOnDay(current, events).length;
+    const isSelected = selectedDay && current.isSame(selectedDay, 'day');
+
+    return (
+      <div className={`calendar-view__day-cell ${isToday ? 'today' : ''} ${isDisabled ? 'disabled' : ''} ${isSelected ? 'selected' : ''} ${eventCount > 0 ? 'has-events-' + eventCount : ''}`}>
+        <span>{current.date()}</span>
+        <div className="event-dots">
+          {Array.from({ length: Math.min(eventCount, 3) }).map((_, index) => (
+            <span key={index} className="event-dot"></span>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   const disabledDate = (current: Dayjs) => {
@@ -26,12 +45,11 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
     const isOutOfRange =
       current.isBefore(lastMonth, "day") ||
       current.isAfter(threeMonthsAhead, "day");
-    const hasNoEvents = !eventsOnDay(current, events);
-    return isOutOfRange || hasNoEvents;
+    return isOutOfRange;
   };
 
-  const cellRender: CalendarProps<Dayjs>["cellRender"] = (_, info) => {
-    if (info.type === "date") return dateCellRender();
+  const cellRender: CalendarProps<Dayjs>["cellRender"] = (day, info) => {
+    if (info.type === "date") return dateCellRender(day);
     return info.originNode;
   };
 
@@ -57,19 +75,17 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
             קודם
           </button>
         </div>
-
       </div>
     );
   };
 
   return (
-    // <div className="calendar-view" style={{ width: setWidth }}>
     <div className="calendar-view">
       <Card className="calendar-view__card">
         <Calendar
           disabledDate={disabledDate}
           fullscreen={false}
-          cellRender={cellRender}
+          fullCellRender={cellRender}
           mode="month"
           onSelect={onSelect}
           headerRender={customHeaderRender}
@@ -80,7 +96,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 }
 
 function eventsOnDay(day: Dayjs, events: IEvently[]) {
-  return events.some(event =>
+  return events.filter(event =>
     day.isBetween(
       dayjs(event.dates.startDate).startOf('day'),
       dayjs(event.dates.endDate).endOf('day'),

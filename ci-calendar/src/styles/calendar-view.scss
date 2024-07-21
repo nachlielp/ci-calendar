@@ -2,13 +2,53 @@
     margin: 0 auto;
     margin-top: 1rem;
 
-    .calendar-view .card {
+
+
+    .calendar-view__card {
         margin-top: 1rem;
     }
 
-    .calendar-view .day-cell {
+    .calendar-view__day-cell {
         padding: 0.5rem;
         position: relative;
+        text-align: center;
+
+        &.selected {
+            background-color: orange;
+            color: white;
+        }
+
+        &.disabled {
+            color: lightgray;
+        }
+
+        .event-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.25rem;
+
+            .event-dot {
+                width: 5px;
+                height: 5px;
+                background-color: red;
+                border-radius: 50%;
+                margin: 0 1px;
+            }
+        }
+    }
+
+    .ant-picker-cell-selected {
+        .calendar-view__day-cell {
+
+            background-color: #bc3528;
+            color: #fff;
+
+            .event-dots {
+                .event-dot {
+                    background-color: #fff;
+                }
+            }
+        }
     }
 
     .calendar-view__header-buttons {
@@ -17,5 +57,9 @@
         justify-content: space-between;
         padding: 0.5rem 1rem;
         margin-top: 1rem;
+    }
+
+    .ant-picker-calendar .ant-picker-cell {
+        padding: 0;
     }
 }
