@@ -1,0 +1,21 @@
+.calendar-view {
+    margin: 0 auto;
+    margin-top: 1rem;
+
+    .calendar-view .card {
+        margin-top: 1rem;
+    }
+
+    .calendar-view .day-cell {
+        padding: 0.5rem;
+        position: relative;
+    }
+
+    .calendar-view__header-buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        margin-top: 1rem;
+    }
+}
