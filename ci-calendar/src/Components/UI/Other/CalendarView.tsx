@@ -1,9 +1,8 @@
 import type { CalendarProps } from "antd";
-import { Button, Calendar, Card, ConfigProvider } from "antd";
+import { Calendar, Card, ConfigProvider } from "antd";
 import type { Dayjs } from "dayjs";
 import { IEvently } from "../../../util/interfaces";
 import isBetween from 'dayjs/plugin/isBetween';
-import { getMonthNameHebrew } from "../../../util/helpers";
 import dayjs from 'dayjs';
 import 'dayjs/locale/he';
 dayjs.extend(isBetween)
@@ -12,18 +11,6 @@ import hb from 'antd/locale/he_IL';
 import { useState } from "react";
 import { Icon } from "./Icon";
 
-const customLocale = {
-  locale: 'ar_EG',
-  lang: {
-    locale: 'ar_EG',
-    weekdays: ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'],
-    weekdaysShort: ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז'],
-    // Add other required properties here if needed
-  },
-  // Add other required properties here if needed
-};
-
-
 interface CalendarViewProps {
   events: IEvently[];
   onSelect: (value: Dayjs) => void;
@@ -31,16 +18,10 @@ interface CalendarViewProps {
 
 export default function CalendarView({ events, onSelect }: CalendarViewProps) {
   const [value, setValue] = useState<Dayjs>(dayjs());
-  const [mode, setMode] = useState<'month' | 'year'>('month');
 
   const onChange = (newValue: Dayjs) => {
     setValue(newValue);
   };
-
-  const onModeChange = (newMode: 'month' | 'year') => {
-    setMode(newMode);
-  };
-
 
   const dateCellRender = (current: Dayjs) => {
     const eventCount = eventsOnDay(current, events).length;
@@ -91,7 +72,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
         <ConfigProvider locale={hb}>
           <Calendar
             value={value}
-            mode={mode}
+            mode='month'
             onChange={onChange}
             fullscreen={false}
             fullCellRender={cellRender}
