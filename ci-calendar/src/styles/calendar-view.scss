@@ -12,10 +12,12 @@
         .back {
             transform: rotate(180deg);
             margin-bottom: 4px;
+            cursor: pointer;
         }
 
         .next {
             margin-top: 4px;
+            cursor: pointer;
         }
 
         .label {
