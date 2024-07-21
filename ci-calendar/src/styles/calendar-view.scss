@@ -2,64 +2,101 @@
     margin: 0 auto;
     margin-top: 1rem;
 
+    .calendar-controller {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
 
+        .back {
+            transform: rotate(180deg);
+            margin-bottom: 4px;
+        }
+
+        .next {
+            margin-top: 4px;
+        }
+
+        .label {
+            font-size: 16px;
+            font-weight: 600;
+            width: 90px;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+    }
 
     .calendar-view__card {
         margin-top: 1rem;
-    }
 
-    .calendar-view__day-cell {
-        padding: 0.5rem;
-        position: relative;
-        text-align: center;
-
-        &.selected {
-            background-color: orange;
-            color: white;
+        .ant-card-body {
+            padding: 16px;
         }
 
-        &.disabled {
-            color: lightgray;
-        }
+        .ant-picker-calendar {
+            .ant-picker-cell {
+                padding: 0;
+            }
 
-        .event-dots {
-            display: flex;
-            justify-content: center;
-            margin-top: 0.25rem;
-
-            .event-dot {
-                width: 5px;
-                height: 5px;
-                background-color: red;
-                border-radius: 50%;
-                margin: 0 1px;
+            .ant-picker-panel {
+                border-top: none;
             }
         }
-    }
 
-    .ant-picker-cell-selected {
+
         .calendar-view__day-cell {
+            padding: 0.5rem;
+            position: relative;
+            text-align: center;
 
-            background-color: #bc3528;
-            color: #fff;
+            &.selected {
+                background-color: orange;
+                color: white;
+            }
+
+            &.disabled {
+                color: lightgray;
+            }
 
             .event-dots {
+                display: flex;
+                justify-content: center;
+                margin-top: 0.25rem;
+
                 .event-dot {
-                    background-color: #fff;
+                    width: 5px;
+                    height: 5px;
+                    background-color: red;
+                    border-radius: 50%;
+                    margin: 0 1px;
+                }
+            }
+        }
+
+        .ant-picker-cell-selected {
+            .calendar-view__day-cell {
+
+                background-color: #bc3528;
+                color: #fff;
+
+                .event-dots {
+                    .event-dot {
+                        background-color: #fff;
+                    }
                 }
             }
         }
     }
 
-    .calendar-view__header-buttons {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 0.5rem 1rem;
-        margin-top: 1rem;
-    }
 
-    .ant-picker-calendar .ant-picker-cell {
-        padding: 0;
-    }
+
+    // .calendar-view__header-buttons {
+    //     display: flex;
+    //     flex-direction: row;
+    //     justify-content: space-between;
+    //     padding: 0.5rem 1rem;
+    //     margin-top: 1rem;
+    // }
+
 }
