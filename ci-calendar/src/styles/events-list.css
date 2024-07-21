@@ -5,6 +5,10 @@
     width: 100%;
 }
 
+.events-list-container>* {
+    width: 100%;
+}
+
 .events-list-footer {
     display: flex;
     justify-content: center;

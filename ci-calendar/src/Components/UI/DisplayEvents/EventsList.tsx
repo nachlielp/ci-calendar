@@ -37,7 +37,7 @@ export default function EventsList({ events, isEdit, isEvents }: IEventsListProp
     <div className="events-list-container">
       {!isEvents && emptyEventsList()}
       {filteredEvents.map((event) => (
-        <div key={event.id} style={{ width: adjustedItemWidth }}>
+        <div key={event.id} >
           {event.dates["startDate"] === event.dates["endDate"] ? (
             <SingleDayModalCard event={event}
               anchorEl={

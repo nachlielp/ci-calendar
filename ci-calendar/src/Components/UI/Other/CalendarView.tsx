@@ -63,7 +63,8 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
   };
 
   return (
-    <div className="calendar-view" style={{ width: setWidth }}>
+    // <div className="calendar-view" style={{ width: setWidth }}>
+    <div className="calendar-view">
       <Card className="calendar-view__card">
         <Calendar
           disabledDate={disabledDate}

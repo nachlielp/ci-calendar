@@ -10,7 +10,6 @@ import { useGetTeachers } from "../../../hooks/useGetTeachers";
 import { EventlyType, IEvently } from "../../../util/interfaces";
 import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
 import { Icon } from "../Other/Icon";
-import SingleDayModalCard from "./SingleDayModalCard";
 // import expand from "../../../assets/expand.svg";
 interface ISingleDayEventCardProps {
   event: IEvently;
@@ -21,7 +20,7 @@ interface ISingleDayEventCardProps {
 export const SingleDayEventCard = React.forwardRef<
   HTMLDivElement,
   ISingleDayEventCardProps
->(({ event, cardWidth, isEdit }, ref) => {
+>(({ event, isEdit }, ref) => {
   // const openGoogleMaps = (placeId: string, address: string) => {
   //   const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
   //   const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
@@ -81,7 +80,7 @@ export const SingleDayEventCard = React.forwardRef<
     <Card
       ref={ref}
       className="single-day-event-card"
-      style={{ width: cardWidth }}
+      style={{ width: '100%' }}
       actions={footer}
     >
       <div className="event-header">
