@@ -1,12 +1,15 @@
 import type { CalendarProps } from "antd";
-import { Calendar, Card } from "antd";
+import { Calendar, Card, ConfigProvider } from "antd";
 import type { Dayjs } from "dayjs";
-import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently } from "../../../util/interfaces";
-import dayjs from "dayjs";
 import isBetween from 'dayjs/plugin/isBetween';
-import { getMonthNameHebrew } from "../../../util/helpers";
+import dayjs from 'dayjs';
+import 'dayjs/locale/he';
 dayjs.extend(isBetween)
+dayjs.locale('he');
+import hb from 'antd/locale/he_IL';
+import { useState } from "react";
+import { Icon } from "./Icon";
 
 interface CalendarViewProps {
   events: IEvently[];
@@ -14,72 +17,76 @@ interface CalendarViewProps {
 }
 
 export default function CalendarView({ events, onSelect }: CalendarViewProps) {
-  const { width } = useWindowSize();
-  const setWidth = width > 600 ? 500 : width * 0.9;
-  const dateCellRender = () => {
-    return <div className="calendar-view__day-cell"></div>;
+  const [value, setValue] = useState<Dayjs>(dayjs());
+
+  const onChange = (newValue: Dayjs) => {
+    setValue(newValue);
   };
 
-  const disabledDate = (current: Dayjs) => {
-    const lastMonth = dayjs().subtract(1, "month").startOf("month");
-    const threeMonthsAhead = dayjs().add(3, "months").endOf("month");
-    const isOutOfRange =
-      current.isBefore(lastMonth, "day") ||
-      current.isAfter(threeMonthsAhead, "day");
-    const hasNoEvents = !eventsOnDay(current, events);
-    return isOutOfRange || hasNoEvents;
-  };
+  const dateCellRender = (current: Dayjs) => {
+    const eventCount = eventsOnDay(current, events).length;
+    const isToday = current.isSame(dayjs(), 'day');
+    const isDisabled = !eventsOnDay(current, events).length;
 
-  const cellRender: CalendarProps<Dayjs>["cellRender"] = (_, info) => {
-    if (info.type === "date") return dateCellRender();
-    return info.originNode;
-  };
-
-  const customHeaderRender = ({ value, onChange }: any) => {
     return (
-      <div className="calendar-view__header-buttons">
-        <div className="">
-          <button
-            className=""
-            onClick={() => onChange(value.add(1, "month"))}
-          >
-            הבא
-          </button>
+      <div className={`calendar-view__day-cell ${isToday && 'today'} ${isDisabled && 'disabled'} ${eventCount > 0 && 'has-events-' + eventCount}`}>
+        <span>{current.date()}</span>
+        <div className="event-dots">
+          {Array.from({ length: Math.min(eventCount, 3) }).map((_, index) => (
+            <span key={index} className="event-dot"></span>
+          ))}
         </div>
-        <div className="">
-          <span>{getMonthNameHebrew(value.month())} {value.year()}</span>
-        </div>
-        <div className="">
-          <button
-            className=""
-            onClick={() => onChange(value.subtract(1, "month"))}
-          >
-            קודם
-          </button>
-        </div>
-
       </div>
     );
   };
 
+  const cellRender: CalendarProps<Dayjs>["cellRender"] = (day, info) => {
+    if (info.type === "date") return dateCellRender(day);
+    return info.originNode;
+  };
+
+  const prevMonth = () => {
+    const newValue = value.subtract(1, 'month');
+    const oneMonthAgo = dayjs().subtract(1, 'month').startOf('month');
+    if (newValue.isAfter(oneMonthAgo)) {
+      setValue(newValue);
+    }
+  };
+
+  const nextMonth = () => {
+    const newValue = value.add(1, 'month');
+    const threeMonthsAhead = dayjs().add(3, 'months').endOf('month');
+    if (newValue.isBefore(threeMonthsAhead)) {
+      setValue(newValue);
+    }
+  };
+
   return (
-    <div className="calendar-view" style={{ width: setWidth }}>
+    <section className="calendar-view">
+      <header className="calendar-controller">
+        <Icon onClick={prevMonth} icon="chevron_right" className="back" />
+        <label className="label">{value.format('MMMM YYYY')}</label>
+        <Icon onClick={nextMonth} icon="chevron_right" className="next" />
+      </header>
       <Card className="calendar-view__card">
-        <Calendar
-          disabledDate={disabledDate}
-          fullscreen={false}
-          cellRender={cellRender}
-          mode="month"
-          onSelect={onSelect}
-          headerRender={customHeaderRender}
-        />
+        <ConfigProvider locale={hb}>
+          <Calendar
+            value={value}
+            mode='month'
+            onChange={onChange}
+            fullscreen={false}
+            fullCellRender={cellRender}
+            onSelect={onSelect}
+            headerRender={() => <div></div>}
+          />
+        </ConfigProvider>
       </Card>
-    </div>
+    </section>
   );
 }
 
 function eventsOnDay(day: Dayjs, events: IEvently[]) {
-  return events.some(event =>
+  return events.filter(event =>
     day.isBetween(
       dayjs(event.dates.startDate).startOf('day'),
       dayjs(event.dates.endDate).endOf('day'),

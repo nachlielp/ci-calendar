@@ -10,9 +10,10 @@ import React from 'react';
 
 interface SingleDayModalCardProps {
     event: IEvently,
+    anchorEl: any | null
 }
 
-export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
+export default function SingleDayModalCard({ event, anchorEl }: SingleDayModalCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = () => {
@@ -53,8 +54,7 @@ export default function SingleDayModalCard({ event }: SingleDayModalCardProps) {
     return (
         <>
             <div className="modal-card-header" onClick={showModal}>
-                <div className="modal-card-title">{event.title}&nbsp;</div>
-                <Icon icon="expand" className="modal-card-icon" />
+                {anchorEl}
             </div>
 
             <Modal open={isModalOpen} onCancel={handleCancel} footer={null} className='single-day-modal-card'>

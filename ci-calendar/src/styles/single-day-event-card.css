@@ -1,117 +1,149 @@
 .single-day-event-card {
     margin-top: 1rem;
-}
-
-.event-header {
-    display: flex;
+    width: 100%;
+    /* display: flex;
     flex-direction: column;
-    align-items: flex-end;
-}
+    gap: 16px; */
 
-.event-title {
-    display: block;
-    font-weight: bold;
-    font-size: 1.125rem;
-    width: 100%;
-}
+    .event-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-bottom: 16px;
+    }
 
-.event-tags {
-    display: block;
-    width: 100%;
-}
+    .event-title {
+        display: block;
+        font-weight: bold;
+        font-size: 1.125rem;
+        width: 100%;
+    }
 
-.event-tag {
-    display: inline-block;
-    margin-bottom: 0.25rem;
-}
+    .event-tags {
+        display: block;
+        width: 100%;
+    }
 
-.event-dates {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
+    .event-tag {
+        display: inline-block;
+        margin-bottom: 0.25rem;
+    }
 
-.event-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-top: 0.25rem;
-    align-self: center;
-}
 
-.sub-event {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    padding-right: 1.5rem;
-}
+    .event-dates,
+    .event-location,
+    .event-teachers {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        width: 100%;
+        margin-bottom: 4px;
 
-.sub-event-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-    margin-top: 0.25rem;
-    margin-right: 0.25rem;
-    align-self: center;
-}
+        .event-label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            margin-left: 8px;
+        }
+    }
 
-.event-location {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
+    .icon-component {
+        align-self: start;
 
-.event-location-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-top: 0.25rem;
-    align-self: center;
-}
+        .event-icon {
+            margin-left: 4px;
+            margin-top: 6px;
 
-.event-location-button {
-    color: #3b82f6;
-    text-decoration: underline;
-    text-align: right;
-}
 
-.event-description {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
+            .injected-svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
 
-.event-description-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-top: 0.25rem;
-    align-self: center;
-}
 
-.event-price {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
 
-.event-price-currency {
-    font-size: 1.125rem;
-    align-self: center;
-}
+    .event-tags {
+        .event-tag {
+            background-color: #E5E5EA;
+            color: #000;
+            border: none;
+            font-size: 14px;
+            font-weight: 400;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            border-radius: 8px;
+        }
+    }
 
-.event-links {
-    margin-top: 1rem;
-}
+    .sub-event {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding-right: 1.5rem;
+    }
 
-.event-link-button {
-    margin-bottom: 0.5rem;
-}
+    .sub-event-icon {
+        width: 0.75rem;
+        height: 0.75rem;
+        margin-top: 0.25rem;
+        margin-right: 0.25rem;
+        align-self: center;
+    }
 
-.event-link-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-left: 0.5rem;
-    align-self: center;
+    .event-location-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.25rem;
+        align-self: center;
+    }
+
+    .event-location-button {
+        color: #3b82f6;
+        text-decoration: underline;
+        text-align: right;
+    }
+
+    .event-description {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .event-description-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-top: 0.25rem;
+        align-self: center;
+    }
+
+    .event-price {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .event-price-currency {
+        font-size: 1.125rem;
+        align-self: center;
+    }
+
+    .event-links {
+        margin-top: 1rem;
+    }
+
+    .event-link-button {
+        margin-bottom: 0.5rem;
+    }
+
+    .event-link-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-left: 0.5rem;
+        align-self: center;
+    }
 }

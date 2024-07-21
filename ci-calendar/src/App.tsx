@@ -40,7 +40,7 @@ export default function App() {
   return (
     <div className="app">
       <SpeedInsights />
-      <div className="app-content">
+      <div className="app-content" style={{ width: '100%', maxWidth: '500px' }}>
         <BrowserRouter>
           <AuthProvider>
             <Header />

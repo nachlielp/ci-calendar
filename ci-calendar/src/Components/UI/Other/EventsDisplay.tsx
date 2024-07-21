@@ -7,13 +7,14 @@ import CalendarView from "./CalendarView";
 import EventsList from "../DisplayEvents/EventsList";
 import { useEffect, useState } from "react";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
-// import FilterModel from "./FilterModel";
+import FilterModel from "./FilterModel";
 import { Button, Tag } from "antd";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 
 import { Icon } from "./Icon";
 import { districtOptions, eventTypes } from "../../../util/options";
 import FilterDrawer from "./FilterDrawer";
+import { useWindowSize } from "../../../hooks/useWindowSize";
 
 interface IEventsDisplayProps {
   events: IEvently[];
@@ -24,6 +25,7 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
   const [isListView, setIsListView] = useState<boolean>(true);
 
+  const { width } = useWindowSize();
   const {
     currentValues: currentEventFilters,
     removeOption: onRemoveEventFilter,
@@ -86,8 +88,7 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
               <Icon icon="calendar" className="events-display-icon" />
             </Button>
           </div>
-          {/* <FilterModel /> */}
-          <FilterDrawer />
+          {width > 768 ? <FilterModel /> : <FilterDrawer />}
         </main>
         <article className="selected-filters">
           {currentEventFilters?.map((eventType: any) => (

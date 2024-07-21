@@ -22,7 +22,7 @@
 @import './styles/single-day-event-base-form.css';
 @import './styles/single-day-event-form.css';
 @import './styles/sub-events-form.css';
-@import './styles/calendar-view.css';
+@import './styles/calendar-view.scss';
 @import './styles/empty.scss';
 @import './styles/icon.scss';
 @import './styles/loading.scss';
@@ -49,6 +49,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     width: 100%;
+    height: 100%;
     margin: 0;
     // height: 100%;
 

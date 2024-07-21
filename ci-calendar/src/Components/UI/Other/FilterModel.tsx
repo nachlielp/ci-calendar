@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Checkbox, Modal } from "antd";
+import { Button, Modal, Tag } from "antd";
 import { eventTypes, districtOptions } from "../../../util/options";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 import { Icon } from "./Icon";
@@ -9,19 +9,20 @@ export default function FilterModel() {
 
   const {
     currentValues: currentEventTypeValues,
-    onOptionsChange: onEventTypeOptionsChange,
+    selectOption: onEventTypeOptionsChange,
+    removeOption: onEventTypeOptionsRemove,
     clearSearchParams,
   } = useParamsHandler({ title: "eventType", options: eventTypes });
 
   const {
     currentValues: currentDistrictValues,
-    onOptionsChange: onDistrictOptionsChange,
+    selectOption: onDistrictOptionsChange,
+    removeOption: onDistrictOptionsRemove,
   } = useParamsHandler({ title: "district", options: districtOptions });
 
   const clearAllSearchParams = () => {
     clearSearchParams(["eventType", "district"]);
   };
-
   const isSelectedFilter = currentEventTypeValues.length || currentDistrictValues.length;
 
   return (
@@ -37,37 +38,38 @@ export default function FilterModel() {
       </Button>
 
       <Modal
+        className="filter-model"
         open={modalOpen}
         onOk={() => setModalOpen(false)}
         onCancel={() => setModalOpen(false)}
-        footer={<Button onClick={clearAllSearchParams} className="default-font">נקה </Button>}
+        // title={<h2 className="filter-modal-title">סינון</h2>}
+        footer={<Button onClick={clearAllSearchParams} className="footer-btn">נקה הכל</Button>}
       >
-        <div>
-          <b className="filter-model-title default-font">סוג אירוע</b>
-        </div>
-        <Checkbox.Group
-          value={currentEventTypeValues}
-          onChange={onEventTypeOptionsChange("eventType")}
-        >
-          {eventTypes.filter(eventType => eventType.value !== "warmup").map(eventType => (
-            <Checkbox key={eventType.value} value={eventType.value} className="filter-model-checkbox">
-              <p className="filter-model-checkbox-label default-font">{eventType.label}</p>
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
-        <div>
-          <b className="filter-model-title">אזור</b>
-        </div>
-        <Checkbox.Group
-          value={currentDistrictValues}
-          onChange={onDistrictOptionsChange("district")}
-        >
-          {districtOptions.map(district => (
-            <Checkbox key={district.value} value={district.value} className="filter-model-checkbox">
-              <p className="filter-model-checkbox-label default-font">{district.label}</p>
-            </Checkbox>
-          ))}
-        </Checkbox.Group>
+        <article className="filter-tags-container">
+          <h3 className="sub-title">סוג אירוע</h3>
+          <div className="filter-model-tags">
+            {eventTypes.map(eventType => {
+              return (
+                currentEventTypeValues.includes(eventType.value) ?
+                  <Tag className="selected tag" key={eventType.value} onClick={() => onEventTypeOptionsRemove("eventType", eventType.value)}>{eventType.label}</Tag>
+                  :
+                  <Tag className="un-selected tag" key={eventType.value} onClick={() => onEventTypeOptionsChange("eventType", eventType.value)}>{eventType.label}</Tag>
+              );
+
+            })}
+          </div>
+          <h3 className="sub-title">אזור</h3>
+          <div className="filter-model-tags">
+            {districtOptions.map(district => {
+              return (
+                currentDistrictValues.includes(district.value) ?
+                  <Tag className="selected tag" key={district.value} onClick={() => onDistrictOptionsRemove("district", district.value)}>{district.label}</Tag>
+                  :
+                  <Tag className="un-selected tag" key={district.value} onClick={() => onDistrictOptionsChange("district", district.value)}>{district.label}</Tag>
+              );
+            })}
+          </div>
+        </article>
       </Modal>
     </div>
   );

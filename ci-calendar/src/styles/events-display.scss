@@ -1,6 +1,6 @@
 .events-display {
     height: calc(100vh - 56px);
-    max-width: 500px;
+    padding: 0 16px;
     align-self: center;
     overflow-y: auto;
     color: #fff;
@@ -20,7 +20,7 @@
         justify-content: center;
         align-items: center;
         margin-top: 1.25rem;
-        margin: 1.25rem 22px 0 22px;
+        // margin: 1.25rem 22px 0 22px;
 
     }
 
@@ -43,9 +43,10 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         justify-self: center;
         gap: 1rem;
+        width: 100%;
     }
 
 
@@ -126,8 +127,9 @@
     }
 
     .events-display-icon {
-        width: 2rem;
-        height: 2rem;
+        width: 24px;
+        height: 24px;
+        color: #fff;
     }
 
     .scroll-to-top {

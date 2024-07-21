@@ -1,3 +1,5 @@
+import { ReactSVG } from "react-svg";
+
 import expand from '../../../assets/svgs/expand.svg';
 import collapse from '../../../assets/svgs/collapse.svg';
 import calendar from '../../../assets/svgs/calendar.svg';
@@ -22,9 +24,13 @@ import doNotDisturb from '../../../assets/svgs/doNotDisturb.svg';
 import info from '../../../assets/svgs/info.svg';
 import addCircle from '../../../assets/svgs/addCircle.svg';
 import openInNew from '../../../assets/svgs/openInNew.svg';
+import schedule from '../../../assets/svgs/schedule.svg';
+import pinDrop from '../../../assets/svgs/pin_drop.svg';
+import person from '../../../assets/svgs/person.svg';
+import chevron_right from '../../../assets/svgs/chevron_right.svg';
 
 
-export const Icon = ({ icon, className, title }: { icon: string; className?: string, title?: string }) => {
+export const Icon = ({ icon, className, title, onClick }: { icon: string; className?: string, title?: string, onClick?: () => void }) => {
     const icons: { [key: string]: string } = {
         expand,
         hov,
@@ -50,6 +56,10 @@ export const Icon = ({ icon, className, title }: { icon: string; className?: str
         info,
         addCircle,
         openInNew,
+        schedule,
+        pinDrop,
+        person,
+        chevron_right,
     };
-    return <div className="icon-component"><img src={icons[icon]} alt="Icon" className={className} />{title}</div>;
+    return <div className="icon-component" onClick={onClick}><ReactSVG src={icons[icon]} className={className} />{title}</div>;
 };
