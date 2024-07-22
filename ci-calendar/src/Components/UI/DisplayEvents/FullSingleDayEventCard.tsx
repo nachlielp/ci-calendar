@@ -91,10 +91,10 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
                     ))}
             </article>
 
-            <hr className="hr" />
 
             {event.description &&
                 <>
+                    <hr className="hr" />
                     <h3 className="section-title">פרטים נוספים</h3>
                     <article className="event-description">
                         <label className="event-label">{event.description}</label>
@@ -102,10 +102,10 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
                 </>
             }
 
-            <hr className="hr" />
 
             {event.price &&
                 <>
+                    <hr className="hr" />
                     <h3 className="section-title">מחיר</h3>
                     <article className="event-price">
                         {event.price.map((price, index) => (
@@ -116,7 +116,6 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
                     </article>
                 </>
             }
-
         </section>
     )
 }

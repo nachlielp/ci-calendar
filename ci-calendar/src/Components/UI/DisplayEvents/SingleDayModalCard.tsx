@@ -1,14 +1,9 @@
 import { useState } from 'react';
-import { Button, Modal, Tag } from 'antd';
-import { formatHebrewDate, getEventTeachersIds, getTag, getType, getTypes, isWhiteSpace } from './SingleDayEventCard';
-import { useGetTeachers } from '../../../hooks/useGetTeachers';
-import { Icon } from '../Other/Icon';
-import dayjs from 'dayjs';
-import { EventlyType, IEvently } from '../../../util/interfaces';
-import BioModal from '../DisplayUsers/BioModal';
-import React from 'react';
+import { Modal } from 'antd';
+import { IEvently } from '../../../util/interfaces';
 import { useWindowSize } from '../../../hooks/useWindowSize';
 import { useNavigate } from 'react-router-dom';
+import FullSingleDayEventCard from './FullSingleDayEventCard';
 
 interface SingleDayModalCardProps {
     event: IEvently,
@@ -34,29 +29,29 @@ export default function SingleDayModalCard({ event, anchorEl }: SingleDayModalCa
     };
 
 
-    const openGoogleMaps = (placeId: string, address: string) => {
-        const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
-        const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
-        const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+    // const openGoogleMaps = (placeId: string, address: string) => {
+    //     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
+    //     const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
+    //     const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
 
-        if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
-            setTimeout(() => {
-                window.location.href = fallbackUrl;
-            }, 25);
-            window.open(iosUrl, '_blank');
-        } else if (/Android/.test(navigator.userAgent)) {
-            setTimeout(() => {
-                window.location.href = fallbackUrl;
-            }, 25);
-            window.open(androidUrl, '_blank');
-        } else {
-            window.open(fallbackUrl, '_blank');
-        }
-    };
+    //     if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
+    //         setTimeout(() => {
+    //             window.location.href = fallbackUrl;
+    //         }, 25);
+    //         window.open(iosUrl, '_blank');
+    //     } else if (/Android/.test(navigator.userAgent)) {
+    //         setTimeout(() => {
+    //             window.location.href = fallbackUrl;
+    //         }, 25);
+    //         window.open(androidUrl, '_blank');
+    //     } else {
+    //         window.open(fallbackUrl, '_blank');
+    //     }
+    // };
 
-    const subEventLen = Object.values(event.subEvents).length;
-    const teachersIds = getEventTeachersIds(event);
-    const { teachers } = useGetTeachers({ ids: teachersIds });
+    // const subEventLen = Object.values(event.subEvents).length;
+    // const teachersIds = getEventTeachersIds(event);
+    // const { teachers } = useGetTeachers({ ids: teachersIds });
 
 
     return (
@@ -66,7 +61,8 @@ export default function SingleDayModalCard({ event, anchorEl }: SingleDayModalCa
             </div>
 
             <Modal open={isModalOpen} onCancel={handleCancel} footer={null} className='single-day-modal-card'>
-                <div className="modal-content">
+                <FullSingleDayEventCard event={event} />
+                {/* <div className="modal-content">
                     <div className="modal-title">{event.title}&nbsp;</div>
                     <div className="event-tags">
                         {getTypes(
@@ -173,7 +169,7 @@ export default function SingleDayModalCard({ event, anchorEl }: SingleDayModalCa
                                 <Icon icon="openInNew" className="modal-link-icon" title={link.title} />
                             </Button>
                         ))}
-                </div>
+                </div> */}
             </Modal>
         </>
     );
