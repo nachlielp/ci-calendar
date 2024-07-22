@@ -43,7 +43,7 @@ export default function FilterDrawer() {
                 className="filter-drawer custom-drawer"
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
-                height="600px"
+                height="550px"
                 placement="bottom"
                 footer={<Button onClick={clearAllSearchParams} className="footer-btn">נקה הכל</Button>}
             >
