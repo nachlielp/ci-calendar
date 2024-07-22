@@ -69,7 +69,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
         <Icon onClick={nextMonth} icon="chevron_right" className="next" />
       </header>
       <Card className="calendar-view__card">
-        <ConfigProvider locale={hb}>
+        <ConfigProvider locale={hb} direction="rtl">
           <Calendar
             value={value}
             mode='month'

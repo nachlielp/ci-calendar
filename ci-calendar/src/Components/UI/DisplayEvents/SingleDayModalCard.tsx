@@ -7,6 +7,8 @@ import dayjs from 'dayjs';
 import { EventlyType, IEvently } from '../../../util/interfaces';
 import BioModal from '../DisplayUsers/BioModal';
 import React from 'react';
+import { useWindowSize } from '../../../hooks/useWindowSize';
+import { useNavigate } from 'react-router-dom';
 
 interface SingleDayModalCardProps {
     event: IEvently,
@@ -15,9 +17,15 @@ interface SingleDayModalCardProps {
 
 export default function SingleDayModalCard({ event, anchorEl }: SingleDayModalCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
+    const { width } = useWindowSize();
 
     const showModal = () => {
-        setIsModalOpen(true);
+        if (width > 768) {
+            setIsModalOpen(true);
+        } else {
+            navigate(`/${event.id}`);
+        }
     };
 
 

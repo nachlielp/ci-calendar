@@ -214,7 +214,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                                 <SingleDayEventCard
                                     key={event.id}
                                     event={event}
-                                    cardWidth={adjustedItemWidth}
                                     isEdit={true}
                                 />
                             ) : (

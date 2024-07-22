@@ -13,7 +13,6 @@ import { Icon } from "../Other/Icon";
 // import expand from "../../../assets/expand.svg";
 interface ISingleDayEventCardProps {
   event: IEvently;
-  cardWidth: number;
   isEdit: boolean;
 }
 
@@ -83,15 +82,13 @@ export const SingleDayEventCard = React.forwardRef<
       style={{ width: '100%' }}
       actions={footer}
     >
-      <div className="event-header">
+      <article className="event-header">
         {isEdit ?
           <div className="event-title">{event.title}&nbsp;</div>
           :
-          <h2 className="modal-card-title">{event.title}&nbsp;</h2>
+          <h2 className="event-title">{event.title}&nbsp;</h2>
         }
-      </div>
-
-
+      </article>
       <article className="event-dates">
         <Icon icon="calendar" className="event-icon" />
         <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>

@@ -7,6 +7,7 @@ import { PrivateRoutes } from './Components/Auth/PrivateRoutes';
 import { UserType } from "./util/interfaces";
 import { useEvents } from "./hooks/useEvents";
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import EventPage from './Components/UI/DisplayEvents/EventPage';
 const Signup = lazy(() => import('./Components/Auth/Signup'));
 const Login = lazy(() => import('./Components/Auth/Login'));
 const ResetPassword = lazy(() => import('./Components/Auth/ResetPassword'));
@@ -43,8 +44,8 @@ export default function App() {
       <div className="app-content" style={{ width: '100%', maxWidth: '500px' }}>
         <BrowserRouter>
           <AuthProvider>
-            <Header />
             <Suspense fallback={<Loading />}>
+              <Header />
               <Routes>
                 <Route path="signup" element={<Signup />} />
                 <Route path="login" element={<Login />} />
@@ -54,6 +55,7 @@ export default function App() {
                   path="/"
                   element={<EventsDisplay events={events} isEdit={false} />}
                 />
+
                 {/* User privet routes */}
                 <Route
                   element={
@@ -112,6 +114,7 @@ export default function App() {
                   <Route path="/manage-users" element={<ManageUsers />} />
                   <Route path="/manage-events" element={<ManageEventsTable events={events} />} />
                 </Route>
+                <Route path="/:eventId" element={<EventPage events={events} />} />
                 <Route
                   path="*"
                   element={<EventsDisplay events={events} isEdit={false} />}

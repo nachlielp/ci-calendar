@@ -1,0 +1,89 @@
+.full-single-day-event-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+
+    .event-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-bottom: 16px;
+    }
+
+    .event-title {
+        display: block;
+        font-weight: bold;
+        font-size: 26px;
+        font-weight: 400;
+        width: 100%;
+        margin: 0;
+        color: #BC3528;
+    }
+
+    .event-tags {
+        display: block;
+        width: 100%;
+    }
+
+    .event-tag {
+        display: inline-block;
+        margin-bottom: 0.25rem;
+    }
+
+
+    .event-dates,
+    .event-location,
+    .event-teachers {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 8px;
+
+        .event-label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            margin-left: 8px;
+        }
+    }
+
+    .icon-component {
+        align-self: flex-start;
+
+        .event-icon {
+            margin-left: 4px;
+            margin-top: 6px;
+
+
+            .injected-svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+
+
+
+    .event-tags {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 4px;
+
+        .event-tag {
+            align-self: flex-start;
+            background-color: #E5E5EA;
+            color: #000;
+            border: none;
+            font-size: 14px;
+            font-weight: 400;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            border-radius: 8px;
+        }
+    }
+
+}

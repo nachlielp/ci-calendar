@@ -44,7 +44,6 @@ export default function EventsList({ events, isEdit, isEvents }: IEventsListProp
                 <SingleDayEventCard
                   key={event.id}
                   event={event}
-                  cardWidth={adjustedItemWidth}
                   isEdit={isEdit}
                 />
               }
