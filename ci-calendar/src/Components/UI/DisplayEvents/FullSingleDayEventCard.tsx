@@ -83,12 +83,40 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
                             type="default"
                             href={link.link}
                             target="_blank"
-                            className="event-link-button"
+                            className="link-button"
                         >
-                            <Icon icon="openInNew" className="event-link-icon" title={link.title} />
+                            <label className="link-label">{link.title}</label>
+                            <Icon icon="openInNew" className="link-icon" />
                         </Button>
                     ))}
             </article>
+
+            <hr className="hr" />
+
+            {event.description &&
+                <>
+                    <h3 className="section-title">פרטים נוספים</h3>
+                    <article className="event-description">
+                        <label className="event-label">{event.description}</label>
+                    </article>
+                </>
+            }
+
+            <hr className="hr" />
+
+            {event.price &&
+                <>
+                    <h3 className="section-title">מחיר</h3>
+                    <article className="event-price">
+                        {event.price.map((price, index) => (
+                            <label key={`${price.title}-${index}`}>
+                                {price.title} - {price.sum}&#8362;
+                            </label>
+                        ))}
+                    </article>
+                </>
+            }
+
         </section>
     )
 }

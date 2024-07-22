@@ -1,7 +1,9 @@
 .full-single-day-event-card {
     display: flex;
     flex-direction: column;
+    width: 100%;
     padding: 16px;
+    gap: 8px;
 
     .event-header {
         display: flex;
@@ -39,7 +41,6 @@
         align-items: flex-end;
         justify-content: flex-start;
         width: 100%;
-        margin-bottom: 8px;
 
         .event-label {
             font-size: 16px;
@@ -86,4 +87,61 @@
         }
     }
 
+    .event-links {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+
+        .link-button {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+            text-decoration: none;
+            border: 2px solid #BC3528;
+            padding: 8px;
+
+            .link-label {
+                font-size: 16px;
+                font-weight: 400;
+                margin-left: 8px;
+            }
+
+
+            .link-icon {
+                .injected-svg {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+        }
+    }
+
+    .hr {
+        border: 1px solid #BC3528;
+        border-bottom: none;
+        margin: 8px 0;
+        width: 90%;
+    }
+
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .event-description {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        word-wrap: break-word; // Add this line
+        overflow-wrap: break-word;
+        margin-left: 20px;
+    }
 }
