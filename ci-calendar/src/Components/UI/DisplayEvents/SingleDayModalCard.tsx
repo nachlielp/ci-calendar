@@ -2,24 +2,26 @@ import { useState } from 'react';
 import { Modal } from 'antd';
 import { IEvently } from '../../../util/interfaces';
 import { useWindowSize } from '../../../hooks/useWindowSize';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import FullSingleDayEventCard from './FullSingleDayEventCard';
 
 interface SingleDayModalCardProps {
     event: IEvently,
+    onSelectEvent: (event: IEvently) => void,
     anchorEl: any | null
 }
 
-export default function SingleDayModalCard({ event, anchorEl }: SingleDayModalCardProps) {
+export default function SingleDayModalCard({ event, anchorEl, onSelectEvent }: SingleDayModalCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const { width } = useWindowSize();
 
     const showModal = () => {
         if (width > 768) {
             setIsModalOpen(true);
         } else {
-            navigate(`/${event.id}`);
+            onSelectEvent(event);
+            // navigate(`/${event.id}`);
         }
     };
 

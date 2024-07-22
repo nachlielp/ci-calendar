@@ -15,6 +15,7 @@ import { Icon } from "./Icon";
 import { districtOptions, eventTypes } from "../../../util/options";
 import FilterDrawer from "./FilterDrawer";
 import { useWindowSize } from "../../../hooks/useWindowSize";
+import EventDrawer from "../DisplayEvents/EventDrawer";
 
 interface IEventsDisplayProps {
   events: IEvently[];
@@ -23,6 +24,7 @@ interface IEventsDisplayProps {
 
 export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<IEvently | null>(null);
   const [isListView, setIsListView] = useState<boolean>(true);
 
   const { width } = useWindowSize();
@@ -45,8 +47,16 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
   const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
   const [todaysEvents, setTodaysEvents] = useState<IEvently[]>([]);
 
-  const onSelect = (value: Dayjs) => {
+  const onSelectDate = (value: Dayjs) => {
     setSelectedDay(value);
+  };
+
+  const onSelectEvent = (event: IEvently) => {
+    setSelectedEvent(event);
+  };
+
+  const onCloseEvent = () => {
+    setSelectedEvent(null);
   };
 
   const visibleEvents = futureEvents.filter((event) => !event.hide);
@@ -106,15 +116,15 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
           <>
             <CalendarView
               events={filteredEvents}
-              onSelect={onSelect}
+              onSelect={onSelectDate}
             />
-            <EventsList events={todaysEvents} isEdit={isEdit} isEvents={!!events.length} />
+            <EventsList events={todaysEvents} isEdit={isEdit} isEvents={!!events.length} onSelectEvent={onSelectEvent} />
           </>
         ) : (
-          <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} />
+          <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} onSelectEvent={onSelectEvent} />
         )}
       </section>
-
+      <EventDrawer event={selectedEvent} onClose={onCloseEvent} />
 
     </div>
   );

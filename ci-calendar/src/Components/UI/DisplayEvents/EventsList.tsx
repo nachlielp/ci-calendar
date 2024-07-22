@@ -11,11 +11,12 @@ import { Empty } from "antd";
 import SingleDayModalCard from "./SingleDayModalCard";
 
 interface IEventsListProps {
+  onSelectEvent: (event: IEvently) => void;
   events: IEvently[];
   isEdit: boolean;
   isEvents: boolean;
 }
-export default function EventsList({ events, isEdit, isEvents }: IEventsListProps) {
+export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: IEventsListProps) {
   const { width } = useWindowSize();
   const { currentUser } = useAuthContext();
   const isAdmin = currentUser?.userType === "admin";
@@ -40,6 +41,7 @@ export default function EventsList({ events, isEdit, isEvents }: IEventsListProp
         <div key={event.id} >
           {event.dates["startDate"] === event.dates["endDate"] ? (
             <SingleDayModalCard event={event}
+              onSelectEvent={onSelectEvent}
               anchorEl={
                 <SingleDayEventCard
                   key={event.id}

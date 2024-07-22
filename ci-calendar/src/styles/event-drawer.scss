@@ -1,0 +1,17 @@
+.event-drawer {
+    .ant-drawer-header {
+        border-bottom: none;
+        padding-bottom: 0;
+
+        .event-drawer-close {
+            .injected-svg {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    }
+
+    .ant-drawer-body {
+        padding-top: 0;
+    }
+}
