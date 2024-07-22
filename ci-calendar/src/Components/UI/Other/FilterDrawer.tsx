@@ -39,7 +39,6 @@ export default function FilterDrawer() {
             </Button>
 
             <Drawer
-
                 title={<h2 className="filter-drawer-title">סינון</h2>}
                 className="filter-drawer custom-drawer"
                 open={modalOpen}
