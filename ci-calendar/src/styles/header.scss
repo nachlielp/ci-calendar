@@ -37,10 +37,17 @@
     color: #fff;
     text-decoration: none;
     box-shadow: none;
+    border: 1px solid transparent; // Ensure border is white on hover
+
+    &:hover {
+        color: #fff !important; // Ensure text color remains white on hover
+        background: none !important; // Ensure background is black on hover
+    }
 }
 
 .icon-main {
     color: #fff;
+    margin-top: 6px;
 }
 
 .header-btn.primary {
