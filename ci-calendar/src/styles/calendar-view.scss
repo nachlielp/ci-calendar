@@ -47,34 +47,34 @@
         }
 
 
-        .calendar-view__day-cell {
-            padding: 0.5rem;
-            position: relative;
-            text-align: center;
+        // .calendar-view__day-cell {
+        //     padding: 0.5rem;
+        //     position: relative;
+        //     text-align: center;
 
-            &.selected {
-                background-color: orange;
-                color: white;
-            }
+        //     &.selected {
+        //         background-color: orange;
+        //         color: white;
+        //     }
 
-            &.disabled {
-                color: lightgray;
-            }
+        //     &.disabled {
+        //         color: lightgray;
+        //     }
 
-            .event-dots {
-                display: flex;
-                justify-content: center;
-                margin-top: 0.25rem;
+        //     .event-dots {
+        //         display: flex;
+        //         justify-content: center;
+        //         margin-top: 0.25rem;
 
-                .event-dot {
-                    width: 5px;
-                    height: 5px;
-                    background-color: red;
-                    border-radius: 50%;
-                    margin: 0 1px;
-                }
-            }
-        }
+        //         .event-dot {
+        //             width: 5px;
+        //             height: 5px;
+        //             background-color: red;
+        //             border-radius: 50%;
+        //             margin: 0 1px;
+        //         }
+        //     }
+        // }
 
         .ant-picker-cell-selected {
             .calendar-view__day-cell {
