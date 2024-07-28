@@ -45,7 +45,6 @@ export default function FilterDrawer() {
                 onClose={() => setModalOpen(false)}
                 height="440px"
                 placement="bottom"
-                footer={<Button onClick={clearAllSearchParams} className="footer-btn">נקה הכל</Button>}
             >
                 <article className="filter-tags-container">
                     <h3 className="sub-title">סוג אירוע</h3>
