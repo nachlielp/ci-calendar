@@ -1,7 +1,7 @@
 
 
 import { Drawer } from 'antd';
-import FullSingleDayEventCard from './FullSingleDayEventCard';
+import FullEventCard from './FullEventCard';
 
 import { IEvently } from '../../../util/interfaces';
 import { Icon } from '../Other/Icon';
@@ -22,7 +22,7 @@ export default function EventDrawer({ event, onClose }: EventDrawerProps) {
             open={!!event}
             closeIcon={<Icon icon="chevron_right" className='event-drawer-close' />}
         >
-            <FullSingleDayEventCard event={event} />
+            <FullEventCard event={event} />
         </Drawer>
     );
 }

@@ -4,7 +4,6 @@ import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
 import ShowMultipleEvents from "../Other/ShowMultipleEvents";
 import { SingleDayEventCard } from "./SingleDayEventCard";
-import { MultiDayEventCard } from "./MultiDayEventCard";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
@@ -150,6 +149,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
         return Array.from(teacherMap.values());
     };
+
     return (
         <section className={`manage-events-table max-w-${tableWidth}px`}>
             <header className={`manage-events-header ${isPhone ? 'header-phone' : 'header-desktop'}`}>
@@ -210,20 +210,11 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
                 expandable={{
                     expandedRowRender: (event) => (
                         <div className="event-card-container" key={event.id}>
-                            {event.dates["startDate"] === event.dates["endDate"] ? (
-                                <SingleDayEventCard
-                                    key={event.id}
-                                    event={event}
-                                    isEdit={true}
-                                />
-                            ) : (
-                                <MultiDayEventCard
-                                    key={event.id}
-                                    event={event}
-                                    cardWidth={adjustedItemWidth}
-                                    isEdit={true}
-                                />
-                            )}
+                            <SingleDayEventCard
+                                key={event.id}
+                                event={event}
+                                isEdit={true}
+                            />
                         </div>
                     ),
                     expandedRowKeys: expandedRowKeys,

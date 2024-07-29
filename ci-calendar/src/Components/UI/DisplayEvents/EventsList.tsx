@@ -6,7 +6,6 @@ import { IEvently } from "../../../util/interfaces";
 import { useAuthContext } from "../../Auth/AuthContext";
 import Loading from "../Other/Loading";
 import EmptyList from "../Other/Empty";
-import { MultiDayEventCard } from "./MultiDayEventCard";
 import { Empty } from "antd";
 import SingleDayModalCard from "./SingleDayModalCard";
 
@@ -39,26 +38,16 @@ export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: 
       {!isEvents && emptyEventsList()}
       {filteredEvents.map((event) => (
         <div key={event.id} >
-          {event.dates["startDate"] === event.dates["endDate"] ? (
-            <SingleDayModalCard event={event}
-              onSelectEvent={onSelectEvent}
-              anchorEl={
-                <SingleDayEventCard
-                  key={event.id}
-                  event={event}
-                  isEdit={isEdit}
-                />
-              }
-            />
-
-          ) : (
-            <MultiDayEventCard
-              key={event.id}
-              event={event}
-              cardWidth={adjustedItemWidth}
-              isEdit={isEdit}
-            />
-          )}
+          <SingleDayModalCard event={event}
+            onSelectEvent={onSelectEvent}
+            anchorEl={
+              <SingleDayEventCard
+                key={event.id}
+                event={event}
+                isEdit={isEdit}
+              />
+            }
+          />
         </div>
       ))}
       <div className="events-list-footer">

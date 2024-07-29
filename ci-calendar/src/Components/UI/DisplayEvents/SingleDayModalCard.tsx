@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Modal } from 'antd';
 import { IEvently } from '../../../util/interfaces';
 import { useWindowSize } from '../../../hooks/useWindowSize';
-// import { useNavigate } from 'react-router-dom';
-import FullSingleDayEventCard from './FullSingleDayEventCard';
+import FullEventCard from './FullEventCard';
 
 interface SingleDayModalCardProps {
     event: IEvently,
@@ -13,7 +12,6 @@ interface SingleDayModalCardProps {
 
 export default function SingleDayModalCard({ event, anchorEl, onSelectEvent }: SingleDayModalCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // const navigate = useNavigate();
     const { width } = useWindowSize();
 
     const showModal = () => {
@@ -21,7 +19,6 @@ export default function SingleDayModalCard({ event, anchorEl, onSelectEvent }: S
             setIsModalOpen(true);
         } else {
             onSelectEvent(event);
-            // navigate(`/${event.id}`);
         }
     };
 
@@ -63,115 +60,7 @@ export default function SingleDayModalCard({ event, anchorEl, onSelectEvent }: S
             </div>
 
             <Modal open={isModalOpen} onCancel={handleCancel} footer={null} className='single-day-modal-card'>
-                <FullSingleDayEventCard event={event} />
-                {/* <div className="modal-content">
-                    <div className="modal-title">{event.title}&nbsp;</div>
-                    <div className="event-tags">
-                        {getTypes(
-                            Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
-                        ).map((type, index) => (
-                            <Tag color="blue" key={`${type}-${index}`} className="event-tag">
-                                {type}
-                            </Tag>
-                        ))}
-                    </div>
-                </div>
-
-                <br />
-                <div className="modal-dates">
-                    <Icon icon="event" className="modal-icon" />
-                    <p>
-                        {subEventLen > 0 ? (
-                            <>
-                                <b>{formatHebrewDate(event.subEvents[0].startTime)}</b>&nbsp;
-                                {dayjs(event.subEvents[0].startTime).format("HH:mm")}-
-                                {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-                            </>
-                        ) : (
-                            <span>No event times available</span>
-                        )}
-                    </p>
-                </div>
-
-                {subEventLen > 0 &&
-                    Object.values(event.subEvents).map((subEvent, index) => (
-                        <div className="sub-event" key={index}>
-                            <Icon icon="hov" className="sub-event-icon" />
-                            <span>
-                                {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
-                                {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
-                                {getType(subEvent.type as EventlyType)}
-                                {subEvent.teachers.length > 0 && (
-                                    <span>&nbsp;עם {
-                                        subEvent.teachers.map((teacher, index, array) => {
-                                            const isTeacher = teachers.find((t) => t.id === teacher.value);
-                                            return (
-                                                <React.Fragment key={teacher.value}>
-                                                    {isTeacher ? <BioModal teacher={isTeacher} /> : teacher.label}
-                                                    {index < array.length - 1 ? ', ' : ''}
-                                                </React.Fragment>
-                                            );
-                                        })
-                                    }</span>
-                                )}
-                                {subEvent.tags && (
-                                    <span>
-                                        &nbsp;
-                                        {subEvent.tags.map((tag) => (
-                                            <Tag key={tag} color="green">
-                                                {getTag(tag)}
-                                            </Tag>
-                                        ))}
-                                    </span>
-                                )}
-                            </span>
-                        </div>
-                    ))}
-
-                <div className="modal-location">
-                    <Icon icon="map" className="modal-icon" />
-                    <button
-                        onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
-                        className="modal-location-button"
-                    >
-                        {event.address.label}
-                    </button>
-                </div>
-
-                {!isWhiteSpace(event.description) && (
-                    <div className="modal-description">
-                        <Icon icon="description" className="modal-icon" />
-                        <p>{event.description}</p>
-                    </div>
-                )}
-
-                {event.price.length > 0 && (
-                    <div className="modal-price">
-                        <span className="modal-price-currency">&#8362;</span>
-                        <ul>
-                            {event.price.map((price, index) => (
-                                <li key={`${price.title}-${index}`}>
-                                    {price.title} - {price.sum}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-
-                <div className="modal-links">
-                    {event.links.length > 0 &&
-                        event.links.map((link) => (
-                            <Button
-                                key={link.title}
-                                type="default"
-                                href={link.link}
-                                target="_blank"
-                                className="modal-link-button"
-                            >
-                                <Icon icon="openInNew" className="modal-link-icon" title={link.title} />
-                            </Button>
-                        ))}
-                </div> */}
+                <FullEventCard event={event} />
             </Modal>
         </>
     );

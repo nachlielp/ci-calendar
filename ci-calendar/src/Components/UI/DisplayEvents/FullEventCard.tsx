@@ -7,7 +7,7 @@ import React from "react";
 import { useGetTeachers } from "../../../hooks/useGetTeachers";
 import BioModal from "../DisplayUsers/BioModal";
 
-export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
+export default function FullEventCard({ event }: { event: IEvently }) {
     const subEventLen = Object.values(event.subEvents).length;
     const teachersIds = getEventTeachersIds(event);
     const { teachers } = useGetTeachers({ ids: teachersIds });
@@ -38,13 +38,23 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
                 <div className="event-title">{event.title}&nbsp;</div>
             </article>
             <article className="event-dates">
-                <Icon icon="calendar" className="event-icon" />
-                <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>
-                <Icon icon="schedule" className="event-icon" />
-                <label className="event-label">
-                    {dayjs(event.subEvents[0].startTime).format("HH:mm")}&nbsp;-&nbsp;
-                    {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-                </label>
+                {event.subEvents.length > 0 ? (
+                    <>
+                        <Icon icon="calendar" className="event-icon" />
+                        <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>
+                        <Icon icon="schedule" className="event-icon" />
+                        <label className="event-label">
+                            {dayjs(event.subEvents[0].startTime).format("HH:mm")}&nbsp;-&nbsp;
+                            {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
+                        </label>
+                    </>
+                ) : (
+                    <>
+                        <Icon icon="calendar" className="event-icon" />
+                        <label className="event-label">{formatHebrewDate(event.dates["startDate"])} - {formatHebrewDate(event.dates["endDate"])}</label>
+                    </>
+                )}
+
             </article>
             <article className="event-location">
                 <Icon icon="pinDrop" className="event-icon" />
@@ -53,17 +63,20 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
                 </label>
             </article>
 
-            <article className="event-teachers">
-                <Icon icon="person" className="event-icon" />
-                <label className="event-label">
-                    עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
-                        <React.Fragment key={index}>
-                            {item}
-                            {index < array.length - 1 && ', '}
-                        </React.Fragment>
-                    ))}
-                </label>
-            </article>
+
+            {subEventLen > 0 &&
+                <article className="event-teachers">
+                    <Icon icon="person" className="event-icon" />
+                    <label className="event-label">
+                        עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
+                            <React.Fragment key={index}>
+                                {item}
+                                {index < array.length - 1 && ', '}
+                            </React.Fragment>
+                        ))}
+                    </label>
+                </article>
+            }
 
             <article className="event-tags">
                 {getTypes(
@@ -92,7 +105,7 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
             </article>
 
 
-            {event.description &&
+            {event.description.length > 0 &&
                 <>
                     <hr className="hr" />
                     <h3 className="section-title">פרטים נוספים</h3>
@@ -103,7 +116,7 @@ export default function FullSingleDayEventCard({ event }: { event: IEvently }) {
             }
 
 
-            {event.price &&
+            {event.price.length > 0 &&
                 <>
                     <hr className="hr" />
                     <h3 className="section-title">מחיר</h3>

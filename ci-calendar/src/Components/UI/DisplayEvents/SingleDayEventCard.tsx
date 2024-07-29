@@ -66,11 +66,13 @@ export const SingleDayEventCard = React.forwardRef<
     return isTeacher ? <BioModal key={teacher.value} teacher={isTeacher} /> : teacher.label;
   });
 
+  const isMultiDay = event.dates["startDate"] !== event.dates["endDate"];
+
   const footer = isEdit
     ? [
       <DeleteEvent eventId={event.id} />,
-      <EditEvent eventId={event.id} isMultiDay={false} />,
-      <RecycleEvent eventId={event.id} isMultiDay={false} />,
+      <EditEvent eventId={event.id} isMultiDay={isMultiDay} />,
+      <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />,
       <HideEvent eventId={event.id} hide={event.hide} />,
     ]
     : [];
@@ -90,13 +92,23 @@ export const SingleDayEventCard = React.forwardRef<
         }
       </article>
       <article className="event-dates">
-        <Icon icon="calendar" className="event-icon" />
-        <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>
-        <Icon icon="schedule" className="event-icon" />
-        <label className="event-label">
-          {dayjs(event.subEvents[0].startTime).format("HH:mm")}&nbsp;-&nbsp;
-          {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
-        </label>
+        {event.subEvents.length > 0 ? (
+          <>
+            <Icon icon="calendar" className="event-icon" />
+            <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>
+            <Icon icon="schedule" className="event-icon" />
+            <label className="event-label">
+              {dayjs(event.subEvents[0].startTime).format("HH:mm")}&nbsp;-&nbsp;
+              {dayjs(event.subEvents[subEventLen - 1].endTime).format("HH:mm")}
+            </label>
+          </>
+        ) : (
+          <>
+            <Icon icon="calendar" className="event-icon" />
+            <label className="event-label">{formatHebrewDate(event.dates["startDate"])} - {formatHebrewDate(event.dates["endDate"])}</label>
+          </>
+        )}
+
       </article>
       {isEdit && subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
@@ -147,7 +159,7 @@ export const SingleDayEventCard = React.forwardRef<
         </button> */}
       </article>
 
-      {!isEdit && (
+      {!isEdit && subEventLen > 0 && (
         <article className="event-teachers">
           <Icon icon="person" className="event-icon" />
           <label className="event-label">
@@ -239,7 +251,7 @@ export const formatHebrewDate = (date: string) => {
   const day = dayjs(date).locale("he").format("D");
   const month = dayjs(date).locale("he").format("MM");
   const hebrewMonth = hebrewMonths.find((m: SelectOption) => m.value === month)?.label;
-  return `${hebrewDay(date)}, ${day} ב${hebrewMonth}`;
+  return `${hebrewDay(date)} ${day} ב${hebrewMonth}`;
 };
 
 export const hebrewDay = (date: string) => {
