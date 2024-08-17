@@ -1,0 +1,28 @@
+.menu-drawer {
+  &.ant-drawer-content {
+    background-color: #e1563a;
+
+    .menu-item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      cursor: pointer;
+
+      border-top: 1px solid #fff;
+    }
+  }
+}
+.menu-drawer-btn {
+  background-color: transparent;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  margin-right: 16px;
+  .menu-drawer-icon {
+    .injected-svg {
+      fill: #000;
+    }
+  }
+}

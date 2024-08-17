@@ -11,11 +11,7 @@ const showDeleteConfirm = (
   confirm({
     title: <div className="text-lg text-red-500">מחק ארוע</div>,
     icon: <Icon icon="warning" className="text-red-500 mr-2 ml-2" />,
-    content: (
-      <div >
-        האם אתה בטוח שאתה רוצה למחוק את הארוע?
-      </div>
-    ),
+    content: <div>האם אתה בטוח שאתה רוצה למחוק את הארוע?</div>,
     okText: "מחיקה",
     okType: "danger",
     cancelText: "ביטול",
@@ -37,11 +33,9 @@ interface IDeleteEventProps {
 const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
   const { deleteEvently } = useAuthContext();
   return (
-    <Space wrap>
-      <Button onClick={() => showDeleteConfirm(eventId, deleteEvently)}>
-        <Icon icon="deleteIcon" />
-      </Button>
-    </Space>
+    <Button onClick={() => showDeleteConfirm(eventId, deleteEvently)}>
+      <Icon icon="deleteIcon" />
+    </Button>
   );
 };
 

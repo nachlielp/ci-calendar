@@ -5,14 +5,15 @@ import { DbUser } from "../../../util/interfaces";
 import { useParamsHandler } from "../../../hooks/useParamsHandler";
 import { viewOptions } from "../../../util/options";
 import { Icon } from "./Icon";
-
+import { MenuDrawer } from "./MenuDrawer";
 export default function Header() {
   const { currentUser, logoutContext } = useAuthContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    onOptionsChange,
-  } = useParamsHandler({ title: "view", options: viewOptions });
+  const { onOptionsChange } = useParamsHandler({
+    title: "view",
+    options: viewOptions,
+  });
 
   let settingsPage = "/";
   if (currentUser?.userType === "admin") {
@@ -31,42 +32,35 @@ export default function Header() {
     navigate("/");
   };
 
-
   return (
     <section className="header-container">
-      {currentUser && (
-        <button
-          className="btn-main"
-          onClick={handleLogOut}
-        >
+      {/* {currentUser && (
+        <button className="btn-main" onClick={handleLogOut}>
           <Icon icon="logout" />
         </button>
-      )}
+      )} */}
       {!currentUser && currentPath !== "/login" && (
-        <LinkButton
-          to="/login"
-          className="header-btn no-border"
-        >
-          התחבר/י
-          &nbsp;
+        <LinkButton to="/login" className="header-btn no-border">
+          התחבר/י &nbsp;
           <Icon icon="account" className="icon-main" />
         </LinkButton>
       )}
 
-      {currentUser && <UserInfo currentUser={currentUser} />}
-      {currentPath !== "/" && (
+      {/* {currentPath !== "/" && (
         <LinkButton to="/" className="header-btn">
           <Icon icon="home" />
         </LinkButton>
-      )}
+      )} */}
       {currentUser && (
         <div className="header-actions">
-          <LinkButton
+          <UserInfo currentUser={currentUser} />
+          {/* <LinkButton
             to={settingsPage}
             className="header-btn "
           >
-            <Icon icon="settings" />
-          </LinkButton>
+            <Icon icon="menu" />
+          </LinkButton> */}
+          <MenuDrawer logout={handleLogOut} />
         </div>
       )}
     </section>
@@ -81,12 +75,7 @@ const UserInfo = ({ currentUser }: IUserInfoProps) => {
     <div>
       {currentUser && (
         <div className={`user-info-container`}>
-          <p className={`user-name`}>
-            {currentUser.fullName}
-          </p>
-          <p className={`user-email`}>
-            {currentUser.email}
-          </p>
+          <p className={`user-name`}>{currentUser.fullName}</p>
         </div>
       )}
     </div>

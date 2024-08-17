@@ -6,60 +6,60 @@
 @import "./styles/events-list.css";
 @import "./styles/events-display.scss";
 @import "./styles/filter-modal.scss";
-@import "./styles/manage-events-table.css";
+@import "./styles/manage-events-table.scss";
 @import "./styles/multi-day-event-card.scss";
 @import "./styles/multi-day-modal-card.css";
 @import "./styles/single-day-event-card.css";
 @import "./styles/single-day-modal-card.css";
 @import "./styles/bio-page.css";
 @import "./styles/bio-card.css";
-@import './styles/add-links-form.css';
-@import './styles/add-prices-form.css';
-@import './styles/edit-multi-day-event-form.css';
-@import './styles/edit-single-day-event-form.css';
-@import './styles/multi-day-event-form.css';
-@import './styles/multi-day-event-sub-events-form.css';
-@import './styles/single-day-event-base-form.css';
-@import './styles/single-day-event-form.css';
-@import './styles/sub-events-form.css';
-@import './styles/calendar-view.scss';
-@import './styles/empty.scss';
-@import './styles/icon.scss';
-@import './styles/loading.scss';
-@import './styles/manage-users.scss';
-@import './styles/teacher-form.scss';
-@import './styles/user-form.scss';
-@import './styles/filter-drawer.scss';
-@import './styles/event-page.scss';
-@import './styles/full-single-day-event-card.scss';
-@import './styles/event-drawer.scss';
+@import "./styles/add-links-form.css";
+@import "./styles/add-prices-form.css";
+@import "./styles/edit-multi-day-event-form.css";
+@import "./styles/edit-single-day-event-form.css";
+@import "./styles/multi-day-event-form.css";
+@import "./styles/multi-day-event-sub-events-form.css";
+@import "./styles/single-day-event-base-form.css";
+@import "./styles/single-day-event-form.css";
+@import "./styles/sub-events-form.css";
+@import "./styles/calendar-view.scss";
+@import "./styles/empty.scss";
+@import "./styles/icon.scss";
+@import "./styles/loading.scss";
+@import "./styles/manage-users.scss";
+@import "./styles/teacher-form.scss";
+@import "./styles/user-form.scss";
+@import "./styles/filter-drawer.scss";
+@import "./styles/event-page.scss";
+@import "./styles/full-single-day-event-card.scss";
+@import "./styles/event-drawer.scss";
+@import "./styles/menu-drawer.scss";
 
-@import './styles/elements/buttons.scss';
+@import "./styles/elements/buttons.scss";
 
 @font-face {
-    font-family: 'Assistant';
-    src: url('./assets/fonts/Assistant-VariableFont_wght.ttf') format('truetype');
+  font-family: "Assistant";
+  src: url("./assets/fonts/Assistant-VariableFont_wght.ttf") format("truetype");
 }
 
 * {
-    font-family: 'Assistant', sans-serif !important;
+  font-family: "Assistant", sans-serif !important;
 }
 
 body {
-    background-image: url('./assets/img/Background.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    // height: 100%;
-
+  background-image: url("./assets/img/Background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  // height: 100%;
 }
 
 .app {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

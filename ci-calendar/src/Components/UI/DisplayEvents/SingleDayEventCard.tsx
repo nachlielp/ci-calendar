@@ -8,7 +8,12 @@ import HideEvent from "../Other/HideEvent";
 import BioModal from "../DisplayUsers/BioModal";
 import { useGetTeachers } from "../../../hooks/useGetTeachers";
 import { EventlyType, IEvently } from "../../../util/interfaces";
-import { tagOptions, eventTypes, hebrewMonths, SelectOption } from "../../../util/options";
+import {
+  tagOptions,
+  eventTypes,
+  hebrewMonths,
+  SelectOption,
+} from "../../../util/options";
 import { Icon } from "../Other/Icon";
 // import expand from "../../../assets/expand.svg";
 interface ISingleDayEventCardProps {
@@ -46,56 +51,62 @@ export const SingleDayEventCard = React.forwardRef<
   const nonRegestoredTeacherNames = Array.from(
     new Set(
       Object.values(event.subEvents)
-        .flatMap(subEvent => subEvent.teachers)
-        .filter(teacher => teacher.value === "NON_EXISTENT")
-        .map(teacher => teacher.label)
+        .flatMap((subEvent) => subEvent.teachers)
+        .filter((teacher) => teacher.value === "NON_EXISTENT")
+        .map((teacher) => teacher.label)
     )
   );
 
   const regestoredTeacherOptions = Array.from(
     new Map(
       Object.values(event.subEvents)
-        .flatMap(subEvent => subEvent.teachers)
-        .filter(teacher => teacher.value !== "NON_EXISTENT")
-        .map(teacher => [teacher.value, teacher]) // Use teacher.value as the key
+        .flatMap((subEvent) => subEvent.teachers)
+        .filter((teacher) => teacher.value !== "NON_EXISTENT")
+        .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
     ).values()
   );
 
-  const teachersBioOrName = regestoredTeacherOptions.map(teacher => {
-    const isTeacher = teachers.find(t => t.id === teacher.value);
-    return isTeacher ? <BioModal key={teacher.value} teacher={isTeacher} /> : teacher.label;
+  const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
+    const isTeacher = teachers.find((t) => t.id === teacher.value);
+    return isTeacher ? (
+      <BioModal key={teacher.value} teacher={isTeacher} />
+    ) : (
+      teacher.label
+    );
   });
 
   const isMultiDay = event.dates["startDate"] !== event.dates["endDate"];
 
   const footer = isEdit
     ? [
-      <DeleteEvent eventId={event.id} />,
-      <EditEvent eventId={event.id} isMultiDay={isMultiDay} />,
-      <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />,
-      <HideEvent eventId={event.id} hide={event.hide} />,
-    ]
+        <DeleteEvent eventId={event.id} />,
+        <EditEvent eventId={event.id} isMultiDay={isMultiDay} />,
+        <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />,
+        <HideEvent eventId={event.id} hide={event.hide} />,
+      ]
     : [];
 
   return (
     <Card
       ref={ref}
       className="single-day-event-card"
-      style={{ width: '100%' }}
+      style={{ width: "100%" }}
       actions={footer}
     >
       <article className="event-header">
-        {isEdit ?
+        {isEdit ? (
           <div className="event-title">{event.title}&nbsp;</div>
-          :
+        ) : (
           <h2 className="event-title">{event.title}&nbsp;</h2>
-        }
+        )}
       </article>
       <article className="event-dates">
         {event.subEvents.length > 0 ? (
           <>
             <Icon icon="calendar" className="event-icon" />
-            <label className="event-label">{formatHebrewDate(event.subEvents[0]?.startTime)}</label>
+            <label className="event-label">
+              {formatHebrewDate(event.subEvents[0]?.startTime)}
+            </label>
             <Icon icon="schedule" className="event-icon" />
             <label className="event-label">
               {dayjs(event.subEvents[0].startTime).format("HH:mm")}&nbsp;-&nbsp;
@@ -105,12 +116,15 @@ export const SingleDayEventCard = React.forwardRef<
         ) : (
           <>
             <Icon icon="calendar" className="event-icon" />
-            <label className="event-label">{formatHebrewDate(event.dates["startDate"])} - {formatHebrewDate(event.dates["endDate"])}</label>
+            <label className="event-label">
+              {formatHebrewDate(event.dates["startDate"])} -{" "}
+              {formatHebrewDate(event.dates["endDate"])}
+            </label>
           </>
         )}
-
       </article>
-      {isEdit && subEventLen > 0 &&
+      {isEdit &&
+        subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <div className="sub-event" key={index}>
             <Icon icon="hov" className="sub-event-icon" />
@@ -119,17 +133,24 @@ export const SingleDayEventCard = React.forwardRef<
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
               {getType(subEvent.type as EventlyType)}
               {subEvent.teachers.length > 0 && (
-                <span>&nbsp;עם {
-                  subEvent.teachers.map((teacher, index, array) => {
-                    const isTeacher = teachers.find((t) => t.id === teacher.value);
+                <span>
+                  &nbsp;עם{" "}
+                  {subEvent.teachers.map((teacher, index, array) => {
+                    const isTeacher = teachers.find(
+                      (t) => t.id === teacher.value
+                    );
                     return (
                       <React.Fragment key={teacher.value}>
-                        {isTeacher ? <BioModal teacher={isTeacher} /> : teacher.label}
-                        {index < array.length - 1 ? ', ' : ''}
+                        {isTeacher ? (
+                          <BioModal teacher={isTeacher} />
+                        ) : (
+                          teacher.label
+                        )}
+                        {index < array.length - 1 ? ", " : ""}
                       </React.Fragment>
                     );
-                  })
-                }</span>
+                  })}
+                </span>
               )}
               {subEvent.tags && (
                 <span>
@@ -143,14 +164,11 @@ export const SingleDayEventCard = React.forwardRef<
               )}
             </span>
           </div>
-        ))
-      }
+        ))}
 
       <article className="event-location">
         <Icon icon="pinDrop" className="event-icon" />
-        <label className="event-label">
-          {event.address.label}
-        </label>
+        <label className="event-label">{event.address.label}</label>
         {/* <button
           onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
           className="event-location-button"
@@ -163,12 +181,16 @@ export const SingleDayEventCard = React.forwardRef<
         <article className="event-teachers">
           <Icon icon="person" className="event-icon" />
           <label className="event-label">
-            עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
-              <React.Fragment key={index}>
-                {item}
-                {index < array.length - 1 && ', '}
-              </React.Fragment>
-            ))}
+            עם{" "}
+            {subEventLen > 1 &&
+              [...teachersBioOrName, ...nonRegestoredTeacherNames].map(
+                (item, index, array) => (
+                  <React.Fragment key={index}>
+                    {item}
+                    {index < array.length - 1 && ", "}
+                  </React.Fragment>
+                )
+              )}
           </label>
         </article>
       )}
@@ -195,7 +217,9 @@ export const SingleDayEventCard = React.forwardRef<
 
       <article className="event-tags">
         {getTypes(
-          Object.values(event.subEvents).flatMap((subEvent) => subEvent.type as EventlyType)
+          Object.values(event.subEvents).flatMap(
+            (subEvent) => subEvent.type as EventlyType
+          )
         ).map((type, index) => (
           <Tag color="blue" key={`${type}-${index}`} className="event-tag">
             {type}
@@ -203,20 +227,26 @@ export const SingleDayEventCard = React.forwardRef<
         ))}
       </article>
 
-      {isEdit && <div style={{ marginTop: 16 }}>
-        {event.links.length > 0 &&
-          event.links.map((link) => (
-            <Button
-              key={link.title}
-              type="default"
-              href={link.link}
-              target="_blank"
-              className="event-link-button"
-            >
-              <Icon icon="openInNew" className="event-link-icon" title={link.title} />
-            </Button>
-          ))}
-      </div>}
+      {isEdit && (
+        <div style={{ marginTop: 16 }}>
+          {event.links.length > 0 &&
+            event.links.map((link) => (
+              <Button
+                key={link.title}
+                type="default"
+                href={link.link}
+                target="_blank"
+                className="event-link-button"
+              >
+                <Icon
+                  icon="openInNew"
+                  className="event-link-icon"
+                  title={link.title}
+                />
+              </Button>
+            ))}
+        </div>
+      )}
     </Card>
   );
 });
@@ -244,13 +274,18 @@ export const isWhiteSpace = (str: string) => {
   return str.trim().length === 0;
 };
 export const getEventTeachersIds = (event: IEvently) => {
-  return event.subEvents.flatMap((subEvent) => subEvent.teachers).map((teacher) => teacher.value).filter((teacher) => teacher !== "NON_EXISTENT");
+  return event.subEvents
+    .flatMap((subEvent) => subEvent.teachers)
+    .map((teacher) => teacher.value)
+    .filter((teacher) => teacher !== "NON_EXISTENT");
 };
 
 export const formatHebrewDate = (date: string) => {
   const day = dayjs(date).locale("he").format("D");
   const month = dayjs(date).locale("he").format("MM");
-  const hebrewMonth = hebrewMonths.find((m: SelectOption) => m.value === month)?.label;
+  const hebrewMonth = hebrewMonths.find(
+    (m: SelectOption) => m.value === month
+  )?.label;
   return `${hebrewDay(date)} ${day} ב${hebrewMonth}`;
 };
 
