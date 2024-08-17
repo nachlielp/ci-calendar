@@ -29,7 +29,7 @@ export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: 
     filteredEvents = useEventsFilter({ events: visibleEvents });
   }
 
-  const adjustedItemWidth = Math.min(width / 1.2, 500);
+  // const adjustedItemWidth = Math.min(width / 1.2, 500);
   if (!filteredEvents.length && isEdit && !isAdmin) return <EmptyList />;
   if (!filteredEvents) return <Loading />;
 
