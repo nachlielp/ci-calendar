@@ -15,14 +15,14 @@ export default function Header() {
     options: viewOptions,
   });
 
-  let settingsPage = "/";
-  if (currentUser?.userType === "admin") {
-    settingsPage = "/admin";
-  } else if (currentUser?.userType === "user") {
-    settingsPage = "/user";
-  } else if (currentUser?.userType === "teacher") {
-    settingsPage = "/teacher";
-  }
+  // let settingsPage = "/";
+  // if (currentUser?.userType === "admin") {
+  //   settingsPage = "/admin";
+  // } else if (currentUser?.userType === "user") {
+  //   settingsPage = "/user";
+  // } else if (currentUser?.userType === "teacher") {
+  //   settingsPage = "/teacher";
+  // }
 
   const currentPath = location.pathname;
 

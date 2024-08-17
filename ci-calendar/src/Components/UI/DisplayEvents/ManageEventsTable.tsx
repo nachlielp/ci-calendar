@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Table, Select, Switch, Breakpoint, Button } from "antd";
+import { Table, Select, Breakpoint } from "antd";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
 import ShowMultipleEvents from "../Other/ShowMultipleEvents";
@@ -58,10 +58,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     } else {
       setSelectedRowKeysPast(newSelectedRowKeys);
     }
-  }
-
-  function togglePastFuture() {
-    setShowFuture((prev) => !prev);
   }
 
   function onClear() {
