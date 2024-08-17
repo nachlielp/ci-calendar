@@ -35,7 +35,6 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
 
     const uniqueTeachers = getUniqueTeachers(filteredEvents);
 
-    const adjustedItemWidth = Math.min(width / 1.5, 500);
 
     const isPhone = width < 600;
 

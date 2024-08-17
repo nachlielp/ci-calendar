@@ -1,6 +1,5 @@
 // import VirtualList from "rc-virtual-list";
 import { SingleDayEventCard } from "./SingleDayEventCard";
-import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import { IEvently } from "../../../util/interfaces";
 import { useAuthContext } from "../../Auth/AuthContext";
@@ -16,7 +15,6 @@ interface IEventsListProps {
   isEvents: boolean;
 }
 export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: IEventsListProps) {
-  const { width } = useWindowSize();
   const { currentUser } = useAuthContext();
   const isAdmin = currentUser?.userType === "admin";
   let filteredEvents = useEventsFilter({ events });

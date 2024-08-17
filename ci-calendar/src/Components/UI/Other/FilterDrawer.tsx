@@ -11,7 +11,6 @@ export default function FilterDrawer() {
         currentValues: currentEventTypeValues,
         selectOption: onEventTypeOptionsChange,
         removeOption: onEventTypeOptionsRemove,
-        clearSearchParams,
     } = useParamsHandler({ title: "eventType", options: eventTypes });
 
     const {
@@ -20,9 +19,6 @@ export default function FilterDrawer() {
         removeOption: onDistrictOptionsRemove,
     } = useParamsHandler({ title: "district", options: districtOptions });
 
-    const clearAllSearchParams = () => {
-        clearSearchParams(["eventType", "district"]);
-    };
 
     const isSelectedFilter = currentEventTypeValues.length || currentDistrictValues.length;
 
