@@ -1,8 +1,8 @@
-import { Button, Card, Image } from "antd";
+import { Card, Image } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useGetTeacher } from "../../../hooks/useGetTeacher";
-import Title from "antd/es/typography/Title";
-import { Typography } from 'antd';
+import { Typography } from "antd";
+import { Icon } from "../Other/Icon";
 const { Text } = Typography;
 
 function BioCard() {
@@ -10,47 +10,44 @@ function BioCard() {
   if (!currentUser) throw new Error("BioCard: No user found");
   const teacher = useGetTeacher(currentUser.id);
 
-  const imgComponent = teacher?.img ? (
-    <Image
-      alt="example"
-      src={teacher.img}
-      key={teacher.img}
-      preview={false}
-      width={200}
-      height={200}
-      className="bio-card-img"
-    />
-  ) : (
-    ""
-  );
-
   return (
     <>
-      {teacher &&
-        <Card
-          hoverable
-          className="bio-card"
-        >
+      {teacher && (
+        <Card hoverable className="bio-card">
           <div className="bio-card-content">
-            {imgComponent}
-            <Title level={3} className="bio-card-title">
-              {teacher.fullName}
-            </Title>
-            <Text>{teacher.bio}</Text>
+            <label className="bio-card-title">{teacher.fullName}</label>
+
+            {teacher?.img && (
+              <Image
+                alt="example"
+                src={teacher.img}
+                key={teacher.img}
+                preview={false}
+                width={250}
+                height={250}
+                className="bio-card-img"
+              />
+            )}
             {teacher.pageUrl && (
-              <Button
-                className="mt-5 w-full"
+              <a
+                className="teacher-page-link"
                 key={teacher.pageUrl}
-                type="default"
                 href={teacher.pageUrl}
                 target="_blank"
               >
                 {teacher.pageTitle || "דף פרופיל"}
-              </Button>
+                <Icon icon="openInNew" className="event-link-icon" />
+              </a>
             )}
+
+            <hr className="bio-card-hr" />
+            <label className="bio-card-subtitle">
+              אודות {teacher.fullName}
+            </label>
+            <Text>{teacher.bio}</Text>
           </div>
         </Card>
-      }
+      )}
     </>
   );
 }

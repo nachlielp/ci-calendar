@@ -11,6 +11,13 @@ interface Cloudinary {
       api_secret?: string;
       max_file_size?: number;
       client_allowed_formats?: string[];
+      eager?: Array<{
+        width: number;
+        height: number;
+        crop: string;
+        gravity: string;
+      }>;
+      eager_async?: boolean;
     },
     callback: (error: any, result: any) => void
   ) => void;
@@ -36,8 +43,10 @@ export default function CloudinaryUpload({
           upload_preset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           api_key: import.meta.env.VITE_CLOUDINARY_API_KEY,
           api_secret: import.meta.env.VITE_CLOUDINARY_API_SECRET,
-          max_file_size: 5242880, // 5MB limit
+          max_file_size: 10042880, // 10MB limit
           client_allowed_formats: ["image"],
+          // eager: [{ width: 250, height: 250, crop: "fill", gravity: "auto" }],
+          // eager_async: true,
         },
         (error, result) => {
           if (error) {
@@ -51,6 +60,7 @@ export default function CloudinaryUpload({
       );
     }
   }, []);
+
   return (
     <>
       <Button type="primary" onClick={() => widgetRef.current.open()}>

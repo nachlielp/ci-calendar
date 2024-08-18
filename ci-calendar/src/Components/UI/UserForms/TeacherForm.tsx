@@ -6,6 +6,7 @@ import {
   Input,
   Card,
   Image,
+  Switch,
 } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useEffect, useState } from "react";
@@ -28,12 +29,13 @@ interface ITeacherFormProps {
   showBioInTeacherPage: () => void;
 }
 //TODO add cropper (react-easy-crop)
-export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps) {
+export default function TeacherForm({
+  showBioInTeacherPage,
+}: ITeacherFormProps) {
   // const { width } = useWindowSize();
   const { currentUser, updateTeacher } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
   const teacher = useGetTeacher(currentUser.id);
-
 
   const [imageUrl, setImageUrl] = useState<string>(teacher?.img || "");
 
@@ -47,7 +49,7 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (!teacher) return;
-    const { name, bio, pageUrl, pageUrlTitle, showProfile, allowTagging, } =
+    const { name, bio, pageUrl, pageUrlTitle, showProfile, allowTagging } =
       values;
     const newTeacher = {
       id: teacher.id,
@@ -69,12 +71,14 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
     }
   };
 
+  //TODO handle error - image to large!!
   const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
     errorInfo
   ) => {
     console.log("Failed:", errorInfo);
   };
 
+  //TODO clear form service !!!
   const clearImage = () => {
     setImageUrl("");
   };
@@ -83,7 +87,7 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
 
   return (
     <>
-      {teacher &&
+      {teacher && (
         <Card className={`teacher-form`}>
           <Form
             onFinish={onFinish}
@@ -100,24 +104,32 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
             }}
           >
             <Form.Item<FieldType>
-              label="שם מלא"
               name="name"
               rules={[{ required: true, message: "נא להזין שם" }]}
             >
-              <Input />
+              <Input placeholder="*שם מלא" />
+            </Form.Item>
+            <Form.Item<FieldType> name="bio">
+              <Input.TextArea
+                rows={7}
+                placeholder="אודות"
+                maxLength={300}
+                showCount
+              />
             </Form.Item>
 
+            <hr className="bio-card-hr" />
 
-
+            <label className="bio-card-subtitle">
+              <b>קישור</b> (יופיע ככפתור בעמוד הפרופיל)
+            </label>
             <Form.Item<FieldType>
-              label="קישור לדף פרופיל"
               name="pageUrl"
               rules={[{ type: "url", warningOnly: true }]}
             >
-              <Input />
+              <Input placeholder="קישור לדף פרופיל" />
             </Form.Item>
             <Form.Item<FieldType>
-              label="כותרת קישור לדף פרופיל"
               name="pageUrlTitle"
               rules={[
                 ({ getFieldValue }) => ({
@@ -132,26 +144,43 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
                 }),
               ]}
             >
-              <Input />
+              <Input placeholder="כותרת קישור לדף פרופיל" />
             </Form.Item>
 
-            <Form.Item<FieldType> label="אודות" name="bio">
-              <Input.TextArea rows={6} />
-            </Form.Item>
-            <Form.Item<FieldType> label="תמונה" name="img">
+            <hr className="bio-card-hr" />
+
+            <label className="bio-card-subtitle">
+              <b>תמונת פרופיל</b>
+              <label>התמונה תופיע בפרופיל שלך באתר</label>
+            </label>
+            <Form.Item<FieldType> name="img">
               <div className="img-container">
-                <Image width={200} src={imageUrl} />
+                <Image
+                  width={200}
+                  src={imageUrl}
+                  className="teacher-form-img"
+                />
               </div>
             </Form.Item>
             <Form.Item<FieldType> name="upload">
-              <CloudinaryUpload uploadNewImage={uploadNewImage} clearImage={clearImage} />
+              <CloudinaryUpload
+                uploadNewImage={uploadNewImage}
+                clearImage={clearImage}
+              />
             </Form.Item>
+
+            <hr className="bio-card-hr" />
+
             <Form.Item<FieldType>
               label="הצגת פרופיל"
               name="showProfile"
               valuePropName="checked"
             >
-              <Checkbox />
+              <Switch
+                checkedChildren="גלוי"
+                unCheckedChildren="מוסתר"
+                defaultChecked={teacher?.showProfile}
+              />
             </Form.Item>
             {/* <Form.Item<FieldType>
               label="אפשר תיוג"
@@ -160,13 +189,12 @@ export default function TeacherForm({ showBioInTeacherPage }: ITeacherFormProps)
             >
               <Checkbox />
             </Form.Item> */}
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-              <Button type="primary" htmlType="submit">
-                שמור
-              </Button>
-            </Form.Item>
+            <Button htmlType="submit" className="teacher-form-submit">
+              שמירת שינויים
+            </Button>
           </Form>
-        </Card>}
+        </Card>
+      )}
     </>
   );
 }
