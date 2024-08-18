@@ -1,5 +1,4 @@
 import { useAuthContext } from "../../Auth/AuthContext";
-import { Button } from "antd";
 import { Icon } from "./Icon";
 
 export default function HideMultipleEvents({
@@ -16,8 +15,8 @@ export default function HideMultipleEvents({
     hideOrShowMultipleEventlys(eventIds, true);
   };
   return (
-    <Button className={`${className}`} onClick={handleHide} disabled={disabled}>
+    <button className={`${className}`} onClick={handleHide} disabled={disabled}>
       <Icon icon="visibilityOff" />
-    </Button>
+    </button>
   );
 }

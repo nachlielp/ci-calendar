@@ -133,12 +133,14 @@
   }
 
   .multiple-events-action-btn {
+    padding: 4px 10px 0 10px;
     margin-right: 1rem;
     color: #fff;
     background-color: transparent;
     border: none;
     box-shadow: none;
     outline: none;
+    border-radius: 5px;
 
     &.active {
       border-color: #000;
