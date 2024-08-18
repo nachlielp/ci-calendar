@@ -3,11 +3,13 @@ import { Drawer } from "antd";
 import { Icon } from "../Other/Icon";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useWindowSize } from "../../../hooks/useWindowSize";
 
 export function MenuDrawer({ logout }: { logout: () => void }) {
   const [open, setOpen] = React.useState<boolean>(false);
   const { currentUser } = useAuthContext();
-
+  const { width } = useWindowSize();
+  const isMobile = width < 768;
   const isAdmin = currentUser?.userType === "admin";
 
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
       icon: "calendar_add_on",
       label: "הוספת אירוע",
       onClick: () => {
-        navigate("/event-form");
+        navigate("/create-events");
         setOpen(false);
       },
     },
@@ -80,7 +82,7 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
         closable
         destroyOnClose
         title={null}
-        placement="top"
+        placement={isMobile ? "top" : "right"}
         open={open}
         onClose={() => setOpen(false)}
         className="menu-drawer"

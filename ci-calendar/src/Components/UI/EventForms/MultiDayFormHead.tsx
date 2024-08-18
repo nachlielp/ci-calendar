@@ -1,38 +1,31 @@
-import { Form, Input, Select, DatePicker, Switch, Card, Tooltip } from "antd";
+import { Form, Input, Select, DatePicker, Card, Tooltip } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { districtOptions, eventTypes } from "../../../util/options";
 import GooglePlacesInput, {
   IGooglePlaceOption,
 } from "../Other/GooglePlacesInput";
 import { IAddress } from "../../../util/interfaces";
-import { useState } from "react";
 import { Icon } from "../Other/Icon";
 
 interface IMultiDayFormHeadProps {
   handleAddressSelect: (place: IGooglePlaceOption) => void;
   handleDateChange: (dates: [Dayjs, Dayjs]) => void;
-  handleScheduleChange: (checked: boolean) => void;
-  schedule: boolean;
   address?: IAddress;
 }
 
 export default function MultiDayFormHead({
   handleAddressSelect,
   handleDateChange,
-  handleScheduleChange,
-  schedule,
   address,
 }: IMultiDayFormHeadProps) {
-  const [isDatesSet, setIsDatesSet] = useState(false);
-
   function onDatesChange(dates: [Dayjs, Dayjs]) {
-    if (dates[0] && dates[1]) {
-      setIsDatesSet(true);
-    }
     handleDateChange(dates);
   }
   return (
-    <Card className="multi-day-form-head-card" title={<span className="multi-day-form-head-title">ארוע רב יומי</span>}>
+    <Card
+      className="multi-day-form-head-card"
+      title={<span className="multi-day-form-head-title">ארוע רב יומי</span>}
+    >
       <Form.Item
         label="כותרת"
         name="event-title"
@@ -57,7 +50,10 @@ export default function MultiDayFormHead({
         name="address"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
-        <GooglePlacesInput onPlaceSelect={handleAddressSelect} defaultValue={address} />
+        <GooglePlacesInput
+          onPlaceSelect={handleAddressSelect}
+          defaultValue={address}
+        />
       </Form.Item>
       <Form.Item
         label="תאריכים"
@@ -85,23 +81,6 @@ export default function MultiDayFormHead({
       >
         <Select options={eventTypes} />
       </Form.Item>
-      <Form.Item
-        label={
-          <Tooltip title={repeatEventTooltip}>
-            <span>
-              <Icon icon="info" title="הגדרת לוז" />
-            </span>
-          </Tooltip>
-        }
-        name="event-schedule"
-      >
-        <Switch
-          defaultChecked={schedule}
-          onChange={handleScheduleChange}
-          disabled={!isDatesSet}
-        />
-      </Form.Item>
     </Card>
   );
 }
-const repeatEventTooltip = "על מנת להוסיף לוז צריך להגדיר טווח תאריכים";

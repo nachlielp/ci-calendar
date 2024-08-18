@@ -17,13 +17,11 @@ import {
 } from "../../../util/interfaces";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import { useState } from "react";
-import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
-import { Icon } from "../Other/Icon";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -48,7 +46,6 @@ const initialValues = {
 
 export default function MultiDayEventForm() {
   const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null);
-  const [schedule, setSchedule] = useState(false);
   const navigate = useNavigate();
   const { teachers } = useTeachersList();
 
@@ -73,10 +70,6 @@ export default function MultiDayEventForm() {
     };
     setAddress(selectedAddress);
     form.setFieldValue("address", selectedAddress);
-  };
-
-  const handleScheduleChange = (checked: boolean) => {
-    setSchedule(checked);
   };
 
   const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
@@ -175,38 +168,8 @@ export default function MultiDayEventForm() {
           <MultiDayFormHead
             handleAddressSelect={handleAddressSelect}
             handleDateChange={handleDateChange}
-            handleScheduleChange={handleScheduleChange}
-            schedule={schedule}
           />
 
-          {schedule && dates && (
-            <Form.List name="days">
-              {(days, { add, remove }) => (
-                <>
-                  {days.map(({ key, name, ...restField }) => (
-                    <div key={key}>
-                      <MultiDayEventSubEventsForm
-                        day={name}
-                        {...restField}
-                        remove={remove}
-                        teachers={teachers}
-                        form={form}
-                        limits={{
-                          start: dates[0],
-                          end: dates[1],
-                        }}
-                      />
-                    </div>
-                  ))}
-                  <div className="add-button-container">
-                    <Button className="add-button" onClick={() => add()} block>
-                      <Icon icon="addCircle" title="הוסף יום" />
-                    </Button>
-                  </div>
-                </>
-              )}
-            </Form.List>
-          )}
           <AddLinksForm />
           <AddPricesForm />
           <Form.Item

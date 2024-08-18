@@ -46,20 +46,9 @@ export default function Header() {
         </LinkButton>
       )}
 
-      {/* {currentPath !== "/" && (
-        <LinkButton to="/" className="header-btn">
-          <Icon icon="home" />
-        </LinkButton>
-      )} */}
       {currentUser && (
         <div className="header-actions">
           <UserInfo currentUser={currentUser} />
-          {/* <LinkButton
-            to={settingsPage}
-            className="header-btn "
-          >
-            <Icon icon="menu" />
-          </LinkButton> */}
           <MenuDrawer logout={handleLogOut} />
         </div>
       )}

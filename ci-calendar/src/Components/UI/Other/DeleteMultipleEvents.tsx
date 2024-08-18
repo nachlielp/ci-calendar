@@ -9,6 +9,12 @@ const showDeleteConfirm = (
   deleteMultipleEventlys: (ids: string[]) => Promise<void>,
   onDelete: () => void
 ) => {
+  const text =
+    eventIds.length > 1 ? (
+      <div>האם למחוק {eventIds.length} ארועים?</div>
+    ) : (
+      <div>האם למחוק אירוע אחד?</div>
+    );
   confirm({
     title: (
       <div style={{ fontSize: "20px", fontWeight: "bold", color: "red" }}>
@@ -16,7 +22,7 @@ const showDeleteConfirm = (
       </div>
     ),
     icon: <Icon icon="warning" />,
-    content: <div>האם אתה בטוח שאתה רוצה למחוק {eventIds.length} ארועים?</div>,
+    content: text,
     okText: "מחיקה",
     okType: "danger",
     cancelText: "ביטול",

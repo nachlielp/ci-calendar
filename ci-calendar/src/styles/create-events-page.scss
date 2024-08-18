@@ -1,0 +1,29 @@
+.create-events-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  //   justify-content: center;
+  max-width: 100%;
+  height: calc(100vh - 56px);
+
+  .btns-container {
+    margin-top: 300px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+
+    .btn {
+      width: 100px;
+      height: 100px;
+      border-radius: 5px;
+      background-color: #fff;
+      border: 2px solid #bf5340;
+
+      font-size: 16px;
+      color: #000;
+      font-weight: 400;
+    }
+  }
+}
