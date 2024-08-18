@@ -1,13 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Form,
-  type FormProps,
-  Input,
-  Card,
-  Image,
-  Switch,
-} from "antd";
+import { Button, Form, type FormProps, Input, Card, Image, Switch } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useEffect, useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";

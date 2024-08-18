@@ -1,11 +1,10 @@
-import { Form, Input, Select, DatePicker, Card, Tooltip } from "antd";
+import { Form, Input, Select, DatePicker, Card } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { districtOptions, eventTypes } from "../../../util/options";
 import GooglePlacesInput, {
   IGooglePlaceOption,
 } from "../Other/GooglePlacesInput";
 import { IAddress } from "../../../util/interfaces";
-import { Icon } from "../Other/Icon";
 
 interface IMultiDayFormHeadProps {
   handleAddressSelect: (place: IGooglePlaceOption) => void;

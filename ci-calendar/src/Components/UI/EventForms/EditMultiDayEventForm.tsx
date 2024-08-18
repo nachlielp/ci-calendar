@@ -17,7 +17,11 @@ import { EventAction } from "../../../App";
 import { v4 as uuidv4 } from "uuid";
 import { Icon } from "../Other/Icon";
 
-export default function EditMultiDayEventForm({ editType }: { editType: EventAction }) {
+export default function EditMultiDayEventForm({
+  editType,
+}: {
+  editType: EventAction;
+}) {
   const { teachers } = useTeachersList();
   const navigate = useNavigate();
   const { getEvent, currentUser, updateEvent, createEvent } = useAuthContext();
@@ -68,15 +72,16 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
     setAddress(selectedAddress);
     form.setFieldValue("address", selectedAddress);
   };
-  const handleScheduleChange = (checked: boolean) => {
-    setSchedule(checked);
-  };
+  // const handleScheduleChange = (checked: boolean) => {
+  //   setSchedule(checked);
+  // };
 
   const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
     setDates(dates);
   };
 
-  const submitedEventId = editType === EventAction.recycle ? uuidv4() : eventData.id;
+  const submitedEventId =
+    editType === EventAction.recycle ? uuidv4() : eventData.id;
 
   const handleSubmit = async (values: any) => {
     const subEventsTemplate: IEventiPart[] = [];
@@ -84,11 +89,13 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
     values.days?.forEach((day: any) => {
       const baseDate = dayjs(day["event-date-base"]); // Clone the base date for each day
 
-      const startTime: string = baseDate.clone()
+      const startTime: string = baseDate
+        .clone()
         .hour(dayjs(day["event-time-base"][0]).hour())
         .minute(dayjs(day["event-time-base"][0]).minute())
         .toISOString();
-      const endTime: string = baseDate.clone()
+      const endTime: string = baseDate
+        .clone()
         .hour(dayjs(day["event-time-base"][1]).hour())
         .minute(dayjs(day["event-time-base"][1]).minute())
         .toISOString();
@@ -102,11 +109,13 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
 
       // Additional sub-events for each day
       day["sub-events"]?.forEach((subEvent: any) => {
-        const subEventStartTime: string = baseDate.clone()
+        const subEventStartTime: string = baseDate
+          .clone()
           .hour(dayjs(subEvent.time[0]).hour())
           .minute(dayjs(subEvent.time[0]).minute())
           .toISOString();
-        const subEventEndTime: string = baseDate.clone()
+        const subEventEndTime: string = baseDate
+          .clone()
           .hour(dayjs(subEvent.time[1]).hour())
           .minute(dayjs(subEvent.time[1]).minute())
           .toISOString();
@@ -159,7 +168,8 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
     }
   };
 
-  const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
+  const submitText =
+    editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
 
   return (
     <>
@@ -173,8 +183,8 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
           <MultiDayFormHead
             handleAddressSelect={handleAddressSelect}
             handleDateChange={handleDateChange}
-            handleScheduleChange={handleScheduleChange}
-            schedule={schedule}
+            // handleScheduleChange={handleScheduleChange}
+            // schedule={schedule}
             address={address}
           />
           {schedule && dates && (
@@ -199,7 +209,11 @@ export default function EditMultiDayEventForm({ editType }: { editType: EventAct
                   <div className="add-button-container">
                     <Button className="add-button" onClick={() => add()} block>
                       <span className="add-button-content">
-                        <Icon icon="addCircle" className="add-icon" title="הוסף יום" />
+                        <Icon
+                          icon="addCircle"
+                          className="add-icon"
+                          title="הוסף יום"
+                        />
                       </span>
                     </Button>
                   </div>
