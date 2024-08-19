@@ -8,6 +8,7 @@ import { UserType } from "./util/interfaces";
 import { useEvents } from "./hooks/useEvents";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import CreateEventsPage from "./Components/Pages/CreateEventsPage";
+import BackgroundTiles from "./Components/UI/Other/BackgroundTiles";
 const Signup = lazy(() => import("./Components/Auth/Signup"));
 const Login = lazy(() => import("./Components/Auth/Login"));
 const ResetPassword = lazy(() => import("./Components/Auth/ResetPassword"));
@@ -50,6 +51,7 @@ export default function App() {
   return (
     <div className="app">
       <SpeedInsights />
+      <BackgroundTiles />
       <div className="app-content" style={{ width: "100%", maxWidth: "500px" }}>
         <BrowserRouter>
           <AuthProvider>
