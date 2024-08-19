@@ -155,7 +155,7 @@ export default function MultiDayEventForm() {
 
   return (
     <>
-      <Card className="event-card">
+      <section className="multi-day-event-form">
         <Form
           {...formItemLayout}
           form={form}
@@ -169,8 +169,15 @@ export default function MultiDayEventForm() {
             handleAddressSelect={handleAddressSelect}
             handleDateChange={handleDateChange}
           />
-
+          <hr className="divider" />
+          <label>
+            <b>קישור</b> (יופיע ככפתור בעמוד האירוע)
+          </label>
           <AddLinksForm />
+          <hr className="divider" />
+          <label>
+            <b>מחיר</b>
+          </label>
           <AddPricesForm />
           <Form.Item
             wrapperCol={{ span: 24 }}
@@ -181,7 +188,7 @@ export default function MultiDayEventForm() {
             </Button>
           </Form.Item>
         </Form>
-      </Card>
+      </section>
       <div className="footer-space"></div>
     </>
   );

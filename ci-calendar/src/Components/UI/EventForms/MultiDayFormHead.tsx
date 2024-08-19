@@ -26,26 +26,23 @@ export default function MultiDayFormHead({
       title={<span className="multi-day-form-head-title">ארוע רב יומי</span>}
     >
       <Form.Item
-        label="כותרת"
         name="event-title"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
-        <Input />
+        <Input placeholder="כותרת " />
       </Form.Item>
-      <Form.Item label="תיאור האירוע" name="event-description">
-        <Input.TextArea rows={6} />
+      <Form.Item name="event-description">
+        <Input.TextArea rows={6} placeholder="תיאור האירוע" />
       </Form.Item>
       <Form.Item
         className="multi-day-form-head-item"
-        label="אזור"
         name="district"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
-        <Select options={districtOptions} />
+        <Select options={districtOptions} placeholder="אזור" />
       </Form.Item>
       <Form.Item
         className="multi-day-form-head-item"
-        label="כתובת"
         name="address"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
@@ -55,11 +52,11 @@ export default function MultiDayFormHead({
         />
       </Form.Item>
       <Form.Item
-        label="תאריכים"
         name="event-date"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
         <DatePicker.RangePicker
+          placeholder={["תאריך התחלה", "תאריך סיום"]}
           className="single-month"
           format={"DD/MM"}
           minDate={dayjs()}
@@ -74,11 +71,10 @@ export default function MultiDayFormHead({
       </Form.Item>
       <Form.Item
         className="multi-day-form-head-full-width"
-        label="סוג האירוע"
         name="main-event-type"
         rules={[{ required: true, message: "שדה חובה" }]}
       >
-        <Select options={eventTypes} />
+        <Select options={eventTypes} placeholder="סוג האירוע" />
       </Form.Item>
     </Card>
   );
