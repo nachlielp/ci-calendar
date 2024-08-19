@@ -1,4 +1,4 @@
-import { Form, Select, Button, Card, Row, Col, TimePicker } from "antd";
+import { Form, Select, Card, Row, Col, TimePicker } from "antd";
 import { eventTypes, tagOptions } from "../../../util/options";
 import { Icon } from "../Other/Icon";
 

@@ -28,16 +28,16 @@ dayjs.extend(timezone);
 dayjs.extend(customParseFormat);
 dayjs.tz.setDefault("Asia/Jerusalem");
 
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 14 },
-  },
-};
+// const formItemLayout = {
+//   labelCol: {
+//     xs: { span: 24 },
+//     sm: { span: 6 },
+//   },
+//   wrapperCol: {
+//     xs: { span: 24 },
+//     sm: { span: 14 },
+//   },
+// };
 
 const initialValues = {
   "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
