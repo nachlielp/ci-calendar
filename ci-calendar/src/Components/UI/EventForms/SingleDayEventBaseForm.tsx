@@ -111,7 +111,11 @@ export default function SingleDayEventBaseForm({
                 name="event-repeat"
                 rules={[{ required: true, message: "שדה חובה" }]}
               >
-                <Select options={repeatOptions} onChange={handleRepeatChange} />
+                <Select
+                  options={repeatOptions}
+                  onChange={handleRepeatChange}
+                  placeholder="חזרה"
+                />
               </Form.Item>
               <Form.Item className="form-item " name="event-repeat">
                 <Tooltip title={repeatEventTooltip}>
