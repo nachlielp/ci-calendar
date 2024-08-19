@@ -79,10 +79,12 @@ export const SingleDayEventCard = React.forwardRef<
 
   const footer = isEdit
     ? [
-        <DeleteEvent eventId={event.id} />,
-        <EditEvent eventId={event.id} isMultiDay={isMultiDay} />,
-        <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />,
-        <HideEvent eventId={event.id} hide={event.hide} />,
+        <div className="event-card-footer">
+          <EditEvent eventId={event.id} isMultiDay={isMultiDay} />
+          <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />
+          <DeleteEvent eventId={event.id} />
+          <HideEvent eventId={event.id} hide={event.hide} />
+        </div>,
       ]
     : [];
 

@@ -244,6 +244,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
           <button
             onClick={() => setShowFuture(true)}
             className={`btn right ${showFuture ? "active" : ""}`}
+            style={{ borderLeft: "none" }}
           >
             עתיד
           </button>

@@ -1,6 +1,5 @@
 import { useAuthContext } from "../../Auth/AuthContext";
 import { Icon } from "./Icon";
-import { Button } from "antd";
 
 export default function HideEvent({
   eventId,
@@ -14,8 +13,12 @@ export default function HideEvent({
     hideEvent(eventId, !hide);
   };
   return (
-    <Button onClick={handleHide}>
-      {hide ? <Icon icon="visibilityOff" /> : <Icon icon="visibility" />}
-    </Button>
+    <button
+      className="event-footer-action"
+      onClick={handleHide}
+      style={{ borderRadius: "5px 0px 0px 5px" }}
+    >
+      {hide ? <Icon icon="visibility" /> : <Icon icon="visibilityOff" />}
+    </button>
   );
 }

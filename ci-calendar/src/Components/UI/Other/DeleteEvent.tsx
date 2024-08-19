@@ -1,4 +1,4 @@
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { Icon } from "./Icon";
 
@@ -30,12 +30,17 @@ const showDeleteConfirm = (
 interface IDeleteEventProps {
   eventId: string;
 }
+
 const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
   const { deleteEvently } = useAuthContext();
   return (
-    <Button onClick={() => showDeleteConfirm(eventId, deleteEvently)}>
+    <button
+      className="event-footer-action"
+      onClick={() => showDeleteConfirm(eventId, deleteEvently)}
+      style={{ borderRadius: " 0px", borderLeft: "none" }}
+    >
       <Icon icon="deleteIcon" />
-    </Button>
+    </button>
   );
 };
 

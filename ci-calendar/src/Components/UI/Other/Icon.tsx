@@ -33,6 +33,7 @@ import group from "../../../assets/svgs/group.svg";
 import calendar_add_on from "../../../assets/svgs/calendar_add_on.svg";
 import addBox from "../../../assets/svgs/add_box.svg";
 import noteStackAdd from "../../../assets/svgs/note_stack_add.svg";
+import contentCopy from "../../../assets/svgs/content_copy.svg";
 
 export const Icon = ({
   icon,
@@ -79,6 +80,7 @@ export const Icon = ({
     calendar_add_on,
     addBox,
     noteStackAdd,
+    contentCopy,
   };
   return (
     <label className="icon-component" onClick={onClick}>

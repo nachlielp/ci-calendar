@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "./Icon";
 
@@ -19,9 +18,13 @@ const EditEvent: React.FC<EditEventProps> = ({ eventId, isMultiDay }) => {
   };
 
   return (
-    <Button onClick={handleEdit}>
+    <button
+      className="event-footer-action"
+      onClick={handleEdit}
+      style={{ borderRadius: "0px 5px 5px 0px" }}
+    >
       <Icon icon="edit" />
-    </Button>
+    </button>
   );
 };
 
