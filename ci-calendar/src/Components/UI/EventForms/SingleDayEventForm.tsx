@@ -87,8 +87,16 @@ export default function SingleDayEventForm() {
 
     const subEventsTemplate = [
       {
-        startTime: baseDate.clone().hour(values["event-time"][0].hour()).minute(values["event-time"][0].minute()).toISOString(),
-        endTime: baseDate.clone().hour(values["event-time"][1].hour()).minute(values["event-time"][1].minute()).toISOString(),
+        startTime: baseDate
+          .clone()
+          .hour(values["event-time"][0].hour())
+          .minute(values["event-time"][0].minute())
+          .toISOString(),
+        endTime: baseDate
+          .clone()
+          .hour(values["event-time"][1].hour())
+          .minute(values["event-time"][1].minute())
+          .toISOString(),
         type: values["event-types"],
         tags: values["event-tags"] || [],
         teachers: formatTeachers(values["teachers"], teachers),
@@ -101,8 +109,16 @@ export default function SingleDayEventForm() {
           type: subEvent.type,
           tags: subEvent.tags || [],
           teachers: formatTeachers(subEvent.teachers, teachers),
-          startTime: baseDate.clone().hour(subEvent.time[0].hour()).minute(subEvent.time[0].minute()).toISOString(),
-          endTime: baseDate.clone().hour(subEvent.time[1].hour()).minute(subEvent.time[1].minute()).toISOString(),
+          startTime: baseDate
+            .clone()
+            .hour(subEvent.time[0].hour())
+            .minute(subEvent.time[0].minute())
+            .toISOString(),
+          endTime: baseDate
+            .clone()
+            .hour(subEvent.time[1].hour())
+            .minute(subEvent.time[1].minute())
+            .toISOString(),
         });
       });
     }
@@ -146,8 +162,16 @@ export default function SingleDayEventForm() {
         for (const date of dates) {
           const subEvents = subEventsTemplate.map((subEvent) => ({
             ...subEvent,
-            startTime: date.clone().hour(dayjs(subEvent.startTime).hour()).minute(dayjs(subEvent.startTime).minute()).toISOString(),
-            endTime: date.clone().hour(dayjs(subEvent.endTime).hour()).minute(dayjs(subEvent.endTime).minute()).toISOString(),
+            startTime: date
+              .clone()
+              .hour(dayjs(subEvent.startTime).hour())
+              .minute(dayjs(subEvent.startTime).minute())
+              .toISOString(),
+            endTime: date
+              .clone()
+              .hour(dayjs(subEvent.endTime).hour())
+              .minute(dayjs(subEvent.endTime).minute())
+              .toISOString(),
           }));
 
           const event: IEvently = {
@@ -183,14 +207,14 @@ export default function SingleDayEventForm() {
 
   return (
     <div className="single-day-event-form">
-      <Card className="event-card">
+      <section className="event-card">
         <Form
-          {...formItemLayout}
+          // {...formItemLayout}
           form={form}
           onFinish={handleSubmit}
           variant="filled"
-          labelCol={{ span: 6, offset: 0 }}
-          wrapperCol={{ span: 16, offset: 0 }}
+          // labelCol={{ span: 6, offset: 0 }}
+          // wrapperCol={{ span: 16, offset: 0 }}
           initialValues={initialValues}
         >
           <SingleDayEventBaseForm
@@ -206,31 +230,42 @@ export default function SingleDayEventForm() {
             teachers={teachers}
           />
           <SubEventsForm form={form} day="" teachers={teachers} />
+          <hr className="divider" />
+          <label>
+            <b>קישור</b> (יופיע ככפתור בעמוד האירוע)
+          </label>
           <AddLinksForm />
+          <hr className="divider" />
+          <label>
+            <b>מחיר</b>
+          </label>
           <AddPricesForm />
 
           <Form.Item className="submit-button-container">
             <Button type="primary" htmlType="submit">
-              צור אירוע
+              יצירת אירוע
             </Button>
           </Form.Item>
         </Form>
-      </Card>
+      </section>
       <div className="footer-space"></div>
     </div>
   );
 }
 
-export const formatTeachers = (selectedTeachers: string[], teachers: { label: string, value: string }[]) => {
+export const formatTeachers = (
+  selectedTeachers: string[],
+  teachers: { label: string; value: string }[]
+) => {
   if (!selectedTeachers) return [];
-  return selectedTeachers.map(teacher => {
+  return selectedTeachers.map((teacher) => {
     const teacherObj = teachers.find((t) => t.value === teacher);
     if (teacherObj) {
       return teacherObj;
     } else {
       return { label: teacher, value: "NON_EXISTENT" };
     }
-  })
+  });
 };
 
 export enum EventFrequency {
@@ -250,7 +285,6 @@ export const repeatOptions = [
 export const repeatEventTooltip = (
   <>
     <p>* כל כמה שבועות - לדוגמה, כל שבועים ביום שלישי </p>
-    <br />
     <p>* כל חודש - לדוגמה, השבת השניה של כל חודש</p>
   </>
 );

@@ -13,11 +13,10 @@ export default function AddLinksForm() {
                   <Form.Item
                     {...restField}
                     className="link-form-item"
-                    label="כותרת קישור"
                     name={[name, "title"]}
                     rules={[{ required: true, message: "שדה חובה" }]}
                   >
-                    <Input />
+                    <Input placeholder="כותרת " />
                   </Form.Item>
                 </Col>
               </Row>
@@ -26,14 +25,13 @@ export default function AddLinksForm() {
                   <Form.Item
                     {...restField}
                     className="link-form-item"
-                    label="קישור"
                     name={[name, "link"]}
                     rules={[
                       { required: true, message: "שדה חובה" },
                       { type: "url", warningOnly: true },
                     ]}
                   >
-                    <Input />
+                    <Input placeholder="קישור" />
                   </Form.Item>
                 </Col>
               </Row>
@@ -46,11 +44,15 @@ export default function AddLinksForm() {
             </Card>
           ))}
           <div className="add-button-container">
-            <Button className="add-button" onClick={() => add()} block>
+            <button className="add-button" onClick={() => add()}>
               <span className="add-button-content">
-                <Icon icon="addCircle" className="add-icon" title="הוסף קישור" />
+                <Icon
+                  icon="addCircle"
+                  className="add-icon"
+                  title="הוסף קישור"
+                />
               </span>
-            </Button>
+            </button>
           </div>
         </>
       )}

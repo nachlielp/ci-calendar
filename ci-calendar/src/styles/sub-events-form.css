@@ -1,28 +1,29 @@
 .sub-events-form {
-    .sub-event-card {
-        margin-top: 1rem;
-        border-width: 2px;
-    }
+  .sub-event-card {
+    margin-top: 1rem;
+    border-width: 2px;
+  }
 
-    .full-width {
-        width: 100%;
-    }
+  .full-width {
+    width: 100%;
+  }
 
-    .button-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 1rem;
-    }
+  .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .add-button-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: 0.5rem;
-    }
-
+  .add-button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
     .add-button {
-        width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
     }
+  }
 }

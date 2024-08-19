@@ -83,7 +83,7 @@ export const Icon = ({
   return (
     <label className="icon-component" onClick={onClick}>
       <ReactSVG src={icons[icon]} className={className} />
-      {title}
+      <span className="icon-title">{title}</span>
     </label>
   );
 };
