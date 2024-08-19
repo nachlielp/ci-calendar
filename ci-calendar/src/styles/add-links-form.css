@@ -34,6 +34,19 @@
   padding-left: 10px;
 }
 
+.add-button-50 {
+  /* width: 100px; */
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding-top: 4px;
+  cursor: pointer;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding-left: 10px;
+}
+
 .add-button-content {
   display: inline-flex;
   align-items: center;

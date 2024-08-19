@@ -77,9 +77,9 @@ export default function SubEventsForm({
               </Row>
 
               <div className="button-container">
-                <Button onClick={() => remove(name)}>
+                <button className="add-button-50" onClick={() => remove(name)}>
                   <Icon icon="doNotDisturb" title="הסר אירוע המשך" />
-                </Button>
+                </button>
               </div>
             </Card>
           ))}

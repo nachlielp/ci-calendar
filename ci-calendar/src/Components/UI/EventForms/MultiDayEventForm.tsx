@@ -157,12 +157,12 @@ export default function MultiDayEventForm() {
     <>
       <section className="multi-day-event-form">
         <Form
-          {...formItemLayout}
+          // {...formItemLayout}
           form={form}
           onFinish={handleSubmit}
           variant="filled"
-          labelCol={{ span: 6, offset: 0 }}
-          wrapperCol={{ span: 16, offset: 0 }}
+          // labelCol={{ span: 6, offset: 0 }}
+          // wrapperCol={{ span: 16, offset: 0 }}
           initialValues={initialValues}
         >
           <MultiDayFormHead

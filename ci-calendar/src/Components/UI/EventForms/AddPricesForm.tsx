@@ -13,11 +13,10 @@ export default function AddPricesForm() {
                   <Form.Item
                     {...restField}
                     className="price-form-item"
-                    label="כותרת מחיר"
                     name={[name, "title"]}
                     rules={[{ required: true, message: "שדה חובה" }]}
                   >
-                    <Input />
+                    <Input placeholder="כותרת " />
                   </Form.Item>
                 </Col>
               </Row>
@@ -26,22 +25,21 @@ export default function AddPricesForm() {
                   <Form.Item
                     {...restField}
                     className="price-form-item"
-                    label="מחיר"
                     name={[name, "sum"]}
                     rules={[
                       { required: true, message: "שדה חובה" },
                       { type: "number", warningOnly: true },
                     ]}
                   >
-                    <InputNumber />
+                    <InputNumber placeholder="מחיר" />
                   </Form.Item>
                 </Col>
               </Row>
 
               <div className="button-container">
-                <Button onClick={() => remove(name)}>
+                <button className="add-button-50" onClick={() => remove(name)}>
                   <Icon icon="doNotDisturb" title="הסר מחיר" />
-                </Button>
+                </button>
               </div>
             </Card>
           ))}

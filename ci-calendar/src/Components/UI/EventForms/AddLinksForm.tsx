@@ -37,9 +37,9 @@ export default function AddLinksForm() {
               </Row>
 
               <div className="button-container">
-                <Button onClick={() => remove(name)}>
+                <button className="add-button-50" onClick={() => remove(name)}>
                   <Icon icon="doNotDisturb" title="הסר קישור" />
-                </Button>
+                </button>
               </div>
             </Card>
           ))}
