@@ -23,7 +23,7 @@ export function AddEventDrawer({
   return (
     <>
       <div onClick={showDrawer}>{anchorEl}</div>
-      <Drawer onClose={onClose} open={open} width="auto">
+      <Drawer onClose={onClose} open={open}>
         {eventType === "single-day" ? (
           <SingleDayEventForm />
         ) : (

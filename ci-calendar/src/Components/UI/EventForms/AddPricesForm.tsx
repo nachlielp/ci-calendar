@@ -46,11 +46,11 @@ export default function AddPricesForm() {
             </Card>
           ))}
           <div className="add-button-container">
-            <Button className="add-button" onClick={() => add()} block>
+            <button className="add-button" onClick={() => add()}>
               <span className="add-button-content">
                 <Icon icon="addCircle" className="add-icon" title="הוסף מחיר" />
               </span>
-            </Button>
+            </button>
           </div>
         </>
       )}

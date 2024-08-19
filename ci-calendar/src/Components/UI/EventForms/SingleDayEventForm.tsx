@@ -230,12 +230,20 @@ export default function SingleDayEventForm() {
             teachers={teachers}
           />
           <SubEventsForm form={form} day="" teachers={teachers} />
+          <hr className="divider" />
+          <label>
+            <b>קישור</b> (יופיע ככפתור בעמוד האירוע)
+          </label>
           <AddLinksForm />
+          <hr className="divider" />
+          <label>
+            <b>מחיר</b>
+          </label>
           <AddPricesForm />
 
           <Form.Item className="submit-button-container">
             <Button type="primary" htmlType="submit">
-              צור אירוע
+              יצירת אירוע
             </Button>
           </Form.Item>
         </Form>
@@ -277,7 +285,6 @@ export const repeatOptions = [
 export const repeatEventTooltip = (
   <>
     <p>* כל כמה שבועות - לדוגמה, כל שבועים ביום שלישי </p>
-    <br />
     <p>* כל חודש - לדוגמה, השבת השניה של כל חודש</p>
   </>
 );

@@ -59,7 +59,7 @@ export default function SingleDayEventBaseForm({
     <div className="single-day-event-base-form">
       <Card
         className="event-card"
-        title={<span className="event-title">ארוע חד יומי</span>}
+        title={<span className="event-title">הוספת אירוע חד יומי</span>}
       >
         <Form.Item
           name="event-title"
@@ -105,20 +105,22 @@ export default function SingleDayEventBaseForm({
 
         {!idEdit && (
           <>
-            <Form.Item
-              className="form-item"
-              label={
+            <article className="row">
+              <Form.Item
+                className="form-item full-width"
+                name="event-repeat"
+                rules={[{ required: true, message: "שדה חובה" }]}
+              >
+                <Select options={repeatOptions} onChange={handleRepeatChange} />
+              </Form.Item>
+              <Form.Item className="form-item " name="event-repeat">
                 <Tooltip title={repeatEventTooltip}>
                   <span>
-                    <Icon icon="info" title="חזרה" />
+                    <Icon icon="info" />
                   </span>
                 </Tooltip>
-              }
-              name="event-repeat"
-              rules={[{ required: true, message: "שדה חובה" }]}
-            >
-              <Select options={repeatOptions} onChange={handleRepeatChange} />
-            </Form.Item>
+              </Form.Item>
+            </article>
             {repeatOption === EventFrequency.byWeek && (
               <Form.Item
                 label="שבועות"
@@ -141,12 +143,12 @@ export default function SingleDayEventBaseForm({
             {repeatOption !== EventFrequency.none && (
               <>
                 <Form.Item
-                  label="סיום חזרה"
                   name="event-repeat-end-date"
                   className="form-item"
                   rules={[{ required: true, message: "שדה חובה" }]}
                 >
                   <DatePicker
+                    placeholder="סיום חזרה"
                     format={"DD/MM"}
                     minDate={eventDate}
                     maxDate={dayjs().add(3, "months")}
@@ -196,11 +198,10 @@ export default function SingleDayEventBaseForm({
           <Col md={24} xs={24}>
             <Form.Item
               className="full-width"
-              label="סוג האירוע"
               name="event-types"
               rules={[{ required: true, message: "שדה חובה" }]}
             >
-              <Select options={eventTypes} />
+              <Select options={eventTypes} placeholder="סוג האירוע" />
             </Form.Item>
           </Col>
         </Row>
@@ -208,12 +209,12 @@ export default function SingleDayEventBaseForm({
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
             <Form.Item
-              label="שעות פעילות"
               name="event-time"
               rules={[{ required: true, message: "שדה חובה" }]}
               className="full-width"
             >
               <TimePicker.RangePicker
+                placeholder={["שעת התחלה", "שעת סיום"]}
                 format="HH:mm"
                 minuteStep={5}
                 changeOnScroll
@@ -224,17 +225,18 @@ export default function SingleDayEventBaseForm({
         </Row>
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="מורים" name="teachers" className="full-width">
+            <Form.Item name="teachers" className="full-width">
               <Select
                 mode="tags"
                 className="full-width"
-                placeholder="Select or type"
+                placeholder="מורים"
                 filterOption={(input, option) =>
                   (option?.label ?? "")
                     .toLowerCase()
                     .indexOf(input.toLowerCase()) >= 0
                 }
                 options={teachers}
+                allowClear
               />
             </Form.Item>
           </Col>
@@ -242,8 +244,12 @@ export default function SingleDayEventBaseForm({
 
         <Row gutter={10} align="middle">
           <Col md={24} xs={24}>
-            <Form.Item label="תגיות" name="event-tags" className="full-width">
-              <Select options={tagOptions} mode="multiple" />
+            <Form.Item name="event-tags" className="full-width">
+              <Select
+                options={tagOptions}
+                mode="multiple"
+                placeholder="תגיות"
+              />
             </Form.Item>
           </Col>
         </Row>
