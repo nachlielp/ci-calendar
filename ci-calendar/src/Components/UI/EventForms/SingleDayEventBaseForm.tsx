@@ -38,7 +38,7 @@ interface ISingleDayEventBaseFormProps {
   eventDate: dayjs.Dayjs;
   endDate: dayjs.Dayjs | null;
   idEdit: boolean;
-  teachers: { label: string, value: string }[];
+  teachers: { label: string; value: string }[];
   address?: IAddress;
 }
 
@@ -53,44 +53,44 @@ export default function SingleDayEventBaseForm({
   eventDate,
   endDate,
   idEdit,
-  address
+  address,
 }: ISingleDayEventBaseFormProps) {
   return (
     <div className="single-day-event-base-form">
-      <Card className="event-card" title={<span className="event-title">ארוע חד יומי</span>}>
+      <Card
+        className="event-card"
+        title={<span className="event-title">ארוע חד יומי</span>}
+      >
         <Form.Item
-          label="כותרת"
           name="event-title"
           rules={[{ required: true, message: "שדה חובה" }]}
         >
-          <Input />
+          <Input placeholder="*כותרת " />
         </Form.Item>
-        <Row>
-          <Col lg={24} md={24} xs={24}></Col>
-        </Row>
-        <Form.Item label="תיאור האירוע" name="event-description">
-          <Input.TextArea rows={6} />
+
+        <Form.Item name="event-description">
+          <Input.TextArea rows={6} placeholder="תיאור האירוע" />
         </Form.Item>
         <Form.Item
           className="form-item"
-          label="אזור"
           name="district"
           rules={[{ required: true, message: "שדה חובה" }]}
         >
-          <Select options={districtOptions} />
+          <Select options={districtOptions} placeholder="אזור" />
         </Form.Item>
 
         <Form.Item
           className="form-item"
-          label="כתובת"
           name="address"
           rules={[{ required: true, message: "שדה חובה" }]}
         >
-          <GooglePlacesInput onPlaceSelect={handleAddressSelect} defaultValue={address} />
+          <GooglePlacesInput
+            onPlaceSelect={handleAddressSelect}
+            defaultValue={address}
+          />
         </Form.Item>
 
         <Form.Item
-          label="תאריך"
           name="event-date"
           rules={[{ required: true, message: "שדה חובה" }]}
         >
@@ -99,6 +99,7 @@ export default function SingleDayEventBaseForm({
             minDate={dayjs()}
             maxDate={dayjs().add(1, "year")}
             onChange={handleDateChange}
+            allowClear={false}
           />
         </Form.Item>
 
@@ -148,7 +149,7 @@ export default function SingleDayEventBaseForm({
                   <DatePicker
                     format={"DD/MM"}
                     minDate={eventDate}
-                    maxDate={dayjs().add(1, "year")}
+                    maxDate={dayjs().add(3, "months")}
                     onChange={handleEndDateChange}
                   />
                 </Form.Item>
@@ -228,7 +229,11 @@ export default function SingleDayEventBaseForm({
                 mode="tags"
                 className="full-width"
                 placeholder="Select or type"
-                filterOption={(input, option) => (option?.label ?? "").toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                filterOption={(input, option) =>
+                  (option?.label ?? "")
+                    .toLowerCase()
+                    .indexOf(input.toLowerCase()) >= 0
+                }
                 options={teachers}
               />
             </Form.Item>

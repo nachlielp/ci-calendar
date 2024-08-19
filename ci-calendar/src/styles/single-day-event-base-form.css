@@ -1,24 +1,30 @@
 .single-day-event-base-form {
-    .event-card {
-        margin-top: 1rem;
-        border-width: 4px;
-    }
+  .event-card {
+    margin-top: 1rem;
+    border-width: 4px;
+  }
 
-    .event-title {
-        display: flex;
-        flex-direction: row;
-        gap: 0.5rem;
-    }
+  .event-title {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
 
-    .form-item {
-        margin-top: 1rem;
-    }
+  .form-item {
+    margin-top: 1rem;
+  }
 
-    .full-width {
-        width: 100%;
-    }
+  .full-width {
+    width: 100%;
+  }
 
-    .list-item {
-        margin-right: 1rem;
-    }
+  .list-item {
+    margin-right: 1rem;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
 }
