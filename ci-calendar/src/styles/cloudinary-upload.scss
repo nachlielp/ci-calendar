@@ -1,0 +1,19 @@
+.cloudinary-upload-btns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+
+  .cloudinary-upload-btn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 5px;
+    // padding: 4px 6px;
+    cursor: pointer;
+    line-height: 1;
+  }
+}

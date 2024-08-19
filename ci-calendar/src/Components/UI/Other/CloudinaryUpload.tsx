@@ -1,5 +1,6 @@
 import { Button } from "antd";
 import { useEffect, useRef } from "react";
+import { Icon } from "./Icon";
 
 interface Cloudinary {
   clearImage: (url: string) => void;
@@ -62,16 +63,18 @@ export default function CloudinaryUpload({
   }, []);
 
   return (
-    <>
-      <Button type="primary" onClick={() => widgetRef.current.open()}>
-        Upload
-      </Button>
-      <Button
-        onClick={() => clearImage()}
-        style={{ backgroundColor: "red", color: "white", marginRight: "10px" }}
+    <article className="cloudinary-upload-btns">
+      <button
+        className="cloudinary-upload-btn"
+        onClick={() => widgetRef.current.open()}
       >
-        Clear
-      </Button>
-    </>
+        <Icon icon="addBox" />
+        העלאת תמונה
+      </button>
+      <button className="cloudinary-upload-btn" onClick={() => clearImage()}>
+        <Icon icon="deleteIcon" />
+        מחיקת תמונה
+      </button>
+    </article>
   );
 }

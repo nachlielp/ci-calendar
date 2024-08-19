@@ -2,8 +2,13 @@
   margin-left: auto;
   margin-right: auto;
   margin-top: 1rem;
-  min-width: 300px;
-  max-width: 500px;
+  margin-bottom: 40px;
+  &.desktop {
+    width: 400px;
+  }
+  &.mobile {
+    width: 90%;
+  }
 
   .img-container {
     display: flex;
@@ -24,6 +29,7 @@
 
   .teacher-form-img {
     border-radius: 5px;
+    object-fit: cover;
   }
 
   .bio-card-subtitle {

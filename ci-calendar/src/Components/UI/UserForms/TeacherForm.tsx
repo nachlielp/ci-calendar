@@ -2,7 +2,7 @@ import { Button, Form, type FormProps, Input, Card, Image, Switch } from "antd";
 import { useAuthContext } from "../../Auth/AuthContext";
 import { useEffect, useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";
-// import { useWindowSize } from "../../../hooks/useWindowSize";
+import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useGetTeacher } from "../../../hooks/useGetTeacher";
 
 type FieldType = {
@@ -23,7 +23,7 @@ interface ITeacherFormProps {
 export default function TeacherForm({
   showBioInTeacherPage,
 }: ITeacherFormProps) {
-  // const { width } = useWindowSize();
+  const { width } = useWindowSize();
   const { currentUser, updateTeacher } = useAuthContext();
   if (!currentUser) throw new Error("TeacherForm.currentUser");
   const teacher = useGetTeacher(currentUser.id);
@@ -79,7 +79,7 @@ export default function TeacherForm({
   return (
     <>
       {teacher && (
-        <Card className={`teacher-form`}>
+        <Card className={`teacher-form ${width > 600 ? "desktop" : "mobile"}`}>
           <Form
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
@@ -116,16 +116,21 @@ export default function TeacherForm({
             </label>
             <Form.Item<FieldType>
               name="pageUrl"
-              rules={[{ type: "url", warningOnly: true }]}
-            >
-              <Input placeholder="קישור לדף פרופיל" />
-            </Form.Item>
-            <Form.Item<FieldType>
-              name="pageUrlTitle"
               rules={[
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (getFieldValue("pageUrl") && !value) {
+                    if (
+                      value &&
+                      !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(
+                        value
+                      )
+                    ) {
+                      return Promise.reject(new Error("נא להזין כתובת תקינה"));
+                    }
+                    if (
+                      getFieldValue("pageUrl") &&
+                      !getFieldValue("pageUrlTitle")
+                    ) {
                       return Promise.reject(
                         new Error("נא להזין כותרת קישור לדף פרופיל")
                       );
@@ -135,6 +140,9 @@ export default function TeacherForm({
                 }),
               ]}
             >
+              <Input placeholder="קישור לדף פרופיל" />
+            </Form.Item>
+            <Form.Item<FieldType> name="pageUrlTitle">
               <Input placeholder="כותרת קישור לדף פרופיל" />
             </Form.Item>
 
@@ -147,8 +155,12 @@ export default function TeacherForm({
             <Form.Item<FieldType> name="img">
               <div className="img-container">
                 <Image
-                  width={200}
+                  alt="example"
                   src={imageUrl}
+                  key={imageUrl}
+                  preview={false}
+                  width={250}
+                  height={250}
                   className="teacher-form-img"
                 />
               </div>
@@ -173,13 +185,7 @@ export default function TeacherForm({
                 defaultChecked={teacher?.showProfile}
               />
             </Form.Item>
-            {/* <Form.Item<FieldType>
-              label="אפשר תיוג"
-              name="allowTagging"
-              valuePropName="checked"
-            >
-              <Checkbox />
-            </Form.Item> */}
+
             <Button htmlType="submit" className="teacher-form-submit">
               שמירת שינויים
             </Button>
