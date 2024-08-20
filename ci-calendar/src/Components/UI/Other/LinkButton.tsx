@@ -22,13 +22,14 @@ export const LinkButton = ({
   children,
 }: ILinkButtonProps) => {
   return (
-    <Link to={to} className="link-btn">
+    <Link to={to} className="link-btn" style={{ textDecoration: "none" }}>
       <Button
         className={`${className} `} // Add flexbox utilities
         disabled={disabled}
         shape={shape}
         onClick={onClick}
         title={label}
+        style={{ textDecoration: "none" }}
       >
         {children}
       </Button>

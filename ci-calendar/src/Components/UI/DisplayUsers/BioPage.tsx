@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { useState } from "react";
 import TeacherForm from "../UserForms/TeacherForm";
 import BioCard from "./BioCard";
@@ -12,9 +11,13 @@ export default function BioPage() {
     <div className="bio-page">
       <div className="button-container">
         {editProfile ? (
-          <Button onClick={() => setEditProfile(false)}>חזרה פרופיל</Button>
+          <button className="btn" onClick={() => setEditProfile(false)}>
+            הצגת הפרופיל
+          </button>
         ) : (
-          <Button onClick={() => setEditProfile(true)}>עריכת פרופיל</Button>
+          <button className="btn" onClick={() => setEditProfile(true)}>
+            עריכת הפרופיל
+          </button>
         )}
       </div>
       {editProfile ? (

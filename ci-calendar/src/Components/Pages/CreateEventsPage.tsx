@@ -34,7 +34,7 @@ export default function CreateEventsPage() {
           <AddEventDrawer
             anchorEl={
               <button className="btn">
-                <Icon icon="noteStackAdd" />
+                <Icon icon="noteStackAdd" className="icon" />
                 אירוע רב יומי
               </button>
             }
@@ -44,7 +44,7 @@ export default function CreateEventsPage() {
           <AddEventModal
             anchorEl={
               <button className="btn">
-                <Icon icon="addBox" />
+                <Icon icon="addBox" className="icon" />
                 אירוע חד יומי
               </button>
             }
