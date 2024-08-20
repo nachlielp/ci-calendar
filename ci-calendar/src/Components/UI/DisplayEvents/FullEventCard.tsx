@@ -27,31 +27,31 @@ export default function FullEventCard({
   const subEventLen = Object.values(event.subEvents).length;
   const teachersIds = getEventTeachersIds(event);
   const { teachers } = useGetTeachers({ ids: teachersIds });
-  const nonRegestoredTeacherNames = Array.from(
-    new Set(
-      Object.values(event.subEvents)
-        .flatMap((subEvent) => subEvent.teachers)
-        .filter((teacher) => teacher.value === "NON_EXISTENT")
-        .map((teacher) => teacher.label)
-    )
-  );
-  const regestoredTeacherOptions = Array.from(
-    new Map(
-      Object.values(event.subEvents)
-        .flatMap((subEvent) => subEvent.teachers)
-        .filter((teacher) => teacher.value !== "NON_EXISTENT")
-        .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
-    ).values()
-  );
+  // const nonRegestoredTeacherNames = Array.from(
+  //   new Set(
+  //     Object.values(event.subEvents)
+  //       .flatMap((subEvent) => subEvent.teachers)
+  //       .filter((teacher) => teacher.value === "NON_EXISTENT")
+  //       .map((teacher) => teacher.label)
+  //   )
+  // );
+  // const regestoredTeacherOptions = Array.from(
+  //   new Map(
+  //     Object.values(event.subEvents)
+  //       .flatMap((subEvent) => subEvent.teachers)
+  //       .filter((teacher) => teacher.value !== "NON_EXISTENT")
+  //       .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
+  //   ).values()
+  // );
 
-  const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
-    const isTeacher = teachers.find((t) => t.id === teacher.value);
-    return isTeacher ? (
-      <BioModal key={teacher.value} teacher={isTeacher} />
-    ) : (
-      teacher.label
-    );
-  });
+  // const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
+  //   const isTeacher = teachers.find((t) => t.id === teacher.value);
+  //   return isTeacher ? (
+  //     <BioModal key={teacher.value} teacher={isTeacher} />
+  //   ) : (
+  //     teacher.label
+  //   );
+  // });
 
   const isMultiDay = event.dates["startDate"] !== event.dates["endDate"];
 
