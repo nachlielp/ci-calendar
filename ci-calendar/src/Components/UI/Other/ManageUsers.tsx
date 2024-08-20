@@ -99,8 +99,14 @@ function ManageUsers() {
   const cardWidth = Math.min(width * 0.9, 500);
 
   const makeAdmin = (
-    <Button disabled={selectedUser?.userType === "admin"} onClick={onMakeAdmin} className="user-btn">
-      הגדר<br />כמנהל
+    <Button
+      disabled={selectedUser?.userType === "admin"}
+      onClick={onMakeAdmin}
+      className="user-btn"
+    >
+      הגדר
+      <br />
+      כמנהל
     </Button>
   );
   const makeTeacher = (
@@ -109,12 +115,20 @@ function ManageUsers() {
       onClick={onMakeTeacher}
       className="user-btn"
     >
-      הגדר<br />כמורה
+      הגדר
+      <br />
+      כמורה
     </Button>
   );
   const makeUser = (
-    <Button disabled={selectedUser?.userType === "user"} onClick={onMakeUser} className="user-btn">
-      הגדר<br />כמשתמש
+    <Button
+      disabled={selectedUser?.userType === "user"}
+      onClick={onMakeUser}
+      className="user-btn"
+    >
+      הגדר
+      <br />
+      כמשתמש
     </Button>
   );
   const footer = selectedUser ? [makeAdmin, makeTeacher, makeUser] : [];
@@ -137,7 +151,7 @@ function ManageUsers() {
         >
           <Input.Search
             size="large"
-            placeholder="שם משתמשים או כתובת מייל"
+            placeholder="שם משתמש או כתובת מייל"
             enterButton
           />
         </AutoComplete>

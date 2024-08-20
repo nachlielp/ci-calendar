@@ -15,7 +15,7 @@ import {
   SelectOption,
 } from "../../../util/options";
 import { Icon } from "../Other/Icon";
-// import expand from "../../../assets/expand.svg";
+
 interface ISingleDayEventCardProps {
   event: IEvently;
   isEdit: boolean;
@@ -96,11 +96,7 @@ export const SingleDayEventCard = React.forwardRef<
       actions={footer}
     >
       <article className="event-header">
-        {isEdit ? (
-          <div className="event-title">{event.title}&nbsp;</div>
-        ) : (
-          <h2 className="event-title">{event.title}&nbsp;</h2>
-        )}
+        <h2 className="event-title">{event.title}&nbsp;</h2>
       </article>
       <article className="event-dates">
         {event.subEvents.length > 0 ? (
@@ -129,7 +125,7 @@ export const SingleDayEventCard = React.forwardRef<
         subEventLen > 0 &&
         Object.values(event.subEvents).map((subEvent, index) => (
           <div className="sub-event" key={index}>
-            <Icon icon="hov" className="sub-event-icon" />
+            {/* <Icon icon="hov" className="sub-event-icon" /> */}
             <span>
               {dayjs(subEvent.endTime).format("HH:mm")}&nbsp;-&nbsp;
               {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;

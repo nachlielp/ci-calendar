@@ -39,7 +39,10 @@ interface IAuthContextType {
   updateEvent: (eventId: string, event: IEvently) => Promise<void>;
   hideEvent: (eventId: string, hide: boolean) => Promise<void>;
   deleteMultipleEventlys: (eventIds: string[]) => Promise<void>;
-  hideOrShowMultipleEventlys: (eventIds: string[], hide: boolean) => Promise<void>;
+  hideOrShowMultipleEventlys: (
+    eventIds: string[],
+    hide: boolean
+  ) => Promise<void>;
   addTeacher: (teacher: DbTeacher) => Promise<void>;
   disableTeacher: (teacherId: string) => Promise<void>;
   updateTeacher: (teacher: DbTeacher) => Promise<void>;
@@ -70,7 +73,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let unsubscribe = () => { };
+    let unsubscribe = () => {};
     const initAuth = async () => {
       try {
         unsubscribe = await onAuthChanged(async (user: User) => {
@@ -84,7 +87,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } catch (error) {
         console.error("AuthContext.initAuth.error: ", error);
       }
-    }
+    };
 
     initAuth();
 
@@ -95,7 +98,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function signup(signupData: IUserSignup) {
     try {
-      const signupRes = await signupEmail(signupData.email, signupData.password);
+      const signupRes = await signupEmail(
+        signupData.email,
+        signupData.password
+      );
+      console.log("signupRes: ", signupRes);
       await getOrCreateDbUserByUser({
         ...signupRes.user,
         displayName: signupData.name,
@@ -237,7 +244,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function hideOrShowMultipleEventlys(eventIds: string[], hide: boolean) {
-    console.log("eventIds to hide: ", eventIds)
+    console.log("eventIds to hide: ", eventIds);
     eventIds.forEach(async (eventId) => {
       try {
         await hideEvent(eventId, hide);
@@ -257,7 +264,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
     return unsubscribe;
   }
-
 
   async function getTeacher(teacherId: string) {
     try {
@@ -282,7 +288,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function disableTeacher(teacherId: string) {
     try {
-      await updateDocument("teachers", teacherId, { allowTagging: false, showProfile: false });
+      await updateDocument("teachers", teacherId, {
+        allowTagging: false,
+        showProfile: false,
+      });
     } catch (error) {
       console.error("AuthContext.disableTeacher.error: ", error);
       throw error;

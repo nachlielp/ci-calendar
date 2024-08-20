@@ -3,7 +3,6 @@ import { Table, Select, Breakpoint } from "antd";
 import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
 import ShowMultipleEvents from "../Other/ShowMultipleEvents";
-import { SingleDayEventCard } from "./SingleDayEventCard";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
@@ -11,6 +10,7 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import dayjs from "dayjs";
 import { Icon } from "../Other/Icon";
 import { SelectOption } from "../../../util/options";
+import FullEventCard from "./FullEventCard";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
@@ -330,7 +330,8 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
         expandable={{
           expandedRowRender: (event) => (
             <div className="event-card-container" key={event.id}>
-              <SingleDayEventCard key={event.id} event={event} isEdit={true} />
+              <FullEventCard event={event} isManageTable={true} />
+              {/* <SingleDayEventCard key={event.id} event={event} isEdit={true} /> */}
             </div>
           ),
           expandedRowKeys: expandedRowKeys,
