@@ -5,6 +5,11 @@
   //   justify-content: center;
 
   height: calc(100vh - 56px);
+  overflow-y: auto;
+  color: #000;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
 
   .user-btn {
     height: 64px;

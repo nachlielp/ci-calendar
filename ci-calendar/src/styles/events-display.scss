@@ -1,17 +1,14 @@
 .events-display {
-  height: calc(100vh - 56px);
   padding: 0 16px;
   align-self: center;
+
+  height: calc(100vh - 56px);
   overflow-y: auto;
   color: #000;
   -ms-overflow-style: none;
-  /* IE and Edge */
   scrollbar-width: none;
-
-  /* Firefox */
   &::-webkit-scrollbar {
     display: none;
-    /* Chrome, Safari, and Opera */
   }
 
   .header {
