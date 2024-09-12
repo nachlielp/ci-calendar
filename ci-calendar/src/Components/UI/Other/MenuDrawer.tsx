@@ -70,6 +70,15 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
       disabled: isUser,
     },
     {
+      key: "newsletter",
+      icon: "mail",
+      label: "ניוזלטר",
+      onClick: () => {
+        navigate("/user");
+        setOpen(false);
+      },
+    },
+    {
       key: "logout",
       icon: "logout",
       label: "התנתקות",

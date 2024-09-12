@@ -36,11 +36,12 @@ export const tagOptions: SelectOption[] = [
   { value: "pre-registration", label: "הרשמה מראש" },
 ];
 
-export const districtOptions: SelectOption[] = [
-  { value: "jerusalem", label: "ירושלים" },
+export const districtOptions = [
+  { value: 'north', label: 'צפון' },
+  { value: 'south', label: 'דרום' },
   { value: "center", label: "מרכז" },
-  { value: "north", label: "צפון" },
-  { value: "south", label: "דרום" },
+  { value: "jerusalem", label: "ירושלים" },
+  // Add more districts as needed
 ];
 
 export const viewOptions: SelectOption[] = [

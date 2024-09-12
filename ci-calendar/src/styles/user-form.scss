@@ -1,5 +1,13 @@
 .user-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .user-form-card {
+    width: 90%;
+    max-width: 400px;
+
+    margin-top: 1rem;
+  }
 }
