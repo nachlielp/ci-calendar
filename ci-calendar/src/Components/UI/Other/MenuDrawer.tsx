@@ -5,8 +5,6 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 
-type UserType = "admin" | "publicUser" | "teacher" | "user";
-
 export function MenuDrawer({ logout }: { logout: () => void }) {
   const [open, setOpen] = React.useState<boolean>(false);
   const { currentUser } = useAuthContext();
