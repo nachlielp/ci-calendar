@@ -5,12 +5,18 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 
+type UserType = "admin" | "publicUser" | "teacher" | "user";
+
 export function MenuDrawer({ logout }: { logout: () => void }) {
   const [open, setOpen] = React.useState<boolean>(false);
   const { currentUser } = useAuthContext();
   const { width } = useWindowSize();
+
   const isMobile = width < 768;
   const isAdmin = currentUser?.userType === "admin";
+  const isCreator =
+    currentUser?.userType === "admin" || currentUser?.userType === "teacher";
+  const isUser = currentUser?.userType === "user";
 
   const navigate = useNavigate();
 
@@ -33,6 +39,7 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
         navigate("/manage-events");
         setOpen(false);
       },
+      disabled: !isCreator,
     },
     {
       key: "create-event",
@@ -42,6 +49,7 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
         navigate("/create-events");
         setOpen(false);
       },
+      disabled: !isCreator,
     },
     {
       key: "manage-users",
@@ -51,6 +59,7 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
         navigate("/manage-users");
         setOpen(false);
       },
+      disabled: !isAdmin,
     },
     {
       key: "my-profile",
@@ -60,6 +69,7 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
         navigate("/bio");
         setOpen(false);
       },
+      disabled: isUser,
     },
     {
       key: "logout",
@@ -69,9 +79,9 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
     },
   ];
 
-  if (!isAdmin) {
-    mapOfMenu = mapOfMenu.filter((item) => item.key !== "manage-users");
-  }
+  // if (!isAdmin) {
+  //   mapOfMenu = mapOfMenu.filter((item) => item.key !== "manage-users");
+  // }
 
   return (
     <>
@@ -90,9 +100,11 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
         bodyStyle={{ padding: 0 }}
       >
         <div className="menu-drawer-content">
-          {mapOfMenu.map((item) => (
-            <MenuItem key={item.key} item={item} />
-          ))}
+          {mapOfMenu
+            .filter((item) => !item.disabled)
+            .map((item) => (
+              <MenuItem key={item.key} item={item} />
+            ))}
         </div>
       </Drawer>
     </>
