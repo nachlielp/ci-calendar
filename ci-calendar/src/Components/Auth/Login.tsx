@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import { useAuthContext } from "./AuthContext";
 import { LinkButton } from "../UI/Other/LinkButton";
+import { supabase } from "../../supabase/client";
 
 enum LoginError {
   none = "",
@@ -58,6 +59,17 @@ export default function Login() {
     }
   };
 
+  const onSupabaseGoogleSignIn = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    if (error) {
+      alert(error.message);
+    }
+    setLoading(false);
+  };
+
   return (
     <Card id="login-form" className="login-form">
       <h1 className="login-title">כניסה</h1>
@@ -69,7 +81,12 @@ export default function Login() {
         onFinish={onFinish}
       >
         <Form.Item>
-          <Input type="email" placeholder="כתובת מייל" ref={emailRef} required />
+          <Input
+            type="email"
+            placeholder="כתובת מייל"
+            ref={emailRef}
+            required
+          />
         </Form.Item>
         <Form.Item>
           <Input.Password
@@ -111,8 +128,12 @@ export default function Login() {
       </div>
 
       <div className="link-container">
-        <LinkButton to="/reset-password" className="default-font">איפוס סיסמה</LinkButton>
-        <LinkButton to="/signup" className="default-font">הרשמה</LinkButton>
+        <LinkButton to="/reset-password" className="default-font">
+          איפוס סיסמה
+        </LinkButton>
+        <LinkButton to="/signup" className="default-font">
+          הרשמה
+        </LinkButton>
       </div>
     </Card>
   );

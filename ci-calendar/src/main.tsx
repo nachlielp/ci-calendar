@@ -1,11 +1,13 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.scss";
-// import "antd/dist/reset.css";
-import { ConfigProvider } from "antd";
+import Providers from "./Providers.tsx";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <ConfigProvider direction="rtl">
-    <App />
-  </ConfigProvider>
+  <BrowserRouter>
+    <Providers>
+      <App />
+    </Providers>
+  </BrowserRouter>
 );

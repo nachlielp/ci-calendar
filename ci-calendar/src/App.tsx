@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import "./styles/overrides.css";
 import { AuthProvider } from "./Components/Auth/AuthContext";
 import Header from "./Components/UI/Other/Header";
@@ -53,101 +53,99 @@ export default function App() {
       <SpeedInsights />
       <BackgroundTiles />
       <div className="app-content" style={{ width: "100%", maxWidth: "500px" }}>
-        <BrowserRouter>
-          <AuthProvider>
-            <Suspense fallback={<Loading />}>
-              <Header />
-              <Routes>
-                <Route path="signup" element={<Signup />} />
-                <Route path="login" element={<Login />} />
+        <AuthProvider>
+          <Suspense fallback={<Loading />}>
+            <Header />
+            <Routes>
+              <Route path="signup" element={<Signup />} />
+              <Route path="login" element={<Login />} />
 
-                <Route path="reset-password" element={<ResetPassword />} />
+              <Route path="reset-password" element={<ResetPassword />} />
+              <Route
+                path="/"
+                element={<EventsDisplay events={events} isEdit={false} />}
+              />
+
+              {/* User privet routes */}
+              <Route
+                element={
+                  <PrivateRoutes
+                    requiredRoles={[
+                      UserType.admin,
+                      UserType.teacher,
+                      UserType.user,
+                    ]}
+                  />
+                }
+              >
+                <Route path="/user" element={<UserPage />} />
+              </Route>
+
+              {/* Teacher privet routes */}
+
+              <Route
+                element={
+                  <PrivateRoutes
+                    requiredRoles={[UserType.admin, UserType.teacher]}
+                  />
+                }
+              >
+                <Route path="/teacher" element={<TeacherPage />} />
+                <Route path="/create-events" element={<CreateEventsPage />} />
+                <Route path="/event-form" element={<EventForm />} />
                 <Route
-                  path="/"
-                  element={<EventsDisplay events={events} isEdit={false} />}
+                  path="/multi-day-event-form"
+                  element={<MultiDayEventForm />}
                 />
-
-                {/* User privet routes */}
                 <Route
-                  element={
-                    <PrivateRoutes
-                      requiredRoles={[
-                        UserType.admin,
-                        UserType.teacher,
-                        UserType.user,
-                      ]}
-                    />
-                  }
-                >
-                  <Route path="/user" element={<UserPage />} />
-                </Route>
-
-                {/* Teacher privet routes */}
-
-                <Route
-                  element={
-                    <PrivateRoutes
-                      requiredRoles={[UserType.admin, UserType.teacher]}
-                    />
-                  }
-                >
-                  <Route path="/teacher" element={<TeacherPage />} />
-                  <Route path="/create-events" element={<CreateEventsPage />} />
-                  <Route path="/event-form" element={<EventForm />} />
-                  <Route
-                    path="/multi-day-event-form"
-                    element={<MultiDayEventForm />}
-                  />
-                  <Route
-                    path="/manage-events"
-                    element={<ManageEventsTable events={events} />}
-                  />
-                  <Route
-                    path="/edit-single-day-event/:eventId"
-                    element={
-                      <EditSingleDayEventForm editType={EventAction.edit} />
-                    }
-                  />
-                  <Route
-                    path="/recycle-single-day-event/:eventId"
-                    element={
-                      <EditSingleDayEventForm editType={EventAction.recycle} />
-                    }
-                  />
-                  <Route
-                    path="/edit-multi-day-event/:eventId"
-                    element={
-                      <EditMultiDayEventForm editType={EventAction.edit} />
-                    }
-                  />
-                  <Route
-                    path="/recycle-multi-day-event/:eventId"
-                    element={
-                      <EditMultiDayEventForm editType={EventAction.recycle} />
-                    }
-                  />
-                  <Route path="/bio" element={<BioPage />} />
-                </Route>
-
-                {/* Admin privet routes */}
-                <Route
-                  element={<PrivateRoutes requiredRoles={[UserType.admin]} />}
-                >
-                  <Route path="/admin" element={<AdminPage />} />
-                  <Route path="/manage-users" element={<ManageUsers />} />
-                  <Route
-                    path="/manage-events"
-                    element={<ManageEventsTable events={events} />}
-                  />
-                </Route>
-                <Route
-                  path="*"
-                  element={<EventsDisplay events={events} isEdit={false} />}
+                  path="/manage-events"
+                  element={<ManageEventsTable events={events} />}
                 />
-              </Routes>
-            </Suspense>
-          </AuthProvider>
-        </BrowserRouter>
+                <Route
+                  path="/edit-single-day-event/:eventId"
+                  element={
+                    <EditSingleDayEventForm editType={EventAction.edit} />
+                  }
+                />
+                <Route
+                  path="/recycle-single-day-event/:eventId"
+                  element={
+                    <EditSingleDayEventForm editType={EventAction.recycle} />
+                  }
+                />
+                <Route
+                  path="/edit-multi-day-event/:eventId"
+                  element={
+                    <EditMultiDayEventForm editType={EventAction.edit} />
+                  }
+                />
+                <Route
+                  path="/recycle-multi-day-event/:eventId"
+                  element={
+                    <EditMultiDayEventForm editType={EventAction.recycle} />
+                  }
+                />
+                <Route path="/bio" element={<BioPage />} />
+              </Route>
+
+              {/* Admin privet routes */}
+              <Route
+                element={<PrivateRoutes requiredRoles={[UserType.admin]} />}
+              >
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/manage-users" element={<ManageUsers />} />
+                <Route
+                  path="/manage-events"
+                  element={<ManageEventsTable events={events} />}
+                />
+              </Route>
+              <Route
+                path="*"
+                element={<EventsDisplay events={events} isEdit={false} />}
+              />
+            </Routes>
+          </Suspense>
+        </AuthProvider>
       </div>
     </div>
   );
