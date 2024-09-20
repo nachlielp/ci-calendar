@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, Button, Card, Form, Input, InputRef } from "antd";
 import { useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
-import { useAuthContext } from "./AuthContext";
+import { useUser } from "../../context/UserContext";
+import { supabase } from "../../supabase/client";
 
 enum SignupError {
   none = "",
@@ -11,7 +12,7 @@ enum SignupError {
 }
 
 export default function Signup() {
-  const { currentUser, signup, googleLogin } = useAuthContext();
+  const { user } = useUser();
   const nameRef = useRef<InputRef>(null);
   const emailRef = useRef<InputRef>(null);
   const passwordRef = useRef<InputRef>(null);
@@ -21,10 +22,10 @@ export default function Signup() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentUser != null) {
+    if (user != null) {
       navigate("/");
     }
-  }, [currentUser]);
+  }, [user]);
 
   const onFinish = async () => {
     if (
@@ -42,7 +43,16 @@ export default function Signup() {
       if (!email || !password || !name) {
         throw new Error("Email or password is null");
       }
-      await signup({ email, password, name });
+      //TODO add method that creates user and passes name not create user in supabase
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { name } },
+      });
+      if (error) {
+        throw error;
+      }
+      console.log("signup data", data);
       navigate("/");
     } catch (e) {
       if (e instanceof FirebaseError) {
@@ -57,12 +67,15 @@ export default function Signup() {
     setLoading(false);
   };
 
-  const googleSignIn = async () => {
-    try {
-      await googleLogin();
-    } catch (error) {
-      console.error(`Signup.googleSignIn.error: ${error}`);
+  const onSupabaseGoogleSignIn = async () => {
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    if (error) {
+      alert(error.message);
     }
+    setLoading(false);
   };
 
   return (
@@ -78,10 +91,22 @@ export default function Signup() {
         onFinish={onFinish}
       >
         <Form.Item>
-          <Input type="text" placeholder="שם" ref={nameRef} required className="signup-input" />
+          <Input
+            type="text"
+            placeholder="שם"
+            ref={nameRef}
+            required
+            className="signup-input"
+          />
         </Form.Item>
         <Form.Item>
-          <Input type="email" placeholder="כתובת מייל" ref={emailRef} required className="signup-input" />
+          <Input
+            type="email"
+            placeholder="כתובת מייל"
+            ref={emailRef}
+            required
+            className="signup-input"
+          />
         </Form.Item>
         <Form.Item>
           <Input.Password
@@ -122,13 +147,13 @@ export default function Signup() {
       <Form.Item className="button-container">
         <Button
           type="default"
-          onClick={googleSignIn}
+          onClick={onSupabaseGoogleSignIn}
           disabled={loading}
           className="google-signin-button"
         >
           הרשמה עם Google
         </Button>
       </Form.Item>
-    </Card >
+    </Card>
   );
 }

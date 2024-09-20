@@ -2,11 +2,11 @@
 import { SingleDayEventCard } from "./SingleDayEventCard";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import { IEvently } from "../../../util/interfaces";
-import { useAuthContext } from "../../Auth/AuthContext";
 import Loading from "../Other/Loading";
 import EmptyList from "../Other/Empty";
 import { Empty } from "antd";
 import SingleDayModalCard from "./SingleDayModalCard";
+import { useUser } from "../../../context/UserContext";
 
 interface IEventsListProps {
   onSelectEvent: (event: IEvently) => void;
@@ -14,14 +14,19 @@ interface IEventsListProps {
   isEdit: boolean;
   isEvents: boolean;
 }
-export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: IEventsListProps) {
-  const { currentUser } = useAuthContext();
-  const isAdmin = currentUser?.userType === "admin";
+export default function EventsList({
+  events,
+  isEdit,
+  isEvents,
+  onSelectEvent,
+}: IEventsListProps) {
+  const { user } = useUser();
+  const isAdmin = user?.userType === "admin";
   let filteredEvents = useEventsFilter({ events });
   if (isEdit && !isAdmin) {
-    filteredEvents = useEventsFilter({ events, uids: currentUser ? [currentUser.id] : [] });
+    filteredEvents = useEventsFilter({ events, uids: user ? [user.id] : [] });
   } else if (isEdit && isAdmin) {
-    filteredEvents = events
+    filteredEvents = events;
   } else {
     const visibleEvents = events.filter((event) => !event.hide);
     filteredEvents = useEventsFilter({ events: visibleEvents });
@@ -35,8 +40,9 @@ export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: 
     <div className="events-list-container">
       {!isEvents && emptyEventsList()}
       {filteredEvents.map((event) => (
-        <div key={event.id} >
-          <SingleDayModalCard event={event}
+        <div key={event.id}>
+          <SingleDayModalCard
+            event={event}
             onSelectEvent={onSelectEvent}
             anchorEl={
               <SingleDayEventCard
@@ -48,8 +54,7 @@ export default function EventsList({ events, isEdit, isEvents, onSelectEvent }: 
           />
         </div>
       ))}
-      <div className="events-list-footer">
-      </div>
+      <div className="events-list-footer"></div>
     </div>
   );
 }
@@ -58,7 +63,7 @@ const emptyEventsList = () => {
   return (
     <Empty
       imageStyle={{ height: 60, marginTop: "10rem" }}
-      description={<span></ span>}
+      description={<span></span>}
     >
       <span style={{ fontSize: "1.5rem" }}>אופס, נראה שיש לנו בעיה</span>
     </Empty>

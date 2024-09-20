@@ -6,19 +6,19 @@ import ShowMultipleEvents from "../Other/ShowMultipleEvents";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { IEvently, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
-import { useAuthContext } from "../../Auth/AuthContext";
 import dayjs from "dayjs";
 import { Icon } from "../Other/Icon";
 import { SelectOption } from "../../../util/options";
 import FullEventCard from "./FullEventCard";
+import { useUser } from "../../../context/UserContext";
 const { Option } = Select;
 
 export default function ManageEventsTable({ events }: { events: IEvently[] }) {
   const { width } = useWindowSize();
-  const { currentUser } = useAuthContext();
+  const { user } = useUser();
   const uid = useMemo(
-    () => (currentUser?.userType === "teacher" ? [currentUser.id] : []),
-    [currentUser]
+    () => (user?.userType === "teacher" ? [user.id] : []),
+    [user]
   );
   const [showFuture, setShowFuture] = useState(true);
   const filteredEvents = useEventsFilter({ events, showFuture, uids: uid });
@@ -204,7 +204,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
   ];
 
   const filteredColumns =
-    currentUser && currentUser.userType === "teacher"
+    user && user.userType === "teacher"
       ? columns.filter((column) => column.key !== "creatorName")
       : columns;
 
@@ -250,7 +250,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
           </button>
         </div>
         <div className="user-select-container">
-          {currentUser && currentUser.userType === UserType.admin && (
+          {user && user.userType === UserType.admin && (
             <Select
               id="select-teacher"
               className="select-teacher"

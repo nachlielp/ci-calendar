@@ -16,6 +16,7 @@ import { reverseFormatTeachers } from "./EditSingleDayEventForm";
 import { EventAction } from "../../../App";
 import { v4 as uuidv4 } from "uuid";
 import { Icon } from "../Other/Icon";
+import { useUser } from "../../../context/UserContext";
 
 export default function EditMultiDayEventForm({
   editType,
@@ -24,9 +25,10 @@ export default function EditMultiDayEventForm({
 }) {
   const { teachers } = useTeachersList();
   const navigate = useNavigate();
-  const { getEvent, currentUser, updateEvent, createEvent } = useAuthContext();
-  if (!currentUser) {
-    throw new Error("currentUser is null, make sure you're within a Provider");
+  const { getEvent, updateEvent, createEvent } = useAuthContext();
+  const { user } = useUser();
+  if (!user) {
+    throw new Error("user is null, make sure you're within a Provider");
   }
 
   const { eventId } = useParams<{ eventId: string }>();
@@ -145,14 +147,14 @@ export default function EditMultiDayEventForm({
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
       description: values["event-description"] || "",
-      owners: [{ value: currentUser.id, label: currentUser.fullName }],
+      owners: [{ value: user.id, label: user.fullName }],
       links: values["links"] || [],
       price: values["prices"] || [],
       hide: false,
       subEvents: subEventsTemplate,
       district: values["district"],
-      creatorId: currentUser.id,
-      creatorName: currentUser.fullName,
+      creatorId: user.id,
+      creatorName: user.fullName,
     };
     try {
       if (editType === EventAction.recycle) {

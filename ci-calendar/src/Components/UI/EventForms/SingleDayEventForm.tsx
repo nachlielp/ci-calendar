@@ -15,6 +15,7 @@ import AddPricesForm from "./AddPricesForm";
 import SubEventsForm from "./SubEventsForm";
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm";
 import { useTeachersList } from "../../../hooks/useTeachersList";
+import { useUser } from "../../../context/UserContext";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -47,17 +48,15 @@ export default function SingleDayEventForm() {
   const [eventDate, setEventDate] = useState(dayjs());
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
   const navigate = useNavigate();
-  const { currentUser, createEvent } = useAuthContext();
+  const { createEvent } = useAuthContext();
+  const { user } = useUser();
   const [address, setAddress] = useState<IAddress>();
 
-  if (!currentUser) {
-    throw new Error("currentUser is null, make sure you're within a Provider");
+  if (!user) {
+    throw new Error("user is null, make sure you're within a Provider");
   }
 
-  if (
-    currentUser.userType !== UserType.admin &&
-    currentUser.userType !== UserType.teacher
-  ) {
+  if (user.userType !== UserType.admin && user.userType !== UserType.teacher) {
     navigate("/");
   }
 
@@ -141,14 +140,14 @@ export default function SingleDayEventForm() {
           updatedAt: dayjs().toISOString(),
           title: values["event-title"],
           description: values["event-description"] || "",
-          owners: [{ value: currentUser.id, label: currentUser.fullName }],
+          owners: [{ value: user.id, label: user.fullName }],
           links: values["links"] || [],
           price: values["prices"] || [],
           hide: false,
           subEvents: subEventsTemplate,
           district: values["district"],
-          creatorId: currentUser.id,
-          creatorName: currentUser.fullName,
+          creatorId: user.id,
+          creatorName: user.fullName,
         };
         await createEvent(event);
       } else if (endDate) {
@@ -186,14 +185,14 @@ export default function SingleDayEventForm() {
             updatedAt: dayjs().toISOString(),
             title: values["event-title"],
             description: values["event-description"] || "",
-            owners: [{ value: currentUser.id, label: currentUser.fullName }],
+            owners: [{ value: user.id, label: user.fullName }],
             links: values["links"] || [],
             price: values["prices"] || [],
             hide: false,
             subEvents: subEvents,
             district: values["district"],
-            creatorId: currentUser.id,
-            creatorName: currentUser.fullName,
+            creatorId: user.id,
+            creatorName: user.fullName,
           };
           await createEvent(event);
         }

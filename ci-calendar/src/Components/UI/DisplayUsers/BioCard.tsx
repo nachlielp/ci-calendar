@@ -1,14 +1,14 @@
 import { Card, Image } from "antd";
-import { useAuthContext } from "../../Auth/AuthContext";
 import { useGetTeacher } from "../../../hooks/useGetTeacher";
 import { Typography } from "antd";
 import { Icon } from "../Other/Icon";
+import { useUser } from "../../../context/UserContext";
 const { Text } = Typography;
 
 function BioCard() {
-  const { currentUser } = useAuthContext();
-  if (!currentUser) throw new Error("BioCard: No user found");
-  const teacher = useGetTeacher(currentUser.id);
+  const { user } = useUser();
+  if (!user) throw new Error("BioCard: No user found");
+  const teacher = useGetTeacher(user.id);
 
   return (
     <>

@@ -1,55 +1,30 @@
 import { LinkButton } from "./LinkButton";
-import { useAuthContext } from "../../Auth/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { DbUser } from "../../../util/interfaces";
-import { useParamsHandler } from "../../../hooks/useParamsHandler";
-import { viewOptions } from "../../../util/options";
+
 import { Icon } from "./Icon";
 import { MenuDrawer } from "./MenuDrawer";
-export default function Header() {
-  const { currentUser, logoutContext } = useAuthContext();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { onOptionsChange } = useParamsHandler({
-    title: "view",
-    options: viewOptions,
-  });
+import { useUser } from "../../../context/UserContext";
 
-  // let settingsPage = "/";
-  // if (currentUser?.userType === "admin") {
-  //   settingsPage = "/admin";
-  // } else if (currentUser?.userType === "user") {
-  //   settingsPage = "/user";
-  // } else if (currentUser?.userType === "teacher") {
-  //   settingsPage = "/teacher";
-  // }
+export default function Header() {
+  const { user } = useUser();
+  const location = useLocation();
 
   const currentPath = location.pathname;
 
-  const handleLogOut = () => {
-    onOptionsChange("view")(["list"]);
-    logoutContext();
-    navigate("/");
-  };
-
   return (
     <section className="header-container">
-      {/* {currentUser && (
-        <button className="btn-main" onClick={handleLogOut}>
-          <Icon icon="logout" />
-        </button>
-      )} */}
-      {!currentUser && currentPath !== "/login" && (
+      {!user && currentPath !== "/login" && (
         <LinkButton to="/login" className="header-btn no-border">
           התחבר/י &nbsp;
           <Icon icon="account" className="icon-main" />
         </LinkButton>
       )}
 
-      {currentUser && (
+      {user && (
         <div className="header-actions">
-          <UserInfo currentUser={currentUser} />
-          <MenuDrawer logout={handleLogOut} />
+          <UserInfo user={user} />
+          <MenuDrawer />
         </div>
       )}
     </section>
@@ -57,14 +32,14 @@ export default function Header() {
 }
 
 interface IUserInfoProps {
-  currentUser: DbUser;
+  user: DbUser;
 }
-const UserInfo = ({ currentUser }: IUserInfoProps) => {
+const UserInfo = ({ user }: IUserInfoProps) => {
   return (
     <div>
-      {currentUser && (
+      {user && (
         <div className={`user-info-container`}>
-          <p className={`user-name`}>{currentUser.fullName}</p>
+          <p className={`user-name`}>{user.fullName}</p>
         </div>
       )}
     </div>

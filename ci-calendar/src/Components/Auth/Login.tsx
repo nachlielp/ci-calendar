@@ -1,63 +1,49 @@
-import { useRef, useState } from "react";
-import { Alert, Button, Card, Form, Input, InputRef } from "antd";
-import { useNavigate } from "react-router-dom";
-import { FirebaseError } from "firebase/app";
+import { useState } from "react";
+// import { Alert, Button, Card, Form, Input, InputRef } from "antd";
+import { Button, Card } from "antd";
+// import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "./AuthContext";
-import { LinkButton } from "../UI/Other/LinkButton";
+// import { LinkButton } from "../UI/Other/LinkButton";
 import { supabase } from "../../supabase/client";
 
-enum LoginError {
-  none = "",
-  wrongPassword = "הסימה לא מתאימה לכתובת מייל",
-  default = "שגיאת התחברות",
-}
+// enum LoginError {
+//   none = "",
+//   wrongPassword = "הסימה לא מתאימה לכתובת מייל",
+//   default = "שגיאת התחברות",
+// }
 
 export default function Login() {
   const { googleLogin, emailLogin } = useAuthContext();
   if (!googleLogin || !emailLogin) {
     throw new Error("AuthContext is null, make sure you're within a Provider");
   }
-  const emailRef = useRef<InputRef>(null);
-  const passwordRef = useRef<InputRef>(null);
-  const [error, setError] = useState<LoginError>(LoginError.none);
+  // const emailRef = useRef<InputRef>(null);
+  // const passwordRef = useRef<InputRef>(null);
+  // const [error, setError] = useState<LoginError>(LoginError.none);
   const [loading, setLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const onFinish = async () => {
-    try {
-      setError(LoginError.none);
-      setLoading(true);
-      const email = emailRef.current?.input?.value;
-      const password = passwordRef.current?.input?.value;
-      if (!email || !password) {
-        throw new Error("Email and password are required");
-      }
-      await emailLogin(email, password);
-      navigate(`/`);
-    } catch (e) {
-      if (e instanceof FirebaseError) {
-        if (
-          e.code === "auth/wrong-password" ||
-          e.code === "auth/user-not-found"
-        ) {
-          setError(LoginError.wrongPassword);
-        }
-        console.error(`Firebase Error: ${e.code}`);
-      } else {
-        setError(LoginError.default);
-        console.error(`Other Error: ${e}`);
-      }
-    }
-    setLoading(false);
-  };
-
-  const googleSignIn = async () => {
-    try {
-      await googleLogin();
-    } catch (error) {
-      console.error(`Signup.googleSignIn.error: ${error}`);
-    }
-  };
+  // const onFinish = async () => {
+  //   try {
+  //     setError(LoginError.none);
+  //     setLoading(true);
+  //     const email = emailRef.current?.input?.value;
+  //     const password = passwordRef.current?.input?.value;
+  //     if (!email || !password) {
+  //       throw new Error("Email and password are required");
+  //     }
+  //     const { error } = await supabase.auth.signInWithPassword({
+  //       email,
+  //       password,
+  //     });
+  //     if (error) throw error;
+  //     navigate(`/`);
+  //   } catch (e) {
+  //     setError(LoginError.default);
+  //     console.error(`Login Error:`, e);
+  //   }
+  //   setLoading(false);
+  // };
 
   const onSupabaseGoogleSignIn = async () => {
     setLoading(true);
@@ -73,7 +59,7 @@ export default function Login() {
   return (
     <Card id="login-form" className="login-form">
       <h1 className="login-title">כניסה</h1>
-      <Form
+      {/* <Form
         name="basic"
         labelCol={{ span: 16 }}
         wrapperCol={{ span: 24 }}
@@ -115,18 +101,18 @@ export default function Login() {
             כניסה
           </Button>
         </Form.Item>
-      </Form>
+      </Form> */}
       <div>
         <Button
           type="default"
-          onClick={googleSignIn}
+          onClick={onSupabaseGoogleSignIn}
           disabled={loading}
           className="google-button default-font"
         >
           כניסה עם Google
         </Button>
       </div>
-
+      {/* 
       <div className="link-container">
         <LinkButton to="/reset-password" className="default-font">
           איפוס סיסמה
@@ -134,7 +120,7 @@ export default function Login() {
         <LinkButton to="/signup" className="default-font">
           הרשמה
         </LinkButton>
-      </div>
+      </div> */}
     </Card>
   );
 }

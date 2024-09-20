@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";
 import { useWindowSize } from "../../../hooks/useWindowSize";
 import { useGetTeacher } from "../../../hooks/useGetTeacher";
+import { useUser } from "../../../context/UserContext";
 
 type FieldType = {
   name?: string;
@@ -24,9 +25,10 @@ export default function TeacherForm({
   showBioInTeacherPage,
 }: ITeacherFormProps) {
   const { width } = useWindowSize();
-  const { currentUser, updateTeacher } = useAuthContext();
-  if (!currentUser) throw new Error("TeacherForm.currentUser");
-  const teacher = useGetTeacher(currentUser.id);
+  const { updateTeacher } = useAuthContext();
+  const { user } = useUser();
+  if (!user) throw new Error("TeacherForm.user");
+  const teacher = useGetTeacher(user.id);
 
   const [imageUrl, setImageUrl] = useState<string>(teacher?.img || "");
 
@@ -45,7 +47,7 @@ export default function TeacherForm({
     const newTeacher = {
       id: teacher.id,
       createdAt: teacher.createdAt,
-      fullName: name || currentUser.fullName,
+      fullName: name || user.fullName,
       bio: bio || "",
       img: imageUrl || "",
       pageUrl: pageUrl || "",

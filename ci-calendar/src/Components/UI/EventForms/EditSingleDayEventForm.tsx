@@ -18,6 +18,7 @@ import SubEventsForm from "./SubEventsForm";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
 import { EventAction } from "../../../App";
+import { useUser } from "../../../context/UserContext";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -35,10 +36,15 @@ const formItemLayout = {
   },
 };
 
-export default function EditSingleDayEventForm({ editType }: { editType: EventAction }) {
+export default function EditSingleDayEventForm({
+  editType,
+}: {
+  editType: EventAction;
+}) {
   const navigate = useNavigate();
   const { teachers } = useTeachersList();
-  const { getEvent, currentUser, updateEvent, createEvent } = useAuthContext();
+  const { getEvent, updateEvent, createEvent } = useAuthContext();
+  const { user } = useUser();
   const { eventId } = useParams<{ eventId: string }>();
   const [eventData, setEventData] = useState<IEvently | null>(null);
   const [newAddress, setNewAddress] = useState<IAddress | null>(null);
@@ -82,14 +88,11 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
   const handleEndDateChange = (date: dayjs.Dayjs) => {
     setEndDate(date);
   };
-  if (!currentUser) {
-    throw new Error("currentUser is null, make sure you're within a Provider");
+  if (!user) {
+    throw new Error("user is null, make sure you're within a Provider");
   }
 
-  if (
-    currentUser.userType !== UserType.admin &&
-    currentUser.userType !== UserType.teacher
-  ) {
+  if (user.userType !== UserType.admin && user.userType !== UserType.teacher) {
     navigate("/");
   }
 
@@ -100,8 +103,16 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
 
     const subEvents = [
       {
-        startTime: baseDate.clone().hour(values["event-time"][0].hour()).minute(values["event-time"][0].minute()).toISOString(),
-        endTime: baseDate.clone().hour(values["event-time"][1].hour()).minute(values["event-time"][1].minute()).toISOString(),
+        startTime: baseDate
+          .clone()
+          .hour(values["event-time"][0].hour())
+          .minute(values["event-time"][0].minute())
+          .toISOString(),
+        endTime: baseDate
+          .clone()
+          .hour(values["event-time"][1].hour())
+          .minute(values["event-time"][1].minute())
+          .toISOString(),
         type: values["event-types"] || "",
         tags: values["event-tags"] || [],
         teachers: formatTeachers(values["teachers"], teachers),
@@ -113,8 +124,16 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
           type: subEvent.type,
           tags: subEvent.tags || [],
           teachers: formatTeachers(subEvent.teachers, teachers),
-          startTime: baseDate.clone().hour(subEvent.time[0].hour()).minute(subEvent.time[0].minute()).toISOString(),
-          endTime: baseDate.clone().hour(subEvent.time[1].hour()).minute(subEvent.time[1].minute()).toISOString(),
+          startTime: baseDate
+            .clone()
+            .hour(subEvent.time[0].hour())
+            .minute(subEvent.time[0].minute())
+            .toISOString(),
+          endTime: baseDate
+            .clone()
+            .hour(subEvent.time[1].hour())
+            .minute(subEvent.time[1].minute())
+            .toISOString(),
         });
       });
     }
@@ -132,14 +151,14 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
       updatedAt: dayjs().toISOString(),
       title: values["event-title"],
       description: values["event-description"] || "",
-      owners: [{ value: currentUser.id, label: currentUser.fullName }],
+      owners: [{ value: user.id, label: user.fullName }],
       links: values["links"] || [],
       price: values["prices"] || [],
       hide: false,
       subEvents: subEvents,
       district: values["district"],
-      creatorId: currentUser.id,
-      creatorName: currentUser.fullName,
+      creatorId: user.id,
+      creatorName: user.fullName,
     };
     try {
       // console.log("EventForm.handleSubmit.event: ", event);
@@ -165,7 +184,8 @@ export default function EditSingleDayEventForm({ editType }: { editType: EventAc
     }
   };
 
-  const submitText = editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
+  const submitText =
+    editType === EventAction.recycle ? "שיכפול אירוע" : "עדכון אירוע";
 
   return (
     <>
@@ -217,7 +237,7 @@ function eventToFormValues(event: IEvently) {
     district: event.district,
     "event-types": event.subEvents[0]?.type,
     "event-tags": event.subEvents[0]?.tags,
-    "teachers": reverseFormatTeachers(event.subEvents[0]?.teachers),
+    teachers: reverseFormatTeachers(event.subEvents[0]?.teachers),
     "event-date": dayjs.tz(
       dayjs(event.subEvents[0]?.startTime),
       "Asia/Jerusalem"
@@ -248,6 +268,10 @@ function eventToFormValues(event: IEvently) {
   return { currentFormValues, address: event.address };
 }
 
-export function reverseFormatTeachers(teachers: { label: string, value: string }[]) {
-  return teachers.map(teacher => teacher.value !== "NON_EXISTENT" ? teacher.value : teacher.label);
+export function reverseFormatTeachers(
+  teachers: { label: string; value: string }[]
+) {
+  return teachers.map((teacher) =>
+    teacher.value !== "NON_EXISTENT" ? teacher.value : teacher.label
+  );
 }

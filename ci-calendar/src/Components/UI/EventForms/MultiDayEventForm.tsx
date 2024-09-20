@@ -22,6 +22,7 @@ import AddPricesForm from "./AddPricesForm";
 import MultiDayFormHead from "./MultiDayFormHead";
 import { useTeachersList } from "../../../hooks/useTeachersList";
 import { formatTeachers } from "./SingleDayEventForm";
+import { useUser } from "../../../context/UserContext";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -48,17 +49,14 @@ export default function MultiDayEventForm() {
   const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null);
   const navigate = useNavigate();
   const { teachers } = useTeachersList();
-
-  const { currentUser, createEvent } = useAuthContext();
+  const { user } = useUser();
+  const { createEvent } = useAuthContext();
   const [address, setAddress] = useState<IAddress>();
-  if (!currentUser) {
-    throw new Error("currentUser is null, make sure you're within a Provider");
+  if (!user) {
+    throw new Error("user is null, make sure you're within a Provider");
   }
 
-  if (
-    currentUser.userType !== UserType.admin &&
-    currentUser.userType !== UserType.teacher
-  ) {
+  if (user.userType !== UserType.admin && user.userType !== UserType.teacher) {
     navigate("/");
   }
   const [form] = Form.useForm();
@@ -134,14 +132,14 @@ export default function MultiDayEventForm() {
         updatedAt: dayjs().toISOString(),
         title: values["event-title"],
         description: values["event-description"] || "",
-        owners: [{ value: currentUser.id, label: currentUser.fullName }],
+        owners: [{ value: user.id, label: user.fullName }],
         links: values["links"] || [],
         price: values["prices"] || [],
         hide: false,
         subEvents: subEventsTemplate,
         district: values["district"],
-        creatorId: currentUser.id,
-        creatorName: currentUser.fullName,
+        creatorId: user.id,
+        creatorName: user.fullName,
       };
       console.log("MultiDayEventForm.handleSubmit.event: ", event);
       await createEvent(event);

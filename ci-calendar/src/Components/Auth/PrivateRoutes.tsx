@@ -1,8 +1,8 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthContext } from "./AuthContext";
 import { UserType } from "../../util/interfaces";
 import Loading from "../UI/Other/Loading";
+import { useUser } from "../../context/UserContext";
 
 interface PrivateRoutesProps {
   requiredRoles?: UserType[];
@@ -11,16 +11,16 @@ interface PrivateRoutesProps {
 export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
   requiredRoles: requiredRoles,
 }) => {
-  const { currentUser, loading } = useAuthContext();
+  const { user, loading } = useUser();
 
   if (loading) {
     return <Loading />;
   }
 
-  if (!currentUser) {
+  if (!user) {
     return <Navigate to="/login" />;
   }
-  if (requiredRoles && !requiredRoles.includes(currentUser.userType)) {
+  if (requiredRoles && !requiredRoles.includes(user.userType)) {
     return <Navigate to="/" />;
   }
 

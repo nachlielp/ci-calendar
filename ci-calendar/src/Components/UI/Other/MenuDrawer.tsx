@@ -1,20 +1,19 @@
 import React from "react";
 import { Drawer } from "antd";
 import { Icon } from "../Other/Icon";
-import { useAuthContext } from "../../Auth/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useWindowSize } from "../../../hooks/useWindowSize";
-
-export function MenuDrawer({ logout }: { logout: () => void }) {
+import { supabase } from "../../../supabase/client";
+import { useUser } from "../../../context/UserContext";
+export function MenuDrawer() {
   const [open, setOpen] = React.useState<boolean>(false);
-  const { currentUser } = useAuthContext();
+  const { user } = useUser();
   const { width } = useWindowSize();
 
   const isMobile = width < 768;
-  const isAdmin = currentUser?.userType === "admin";
-  const isCreator =
-    currentUser?.userType === "admin" || currentUser?.userType === "teacher";
-  const isUser = currentUser?.userType === "user";
+  const isAdmin = user?.userType === "admin";
+  const isCreator = user?.userType === "admin" || user?.userType === "teacher";
+  const isUser = user?.userType === "user";
 
   const navigate = useNavigate();
 
@@ -82,7 +81,11 @@ export function MenuDrawer({ logout }: { logout: () => void }) {
       key: "logout",
       icon: "logout",
       label: "התנתקות",
-      onClick: logout,
+      onClick: () => {
+        supabase.auth.signOut();
+        setOpen(false);
+        navigate("/");
+      },
     },
   ];
 
