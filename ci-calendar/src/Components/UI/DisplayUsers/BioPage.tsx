@@ -5,6 +5,7 @@ import BioCard from "./BioCard";
 export default function BioPage() {
   const [editProfile, setEditProfile] = useState(false);
   const handleSubmitEdit = () => {
+    console.log("handleSubmitEdit");
     setEditProfile(false);
   };
   return (
@@ -21,7 +22,7 @@ export default function BioPage() {
         )}
       </div>
       {editProfile ? (
-        <TeacherForm showBioInTeacherPage={handleSubmitEdit} />
+        <TeacherForm closeEditProfile={handleSubmitEdit} />
       ) : (
         <BioCard />
       )}

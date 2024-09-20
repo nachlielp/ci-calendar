@@ -74,6 +74,12 @@ export interface DbUser {
   email: string;
   subscribedForUpdatesAt: string;
   newsletter: boolean;
+  pageUrl: string;
+  pageTitle: string;
+  showProfile: boolean;
+  allowTagging: boolean;
+  img: string;
+  bio: string;
 }
 
 export interface DbTeacher {

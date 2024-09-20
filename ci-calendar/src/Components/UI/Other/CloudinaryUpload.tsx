@@ -27,6 +27,7 @@ interface ICloudinaryUploadProps {
   uploadNewImage: (url: string) => void;
   clearImage: () => void;
 }
+
 export default function CloudinaryUpload({
   uploadNewImage,
   clearImage,

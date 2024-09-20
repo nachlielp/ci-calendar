@@ -1,10 +1,10 @@
 import { Button, Form, type FormProps, Input, Card, Image, Switch } from "antd";
-import { useAuthContext } from "../../Auth/AuthContext";
 import { useEffect, useState } from "react";
 import CloudinaryUpload from "../Other/CloudinaryUpload";
 import { useWindowSize } from "../../../hooks/useWindowSize";
-import { useGetTeacher } from "../../../hooks/useGetTeacher";
 import { useUser } from "../../../context/UserContext";
+import { userService } from "../../../supabase/userService";
+import { DbUser } from "../../../util/interfaces";
 
 type FieldType = {
   name?: string;
@@ -18,35 +18,30 @@ type FieldType = {
 };
 
 interface ITeacherFormProps {
-  showBioInTeacherPage: () => void;
+  closeEditProfile: () => void;
 }
+
 //TODO add cropper (react-easy-crop)
-export default function TeacherForm({
-  showBioInTeacherPage,
-}: ITeacherFormProps) {
+export default function TeacherForm({ closeEditProfile }: ITeacherFormProps) {
   const { width } = useWindowSize();
-  const { updateTeacher } = useAuthContext();
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   if (!user) throw new Error("TeacherForm.user");
-  const teacher = useGetTeacher(user.id);
 
-  const [imageUrl, setImageUrl] = useState<string>(teacher?.img || "");
-
+  const [imageUrl, setImageUrl] = useState<string>(user?.img || "");
+  const [form] = Form.useForm();
   useEffect(() => {
-    setImageUrl(teacher?.img || "");
-  }, [teacher]);
+    setImageUrl(user?.img || "");
+  }, [user]);
 
   const uploadNewImage = (url: string) => {
     setImageUrl(url);
   };
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    if (!teacher) return;
+    if (!user) return;
     const { name, bio, pageUrl, pageUrlTitle, showProfile, allowTagging } =
       values;
-    const newTeacher = {
-      id: teacher.id,
-      createdAt: teacher.createdAt,
+    const newTeacher: Partial<DbUser> = {
       fullName: name || user.fullName,
       bio: bio || "",
       img: imageUrl || "",
@@ -57,8 +52,11 @@ export default function TeacherForm({
       updatedAt: new Date().toISOString(),
     };
     try {
-      await updateTeacher(newTeacher);
-      showBioInTeacherPage();
+      // await updateTeacher(newTeacher);
+      const updatedUser = await userService.updateUser(user.id, newTeacher);
+      console.log("updatedUser: ", updatedUser);
+      setUser(updatedUser);
+      closeEditProfile();
     } catch (error) {
       console.error("UserForm.onFinish.error: ", error);
     }
@@ -80,20 +78,21 @@ export default function TeacherForm({
 
   return (
     <>
-      {teacher && (
+      {user && (
         <Card className={`teacher-form ${width > 600 ? "desktop" : "mobile"}`}>
           <Form
-            onFinish={onFinish}
+            // onFinish={onFinish}
             onFinishFailed={onFinishFailed}
+            form={form}
             autoComplete="off"
             initialValues={{
-              name: teacher.fullName,
-              bio: teacher.bio,
-              img: teacher.img,
-              pageUrl: teacher.pageUrl,
-              pageUrlTitle: teacher.pageTitle,
-              showProfile: teacher.showProfile,
-              allowTagging: teacher.allowTagging,
+              name: user.fullName,
+              bio: user.bio,
+              img: user.img,
+              pageUrl: user.pageUrl,
+              pageUrlTitle: user.pageTitle,
+              showProfile: user.showProfile,
+              allowTagging: user.allowTagging,
             }}
           >
             <Form.Item<FieldType>
@@ -184,11 +183,15 @@ export default function TeacherForm({
               <Switch
                 checkedChildren="גלוי"
                 unCheckedChildren="מוסתר"
-                defaultChecked={teacher?.showProfile}
+                defaultChecked={user?.showProfile}
               />
             </Form.Item>
 
-            <Button htmlType="submit" className="teacher-form-submit">
+            <Button
+              htmlType="submit"
+              className="teacher-form-submit"
+              onClick={() => form.validateFields().then(onFinish)}
+            >
               שמירת שינויים
             </Button>
           </Form>

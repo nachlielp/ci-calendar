@@ -1,5 +1,4 @@
 import { Card, Image } from "antd";
-import { useGetTeacher } from "../../../hooks/useGetTeacher";
 import { Typography } from "antd";
 import { Icon } from "../Other/Icon";
 import { useUser } from "../../../context/UserContext";
@@ -8,43 +7,40 @@ const { Text } = Typography;
 function BioCard() {
   const { user } = useUser();
   if (!user) throw new Error("BioCard: No user found");
-  const teacher = useGetTeacher(user.id);
 
   return (
     <>
-      {teacher && (
+      {user && (
         <Card hoverable className="bio-card">
           <div className="bio-card-content">
-            <label className="bio-card-title">{teacher.fullName}</label>
+            <label className="bio-card-title">{user.fullName}</label>
 
-            {teacher?.img && (
+            {user?.img && (
               <Image
                 alt="example"
-                src={teacher.img}
-                key={teacher.img}
+                src={user.img}
+                key={user.img}
                 preview={false}
                 width={250}
                 height={250}
                 className="bio-card-img"
               />
             )}
-            {teacher.pageUrl && (
+            {user.pageUrl && (
               <a
                 className="teacher-page-link"
-                key={teacher.pageUrl}
-                href={teacher.pageUrl}
+                key={user.pageUrl}
+                href={user.pageUrl}
                 target="_blank"
               >
-                {teacher.pageTitle || "דף פרופיל"}
+                {user.pageTitle || "דף פרופיל"}
                 <Icon icon="openInNew" className="event-link-icon" />
               </a>
             )}
 
             <hr className="bio-card-hr" />
-            <label className="bio-card-subtitle">
-              אודות {teacher.fullName}
-            </label>
-            <Text>{teacher.bio}</Text>
+            <label className="bio-card-subtitle">אודות {user.fullName}</label>
+            <Text>{user.bio}</Text>
           </div>
         </Card>
       )}
