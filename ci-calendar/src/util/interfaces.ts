@@ -64,6 +64,15 @@ export enum UserType {
   teacher = "teacher",
   user = "user",
 }
+
+export interface IMailingList {
+  createdAt: string;
+  updatedAt: string;
+  subscribedForUpdatesAt: string;
+  active: boolean;
+  districts: District[];
+  eventTypes: EventlyType[];
+}
 export interface DbUser {
   id: string;
   createdAt: string;
@@ -73,7 +82,7 @@ export interface DbUser {
   phoneNumber: string;
   email: string;
   subscribedForUpdatesAt: string;
-  newsletter: boolean;
+  newsletter: IMailingList;
   pageUrl: string;
   pageTitle: string;
   showProfile: boolean;

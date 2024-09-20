@@ -6,42 +6,47 @@ import {
   Input,
   Card,
   Select,
-  Switch,
 } from "antd";
-import { DbUser } from "../../../util/interfaces";
-import { useAuthContext } from "../../Auth/AuthContext";
-import { districtOptions } from "../../../util/options";
+
+import { districtOptions, eventTypes } from "../../../util/options";
 import { useState } from "react";
+import { useUser } from "../../../context/UserContext";
+import { userService } from "../../../supabase/userService";
+import { District, EventlyType, IMailingList } from "../../../util/interfaces";
 
 type FieldType = {
   name: string;
-  mailingList: string;
+  active: boolean;
   phoneNumber?: string;
   districts?: string[];
-  retreat: boolean;
-  workshop: boolean;
-  conference: boolean;
+  ciEvents?: string[];
 };
 
-interface IUserFormProps {
-  user: DbUser;
-}
-
-export default function UserForm({ user }: IUserFormProps) {
-  const [mailingList, setMailingList] = useState(user.newsletter);
-  const { updateUser } = useAuthContext();
+export default function UserForm() {
+  const { user } = useUser();
+  if (!user) {
+    throw new Error("user is null, make sure you're within a Provider");
+  }
+  const [mailingList, setMailingList] = useState<IMailingList>(user.newsletter);
   const [form] = Form.useForm();
 
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
-    user.fullName = values.name || user.fullName;
-    user.newsletter = values.mailingList?.toString() === "true";
-    user.subscribedForUpdatesAt = user.newsletter
-      ? new Date().toISOString()
-      : "";
-    user.phoneNumber = values.phoneNumber || "";
-    // user.districts = values.districts || [];
+    const updatedUser = { ...user };
+    updatedUser.fullName = values.name || user.fullName;
+
+    const newNewsletter: IMailingList = {
+      ...mailingList,
+      active: values.active,
+      districts: (values.districts as District[]) || [],
+      eventTypes: (values.ciEvents as EventlyType[]) || [],
+    };
+
+    updatedUser.newsletter = newNewsletter;
+
+    updatedUser.phoneNumber = values.phoneNumber || "";
+
     try {
-      await updateUser(user);
+      await userService.updateUser(user.id, updatedUser);
     } catch (error) {
       console.error("UserForm.onFinish.error: ", error);
     }
@@ -56,31 +61,38 @@ export default function UserForm({ user }: IUserFormProps) {
           autoComplete="off"
           initialValues={{
             name: user.fullName,
-            mailingList: user.newsletter,
+            active: user.newsletter.active,
             phoneNumber: user.phoneNumber,
+            ciEvents: user.newsletter.eventTypes,
+            districts: user.newsletter.districts,
           }}
         >
           <Form.Item<FieldType>
             label="קבלת הודעות וואצאפ שבועיות"
-            name="mailingList"
+            name="active"
             valuePropName="checked"
           >
             <Checkbox
-              checked={mailingList}
-              onChange={(e) => setMailingList(e.target.checked)}
+              checked={user.newsletter.active}
+              onChange={(e) =>
+                setMailingList({
+                  ...mailingList,
+                  active: e.target.checked,
+                })
+              }
             />
           </Form.Item>
 
           <Form.Item
             shouldUpdate={(prevValues, currentValues) =>
-              prevValues.mailingList !== currentValues.mailingList
+              prevValues.active !== currentValues.active
             }
           >
             <Form.Item<FieldType>
               name="phoneNumber"
               rules={[
                 () => ({
-                  required: mailingList,
+                  required: mailingList.active,
                   message: "נא להזין מספר טלפון",
                 }),
                 {
@@ -101,31 +113,19 @@ export default function UserForm({ user }: IUserFormProps) {
               options={districtOptions}
               showSearch={false}
               allowClear
-              disabled={!mailingList}
+              disabled={!mailingList.active}
             />
           </Form.Item>
 
-          <Form.Item<FieldType> name="retreat">
-            <Switch
-              checkedChildren="ריטריטים"
-              unCheckedChildren="ריטריטים"
-              disabled={!mailingList}
-            />
-          </Form.Item>
-
-          <Form.Item<FieldType> name="workshop">
-            <Switch
-              checkedChildren="סדנאות"
-              unCheckedChildren="סדנאות"
-              disabled={!mailingList}
-            />
-          </Form.Item>
-
-          <Form.Item<FieldType> name="conference">
-            <Switch
-              checkedChildren="כנסים"
-              unCheckedChildren="כנסים"
-              disabled={!mailingList}
+          <Form.Item<FieldType> name="ciEvents">
+            <Select
+              mode="multiple"
+              placeholder="ארועים"
+              style={{ width: "100%" }}
+              options={eventTypes.filter((event) => event.value !== "warmup")}
+              showSearch={false}
+              allowClear
+              disabled={!mailingList.active}
             />
           </Form.Item>
 

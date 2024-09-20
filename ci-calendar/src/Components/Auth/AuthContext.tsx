@@ -146,20 +146,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userRes = await getDocument("users", user.uid);
       if (userRes === null) {
-        const newUser: DbUser = {
-          id: user.uid,
-          fullName: user.displayName || "",
-          userType: UserType.user,
-          email: user.email || "",
-          newsletter: false,
-          subscribedForUpdatesAt: "",
-          phoneNumber: "",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        await addDocument("users", newUser);
-        setCurrentUser(newUser);
-        subscribeToUserChanges(newUser.id);
+        // const newUser: DbUser = {
+        //   id: user.uid,
+        //   fullName: user.displayName || "",
+        //   userType: UserType.user,
+        //   email: user.email || "",
+        //   newsletter: false,
+        //   subscribedForUpdatesAt: "",
+        //   phoneNumber: "",
+        //   createdAt: new Date().toISOString(),
+        //   updatedAt: new Date().toISOString(),
+        // };
+        // await addDocument("users", newUser);
+        // setCurrentUser(newUser);
+        // subscribeToUserChanges(newUser.id);
         navigate(`/`);
       } else {
         userRes.userType = userRes.userType as UserType;

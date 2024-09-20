@@ -12,7 +12,7 @@ import BackgroundTiles from "./Components/UI/Other/BackgroundTiles";
 const Signup = lazy(() => import("./Components/Auth/Signup"));
 const Login = lazy(() => import("./Components/Auth/Login"));
 const ResetPassword = lazy(() => import("./Components/Auth/ResetPassword"));
-const UserPage = lazy(() => import("./Components/Pages/UserPage"));
+const UserForm = lazy(() => import("./Components/UI/UserForms/UserForm"));
 const TeacherPage = lazy(() => import("./Components/Pages/TeacherPage"));
 const EventForm = lazy(
   () => import("./Components/UI/EventForms/SingleDayEventForm")
@@ -78,7 +78,7 @@ export default function App() {
                   />
                 }
               >
-                <Route path="/user" element={<UserPage />} />
+                <Route path="/user" element={<UserForm />} />
               </Route>
 
               {/* Teacher privet routes */}
