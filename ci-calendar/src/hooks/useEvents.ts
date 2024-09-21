@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 import { cieventsService, FilterOptions } from "../supabase/cieventsService"
 import { supabase } from "../supabase/client"
 
-export const useEvents = (filterBy: FilterOptions) => {
+export const useEvents = (filterBy: FilterOptions = {}) => {
     const [events, setEvents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
 
