@@ -1,7 +1,7 @@
 // import VirtualList from "rc-virtual-list";
 import { SingleDayEventCard } from "./SingleDayEventCard";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
-import { IEvently } from "../../../util/interfaces";
+import { CIEvent } from "../../../util/interfaces";
 import Loading from "../Other/Loading";
 import EmptyList from "../Other/Empty";
 import { Empty } from "antd";
@@ -9,8 +9,8 @@ import SingleDayModalCard from "./SingleDayModalCard";
 import { useUser } from "../../../context/UserContext";
 
 interface IEventsListProps {
-  onSelectEvent: (event: IEvently) => void;
-  events: IEvently[];
+  onSelectEvent: (event: CIEvent) => void;
+  events: CIEvent[];
   isEdit: boolean;
   isEvents: boolean;
 }

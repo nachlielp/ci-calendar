@@ -17,7 +17,7 @@ import {
   getTeachersAndAdminsList,
   addOrActivateTeacher,
 } from "../../firebase.service";
-import { DbTeacher, DbUser, IEvently, UserType } from "../../util/interfaces";
+import { DbTeacher, DbUser, CIEvent, UserType } from "../../util/interfaces";
 
 export interface IUserSignup {
   email: string;
@@ -32,11 +32,11 @@ interface IAuthContextType {
   logoutContext: () => Promise<void>;
   googleLogin: () => Promise<UserCredential | void>;
   resetPassword: (email: string) => Promise<void>;
-  createEvent: (event: IEvently) => Promise<void>;
+  createEvent: (event: CIEvent) => Promise<void>;
   deleteEvently: (eventId: string) => Promise<void>;
   updateUser: (user: DbUser) => Promise<void>;
-  getEvent: (eventId: string) => Promise<IEvently | null>;
-  updateEvent: (eventId: string, event: IEvently) => Promise<void>;
+  getEvent: (eventId: string) => Promise<CIEvent | null>;
+  updateEvent: (eventId: string, event: CIEvent) => Promise<void>;
   hideEvent: (eventId: string, hide: boolean) => Promise<void>;
   deleteMultipleEventlys: (eventIds: string[]) => Promise<void>;
   hideOrShowMultipleEventlys: (
@@ -181,7 +181,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
   //TODO Update type
-  async function createEvent(event: IEvently): Promise<void> {
+  async function createEvent(event: CIEvent): Promise<void> {
     try {
       await addDocument("events", event);
     } catch (error) {
@@ -212,7 +212,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const eventDoc = await getDocument("events", eventId);
       if (eventDoc) {
-        return eventDoc as IEvently;
+        return eventDoc as CIEvent;
       }
       return null;
     } catch (error) {
@@ -221,7 +221,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  async function updateEvent(eventId: string, event: IEvently) {
+  async function updateEvent(eventId: string, event: CIEvent) {
     try {
       await updateDocument("events", eventId, event);
     } catch (error) {

@@ -34,6 +34,7 @@ const EditMultiDayEventForm = lazy(
 const ManageEventsTable = lazy(
   () => import("./Components/UI/DisplayEvents/ManageEventsTable")
 );
+import dayjs from "dayjs";
 
 export enum EventAction {
   edit,
@@ -42,7 +43,10 @@ export enum EventAction {
 }
 
 export default function App() {
-  const { events, loading } = useEvents();
+  const { events, loading } = useEvents({
+    startDate: dayjs().format("YYYY-MM-DD"),
+    hideClosed: true,
+  });
 
   if (loading) {
     return <Loading />;

@@ -1,10 +1,10 @@
 import { useSearchParams } from "react-router-dom";
-import { IEvently } from "../util/interfaces";
+import { CIEvent } from "../util/interfaces";
 import dayjs from "dayjs";
 import { useMemo } from "react";
 
 interface IUseEventsFilterProps {
-  events: IEvently[];
+  events: CIEvent[];
   showFuture?: boolean;
   uids?: string[];
 }

@@ -3,7 +3,7 @@ import { useAuthContext } from "../../Auth/AuthContext";
 import { Button, Card, Form } from "antd";
 import { useEffect, useState } from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { IEvently, IAddress, IEventiPart } from "../../../util/interfaces";
+import { CIEvent, IAddress, IEventiPart } from "../../../util/interfaces";
 import Loading from "../Other/Loading";
 import AddLinksForm from "./AddLinksForm";
 import AddPricesForm from "./AddPricesForm";
@@ -32,7 +32,7 @@ export default function EditMultiDayEventForm({
   }
 
   const { eventId } = useParams<{ eventId: string }>();
-  const [eventData, setEventData] = useState<IEvently | null>(null);
+  const [eventData, setEventData] = useState<CIEvent | null>(null);
   const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null);
   const [schedule, setSchedule] = useState(false);
   const [currentFormValues, setCurrentFormValues] = useState<any>();
@@ -135,7 +135,7 @@ export default function EditMultiDayEventForm({
       return;
     }
 
-    const event: IEvently = {
+    const event: CIEvent = {
       dates: {
         startDate: dates[0].toISOString(),
         endDate: dates[1].toISOString(),
@@ -240,7 +240,7 @@ export default function EditMultiDayEventForm({
   );
 }
 
-const eventToFormValues = (event: IEvently) => {
+const eventToFormValues = (event: CIEvent) => {
   const daysMap = new Map<string, any[]>();
   event.subEvents.forEach((subEvent) => {
     const startDay = dayjs(subEvent.startTime).format("YYYY-MM-DD");

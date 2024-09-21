@@ -4,7 +4,7 @@ import DeleteMultipleEvents from "../Other/DeleteMultipleEvents";
 import HideMultipleEvents from "../Other/HideMultipleEvents";
 import ShowMultipleEvents from "../Other/ShowMultipleEvents";
 import { useWindowSize } from "../../../hooks/useWindowSize";
-import { IEvently, UserType } from "../../../util/interfaces";
+import { CIEvent, UserType } from "../../../util/interfaces";
 import { useEventsFilter } from "../../../hooks/useEventsFilter";
 import dayjs from "dayjs";
 import { Icon } from "../Other/Icon";
@@ -13,7 +13,7 @@ import FullEventCard from "./FullEventCard";
 import { useUser } from "../../../context/UserContext";
 const { Option } = Select;
 
-export default function ManageEventsTable({ events }: { events: IEvently[] }) {
+export default function ManageEventsTable({ events }: { events: CIEvent[] }) {
   const { width } = useWindowSize();
   const { user } = useUser();
   const uid = useMemo(
@@ -22,7 +22,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
   );
   const [showFuture, setShowFuture] = useState(true);
   const filteredEvents = useEventsFilter({ events, showFuture, uids: uid });
-  const [teachersEvents, setTeachersEvents] = useState<IEvently[]>([]);
+  const [teachersEvents, setTeachersEvents] = useState<CIEvent[]>([]);
   const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<
     React.Key[]
   >([]);
@@ -132,7 +132,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
     ? filteredEvents.filter((event) => selectedRowKeysFuture.includes(event.id))
     : filteredEvents.filter((event) => selectedRowKeysPast.includes(event.id));
 
-  function onExpand(expanded: boolean, record: IEvently) {
+  function onExpand(expanded: boolean, record: CIEvent) {
     setExpandedRowKeys(expanded ? [record.id] : []);
   }
 
@@ -173,7 +173,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
       title: "פרטי אירוע",
       dataIndex: "title",
       key: "eventDetails",
-      render: (title: string, record: IEvently) => {
+      render: (title: string, record: CIEvent) => {
         const startDate = new Date(record.dates.startDate).toLocaleDateString();
         const endDate = new Date(record.dates.endDate).toLocaleDateString();
         const dateString =
@@ -197,7 +197,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
           </div>
         );
       },
-      sorter: (a: IEvently, b: IEvently) =>
+      sorter: (a: CIEvent, b: CIEvent) =>
         dayjs(a.dates["startDate"]).diff(dayjs(b.dates["startDate"]), "day"),
       responsive: ["xl", "lg", "md", "sm", "xs"] as Breakpoint[],
     },
@@ -208,7 +208,7 @@ export default function ManageEventsTable({ events }: { events: IEvently[] }) {
       ? columns.filter((column) => column.key !== "creatorName")
       : columns;
 
-  function getUniqueTeachers(events: IEvently[]): SelectOption[] {
+  function getUniqueTeachers(events: CIEvent[]): SelectOption[] {
     const teacherMap = new Map<string, SelectOption>();
 
     events.forEach((event) => {

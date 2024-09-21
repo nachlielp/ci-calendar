@@ -12,7 +12,7 @@ import { tagOptions } from "../../../util/options";
 import {
   IAddress,
   IEventiPart,
-  IEvently,
+  CIEvent,
   UserType,
 } from "../../../util/interfaces";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
@@ -120,7 +120,7 @@ export default function MultiDayEventForm() {
     }
 
     try {
-      const event: IEvently = {
+      const event: CIEvent = {
         dates: {
           startDate: dates[0].toISOString(),
           endDate: dates[1].toISOString(),

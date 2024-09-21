@@ -1,11 +1,11 @@
 import { Drawer } from "antd";
 import FullEventCard from "./FullEventCard";
 
-import { IEvently } from "../../../util/interfaces";
+import { CIEvent } from "../../../util/interfaces";
 import { Icon } from "../Other/Icon";
 
 interface EventDrawerProps {
-  event: IEvently | null;
+  event: CIEvent | null;
   onClose: () => void;
 }
 

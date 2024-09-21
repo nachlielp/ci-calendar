@@ -1,131 +1,164 @@
-import dayjs, { Dayjs } from "dayjs";
-import isBetween from 'dayjs/plugin/isBetween';
+import dayjs, { Dayjs } from "dayjs"
+import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
-import { getLabelByValue } from "../../../util/helpers";
-import { IEvently } from "../../../util/interfaces";
-import CalendarView from "./CalendarView";
-import EventsList from "../DisplayEvents/EventsList";
-import { useEffect, useState } from "react";
-import { useEventsFilter } from "../../../hooks/useEventsFilter";
-import FilterModel from "./FilterModel";
-import { Button, Tag } from "antd";
-import { useParamsHandler } from "../../../hooks/useParamsHandler";
+import { getLabelByValue } from "../../../util/helpers"
+import { CIEvent } from "../../../util/interfaces"
+import CalendarView from "./CalendarView"
+import EventsList from "../DisplayEvents/EventsList"
+import { useEffect, useState } from "react"
+import { useEventsFilter } from "../../../hooks/useEventsFilter"
+import FilterModel from "./FilterModel"
+import { Button, Tag } from "antd"
+import { useParamsHandler } from "../../../hooks/useParamsHandler"
 
-import { Icon } from "./Icon";
-import { districtOptions, eventTypes } from "../../../util/options";
-import FilterDrawer from "./FilterDrawer";
-import { useWindowSize } from "../../../hooks/useWindowSize";
-import EventDrawer from "../DisplayEvents/EventDrawer";
+import { Icon } from "./Icon"
+import { districtOptions, eventTypes } from "../../../util/options"
+import FilterDrawer from "./FilterDrawer"
+import { useWindowSize } from "../../../hooks/useWindowSize"
+import EventDrawer from "../DisplayEvents/EventDrawer"
 
 interface IEventsDisplayProps {
-  events: IEvently[];
-  isEdit: boolean;
+    events: CIEvent[]
+    isEdit: boolean
 }
 
 export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
-  const [futureEvents, setFutureEvents] = useState<IEvently[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<IEvently | null>(null);
-  const [isListView, setIsListView] = useState<boolean>(true);
+    const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
+    const [isListView, setIsListView] = useState<boolean>(true)
 
-  const { width } = useWindowSize();
-  const {
-    currentValues: currentEventFilters,
-    removeOption: onRemoveEventFilter,
-  } = useParamsHandler({ title: "eventType", options: eventTypes });
+    const { width } = useWindowSize()
+    const {
+        currentValues: currentEventFilters,
+        removeOption: onRemoveEventFilter,
+    } = useParamsHandler({ title: "eventType", options: eventTypes })
 
-  const {
-    currentValues: currentDistrictValues,
-    removeOption: onRemoveDistrictFilter,
-  } = useParamsHandler({ title: "district", options: districtOptions });
+    const {
+        currentValues: currentDistrictValues,
+        removeOption: onRemoveDistrictFilter,
+    } = useParamsHandler({ title: "district", options: districtOptions })
 
+    const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs())
+    const [todaysEvents, setTodaysEvents] = useState<CIEvent[]>([])
 
-  useEffect(() => {
-    const futureEvents = events.filter((event) => dayjs(event.dates["endDate"]).isAfter(dayjs().startOf('day')));
-    setFutureEvents(futureEvents);
-  }, [events]);
+    const onSelectDate = (value: Dayjs) => {
+        setSelectedDay(value)
+    }
 
-  const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs());
-  const [todaysEvents, setTodaysEvents] = useState<IEvently[]>([]);
+    const onSelectEvent = (event: CIEvent) => {
+        setSelectedEvent(event)
+    }
 
-  const onSelectDate = (value: Dayjs) => {
-    setSelectedDay(value);
-  };
+    const onCloseEvent = () => {
+        setSelectedEvent(null)
+    }
 
-  const onSelectEvent = (event: IEvently) => {
-    setSelectedEvent(event);
-  };
+    const visibleEvents = events.filter((event) => !event.hide)
+    const filteredEvents = useEventsFilter({ events: visibleEvents })
 
-  const onCloseEvent = () => {
-    setSelectedEvent(null);
-  };
+    useEffect(() => {
+        const todaysEvents = filteredEvents.filter((event) =>
+            dayjs(selectedDay).isBetween(
+                dayjs(event.startDate),
+                dayjs(event.endDate),
+                "day",
+                "[]"
+            )
+        )
+        setTodaysEvents(todaysEvents)
+    }, [selectedDay])
 
-  const visibleEvents = futureEvents.filter((event) => !event.hide);
-  const filteredEvents = useEventsFilter({ events: visibleEvents });
+    function onViewList() {
+        setIsListView(true)
+    }
 
-  useEffect(() => {
-    const todaysEvents = filteredEvents.filter((event) =>
-      dayjs(selectedDay).isBetween(dayjs(event.dates["startDate"]), dayjs(event.dates["endDate"]), "day", "[]"));
-    setTodaysEvents(todaysEvents);
-  }, [selectedDay]);
+    function onViewCalendar() {
+        setIsListView(false)
+        setSelectedDay(dayjs())
+    }
 
-  function onViewList() {
-    setIsListView(true);
-  }
-
-  function onViewCalendar() {
-    setIsListView(false);
-    setSelectedDay(dayjs())
-  }
-
-
-  return (
-    <div className="events-display">
-      <header className="header">
-        <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
-        <p className="subtitle">כל האירועים במקום אחד</p>
-        <main className="menu-container">
-          <div className="menu-btns">
-            <Button
-              onClick={onViewList}
-              className={`btn left ${isListView ? 'active' : ''}`}
-            >
-              <Icon icon="viewDay" className="events-display-icon" />
-            </Button>
-            <Button
-              onClick={onViewCalendar}
-              className={`btn right ${!isListView ? 'active' : ''}`}
-            >
-              <Icon icon="calendar" className="events-display-icon" />
-            </Button>
-          </div>
-          {width > 768 ? <FilterModel /> : <FilterDrawer />}
-        </main>
-        <article className="selected-filters">
-          {currentEventFilters?.map((eventType: any) => (
-            <Tag className="filter-tag" color="#913e2f" key={eventType} closable onClose={() => onRemoveEventFilter("eventType", eventType)}>{getLabelByValue(eventType, eventTypes)}</Tag>
-          ))}
-          {
-            currentDistrictValues?.map((district: any) => (
-              <Tag className="filter-tag" color="#913e2f" key={district} closable onClose={() => onRemoveDistrictFilter("district", district)}>{getLabelByValue(district, districtOptions)}</Tag>
-            ))
-          }
-        </article>
-      </header>
-      <section className="events-display-list">
-        {!isListView ? (
-          <>
-            <CalendarView
-              events={filteredEvents}
-              onSelect={onSelectDate}
-            />
-            <EventsList events={todaysEvents} isEdit={isEdit} isEvents={!!events.length} onSelectEvent={onSelectEvent} />
-          </>
-        ) : (
-          <EventsList events={futureEvents} isEdit={isEdit} isEvents={!!events.length} onSelectEvent={onSelectEvent} />
-        )}
-      </section>
-      <EventDrawer event={selectedEvent} onClose={onCloseEvent} />
-
-    </div>
-  );
+    return (
+        <div className="events-display">
+            <header className="header">
+                <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
+                <p className="subtitle">כל האירועים במקום אחד</p>
+                <main className="menu-container">
+                    <div className="menu-btns">
+                        <Button
+                            onClick={onViewList}
+                            className={`btn left ${isListView ? "active" : ""}`}
+                        >
+                            <Icon
+                                icon="viewDay"
+                                className="events-display-icon"
+                            />
+                        </Button>
+                        <Button
+                            onClick={onViewCalendar}
+                            className={`btn right ${
+                                !isListView ? "active" : ""
+                            }`}
+                        >
+                            <Icon
+                                icon="calendar"
+                                className="events-display-icon"
+                            />
+                        </Button>
+                    </div>
+                    {width > 768 ? <FilterModel /> : <FilterDrawer />}
+                </main>
+                <article className="selected-filters">
+                    {currentEventFilters?.map((eventType: any) => (
+                        <Tag
+                            className="filter-tag"
+                            color="#913e2f"
+                            key={eventType}
+                            closable
+                            onClose={() =>
+                                onRemoveEventFilter("eventType", eventType)
+                            }
+                        >
+                            {getLabelByValue(eventType, eventTypes)}
+                        </Tag>
+                    ))}
+                    {currentDistrictValues?.map((district: any) => (
+                        <Tag
+                            className="filter-tag"
+                            color="#913e2f"
+                            key={district}
+                            closable
+                            onClose={() =>
+                                onRemoveDistrictFilter("district", district)
+                            }
+                        >
+                            {getLabelByValue(district, districtOptions)}
+                        </Tag>
+                    ))}
+                </article>
+            </header>
+            <section className="events-display-list">
+                {!isListView ? (
+                    <>
+                        <CalendarView
+                            events={filteredEvents}
+                            onSelect={onSelectDate}
+                        />
+                        <EventsList
+                            events={todaysEvents}
+                            isEdit={isEdit}
+                            isEvents={!!events.length}
+                            onSelectEvent={onSelectEvent}
+                        />
+                    </>
+                ) : (
+                    <EventsList
+                        events={events}
+                        isEdit={isEdit}
+                        isEvents={!!events.length}
+                        onSelectEvent={onSelectEvent}
+                    />
+                )}
+            </section>
+            <EventDrawer event={selectedEvent} onClose={onCloseEvent} />
+        </div>
+    )
 }

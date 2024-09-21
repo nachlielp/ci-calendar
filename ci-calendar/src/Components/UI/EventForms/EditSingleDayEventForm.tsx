@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { IAddress, IEvently, UserType } from "../../../util/interfaces";
+import { IAddress, CIEvent, UserType } from "../../../util/interfaces";
 import Loading from "../Other/Loading";
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput";
 import AddLinksForm from "./AddLinksForm";
@@ -46,7 +46,7 @@ export default function EditSingleDayEventForm({
   const { getEvent, updateEvent, createEvent } = useAuthContext();
   const { user } = useUser();
   const { eventId } = useParams<{ eventId: string }>();
-  const [eventData, setEventData] = useState<IEvently | null>(null);
+  const [eventData, setEventData] = useState<CIEvent | null>(null);
   const [newAddress, setNewAddress] = useState<IAddress | null>(null);
   const [eventDate, setEventDate] = useState(dayjs());
   const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null);
@@ -139,7 +139,7 @@ export default function EditSingleDayEventForm({
     }
 
     const eventId = editType === EventAction.recycle ? uuidv4() : eventData.id;
-    const event: IEvently = {
+    const event: CIEvent = {
       dates: {
         startDate: baseDate.toISOString(),
         endDate: baseDate.toISOString(),
@@ -229,7 +229,7 @@ export default function EditSingleDayEventForm({
   );
 }
 
-function eventToFormValues(event: IEvently) {
+function eventToFormValues(event: CIEvent) {
   const currentFormValues = {
     "event-title": event.title,
     "event-description": event.description,
