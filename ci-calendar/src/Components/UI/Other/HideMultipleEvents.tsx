@@ -1,22 +1,25 @@
-import { useAuthContext } from "../../Auth/AuthContext";
-import { Icon } from "./Icon";
+import { cieventsService } from "../../../supabase/cieventsService"
+import { Icon } from "./Icon"
 
 export default function HideMultipleEvents({
-  eventIds,
-  className,
-  disabled,
+    eventIds,
+    className,
+    disabled,
 }: {
-  eventIds: string[];
-  className?: string;
-  disabled?: boolean;
+    eventIds: string[]
+    className?: string
+    disabled?: boolean
 }) {
-  const { hideOrShowMultipleEventlys } = useAuthContext();
-  const handleHide = () => {
-    hideOrShowMultipleEventlys(eventIds, true);
-  };
-  return (
-    <button className={`${className}`} onClick={handleHide} disabled={disabled}>
-      <Icon icon="visibilityOff" />
-    </button>
-  );
+    const handleHide = () => {
+        cieventsService.updateMultipleCIEvents(eventIds, { hide: true })
+    }
+    return (
+        <button
+            className={`${className}`}
+            onClick={handleHide}
+            disabled={disabled}
+        >
+            <Icon icon="visibilityOff" />
+        </button>
+    )
 }

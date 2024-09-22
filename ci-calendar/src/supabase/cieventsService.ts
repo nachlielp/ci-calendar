@@ -16,6 +16,7 @@ export const cieventsService = {
     updateCIEvent,
     deleteCIEvent,
     deleteMultipleCIEvents,
+    updateMultipleCIEvents,
 }
 
 async function getCIEvent(id: string): Promise<CIEvent> {
@@ -94,6 +95,25 @@ async function updateCIEvent(
         return data as CIEvent
     } catch (error) {
         console.error("Error updating CI event:", error)
+        throw error
+    }
+}
+
+async function updateMultipleCIEvents(
+    ids: string[],
+    eventUpdate: Partial<CIEvent>
+): Promise<CIEvent[]> {
+    try {
+        const { data, error } = await supabase
+            .from("ci-events")
+            .update(eventUpdate)
+            .in("id", ids)
+            .select("*")
+
+        if (error) throw error
+        return data as CIEvent[]
+    } catch (error) {
+        console.error("Error updating multiple CI events:", error)
         throw error
     }
 }
