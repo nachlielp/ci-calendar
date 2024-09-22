@@ -1,7 +1,14 @@
 import { supabase } from "./client"
-import { DbUser } from "../util/interfaces"
+import { DbUser, UserType } from "../util/interfaces"
 
+export type ManageUserOption = {
+    id: string
+    fullName: string
+    userType: UserType
+    email: string
+}
 export const userService = {
+    getUsers,
     getUser,
     updateUser,
     createUser,
@@ -68,6 +75,18 @@ async function createUser(user: DbUser): Promise<DbUser | null> {
     } catch (error) {
         console.error("Error in createUser:", error)
         return null
+    }
+}
+
+async function getUsers(): Promise<ManageUserOption[]> {
+    try {
+        const { data } = await supabase
+            .from("users")
+            .select("id,fullName,userType,email")
+        return data as ManageUserOption[]
+    } catch (error) {
+        console.error("Error in getUsers:", error)
+        return []
     }
 }
 

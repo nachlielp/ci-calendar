@@ -1,20 +1,24 @@
-import { useEffect, useState } from "react";
-import { firebaseService } from "../firebase.service";
-import { DbUser } from "../util/interfaces";
+import { useEffect, useState } from "react"
+import { ManageUserOption, userService } from "../supabase/userService"
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<DbUser[]>([]);
-  const [loading, setLoading] = useState(true);
+    const [users, setUsers] = useState<ManageUserOption[]>([])
+    const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    const initTFirebase = async () => {
-      firebaseService.initFirebaseJS();
-      firebaseService.subscribeToCollection("users", (users: any) => {
-        setUsers(users);
-        setLoading(false);
-      });
-    };
-    initTFirebase();
-  }, []);
-  return { users, loading };
-};
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const users = await userService.getUsers()
+                setUsers(users)
+                setLoading(false)
+            } catch (error) {
+                console.error("useTeachersList.fetchTeachers.error: ", error)
+                setLoading(false)
+            }
+        }
+
+        fetchTeachers()
+    }, [])
+
+    return { users, loading }
+}
