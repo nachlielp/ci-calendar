@@ -12,7 +12,6 @@ export const useTeachersList = () => {
         const fetchTeachers = async () => {
             try {
                 const teachers = await userService.getTaggableTeachers()
-                console.log("useTeachersList.teachers: ", teachers)
                 setTeachers(teachers)
                 setLoading(false)
             } catch (error) {

@@ -8,19 +8,13 @@ import { v4 as uuidv4 } from "uuid"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import {
-    IAddress,
-    CIEvent,
-    UserType,
-    DbTeacher,
-} from "../../../util/interfaces"
+import { IAddress, CIEvent, UserType } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm"
 import SubEventsForm from "./SubEventsForm"
-// import { useTeachersList } from "../../../hooks/useTeachersList"
 import { formatTeachers } from "./SingleDayEventForm"
 import { EventAction } from "../../../App"
 import { useUser } from "../../../context/UserContext"

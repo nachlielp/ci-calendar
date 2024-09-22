@@ -1,20 +1,13 @@
 import { useNavigate } from "react-router-dom"
-import { useAuthContext } from "../../Auth/AuthContext"
 import { Button, Form } from "antd"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import "../../../styles/overrides.css"
-import { v4 as uuidv4 } from "uuid"
 
 import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { tagOptions } from "../../../util/options"
-import {
-    IAddress,
-    IEventiPart,
-    CIEvent,
-    UserType,
-} from "../../../util/interfaces"
+import { IAddress, IEventiPart, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -23,6 +16,10 @@ import MultiDayFormHead from "./MultiDayFormHead"
 import { useTeachersList } from "../../../hooks/useTeachersList"
 import { formatTeachers } from "./SingleDayEventForm"
 import { useUser } from "../../../context/UserContext"
+import {
+    cieventsService,
+    CIEventWithoutId,
+} from "../../../supabase/cieventsService"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -50,7 +47,6 @@ export default function MultiDayEventForm() {
     const navigate = useNavigate()
     const { teachers } = useTeachersList()
     const { user } = useUser()
-    const { createEvent } = useAuthContext()
     const [address, setAddress] = useState<IAddress>()
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -123,11 +119,10 @@ export default function MultiDayEventForm() {
         }
 
         try {
-            const event: CIEvent = {
+            const event: CIEventWithoutId = {
                 startDate: dates[0].toISOString(),
                 endDate: dates[1].toISOString(),
                 type: values["main-event-type"],
-                id: uuidv4(),
                 address: address,
                 createdAt: dayjs().toISOString(),
                 updatedAt: dayjs().toISOString(),
@@ -143,8 +138,7 @@ export default function MultiDayEventForm() {
                 creatorName: user.fullName,
             }
             console.log("MultiDayEventForm.handleSubmit.event: ", event)
-            await createEvent(event)
-
+            await cieventsService.createCIEvent(event)
             navigate("/")
         } catch (error) {
             console.error("EventForm.handleSubmit.error: ", error)
