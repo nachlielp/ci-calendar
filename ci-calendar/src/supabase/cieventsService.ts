@@ -9,6 +9,8 @@ export interface FilterOptions {
     hideClosed?: boolean
 }
 
+export type CIEventWithoutId = Omit<CIEvent, "id">
+
 export const cieventsService = {
     getCIEvent,
     getCIEvents,
@@ -63,7 +65,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
     }
 }
 
-async function createCIEvent(event: CIEvent): Promise<CIEvent> {
+async function createCIEvent(event: CIEventWithoutId): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
             .from("ci-events")

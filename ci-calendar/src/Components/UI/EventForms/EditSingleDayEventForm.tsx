@@ -25,6 +25,7 @@ import { formatTeachers } from "./SingleDayEventForm"
 import { EventAction } from "../../../App"
 import { useUser } from "../../../context/UserContext"
 import { cieventsService } from "../../../supabase/cieventsService"
+import { useTeachersList } from "../../../hooks/useTeachersList"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -48,8 +49,7 @@ export default function EditSingleDayEventForm({
     editType: EventAction
 }) {
     const navigate = useNavigate()
-    // const { teachers } = useTeachersList()
-    const teachers: { label: string; value: string }[] = []
+    const { teachers } = useTeachersList()
     // const { getEvent, updateEvent, createEvent } = useAuthContext()
     const { user } = useUser()
     const { eventId } = useParams<{ eventId: string }>()
@@ -188,7 +188,7 @@ export default function EditSingleDayEventForm({
                 }
             } else {
                 try {
-                    await cieventsService.updateCIEvent(event)
+                    await cieventsService.updateCIEvent(eventId, event)
                     navigate("/manage-events")
                 } catch (error) {
                     console.error(

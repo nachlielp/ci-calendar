@@ -1,22 +1,28 @@
-import { useEffect, useState } from "react";
-import { useAuthContext } from "../Components/Auth/AuthContext";
+import { useEffect, useState } from "react"
+
+import { userService } from "../supabase/userService"
 
 export const useTeachersList = () => {
-    const [teachers, setTeachers] = useState<{ label: string, value: string }[]>([]);
-    const [loading, setLoading] = useState(true);
-    const { getTeachersList } = useAuthContext();
+    const [teachers, setTeachers] = useState<
+        { label: string; value: string }[]
+    >([])
+    const [loading, setLoading] = useState(true)
+
     useEffect(() => {
-        const initTFirebase = async () => {
+        const fetchTeachers = async () => {
             try {
-                const teacheres = await getTeachersList();
-                setTeachers(teacheres);
-                setLoading(false);
+                const teachers = await userService.getTaggableTeachers()
+                console.log("useTeachersList.teachers: ", teachers)
+                setTeachers(teachers)
+                setLoading(false)
             } catch (error) {
-                console.error("useTeachersList.initTFirebase.error: ", error);
-                throw error;
+                console.error("useTeachersList.fetchTeachers.error: ", error)
+                setLoading(false)
             }
-        };
-        initTFirebase();
-    }, []);
-    return { teachers, loading };
-};
+        }
+
+        fetchTeachers()
+    }, [])
+
+    return { teachers, loading }
+}

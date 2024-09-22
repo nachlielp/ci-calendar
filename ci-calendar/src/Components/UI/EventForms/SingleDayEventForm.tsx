@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom"
-import { useAuthContext } from "../../Auth/AuthContext"
+// import { useAuthContext } from "../../Auth/AuthContext"
 import { Button, Form } from "antd"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { v4 as uuidv4 } from "uuid"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { tagOptions } from "../../../util/options"
-import { IAddress, CIEvent, UserType } from "../../../util/interfaces"
+import { IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -16,6 +15,10 @@ import SubEventsForm from "./SubEventsForm"
 import SingleDayEventBaseForm from "./SingleDayEventBaseForm"
 import { useTeachersList } from "../../../hooks/useTeachersList"
 import { useUser } from "../../../context/UserContext"
+import {
+    cieventsService,
+    CIEventWithoutId,
+} from "../../../supabase/cieventsService"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -39,16 +42,16 @@ const initialValues = {
 }
 
 export default function SingleDayEventForm() {
+    console.log("SingleDayEventForm.render")
     const [form] = Form.useForm()
     const { teachers } = useTeachersList()
-
     const [repeatOption, setRepeatOption] = useState<EventFrequency>(
         EventFrequency.none
     )
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const navigate = useNavigate()
-    const { createEvent } = useAuthContext()
+    // const { createEvent } = useAuthContext()
     const { user } = useUser()
     const [address, setAddress] = useState<IAddress>()
 
@@ -131,8 +134,7 @@ export default function SingleDayEventForm() {
 
         try {
             if (repeatOption === EventFrequency.none) {
-                const event: CIEvent = {
-                    id: uuidv4(),
+                const event: CIEventWithoutId = {
                     startDate: eventDate.toISOString(),
                     endDate: eventDate.toISOString(),
                     type: "",
@@ -150,7 +152,7 @@ export default function SingleDayEventForm() {
                     creatorId: user.id,
                     creatorName: user.fullName,
                 }
-                await createEvent(event)
+                await cieventsService.createCIEvent(event)
             } else if (endDate) {
                 const dates = listOfDates(
                     eventDate,
@@ -174,11 +176,10 @@ export default function SingleDayEventForm() {
                             .toISOString(),
                     }))
 
-                    const event: CIEvent = {
+                    const event: CIEventWithoutId = {
                         type: "",
                         startDate: date.toISOString(),
                         endDate: date.toISOString(),
-                        id: uuidv4(),
                         address: address,
                         createdAt: dayjs().toISOString(),
                         updatedAt: dayjs().toISOString(),
@@ -193,7 +194,7 @@ export default function SingleDayEventForm() {
                         creatorId: user.id,
                         creatorName: user.fullName,
                     }
-                    await createEvent(event)
+                    await cieventsService.createCIEvent(event)
                 }
             }
             navigate("/")
@@ -224,7 +225,7 @@ export default function SingleDayEventForm() {
                         repeatOption={repeatOption}
                         eventDate={eventDate}
                         endDate={endDate}
-                        idEdit={false}
+                        isEdit={false}
                         teachers={teachers}
                     />
                     <SubEventsForm form={form} day="" teachers={teachers} />
