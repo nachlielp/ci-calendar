@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { DbTeacher, UserType } from "../../../util/interfaces"
 import { useUsers } from "../../../hooks/useUsers"
 import { useWindowSize } from "../../../hooks/useWindowSize"
-import { ManageUserOption } from "../../../supabase/userService"
+import { ManageUserOption, userService } from "../../../supabase/userService"
 // import { useAuthContext } from "../../Auth/AuthContext";
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
@@ -66,58 +66,90 @@ function ManageUsers() {
     const onMakeAdmin = async () => {
         if (!selectedUser) return
         try {
-            // await updateUser({ ...selectedUser, userType: UserType.admin });
-            setSelectedUser({ ...selectedUser, userType: UserType.admin })
-            await onAddTeacher()
+            const updatedUser = await userService.updateUser(selectedUser.id, {
+                userType: UserType.admin,
+            })
+            if (!updatedUser) return
+            const partialUser = {
+                id: updatedUser.id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                userType: updatedUser.userType,
+            }
+
+            setSelectedUser(partialUser)
         } catch (error) {
             console.error(`ManageUsers.onMakeAdmin.error: `, error)
             throw error
         }
     }
-    const onMakeTeacher = async () => {
+    const onMakeCreator = async () => {
         if (!selectedUser) return
         try {
-            // await updateUser({ ...selectedUser, userType: UserType.teacher });
-            setSelectedUser({ ...selectedUser, userType: UserType.teacher })
-            await onAddTeacher()
+            const updatedUser = await userService.updateUser(selectedUser.id, {
+                userType: UserType.creator,
+            })
+            if (!updatedUser) return
+            const partialUser = {
+                id: updatedUser.id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                userType: updatedUser.userType,
+            }
+
+            setSelectedUser(partialUser)
         } catch (error) {
-            console.error(`ManageUsers.onMakeTeacher.error: `, error)
+            console.error(`ManageUsers.onMakeCreator.error: `, error)
+            throw error
+        }
+    }
+
+    const onMakeProfile = async () => {
+        if (!selectedUser) return
+        try {
+            const updatedUser = await userService.updateUser(selectedUser.id, {
+                userType: UserType.profile,
+            })
+            if (!updatedUser) return
+            const partialUser = {
+                id: updatedUser.id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                userType: updatedUser.userType,
+            }
+
+            setSelectedUser(partialUser)
+        } catch (error) {
+            console.error(`ManageUsers.onMakeProfile.error: `, error)
             throw error
         }
     }
     const onMakeUser = async () => {
         if (!selectedUser) return
         try {
-            // await updateUser({ ...selectedUser, userType: UserType.user });
-            setSelectedUser({ ...selectedUser, userType: UserType.user })
-            // await disableTeacher(selectedUser.id);
+            const updatedUser = await userService.updateUser(selectedUser.id, {
+                userType: UserType.user,
+            })
+            if (!updatedUser) return
+            const partialUser = {
+                id: updatedUser.id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                userType: updatedUser.userType,
+            }
+
+            setSelectedUser(partialUser)
         } catch (error) {
             console.error(`ManageUsers.onMakeUser.error: `, error)
             throw error
         }
     }
 
-    async function onAddTeacher() {
-        if (!selectedUser) return
-        const teacher: DbTeacher = {
-            id: selectedUser.id,
-            fullName: selectedUser.fullName,
-            bio: "",
-            allowTagging: true,
-            pageTitle: "",
-            pageUrl: "",
-            showProfile: false,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            img: "",
-        }
-        // await addTeacher(teacher)
-    }
     const cardWidth = Math.min(width * 0.9, 500)
 
     const makeAdmin = (
         <Button
-            disabled={selectedUser?.userType === "admin"}
+            disabled={selectedUser?.userType === UserType.admin}
             onClick={onMakeAdmin}
             className="user-btn"
         >
@@ -126,20 +158,32 @@ function ManageUsers() {
             כמנהל
         </Button>
     )
-    const makeTeacher = (
+    const makeCreator = (
         <Button
-            disabled={selectedUser?.userType === "teacher"}
-            onClick={onMakeTeacher}
+            disabled={selectedUser?.userType === UserType.creator}
+            onClick={onMakeCreator}
             className="user-btn"
         >
             הגדר
             <br />
-            כמורה
+            כיוצר
+        </Button>
+    )
+
+    const makeProfile = (
+        <Button
+            disabled={selectedUser?.userType === UserType.profile}
+            onClick={onMakeProfile}
+            className="user-btn"
+        >
+            הגדר
+            <br />
+            כפרופיל
         </Button>
     )
     const makeUser = (
         <Button
-            disabled={selectedUser?.userType === "user"}
+            disabled={selectedUser?.userType === UserType.user}
             onClick={onMakeUser}
             className="user-btn"
         >
@@ -148,7 +192,9 @@ function ManageUsers() {
             כמשתמש
         </Button>
     )
-    const footer = selectedUser ? [makeAdmin, makeTeacher, makeUser] : []
+    const footer = selectedUser
+        ? [makeAdmin, makeCreator, makeProfile, makeUser]
+        : []
 
     return (
         <div className="manage-users">

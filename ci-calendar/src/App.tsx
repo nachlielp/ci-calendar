@@ -87,7 +87,7 @@ export default function App() {
                                     <PrivateRoutes
                                         requiredRoles={[
                                             UserType.admin,
-                                            UserType.teacher,
+                                            UserType.creator,
                                             UserType.user,
                                         ]}
                                     />
@@ -103,7 +103,7 @@ export default function App() {
                                     <PrivateRoutes
                                         requiredRoles={[
                                             UserType.admin,
-                                            UserType.teacher,
+                                            UserType.creator,
                                         ]}
                                     />
                                 }

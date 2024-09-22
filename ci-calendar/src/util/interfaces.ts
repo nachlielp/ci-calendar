@@ -62,7 +62,7 @@ export enum District {
 
 export enum UserType {
     admin = "admin",
-    teacher = "teacher",
+    creator = "creator",
     profile = "profile",
     user = "user",
 }
