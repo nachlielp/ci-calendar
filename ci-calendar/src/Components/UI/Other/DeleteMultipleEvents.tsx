@@ -1,5 +1,4 @@
 import { Modal } from "antd"
-import { useAuthContext } from "../../Auth/AuthContext"
 import { Icon } from "./Icon"
 import { cieventsService } from "../../../supabase/cieventsService"
 
