@@ -1,4 +1,5 @@
 import type { CalendarProps } from "antd"
+import utc from "dayjs/plugin/utc"
 import { Calendar, Card, ConfigProvider } from "antd"
 import type { Dayjs } from "dayjs"
 import { CIEvent } from "../../../util/interfaces"
@@ -6,6 +7,7 @@ import isBetween from "dayjs/plugin/isBetween"
 import dayjs from "dayjs"
 import "dayjs/locale/he"
 dayjs.extend(isBetween)
+dayjs.extend(utc)
 dayjs.locale("he")
 import hb from "antd/locale/he_IL"
 import { useState } from "react"

@@ -103,7 +103,7 @@ export const SingleDayEventCard = React.forwardRef<
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {formatHebrewDate(event.subEvents[0]?.startTime)}
+                            {formatHebrewDate(event.startDate)}
                         </label>
                         <Icon icon="schedule" className="event-icon" />
                         <label className="event-label">
