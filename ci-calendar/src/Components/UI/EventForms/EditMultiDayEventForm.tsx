@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { useAuthContext } from "../../Auth/AuthContext"
 import { Button, Card, Form } from "antd"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
@@ -17,6 +16,7 @@ import { EventAction } from "../../../App"
 import { v4 as uuidv4 } from "uuid"
 import { Icon } from "../Other/Icon"
 import { useUser } from "../../../context/UserContext"
+import { cieventsService } from "../../../supabase/cieventsService.ts"
 
 export default function EditMultiDayEventForm({
     editType,
@@ -26,7 +26,6 @@ export default function EditMultiDayEventForm({
     console.log("EditMultiDayEventForm.editType: ", editType)
     const { teachers } = useTeachersList()
     const navigate = useNavigate()
-    const { getEvent, updateEvent, createEvent } = useAuthContext()
     const { user } = useUser()
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -44,7 +43,7 @@ export default function EditMultiDayEventForm({
         const fetchEvent = async () => {
             try {
                 if (eventId) {
-                    const res = await getEvent(eventId)
+                    const res = await cieventsService.getCIEvent(eventId)
                     setEventData(res)
                     if (res) {
                         const { currentFormValues, address } =
@@ -67,7 +66,7 @@ export default function EditMultiDayEventForm({
             }
         }
         fetchEvent()
-    }, [eventId, getEvent])
+    }, [eventId])
 
     if (!eventData) return <Loading />
 
@@ -141,10 +140,8 @@ export default function EditMultiDayEventForm({
         }
 
         const event: CIEvent = {
-            dates: {
-                startDate: dates[0].toISOString(),
-                endDate: dates[1].toISOString(),
-            },
+            startDate: dates[0].toISOString(),
+            endDate: dates[1].toISOString(),
             type: values["main-event-type"],
             id: submitedEventId,
             address: address,
@@ -152,21 +149,21 @@ export default function EditMultiDayEventForm({
             updatedAt: dayjs().toISOString(),
             title: values["event-title"],
             description: values["event-description"] || "",
-            owners: [{ value: user.id, label: user.fullName }],
+            owners: [{ value: user.user_id, label: user.fullName }],
             links: values["links"] || [],
             price: values["prices"] || [],
             hide: false,
             subEvents: subEventsTemplate,
             district: values["district"],
-            creatorId: user.id,
+            creatorId: user.user_id,
             creatorName: user.fullName,
         }
         try {
             if (editType === EventAction.recycle) {
-                await createEvent(event)
+                await cieventsService.createCIEvent(event)
                 navigate("/manage-events")
             } else {
-                await updateEvent(eventData.id, event)
+                await cieventsService.updateCIEvent(eventData.id, event)
                 navigate("/manage-events")
             }
         } catch (error) {
@@ -292,10 +289,7 @@ const eventToFormValues = (event: CIEvent) => {
         "event-description": event.description,
         district: event.district,
         address: event.address,
-        "event-date": [
-            dayjs(event.dates.startDate),
-            dayjs(event.dates.endDate),
-        ],
+        "event-date": [dayjs(event.startDate), dayjs(event.endDate)],
         "main-event-type": event.type,
         "event-schedule": event.subEvents.length > 0,
         links: event.links,

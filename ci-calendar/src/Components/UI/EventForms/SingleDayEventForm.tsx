@@ -60,8 +60,8 @@ export default function SingleDayEventForm() {
     }
 
     if (
-        user.userType !== UserType.admin &&
-        user.userType !== UserType.teacher
+        user.user_type !== UserType.admin &&
+        user.user_type !== UserType.creator
     ) {
         navigate("/")
     }
@@ -143,13 +143,13 @@ export default function SingleDayEventForm() {
                     updatedAt: dayjs().toISOString(),
                     title: values["event-title"],
                     description: values["event-description"] || "",
-                    owners: [{ value: user.id, label: user.fullName }],
+                    owners: [{ value: user.user_id, label: user.fullName }],
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     hide: false,
                     subEvents: subEventsTemplate,
                     district: values["district"],
-                    creatorId: user.id,
+                    creatorId: user.user_id,
                     creatorName: user.fullName,
                 }
                 await cieventsService.createCIEvent(event)
@@ -185,13 +185,13 @@ export default function SingleDayEventForm() {
                         updatedAt: dayjs().toISOString(),
                         title: values["event-title"],
                         description: values["event-description"] || "",
-                        owners: [{ value: user.id, label: user.fullName }],
+                        owners: [{ value: user.user_id, label: user.fullName }],
                         links: values["links"] || [],
                         price: values["prices"] || [],
                         hide: false,
                         subEvents: subEvents,
                         district: values["district"],
-                        creatorId: user.id,
+                        creatorId: user.user_id,
                         creatorName: user.fullName,
                     }
                     await cieventsService.createCIEvent(event)

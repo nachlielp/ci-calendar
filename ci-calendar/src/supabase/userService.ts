@@ -2,9 +2,9 @@ import { supabase } from "./client"
 import { DbUser, UserType } from "../util/interfaces"
 
 export type ManageUserOption = {
-    id: string
+    user_id: string
     fullName: string
-    userType: UserType
+    user_type: UserType
     email: string
 }
 export const userService = {
@@ -20,7 +20,7 @@ async function getUser(id: string): Promise<DbUser | null> {
         const { data, error } = await supabase
             .from("users")
             .select("*")
-            .eq("id", id)
+            .eq("user_id", id)
             .single()
 
         if (error) {
@@ -41,19 +41,20 @@ async function updateUser(
     id: string,
     user: Partial<DbUser>
 ): Promise<DbUser | null> {
+    console.log("updateUser: ", user)
+    console.log("id: ", id)
     try {
         const { data, error } = await supabase
             .from("users")
             .update(user)
-            .eq("id", id)
+            .eq("user_id", id)
             .select()
-            .single()
 
         if (error) {
             throw error
         }
         console.log("Updated user data: ", data)
-        return data as DbUser
+        return data[0] as DbUser
     } catch (error) {
         console.error("Error in updateUser:", error)
         return null
@@ -82,7 +83,7 @@ async function getUsers(): Promise<ManageUserOption[]> {
     try {
         const { data } = await supabase
             .from("users")
-            .select("id,fullName,userType,email")
+            .select("user_id,fullName,user_type,email")
         return data as ManageUserOption[]
     } catch (error) {
         console.error("Error in getUsers:", error)
@@ -100,16 +101,16 @@ async function getTaggableTeachers(): Promise<
 
         const { data, error } = await supabase
             .from("users")
-            .select("id, fullName, userType, allowTagging")
+            .select("user_id, fullName, user_type, allowTagging")
             .or(
-                `userType.neq.user,allowTagging.eq.true,id.eq.${currentUser.user.id}`
+                `user_type.neq.user,allowTagging.eq.true,user_id.eq.${currentUser.user.id}`
             )
 
         if (error) throw error
 
         return data.map((user) => ({
             label: user.fullName,
-            value: user.id,
+            value: user.user_id,
         }))
     } catch (error) {
         console.error("Error fetching taggable teachers:", error)

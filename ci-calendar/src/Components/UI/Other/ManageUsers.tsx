@@ -1,6 +1,6 @@
 import { AutoComplete, Button, Card, Input, SelectProps } from "antd"
 import { useEffect, useState } from "react"
-import { DbTeacher, UserType } from "../../../util/interfaces"
+import { UserType } from "../../../util/interfaces"
 import { useUsers } from "../../../hooks/useUsers"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { ManageUserOption, userService } from "../../../supabase/userService"
@@ -14,7 +14,7 @@ const searchResult = (query: string, users: ManageUserOption[]) => {
                 user.email.toLowerCase().includes(query.toLowerCase())
         )
         .map((user) => ({
-            value: user.id,
+            value: user.user_id,
             label: (
                 <div
                     style={{ display: "flex", justifyContent: "space-between" }}
@@ -42,7 +42,7 @@ function ManageUsers() {
         if (users.length > 0) {
             setOptions(
                 users.map((user) => ({
-                    value: user.id,
+                    value: user.user_id,
                     label: `${user.fullName} - ${user.email}`,
                 }))
             )
@@ -56,7 +56,7 @@ function ManageUsers() {
 
     const onSelect = (value: string) => {
         console.log(`ManageUsers.onSelect.value: `, value)
-        const user = users.find((user) => user.id === value)
+        const user = users.find((user) => user.user_id === value)
         if (user) {
             setSelectedUser(user)
             setInputValue(user.fullName)
@@ -66,15 +66,18 @@ function ManageUsers() {
     const onMakeAdmin = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(selectedUser.id, {
-                userType: UserType.admin,
-            })
+            const updatedUser = await userService.updateUser(
+                selectedUser.user_id,
+                {
+                    user_type: UserType.admin,
+                }
+            )
             if (!updatedUser) return
             const partialUser = {
-                id: updatedUser.id,
+                user_id: updatedUser.user_id,
                 fullName: updatedUser.fullName,
                 email: updatedUser.email,
-                userType: updatedUser.userType,
+                user_type: updatedUser.user_type,
             }
 
             setSelectedUser(partialUser)
@@ -86,15 +89,18 @@ function ManageUsers() {
     const onMakeCreator = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(selectedUser.id, {
-                userType: UserType.creator,
-            })
+            const updatedUser = await userService.updateUser(
+                selectedUser.user_id,
+                {
+                    user_type: UserType.creator,
+                }
+            )
             if (!updatedUser) return
             const partialUser = {
-                id: updatedUser.id,
+                user_id: updatedUser.user_id,
                 fullName: updatedUser.fullName,
                 email: updatedUser.email,
-                userType: updatedUser.userType,
+                user_type: updatedUser.user_type,
             }
 
             setSelectedUser(partialUser)
@@ -107,15 +113,18 @@ function ManageUsers() {
     const onMakeProfile = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(selectedUser.id, {
-                userType: UserType.profile,
-            })
+            const updatedUser = await userService.updateUser(
+                selectedUser.user_id,
+                {
+                    user_type: UserType.profile,
+                }
+            )
             if (!updatedUser) return
             const partialUser = {
-                id: updatedUser.id,
+                user_id: updatedUser.user_id,
                 fullName: updatedUser.fullName,
                 email: updatedUser.email,
-                userType: updatedUser.userType,
+                user_type: updatedUser.user_type,
             }
 
             setSelectedUser(partialUser)
@@ -127,15 +136,18 @@ function ManageUsers() {
     const onMakeUser = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(selectedUser.id, {
-                userType: UserType.user,
-            })
+            const updatedUser = await userService.updateUser(
+                selectedUser.user_id,
+                {
+                    user_type: UserType.user,
+                }
+            )
             if (!updatedUser) return
             const partialUser = {
-                id: updatedUser.id,
+                user_id: updatedUser.user_id,
                 fullName: updatedUser.fullName,
                 email: updatedUser.email,
-                userType: updatedUser.userType,
+                user_type: updatedUser.user_type,
             }
 
             setSelectedUser(partialUser)
@@ -149,7 +161,7 @@ function ManageUsers() {
 
     const makeAdmin = (
         <Button
-            disabled={selectedUser?.userType === UserType.admin}
+            disabled={selectedUser?.user_type === UserType.admin}
             onClick={onMakeAdmin}
             className="user-btn"
         >
@@ -160,7 +172,7 @@ function ManageUsers() {
     )
     const makeCreator = (
         <Button
-            disabled={selectedUser?.userType === UserType.creator}
+            disabled={selectedUser?.user_type === UserType.creator}
             onClick={onMakeCreator}
             className="user-btn"
         >
@@ -172,7 +184,7 @@ function ManageUsers() {
 
     const makeProfile = (
         <Button
-            disabled={selectedUser?.userType === UserType.profile}
+            disabled={selectedUser?.user_type === UserType.profile}
             onClick={onMakeProfile}
             className="user-btn"
         >
@@ -183,7 +195,7 @@ function ManageUsers() {
     )
     const makeUser = (
         <Button
-            disabled={selectedUser?.userType === UserType.user}
+            disabled={selectedUser?.user_type === UserType.user}
             onClick={onMakeUser}
             className="user-btn"
         >
@@ -222,7 +234,7 @@ function ManageUsers() {
                     <div>
                         <p>{selectedUser.fullName}</p>
                         <p>{selectedUser.email}</p>
-                        <p>{selectedUser.userType}</p>
+                        <p>{selectedUser.user_type}</p>
                     </div>
                 )}
             </Card>

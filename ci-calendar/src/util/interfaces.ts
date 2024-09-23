@@ -76,10 +76,10 @@ export interface IMailingList {
     eventTypes: EventlyType[]
 }
 export interface DbUser {
-    id: string
+    user_id: string
     createdAt: string
     updatedAt: string
-    userType: UserType
+    user_type: UserType
     fullName: string
     phoneNumber: string
     email: string

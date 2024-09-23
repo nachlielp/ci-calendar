@@ -20,7 +20,7 @@ export default function ManageEventsTable() {
     const { events } = useEvents()
 
     const uid = useMemo(
-        () => (user?.userType === "teacher" ? [user.id] : []),
+        () => (user?.user_type === "creator" ? [user.user_id] : []),
         [user]
     )
     const [showFuture, setShowFuture] = useState(true)
@@ -222,7 +222,7 @@ export default function ManageEventsTable() {
     ]
 
     const filteredColumns =
-        user && user.userType === "teacher"
+        user && user.user_type === "creator"
             ? columns.filter((column) => column.key !== "creatorName")
             : columns
 
@@ -268,7 +268,7 @@ export default function ManageEventsTable() {
                     </button>
                 </div>
                 <div className="user-select-container">
-                    {user && user.userType === UserType.admin && (
+                    {user && user.user_type === UserType.admin && (
                         <Select
                             id="select-teacher"
                             className="select-teacher"

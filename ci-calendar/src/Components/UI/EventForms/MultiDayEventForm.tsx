@@ -53,8 +53,8 @@ export default function MultiDayEventForm() {
     }
 
     if (
-        user.userType !== UserType.admin &&
-        user.userType !== UserType.teacher
+        user.user_type !== UserType.admin &&
+        user.user_type !== UserType.creator
     ) {
         navigate("/")
     }
@@ -128,13 +128,13 @@ export default function MultiDayEventForm() {
                 updatedAt: dayjs().toISOString(),
                 title: values["event-title"],
                 description: values["event-description"] || "",
-                owners: [{ value: user.id, label: user.fullName }],
+                owners: [{ value: user.user_id, label: user.fullName }],
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 hide: false,
                 subEvents: subEventsTemplate,
                 district: values["district"],
-                creatorId: user.id,
+                creatorId: user.user_id,
                 creatorName: user.fullName,
             }
             console.log("MultiDayEventForm.handleSubmit.event: ", event)
