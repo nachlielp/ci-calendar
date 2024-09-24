@@ -1,47 +1,50 @@
-import { LinkButton } from "./LinkButton";
-import { useLocation } from "react-router-dom";
-import { DbUser } from "../../../util/interfaces";
+import { LinkButton } from "./LinkButton"
+import { useLocation } from "react-router-dom"
+import { DbUser } from "../../../util/interfaces"
 
-import { Icon } from "./Icon";
-import { MenuDrawer } from "./MenuDrawer";
-import { useUser } from "../../../context/UserContext";
+import { Icon } from "./Icon"
+import { MenuDrawer } from "./MenuDrawer"
+import { useUser } from "../../../context/UserContext"
 
 export default function Header() {
-  const { user } = useUser();
-  const location = useLocation();
+    const { user } = useUser()
+    const location = useLocation()
 
-  const currentPath = location.pathname;
+    const currentPath = location.pathname
 
-  return (
-    <section className="header-container">
-      {!user && currentPath !== "/login" && (
-        <LinkButton to="/login" className="header-btn no-border">
-          התחבר/י &nbsp;
-          <Icon icon="account" className="icon-main" />
-        </LinkButton>
-      )}
+    return (
+        <section className="header-container">
+            {!user &&
+                !["/login", "/signup", "/reset-password"].includes(
+                    currentPath
+                ) && (
+                    <LinkButton to="/login" className="header-btn no-border">
+                        התחבר/י &nbsp;
+                        <Icon icon="account" className="icon-main" />
+                    </LinkButton>
+                )}
 
-      {user && (
-        <div className="header-actions">
-          <UserInfo user={user} />
-          <MenuDrawer />
-        </div>
-      )}
-    </section>
-  );
+            {user && (
+                <div className="header-actions">
+                    <UserInfo user={user} />
+                    <MenuDrawer />
+                </div>
+            )}
+        </section>
+    )
 }
 
 interface IUserInfoProps {
-  user: DbUser;
+    user: DbUser
 }
 const UserInfo = ({ user }: IUserInfoProps) => {
-  return (
-    <div>
-      {user && (
-        <div className={`user-info-container`}>
-          <p className={`user-name`}>{user.fullName}</p>
+    return (
+        <div>
+            {user && (
+                <div className={`user-info-container`}>
+                    <p className={`user-name`}>{user.fullName}</p>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
-};
+    )
+}
