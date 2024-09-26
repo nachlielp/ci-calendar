@@ -9,7 +9,7 @@ function createDbUserFromUser(user: User): DbUser {
     return {
         user_id: user.id,
         user_type: UserType.user,
-        fullName: user.user_metadata.full_name || "",
+        fullName: user.user_metadata.fullName || "",
         email: user.email || "",
         phoneNumber: user.phone || "",
         createdAt: user.created_at,
