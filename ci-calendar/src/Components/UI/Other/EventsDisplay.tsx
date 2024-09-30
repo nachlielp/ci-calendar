@@ -2,7 +2,7 @@ import dayjs, { Dayjs } from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
 import { getLabelByValue } from "../../../util/helpers"
-import { CIEvent } from "../../../util/interfaces"
+import { CIEvent, UserBio } from "../../../util/interfaces"
 import CalendarView from "./CalendarView"
 import EventsList from "../DisplayEvents/EventsList"
 import { useEffect, useState } from "react"
@@ -19,10 +19,15 @@ import EventDrawer from "../DisplayEvents/EventDrawer"
 
 interface IEventsDisplayProps {
     events: CIEvent[]
+    viewableTeachers: UserBio[]
     isEdit: boolean
 }
 
-export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
+export default function EventsDisplay({
+    events,
+    viewableTeachers,
+    isEdit,
+}: IEventsDisplayProps) {
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
     const [isListView, setIsListView] = useState<boolean>(true)
 
@@ -147,6 +152,7 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
                             isEdit={isEdit}
                             isEvents={!!events.length}
                             onSelectEvent={onSelectEvent}
+                            viewableTeachers={viewableTeachers}
                         />
                     </>
                 ) : (
@@ -155,10 +161,15 @@ export default function EventsDisplay({ events, isEdit }: IEventsDisplayProps) {
                         isEdit={isEdit}
                         isEvents={!!events.length}
                         onSelectEvent={onSelectEvent}
+                        viewableTeachers={viewableTeachers}
                     />
                 )}
             </section>
-            <EventDrawer event={selectedEvent} onClose={onCloseEvent} />
+            <EventDrawer
+                event={selectedEvent}
+                onClose={onCloseEvent}
+                viewableTeachers={viewableTeachers}
+            />
         </div>
     )
 }

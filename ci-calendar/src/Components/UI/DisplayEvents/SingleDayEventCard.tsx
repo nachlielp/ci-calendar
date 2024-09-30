@@ -6,7 +6,7 @@ import EditEvent from "../Other/EditEvent"
 import RecycleEvent from "../Other/RecycleEvent"
 import HideEvent from "../Other/HideEvent"
 import BioModal from "../DisplayUsers/BioModal"
-import { EventlyType, CIEvent } from "../../../util/interfaces"
+import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import {
     tagOptions,
     eventTypes,
@@ -18,6 +18,7 @@ import { Icon } from "../Other/Icon"
 interface ISingleDayEventCardProps {
     event: CIEvent
     isEdit: boolean
+    viewableTeachers: UserBio[]
 }
 
 export const SingleDayEventCard = React.forwardRef<
@@ -45,8 +46,6 @@ export const SingleDayEventCard = React.forwardRef<
     // };
 
     const subEventLen = Object.values(event.subEvents).length
-    // const teachersIds = getEventTeachersIds(event)
-    // const { teachers } = useTeacherList()
 
     const nonRegestoredTeacherNames = Array.from(
         new Set(
@@ -67,13 +66,15 @@ export const SingleDayEventCard = React.forwardRef<
     )
 
     const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
-        // const isTeacher = teachers.find((t) => t.id === teacher.value)
-        const isTeacher = false
-        return isTeacher ? (
-            <BioModal key={teacher.value} teacher={isTeacher} />
-        ) : (
-            teacher.label
-        )
+        return teacher.label
+        // const isTeacher = viewableTeachers.find(
+        //     (t) => t.user_id === teacher.value
+        // )
+        // return isTeacher ? (
+        //     <BioModal key={teacher.value} teacher={isTeacher} />
+        // ) : (
+        //     teacher.label
+        // )
     })
 
     const isMultiDay = event.startDate !== event.endDate

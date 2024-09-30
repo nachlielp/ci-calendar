@@ -35,12 +35,12 @@ export interface IAddress {
 }
 export interface CIEvent {
     id: string
+    owners: UserOption[]
     title: string
     description: string
     address: IAddress
     createdAt: string
     updatedAt: string
-    owners: UserOption[]
     hide: boolean
     startDate: string
     endDate: string
@@ -85,6 +85,17 @@ export interface DbUser {
     email: string
     subscribedForUpdatesAt: string
     newsletter: IMailingList
+    pageUrl: string
+    pageTitle: string
+    showProfile: boolean
+    allowTagging: boolean
+    img: string
+    bio: string
+}
+
+export interface UserBio extends Partial<DbUser> {
+    user_id: string
+    fullName: string
     pageUrl: string
     pageTitle: string
     showProfile: boolean

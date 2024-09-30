@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react"
-import { CIEvent } from "../util/interfaces"
+import { UserBio, CIEvent, IEventiPart } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService, FilterOptions } from "../supabase/cieventsService"
 import { supabase } from "../supabase/client"
+import { userService } from "../supabase/userService"
 
 export const useEvents = (filterBy: FilterOptions = {}) => {
     const [events, setEvents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
-
+    const [viewableTeachers, setViewableTeachers] = useState<UserBio[]>([])
     useEffect(() => {
         const fetchEvents = async () => {
             try {
@@ -15,6 +16,21 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
                     filterBy
                 )
                 sortAndSetEvents(fetchedEvents)
+
+                const eventsTeacherIds: string[] = []
+                fetchedEvents.forEach((event) => {
+                    const teacherIds = event.subEvents
+                        .flatMap((subEvent: IEventiPart) => subEvent.teachers)
+                        .map((teacher: { value: string }) => teacher.value)
+                        .filter((teacher: string) => teacher !== "NON_EXISTENT")
+
+                    eventsTeacherIds.push(...teacherIds)
+                })
+
+                const viewableTeachers = await userService.getViewableTeachers(
+                    eventsTeacherIds
+                )
+                setViewableTeachers(viewableTeachers)
             } catch (error) {
                 console.error("Error fetching events:", error)
             } finally {
@@ -53,5 +69,5 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
         setEvents(sortedEvents)
     }
 
-    return { events, loading }
+    return { events, loading, viewableTeachers }
 }

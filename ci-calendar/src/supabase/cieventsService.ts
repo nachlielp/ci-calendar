@@ -55,9 +55,10 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         if (filterBy?.hideClosed) {
             query = query.eq("hide", false)
         }
-        const { data, error } = await query
 
+        const { data, error } = await query
         if (error) throw error
+
         return data as CIEvent[]
     } catch (error) {
         console.error("Error fetching CI events:", error)

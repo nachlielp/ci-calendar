@@ -1,5 +1,5 @@
 import { supabase } from "./client"
-import { DbUser, UserType } from "../util/interfaces"
+import { UserBio, DbUser, UserType } from "../util/interfaces"
 
 export type ManageUserOption = {
     user_id: string
@@ -13,6 +13,7 @@ export const userService = {
     updateUser,
     createUser,
     getTaggableTeachers,
+    getViewableTeachers,
 }
 
 async function getUser(id: string): Promise<DbUser | null> {
@@ -102,9 +103,7 @@ async function getTaggableTeachers(): Promise<
         const { data, error } = await supabase
             .from("users")
             .select("user_id, fullName, user_type, allowTagging")
-            .or(
-                `user_type.neq.user,allowTagging.eq.true,user_id.eq.${currentUser.user.id}`
-            )
+            .or(`allowTagging.eq.true,user_id.eq.${currentUser.user.id}`)
 
         if (error) throw error
 
@@ -114,6 +113,25 @@ async function getTaggableTeachers(): Promise<
         }))
     } catch (error) {
         console.error("Error fetching taggable teachers:", error)
+        throw error
+    }
+}
+
+async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
+    try {
+        const { data, error } = await supabase
+            .from("users")
+            .select(
+                "user_id, fullName, img, bio, pageUrl, pageTitle, showProfile, allowTagging"
+            )
+            .in("user_id", teacherIds)
+            .eq("allowTagging", true)
+
+        if (error) throw error
+
+        return data as UserBio[]
+    } catch (error) {
+        console.error("Error fetching viewable teachers:", error)
         throw error
     }
 }

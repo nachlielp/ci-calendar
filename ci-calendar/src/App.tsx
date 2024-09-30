@@ -44,7 +44,7 @@ export enum EventAction {
 }
 
 export default function App() {
-    const { events, loading } = useEvents({
+    const { events, loading, viewableTeachers } = useEvents({
         startDate: dayjs().format("YYYY-MM-DD"),
         hideClosed: true,
     })
@@ -78,6 +78,7 @@ export default function App() {
                                     <EventsDisplay
                                         events={events}
                                         isEdit={false}
+                                        viewableTeachers={viewableTeachers}
                                     />
                                 }
                             />
@@ -192,6 +193,7 @@ export default function App() {
                                     <EventsDisplay
                                         events={events}
                                         isEdit={false}
+                                        viewableTeachers={viewableTeachers}
                                     />
                                 }
                             />

@@ -1,7 +1,7 @@
 // import VirtualList from "rc-virtual-list";
 import { SingleDayEventCard } from "./SingleDayEventCard"
 import { useEventsFilter } from "../../../hooks/useEventsFilter"
-import { CIEvent } from "../../../util/interfaces"
+import { CIEvent, UserBio } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import EmptyList from "../Other/Empty"
 import { Empty } from "antd"
@@ -11,6 +11,7 @@ import { useUser } from "../../../context/UserContext"
 interface IEventsListProps {
     onSelectEvent: (event: CIEvent) => void
     events: CIEvent[]
+    viewableTeachers: UserBio[]
     isEdit: boolean
     isEvents: boolean
 }
@@ -19,6 +20,7 @@ export default function EventsList({
     isEdit,
     isEvents,
     onSelectEvent,
+    viewableTeachers,
 }: IEventsListProps) {
     const { user } = useUser()
     const isAdmin = user?.user_type === "admin"
@@ -52,8 +54,10 @@ export default function EventsList({
                                 key={event.id}
                                 event={event}
                                 isEdit={isEdit}
+                                viewableTeachers={viewableTeachers}
                             />
                         }
+                        viewableTeachers={viewableTeachers}
                     />
                 </div>
             ))}
