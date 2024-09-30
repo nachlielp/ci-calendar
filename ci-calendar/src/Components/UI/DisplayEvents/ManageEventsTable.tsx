@@ -16,6 +16,7 @@ const { Option } = Select
 
 export default function ManageEventsTable() {
     const { width } = useWindowSize()
+    //TODO get list of events by user and page
     const { user } = useUser()
     const { events } = useEvents()
 

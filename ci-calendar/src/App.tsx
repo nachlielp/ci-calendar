@@ -35,6 +35,7 @@ const ManageEventsTable = lazy(
     () => import("./Components/UI/DisplayEvents/ManageEventsTable")
 )
 import dayjs from "dayjs"
+import SupportPage from "./Components/Pages/SupportPage"
 
 export enum EventAction {
     edit,
@@ -94,6 +95,10 @@ export default function App() {
                                 }
                             >
                                 <Route path="/user" element={<UserForm />} />
+                                <Route
+                                    path="/request"
+                                    element={<SupportPage />}
+                                />
                             </Route>
 
                             {/* Teacher privet routes */}

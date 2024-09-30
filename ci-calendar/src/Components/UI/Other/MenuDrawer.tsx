@@ -83,6 +83,15 @@ export function MenuDrawer() {
             },
         },
         {
+            key: "request",
+            icon: "support_agent",
+            label: "תמיכה",
+            onClick: () => {
+                navigate("/request")
+                setOpen(false)
+            },
+        },
+        {
             key: "logout",
             icon: "logout",
             label: "התנתקות",
