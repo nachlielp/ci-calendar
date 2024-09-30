@@ -6,7 +6,6 @@ import EditEvent from "../Other/EditEvent"
 import RecycleEvent from "../Other/RecycleEvent"
 import HideEvent from "../Other/HideEvent"
 import BioModal from "../DisplayUsers/BioModal"
-import { useGetTeachers } from "../../../hooks/useGetTeachers"
 import { EventlyType, CIEvent } from "../../../util/interfaces"
 import {
     tagOptions,
@@ -46,8 +45,9 @@ export const SingleDayEventCard = React.forwardRef<
     // };
 
     const subEventLen = Object.values(event.subEvents).length
-    const teachersIds = getEventTeachersIds(event)
-    const { teachers } = useGetTeachers({ ids: teachersIds })
+    // const teachersIds = getEventTeachersIds(event)
+    // const { teachers } = useTeacherList()
+
     const nonRegestoredTeacherNames = Array.from(
         new Set(
             Object.values(event.subEvents)
@@ -67,7 +67,8 @@ export const SingleDayEventCard = React.forwardRef<
     )
 
     const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
-        const isTeacher = teachers.find((t) => t.id === teacher.value)
+        // const isTeacher = teachers.find((t) => t.id === teacher.value)
+        const isTeacher = false
         return isTeacher ? (
             <BioModal key={teacher.value} teacher={isTeacher} />
         ) : (
@@ -138,12 +139,13 @@ export const SingleDayEventCard = React.forwardRef<
                             {getType(subEvent.type as EventlyType)}
                             {subEvent.teachers.length > 0 && (
                                 <span>
-                                    &nbsp;עם{" "}
+                                    &nbsp;עם
                                     {subEvent.teachers.map(
                                         (teacher, index, array) => {
-                                            const isTeacher = teachers.find(
-                                                (t) => t.id === teacher.value
-                                            )
+                                            // const isTeacher = teachers.find(
+                                            //     (t) => t.id === teacher.value
+                                            // )
+                                            const isTeacher = false
                                             return (
                                                 <React.Fragment
                                                     key={teacher.value}
@@ -194,7 +196,7 @@ export const SingleDayEventCard = React.forwardRef<
                     <Icon icon="person" className="event-icon" />
                     <label className="event-label">
                         עם{" "}
-                        {subEventLen > 1 &&
+                        {subEventLen > 0 &&
                             [
                                 ...teachersBioOrName,
                                 ...nonRegestoredTeacherNames,
