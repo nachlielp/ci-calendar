@@ -22,10 +22,6 @@ export function MenuDrawer() {
         user?.user_type === UserType.admin ||
         user?.user_type === UserType.creator
 
-    const isUser =
-        user?.user_type === UserType.user ||
-        user?.user_type === UserType.profile
-
     const navigate = useNavigate()
 
     const goHome = () => {
