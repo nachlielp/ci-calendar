@@ -91,6 +91,7 @@ export default function App() {
                                             UserType.admin,
                                             UserType.creator,
                                             UserType.user,
+                                            UserType.profile,
                                         ]}
                                     />
                                 }
@@ -102,7 +103,22 @@ export default function App() {
                                 />
                             </Route>
 
-                            {/* Teacher privet routes */}
+                            {/* Profile privet routes */}
+                            <Route
+                                element={
+                                    <PrivateRoutes
+                                        requiredRoles={[
+                                            UserType.profile,
+                                            UserType.admin,
+                                            UserType.creator,
+                                        ]}
+                                    />
+                                }
+                            >
+                                <Route path="/bio" element={<BioPage />} />
+                            </Route>
+
+                            {/* Creator privet routes */}
 
                             <Route
                                 element={
@@ -166,7 +182,6 @@ export default function App() {
                                         />
                                     }
                                 />
-                                <Route path="/bio" element={<BioPage />} />
                             </Route>
 
                             {/* Admin privet routes */}

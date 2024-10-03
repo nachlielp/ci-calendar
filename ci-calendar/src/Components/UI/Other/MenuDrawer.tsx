@@ -16,6 +16,12 @@ export function MenuDrawer() {
     const isCreator =
         user?.user_type === UserType.admin ||
         user?.user_type === UserType.creator
+
+    const isProfile =
+        user?.user_type === UserType.profile ||
+        user?.user_type === UserType.admin ||
+        user?.user_type === UserType.creator
+
     const isUser =
         user?.user_type === UserType.user ||
         user?.user_type === UserType.profile
@@ -71,7 +77,7 @@ export function MenuDrawer() {
                 navigate("/bio")
                 setOpen(false)
             },
-            disabled: isUser,
+            disabled: !isProfile,
         },
         {
             key: "newsletter",
