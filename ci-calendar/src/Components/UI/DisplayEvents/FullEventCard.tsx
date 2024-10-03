@@ -13,6 +13,7 @@ import EditEvent from "../Other/EditEvent"
 import RecycleEvent from "../Other/RecycleEvent"
 import DeleteEvent from "../Other/DeleteEvent"
 import HideEvent from "../Other/HideEvent"
+import React from "react"
 
 export default function FullEventCard({
     event,
@@ -23,35 +24,7 @@ export default function FullEventCard({
     isManageTable?: boolean
     viewableTeachers: UserBio[]
 }) {
-    console.log(viewableTeachers)
-
     const subEventLen = Object.values(event.subEvents).length
-    // const teachersIds = getEventTeachersIds(event)
-    // const nonRegestoredTeacherNames = Array.from(
-    //   new Set(
-    //     Object.values(event.subEvents)
-    //       .flatMap((subEvent) => subEvent.teachers)
-    //       .filter((teacher) => teacher.value === "NON_EXISTENT")
-    //       .map((teacher) => teacher.label)
-    //   )
-    // );
-    // const regestoredTeacherOptions = Array.from(
-    //   new Map(
-    //     Object.values(event.subEvents)
-    //       .flatMap((subEvent) => subEvent.teachers)
-    //       .filter((teacher) => teacher.value !== "NON_EXISTENT")
-    //       .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
-    //   ).values()
-    // );
-
-    // const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
-    //   const isTeacher = teachers.find((t) => t.id === teacher.value);
-    //   return isTeacher ? (
-    //     <BioModal key={teacher.value} teacher={isTeacher} />
-    //   ) : (
-    //     teacher.label
-    //   );
-    // });
 
     const isMultiDay = event.startDate !== event.endDate
 
@@ -119,38 +92,32 @@ export default function FullEventCard({
                             {subEvent.teachers.length > 0 && (
                                 <span>
                                     &nbsp;עם{" "}
-                                    {subEvent.teachers.map((teacher) => {
-                                        const isTeacher =
-                                            viewableTeachers?.find(
-                                                (t) =>
-                                                    t.user_id === teacher.value
+                                    {subEvent.teachers.map(
+                                        (teacher, index, array) => {
+                                            const isTeacher =
+                                                viewableTeachers?.find(
+                                                    (t) =>
+                                                        t.user_id ===
+                                                        teacher.value
+                                                )
+                                            return (
+                                                <React.Fragment
+                                                    key={teacher.value}
+                                                >
+                                                    {isTeacher ? (
+                                                        <BioModal
+                                                            teacher={isTeacher}
+                                                        />
+                                                    ) : (
+                                                        teacher.label
+                                                    )}
+                                                    {index < array.length - 1
+                                                        ? ", "
+                                                        : ""}
+                                                </React.Fragment>
                                             )
-                                        return isTeacher ? (
-                                            <BioModal
-                                                key={teacher.value}
-                                                teacher={isTeacher}
-                                            />
-                                        ) : (
-                                            teacher.label
-                                        )
-                                        // const isTeacher = false
-                                        // return (
-                                        //     <React.Fragment
-                                        //         key={teacher.value}
-                                        //     >
-                                        //         {isTeacher ? (
-                                        //             <BioModal
-                                        //                 teacher={isTeacher}
-                                        //             />
-                                        //         ) : (
-                                        //             teacher.label
-                                        //         )}
-                                        //         {index < array.length - 1
-                                        //             ? ", "
-                                        //             : ""}
-                                        //     </React.Fragment>
-                                        // )
-                                    })}
+                                        }
+                                    )}
                                 </span>
                             )}
                             {subEvent.tags && (

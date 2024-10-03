@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { Button, Typography, Modal, Image } from "antd"
+import { Modal } from "antd"
 import { UserBio } from "../../../util/interfaces"
-const { Title, Text } = Typography
+import BioCard from "./BioCard"
 
 interface BioModalProps {
     teacher: UserBio
@@ -22,19 +22,6 @@ export default function BioModal({ teacher }: BioModalProps) {
         setIsModalOpen(false)
     }
 
-    const imgComponent = teacher.img ? (
-        <Image
-            alt="example"
-            src={teacher.img}
-            key={teacher.img}
-            width={340}
-            height={340}
-            style={{ objectFit: "cover", borderRadius: "5%" }}
-        />
-    ) : (
-        ""
-    )
-
     return (
         <>
             <label
@@ -44,6 +31,7 @@ export default function BioModal({ teacher }: BioModalProps) {
                     color: "blue",
                     textDecoration: "underline",
                     border: "none",
+                    cursor: "pointer",
                 }}
             >
                 {teacher.fullName}
@@ -54,23 +42,9 @@ export default function BioModal({ teacher }: BioModalProps) {
                 onOk={handleOk}
                 onCancel={handleCancel}
                 footer={null}
+                width={350}
             >
-                <div className="flex flex-col justify-center items-center w-full ">
-                    <Title level={3}>{teacher.fullName}</Title>
-                    {imgComponent}
-                    <Text className="m-10">{teacher.bio}</Text>
-                    {teacher.pageUrl && (
-                        <Button
-                            className="mt-5 w-full"
-                            key={teacher.pageUrl}
-                            type="default"
-                            href={teacher.pageUrl}
-                            target="_blank"
-                        >
-                            {teacher.pageTitle}
-                        </Button>
-                    )}
-                </div>
+                <BioCard teacher={teacher} />
             </Modal>
         </>
     )

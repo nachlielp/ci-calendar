@@ -1,57 +1,45 @@
-import { Card, Image } from "antd"
+import { Image } from "antd"
 import { Typography } from "antd"
 import { Icon } from "../Other/Icon"
-import { useUser } from "../../../context/UserContext"
+import { UserBio } from "../../../util/interfaces"
 const { Text } = Typography
 
-function BioCard() {
-    const { user } = useUser()
-    if (!user) throw new Error("BioCard: No user found")
-
+function BioCard({ teacher }: { teacher: UserBio }) {
     return (
-        <>
-            {user && (
-                <Card hoverable className="bio-card">
-                    <div className="bio-card-content">
-                        <label className="bio-card-title">
-                            {user.fullName}
-                        </label>
+        <section className="bio-card" style={{ direction: "rtl" }}>
+            <div className="bio-card-content">
+                <label className="bio-card-title">{teacher.fullName}</label>
 
-                        {user?.img && (
-                            <Image
-                                alt="example"
-                                src={user.img}
-                                key={user.img}
-                                preview={false}
-                                width={250}
-                                height={250}
-                                className="bio-card-img"
-                            />
-                        )}
-                        {user.pageUrl && (
-                            <a
-                                className="teacher-page-link"
-                                key={user.pageUrl}
-                                href={user.pageUrl}
-                                target="_blank"
-                            >
-                                {user.pageTitle || "דף פרופיל"}
-                                <Icon
-                                    icon="openInNew"
-                                    className="event-link-icon"
-                                />
-                            </a>
-                        )}
+                {teacher?.img && (
+                    <Image
+                        alt="example"
+                        src={teacher.img}
+                        key={teacher.img}
+                        preview={false}
+                        width={250}
+                        height={250}
+                        className="bio-card-img"
+                    />
+                )}
+                {teacher.pageUrl && (
+                    <a
+                        className="teacher-page-link"
+                        key={teacher.pageUrl}
+                        href={teacher.pageUrl}
+                        target="_blank"
+                    >
+                        {teacher.pageTitle || "דף פרופיל"}
+                        <Icon icon="openInNew" className="event-link-icon" />
+                    </a>
+                )}
 
-                        <hr className="bio-card-hr" />
-                        <label className="bio-card-subtitle">
-                            אודות {user.fullName}
-                        </label>
-                        <Text>{user.bio}</Text>
-                    </div>
-                </Card>
-            )}
-        </>
+                <hr className="bio-card-hr" />
+                <label className="bio-card-subtitle">
+                    אודות {teacher.fullName}
+                </label>
+                <Text>{teacher.bio}</Text>
+            </div>
+        </section>
     )
 }
 

@@ -126,6 +126,7 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
             )
             .in("user_id", teacherIds)
             .eq("showProfile", true)
+
         if (error) throw error
         console.log("viewable teachers", data)
         return data as UserBio[]
