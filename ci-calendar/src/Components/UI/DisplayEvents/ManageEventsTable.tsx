@@ -357,7 +357,11 @@ export default function ManageEventsTable() {
                 expandable={{
                     expandedRowRender: (event) => (
                         <div className="event-card-container" key={event.id}>
-                            <FullEventCard event={event} isManageTable={true} />
+                            <FullEventCard
+                                event={event}
+                                isManageTable={true}
+                                viewableTeachers={[]}
+                            />
                             {/* <SingleDayEventCard key={event.id} event={event} isEdit={true} /> */}
                         </div>
                     ),
