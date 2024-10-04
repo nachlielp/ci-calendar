@@ -6,10 +6,11 @@ export const utilService = {
 }
 
 function createDbUserFromUser(user: User): DbUser {
+    console.log(user)
     return {
         user_id: user.id,
         user_type: UserType.user,
-        fullName: user.user_metadata.fullName || "",
+        fullName: user.user_metadata.name || "",
         email: user.email || "",
         phoneNumber: user.phone || "",
         createdAt: user.created_at,
@@ -29,6 +30,7 @@ function createDbUserFromUser(user: User): DbUser {
         allowTagging: false,
         img: "", // Add this line
         bio: "",
+        provider: user.app_metadata["provider"] || "",
     }
 }
 

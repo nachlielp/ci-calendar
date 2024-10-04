@@ -89,6 +89,7 @@ export interface DbUser {
     pageTitle: string
     showProfile: boolean
     allowTagging: boolean
+    provider: string
     img: string
     bio: string
 }
