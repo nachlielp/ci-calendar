@@ -24,6 +24,15 @@ export default function Header() {
                     </LinkButton>
                 )}
 
+            {!user &&
+                ["/login", "/signup", "/reset-password"].includes(
+                    currentPath
+                ) && (
+                    <LinkButton to="/" className="header-btn no-border">
+                        חזרה &nbsp;
+                        <Icon icon="home" className="icon-main" />
+                    </LinkButton>
+                )}
             {user && (
                 <div className="header-actions">
                     <UserInfo user={user} />
