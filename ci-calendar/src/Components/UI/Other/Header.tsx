@@ -15,7 +15,7 @@ export default function Header() {
     return (
         <section className="header-container">
             {!user &&
-                !["/login", "/signup", "/reset-password"].includes(
+                !["/login", "/signup", "/reset-password-request"].includes(
                     currentPath
                 ) && (
                     <LinkButton
@@ -28,7 +28,7 @@ export default function Header() {
                 )}
 
             {!user &&
-                ["/login", "/signup", "/reset-password"].includes(
+                ["/login", "/signup", "/reset-password-request"].includes(
                     currentPath
                 ) && (
                     <LinkButton

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { FirebaseError } from "firebase/app"
 import { useUser } from "../../context/UserContext"
 import { supabase } from "../../supabase/client"
+import { Icon } from "../UI/Other/Icon"
 
 enum SignupError {
     none = "",
@@ -80,7 +81,7 @@ export default function Signup() {
 
     return (
         <Card id="signup-form" className="signup-form">
-            <h1 className="signup-title">הרשמה</h1>
+            <h1 className="general-title">הרשמה</h1>
 
             <Form
                 title="הרשמה"
@@ -90,7 +91,7 @@ export default function Signup() {
                 className="signup-form-content"
                 onFinish={onFinish}
             >
-                <Form.Item>
+                <Form.Item style={{ margin: "8px" }}>
                     <Input
                         type="text"
                         placeholder="שם"
@@ -99,7 +100,7 @@ export default function Signup() {
                         className="signup-input"
                     />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item style={{ margin: "8px" }}>
                     <Input
                         type="email"
                         placeholder="כתובת מייל"
@@ -108,7 +109,7 @@ export default function Signup() {
                         className="signup-input"
                     />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item style={{ margin: "8px" }}>
                     <Input.Password
                         status={error ? "error" : undefined}
                         placeholder="סיסמה"
@@ -117,7 +118,7 @@ export default function Signup() {
                         className="signup-input"
                     />
                 </Form.Item>
-                <Form.Item>
+                <Form.Item style={{ margin: "8px" }}>
                     <Input.Password
                         status={error ? "error" : undefined}
                         placeholder="אימות סיסמה"
@@ -137,27 +138,30 @@ export default function Signup() {
                     </Form.Item>
                 )}
 
-                <Form.Item className="button-container">
-                    <Button
-                        type="primary"
-                        htmlType="submit"
+                <article className="button-container">
+                    <button
+                        type="submit"
                         disabled={loading}
-                        className="signup-button"
+                        className="general-action-btn"
                     >
                         הרשמה
+                    </button>
+                    <Button
+                        type="default"
+                        onClick={onSupabaseGoogleSignIn}
+                        disabled={loading}
+                        className="google-button"
+                    >
+                        <label className="google-button-label">כניסה עם </label>
+                        &nbsp;
+                        <Icon
+                            icon="google_color"
+                            className="icon-main google-icon"
+                        />
                     </Button>
-                </Form.Item>
+                </article>
+                <Form.Item></Form.Item>
             </Form>
-            <Form.Item className="button-container">
-                <Button
-                    type="default"
-                    onClick={onSupabaseGoogleSignIn}
-                    disabled={loading}
-                    className="google-signin-button"
-                >
-                    הרשמה עם Google
-                </Button>
-            </Form.Item>
         </Card>
     )
 }

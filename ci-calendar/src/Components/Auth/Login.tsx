@@ -88,9 +88,6 @@ export default function Login() {
                     <Input
                         type="email"
                         placeholder="כתובת מייל"
-                        // prefix={
-                        //     <Icon icon="mail" className="login-input-icon" />
-                        // }
                         ref={emailRef}
                         required
                         style={{ marginBottom: "8px" }}
