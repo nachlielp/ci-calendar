@@ -1,5 +1,5 @@
 import { useRef, useState } from "react"
-import { Alert, Button, Card, Form, Input, InputRef } from "antd"
+import { Alert, Card, Form, Input, InputRef } from "antd"
 import { supabase } from "../../supabase/client"
 
 function ResetPasswordRequest() {
