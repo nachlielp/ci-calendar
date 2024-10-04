@@ -115,20 +115,19 @@ export default function Login() {
                 )}
 
                 <Form.Item style={{ marginBottom: "8px" }}>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
+                    <button
+                        type="submit"
                         disabled={loading}
-                        className="login-button default-font"
+                        className="general-action-btn"
                     >
                         כניסה
-                    </Button>
+                    </button>
                 </Form.Item>
             </Form>
 
             <div className="link-container">
                 <LinkButton
-                    to="/reset-password"
+                    to="/reset-password-request"
                     className="login-secondary-btn"
                 >
                     איפוס סיסמה

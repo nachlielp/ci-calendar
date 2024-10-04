@@ -2,6 +2,7 @@
 @import "./styles/login.css";
 @import "./styles/signup.css";
 @import "./styles/reset-password.css";
+@import "./styles/reset-password-request.css";
 @import "./styles/teacher-page.css";
 @import "./styles/events-list.css";
 @import "./styles/events-display.scss";
@@ -36,56 +37,59 @@
 @import "./styles/menu-drawer.scss";
 @import "./styles/create-events-page.scss";
 @import "./styles/cloudinary-upload.scss";
+@import "./styles/elements/buttons.scss";
+@import "./styles/elements/title.scss";
 @font-face {
-  font-family: "Assistant";
-  src: url("./assets/fonts/Assistant-VariableFont_wght.ttf") format("truetype");
+    font-family: "Assistant";
+    src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")
+        format("truetype");
 }
 
 * {
-  font-family: "Assistant", sans-serif !important;
+    font-family: "Assistant", sans-serif !important;
 }
 html,
 body {
-  touch-action: pan-x pan-y;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    touch-action: pan-x pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .background-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  z-index: -1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1;
 }
 
 .background-tile {
-  width: 100vw;
-  height: 100vw;
-  background-image: url("./assets/img/Background_2.png");
-  background-size: cover;
-  background-position: center;
-  margin-bottom: -1px;
+    width: 100vw;
+    height: 100vw;
+    background-image: url("./assets/img/Background_2.png");
+    background-size: cover;
+    background-position: center;
+    margin-bottom: -1px;
 }
 
 .background-tile:nth-child(even) {
-  transform: rotate(180deg) scaleX(-1);
+    transform: rotate(180deg) scaleX(-1);
 }
 
 .app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

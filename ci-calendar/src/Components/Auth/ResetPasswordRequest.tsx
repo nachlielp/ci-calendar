@@ -1,19 +1,13 @@
 import { useRef, useState } from "react"
 import { Alert, Button, Card, Form, Input, InputRef } from "antd"
-import { useAuthContext } from "./AuthContext"
 import { supabase } from "../../supabase/client"
 
-function ResetPassword() {
-    const { resetPassword } = useAuthContext()
-    if (!resetPassword) {
-        throw new Error(
-            "AuthContext is null, make sure you're within a Provider"
-        )
-    }
+function ResetPasswordRequest() {
     const emailRef = useRef<InputRef>(null)
 
     const [loading, setLoading] = useState<boolean>(false)
     const [message, setMessage] = useState<string>("")
+    const [mailSent, setMailSent] = useState<boolean>(false)
     const [messageType, setMessageType] = useState<"info" | "error">()
     const onFinish = async () => {
         try {
@@ -23,27 +17,32 @@ function ResetPassword() {
             if (!email) {
                 throw new Error("Email is required")
             }
+            const resetPasswordPage = `${window.location.origin}/reset-password`
+            console.log("resetPasswordUrl", resetPasswordPage)
             const { error, data } = await supabase.auth.resetPasswordForEmail(
-                email
+                email,
+                { redirectTo: resetPasswordPage }
             )
             if (error) throw error
             console.log("data", data)
+            setMailSent(true)
             setMessage(
-                "הקישרו לכניסה לחשבון נשלח לכתובת המייל שהזנתם, אנה אתחלו את הסיסמה מתוך החשבון שלכם"
+                "אם הכתובת נמצאת במערכת, הקישור לאיפוס הסיסמה נשלח לכתובת המייל שהזנתם בדקות הקרובות, אנא אתחלו את הסיסמה מתוך החשבון שלכם"
             )
             setMessageType("info")
         } catch (e) {
-            setMessage("Failed to reset password")
+            setMessage("השיחזור נכשל")
             setMessageType("error")
-            console.error(`Failed to reset password: ${e}`)
+            console.error(`Failed to reset : ${e}`)
         }
         setLoading(false)
     }
 
     return (
         <Card id="reset-password-form" className="reset-password-form">
-            <h1 className="reset-password-title">איפוס סיסמה</h1>
+            <h1 className="general-title">איפוס סיסמה</h1>
 
+            <h3 className="login-subtitle">נא להזין את המייל שאיתו נרשמתם:</h3>
             <Form
                 title=" איפוס סיסמה"
                 name="basic"
@@ -58,6 +57,7 @@ function ResetPassword() {
                         placeholder="אימייל"
                         ref={emailRef}
                         required
+                        disabled={mailSent}
                     />
                 </Form.Item>
                 {message ? (
@@ -67,19 +67,22 @@ function ResetPassword() {
                 ) : (
                     <></>
                 )}
-                <Form.Item style={{ marginBottom: "8px" }}>
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={loading}
-                        className="reset-password-button"
-                    >
-                        איפוס סיסמה
-                    </Button>
-                </Form.Item>
+                {!mailSent ? (
+                    <Form.Item style={{ marginBottom: "8px" }}>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="general-action-btn"
+                        >
+                            איפוס סיסמה
+                        </button>
+                    </Form.Item>
+                ) : (
+                    <></>
+                )}
             </Form>
         </Card>
     )
 }
 
-export default ResetPassword
+export default ResetPasswordRequest

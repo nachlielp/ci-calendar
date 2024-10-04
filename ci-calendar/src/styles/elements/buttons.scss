@@ -1,3 +1,26 @@
 .link-btn {
     text-decoration: none;
 }
+
+.general-action-btn {
+    width: auto;
+    font-family: Assistant;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20.93px;
+    text-align: right;
+    background-color: #dd5239;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 16px;
+    border: none;
+    &:hover {
+        background-color: #c6280c;
+        color: white;
+    }
+
+    &.loading {
+        background-color: #d77968;
+        color: white;
+    }
+}

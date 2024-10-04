@@ -37,6 +37,8 @@ import contentCopy from "../../../assets/svgs/content_copy.svg"
 import mail from "../../../assets/svgs/mail.svg"
 import support_agent from "../../../assets/svgs/support_agent.svg"
 import google_color from "../../../assets/svgs/google_color.svg"
+import lock_reset from "../../../assets/svgs/lock_reset.svg"
+
 export const Icon = ({
     icon,
     className,
@@ -88,6 +90,7 @@ export const Icon = ({
         mail,
         support_agent,
         google_color,
+        lock_reset,
     }
     return (
         <label className="icon-component" onClick={onClick}>

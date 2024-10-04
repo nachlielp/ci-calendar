@@ -22,6 +22,8 @@ export function MenuDrawer() {
         user?.user_type === UserType.admin ||
         user?.user_type === UserType.creator
 
+    const isEmailProvider = user?.provider === "email"
+
     const navigate = useNavigate()
 
     const goHome = () => {
@@ -92,6 +94,16 @@ export function MenuDrawer() {
                 navigate("/request")
                 setOpen(false)
             },
+        },
+        {
+            key: "reset-password",
+            icon: "lock_reset",
+            label: "איפוס סיסמה",
+            onClick: () => {
+                navigate("/reset-password")
+                setOpen(false)
+            },
+            disabled: !isEmailProvider,
         },
         {
             key: "logout",
