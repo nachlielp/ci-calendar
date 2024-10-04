@@ -18,7 +18,10 @@ export default function Header() {
                 !["/login", "/signup", "/reset-password"].includes(
                     currentPath
                 ) && (
-                    <LinkButton to="/login" className="header-btn no-border">
+                    <LinkButton
+                        to="/login"
+                        className="header-btn no-border align-to-content"
+                    >
                         התחבר/י &nbsp;
                         <Icon icon="account" className="icon-main" />
                     </LinkButton>
@@ -28,7 +31,10 @@ export default function Header() {
                 ["/login", "/signup", "/reset-password"].includes(
                     currentPath
                 ) && (
-                    <LinkButton to="/" className="header-btn no-border">
+                    <LinkButton
+                        to="/"
+                        className="header-btn no-border align-to-content"
+                    >
                         חזרה &nbsp;
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>

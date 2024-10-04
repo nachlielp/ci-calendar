@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuthContext } from "./AuthContext"
 import { LinkButton } from "../UI/Other/LinkButton"
 import { supabase } from "../../supabase/client"
+import { Icon } from "../UI/Other/Icon"
 
 enum LoginError {
     none = "",
@@ -60,7 +61,21 @@ export default function Login() {
 
     return (
         <Card id="login-form" className="login-form">
-            <h1 className="login-title">כניסה</h1>
+            <h1 className="login-title">כניסה והזדהות</h1>
+            <div>
+                <Button
+                    type="default"
+                    onClick={onSupabaseGoogleSignIn}
+                    disabled={loading}
+                    className="google-button default-font"
+                >
+                    <label className="google-button-label">כניסה עם </label>
+                    <Icon
+                        icon="google_color"
+                        className="icon-main google-icon"
+                    />
+                </Button>
+            </div>
             <Form
                 name="basic"
                 labelCol={{ span: 16 }}
@@ -68,21 +83,27 @@ export default function Login() {
                 style={{ maxWidth: 500 }}
                 onFinish={onFinish}
             >
+                <h3 className="login-subtitle">כניסה עם סיסמה:</h3>
                 <Form.Item>
                     <Input
                         type="email"
                         placeholder="כתובת מייל"
+                        // prefix={
+                        //     <Icon icon="mail" className="login-input-icon" />
+                        // }
                         ref={emailRef}
                         required
+                        style={{ marginBottom: "8px" }}
+                        allowClear
                     />
-                </Form.Item>
-                <Form.Item>
+
                     <Input.Password
                         status={error ? "error" : undefined}
                         placeholder="סיסמה"
                         ref={passwordRef}
                         required
                         className="default-font"
+                        allowClear
                     />
                 </Form.Item>
                 {error ? (
@@ -104,22 +125,15 @@ export default function Login() {
                     </Button>
                 </Form.Item>
             </Form>
-            <div>
-                <Button
-                    type="default"
-                    onClick={onSupabaseGoogleSignIn}
-                    disabled={loading}
-                    className="google-button default-font"
-                >
-                    כניסה עם Google
-                </Button>
-            </div>
 
             <div className="link-container">
-                <LinkButton to="/reset-password" className="default-font">
+                <LinkButton
+                    to="/reset-password"
+                    className="login-secondary-btn"
+                >
                     איפוס סיסמה
                 </LinkButton>
-                <LinkButton to="/signup" className="default-font">
+                <LinkButton to="/signup" className="login-secondary-btn">
                     הרשמה
                 </LinkButton>
             </div>

@@ -36,15 +36,18 @@ import noteStackAdd from "../../../assets/svgs/note_stack_add.svg"
 import contentCopy from "../../../assets/svgs/content_copy.svg"
 import mail from "../../../assets/svgs/mail.svg"
 import support_agent from "../../../assets/svgs/support_agent.svg"
+import google_color from "../../../assets/svgs/google_color.svg"
 export const Icon = ({
     icon,
     className,
     title,
+    pretitle,
     onClick,
 }: {
     icon: string
     className?: string
     title?: string
+    pretitle?: string
     onClick?: () => void
 }) => {
     const icons: { [key: string]: string } = {
@@ -84,11 +87,13 @@ export const Icon = ({
         contentCopy,
         mail,
         support_agent,
+        google_color,
     }
     return (
         <label className="icon-component" onClick={onClick}>
+            {pretitle && <span className="icon-title">{pretitle} &nbsp;</span>}
             <ReactSVG src={icons[icon]} className={className} />
-            <span className="icon-title">{title}</span>
+            {title && <span className="icon-title">{title}</span>}
         </label>
     )
 }
