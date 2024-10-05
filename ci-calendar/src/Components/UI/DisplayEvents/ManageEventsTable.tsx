@@ -16,7 +16,6 @@ const { Option } = Select
 
 export default function ManageEventsTable() {
     const { width } = useWindowSize()
-    //TODO get list of events by user and page
     const { user } = useUser()
     const { events } = useEvents()
 
@@ -189,10 +188,8 @@ export default function ManageEventsTable() {
             dataIndex: "title",
             key: "eventDetails",
             render: (title: string, record: CIEvent) => {
-                const startDate = new Date(
-                    record.startDate
-                ).toLocaleDateString()
-                const endDate = new Date(record.endDate).toLocaleDateString()
+                const startDate = dayjs(record.startDate).format("DD/MM/YYYY")
+                const endDate = dayjs(record.endDate).format("DD/MM/YYYY")
                 const dateString =
                     startDate === endDate
                         ? startDate

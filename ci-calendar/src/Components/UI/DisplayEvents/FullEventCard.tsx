@@ -1,12 +1,7 @@
 import { Button, Tag } from "antd"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
-import {
-    formatHebrewDate,
-    getTag,
-    getType,
-    getTypes,
-} from "./SingleDayEventCard"
+import { getTag, getType, getTypes } from "./SingleDayEventCard"
 import dayjs from "dayjs"
 import BioModal from "../DisplayUsers/BioModal"
 import EditEvent from "../Other/EditEvent"
@@ -14,7 +9,7 @@ import RecycleEvent from "../Other/RecycleEvent"
 import DeleteEvent from "../Other/DeleteEvent"
 import HideEvent from "../Other/HideEvent"
 import React from "react"
-
+import { utilService } from "../../../util/utilService"
 export default function FullEventCard({
     event,
     isManageTable,
@@ -38,7 +33,7 @@ export default function FullEventCard({
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {formatHebrewDate(event.subEvents[0]?.startTime)}
+                            {utilService.formatHebrewDate(event.startDate)}
                         </label>
                         <Icon icon="schedule" className="event-icon" />
                         <label className="event-label">
@@ -55,8 +50,8 @@ export default function FullEventCard({
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {formatHebrewDate(event.startDate)} -{" "}
-                            {formatHebrewDate(event.endDate)}
+                            {utilService.formatHebrewDate(event.startDate)} -{" "}
+                            {utilService.formatHebrewDate(event.endDate)}
                         </label>
                     </>
                 )}

@@ -135,8 +135,16 @@ export default function SingleDayEventForm() {
         try {
             if (repeatOption === EventFrequency.none) {
                 const event: CIEventWithoutId = {
-                    startDate: eventDate.toISOString(),
-                    endDate: eventDate.toISOString(),
+                    startDate: eventDate
+                        .hour(13)
+                        .minute(0)
+                        .second(0)
+                        .format("YYYY-MM-DDTHH:mm:ss"),
+                    endDate: eventDate
+                        .hour(13)
+                        .minute(0)
+                        .second(0)
+                        .format("YYYY-MM-DDTHH:mm:ss"),
                     type: "",
                     address: address,
                     createdAt: dayjs().toISOString(),
@@ -152,6 +160,7 @@ export default function SingleDayEventForm() {
                     creatorId: user.user_id,
                     creatorName: user.fullName,
                 }
+
                 await cieventsService.createCIEvent(event)
             } else if (endDate) {
                 const dates = listOfDates(
@@ -178,8 +187,16 @@ export default function SingleDayEventForm() {
 
                     const event: CIEventWithoutId = {
                         type: "",
-                        startDate: date.toISOString(),
-                        endDate: date.toISOString(),
+                        startDate: date
+                            .hour(13)
+                            .minute(0)
+                            .second(0)
+                            .format("YYYY-MM-DDTHH:mm:ss"),
+                        endDate: date
+                            .hour(13)
+                            .minute(0)
+                            .second(0)
+                            .format("YYYY-MM-DDTHH:mm:ss"),
                         address: address,
                         createdAt: dayjs().toISOString(),
                         updatedAt: dayjs().toISOString(),

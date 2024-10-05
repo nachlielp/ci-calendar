@@ -1,8 +1,12 @@
+import dayjs from "dayjs"
 import { DbUser, UserType } from "./interfaces"
 import { User } from "@supabase/supabase-js"
+import { hebrewMonths, SelectOption } from "./options"
 export const utilService = {
     createDbUserFromUser,
     deepCompare,
+    formatHebrewDate,
+    hebrewDay,
 }
 
 function createDbUserFromUser(user: User): DbUser {
@@ -61,4 +65,36 @@ function deepCompare(obj1: any, obj2: any): boolean {
     }
 
     return true
+}
+
+function formatHebrewDate(date: string) {
+    const hebrewDate = dayjs(date)
+    console.log("hebrewDate", hebrewDate)
+    const day = hebrewDate.format("D")
+    const month = hebrewDate.format("MM")
+    const hebrewMonth = hebrewMonths.find(
+        (m: SelectOption) => m.value === month
+    )?.label
+    return `${hebrewDay(date)} ${day} ב${hebrewMonth}`
+}
+
+function hebrewDay(date: string) {
+    switch (dayjs(date).locale("he").format("dd")) {
+        case "Su":
+            return "יום ראשון"
+        case "Mo":
+            return "יום שני"
+        case "Tu":
+            return "יום שלישי"
+        case "We":
+            return "יום רביעי"
+        case "Th":
+            return "יום חמישי"
+        case "Fr":
+            return "יום שישי"
+        case "Sa":
+            return "יום שבת"
+        default:
+            return ""
+    }
 }

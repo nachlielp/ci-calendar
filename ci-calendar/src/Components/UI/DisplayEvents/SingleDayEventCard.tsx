@@ -7,14 +7,9 @@ import RecycleEvent from "../Other/RecycleEvent"
 import HideEvent from "../Other/HideEvent"
 import BioModal from "../DisplayUsers/BioModal"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
-import {
-    tagOptions,
-    eventTypes,
-    hebrewMonths,
-    SelectOption,
-} from "../../../util/options"
+import { tagOptions, eventTypes } from "../../../util/options"
 import { Icon } from "../Other/Icon"
-
+import { utilService } from "../../../util/utilService"
 interface ISingleDayEventCardProps {
     event: CIEvent
     isEdit: boolean
@@ -25,6 +20,7 @@ export const SingleDayEventCard = React.forwardRef<
     HTMLDivElement,
     ISingleDayEventCardProps
 >(({ event, isEdit }, ref) => {
+    console.log("event", event)
     // const openGoogleMaps = (placeId: string, address: string) => {
     //   const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
     //   const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
@@ -105,7 +101,7 @@ export const SingleDayEventCard = React.forwardRef<
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {formatHebrewDate(event.startDate)}
+                            {utilService.formatHebrewDate(event.startDate)}
                         </label>
                         <Icon icon="schedule" className="event-icon" />
                         <label className="event-label">
@@ -122,8 +118,8 @@ export const SingleDayEventCard = React.forwardRef<
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {formatHebrewDate(event.startDate)} -{" "}
-                            {formatHebrewDate(event.endDate)}
+                            {utilService.formatHebrewDate(event.startDate)} -{" "}
+                            {utilService.formatHebrewDate(event.endDate)}
                         </label>
                     </>
                 )}
@@ -302,34 +298,4 @@ export const getEventTeachersIds = (event: CIEvent) => {
         .flatMap((subEvent) => subEvent.teachers)
         .map((teacher) => teacher.value)
         .filter((teacher) => teacher !== "NON_EXISTENT")
-}
-
-export const formatHebrewDate = (date: string) => {
-    const day = dayjs(date).locale("he").format("D")
-    const month = dayjs(date).locale("he").format("MM")
-    const hebrewMonth = hebrewMonths.find(
-        (m: SelectOption) => m.value === month
-    )?.label
-    return `${hebrewDay(date)} ${day} ב${hebrewMonth}`
-}
-
-export const hebrewDay = (date: string) => {
-    switch (dayjs(date).locale("he").format("dd")) {
-        case "Su":
-            return "יום ראשון"
-        case "Mo":
-            return "יום שני"
-        case "Tu":
-            return "יום שלישי"
-        case "We":
-            return "יום רביעי"
-        case "Th":
-            return "יום חמישי"
-        case "Fr":
-            return "יום שישי"
-        case "Sa":
-            return "יום שבת"
-        default:
-            return ""
-    }
 }

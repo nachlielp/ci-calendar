@@ -55,7 +55,7 @@ export default function SingleDayEventBaseForm({
     isEdit,
     address,
 }: ISingleDayEventBaseFormProps) {
-    console.log("eventDate", eventDate.format("DD/MM"))
+    console.log("eventDate DD/MM", eventDate.format("DD/MM"))
     return (
         <div className="single-day-event-base-form">
             <Card
@@ -97,7 +97,7 @@ export default function SingleDayEventBaseForm({
                 >
                     <DatePicker
                         format={"DD/MM"}
-                        minDate={eventDate}
+                        minDate={dayjs()}
                         maxDate={dayjs().add(3, "months")}
                         onChange={handleDateChange}
                         allowClear={false}
