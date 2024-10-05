@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom"
-import { CIEvent } from "../util/interfaces"
+import { CIEvent, WeekendDistrict, WeekendEventType } from "../util/interfaces"
 import dayjs from "dayjs"
 import { useMemo } from "react"
 
@@ -7,12 +7,14 @@ interface IUseEventsFilterProps {
     events: CIEvent[]
     showFuture?: boolean
     uids?: string[]
+    isWeekendPage?: boolean
 }
 
 export const useEventsFilter = ({
     events,
     showFuture,
     uids,
+    isWeekendPage,
 }: IUseEventsFilterProps) => {
     const [searchParams] = useSearchParams()
 
@@ -20,7 +22,39 @@ export const useEventsFilter = ({
         const eventTypes = searchParams.getAll("eventType")
         const districts = searchParams.getAll("district")
 
+        const weekendTypes = searchParams
+            .getAll("t")
+            .map(
+                (type) =>
+                    WeekendEventType[type as keyof typeof WeekendEventType]
+            )
+        const weekendDistricts = searchParams
+            .getAll("d")
+            .map(
+                (district) =>
+                    WeekendDistrict[district as keyof typeof WeekendDistrict]
+            )
+
         let filtered = events
+
+        if (isWeekendPage) {
+            console.log("weekendTypes: ", weekendTypes)
+            const weekendStart = dayjs().startOf("day")
+            const weekendEnd = dayjs().add(1, "week").endOf("week").endOf("day")
+            filtered = filtered.filter(
+                (event) =>
+                    dayjs(event.startDate) >= weekendStart &&
+                    dayjs(event.startDate) <= weekendEnd &&
+                    (!weekendTypes.length ||
+                        hasOverlap(
+                            weekendTypes,
+                            event.subEvents.map((subEvent) => subEvent.type)
+                        )) &&
+                    (!weekendDistricts.length ||
+                        hasOverlap(weekendDistricts, [event.district]))
+            )
+            return filtered
+        }
 
         if (uids && uids.length > 0) {
             filtered = filtered.filter((event) =>
@@ -59,6 +93,7 @@ export const useEventsFilter = ({
             if (districts.length === 0) {
                 return hasOverlap(eventTypes, eventTypeList)
             }
+
             return (
                 hasOverlap(districts, [event.district]) &&
                 hasOverlap(eventTypes, eventTypeList)

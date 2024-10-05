@@ -39,6 +39,7 @@ const ManageEventsTable = lazy(
 import dayjs from "dayjs"
 import SupportPage from "./Components/Pages/SupportPage"
 import ResetPassword from "./Components/Pages/RestPassword"
+import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
 
 export enum EventAction {
     edit,
@@ -85,7 +86,10 @@ export default function App() {
                                     />
                                 }
                             />
-
+                            <Route
+                                path="/weekly-events"
+                                element={<WeeklyEventsPage events={events} />}
+                            />
                             {/* User privet routes */}
                             <Route
                                 element={

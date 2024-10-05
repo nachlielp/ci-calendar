@@ -1,10 +1,24 @@
 export enum EventlyType {
     class = "class",
-    jam = "jam",
+    jame = "jame",
     workshop = "workshop",
     conference = "conference",
     underscore = "underscore",
     retreat = "retreat",
+}
+export enum WeekendEventType {
+    cl = "class",
+    j = "jame",
+    w = "workshop",
+    co = "conference",
+    u = "underscore",
+    r = "retreat",
+}
+export enum WeekendDistrict {
+    n = "north",
+    s = "south",
+    c = "center",
+    j = "jerusalem",
 }
 
 export interface UserOption {
