@@ -70,10 +70,17 @@ export default function RequestForm() {
                         <Input.TextArea placeholder="תיאור הבקשה" rows={6} />
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            Submit
-                        </Button>
+                    <Form.Item
+                        wrapperCol={{ span: 24 }}
+                        className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
+                    >
+                        <button type="submit" className="general-action-btn">
+                            הגשה
+                        </button>
                     </Form.Item>
                 </Form>
             </Card>

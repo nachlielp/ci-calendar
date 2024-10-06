@@ -149,8 +149,16 @@ export default function EditSingleDayEventForm({
         const eventId =
             editType === EventAction.recycle ? uuidv4() : eventData.id
         const event: CIEvent = {
-            startDate: baseDate.toISOString(),
-            endDate: baseDate.toISOString(),
+            startDate: baseDate
+                .hour(13)
+                .minute(0)
+                .second(0)
+                .format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: baseDate
+                .hour(13)
+                .minute(0)
+                .second(0)
+                .format("YYYY-MM-DDTHH:mm:ss"),
             type: "",
             id: eventId,
             address: newAddress || address,
@@ -230,10 +238,14 @@ export default function EditSingleDayEventForm({
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
                     >
-                        <Button type="primary" htmlType="submit">
+                        <button type="submit" className="general-action-btn">
                             {submitText}
-                        </Button>
+                        </button>
                     </Form.Item>
                 </Form>
             </Card>

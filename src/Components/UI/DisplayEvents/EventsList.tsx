@@ -1,12 +1,12 @@
 // import VirtualList from "rc-virtual-list";
-import { SingleDayEventCard } from "./SingleDayEventCard"
+import { EventPreview } from "./EventPreview"
 import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import EmptyList from "../Other/Empty"
 import { Empty } from "antd"
-import SingleDayModalCard from "./SingleDayModalCard"
 import { useUser } from "../../../context/UserContext"
+import EventModalWrapper from "./EventModalWrapper"
 
 interface IEventsListProps {
     onSelectEvent: (event: CIEvent) => void
@@ -46,11 +46,11 @@ export default function EventsList({
             {!isEvents && emptyEventsList()}
             {filteredEvents.map((event) => (
                 <div key={event.id}>
-                    <SingleDayModalCard
+                    <EventModalWrapper
                         event={event}
                         onSelectEvent={onSelectEvent}
                         anchorEl={
-                            <SingleDayEventCard
+                            <EventPreview
                                 key={event.id}
                                 event={event}
                                 isEdit={isEdit}

@@ -85,27 +85,24 @@ export default function NewsletterPage() {
                         />
                     </Form.Item>
 
-                    <Form.Item
+                    <Form.Item<FieldType>
+                        name="phoneNumber"
                         shouldUpdate={(prevValues, currentValues) =>
                             prevValues.active !== currentValues.active
                         }
+                        rules={[
+                            () => ({
+                                required: mailingList.active,
+                                message: "נא להזין מספר טלפון",
+                            }),
+                            {
+                                pattern:
+                                    /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
+                                message: "נא להזין מספר טלפון ישראלי תקני",
+                            },
+                        ]}
                     >
-                        <Form.Item<FieldType>
-                            name="phoneNumber"
-                            rules={[
-                                () => ({
-                                    required: mailingList.active,
-                                    message: "נא להזין מספר טלפון",
-                                }),
-                                {
-                                    pattern:
-                                        /^(?:\+972-?|0)([23489]|5[0248]|7[234679])[0-9]{7}$/,
-                                    message: "נא להזין מספר טלפון ישראלי תקני",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="מספר פלאפון" />
-                        </Form.Item>
+                        <Input placeholder="מספר פלאפון" />
                     </Form.Item>
 
                     <Form.Item<FieldType> name="districts">
@@ -134,10 +131,17 @@ export default function NewsletterPage() {
                         />
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type="primary" htmlType="submit">
-                            שמור
-                        </Button>
+                    <Form.Item
+                        wrapperCol={{ span: 24 }}
+                        className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
+                    >
+                        <button type="submit" className="general-action-btn">
+                            שמירה
+                        </button>
                     </Form.Item>
                 </Form>
             </Card>

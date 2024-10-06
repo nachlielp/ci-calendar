@@ -120,8 +120,16 @@ export default function MultiDayEventForm() {
 
         try {
             const event: CIEventWithoutId = {
-                startDate: dates[0].toISOString(),
-                endDate: dates[1].toISOString(),
+                startDate: dates[0]
+                    .hour(13)
+                    .minute(0)
+                    .second(0)
+                    .format("YYYY-MM-DDTHH:mm:ss"),
+                endDate: dates[1]
+                    .hour(13)
+                    .minute(0)
+                    .second(0)
+                    .format("YYYY-MM-DDTHH:mm:ss"),
                 type: values["main-event-type"],
                 address: address,
                 createdAt: dayjs().toISOString(),
@@ -132,7 +140,7 @@ export default function MultiDayEventForm() {
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 hide: false,
-                subEvents: subEventsTemplate,
+                subEvents: [],
                 district: values["district"],
                 creatorId: user.user_id,
                 creatorName: user.fullName,
@@ -172,17 +180,21 @@ export default function MultiDayEventForm() {
                         <b>מחיר</b>
                     </label>
                     <AddPricesForm />
+
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
                     >
-                        <Button type="primary" htmlType="submit">
-                            צור אירוע
-                        </Button>
+                        <button type="submit" className="general-action-btn">
+                            יצירת אירוע
+                        </button>
                     </Form.Item>
                 </Form>
             </section>
-            <div className="footer-space"></div>
         </>
     )
 }

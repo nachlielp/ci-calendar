@@ -14,9 +14,7 @@ const ResetPasswordRequest = lazy(
     () => import("./Components/Auth/ResetPasswordRequest")
 )
 const NewsletterPage = lazy(() => import("./Components/Pages/NewsletterPage"))
-const EventForm = lazy(
-    () => import("./Components/UI/EventForms/SingleDayEventForm")
-)
+
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const EditSingleDayEventForm = lazy(
     () => import("./Components/UI/EventForms/EditSingleDayEventForm")
@@ -25,9 +23,7 @@ const Loading = lazy(() => import("./Components/UI/Other/Loading"))
 const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
 const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
 const EventsPage = lazy(() => import("./Components/Pages/EventsPage"))
-const MultiDayEventForm = lazy(
-    () => import("./Components/UI/EventForms/MultiDayEventForm")
-)
+
 const EditMultiDayEventForm = lazy(
     () => import("./Components/UI/EventForms/EditMultiDayEventForm")
 )
@@ -141,15 +137,6 @@ export default function App() {
                             <Route
                                 path="/create-events"
                                 element={<CreateEventsPage />}
-                            />
-                            <Route path="/event-form" element={<EventForm />} />
-                            <Route
-                                path="/multi-day-event-form"
-                                element={<MultiDayEventForm />}
-                            />
-                            <Route
-                                path="/manage-events"
-                                element={<ManageEventsTable />}
                             />
                             <Route
                                 path="/edit-single-day-event/:eventId"

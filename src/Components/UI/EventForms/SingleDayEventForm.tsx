@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom"
-// import { useAuthContext } from "../../Auth/AuthContext"
 import { Button, Form } from "antd"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
@@ -25,24 +24,12 @@ dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
 dayjs.tz.setDefault("Asia/Jerusalem")
 
-// const formItemLayout = {
-//   labelCol: {
-//     xs: { span: 24 },
-//     sm: { span: 6 },
-//   },
-//   wrapperCol: {
-//     xs: { span: 24 },
-//     sm: { span: 14 },
-//   },
-// };
-
 const initialValues = {
     "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
     "event-tags": [tagOptions[0].value],
 }
 
 export default function SingleDayEventForm() {
-    console.log("SingleDayEventForm.render")
     const [form] = Form.useForm()
     const { teachers } = useTeachersList()
     const [repeatOption, setRepeatOption] = useState<EventFrequency>(
@@ -51,7 +38,6 @@ export default function SingleDayEventForm() {
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const navigate = useNavigate()
-    // const { createEvent } = useAuthContext()
     const { user } = useUser()
     const [address, setAddress] = useState<IAddress>()
 
@@ -257,14 +243,20 @@ export default function SingleDayEventForm() {
                     </label>
                     <AddPricesForm />
 
-                    <Form.Item className="submit-button-container">
-                        <Button type="primary" htmlType="submit">
+                    <Form.Item
+                        wrapperCol={{ span: 24 }}
+                        className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
+                    >
+                        <button type="submit" className="general-action-btn">
                             יצירת אירוע
-                        </Button>
+                        </button>
                     </Form.Item>
                 </Form>
             </section>
-            <div className="footer-space"></div>
         </div>
     )
 }

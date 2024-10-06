@@ -4,19 +4,20 @@ import { CIEvent, UserBio } from "../../../util/interfaces"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import FullEventCard from "./FullEventCard"
 
-interface SingleDayModalCardProps {
+interface EventCardProps {
     event: CIEvent
     viewableTeachers: UserBio[]
     onSelectEvent: (event: CIEvent) => void
     anchorEl: any | null
 }
 
-export default function SingleDayModalCard({
+export default function EventModalWrapper({
     event,
     anchorEl,
     viewableTeachers,
     onSelectEvent,
-}: SingleDayModalCardProps) {
+}: EventCardProps) {
+    console.log("EventCard")
     const [isModalOpen, setIsModalOpen] = useState(false)
     const { width } = useWindowSize()
 

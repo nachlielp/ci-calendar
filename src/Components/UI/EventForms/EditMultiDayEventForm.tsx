@@ -140,8 +140,16 @@ export default function EditMultiDayEventForm({
         }
 
         const event: CIEvent = {
-            startDate: dates[0].toISOString(),
-            endDate: dates[1].toISOString(),
+            startDate: dates[0]
+                .hour(13)
+                .minute(0)
+                .second(0)
+                .format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: dates[1]
+                .hour(13)
+                .minute(0)
+                .second(0)
+                .format("YYYY-MM-DDTHH:mm:ss"),
             type: values["main-event-type"],
             id: submitedEventId,
             address: address,
@@ -234,10 +242,14 @@ export default function EditMultiDayEventForm({
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
                     >
-                        <Button type="primary" htmlType="submit">
+                        <button type="submit" className="general-action-btn">
                             {submitText}
-                        </Button>
+                        </button>
                     </Form.Item>
                 </Form>
             </Card>

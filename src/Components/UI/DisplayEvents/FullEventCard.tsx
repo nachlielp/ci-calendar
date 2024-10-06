@@ -1,7 +1,7 @@
 import { Button, Tag } from "antd"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
-import { getTag, getType, getTypes } from "./SingleDayEventCard"
+import { getTag, getType, getTypes } from "./EventPreview"
 import dayjs from "dayjs"
 import BioModal from "../DisplayUsers/BioModal"
 import EditEvent from "../Other/EditEvent"
