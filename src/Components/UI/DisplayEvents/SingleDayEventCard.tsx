@@ -20,7 +20,6 @@ export const SingleDayEventCard = React.forwardRef<
     HTMLDivElement,
     ISingleDayEventCardProps
 >(({ event, isEdit }, ref) => {
-    console.log("event", event)
     // const openGoogleMaps = (placeId: string, address: string) => {
     //   const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
     //   const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
