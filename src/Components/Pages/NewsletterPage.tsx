@@ -8,11 +8,11 @@ import {
     Select,
 } from "antd"
 
-import { districtOptions, eventTypes } from "../../../util/options"
+import { districtOptions, eventTypes } from "../../util/options"
 import { useState } from "react"
-import { useUser } from "../../../context/UserContext"
-import { userService } from "../../../supabase/userService"
-import { District, EventlyType, IMailingList } from "../../../util/interfaces"
+import { useUser } from "../../context/UserContext"
+import { userService } from "../../supabase/userService"
+import { District, EventlyType, IMailingList } from "../../util/interfaces"
 
 type FieldType = {
     name: string
@@ -22,7 +22,7 @@ type FieldType = {
     ciEvents?: string[]
 }
 
-export default function UserForm() {
+export default function NewsletterPage() {
     const { user } = useUser()
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")

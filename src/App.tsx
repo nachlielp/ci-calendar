@@ -13,7 +13,7 @@ const Login = lazy(() => import("./Components/Auth/Login"))
 const ResetPasswordRequest = lazy(
     () => import("./Components/Auth/ResetPasswordRequest")
 )
-const UserForm = lazy(() => import("./Components/UI/UserForms/UserForm"))
+const NewsletterPage = lazy(() => import("./Components/Pages/NewsletterPage"))
 const TeacherPage = lazy(() => import("./Components/Pages/TeacherPage"))
 const EventForm = lazy(
     () => import("./Components/UI/EventForms/SingleDayEventForm")
@@ -101,7 +101,10 @@ export default function App() {
                                 />
                             }
                         >
-                            <Route path="/user" element={<UserForm />} />
+                            <Route
+                                path="/newsletter"
+                                element={<NewsletterPage />}
+                            />
                             <Route path="/request" element={<SupportPage />} />
                             <Route
                                 path="/reset-password"

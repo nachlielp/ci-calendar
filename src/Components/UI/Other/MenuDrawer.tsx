@@ -82,7 +82,7 @@ export function MenuDrawer() {
             icon: "mail",
             label: "ניוזלטר",
             onClick: () => {
-                navigate("/user")
+                navigate("/newsletter")
                 setOpen(false)
             },
         },
