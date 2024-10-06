@@ -14,11 +14,10 @@ const ResetPasswordRequest = lazy(
     () => import("./Components/Auth/ResetPasswordRequest")
 )
 const NewsletterPage = lazy(() => import("./Components/Pages/NewsletterPage"))
-const TeacherPage = lazy(() => import("./Components/Pages/TeacherPage"))
 const EventForm = lazy(
     () => import("./Components/UI/EventForms/SingleDayEventForm")
 )
-const BioPage = lazy(() => import("./Components/UI/DisplayUsers/BioPage"))
+const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const EditSingleDayEventForm = lazy(
     () => import("./Components/UI/EventForms/EditSingleDayEventForm")
 )
@@ -37,7 +36,7 @@ const ManageEventsTable = lazy(
 )
 import dayjs from "dayjs"
 import SupportPage from "./Components/Pages/SupportPage"
-import ResetPassword from "./Components/Pages/RestPassword"
+import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
 
 export enum EventAction {
@@ -108,7 +107,7 @@ export default function App() {
                             <Route path="/request" element={<SupportPage />} />
                             <Route
                                 path="/reset-password"
-                                element={<ResetPassword />}
+                                element={<ResetPasswordPage />}
                             />
                         </Route>
 
@@ -139,7 +138,6 @@ export default function App() {
                                 />
                             }
                         >
-                            <Route path="/teacher" element={<TeacherPage />} />
                             <Route
                                 path="/create-events"
                                 element={<CreateEventsPage />}

@@ -2,7 +2,7 @@ import { Alert, Card, Form, Input } from "antd"
 import { supabase } from "../../supabase/client"
 import { useState } from "react"
 
-export default function ResetPassword() {
+export default function ResetPasswordPage() {
     const [form] = Form.useForm()
     const [message, setMessage] = useState<string | null>(null)
     const [messageType, setMessageType] = useState<

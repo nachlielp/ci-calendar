@@ -1,6 +1,6 @@
 import { useState } from "react"
-import TeacherForm from "../UserForms/TeacherForm"
-import BioSelfPreview from "./BioSelfPreview"
+import TeacherForm from "../UI/UserForms/TeacherForm"
+import BioSelfPreview from "../UI/DisplayUsers/BioSelfPreview"
 import { Card } from "antd"
 
 export default function BioPage() {
