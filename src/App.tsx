@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
+import dayjs from "dayjs"
 import Header from "./Components/UI/Other/Header"
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
@@ -14,7 +15,6 @@ const ResetPasswordRequest = lazy(
     () => import("./Components/Auth/ResetPasswordRequest")
 )
 const NewsletterPage = lazy(() => import("./Components/Pages/NewsletterPage"))
-
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const EditSingleDayEventForm = lazy(
     () => import("./Components/UI/EventForms/EditSingleDayEventForm")
@@ -23,14 +23,12 @@ const Loading = lazy(() => import("./Components/UI/Other/Loading"))
 const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
 const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
 const EventsPage = lazy(() => import("./Components/Pages/EventsPage"))
-
 const EditMultiDayEventForm = lazy(
     () => import("./Components/UI/EventForms/EditMultiDayEventForm")
 )
 const ManageEventsTable = lazy(
     () => import("./Components/UI/DisplayEvents/ManageEventsTable")
 )
-import dayjs from "dayjs"
 import SupportPage from "./Components/Pages/SupportPage"
 import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
