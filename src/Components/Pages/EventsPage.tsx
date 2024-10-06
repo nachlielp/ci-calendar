@@ -118,7 +118,7 @@ export default function EventsPage({
                             color="#913e2f"
                             key={eventType}
                             closable
-                            onClose={() =>
+                            onClick={() =>
                                 onRemoveEventFilter("eventType", eventType)
                             }
                         >
@@ -131,7 +131,7 @@ export default function EventsPage({
                             color="#913e2f"
                             key={district}
                             closable
-                            onClose={() =>
+                            onClick={() =>
                                 onRemoveDistrictFilter("district", district)
                             }
                         >
