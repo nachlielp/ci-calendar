@@ -17,7 +17,6 @@ export default function EventModalWrapper({
     viewableTeachers,
     onSelectEvent,
 }: EventCardProps) {
-    console.log("EventCard")
     const [isModalOpen, setIsModalOpen] = useState(false)
     const { width } = useWindowSize()
 

@@ -18,7 +18,6 @@ interface EventPreviewProps {
 
 export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
     ({ event, isEdit }, ref) => {
-        console.log("EventPreview")
         // const openGoogleMaps = (placeId: string, address: string) => {
         //   const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
         //   const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;

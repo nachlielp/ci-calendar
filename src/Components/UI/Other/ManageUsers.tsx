@@ -4,7 +4,6 @@ import { UserType } from "../../../util/interfaces"
 import { useUsers } from "../../../hooks/useUsers"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { ManageUserOption, userService } from "../../../supabase/userService"
-// import { useAuthContext } from "../../Auth/AuthContext";
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
@@ -55,7 +54,6 @@ function ManageUsers() {
     }
 
     const onSelect = (value: string) => {
-        console.log(`ManageUsers.onSelect.value: `, value)
         const user = users.find((user) => user.user_id === value)
         if (user) {
             setSelectedUser(user)
@@ -165,9 +163,7 @@ function ManageUsers() {
             onClick={onMakeAdmin}
             className="user-btn"
         >
-            הגדר
-            <br />
-            כמנהל
+            הגדרה כמנהל
         </Button>
     )
     const makeCreator = (
@@ -176,9 +172,7 @@ function ManageUsers() {
             onClick={onMakeCreator}
             className="user-btn"
         >
-            הגדר
-            <br />
-            כיוצר
+            הגדרה כיוצר
         </Button>
     )
 
@@ -188,9 +182,7 @@ function ManageUsers() {
             onClick={onMakeProfile}
             className="user-btn"
         >
-            הגדר
-            <br />
-            כפרופיל
+            הגדרה כפרופיל
         </Button>
     )
     const makeUser = (
@@ -199,9 +191,7 @@ function ManageUsers() {
             onClick={onMakeUser}
             className="user-btn"
         >
-            הגדר
-            <br />
-            כמשתמש
+            הגדרה כמשתמש
         </Button>
     )
     const footer = selectedUser

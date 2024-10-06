@@ -55,7 +55,6 @@ export default function SingleDayEventBaseForm({
     isEdit,
     address,
 }: ISingleDayEventBaseFormProps) {
-    console.log("eventDate DD/MM", eventDate.format("DD/MM"))
     return (
         <div className="single-day-event-base-form">
             <Card

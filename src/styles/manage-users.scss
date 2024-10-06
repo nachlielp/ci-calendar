@@ -1,34 +1,38 @@
 .manage-users {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  //   justify-content: center;
-
-  height: calc(100vh - 56px);
-  overflow-y: auto;
-  color: #000;
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-
-  .user-btn {
-    height: 64px;
-  }
-
-  .manage-users-card {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
-    width: 100%;
-    max-width: 500px;
+    align-items: center;
+    //   justify-content: center;
 
-    margin-top: 100px;
-  }
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    color: #000;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
 
-  @media (max-width: 640px) {
-    .manage-users-card {
-      max-width: 90%;
+    .user-btn {
+        height: 48px;
+        white-space: normal; // Allow text to wrap
+        text-align: center; // Center the text
+        padding: 0 8px;
+        margin: 0 8px;
     }
-  }
+
+    .manage-users-card {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+        width: 100%;
+        max-width: 500px;
+
+        margin-top: 100px;
+    }
+
+    @media (max-width: 640px) {
+        .manage-users-card {
+            max-width: 90%;
+        }
+    }
 }

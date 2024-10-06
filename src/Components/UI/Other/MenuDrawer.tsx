@@ -135,7 +135,7 @@ export function MenuDrawer() {
                 onClose={() => setOpen(false)}
                 className="menu-drawer"
                 height="auto"
-                bodyStyle={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
             >
                 <div className="menu-drawer-content">
                     {mapOfMenu
