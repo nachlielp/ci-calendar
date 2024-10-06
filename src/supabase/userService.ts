@@ -128,7 +128,6 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
             .eq("showProfile", true)
 
         if (error) throw error
-        console.log("viewable teachers", data)
         return data as UserBio[]
     } catch (error) {
         console.error("Error fetching viewable teachers:", error)

@@ -54,7 +54,6 @@ export default function SingleDayModalCard({
 
     // const subEventLen = Object.values(event.subEvents).length;
     // const teachersIds = getEventTeachersIds(event);
-    // const { teachers } = useGetTeachers({ ids: teachersIds });
 
     return (
         <>

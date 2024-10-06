@@ -69,7 +69,6 @@ function deepCompare(obj1: any, obj2: any): boolean {
 
 function formatHebrewDate(date: string) {
     const hebrewDate = dayjs(date)
-    console.log("hebrewDate", hebrewDate)
     const day = hebrewDate.format("D")
     const month = hebrewDate.format("MM")
     const hebrewMonth = hebrewMonths.find(

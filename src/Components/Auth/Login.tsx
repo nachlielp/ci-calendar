@@ -2,7 +2,6 @@ import { useState, useRef } from "react"
 import { Alert, Button, Card, Form, Input, InputRef } from "antd"
 // import { Button, Card } from "antd";
 import { useNavigate } from "react-router-dom"
-import { useAuthContext } from "./AuthContext"
 import { LinkButton } from "../UI/Other/LinkButton"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../UI/Other/Icon"
@@ -14,12 +13,6 @@ enum LoginError {
 }
 
 export default function Login() {
-    const { googleLogin, emailLogin } = useAuthContext()
-    if (!googleLogin || !emailLogin) {
-        throw new Error(
-            "AuthContext is null, make sure you're within a Provider"
-        )
-    }
     const emailRef = useRef<InputRef>(null)
     const passwordRef = useRef<InputRef>(null)
     const [error, setError] = useState<LoginError>(LoginError.none)

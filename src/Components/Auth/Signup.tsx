@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { Alert, Button, Card, Form, Input, InputRef } from "antd"
 import { useNavigate } from "react-router-dom"
-import { FirebaseError } from "firebase/app"
 import { useUser } from "../../context/UserContext"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../UI/Other/Icon"
@@ -56,11 +55,10 @@ export default function Signup() {
             console.log("signup data", data)
             navigate("/")
         } catch (e) {
-            if (e instanceof FirebaseError) {
-                if (e.code === "auth/weak-password") {
-                    setError(SignupError.passwordToShort)
-                }
-                console.error(`Firebase Error: ${e.code}`)
+            if (e instanceof Error) {
+                //TODO add more specific error handling
+                setError(SignupError.passwordToShort)
+                console.error(` Error: ${e}`)
             } else {
                 console.error(`Other Error: ${e}`)
             }
