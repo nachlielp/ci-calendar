@@ -25,7 +25,7 @@ const EditSingleDayEventForm = lazy(
 const Loading = lazy(() => import("./Components/UI/Other/Loading"))
 const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
 const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
-const EventsDisplay = lazy(() => import("./Components/UI/Other/EventsDisplay"))
+const EventsPage = lazy(() => import("./Components/Pages/EventsPage"))
 const MultiDayEventForm = lazy(
     () => import("./Components/UI/EventForms/MultiDayEventForm")
 )
@@ -77,7 +77,7 @@ export default function App() {
                         <Route
                             path="/"
                             element={
-                                <EventsDisplay
+                                <EventsPage
                                     events={events}
                                     isEdit={false}
                                     viewableTeachers={viewableTeachers}
@@ -205,7 +205,7 @@ export default function App() {
                         <Route
                             path="*"
                             element={
-                                <EventsDisplay
+                                <EventsPage
                                     events={events}
                                     isEdit={false}
                                     viewableTeachers={viewableTeachers}

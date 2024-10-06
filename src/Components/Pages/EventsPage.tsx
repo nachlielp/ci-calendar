@@ -1,33 +1,33 @@
 import dayjs, { Dayjs } from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
-import { getLabelByValue } from "../../../util/helpers"
-import { CIEvent, UserBio } from "../../../util/interfaces"
-import CalendarView from "./CalendarView"
-import EventsList from "../DisplayEvents/EventsList"
+import { getLabelByValue } from "../../util/helpers"
+import { CIEvent, UserBio } from "../../util/interfaces"
+import CalendarView from "../UI/Other/CalendarView"
+import EventsList from "../UI/DisplayEvents/EventsList"
 import { useEffect, useState } from "react"
-import { useEventsFilter } from "../../../hooks/useEventsFilter"
-import FilterModel from "./FilterModel"
+import { useEventsFilter } from "../../hooks/useEventsFilter"
+import FilterModel from "../UI/Other/FilterModel"
 import { Button, Tag } from "antd"
-import { useParamsHandler } from "../../../hooks/useParamsHandler"
+import { useParamsHandler } from "../../hooks/useParamsHandler"
 
-import { Icon } from "./Icon"
-import { districtOptions, eventTypes } from "../../../util/options"
-import FilterDrawer from "./FilterDrawer"
-import { useWindowSize } from "../../../hooks/useWindowSize"
-import EventDrawer from "../DisplayEvents/EventDrawer"
+import { Icon } from "../UI/Other/Icon"
+import { districtOptions, eventTypes } from "../../util/options"
+import FilterDrawer from "../UI/Other/FilterDrawer"
+import { useWindowSize } from "../../hooks/useWindowSize"
+import EventDrawer from "../UI/DisplayEvents/EventDrawer"
 
-interface IEventsDisplayProps {
+interface IEventsPageProps {
     events: CIEvent[]
     viewableTeachers: UserBio[]
     isEdit: boolean
 }
 
-export default function EventsDisplay({
+export default function EventsPage({
     events,
     viewableTeachers,
     isEdit,
-}: IEventsDisplayProps) {
+}: IEventsPageProps) {
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
     const [isListView, setIsListView] = useState<boolean>(true)
 
