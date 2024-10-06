@@ -192,13 +192,14 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         </button> */}
                 </article>
 
-                {!isEdit && subEventLen > 0 && (
-                    <article className="event-teachers">
-                        <Icon icon="person" className="event-icon" />
-                        <label className="event-label">
-                            עם{" "}
-                            {subEventLen > 0 &&
-                                [
+                {!isEdit &&
+                    (teachersBioOrName.length > 0 ||
+                        nonRegestoredTeacherNames.length > 0) && (
+                        <article className="event-teachers">
+                            <Icon icon="person" className="event-icon" />
+                            <label className="event-label">
+                                עם{" "}
+                                {[
                                     ...teachersBioOrName,
                                     ...nonRegestoredTeacherNames,
                                 ].map((item, index, array) => (
@@ -207,9 +208,9 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                         {index < array.length - 1 && ", "}
                                     </React.Fragment>
                                 ))}
-                        </label>
-                    </article>
-                )}
+                            </label>
+                        </article>
+                    )}
 
                 {isEdit && !isWhiteSpace(event.description) && (
                     <div className="event-description">
