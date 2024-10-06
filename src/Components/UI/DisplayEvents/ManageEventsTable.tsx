@@ -8,7 +8,7 @@ import { CIEvent, UserType } from "../../../util/interfaces"
 import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import dayjs from "dayjs"
 import { Icon } from "../Other/Icon"
-import { SelectOption } from "../../../util/options"
+import { ScreenSize, SelectOption } from "../../../util/options"
 import FullEventCard from "./FullEventCard"
 import { useUser } from "../../../context/UserContext"
 import { useEvents } from "../../../hooks/useEvents"
@@ -51,7 +51,7 @@ export default function ManageEventsTable() {
 
     const uniqueTeachers = getUniqueTeachers(filteredEvents)
 
-    const isPhone = width < 600
+    const isPhone = width < ScreenSize.mobile
 
     const tableWidth = isPhone ? width * 0.9 : width * 0.5
 

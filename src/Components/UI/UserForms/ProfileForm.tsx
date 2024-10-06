@@ -17,12 +17,12 @@ type FieldType = {
     allowTagging?: string
 }
 
-interface ITeacherFormProps {
+interface ProfileFormProps {
     closeEditProfile: () => void
 }
 
 //TODO add cropper (react-easy-crop)
-export default function TeacherForm({ closeEditProfile }: ITeacherFormProps) {
+export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const { width } = useWindowSize()
     const { user, setUser } = useUser()
     if (!user) throw new Error("TeacherForm.user")

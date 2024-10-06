@@ -1,5 +1,5 @@
 import { useState } from "react"
-import TeacherForm from "../UI/UserForms/TeacherForm"
+import ProfileForm from "../UI/UserForms/ProfileForm"
 import BioSelfPreview from "../UI/DisplayUsers/BioSelfPreview"
 import { Card } from "antd"
 
@@ -29,7 +29,7 @@ export default function BioPage() {
                 )}
             </div>
             {editProfile ? (
-                <TeacherForm closeEditProfile={handleSubmitEdit} />
+                <ProfileForm closeEditProfile={handleSubmitEdit} />
             ) : (
                 <Card style={{ marginTop: "1rem" }}>
                     <BioSelfPreview />

@@ -1,4 +1,3 @@
-// import VirtualList from "rc-virtual-list";
 import { EventPreview } from "./EventPreview"
 import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import { CIEvent, UserBio } from "../../../util/interfaces"
