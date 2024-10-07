@@ -1,9 +1,8 @@
 import { useUser } from "../../../context/UserContext"
 import useRequests from "../../../hooks/useRequests"
 import { List } from "antd"
-import { RequestTypeHebrew } from "../../../supabase/requestsService"
 import dayjs from "dayjs"
-
+import { RequestTypeHebrew } from "../../../util/interfaces"
 // TODO: style list
 
 export default function RequestsList() {

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
-import { CiRequest, requestsService } from "../supabase/requestsService"
+import { requestsService } from "../supabase/requestsService"
+import { CIRequest } from "../util/interfaces"
 
 export default function useRequests(user_id: string) {
-    const [requests, setRequests] = useState<CiRequest[]>([])
+    const [requests, setRequests] = useState<CIRequest[]>([])
 
     useEffect(() => {
         const fetchRequests = async () => {

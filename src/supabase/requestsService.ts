@@ -1,37 +1,12 @@
+import { CIRequest, RequestType } from "../util/interfaces"
 import { supabase } from "./client"
 
-export enum RequestType {
-    make_profile = "make_profile",
-    make_creator = "make_creator",
-    support = "support",
-}
-
-export enum RequestTypeHebrew {
-    make_profile = "הרשמה כמורה",
-    make_creator = "הרשמה כמורה ויוצר ארועים",
-    support = "תמיכה",
-}
-
-export type CiRequest = {
-    request_id: string
-    created_at: string
-    request_type: string
-    created_by: string
-    type: RequestType
-    status: string
-    message: string
-    user_id: string
-    response: string
-    phone: string
-    email: string
-}
-
-export type CreateRequest = Partial<CiRequest> & {
+export type CreateRequest = Partial<CIRequest> & {
     type: RequestType
     message: string
 }
 
-export type UpdateRequest = Partial<CiRequest> & {
+export type UpdateRequest = Partial<CIRequest> & {
     request_id: string
     status?: string
     response?: string
@@ -69,7 +44,11 @@ async function getOpenRequestsByType(type: RequestType) {
 }
 
 async function createRequest(request: CreateRequest) {
-    const { data, error } = await supabase.from("requests").insert(request)
+    const { data, error } = await supabase
+        .from("requests")
+        .insert(request)
+        .select()
+        .single()
 
     return { data, error }
 }

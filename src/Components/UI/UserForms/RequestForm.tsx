@@ -1,7 +1,8 @@
 import { Form, type FormProps, Input, Card, Select } from "antd"
 
 import { useUser } from "../../../context/UserContext"
-import { requestsService, RequestType } from "../../../supabase/requestsService"
+import { requestsService } from "../../../supabase/requestsService"
+import { RequestType } from "../../../util/interfaces"
 import { useState } from "react"
 
 type RequestFieldType = {
@@ -16,10 +17,14 @@ const requestOptions = [
     { label: "תמיכה", value: "support" },
 ]
 
+const enum RequestResponse {
+    success = "הבקשה נשלחה בהצלחה",
+    error = "קרה שגיאה בשליחת הבקשה",
+}
 export default function RequestForm() {
     const { user } = useUser()
     const [type, setType] = useState<RequestType | null>(null)
-    const [isSubmitted, setIsSubmitted] = useState<boolean>(false)
+    const [isSubmitted, setIsSubmitted] = useState<RequestResponse | null>(null)
 
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -37,9 +42,16 @@ export default function RequestForm() {
         }
         console.log("requestPayload: ", requestPayload)
         try {
-            await requestsService.createRequest(requestPayload)
-
-            setIsSubmitted(true)
+            const { data, error } = await requestsService.createRequest(
+                requestPayload
+            )
+            if (error) {
+                setIsSubmitted(RequestResponse.error)
+                throw new Error(`RequestForm.onFinish.error: ${error}`)
+            }
+            if (data) {
+                setIsSubmitted(RequestResponse.success)
+            }
         } catch (error) {
             console.error("RequestForm.onFinish.error: ", error)
         }
@@ -130,7 +142,7 @@ export default function RequestForm() {
                 )}
                 {isSubmitted && (
                     <div>
-                        <h2>הבקשה נשלחה בהצלחה</h2>
+                        <h2>{isSubmitted}</h2>
                     </div>
                 )}
             </Card>
