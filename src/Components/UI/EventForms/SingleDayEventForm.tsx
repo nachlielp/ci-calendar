@@ -10,8 +10,8 @@ import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
-import SubEventsForm from "./SubEventsForm"
-import SingleDayEventBaseForm from "./SingleDayEventBaseForm"
+import EventSegmentsForm from "./EventSegmentsForm"
+import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { useTeachersList } from "../../../hooks/useTeachersList"
 import { useUser } from "../../../context/UserContext"
 import {
@@ -219,7 +219,7 @@ export default function SingleDayEventForm() {
                     // wrapperCol={{ span: 16, offset: 0 }}
                     initialValues={initialValues}
                 >
-                    <SingleDayEventBaseForm
+                    <SingleDayEventFormHead
                         form={form}
                         handleAddressSelect={handleAddressSelect}
                         handleDateChange={handleDateChange}
@@ -231,7 +231,7 @@ export default function SingleDayEventForm() {
                         isEdit={false}
                         teachers={teachers}
                     />
-                    <SubEventsForm form={form} day="" teachers={teachers} />
+                    <EventSegmentsForm form={form} day="" teachers={teachers} />
                     <hr className="divider" />
                     <label>
                         <b>קישור</b> (יופיע ככפתור בעמוד האירוע)

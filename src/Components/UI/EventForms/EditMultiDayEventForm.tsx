@@ -1,20 +1,18 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { Button, Card, Form } from "antd"
+import { Card, Form } from "antd"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { CIEvent, IAddress, IEventiPart } from "../../../util/interfaces"
+import { CIEvent, IAddress, CIEventPart } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import MultiDayFormHead from "./MultiDayFormHead"
-import MultiDayEventSubEventsForm from "./MultiDayEventSubEventsForm"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useTeachersList } from "../../../hooks/useTeachersList"
 import { formatTeachers } from "./SingleDayEventForm"
 import { reverseFormatTeachers } from "./EditSingleDayEventForm"
 import { EventAction } from "../../../App"
 import { v4 as uuidv4 } from "uuid"
-import { Icon } from "../Other/Icon"
 import { useUser } from "../../../context/UserContext"
 import { cieventsService } from "../../../supabase/cieventsService.ts"
 
@@ -34,7 +32,6 @@ export default function EditMultiDayEventForm({
     const { eventId } = useParams<{ eventId: string }>()
     const [eventData, setEventData] = useState<CIEvent | null>(null)
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
-    const [schedule, setSchedule] = useState(false)
     const [currentFormValues, setCurrentFormValues] = useState<any>()
     const [address, setAddress] = useState<IAddress | undefined>()
     const [form] = Form.useForm()
@@ -54,7 +51,6 @@ export default function EditMultiDayEventForm({
                             dayjs(currentFormValues["event-date"][1]),
                         ])
                         setAddress(address)
-                        setSchedule(currentFormValues["event-schedule"])
                     }
                 }
             } catch (error) {
@@ -78,9 +74,6 @@ export default function EditMultiDayEventForm({
         setAddress(selectedAddress)
         form.setFieldValue("address", selectedAddress)
     }
-    // const handleScheduleChange = (checked: boolean) => {
-    //   setSchedule(checked);
-    // };
 
     const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
         setDates(dates)
@@ -90,7 +83,7 @@ export default function EditMultiDayEventForm({
         editType === EventAction.recycle ? uuidv4() : eventData.id
 
     const handleSubmit = async (values: any) => {
-        const subEventsTemplate: IEventiPart[] = []
+        const subEventsTemplate: CIEventPart[] = []
 
         values.days?.forEach((day: any) => {
             const baseDate = dayjs(day["event-date-base"]) // Clone the base date for each day
@@ -199,44 +192,7 @@ export default function EditMultiDayEventForm({
                         // schedule={schedule}
                         address={address}
                     />
-                    {schedule && dates && (
-                        <Form.List name="days">
-                            {(days, { add, remove }) => (
-                                <>
-                                    {days.map(({ key, name, ...restField }) => (
-                                        <div key={key}>
-                                            <MultiDayEventSubEventsForm
-                                                day={name}
-                                                {...restField}
-                                                remove={remove}
-                                                teachers={teachers}
-                                                form={form}
-                                                limits={{
-                                                    start: dates[0],
-                                                    end: dates[1],
-                                                }}
-                                            />
-                                        </div>
-                                    ))}
-                                    <div className="add-button-container">
-                                        <Button
-                                            className="add-button"
-                                            onClick={() => add()}
-                                            block
-                                        >
-                                            <span className="add-button-content">
-                                                <Icon
-                                                    icon="addCircle"
-                                                    className="add-icon"
-                                                    title="הוסף יום"
-                                                />
-                                            </span>
-                                        </Button>
-                                    </div>
-                                </>
-                            )}
-                        </Form.List>
-                    )}
+
                     <AddLinksForm />
                     <AddPricesForm />
                     <Form.Item
@@ -253,7 +209,6 @@ export default function EditMultiDayEventForm({
                     </Form.Item>
                 </Form>
             </Card>
-            <div className="footer-space"></div>
         </>
     )
 }

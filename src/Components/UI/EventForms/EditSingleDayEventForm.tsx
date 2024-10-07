@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom"
-// import { useAuthContext } from "../../Auth/AuthContext"
 import { Card, Form } from "antd"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { useEffect, useState } from "react"
@@ -13,8 +12,8 @@ import Loading from "../Other/Loading"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
-import SingleDayEventBaseForm from "./SingleDayEventBaseForm"
-import SubEventsForm from "./SubEventsForm"
+import SingleDayEventFormHead from "./SingleDayEventFormHead"
+import EventSegmentsForm from "./EventSegmentsForm"
 import { formatTeachers } from "./SingleDayEventForm"
 import { EventAction } from "../../../App"
 import { useUser } from "../../../context/UserContext"
@@ -44,7 +43,6 @@ export default function EditSingleDayEventForm({
 }) {
     const navigate = useNavigate()
     const { teachers } = useTeachersList()
-    // const { getEvent, updateEvent, createEvent } = useAuthContext()
     const { user } = useUser()
     const { eventId } = useParams<{ eventId: string }>()
     const [eventData, setEventData] = useState<CIEvent | null>(null)
@@ -220,7 +218,7 @@ export default function EditSingleDayEventForm({
                     wrapperCol={{ span: 16, offset: 0 }}
                     initialValues={currentFormValues}
                 >
-                    <SingleDayEventBaseForm
+                    <SingleDayEventFormHead
                         form={form}
                         handleAddressSelect={handleAddressSelect}
                         handleDateChange={handleDateChange}
@@ -231,7 +229,7 @@ export default function EditSingleDayEventForm({
                         teachers={teachers}
                         address={address}
                     />
-                    <SubEventsForm day="" form={form} teachers={teachers} />
+                    <EventSegmentsForm day="" form={form} teachers={teachers} />
                     <AddLinksForm />
                     <AddPricesForm />
 

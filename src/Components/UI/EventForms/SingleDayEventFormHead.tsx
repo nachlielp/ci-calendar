@@ -28,7 +28,7 @@ import {
 import { IAddress } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 
-interface ISingleDayEventBaseFormProps {
+interface SingleDayEventFormHeadProps {
     form: any
     handleAddressSelect: (place: IGooglePlaceOption) => void
     handleDateChange: (date: dayjs.Dayjs) => void
@@ -42,7 +42,7 @@ interface ISingleDayEventBaseFormProps {
     address?: IAddress
 }
 
-export default function SingleDayEventBaseForm({
+export default function SingleDayEventFormHead({
     form,
     handleAddressSelect,
     handleDateChange,
@@ -54,7 +54,7 @@ export default function SingleDayEventBaseForm({
     endDate,
     isEdit,
     address,
-}: ISingleDayEventBaseFormProps) {
+}: SingleDayEventFormHeadProps) {
     return (
         <div className="single-day-event-base-form">
             <Card

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { UserBio, CIEvent, IEventiPart } from "../util/interfaces"
+import { UserBio, CIEvent, CIEventPart } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService, FilterOptions } from "../supabase/cieventsService"
 import { supabase } from "../supabase/client"
@@ -20,7 +20,7 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
                 const eventsTeacherIds: string[] = []
                 fetchedEvents.forEach((event) => {
                     const teacherIds = event.subEvents
-                        .flatMap((subEvent: IEventiPart) => subEvent.teachers)
+                        .flatMap((subEvent: CIEventPart) => subEvent.teachers)
                         .map((teacher: { value: string }) => teacher.value)
                         .filter((teacher: string) => teacher !== "NON_EXISTENT")
 

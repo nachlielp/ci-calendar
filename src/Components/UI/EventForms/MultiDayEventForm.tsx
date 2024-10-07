@@ -7,7 +7,7 @@ import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { tagOptions } from "../../../util/options"
-import { IAddress, IEventiPart, UserType } from "../../../util/interfaces"
+import { IAddress, CIEventPart, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -25,17 +25,6 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
 dayjs.tz.setDefault("Asia/Jerusalem")
-
-// const formItemLayout = {
-//   labelCol: {
-//     xs: { span: 24 },
-//     sm: { span: 6 },
-//   },
-//   wrapperCol: {
-//     xs: { span: 24 },
-//     sm: { span: 14 },
-//   },
-// };
 
 const initialValues = {
     "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
@@ -73,9 +62,7 @@ export default function MultiDayEventForm() {
         setDates(dates)
     }
     const handleSubmit = async (values: any) => {
-        // console.log("MultiDayEventForm.handleSubmit.values: ", values);
-
-        const subEventsTemplate: IEventiPart[] = []
+        const subEventsTemplate: CIEventPart[] = []
 
         values.days?.forEach((day: any) => {
             const startTime: string = dayjs(day["event-date-base"])
