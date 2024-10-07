@@ -22,6 +22,8 @@ export type CiRequest = {
     message: string
     user_id: string
     response: string
+    phone: string
+    email: string
 }
 
 export type CreateRequest = Partial<CiRequest> & {

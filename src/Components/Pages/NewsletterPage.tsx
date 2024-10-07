@@ -9,7 +9,7 @@ import { District, EventlyType, IMailingList } from "../../util/interfaces"
 type FieldType = {
     name: string
     active: boolean
-    phoneNumber?: string
+    phone?: string
     districts?: string[]
     ciEvents?: string[]
 }
@@ -37,7 +37,7 @@ export default function NewsletterPage() {
 
         updatedUser.newsletter = newNewsletter
 
-        updatedUser.phoneNumber = values.phoneNumber || ""
+        updatedUser.phone = values.phone || ""
 
         try {
             await userService.updateUser(user.user_id, updatedUser)
@@ -56,7 +56,7 @@ export default function NewsletterPage() {
                     initialValues={{
                         name: user.fullName,
                         active: user.newsletter.active,
-                        phoneNumber: user.phoneNumber,
+                        phone: user.phone,
                         ciEvents: user.newsletter.eventTypes,
                         districts: user.newsletter.districts,
                     }}
@@ -78,7 +78,7 @@ export default function NewsletterPage() {
                     </Form.Item>
 
                     <Form.Item<FieldType>
-                        name="phoneNumber"
+                        name="phone"
                         shouldUpdate={(prevValues, currentValues) =>
                             prevValues.active !== currentValues.active
                         }

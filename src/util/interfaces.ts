@@ -95,7 +95,7 @@ export interface DbUser {
     updatedAt: string
     user_type: UserType
     fullName: string
-    phoneNumber: string
+    phone: string
     email: string
     subscribedForUpdatesAt: string
     newsletter: IMailingList

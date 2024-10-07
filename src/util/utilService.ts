@@ -16,7 +16,7 @@ function createDbUserFromUser(user: User): DbUser {
         user_type: UserType.user,
         fullName: user.user_metadata.name || "",
         email: user.email || "",
-        phoneNumber: user.phone || "",
+        phone: user.phone || "",
         createdAt: user.created_at,
         updatedAt: new Date().toISOString(),
         subscribedForUpdatesAt: new Date().toISOString(),

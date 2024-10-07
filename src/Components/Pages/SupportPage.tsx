@@ -8,12 +8,12 @@ export default function SupportPage() {
 
     return (
         <div>
-            <div style={{ textAlign: "center" }}>
+            <div style={{ direction: "rtl" }}>
                 <Button onClick={() => setCreateRequest((prev) => !prev)}>
                     {createRequest ? " ביטול בקשה" : "יצירת בקשה"}
                 </Button>
+                {createRequest && <RequestForm />}
             </div>
-            {createRequest && <RequestForm />}
             <RequestsList />
         </div>
     )
