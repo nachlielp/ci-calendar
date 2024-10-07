@@ -19,7 +19,7 @@ export default function FullEventCard({
     isManageTable?: boolean
     viewableTeachers: UserBio[]
 }) {
-    const subEventLen = Object.values(event.subEvents).length
+    const segmentLen = event.segments.length
 
     const isMultiDay = event.startDate !== event.endDate
 
@@ -29,7 +29,7 @@ export default function FullEventCard({
                 <div className="event-title">{event.title}&nbsp;</div>
             </article>
             <article className="event-dates">
-                {event.subEvents.length > 0 ? (
+                {event.segments.length > 0 ? (
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
@@ -37,12 +37,10 @@ export default function FullEventCard({
                         </label>
                         <Icon icon="schedule" className="event-icon" />
                         <label className="event-label">
-                            {dayjs(event.subEvents[0].startTime).format(
-                                "HH:mm"
-                            )}
+                            {dayjs(event.segments[0].startTime).format("HH:mm")}
                             &nbsp;-&nbsp;
                             {dayjs(
-                                event.subEvents[subEventLen - 1].endTime
+                                event.segments[segmentLen - 1].endTime
                             ).format("HH:mm")}
                         </label>
                     </>
@@ -75,19 +73,19 @@ export default function FullEventCard({
                 </article>
             } */}
 
-            {subEventLen > 0 &&
-                Object.values(event.subEvents).map((subEvent, index) => (
+            {segmentLen > 0 &&
+                event.segments.map((segment, index) => (
                     <div className="sub-event" key={index}>
                         {/* <Icon icon="hov" className="sub-event-icon" /> */}
                         <span>
-                            {dayjs(subEvent.endTime).format("HH:mm")}
+                            {dayjs(segment.endTime).format("HH:mm")}
                             &nbsp;-&nbsp;
-                            {dayjs(subEvent.startTime).format("HH:mm")}&nbsp;
-                            {getType(subEvent.type as EventlyType)}
-                            {subEvent.teachers.length > 0 && (
+                            {dayjs(segment.startTime).format("HH:mm")}&nbsp;
+                            {getType(segment.type as EventlyType)}
+                            {segment.teachers.length > 0 && (
                                 <span>
                                     &nbsp;עם{" "}
-                                    {subEvent.teachers.map(
+                                    {segment.teachers.map(
                                         (teacher, index, array) => {
                                             const isTeacher =
                                                 viewableTeachers?.find(
@@ -115,10 +113,10 @@ export default function FullEventCard({
                                     )}
                                 </span>
                             )}
-                            {subEvent.tags && (
+                            {segment.tags && (
                                 <span>
                                     &nbsp;
-                                    {subEvent.tags.map((tag) => (
+                                    {segment.tags.map((tag) => (
                                         <Tag key={tag} color="green">
                                             {getTag(tag)}
                                         </Tag>
@@ -131,8 +129,8 @@ export default function FullEventCard({
 
             <article className="event-tags">
                 {getTypes(
-                    Object.values(event.subEvents).flatMap(
-                        (subEvent) => subEvent.type as EventlyType
+                    event.segments.flatMap(
+                        (segment) => segment.type as EventlyType
                     )
                 ).map((type, index) => (
                     <Tag

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { Card, Form } from "antd"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { CIEvent, IAddress, CIEventPart } from "../../../util/interfaces"
+import { CIEvent, IAddress, CIEventSegments } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
@@ -83,7 +83,7 @@ export default function EditMultiDayEventForm({
         editType === EventAction.recycle ? uuidv4() : eventData.id
 
     const handleSubmit = async (values: any) => {
-        const subEventsTemplate: CIEventPart[] = []
+        const segmentsTemplate: CIEventSegments[] = []
 
         values.days?.forEach((day: any) => {
             const baseDate = dayjs(day["event-date-base"]) // Clone the base date for each day
@@ -98,7 +98,7 @@ export default function EditMultiDayEventForm({
                 .hour(dayjs(day["event-time-base"][1]).hour())
                 .minute(dayjs(day["event-time-base"][1]).minute())
                 .toISOString()
-            subEventsTemplate.push({
+            segmentsTemplate.push({
                 startTime: startTime,
                 endTime: endTime,
                 type: day["event-type-base"],
@@ -107,23 +107,23 @@ export default function EditMultiDayEventForm({
             })
 
             // Additional sub-events for each day
-            day["sub-events"]?.forEach((subEvent: any) => {
-                const subEventStartTime: string = baseDate
+            day["segments"]?.forEach((segment: any) => {
+                const segmentStartTime: string = baseDate
                     .clone()
-                    .hour(dayjs(subEvent.time[0]).hour())
-                    .minute(dayjs(subEvent.time[0]).minute())
+                    .hour(dayjs(segment.time[0]).hour())
+                    .minute(dayjs(segment.time[0]).minute())
                     .toISOString()
-                const subEventEndTime: string = baseDate
+                const segmentEndTime: string = baseDate
                     .clone()
-                    .hour(dayjs(subEvent.time[1]).hour())
-                    .minute(dayjs(subEvent.time[1]).minute())
+                    .hour(dayjs(segment.time[1]).hour())
+                    .minute(dayjs(segment.time[1]).minute())
                     .toISOString()
-                subEventsTemplate.push({
-                    type: subEvent.type,
-                    tags: subEvent.tags || [],
-                    teachers: formatTeachers(subEvent.teachers, teachers),
-                    startTime: subEventStartTime,
-                    endTime: subEventEndTime,
+                segmentsTemplate.push({
+                    type: segment.type,
+                    tags: segment.tags || [],
+                    teachers: formatTeachers(segment.teachers, teachers),
+                    startTime: segmentStartTime,
+                    endTime: segmentEndTime,
                 })
             })
         })
@@ -154,7 +154,7 @@ export default function EditMultiDayEventForm({
             links: values["links"] || [],
             price: values["prices"] || [],
             hide: false,
-            subEvents: subEventsTemplate,
+            segments: segmentsTemplate,
             district: values["district"],
             creatorId: user.user_id,
             creatorName: user.fullName,
@@ -215,30 +215,30 @@ export default function EditMultiDayEventForm({
 
 const eventToFormValues = (event: CIEvent) => {
     const daysMap = new Map<string, any[]>()
-    event.subEvents.forEach((subEvent) => {
-        const startDay = dayjs(subEvent.startTime).format("YYYY-MM-DD")
+    event.segments.forEach((segment) => {
+        const startDay = dayjs(segment.startTime).format("YYYY-MM-DD")
         if (!daysMap.has(startDay)) {
             daysMap.set(startDay, [])
         }
         daysMap.get(startDay)!.push({
-            "event-date-base": dayjs(subEvent.startTime),
-            "event-type-base": subEvent.type,
+            "event-date-base": dayjs(segment.startTime),
+            "event-type-base": segment.type,
             "event-time-base": [
-                dayjs(subEvent.startTime),
-                dayjs(subEvent.endTime),
+                dayjs(segment.startTime),
+                dayjs(segment.endTime),
             ],
-            "event-teachers-base": reverseFormatTeachers(subEvent.teachers),
-            "event-tags-base": subEvent.tags,
+            "event-teachers-base": reverseFormatTeachers(segment.teachers),
+            "event-tags-base": segment.tags,
         })
     })
 
-    const days = Array.from(daysMap, ([_, subEvents]) => {
-        const baseEvent = subEvents[0]
-        const otherSubEvents = subEvents.slice(1).map((subEvent) => ({
-            type: subEvent["event-type-base"],
-            time: subEvent["event-time-base"],
-            teachers: reverseFormatTeachers(subEvent["event-teachers-base"]),
-            tags: subEvent["event-tags-base"],
+    const days = Array.from(daysMap, ([_, segments]) => {
+        const baseEvent = segments[0]
+        const otherSegments = segments.slice(1).map((segment) => ({
+            type: segment["event-type-base"],
+            time: segment["event-time-base"],
+            teachers: reverseFormatTeachers(segment["event-teachers-base"]),
+            tags: segment["event-tags-base"],
         }))
         return {
             "event-date-base": baseEvent["event-date-base"],
@@ -246,7 +246,7 @@ const eventToFormValues = (event: CIEvent) => {
             "event-time-base": baseEvent["event-time-base"],
             "event-teachers-base": baseEvent["event-teachers-base"],
             "event-tags-base": baseEvent["event-tags-base"],
-            "sub-events": otherSubEvents,
+            segments: otherSegments,
         }
     })
     const currentFormValues = {
@@ -258,7 +258,7 @@ const eventToFormValues = (event: CIEvent) => {
         address: event.address,
         "event-date": [dayjs(event.startDate), dayjs(event.endDate)],
         "main-event-type": event.type,
-        "event-schedule": event.subEvents.length > 0,
+        "event-schedule": event.segments.length > 0,
         links: event.links,
         prices: event.price,
         days: days,

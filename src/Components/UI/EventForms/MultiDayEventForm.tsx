@@ -7,7 +7,7 @@ import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { tagOptions } from "../../../util/options"
-import { IAddress, CIEventPart, UserType } from "../../../util/interfaces"
+import { IAddress, CIEventSegments, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -62,7 +62,7 @@ export default function MultiDayEventForm() {
         setDates(dates)
     }
     const handleSubmit = async (values: any) => {
-        const subEventsTemplate: CIEventPart[] = []
+        const segmentsTemplate: CIEventSegments[] = []
 
         values.days?.forEach((day: any) => {
             const startTime: string = dayjs(day["event-date-base"])
@@ -73,7 +73,7 @@ export default function MultiDayEventForm() {
                 .hour(dayjs(day["event-time-base"][1]).hour())
                 .minute(dayjs(day["event-time-base"][1]).minute())
                 .toISOString()
-            subEventsTemplate.push({
+            segmentsTemplate.push({
                 startTime: startTime,
                 endTime: endTime,
                 type: day["event-type-base"],
@@ -81,20 +81,19 @@ export default function MultiDayEventForm() {
                 teachers: formatTeachers(day["event-teacher-base"], teachers),
             })
 
-            // Additional sub-events for each day
-            day["sub-events"]?.forEach((subEvent: any) => {
+            day["segments"]?.forEach((segment: any) => {
                 const startTime: string = dayjs(day["event-date-base"])
-                    .hour(dayjs(subEvent.time[0]).hour())
-                    .minute(dayjs(subEvent.time[0]).minute())
+                    .hour(dayjs(segment.time[0]).hour())
+                    .minute(dayjs(segment.time[0]).minute())
                     .toISOString()
                 const endTime: string = dayjs(day["event-date-base"])
-                    .hour(dayjs(subEvent.time[1]).hour())
-                    .minute(dayjs(subEvent.time[1]).minute())
+                    .hour(dayjs(segment.time[1]).hour())
+                    .minute(dayjs(segment.time[1]).minute())
                     .toISOString()
-                subEventsTemplate.push({
-                    type: subEvent.type,
-                    tags: subEvent.tags || [],
-                    teachers: formatTeachers(subEvent.teacher, teachers),
+                segmentsTemplate.push({
+                    type: segment.type,
+                    tags: segment.tags || [],
+                    teachers: formatTeachers(segment.teacher, teachers),
                     startTime: startTime,
                     endTime: endTime,
                 })
@@ -127,7 +126,7 @@ export default function MultiDayEventForm() {
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 hide: false,
-                subEvents: [],
+                segments: [],
                 district: values["district"],
                 creatorId: user.user_id,
                 creatorName: user.fullName,

@@ -76,7 +76,7 @@ export default function SingleDayEventForm() {
     const handleSubmit = async (values: any) => {
         const baseDate = dayjs(values["event-date"]) // Clone the base date for consistent date manipulation
 
-        const subEventsTemplate = [
+        const segmentsTemplate = [
             {
                 startTime: baseDate
                     .clone()
@@ -94,21 +94,21 @@ export default function SingleDayEventForm() {
             },
         ]
 
-        if (values["sub-events"]) {
-            values["sub-events"].forEach((subEvent: any) => {
-                subEventsTemplate.push({
-                    type: subEvent.type,
-                    tags: subEvent.tags || [],
-                    teachers: formatTeachers(subEvent.teachers, teachers),
+        if (values["segments"]) {
+            values["segments"].forEach((segment: any) => {
+                segmentsTemplate.push({
+                    type: segment.type,
+                    tags: segment.tags || [],
+                    teachers: formatTeachers(segment.teachers, teachers),
                     startTime: baseDate
                         .clone()
-                        .hour(subEvent.time[0].hour())
-                        .minute(subEvent.time[0].minute())
+                        .hour(segment.time[0].hour())
+                        .minute(segment.time[0].minute())
                         .toISOString(),
                     endTime: baseDate
                         .clone()
-                        .hour(subEvent.time[1].hour())
-                        .minute(subEvent.time[1].minute())
+                        .hour(segment.time[1].hour())
+                        .minute(segment.time[1].minute())
                         .toISOString(),
                 })
             })
@@ -141,7 +141,7 @@ export default function SingleDayEventForm() {
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     hide: false,
-                    subEvents: subEventsTemplate,
+                    segments: segmentsTemplate,
                     district: values["district"],
                     creatorId: user.user_id,
                     creatorName: user.fullName,
@@ -157,17 +157,17 @@ export default function SingleDayEventForm() {
                 )
 
                 for (const date of dates) {
-                    const subEvents = subEventsTemplate.map((subEvent) => ({
-                        ...subEvent,
+                    const segments = segmentsTemplate.map((segment) => ({
+                        ...segment,
                         startTime: date
                             .clone()
-                            .hour(dayjs(subEvent.startTime).hour())
-                            .minute(dayjs(subEvent.startTime).minute())
+                            .hour(dayjs(segment.startTime).hour())
+                            .minute(dayjs(segment.startTime).minute())
                             .toISOString(),
                         endTime: date
                             .clone()
-                            .hour(dayjs(subEvent.endTime).hour())
-                            .minute(dayjs(subEvent.endTime).minute())
+                            .hour(dayjs(segment.endTime).hour())
+                            .minute(dayjs(segment.endTime).minute())
                             .toISOString(),
                     }))
 
@@ -192,7 +192,7 @@ export default function SingleDayEventForm() {
                         links: values["links"] || [],
                         price: values["prices"] || [],
                         hide: false,
-                        subEvents: subEvents,
+                        segments: segments,
                         district: values["district"],
                         creatorId: user.user_id,
                         creatorName: user.fullName,

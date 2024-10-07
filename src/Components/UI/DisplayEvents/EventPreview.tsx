@@ -38,12 +38,12 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         //   }
         // };
 
-        const subEventLen = Object.values(event.subEvents).length
+        const segmentsLength = Object.values(event.segments).length
 
         const nonRegestoredTeacherNames = Array.from(
             new Set(
-                Object.values(event.subEvents)
-                    .flatMap((subEvent) => subEvent.teachers)
+                Object.values(event.segments)
+                    .flatMap((segment) => segment.teachers)
                     .filter((teacher) => teacher.value === "NON_EXISTENT")
                     .map((teacher) => teacher.label)
             )
@@ -51,8 +51,8 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
 
         const regestoredTeacherOptions = Array.from(
             new Map(
-                Object.values(event.subEvents)
-                    .flatMap((subEvent) => subEvent.teachers)
+                Object.values(event.segments)
+                    .flatMap((segment) => segment.teachers)
                     .filter((teacher) => teacher.value !== "NON_EXISTENT")
                     .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
             ).values()
@@ -97,7 +97,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     <h2 className="event-title">{event.title}&nbsp;</h2>
                 </article>
                 <article className="event-dates">
-                    {event.subEvents.length > 0 ? (
+                    {event.segments.length > 0 ? (
                         <>
                             <Icon icon="calendar" className="event-icon" />
                             <label className="event-label">
@@ -105,12 +105,12 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                             </label>
                             <Icon icon="schedule" className="event-icon" />
                             <label className="event-label">
-                                {dayjs(event.subEvents[0].startTime).format(
+                                {dayjs(event.segments[0].startTime).format(
                                     "HH:mm"
                                 )}
                                 &nbsp;-&nbsp;
                                 {dayjs(
-                                    event.subEvents[subEventLen - 1].endTime
+                                    event.segments[segmentsLength - 1].endTime
                                 ).format("HH:mm")}
                             </label>
                         </>
@@ -125,20 +125,20 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     )}
                 </article>
                 {isEdit &&
-                    subEventLen > 0 &&
-                    Object.values(event.subEvents).map((subEvent, index) => (
+                    segmentsLength > 0 &&
+                    Object.values(event.segments).map((segment, index) => (
                         <div className="sub-event" key={index}>
                             {/* <Icon icon="hov" className="sub-event-icon" /> */}
                             <span>
-                                {dayjs(subEvent.endTime).format("HH:mm")}
+                                {dayjs(segment.endTime).format("HH:mm")}
                                 &nbsp;-&nbsp;
-                                {dayjs(subEvent.startTime).format("HH:mm")}
+                                {dayjs(segment.startTime).format("HH:mm")}
                                 &nbsp;
-                                {getType(subEvent.type as EventlyType)}
-                                {subEvent.teachers.length > 0 && (
+                                {getType(segment.type as EventlyType)}
+                                {segment.teachers.length > 0 && (
                                     <span>
                                         &nbsp;עם
-                                        {subEvent.teachers.map(
+                                        {segment.teachers.map(
                                             (teacher, index, array) => {
                                                 // const isTeacher = teachers.find(
                                                 //     (t) => t.id === teacher.value
@@ -167,10 +167,10 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                         )}
                                     </span>
                                 )}
-                                {subEvent.tags && (
+                                {segment.tags && (
                                     <span>
                                         &nbsp;
-                                        {subEvent.tags.map((tag) => (
+                                        {segment.tags.map((tag) => (
                                             <Tag key={tag} color="green">
                                                 {getTag(tag)}
                                             </Tag>
@@ -237,8 +237,8 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
 
                 <article className="event-tags">
                     {getTypes(
-                        Object.values(event.subEvents).flatMap(
-                            (subEvent) => subEvent.type as EventlyType
+                        Object.values(event.segments).flatMap(
+                            (segment) => segment.type as EventlyType
                         )
                     ).map((type, index) => (
                         <Tag
@@ -300,8 +300,8 @@ export const isWhiteSpace = (str: string) => {
     return str.trim().length === 0
 }
 export const getEventTeachersIds = (event: CIEvent) => {
-    return event.subEvents
-        .flatMap((subEvent) => subEvent.teachers)
+    return event.segments
+        .flatMap((segment) => segment.teachers)
         .map((teacher) => teacher.value)
         .filter((teacher) => teacher !== "NON_EXISTENT")
 }

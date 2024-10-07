@@ -107,7 +107,7 @@ export default function EditSingleDayEventForm({
 
         const baseDate = dayjs(values["event-date"]) // Clone the base date
 
-        const subEvents = [
+        const segments = [
             {
                 startTime: baseDate
                     .clone()
@@ -124,21 +124,21 @@ export default function EditSingleDayEventForm({
                 teachers: formatTeachers(values["teachers"], teachers),
             },
         ]
-        if (values["sub-events"]) {
-            values["sub-events"].forEach((subEvent: any) => {
-                subEvents.push({
-                    type: subEvent.type,
-                    tags: subEvent.tags || [],
-                    teachers: formatTeachers(subEvent.teachers, teachers),
+        if (values["segments"]) {
+            values["segments"].forEach((segment: any) => {
+                segments.push({
+                    type: segment.type,
+                    tags: segment.tags || [],
+                    teachers: formatTeachers(segment.teachers, teachers),
                     startTime: baseDate
                         .clone()
-                        .hour(subEvent.time[0].hour())
-                        .minute(subEvent.time[0].minute())
+                        .hour(segment.time[0].hour())
+                        .minute(segment.time[0].minute())
                         .toISOString(),
                     endTime: baseDate
                         .clone()
-                        .hour(subEvent.time[1].hour())
-                        .minute(subEvent.time[1].minute())
+                        .hour(segment.time[1].hour())
+                        .minute(segment.time[1].minute())
                         .toISOString(),
                 })
             })
@@ -168,7 +168,7 @@ export default function EditSingleDayEventForm({
             links: values["links"] || [],
             price: values["prices"] || [],
             hide: false,
-            subEvents: subEvents,
+            segments: segments,
             district: values["district"],
             creatorId: user.user_id,
             creatorName: user.fullName,
@@ -258,24 +258,24 @@ function eventToFormValues(event: CIEvent) {
         "event-description": event.description,
         address: event.address,
         district: event.district,
-        "event-types": event.subEvents[0]?.type,
-        "event-tags": event.subEvents[0]?.tags,
-        teachers: reverseFormatTeachers(event.subEvents[0]?.teachers),
+        "event-types": event.segments[0]?.type,
+        "event-tags": event.segments[0]?.tags,
+        teachers: reverseFormatTeachers(event.segments[0]?.teachers),
         "event-date": dayjs.tz(
-            dayjs(event.subEvents[0]?.startTime),
+            dayjs(event.segments[0]?.startTime),
             "Asia/Jerusalem"
         ),
         "event-time": [
-            dayjs(event.subEvents[0]?.startTime).tz("Asia/Jerusalem"),
-            dayjs(event.subEvents[0]?.endTime).tz("Asia/Jerusalem"),
+            dayjs(event.segments[0]?.startTime).tz("Asia/Jerusalem"),
+            dayjs(event.segments[0]?.endTime).tz("Asia/Jerusalem"),
         ],
-        "sub-events": event.subEvents.slice(1).map((subEvent) => ({
-            type: subEvent.type,
-            tags: subEvent.tags,
-            teachers: reverseFormatTeachers(subEvent.teachers),
+        segments: event.segments.slice(1).map((segment) => ({
+            type: segment.type,
+            tags: segment.tags,
+            teachers: reverseFormatTeachers(segment.teachers),
             time: [
-                dayjs(subEvent.startTime).tz("Asia/Jerusalem"),
-                dayjs(subEvent.endTime).tz("Asia/Jerusalem"),
+                dayjs(segment.startTime).tz("Asia/Jerusalem"),
+                dayjs(segment.endTime).tz("Asia/Jerusalem"),
             ],
         })),
         links: event.links.map((link) => ({

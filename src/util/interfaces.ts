@@ -26,7 +26,7 @@ export interface UserOption {
     label: string
 }
 
-export interface CIEventPart {
+export interface CIEventSegments {
     endTime: string
     type: string
     startTime: string
@@ -63,7 +63,7 @@ export interface CIEvent {
     type: string
     price: IPrice[]
     links: ILink[]
-    subEvents: CIEventPart[]
+    segments: CIEventSegments[]
     creatorId: string
     creatorName: string
 }

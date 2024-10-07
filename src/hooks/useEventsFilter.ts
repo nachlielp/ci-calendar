@@ -48,7 +48,7 @@ export const useEventsFilter = ({
                     (!weekendTypes.length ||
                         hasOverlap(
                             weekendTypes,
-                            event.subEvents.map((subEvent) => subEvent.type)
+                            event.segments.map((segment) => segment.type)
                         )) &&
                     (!weekendDistricts.length ||
                         hasOverlap(weekendDistricts, [event.district]))
@@ -79,7 +79,7 @@ export const useEventsFilter = ({
         filtered = filtered.filter((event) => {
             const eventTypeList =
                 event.startDate === event.endDate
-                    ? event.subEvents.map((subEvent) => subEvent.type)
+                    ? event.segments.map((segment) => segment.type)
                     : [event.type]
             if (event.type !== "") {
                 eventTypeList.push(event.type)

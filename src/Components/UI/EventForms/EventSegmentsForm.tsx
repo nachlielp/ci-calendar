@@ -13,11 +13,11 @@ export default function EventSegmentsForm({
     teachers,
 }: EventSegmentsFormProps) {
     return (
-        <Form.List name={day ? [day, "sub-events"] : "sub-events"}>
-            {(subEvents, { add, remove }) => (
+        <Form.List name={day ? [day, "segments"] : "segments"}>
+            {(segments, { add, remove }) => (
                 <>
-                    {subEvents.map(({ key, name }) => (
-                        <Card className="sub-event-card" key={key}>
+                    {segments.map(({ key, name }) => (
+                        <Card className="segment-card" key={key}>
                             <Row gutter={10} align="middle">
                                 <Col md={24} xs={24}>
                                     <Form.Item
