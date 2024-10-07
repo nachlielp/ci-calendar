@@ -39,6 +39,7 @@ export default function RequestForm() {
             message: values.description || "",
             phone: values.phone || user.phone || "",
             email: user.email || "",
+            name: user.fullName || "",
         }
         console.log("requestPayload: ", requestPayload)
         try {

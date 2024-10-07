@@ -138,12 +138,13 @@ export type CIRequest = {
     request_type: string
     created_by: string
     type: RequestType
-    status: string
+    status: RequestStatus
     message: string
     user_id: string
     response: string
     phone: string
     email: string
+    name: string
 }
 
 export enum RequestType {
@@ -156,4 +157,15 @@ export enum RequestTypeHebrew {
     make_profile = "הרשמה כמורה",
     make_creator = "הרשמה כמורה ויוצר ארועים",
     support = "תמיכה",
+}
+
+export enum RequestStatus {
+    open = "open",
+    closed = "closed",
+    pending = "pending",
+}
+export enum RequestStatusHebrew {
+    open = "פתוח",
+    closed = "סגור",
+    pending = "בטיפול",
 }
