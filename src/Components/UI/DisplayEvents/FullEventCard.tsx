@@ -4,10 +4,10 @@ import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
 import dayjs from "dayjs"
 import BioModal from "../DisplayUsers/BioModal"
-import EditEvent from "../Other/EditEvent"
-import RecycleEvent from "../Other/RecycleEvent"
-import DeleteEvent from "../Other/DeleteEvent"
-import HideEvent from "../Other/HideEvent"
+import EditEvent from "../Other/EditEventButton"
+import RecycleEvent from "../Other/RecycleEventButton"
+import DeleteEventButton from "../Other/DeleteEventButton"
+import HideEventButton from "../Other/HideEventButton"
 import React from "react"
 import { utilService } from "../../../util/utilService"
 export default function FullEventCard({
@@ -188,8 +188,8 @@ export default function FullEventCard({
                 <div className="event-card-footer">
                     <EditEvent eventId={event.id} isMultiDay={isMultiDay} />
                     <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />
-                    <DeleteEvent eventId={event.id} />
-                    <HideEvent eventId={event.id} hide={event.hide} />
+                    <DeleteEventButton eventId={event.id} />
+                    <HideEventButton eventId={event.id} hide={event.hide} />
                 </div>
             )}
         </section>

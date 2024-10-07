@@ -2,7 +2,7 @@ import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 import dayjs from "dayjs"
-import Header from "./Components/UI/Other/Header"
+import AppHeader from "./Components/UI/Other/AppHeader"
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
 import { useEvents } from "./hooks/useEvents"
@@ -58,7 +58,7 @@ export default function App() {
                 style={{ width: "100%", maxWidth: "500px" }}
             >
                 <Suspense fallback={<Loading />}>
-                    <Header />
+                    <AppHeader />
                     <Routes>
                         <Route path="signup" element={<Signup />} />
                         <Route path="login" element={<Login />} />

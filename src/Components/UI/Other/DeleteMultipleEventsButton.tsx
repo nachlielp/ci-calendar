@@ -41,7 +41,7 @@ interface IDeleteEventProps {
     disabled?: boolean
     onDelete: () => void
 }
-export default function DeleteMultipleEvents({
+export default function DeleteMultipleEventsButton({
     eventIds,
     className,
     disabled,

@@ -6,7 +6,7 @@ import { Icon } from "./Icon"
 import { MenuDrawer } from "./MenuDrawer"
 import { useUser } from "../../../context/UserContext"
 
-export default function Header() {
+export default function AppHeader() {
     const { user } = useUser()
     const location = useLocation()
 

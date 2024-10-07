@@ -1,10 +1,10 @@
 import React from "react"
 import { Card, Tag, Button } from "antd"
 import dayjs from "dayjs"
-import DeleteEvent from "../Other/DeleteEvent"
-import EditEvent from "../Other/EditEvent"
-import RecycleEvent from "../Other/RecycleEvent"
-import HideEvent from "../Other/HideEvent"
+import DeleteEventButton from "../Other/DeleteEventButton"
+import EditEvent from "../Other/EditEventButton"
+import RecycleEvent from "../Other/RecycleEventButton"
+import HideEventButton from "../Other/HideEventButton"
 import BioModal from "../DisplayUsers/BioModal"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { tagOptions, eventTypes } from "../../../util/options"
@@ -80,8 +80,8 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                           eventId={event.id}
                           isMultiDay={isMultiDay}
                       />
-                      <DeleteEvent eventId={event.id} />
-                      <HideEvent eventId={event.id} hide={event.hide} />
+                      <DeleteEventButton eventId={event.id} />
+                      <HideEventButton eventId={event.id} hide={event.hide} />
                   </div>,
               ]
             : []

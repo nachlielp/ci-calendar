@@ -1,15 +1,11 @@
-import { Spin } from "antd";
+import { Spin } from "antd"
 
-function Loading() {
-  return (
-    <div
-      className="loading-component"
-    >
-      <Spin size="large">
-        <div className="content" />
-      </Spin>
-    </div>
-  );
+export default function Loading() {
+    return (
+        <div className="loading-component">
+            <Spin size="large">
+                <div className="content" />
+            </Spin>
+        </div>
+    )
 }
-
-export default Loading;

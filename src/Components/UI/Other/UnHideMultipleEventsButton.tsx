@@ -1,7 +1,7 @@
 import { cieventsService } from "../../../supabase/cieventsService"
 import { Icon } from "./Icon"
 
-export default function HideMultipleEvents({
+export default function UnHideMultipleEventsButton({
     eventIds,
     className,
     disabled,
@@ -11,7 +11,7 @@ export default function HideMultipleEvents({
     disabled?: boolean
 }) {
     const handleHide = () => {
-        cieventsService.updateMultipleCIEvents(eventIds, { hide: true })
+        cieventsService.updateMultipleCIEvents(eventIds, { hide: false })
     }
     return (
         <button
@@ -19,7 +19,7 @@ export default function HideMultipleEvents({
             onClick={handleHide}
             disabled={disabled}
         >
-            <Icon icon="visibilityOff" />
+            <Icon icon="visibility" />
         </button>
     )
 }

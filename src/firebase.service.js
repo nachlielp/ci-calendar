@@ -1,5 +1,4 @@
 //NOTICE the app no longer uses firebase, this file is left for reference
-//if we decide to use firebase again in the future dont forget to reinstall the firebase package
 
 // import { initializeApp, getApps } from "firebase/app";
 // import { get, query } from "firebase/database";

@@ -1,7 +1,7 @@
 import { cieventsService } from "../../../supabase/cieventsService"
 import { Icon } from "./Icon"
 
-export default function HideEvent({
+export default function HideEventButton({
     eventId,
     hide,
 }: {

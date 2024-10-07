@@ -3,6 +3,9 @@ import useRequests from "../../../hooks/useRequests"
 import { List } from "antd"
 import { RequestTypeHebrew } from "../../../supabase/requestsService"
 import dayjs from "dayjs"
+
+// TODO: style list
+
 export default function RequestsList() {
     const { user } = useUser()
     if (!user) {

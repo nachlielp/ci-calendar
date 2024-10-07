@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
 import { Table, Select, Breakpoint } from "antd"
-import DeleteMultipleEvents from "../Other/DeleteMultipleEvents"
-import HideMultipleEvents from "../Other/HideMultipleEvents"
-import ShowMultipleEvents from "../Other/ShowMultipleEvents"
+import DeleteMultipleEventsButton from "../Other/DeleteMultipleEventsButton"
+import HideMultipleEventsButton from "../Other/HideMultipleEventsButton"
+import UnHideMultipleEventsButton from "../Other/UnHideMultipleEventsButton"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { CIEvent, UserType } from "../../../util/interfaces"
 import { useEventsFilter } from "../../../hooks/useEventsFilter"
@@ -294,7 +294,7 @@ export default function ManageEventsTable() {
                     )}
                 </div>
                 <div className="actions-row">
-                    <DeleteMultipleEvents
+                    <DeleteMultipleEventsButton
                         eventIds={selectedEventsToDelete.map(
                             (event) => event.id
                         )}
@@ -308,7 +308,7 @@ export default function ManageEventsTable() {
                         }
                         onDelete={onDelete}
                     />
-                    <HideMultipleEvents
+                    <HideMultipleEventsButton
                         eventIds={visableEventsToHide.map((event) => event.id)}
                         className={`multiple-events-action-btn ${
                             isActiveActions ? "active" : ""
@@ -319,7 +319,7 @@ export default function ManageEventsTable() {
                                 : selectedRowKeysPast.length === 0
                         }
                     />
-                    <ShowMultipleEvents
+                    <UnHideMultipleEventsButton
                         eventIds={hiddenEventsToShow.map((event) => event.id)}
                         className={`multiple-events-action-btn ${
                             isActiveActions ? "active" : ""

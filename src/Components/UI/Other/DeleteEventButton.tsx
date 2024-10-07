@@ -28,7 +28,7 @@ interface IDeleteEventProps {
     eventId: string
 }
 
-const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
+export default function DeleteEventButton({ eventId }: IDeleteEventProps) {
     return (
         <button
             className="event-footer-action"
@@ -39,5 +39,3 @@ const DeleteEvent = ({ eventId }: IDeleteEventProps) => {
         </button>
     )
 }
-
-export default DeleteEvent
