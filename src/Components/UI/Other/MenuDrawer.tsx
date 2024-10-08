@@ -107,6 +107,17 @@ export function MenuDrawer() {
                 navigate("/request")
                 setOpen(false)
             },
+            disabled: isAdmin,
+        },
+        {
+            key: "request",
+            icon: "support_agent",
+            label: "ניהול תמיכה",
+            onClick: () => {
+                navigate("/manage-support")
+                setOpen(false)
+            },
+            disabled: !isAdmin,
         },
         {
             key: "reset-password",

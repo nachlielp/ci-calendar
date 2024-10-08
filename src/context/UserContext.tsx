@@ -4,7 +4,7 @@ import { supabase } from "../supabase/client"
 import { useSession } from "./SessionContext"
 import { userService } from "../supabase/userService"
 import { utilService } from "../util/utilService"
-import useRequests from "../hooks/useRequests"
+import useUserRequests from "../hooks/useUserRequests"
 
 interface IUserContextType {
     user: DbUser | null
@@ -31,7 +31,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [loading, setLoading] = useState<boolean>(true)
     const { session } = useSession()
     //requests are in user context because they are used in multiple components but the subscription events can be caught by a single instance
-    const { requests } = useRequests(user?.user_id || "")
+    const { requests } = useUserRequests(user?.user_id || "")
     const updateUserContext = async (updatedUser: Partial<DbUser>) => {
         try {
             if (user && user.user_id) {

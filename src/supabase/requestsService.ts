@@ -1,3 +1,4 @@
+import { UseRequestsProps } from "../hooks/useRequests"
 import { CIRequest, RequestType } from "../util/interfaces"
 import { supabase } from "./client"
 
@@ -24,8 +25,9 @@ export const requestsService = {
     getOpenRequestsByType,
     markAsViewedRequestByAdmin,
     markAsViewedResponseByUser,
-    doesUserHaveNewClosedRequest,
     subscribeToResponses,
+    getAllRequests,
+    subscribeToAllRequests,
 }
 
 async function getUserRequests(userId: string) {
@@ -36,6 +38,84 @@ async function getUserRequests(userId: string) {
         .order("created_at", { ascending: false })
 
     return { data, error }
+}
+
+function subscribeToResponses(
+    userId: string,
+    callback: (hasNewResponse: boolean) => void
+) {
+    const channel = supabase
+        .channel(`public:requests:created_by=eq.${userId}`)
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "requests" },
+            (payload) => {
+                if (
+                    payload.eventType === "INSERT" ||
+                    (payload.eventType === "UPDATE" &&
+                        payload.new.status === "closed")
+                ) {
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            }
+        )
+        .subscribe()
+
+    return channel
+}
+
+async function getAllRequests({
+    status,
+    type,
+}: // user_name,
+// email,
+// page,
+// pageSize,
+UseRequestsProps) {
+    // console.log("user_name", user_name)
+    // console.log("email", email)
+    // console.log("page", page)
+    // console.log("pageSize", pageSize)
+    let query = supabase
+        .from("requests")
+        .select("*")
+        .order("created_at", { ascending: false })
+
+    if (status) {
+        query = query.in("status", status)
+    }
+    if (type) {
+        query = query.eq("type", type)
+    }
+    // if (user_name) {
+    //     query = query.eq("name", user_name)
+    // }
+    // if (email) {
+    //     query = query.eq("email", email)
+    // }
+    // if (page && pageSize) {
+    //     query = query.range((page - 1) * pageSize, page * pageSize)
+    // }
+
+    const { data, error } = await query
+    return { data, error }
+}
+
+async function subscribeToAllRequests(callback: (data: CIRequest[]) => void) {
+    const channel = supabase
+        .channel("public:requests")
+        .on(
+            "postgres_changes",
+            { event: "INSERT", schema: "public", table: "requests" },
+            (payload) => {
+                callback([payload.new as CIRequest])
+            }
+        )
+        .subscribe()
+
+    return channel
 }
 
 async function getOpenRequestsByType(type: RequestType) {
@@ -95,46 +175,4 @@ async function markAsViewedResponseByUser(requestId: string) {
         .single()
 
     return { data, error }
-}
-
-async function doesUserHaveNewClosedRequest(userId: string) {
-    const { data, error } = await supabase
-        .from("requests")
-        .select("request_id")
-        .eq("created_by", userId)
-        .eq("status", "closed")
-        .not("viewed_response", "is", "true")
-
-    if (error) {
-        console.error("Error fetching requests:", error)
-        return false
-    }
-
-    return data && data.length > 0
-}
-
-function subscribeToResponses(
-    userId: string,
-    callback: (hasNewResponse: boolean) => void
-) {
-    const channel = supabase
-        .channel(`public:requests:created_by=eq.${userId}`)
-        .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "requests" },
-            (payload) => {
-                if (
-                    payload.eventType === "INSERT" ||
-                    (payload.eventType === "UPDATE" &&
-                        payload.new.status === "closed")
-                ) {
-                    callback(true)
-                } else {
-                    callback(false)
-                }
-            }
-        )
-        .subscribe()
-
-    return channel
 }

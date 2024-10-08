@@ -32,6 +32,7 @@ const ManageEventsTable = lazy(
 import SupportPage from "./Components/Pages/SupportPage"
 import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
+import ManageSupportPage from "./Components/Pages/ManageSupportPage"
 
 export enum EventAction {
     edit,
@@ -186,6 +187,10 @@ export default function App() {
                             <Route
                                 path="/manage-events"
                                 element={<ManageEventsTable />}
+                            />
+                            <Route
+                                path="/manage-support"
+                                element={<ManageSupportPage />}
                             />
                         </Route>
                         <Route
