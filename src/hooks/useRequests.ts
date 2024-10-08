@@ -7,6 +7,9 @@ export default function useRequests(user_id: string) {
 
     useEffect(() => {
         const fetchRequests = async () => {
+            if (!user_id) {
+                return
+            }
             const { data, error } = await requestsService.getUserRequests(
                 user_id
             )
@@ -17,7 +20,20 @@ export default function useRequests(user_id: string) {
             setRequests(data || [])
         }
 
+        const subscription = requestsService.subscribeToResponses(
+            user_id,
+            async (hasNewResponse) => {
+                if (hasNewResponse) {
+                    await fetchRequests()
+                }
+            }
+        )
+
         fetchRequests()
+
+        return () => {
+            subscription.unsubscribe()
+        }
     }, [user_id])
 
     return { requests }

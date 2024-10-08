@@ -1,4 +1,4 @@
-import { Table } from "antd"
+import { Badge, Table } from "antd"
 import type { TableColumnsType } from "antd"
 
 import dayjs from "dayjs"
@@ -11,14 +11,24 @@ import {
 } from "../../../util/interfaces"
 import { useState } from "react"
 import { requestsService } from "../../../supabase/requestsService"
+import { useUser } from "../../../context/UserContext"
 
 const columns: TableColumnsType<CIRequest> = [
     {
         title: "בקשה",
         dataIndex: "type",
         key: "type",
-        render: (text: RequestType) => {
-            return <span>{RequestTypeHebrew[text]}</span>
+        render: (text: RequestType, record: CIRequest) => {
+            return (
+                <span>
+                    <Badge
+                        count={!closedAndNotViewedResponse(record) && 0}
+                        size="small"
+                    >
+                        {RequestTypeHebrew[text]}
+                    </Badge>
+                </span>
+            )
         },
     },
     {
@@ -39,7 +49,12 @@ const columns: TableColumnsType<CIRequest> = [
     },
 ]
 
-export default function RequestsList({ requests }: { requests: CIRequest[] }) {
+export default function RequestsList() {
+    const { user, requests } = useUser()
+    if (!user) {
+        throw new Error("user is null, make sure you're within a Provider")
+    }
+
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
 
     async function handleExpand(expanded: boolean, record: CIRequest) {
@@ -87,4 +102,8 @@ export default function RequestsList({ requests }: { requests: CIRequest[] }) {
             />
         </div>
     )
+}
+
+function closedAndNotViewedResponse(record: CIRequest) {
+    return record.status === RequestStatus.closed && !record.viewed_response
 }

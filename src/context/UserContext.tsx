@@ -1,12 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { DbUser } from "../util/interfaces"
+import { CIRequest, DbUser } from "../util/interfaces"
 import { supabase } from "../supabase/client"
 import { useSession } from "./SessionContext"
 import { userService } from "../supabase/userService"
 import { utilService } from "../util/utilService"
+import { requestsService } from "../supabase/requestsService"
+import useRequests from "../hooks/useRequests"
 
 interface IUserContextType {
     user: DbUser | null
+    requests: CIRequest[]
     setUser: (user: DbUser | null) => void
     loading: boolean
     updateUserContext: (updatedUser: Partial<DbUser>) => Promise<void>
@@ -14,6 +17,7 @@ interface IUserContextType {
 
 const UserContext = createContext<IUserContextType>({
     user: null,
+    requests: [],
     setUser: () => {},
     loading: true,
     updateUserContext: async () => {},
@@ -27,7 +31,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<DbUser | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const { session } = useSession()
-
+    //requests are in user context because they are used in multiple components but the subscription events can be caught by a single instance
+    const { requests } = useRequests(user?.user_id || "")
     const updateUserContext = async (updatedUser: Partial<DbUser>) => {
         try {
             if (user && user.user_id) {
@@ -79,7 +84,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <UserContext.Provider
-            value={{ user, setUser, loading, updateUserContext }}
+            value={{ user, setUser, loading, updateUserContext, requests }}
         >
             {children}
         </UserContext.Provider>

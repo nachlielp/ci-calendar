@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Table, Select, Breakpoint } from "antd"
 import DeleteMultipleEventsButton from "../Other/DeleteMultipleEventsButton"
-import HideMultipleEventsButton from "../Other/HideMultipleEventsButton"
+import HideMultipleEventsButton from "../Other/HideMultipleEvents"
 import UnHideMultipleEventsButton from "../Other/UnHideMultipleEventsButton"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { CIEvent, UserType } from "../../../util/interfaces"

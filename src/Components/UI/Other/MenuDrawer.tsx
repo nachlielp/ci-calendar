@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Badge, Drawer } from "antd"
 import { Icon } from "../Other/Icon"
 import { useNavigate } from "react-router-dom"
@@ -6,12 +6,23 @@ import { useWindowSize } from "../../../hooks/useWindowSize"
 import { supabase } from "../../../supabase/client"
 import { useUser } from "../../../context/UserContext"
 import { UserType } from "../../../util/interfaces"
-import useNewResponses from "../../../hooks/useNewResponses"
+
 export function MenuDrawer() {
     const [open, setOpen] = React.useState<boolean>(false)
-    const { user } = useUser()
+    const { user, requests } = useUser()
     const { width } = useWindowSize()
-    const { isNewResponse } = useNewResponses(user?.user_id)
+    const [isNewResponse, setIsNewResponse] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (requests.length > 0) {
+            setIsNewResponse(
+                requests.some(
+                    (request) =>
+                        request.status === "closed" && !request.viewed_response
+                )
+            )
+        }
+    }, [requests])
 
     const isMobile = width < 768
     const isAdmin = user?.user_type === UserType.admin
@@ -118,10 +129,6 @@ export function MenuDrawer() {
             },
         },
     ]
-
-    // if (!isAdmin) {
-    //   mapOfMenu = mapOfMenu.filter((item) => item.key !== "manage-users");
-    // }
 
     return (
         <>

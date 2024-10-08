@@ -25,6 +25,7 @@ export const requestsService = {
     markAsViewedRequestByAdmin,
     markAsViewedResponseByUser,
     doesUserHaveNewClosedRequest,
+    subscribeToResponses,
 }
 
 async function getUserRequests(userId: string) {
@@ -110,4 +111,30 @@ async function doesUserHaveNewClosedRequest(userId: string) {
     }
 
     return data && data.length > 0
+}
+
+function subscribeToResponses(
+    userId: string,
+    callback: (hasNewResponse: boolean) => void
+) {
+    const channel = supabase
+        .channel(`public:requests:created_by=eq.${userId}`)
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "requests" },
+            (payload) => {
+                if (
+                    payload.eventType === "INSERT" ||
+                    (payload.eventType === "UPDATE" &&
+                        payload.new.status === "closed")
+                ) {
+                    callback(true)
+                } else {
+                    callback(false)
+                }
+            }
+        )
+        .subscribe()
+
+    return channel
 }
