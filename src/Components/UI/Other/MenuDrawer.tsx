@@ -1,15 +1,17 @@
 import React from "react"
-import { Drawer } from "antd"
+import { Badge, Drawer } from "antd"
 import { Icon } from "../Other/Icon"
 import { useNavigate } from "react-router-dom"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { supabase } from "../../../supabase/client"
 import { useUser } from "../../../context/UserContext"
 import { UserType } from "../../../util/interfaces"
+import useNewResponses from "../../../hooks/useNewResponses"
 export function MenuDrawer() {
     const [open, setOpen] = React.useState<boolean>(false)
     const { user } = useUser()
     const { width } = useWindowSize()
+    const { isNewResponse } = useNewResponses(user?.user_id)
 
     const isMobile = width < 768
     const isAdmin = user?.user_type === UserType.admin
@@ -124,7 +126,9 @@ export function MenuDrawer() {
     return (
         <>
             <button onClick={() => setOpen(true)} className="menu-drawer-btn">
-                <Icon icon="menu" className="menu-drawer-icon" />
+                <Badge count={!isNewResponse && 0} size="small">
+                    <Icon icon="menu" className="menu-drawer-icon" />
+                </Badge>
             </button>
             <Drawer
                 closable
@@ -141,7 +145,13 @@ export function MenuDrawer() {
                     {mapOfMenu
                         .filter((item) => !item.disabled)
                         .map((item) => (
-                            <MenuItem key={item.key} item={item} />
+                            <MenuItem
+                                key={item.key}
+                                item={item}
+                                isBadge={
+                                    item.key === "request" && isNewResponse
+                                }
+                            />
                         ))}
                 </div>
             </Drawer>
@@ -149,10 +159,12 @@ export function MenuDrawer() {
     )
 }
 
-const MenuItem = ({ item }: { item: any }) => {
+const MenuItem = ({ item, isBadge }: { item: any; isBadge: boolean }) => {
     return (
         <article className="menu-item" onClick={item.onClick}>
-            <Icon icon={item.icon} />
+            <Badge count={!isBadge && 0} size="small">
+                <Icon icon={item.icon} />
+            </Badge>
             <p>{item.label}</p>
         </article>
     )

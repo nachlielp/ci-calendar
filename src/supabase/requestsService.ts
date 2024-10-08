@@ -22,6 +22,9 @@ export const requestsService = {
     updateRequest,
     deleteRequest,
     getOpenRequestsByType,
+    markAsViewedRequestByAdmin,
+    markAsViewedResponseByUser,
+    doesUserHaveNewClosedRequest,
 }
 
 async function getUserRequests(userId: string) {
@@ -69,4 +72,42 @@ async function deleteRequest(requestId: string) {
         .eq("request_id", requestId)
 
     return { data, error }
+}
+
+async function markAsViewedRequestByAdmin(requestId: string, userId: string) {
+    const { data, error } = await supabase
+        .from("requests")
+        .update({ viewed_by: { _fn: "array_append", args: [userId] } })
+        .eq("request_id", requestId)
+        .select()
+        .single()
+
+    return { data, error }
+}
+
+async function markAsViewedResponseByUser(requestId: string) {
+    const { data, error } = await supabase
+        .from("requests")
+        .update({ viewed_response: true })
+        .eq("request_id", requestId)
+        .select()
+        .single()
+
+    return { data, error }
+}
+
+async function doesUserHaveNewClosedRequest(userId: string) {
+    const { data, error } = await supabase
+        .from("requests")
+        .select("request_id")
+        .eq("created_by", userId)
+        .eq("status", "closed")
+        .not("viewed_response", "is", "true")
+
+    if (error) {
+        console.error("Error fetching requests:", error)
+        return false
+    }
+
+    return data && data.length > 0
 }

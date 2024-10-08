@@ -1,5 +1,3 @@
-import { useUser } from "../../../context/UserContext"
-import useRequests from "../../../hooks/useRequests"
 import { Table } from "antd"
 import type { TableColumnsType } from "antd"
 
@@ -12,6 +10,7 @@ import {
     RequestStatusHebrew,
 } from "../../../util/interfaces"
 import { useState } from "react"
+import { requestsService } from "../../../supabase/requestsService"
 
 const columns: TableColumnsType<CIRequest> = [
     {
@@ -40,16 +39,14 @@ const columns: TableColumnsType<CIRequest> = [
     },
 ]
 
-export default function RequestsList() {
-    const { user } = useUser()
+export default function RequestsList({ requests }: { requests: CIRequest[] }) {
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
-    const { requests } = useRequests(user.user_id)
 
-    const handleExpand = (expanded: boolean, record: CIRequest) => {
+    async function handleExpand(expanded: boolean, record: CIRequest) {
         setExpandedRowKeys(expanded ? [record.request_id] : [])
+        if (record.status === RequestStatus.closed && !record.viewed_response) {
+            await requestsService.markAsViewedResponseByUser(record.request_id)
+        }
     }
 
     return (

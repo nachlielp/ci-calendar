@@ -145,6 +145,8 @@ export type CIRequest = {
     phone: string
     email: string
     name: string
+    viewed_response: boolean
+    viewed_by: string[]
 }
 
 export enum RequestType {

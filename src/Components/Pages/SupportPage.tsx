@@ -2,9 +2,18 @@ import { useState } from "react"
 import RequestForm from "../UI/UserForms/RequestForm"
 import RequestsList from "../UI/Other/RequestsList"
 import MenuButtons from "../UI/Other/MenuButtons"
+import useRequests from "../../hooks/useRequests"
+import { useUser } from "../../context/UserContext"
 
 export default function SupportPage() {
-    const [createRequest, setCreateRequest] = useState<boolean>(false)
+    const { user } = useUser()
+    if (!user) {
+        throw new Error("user is null, make sure you're within a Provider")
+    }
+    const { requests } = useRequests(user.user_id)
+    const [createRequest, setCreateRequest] = useState<boolean>(
+        requests.length === 0
+    )
 
     function onSelectKey(key: string) {
         setCreateRequest(key === "create")
@@ -30,10 +39,10 @@ export default function SupportPage() {
                         title: "צפייה בבקשות",
                     },
                 ]}
-                defaultKey="create"
+                defaultKey={requests.length > 0 ? "requests" : "create"}
             />
             {createRequest && <RequestForm />}
-            {!createRequest && <RequestsList />}
+            {!createRequest && <RequestsList requests={requests} />}
         </div>
     )
 }
