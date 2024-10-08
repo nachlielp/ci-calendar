@@ -16,6 +16,7 @@ import { districtOptions, eventTypes } from "../../util/options"
 import FilterDrawer from "../UI/Other/FilterDrawer"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import EventDrawer from "../UI/DisplayEvents/EventDrawer"
+import MenuButtons from "../UI/Other/MenuButtons"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -72,13 +73,14 @@ export default function EventsPage({
         setTodaysEvents(todaysEvents)
     }, [selectedDay])
 
-    function onViewList() {
-        setIsListView(true)
-    }
-
-    function onViewCalendar() {
-        setIsListView(false)
-        setSelectedDay(dayjs())
+    function onSelectKey(key: string) {
+        if (key === "list") {
+            setIsListView(true)
+        }
+        if (key === "calendar") {
+            setIsListView(false)
+            setSelectedDay(dayjs())
+        }
     }
 
     return (
@@ -87,28 +89,20 @@ export default function EventsPage({
                 <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
                 <p className="subtitle">כל האירועים במקום אחד</p>
                 <main className="menu-container">
-                    <div className="menu-btns">
-                        <Button
-                            onClick={onViewList}
-                            className={`btn left ${isListView ? "active" : ""}`}
-                        >
-                            <Icon
-                                icon="viewDay"
-                                className="events-display-icon"
-                            />
-                        </Button>
-                        <Button
-                            onClick={onViewCalendar}
-                            className={`btn right ${
-                                !isListView ? "active" : ""
-                            }`}
-                        >
-                            <Icon
-                                icon="calendar"
-                                className="events-display-icon"
-                            />
-                        </Button>
-                    </div>
+                    <MenuButtons
+                        onSelectKey={onSelectKey}
+                        options={[
+                            {
+                                key: "list",
+                                icon: "viewDay",
+                            },
+                            {
+                                key: "calendar",
+                                icon: "calendar",
+                            },
+                        ]}
+                        defaultKey="list"
+                    />
                     {width > 768 ? <FilterModel /> : <FilterDrawer />}
                 </main>
                 <article className="selected-filters">

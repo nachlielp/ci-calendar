@@ -1,0 +1,65 @@
+.menu-btns {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 3rem;
+        background: none;
+        color: #000;
+        border: 1px solid #000;
+        padding-top: 8px;
+
+        &.active {
+            position: relative;
+
+            &::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.2);
+                pointer-events: none;
+                z-index: 0;
+                color: #000;
+            }
+
+            &.right {
+                border-radius: 0 5px 5px 0;
+                border-left: none !important;
+            }
+
+            &.left {
+                border-radius: 5px 0 0 5px;
+                border-right: none !important;
+            }
+        }
+
+        &.right {
+            border-radius: 0 5px 5px 0;
+        }
+
+        &.left {
+            border-radius: 5px 0 0 5px;
+        }
+
+        &:hover {
+            color: #220505 !important;
+            border: 1px solid #000 !important;
+            background: none !important;
+        }
+
+        .injected-svg {
+            position: relative;
+            fill: #000;
+            cursor: pointer;
+        }
+    }
+}

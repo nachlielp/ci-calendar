@@ -45,7 +45,7 @@
         width: 100%;
     }
 
-    .menu-btns {
+    .events-display-menu-btns {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -60,7 +60,7 @@
             background: none;
             color: #000;
             border: 1px solid #000;
-
+            cursor: pointer;
             &.active {
                 position: relative;
 
