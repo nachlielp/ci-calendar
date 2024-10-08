@@ -13,7 +13,6 @@
         background: none;
         color: #000;
         border: 1px solid #000;
-        padding-top: 8px;
 
         &.active {
             position: relative;
@@ -57,6 +56,8 @@
         }
 
         .injected-svg {
+            padding-top: 6px;
+
             position: relative;
             fill: #000;
             cursor: pointer;

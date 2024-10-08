@@ -12,6 +12,7 @@ import { ScreenSize, SelectOption } from "../../../util/options"
 import FullEventCard from "./FullEventCard"
 import { useUser } from "../../../context/UserContext"
 import { useEvents } from "../../../hooks/useEvents"
+import MenuButtons from "../Other/MenuButtons"
 const { Option } = Select
 
 export default function ManageEventsTable() {
@@ -117,6 +118,9 @@ export default function ManageEventsTable() {
         }
     }
 
+    function onSelectTimeframe(key: string) {
+        setShowFuture(key === "future")
+    }
     const rowSelection = {
         selectedRowKeys: showFuture
             ? selectedRowKeysFuture
@@ -250,21 +254,20 @@ export default function ManageEventsTable() {
                     isPhone ? "header-phone" : "header-desktop"
                 }`}
             >
-                <div className="switch-container">
-                    <button
-                        onClick={() => setShowFuture(false)}
-                        className={`btn left ${!showFuture ? "active" : ""}`}
-                    >
-                        עבר
-                    </button>
-                    <button
-                        onClick={() => setShowFuture(true)}
-                        className={`btn right ${showFuture ? "active" : ""}`}
-                        style={{ borderLeft: "none" }}
-                    >
-                        עתיד
-                    </button>
-                </div>
+                <MenuButtons
+                    onSelectKey={onSelectTimeframe}
+                    options={[
+                        {
+                            key: "past",
+                            title: "עבר",
+                        },
+                        {
+                            key: "future",
+                            title: "עתיד",
+                        },
+                    ]}
+                    defaultKey="future"
+                />
                 <div className="user-select-container">
                     {user && user.user_type === UserType.admin && (
                         <Select
