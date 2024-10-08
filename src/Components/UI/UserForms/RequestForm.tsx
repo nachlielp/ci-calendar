@@ -73,6 +73,7 @@ export default function RequestForm() {
                             name: user.fullName,
                             email: user.email,
                         }}
+                        style={{ minHeight: "130px" }}
                     >
                         <Form.Item<RequestFieldType>
                             name="requestType"
