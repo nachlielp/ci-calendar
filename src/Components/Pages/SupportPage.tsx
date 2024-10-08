@@ -2,8 +2,6 @@ import { useState } from "react"
 import RequestForm from "../UI/UserForms/RequestForm"
 import RequestsList from "../UI/Other/RequestsList"
 import MenuButtons from "../UI/Other/MenuButtons"
-import useRequests from "../../hooks/useRequests"
-import { useUser } from "../../context/UserContext"
 
 export default function SupportPage() {
     const [createRequest, setCreateRequest] = useState<boolean>(false)

@@ -4,7 +4,6 @@ import { supabase } from "../supabase/client"
 import { useSession } from "./SessionContext"
 import { userService } from "../supabase/userService"
 import { utilService } from "../util/utilService"
-import { requestsService } from "../supabase/requestsService"
 import useRequests from "../hooks/useRequests"
 
 interface IUserContextType {
