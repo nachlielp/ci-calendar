@@ -16,10 +16,10 @@ export default function useUserRequests({
     status,
     type,
     name,
-    email,
-    page,
-    pageSize,
-}: UseRequestsProps) {
+}: // email,
+// page,
+// pageSize,
+UseRequestsProps) {
     const [requests, setRequests] = useState<CIRequest[]>([])
 
     useEffect(() => {
@@ -28,9 +28,9 @@ export default function useUserRequests({
                 status,
                 type,
                 name,
-                email,
-                page,
-                pageSize,
+                // email,
+                // page,
+                // pageSize,
             })
             if (error) {
                 console.error("useRequests.fetchRequests.error: ", error)
@@ -43,6 +43,7 @@ export default function useUserRequests({
             const channel = await requestsService.subscribeToAllRequests(
                 async (hasNewResponse) => {
                     if (hasNewResponse) {
+                        console.log("hasNewResponse: ", hasNewResponse)
                         await fetchRequests()
                     }
                 }

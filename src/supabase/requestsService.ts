@@ -69,15 +69,12 @@ function subscribeToResponses(
 async function getAllRequests({
     status,
     type,
+    name,
 }: // user_name,
 // email,
 // page,
 // pageSize,
 UseRequestsProps) {
-    // console.log("user_name", user_name)
-    // console.log("email", email)
-    // console.log("page", page)
-    // console.log("pageSize", pageSize)
     let query = supabase
         .from("requests")
         .select("*")
@@ -89,9 +86,10 @@ UseRequestsProps) {
     if (type) {
         query = query.eq("type", type)
     }
-    // if (user_name) {
-    //     query = query.eq("name", user_name)
-    // }
+    if (name) {
+        query = query.ilike("name", `%${name}%`)
+    }
+
     // if (email) {
     //     query = query.eq("email", email)
     // }
@@ -108,7 +106,7 @@ async function subscribeToAllRequests(callback: (data: CIRequest[]) => void) {
         .channel("public:requests")
         .on(
             "postgres_changes",
-            { event: "INSERT", schema: "public", table: "requests" },
+            { event: "*", schema: "public", table: "requests" },
             (payload) => {
                 callback([payload.new as CIRequest])
             }

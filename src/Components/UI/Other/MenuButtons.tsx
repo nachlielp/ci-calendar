@@ -12,6 +12,7 @@ interface MenuButtonsProps {
     size?: "small" | "medium" | "large"
     btnClassName?: string
     onSelectKey: (key: string) => void
+    direction?: "ltr" | "rtl"
 }
 
 export default function MenuButtons({
@@ -20,10 +21,11 @@ export default function MenuButtons({
     size = "medium",
     btnClassName,
     onSelectKey,
+    direction = "ltr",
 }: MenuButtonsProps) {
     const [selectedBtn, setSelectedBtn] = useState<string>(defaultKey)
     return (
-        <div className="menu-btns">
+        <div className={`menu-btns ${direction}`}>
             {options.map((option, index) => (
                 <Button
                     key={option.key}
