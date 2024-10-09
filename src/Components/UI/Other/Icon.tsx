@@ -39,6 +39,8 @@ import support_agent from "../../../assets/svgs/support_agent.svg"
 import google_color from "../../../assets/svgs/google_color.svg"
 import lock_reset from "../../../assets/svgs/lock_reset.svg"
 import search from "../../../assets/svgs/search.svg"
+import search_off from "../../../assets/svgs/search_off.svg"
+
 export const Icon = ({
     icon,
     className,
@@ -92,6 +94,7 @@ export const Icon = ({
         google_color,
         lock_reset,
         search,
+        search_off,
     }
     return (
         <label className="icon-component" onClick={onClick}>

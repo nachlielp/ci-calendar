@@ -18,7 +18,7 @@ import {
     RequestStatusHebrew,
 } from "../../util/interfaces"
 import useRequests from "../../hooks/useRequests"
-import { useState } from "react"
+import { Key, useState } from "react"
 import { SorterResult } from "antd/es/table/interface"
 import Highlighter from "react-highlight-words"
 import { Icon } from "../UI/Other/Icon"
@@ -69,23 +69,53 @@ const getColumns = (tableParams: TableParams): TableColumnsType<CIRequest> => [
         render: (text: string) => {
             return <span>{text}</span>
         },
-        filters: [
-            { text: "Example Name 1", value: "Example Name 1" },
-            { text: "Example Name 2", value: "Example Name 2" },
-            // Add more predefined names or dynamically generate this list
-        ],
-        onFilter: (value, record) => record.name.includes(value as string),
-        filterSearch: true,
+        filterDropdown: ({
+            setSelectedKeys,
+            selectedKeys,
+            confirm,
+            clearFilters,
+        }) => (
+            <div style={{ padding: 8 }}>
+                <Input
+                    placeholder={`חיפוש לפי שם`}
+                    value={selectedKeys[0]}
+                    onChange={(e) =>
+                        setSelectedKeys(e.target.value ? [e.target.value] : [])
+                    }
+                    onPressEnter={() => confirm()}
+                    style={{ marginBottom: 8, display: "block" }}
+                />
+                <Space>
+                    <button onClick={() => confirm()} style={{ width: 90 }}>
+                        <Icon
+                            icon="search"
+                            className="filter-search-icon-btn"
+                        />
+                    </button>
+
+                    <button
+                        onClick={() => clearFilters && clearFilters()}
+                        style={{ width: 90 }}
+                    >
+                        <Icon
+                            icon="search_off"
+                            className="filter-search-icon-btn"
+                        />
+                    </button>
+                </Space>
+            </div>
+        ),
+        filterIcon: (filtered) => (
+            <Icon
+                icon="search"
+                className={`filter-search-icon ${filtered && "active"}`}
+            />
+        ),
+        onFilter: (value: boolean | Key, record: CIRequest) =>
+            typeof value === "string" &&
+            record.name.toString().toLowerCase().includes(value.toLowerCase()),
+        filteredValue: tableParams.filters?.name || null,
     },
-    // ,
-    // {
-    //     title: "תאריך",
-    //     dataIndex: "created_at",
-    //     key: "created_at",
-    //     render: (text: string) => {
-    //         return <span>{dayjs(text).format("DD/MM/YY")}</span>
-    //     },
-    // },
 ]
 
 export default function ManageSupportPage() {
@@ -125,6 +155,7 @@ export default function ManageSupportPage() {
             sortField: Array.isArray(sorter) ? undefined : sorter.field,
         }))
     }
+
     return (
         <div style={{ direction: "rtl", marginTop: "20px" }}>
             <Table
@@ -165,106 +196,3 @@ export default function ManageSupportPage() {
         </div>
     )
 }
-
-// const getColumnSearchProps = (
-//     searchInput: React.RefObject<InputRef>,
-//     handleSearch: (
-//         selectedKeys: string[],
-//         confirm: () => void,
-//         dataIndex: DataIndex
-//     ) => void,
-//     handleReset: (clearFilters: () => void) => void,
-//     setSearchText: React.Dispatch<React.SetStateAction<string>>,
-//     setSearchedColumn: React.Dispatch<React.SetStateAction<DataIndex | null>>,
-//     searchText: string,
-//     searchedColumn: DataIndex
-// ): TableColumnType<CIRequest> => ({
-//     filterDropdown: ({
-//         setSelectedKeys,
-//         selectedKeys,
-//         confirm,
-//         clearFilters,
-//         close,
-//     }) => (
-//         <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-//             <Input
-//                 ref={searchInput}
-//                 placeholder={`חיפוש לפי שם`}
-//                 value={selectedKeys[0]}
-//                 onChange={(e) =>
-//                     setSelectedKeys(e.target.value ? [e.target.value] : [])
-//                 }
-//                 onPressEnter={() =>
-//                     handleSearch(selectedKeys as string[], confirm, "name")
-//                 }
-//                 style={{ marginBottom: 8, display: "block" }}
-//             />
-//             <Space>
-//                 <Button
-//                     type="primary"
-//                     onClick={() =>
-//                         handleSearch(
-//                             selectedKeys as string[],
-//                             confirm,
-//                             dataIndex
-//                         )
-//                     }
-//                     icon={<Icon icon="search" />}
-//                     size="small"
-//                     style={{ width: 90 }}
-//                 >
-//                     Search
-//                 </Button>
-//                 <Button
-//                     onClick={() => clearFilters && handleReset(clearFilters)}
-//                     size="small"
-//                     style={{ width: 90 }}
-//                 >
-//                     Reset
-//                 </Button>
-//                 <Button
-//                     type="link"
-//                     size="small"
-//                     onClick={() => {
-//                         confirm({ closeDropdown: false })
-//                         setSearchText((selectedKeys as string[])[0])
-//                         setSearchedColumn(dataIndex)
-//                     }}
-//                 >
-//                     Filter
-//                 </Button>
-//                 <Button
-//                     type="link"
-//                     size="small"
-//                     onClick={() => {
-//                         close()
-//                     }}
-//                 >
-//                     close
-//                 </Button>
-//             </Space>
-//         </div>
-//     ),
-//     filterIcon: (filtered: boolean) => <Icon icon="search" />,
-//     onFilter: (value, record) =>
-//         record[dataIndex]
-//             .toString()
-//             .toLowerCase()
-//             .includes((value as string).toLowerCase()),
-//     onFilterDropdownOpenChange: (visible) => {
-//         if (visible) {
-//             setTimeout(() => searchInput.current?.select(), 100)
-//         }
-//     },
-//     render: (text) =>
-//         searchedColumn === dataIndex ? (
-//             <Highlighter
-//                 highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-//                 searchWords={[searchText]}
-//                 autoEscape
-//                 textToHighlight={text ? text.toString() : ""}
-//             />
-//         ) : (
-//             text
-//         ),
-// })
