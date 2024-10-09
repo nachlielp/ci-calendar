@@ -20,8 +20,7 @@ import { useState } from "react"
 import { SorterResult } from "antd/es/table/interface"
 // import Highlighter from "react-highlight-words"
 import { Icon } from "../UI/Other/Icon"
-import MenuButtons from "../UI/Other/MenuButtons"
-import { Button } from "antd/es/radio"
+
 import { requestsService } from "../../supabase/requestsService"
 import { userService } from "../../supabase/userService"
 
@@ -171,6 +170,7 @@ export default function ManageSupportPage() {
                 await requestsService.updateRequest({
                     request_id: request.request_id,
                     response: request.response,
+                    viewed_response: false,
                 })
                 break
         }
