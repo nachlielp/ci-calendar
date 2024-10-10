@@ -38,7 +38,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
             >
                 <span>{current.date()}</span>
                 <div className="event-dots">
-                    {Array.from({ length: Math.min(eventCount, 3) }).map(
+                    {Array.from({ length: Math.min(eventCount, 5) }).map(
                         (_, index) => (
                             <span key={index} className="event-dot"></span>
                         )
