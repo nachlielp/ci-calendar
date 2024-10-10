@@ -52,8 +52,8 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         if (filterBy?.sort_by) {
             query = query.order(filterBy.sort_by)
         }
-        if (filterBy?.hide_closed) {
-            query = query.eq("hide_closed", filterBy.hide_closed)
+        if (filterBy?.hide) {
+            query = query.eq("hide", filterBy.hide)
         }
 
         const { data, error } = await query

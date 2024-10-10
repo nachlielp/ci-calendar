@@ -62,8 +62,8 @@ export default function EventsPage({
     useEffect(() => {
         const todaysEvents = filteredEvents.filter((event) =>
             dayjs(selectedDay).isBetween(
-                dayjs(event.startDate),
-                dayjs(event.endDate),
+                dayjs(event.start_date),
+                dayjs(event.end_date),
                 "day",
                 "[]"
             )
