@@ -32,6 +32,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const { session } = useSession()
     //requests are in user context because they are used in multiple components but the subscription events can be caught by a single instance
     const { requests } = useUserRequests(user?.user_id || "")
+
     const updateUserContext = async (updatedUser: Partial<DbUser>) => {
         try {
             if (user && user.user_id) {
@@ -51,26 +52,26 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                if (session) {
-                    const { data } = await supabase.auth.getUser()
-                    if (data?.user?.id) {
-                        const user = await userService.getUser(data.user.id)
-                        if (user) {
-                            setUser(user)
-                        } else {
-                            const newUser = utilService.createDbUserFromUser(
-                                data.user
-                            )
-                            const createdUser = await userService.createUser(
-                                newUser
-                            )
-                            if (createdUser) {
-                                setUser(createdUser)
-                            }
+                if (!session) {
+                    setUser(null)
+                    return
+                }
+                const { data } = await supabase.auth.getUser()
+                if (data?.user?.id) {
+                    const user = await userService.getUser(data.user.id)
+                    if (user) {
+                        setUser(user)
+                    } else {
+                        const newUser = utilService.createDbUserFromUser(
+                            data.user
+                        )
+                        const createdUser = await userService.createUser(
+                            newUser
+                        )
+                        if (createdUser) {
+                            setUser(createdUser)
                         }
                     }
-                } else {
-                    setUser(null)
                 }
             } catch (error) {
                 console.error("Error fetching user:", error)
