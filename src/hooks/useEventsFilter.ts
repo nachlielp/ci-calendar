@@ -43,8 +43,8 @@ export const useEventsFilter = ({
             const weekendEnd = dayjs().add(1, "week").endOf("week").endOf("day")
             filtered = filtered.filter(
                 (event) =>
-                    dayjs(event.startDate) >= weekendStart &&
-                    dayjs(event.startDate) <= weekendEnd &&
+                    dayjs(event.start_date) >= weekendStart &&
+                    dayjs(event.start_date) <= weekendEnd &&
                     (!weekendTypes.length ||
                         hasOverlap(
                             weekendTypes,
@@ -58,7 +58,7 @@ export const useEventsFilter = ({
 
         if (uids && uids.length > 0) {
             filtered = filtered.filter((event) =>
-                uids.includes(event.creatorId)
+                uids.includes(event.creator_id)
             )
         }
 
@@ -67,18 +67,18 @@ export const useEventsFilter = ({
             const startOfToday = dayjs().startOf("day")
             if (showFuture) {
                 filtered = filtered.filter(
-                    (event) => dayjs(event.endDate) >= startOfToday
+                    (event) => dayjs(event.end_date) >= startOfToday
                 )
             } else {
                 filtered = filtered.filter(
-                    (event) => dayjs(event.startDate) < now
+                    (event) => dayjs(event.start_date) < now
                 )
             }
         }
 
         filtered = filtered.filter((event) => {
             const eventTypeList =
-                event.startDate === event.endDate
+                event.start_date === event.end_date
                     ? event.segments.map((segment) => segment.type)
                     : [event.type]
             if (event.type !== "") {

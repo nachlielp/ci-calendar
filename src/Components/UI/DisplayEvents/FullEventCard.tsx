@@ -21,7 +21,7 @@ export default function FullEventCard({
 }) {
     const segmentLen = event.segments.length
 
-    const isMultiDay = event.startDate !== event.endDate
+    const isMultiDay = event.start_date !== event.end_date
 
     return (
         <section className="full-single-day-event-card" dir="rtl">
@@ -33,7 +33,7 @@ export default function FullEventCard({
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {utilService.formatHebrewDate(event.startDate)}
+                            {utilService.formatHebrewDate(event.start_date)}
                         </label>
                         <Icon icon="schedule" className="event-icon" />
                         <label className="event-label">
@@ -48,8 +48,8 @@ export default function FullEventCard({
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {utilService.formatHebrewDate(event.startDate)} -{" "}
-                            {utilService.formatHebrewDate(event.endDate)}
+                            {utilService.formatHebrewDate(event.start_date)} -{" "}
+                            {utilService.formatHebrewDate(event.end_date)}
                         </label>
                     </>
                 )}

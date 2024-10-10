@@ -58,7 +58,7 @@ export default function EditSingleDayEventForm({
                 if (eventId) {
                     const eventData = await cieventsService.getCIEvent(eventId)
                     setEventData(eventData)
-                    setEventDate(dayjs(eventData.startDate))
+                    setEventDate(dayjs(eventData.start_date))
                 }
             } catch (error) {
                 console.error(
@@ -147,12 +147,12 @@ export default function EditSingleDayEventForm({
         const eventId =
             editType === EventAction.recycle ? uuidv4() : eventData.id
         const event: CIEvent = {
-            startDate: baseDate
+            start_date: baseDate
                 .hour(13)
                 .minute(0)
                 .second(0)
                 .format("YYYY-MM-DDTHH:mm:ss"),
-            endDate: baseDate
+            end_date: baseDate
                 .hour(13)
                 .minute(0)
                 .second(0)
@@ -160,8 +160,8 @@ export default function EditSingleDayEventForm({
             type: "",
             id: eventId,
             address: newAddress || address,
-            createdAt: eventData.createdAt,
-            updatedAt: dayjs().toISOString(),
+            created_at: eventData.created_at,
+            updated_at: dayjs().toISOString(),
             title: values["event-title"],
             description: values["event-description"] || "",
             owners: [{ value: user.user_id, label: user.fullName }],
@@ -170,8 +170,8 @@ export default function EditSingleDayEventForm({
             hide: false,
             segments: segments,
             district: values["district"],
-            creatorId: user.user_id,
-            creatorName: user.fullName,
+            creator_id: user.user_id,
+            creator_name: user.fullName,
         }
         try {
             // console.log("EventForm.handleSubmit.event: ", event);

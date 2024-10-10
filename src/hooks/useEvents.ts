@@ -64,7 +64,7 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
 
     const sortAndSetEvents = (fetchedEvents: CIEvent[]) => {
         const sortedEvents = fetchedEvents.sort((a, b) =>
-            dayjs(a.startDate).diff(dayjs(b.startDate))
+            dayjs(a.start_date).diff(dayjs(b.start_date))
         )
         setEvents(sortedEvents)
     }

@@ -53,19 +53,39 @@ export interface CIEvent {
     title: string
     description: string
     address: IAddress
-    createdAt: string
-    updatedAt: string
+    created_at: string
+    updated_at: string
     hide: boolean
-    startDate: string
-    endDate: string
+    start_date: string
+    end_date: string
     //TODO add loc info to district
     district: string
     type: string
     price: IPrice[]
     links: ILink[]
     segments: CIEventSegments[]
-    creatorId: string
-    creatorName: string
+    creator_id: string
+    creator_name: string
+}
+export interface CITemplate {
+    id: string
+    owners: UserOption[]
+    title: string
+    description: string
+    address: IAddress
+    created_at: string
+    updated_at: string
+    hide: boolean
+    start_date: string
+    end_date: string
+    //TODO add loc info to district
+    district: string
+    type: string
+    price: IPrice[]
+    links: ILink[]
+    segments: CIEventSegments[]
+    creator_id: string
+    creator_name: string
 }
 export enum District {
     north = "north",
@@ -117,19 +137,6 @@ export interface UserBio extends Partial<DbUser> {
     allowTagging: boolean
     img: string
     bio: string
-}
-
-export interface DbTeacher {
-    id: string
-    createdAt: string
-    updatedAt: string
-    fullName: string
-    img: string
-    bio: string
-    pageUrl: string
-    pageTitle: string
-    showProfile: boolean
-    allowTagging: boolean
 }
 
 export type CIRequest = {

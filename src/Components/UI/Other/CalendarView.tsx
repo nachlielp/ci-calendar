@@ -104,8 +104,8 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 function eventsOnDay(day: Dayjs, events: CIEvent[]) {
     return events.filter((event) =>
         day.isBetween(
-            dayjs(event.startDate).startOf("day"),
-            dayjs(event.endDate).endOf("day"),
+            dayjs(event.start_date).startOf("day"),
+            dayjs(event.end_date).endOf("day"),
             null,
             "[]"
         )

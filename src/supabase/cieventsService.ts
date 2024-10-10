@@ -2,11 +2,11 @@ import { supabase } from "./client"
 import { CIEvent } from "../util/interfaces"
 
 export interface FilterOptions {
-    startDate?: string
-    endDate?: string
-    creatorId?: string
-    sortBy?: string
-    hideClosed?: boolean
+    start_date?: string
+    end_date?: string
+    creator_id?: string
+    sort_by?: string
+    hide?: boolean
 }
 
 export type CIEventWithoutId = Omit<CIEvent, "id">
@@ -40,20 +40,20 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
     try {
         let query = supabase.from("ci-events").select("*")
 
-        if (filterBy?.startDate) {
-            query = query.gte("startDate", filterBy.startDate)
+        if (filterBy?.start_date) {
+            query = query.gte("start_date", filterBy.start_date)
         }
-        if (filterBy?.endDate) {
-            query = query.lte("endDate", filterBy.endDate)
+        if (filterBy?.end_date) {
+            query = query.lte("end_date", filterBy.end_date)
         }
-        if (filterBy?.creatorId) {
-            query = query.eq("creatorId", filterBy.creatorId)
+        if (filterBy?.creator_id) {
+            query = query.eq("creator_id", filterBy.creator_id)
         }
-        if (filterBy?.sortBy) {
-            query = query.order(filterBy.sortBy)
+        if (filterBy?.sort_by) {
+            query = query.order(filterBy.sort_by)
         }
-        if (filterBy?.hideClosed) {
-            query = query.eq("hide", false)
+        if (filterBy?.hide_closed) {
+            query = query.eq("hide_closed", filterBy.hide_closed)
         }
 
         const { data, error } = await query

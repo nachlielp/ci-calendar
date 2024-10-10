@@ -44,7 +44,7 @@ export default function ManageEventsTable() {
         } else {
             setTeachersEvents(
                 filteredEvents.filter(
-                    (event) => event.creatorId === selectedTeacher.value
+                    (event) => event.creator_id === selectedTeacher.value
                 )
             )
         }
@@ -84,7 +84,7 @@ export default function ManageEventsTable() {
         teacher
             ? setTeachersEvents(
                   filteredEvents.filter(
-                      (event) => event.creatorId === selectedTeacherId
+                      (event) => event.creator_id === selectedTeacherId
                   )
               )
             : setTeachersEvents(filteredEvents)
@@ -102,7 +102,7 @@ export default function ManageEventsTable() {
                     filteredEvents.some(
                         (event) =>
                             event.id === key &&
-                            event.creatorId === selectedTeacherId
+                            event.creator_id === selectedTeacherId
                     )
                 )
             )
@@ -111,7 +111,7 @@ export default function ManageEventsTable() {
                     filteredEvents.some(
                         (event) =>
                             event.id === key &&
-                            event.creatorId === selectedTeacherId
+                            event.creator_id === selectedTeacherId
                     )
                 )
             )
@@ -157,47 +157,22 @@ export default function ManageEventsTable() {
     const columns = [
         {
             title: "בעלים",
-            dataIndex: "creatorName",
-            key: "creatorName",
-            render: (creatorName: string) => creatorName,
+            dataIndex: "creator_name",
+            key: "creator_name",
+            render: (creator_name: string) => creator_name,
             responsive: ["xl", "lg", "md"] as Breakpoint[],
         },
-        // {
-        //   title: "תאריך",
-        //   dataIndex: "dates",
-        //   key: "dates",
-        //   render: (dates: { startDate: string; endDate: string }) => {
-        //     const startDate = new Date(dates.startDate).toLocaleDateString();
-        //     const endDate = new Date(dates.endDate).toLocaleDateString();
-        //     return startDate === endDate ? startDate : `${startDate} - ${endDate}`;
-        //   },
-        //   sorter: (a: IEvently, b: IEvently) =>
-        //     dayjs(a.dates["startDate"]).diff(dayjs(b.dates["startDate"]), "day"),
-        //   responsive: ["xl", "lg", "md", "sm", "xs"] as Breakpoint[],
-        // },
-        // {
-        //   title: "כותרת",
-        //   dataIndex: "title",
-        //   key: "title",
-        //   render: (title: string, record: IEvently) => (
-        //     <span>
-        //       {title}
-        //       {record.hide && <Icon icon="visibilityOff" />}
-        //     </span>
-        //   ),
-        //   responsive: ["xl", "lg", "md", "sm", "xs"] as Breakpoint[],
-        // },
         {
             title: "פרטי אירוע",
             dataIndex: "title",
             key: "eventDetails",
             render: (title: string, record: CIEvent) => {
-                const startDate = dayjs(record.startDate).format("DD/MM/YYYY")
-                const endDate = dayjs(record.endDate).format("DD/MM/YYYY")
+                const start_date = dayjs(record.start_date).format("DD/MM/YYYY")
+                const end_date = dayjs(record.end_date).format("DD/MM/YYYY")
                 const dateString =
-                    startDate === endDate
-                        ? startDate
-                        : `${startDate} - ${endDate}`
+                    start_date === end_date
+                        ? start_date
+                        : `${start_date} - ${end_date}`
 
                 return (
                     <div style={{ display: "flex", flexDirection: "column" }}>
@@ -218,24 +193,24 @@ export default function ManageEventsTable() {
                 )
             },
             sorter: (a: CIEvent, b: CIEvent) =>
-                dayjs(a.startDate).diff(dayjs(b.startDate), "day"),
+                dayjs(a.start_date).diff(dayjs(b.start_date), "day"),
             responsive: ["xl", "lg", "md", "sm", "xs"] as Breakpoint[],
         },
     ]
 
     const filteredColumns =
         user && user.user_type === "creator"
-            ? columns.filter((column) => column.key !== "creatorName")
+            ? columns.filter((column) => column.key !== "creator_name")
             : columns
 
     function getUniqueTeachers(events: CIEvent[]): SelectOption[] {
         const teacherMap = new Map<string, SelectOption>()
 
         events.forEach((event) => {
-            if (event.creatorId && event.creatorName) {
-                teacherMap.set(event.creatorId, {
-                    label: event.creatorName,
-                    value: event.creatorId,
+            if (event.creator_id && event.creator_name) {
+                teacherMap.set(event.creator_id, {
+                    label: event.creator_name,
+                    value: event.creator_id,
                 })
             }
         })

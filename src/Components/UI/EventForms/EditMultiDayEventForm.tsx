@@ -133,12 +133,12 @@ export default function EditMultiDayEventForm({
         }
 
         const event: CIEvent = {
-            startDate: dates[0]
+            start_date: dates[0]
                 .hour(13)
                 .minute(0)
                 .second(0)
                 .format("YYYY-MM-DDTHH:mm:ss"),
-            endDate: dates[1]
+            end_date: dates[1]
                 .hour(13)
                 .minute(0)
                 .second(0)
@@ -146,8 +146,8 @@ export default function EditMultiDayEventForm({
             type: values["main-event-type"],
             id: submitedEventId,
             address: address,
-            createdAt: eventData.createdAt,
-            updatedAt: dayjs().toISOString(),
+            created_at: eventData.created_at,
+            updated_at: dayjs().toISOString(),
             title: values["event-title"],
             description: values["event-description"] || "",
             owners: [{ value: user.user_id, label: user.fullName }],
@@ -156,8 +156,8 @@ export default function EditMultiDayEventForm({
             hide: false,
             segments: segmentsTemplate,
             district: values["district"],
-            creatorId: user.user_id,
-            creatorName: user.fullName,
+            creator_id: user.user_id,
+            creator_name: user.fullName,
         }
         try {
             if (editType === EventAction.recycle) {
@@ -250,13 +250,13 @@ const eventToFormValues = (event: CIEvent) => {
         }
     })
     const currentFormValues = {
-        createdAt: event.createdAt,
-        updatedAt: dayjs().toISOString(),
+        created_at: event.created_at,
+        updated_at: dayjs().toISOString(),
         "event-title": event.title,
         "event-description": event.description,
         district: event.district,
         address: event.address,
-        "event-date": [dayjs(event.startDate), dayjs(event.endDate)],
+        "event-date": [dayjs(event.start_date), dayjs(event.end_date)],
         "main-event-type": event.type,
         "event-schedule": event.segments.length > 0,
         links: event.links,

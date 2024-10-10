@@ -121,20 +121,20 @@ export default function SingleDayEventForm() {
         try {
             if (repeatOption === EventFrequency.none) {
                 const event: CIEventWithoutId = {
-                    startDate: eventDate
+                    start_date: eventDate
                         .hour(13)
                         .minute(0)
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss"),
-                    endDate: eventDate
+                    end_date: eventDate
                         .hour(13)
                         .minute(0)
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss"),
                     type: "",
                     address: address,
-                    createdAt: dayjs().toISOString(),
-                    updatedAt: dayjs().toISOString(),
+                    created_at: dayjs().toISOString(),
+                    updated_at: dayjs().toISOString(),
                     title: values["event-title"],
                     description: values["event-description"] || "",
                     owners: [{ value: user.user_id, label: user.fullName }],
@@ -143,8 +143,8 @@ export default function SingleDayEventForm() {
                     hide: false,
                     segments: segmentsTemplate,
                     district: values["district"],
-                    creatorId: user.user_id,
-                    creatorName: user.fullName,
+                    creator_id: user.user_id,
+                    creator_name: user.fullName,
                 }
 
                 await cieventsService.createCIEvent(event)
@@ -173,19 +173,19 @@ export default function SingleDayEventForm() {
 
                     const event: CIEventWithoutId = {
                         type: "",
-                        startDate: date
+                        start_date: date
                             .hour(13)
                             .minute(0)
                             .second(0)
                             .format("YYYY-MM-DDTHH:mm:ss"),
-                        endDate: date
+                        end_date: date
                             .hour(13)
                             .minute(0)
                             .second(0)
                             .format("YYYY-MM-DDTHH:mm:ss"),
                         address: address,
-                        createdAt: dayjs().toISOString(),
-                        updatedAt: dayjs().toISOString(),
+                        created_at: dayjs().toISOString(),
+                        updated_at: dayjs().toISOString(),
                         title: values["event-title"],
                         description: values["event-description"] || "",
                         owners: [{ value: user.user_id, label: user.fullName }],
@@ -194,8 +194,8 @@ export default function SingleDayEventForm() {
                         hide: false,
                         segments: segments,
                         district: values["district"],
-                        creatorId: user.user_id,
-                        creatorName: user.fullName,
+                        creator_id: user.user_id,
+                        creator_name: user.fullName,
                     }
                     await cieventsService.createCIEvent(event)
                 }
@@ -306,26 +306,26 @@ export function getDayAndWeekOfMonth(date: dayjs.Dayjs) {
 }
 
 export function listOfDates(
-    startDate: dayjs.Dayjs,
-    endDate: dayjs.Dayjs,
+    start_date: dayjs.Dayjs,
+    end_date: dayjs.Dayjs,
     repeatOption: EventFrequency,
     repeatInterval?: number
 ) {
     const dates = []
-    let date = startDate
+    let date = start_date
     if (repeatOption === EventFrequency.weekly) {
-        while (!date.isAfter(endDate.add(1, "day"))) {
+        while (!date.isAfter(end_date.add(1, "day"))) {
             dates.push(date)
             date = date.add(1, "week")
         }
     } else if (repeatOption === EventFrequency.byWeek && repeatInterval) {
-        while (!date.isAfter(endDate.add(1, "day"))) {
+        while (!date.isAfter(end_date.add(1, "day"))) {
             dates.push(date)
             date = date.add(repeatInterval, "week")
         }
     } else if (repeatOption === EventFrequency.monthly) {
-        const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(startDate)
-        while (!date.isAfter(endDate)) {
+        const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(start_date)
+        while (!date.isAfter(end_date)) {
             dates.push(date)
             date = date.add(1, "month")
             date = moveToSameWeekAndDay(date, dayOfWeek, weekOfMonth)

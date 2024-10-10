@@ -106,20 +106,20 @@ export default function MultiDayEventForm() {
 
         try {
             const event: CIEventWithoutId = {
-                startDate: dates[0]
+                start_date: dates[0]
                     .hour(13)
                     .minute(0)
                     .second(0)
                     .format("YYYY-MM-DDTHH:mm:ss"),
-                endDate: dates[1]
+                end_date: dates[1]
                     .hour(13)
                     .minute(0)
                     .second(0)
                     .format("YYYY-MM-DDTHH:mm:ss"),
                 type: values["main-event-type"],
                 address: address,
-                createdAt: dayjs().toISOString(),
-                updatedAt: dayjs().toISOString(),
+                created_at: dayjs().toISOString(),
+                updated_at: dayjs().toISOString(),
                 title: values["event-title"],
                 description: values["event-description"] || "",
                 owners: [{ value: user.user_id, label: user.fullName }],
@@ -128,8 +128,8 @@ export default function MultiDayEventForm() {
                 hide: false,
                 segments: [],
                 district: values["district"],
-                creatorId: user.user_id,
-                creatorName: user.fullName,
+                creator_id: user.user_id,
+                creator_name: user.fullName,
             }
             console.log("MultiDayEventForm.handleSubmit.event: ", event)
             await cieventsService.createCIEvent(event)
