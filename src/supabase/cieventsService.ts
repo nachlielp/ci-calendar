@@ -57,6 +57,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         }
 
         const { data, error } = await query
+
         if (error) throw error
 
         return data as CIEvent[]

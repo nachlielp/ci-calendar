@@ -34,7 +34,7 @@ export default function BioModal({ teacher }: BioModalProps) {
                     cursor: "pointer",
                 }}
             >
-                {teacher.fullName}
+                {teacher.full_name}
             </label>
 
             <Modal

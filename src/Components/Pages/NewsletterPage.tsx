@@ -26,7 +26,7 @@ export default function NewsletterPage() {
 
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
         const updatedUser = { ...user }
-        updatedUser.fullName = values.name || user.fullName
+        updatedUser.full_name = values.name || user.full_name
 
         const newNewsletter: IMailingList = {
             ...mailingList,
@@ -54,7 +54,7 @@ export default function NewsletterPage() {
                     onFinish={onFinish}
                     autoComplete="off"
                     initialValues={{
-                        name: user.fullName,
+                        name: user.full_name,
                         active: user.newsletter.active,
                         phone: user.phone,
                         ciEvents: user.newsletter.eventTypes,

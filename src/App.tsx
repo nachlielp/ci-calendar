@@ -43,7 +43,7 @@ export enum EventAction {
 export default function App() {
     const { events, loading, viewableTeachers } = useEvents({
         start_date: dayjs().format("YYYY-MM-DD"),
-        hide: true,
+        hide: false,
     })
 
     if (loading) {

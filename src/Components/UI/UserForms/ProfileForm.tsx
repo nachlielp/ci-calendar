@@ -7,14 +7,14 @@ import { userService } from "../../../supabase/userService"
 import { DbUser } from "../../../util/interfaces"
 
 type FieldType = {
-    name?: string
+    full_name?: string
     bio?: string
     img?: string
-    pageUrl?: string
-    pageUrlTitle?: string
+    page_url?: string
+    page_title?: string
     upload?: string
-    showProfile?: string
-    allowTagging?: string
+    show_profile?: string
+    allow_tagging?: string
 }
 
 interface ProfileFormProps {
@@ -29,9 +29,9 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
     const [imageUrl, setImageUrl] = useState<string>(user?.img || "")
     const [form] = Form.useForm()
+
     useEffect(() => {
         setImageUrl(user?.img || "")
-        console.log("user: ", user)
     }, [user])
 
     const uploadNewImage = (url: string) => {
@@ -40,17 +40,23 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
         if (!user) return
-        const { name, bio, pageUrl, pageUrlTitle, showProfile, allowTagging } =
-            values
+        const {
+            full_name,
+            bio,
+            page_url,
+            page_title,
+            show_profile,
+            allow_tagging,
+        } = values
         const newTeacher: Partial<DbUser> = {
-            fullName: name || user.fullName,
+            full_name: full_name || user.full_name,
             bio: bio || "",
             img: imageUrl || "",
-            pageUrl: pageUrl || "",
-            pageTitle: pageUrlTitle || "",
-            showProfile: showProfile?.toString() === "true",
-            allowTagging: allowTagging?.toString() === "true",
-            updatedAt: new Date().toISOString(),
+            page_url: page_url || "",
+            page_title: page_title || "",
+            show_profile: show_profile?.toString() === "true",
+            allow_tagging: allow_tagging?.toString() === "true",
+            updated_at: new Date().toISOString(),
         }
         try {
             // await updateTeacher(newTeacher);
@@ -94,17 +100,17 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         form={form}
                         autoComplete="off"
                         initialValues={{
-                            name: user.fullName,
+                            full_name: user.full_name,
                             bio: user.bio,
                             img: user.img,
-                            pageUrl: user.pageUrl,
-                            pageUrlTitle: user.pageTitle,
-                            showProfile: user.showProfile,
-                            allowTagging: user.allowTagging,
+                            page_url: user.page_url,
+                            page_title: user.page_title,
+                            show_profile: user.show_profile,
+                            allow_tagging: user.allow_tagging,
                         }}
                     >
                         <Form.Item<FieldType>
-                            name="name"
+                            name="full_name"
                             rules={[{ required: true, message: "נא להזין שם" }]}
                         >
                             <Input placeholder="*שם מלא" />
@@ -124,7 +130,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                             <b>קישור</b> (יופיע ככפתור בעמוד הפרופיל)
                         </label>
                         <Form.Item<FieldType>
-                            name="pageUrl"
+                            name="page_url"
                             rules={[
                                 ({ getFieldValue }) => ({
                                     validator(_, value) {
@@ -141,12 +147,12 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                                             )
                                         }
                                         if (
-                                            getFieldValue("pageUrl") &&
-                                            !getFieldValue("pageUrlTitle")
+                                            getFieldValue("page_url") &&
+                                            !getFieldValue("page_title")
                                         ) {
                                             return Promise.reject(
                                                 new Error(
-                                                    "נא להזין כותרת קישור לדף פרופיל"
+                                                    "נא להזין קישור לדף פרופיל"
                                                 )
                                             )
                                         }
@@ -157,7 +163,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         >
                             <Input placeholder="קישור לדף פרופיל" />
                         </Form.Item>
-                        <Form.Item<FieldType> name="pageUrlTitle">
+                        <Form.Item<FieldType> name="page_title">
                             <Input placeholder="כותרת קישור לדף פרופיל" />
                         </Form.Item>
 
@@ -191,13 +197,13 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
                         <Form.Item<FieldType>
                             label="הצגת פרופיל"
-                            name="showProfile"
+                            name="show_profile"
                             valuePropName="checked"
                         >
                             <Switch
                                 checkedChildren="גלוי"
                                 unCheckedChildren="מוסתר"
-                                defaultChecked={user?.showProfile}
+                                defaultChecked={user?.show_profile}
                             />
                         </Form.Item>
 

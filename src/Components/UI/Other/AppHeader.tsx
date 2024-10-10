@@ -58,7 +58,7 @@ const UserInfo = ({ user }: IUserInfoProps) => {
         <div>
             {user && (
                 <div className={`user-info-container`}>
-                    <p className={`user-name`}>{user.fullName}</p>
+                    <p className={`user-name`}>{user.full_name}</p>
                 </div>
             )}
         </div>

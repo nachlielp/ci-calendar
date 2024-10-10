@@ -109,20 +109,21 @@ export interface IMailingList {
     districts: District[]
     eventTypes: EventlyType[]
 }
+
 export interface DbUser {
     user_id: string
-    createdAt: string
-    updatedAt: string
+    created_at: string
+    updated_at: string
     user_type: UserType
-    fullName: string
+    full_name: string
     phone: string
     email: string
-    subscribedForUpdatesAt: string
+    subscribed_for_updates_at: string
     newsletter: IMailingList
-    pageUrl: string
-    pageTitle: string
-    showProfile: boolean
-    allowTagging: boolean
+    page_url: string
+    page_title: string
+    show_profile: boolean
+    allow_tagging: boolean
     provider: string
     img: string
     bio: string
@@ -130,11 +131,11 @@ export interface DbUser {
 
 export interface UserBio extends Partial<DbUser> {
     user_id: string
-    fullName: string
-    pageUrl: string
-    pageTitle: string
-    showProfile: boolean
-    allowTagging: boolean
+    full_name: string
+    page_url: string
+    page_title: string
+    show_profile: boolean
+    allow_tagging: boolean
     img: string
     bio: string
 }

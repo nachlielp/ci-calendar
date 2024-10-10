@@ -3,7 +3,7 @@ import { UserBio, DbUser, UserType } from "../util/interfaces"
 
 export type ManageUserOption = {
     user_id: string
-    fullName: string
+    full_name: string
     user_type: UserType
     email: string
 }
@@ -84,7 +84,7 @@ async function getUsers(): Promise<ManageUserOption[]> {
     try {
         const { data } = await supabase
             .from("users")
-            .select("user_id,fullName,user_type,email")
+            .select("user_id,full_name,user_type,email")
         return data as ManageUserOption[]
     } catch (error) {
         console.error("Error in getUsers:", error)
@@ -102,13 +102,13 @@ async function getTaggableTeachers(): Promise<
 
         const { data, error } = await supabase
             .from("users")
-            .select("user_id, fullName, user_type, allowTagging")
-            .or(`allowTagging.eq.true,user_id.eq.${currentUser.user.id}`)
+            .select("user_id, full_name, user_type, allow_tagging")
+            .or(`allow_tagging.eq.true,user_id.eq.${currentUser.user.id}`)
 
         if (error) throw error
 
         return data.map((user) => ({
-            label: user.fullName,
+            label: user.full_name,
             value: user.user_id,
         }))
     } catch (error) {
@@ -122,10 +122,10 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
         const { data, error } = await supabase
             .from("users")
             .select(
-                "user_id, fullName, img, bio, pageUrl, pageTitle, showProfile, allowTagging"
+                "user_id, full_name, img, bio, page_url, page_title, show_profile, allow_tagging"
             )
             .in("user_id", teacherIds)
-            .eq("showProfile", true)
+            .eq("show_profile", true)
 
         if (error) throw error
         return data as UserBio[]

@@ -8,7 +8,7 @@ function BioCard({ teacher }: { teacher: UserBio }) {
     return (
         <section className="bio-card" style={{ direction: "rtl" }}>
             <div className="bio-card-content">
-                <label className="bio-card-title">{teacher.fullName}</label>
+                <label className="bio-card-title">{teacher.full_name}</label>
 
                 {teacher?.img && (
                     <Image
@@ -21,21 +21,21 @@ function BioCard({ teacher }: { teacher: UserBio }) {
                         className="bio-card-img"
                     />
                 )}
-                {teacher.pageUrl && (
+                {teacher.page_url && (
                     <a
                         className="teacher-page-link"
-                        key={teacher.pageUrl}
-                        href={teacher.pageUrl}
+                        key={teacher.page_url}
+                        href={teacher.page_url}
                         target="_blank"
                     >
-                        {teacher.pageTitle || "דף פרופיל"}
+                        {teacher.page_title || "דף פרופיל"}
                         <Icon icon="openInNew" className="event-link-icon" />
                     </a>
                 )}
 
                 <hr className="bio-card-hr" />
                 <label className="bio-card-subtitle">
-                    אודות {teacher.fullName}
+                    אודות {teacher.full_name}
                 </label>
                 <Text>{teacher.bio}</Text>
             </div>

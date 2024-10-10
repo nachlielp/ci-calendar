@@ -137,14 +137,14 @@ export default function SingleDayEventForm() {
                     updated_at: dayjs().toISOString(),
                     title: values["event-title"],
                     description: values["event-description"] || "",
-                    owners: [{ value: user.user_id, label: user.fullName }],
+                    owners: [{ value: user.user_id, label: user.full_name }],
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     hide: false,
                     segments: segmentsTemplate,
                     district: values["district"],
                     creator_id: user.user_id,
-                    creator_name: user.fullName,
+                    creator_name: user.full_name,
                 }
 
                 await cieventsService.createCIEvent(event)
@@ -188,14 +188,16 @@ export default function SingleDayEventForm() {
                         updated_at: dayjs().toISOString(),
                         title: values["event-title"],
                         description: values["event-description"] || "",
-                        owners: [{ value: user.user_id, label: user.fullName }],
+                        owners: [
+                            { value: user.user_id, label: user.full_name },
+                        ],
                         links: values["links"] || [],
                         price: values["prices"] || [],
                         hide: false,
                         segments: segments,
                         district: values["district"],
                         creator_id: user.user_id,
-                        creator_name: user.fullName,
+                        creator_name: user.full_name,
                     }
                     await cieventsService.createCIEvent(event)
                 }

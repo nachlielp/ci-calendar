@@ -39,7 +39,7 @@ export default function RequestForm() {
             message: values.description || "",
             phone: values.phone || user.phone || "",
             email: user.email || "",
-            name: user.fullName || "",
+            full_name: user.full_name || "",
         }
         console.log("requestPayload: ", requestPayload)
         try {
@@ -70,7 +70,7 @@ export default function RequestForm() {
                         onFinish={onFinish}
                         autoComplete="off"
                         initialValues={{
-                            name: user.fullName,
+                            full_name: user.full_name,
                             email: user.email,
                         }}
                         style={{ minHeight: "130px" }}
