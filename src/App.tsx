@@ -138,7 +138,7 @@ export default function App() {
                                 element={<CreateEventsPage />}
                             />
                             <Route
-                                path="/edit-single-day-event/:eventId"
+                                path="/edit-single-day-event/:itemId"
                                 element={
                                     <EditSingleDayEventForm
                                         editType={EventAction.edit}
@@ -146,7 +146,7 @@ export default function App() {
                                 }
                             />
                             <Route
-                                path="/recycle-single-day-event/:eventId"
+                                path="/recycle-single-day-event/:itemId"
                                 element={
                                     <EditSingleDayEventForm
                                         editType={EventAction.recycle}
@@ -154,7 +154,7 @@ export default function App() {
                                 }
                             />
                             <Route
-                                path="/edit-multi-day-event/:eventId"
+                                path="/edit-multi-day-event/:itemId"
                                 element={
                                     <EditMultiDayEventForm
                                         editType={EventAction.edit}
@@ -162,10 +162,19 @@ export default function App() {
                                 }
                             />
                             <Route
-                                path="/recycle-multi-day-event/:eventId"
+                                path="/recycle-multi-day-event/:itemId"
                                 element={
                                     <EditMultiDayEventForm
                                         editType={EventAction.recycle}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/edit-single-day-template/:itemId"
+                                element={
+                                    <EditSingleDayEventForm
+                                        editType={EventAction.edit}
+                                        isTemplate={true}
                                     />
                                 }
                             />

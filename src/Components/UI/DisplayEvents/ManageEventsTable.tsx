@@ -21,7 +21,10 @@ export default function ManageEventsTable() {
     const { events } = useEvents()
 
     const uid = useMemo(
-        () => (user?.user_type === "creator" ? [user.user_id] : []),
+        () =>
+            user?.user_type === "creator" || user?.user_type === "admin"
+                ? [user.user_id]
+                : [],
         [user]
     )
     const [showFuture, setShowFuture] = useState(true)
@@ -53,8 +56,6 @@ export default function ManageEventsTable() {
     const uniqueTeachers = getUniqueTeachers(filteredEvents)
 
     const isPhone = width < ScreenSize.mobile
-
-    const tableWidth = isPhone ? width * 0.9 : width * 0.5
 
     function onSelectChange(newSelectedRowKeys: React.Key[]) {
         if (showFuture) {
@@ -121,6 +122,7 @@ export default function ManageEventsTable() {
     function onSelectTimeframe(key: string) {
         setShowFuture(key === "future")
     }
+
     const rowSelection = {
         selectedRowKeys: showFuture
             ? selectedRowKeysFuture
@@ -223,7 +225,7 @@ export default function ManageEventsTable() {
         : selectedRowKeysPast.length > 0
 
     return (
-        <section className={`manage-events-table max-w-${tableWidth}px`}>
+        <section className={`manage-events-table `}>
             <header
                 className={`manage-events-header ${
                     isPhone ? "header-phone" : "header-desktop"

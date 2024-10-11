@@ -470,6 +470,7 @@ export const formatMonthlyDate = (date: dayjs.Dayjs) => {
 
 export function singleDayTemplateToFormValues(template: CITemplate) {
     const currentFormValues = {
+        "template-name": template.name,
         "event-title": template.title,
         "event-description": template.description,
         address: template.address,

@@ -3,7 +3,10 @@ import { CITemplate } from "../util/interfaces"
 import { useUser } from "../context/UserContext"
 import { templateService } from "../supabase/templateService"
 
-export default function useTemplates({ isMultiDay }: { isMultiDay?: boolean }) {
+interface UseTemplatesProps {
+    isMultiDay: boolean | null
+}
+export default function useTemplates({ isMultiDay }: UseTemplatesProps) {
     const [templates, setTemplates] = useState<CITemplate[]>([])
 
     const { user } = useUser()

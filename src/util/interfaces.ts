@@ -85,6 +85,7 @@ export interface CITemplate {
     segments: CIEventSegments[]
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
+    created_by: string
 }
 export enum District {
     north = "north",
