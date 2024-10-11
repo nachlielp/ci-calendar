@@ -1,37 +1,38 @@
 .create-events-page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  //   justify-content: center;
-  max-width: 100%;
-  height: calc(100vh - 56px);
-
-  .btns-container {
-    margin-top: 300px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 50px;
+    max-width: 100%;
+    height: calc(100vh - 56px);
 
-    .btn {
-      width: 100px;
-      height: 100px;
-      border-radius: 5px;
-      background-color: #fff;
-      border: 2px solid #bf5340;
+    .btns-container {
+        margin-top: 200px;
+        width: 350px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 50px;
+        flex-wrap: wrap;
 
-      font-size: 16px;
-      color: #000;
-      font-weight: 400;
-      cursor: pointer;
-      .icon-component {
-        cursor: pointer;
+        .btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            background-color: #fff;
+            border: 2px solid #bf5340;
 
-        .icon {
-          cursor: pointer;
+            font-size: 16px;
+            color: #000;
+            font-weight: 400;
+            cursor: pointer;
+            .icon-component {
+                cursor: pointer;
+
+                .icon {
+                    cursor: pointer;
+                }
+            }
         }
-      }
     }
-  }
 }

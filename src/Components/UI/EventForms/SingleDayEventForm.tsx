@@ -233,36 +233,42 @@ export default function SingleDayEventForm({
                     initialValues={initialValues}
                 >
                     {isTemplate && (
-                        <Form.Item name="template-name" label="שם התבנית">
-                            <Input
-                                placeholder="לדוגמה - יום חמישי בקבוצה"
-                                allowClear
-                            />
-                            <button
-                                type="button"
-                                onClick={() => clearForm()}
-                                className="general-clear-btn"
-                            >
-                                ניקוי טופס
-                            </button>
+                        <Form.Item name="template-name">
+                            <Row gutter={8}>
+                                <Col span={16}>
+                                    <Form.Item name="template-name">
+                                        <Input
+                                            placeholder="שם התבנית"
+                                            allowClear
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={8}>
+                                    <button
+                                        type="button"
+                                        onClick={() => clearForm()}
+                                        className="general-clear-btn"
+                                    >
+                                        ניקוי טופס
+                                    </button>
+                                </Col>
+                            </Row>
                         </Form.Item>
                     )}
                     {!isTemplate && (
                         <Form.Item>
                             <Row gutter={8}>
-                                <Col span={18}>
-                                    <Form.Item
-                                        name="template-description"
-                                        label="בחירת תבנית"
-                                    >
+                                <Col span={16}>
+                                    <Form.Item name="template-description">
                                         <Select
                                             options={templateOptions}
                                             onChange={handleTemplateChange}
                                             allowClear
+                                            placeholder="בחירת תבנית"
                                         />
                                     </Form.Item>
                                 </Col>
-                                <Col span={6}>
+                                <Col span={8}>
                                     <button
                                         type="button"
                                         onClick={() => clearForm()}

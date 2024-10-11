@@ -2,76 +2,57 @@ import { Icon } from "../UI/Other/Icon"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import AddEventModal from "../UI/EventForms/AddEventModal"
 import { AddEventDrawer } from "../UI/EventForms/AddEventDrawer"
+import { ScreenSize } from "../../util/options"
 export default function CreateEventsPage() {
     const { width } = useWindowSize()
-    const isMobile = width < 600
+    const isMobile = width < ScreenSize.mobile
+
+    const buttonsArray = [
+        { type: "single-day", isTemplate: false, label: "אירוע חד יומי" },
+        {
+            type: "single-day",
+            isTemplate: true,
+            label: "אירוע חד יומי - תבנית",
+        },
+        { type: "multi-day", isTemplate: false, label: "אירוע רב יומי" },
+        { type: "multi-day", isTemplate: true, label: "אירוע רב יומי - תבנית" },
+    ]
     return (
         <section className="create-events-page">
             <article className="btns-container">
-                {isMobile ? (
-                    <AddEventDrawer
-                        anchorEl={
-                            <button className="btn">
-                                <Icon icon="noteStackAdd" />
-                                אירוע רב יומי
-                            </button>
-                        }
-                        eventType="multi-day"
-                    />
-                ) : (
-                    <AddEventModal
-                        anchorEl={
-                            <button className="btn">
-                                <Icon icon="noteStackAdd" />
-                                אירוע רב יומי
-                            </button>
-                        }
-                        eventType="multi-day"
-                    />
+                {isMobile && (
+                    <>
+                        {buttonsArray.map((button, index) => (
+                            <AddEventDrawer
+                                key={index}
+                                anchorEl={
+                                    <button className="btn">
+                                        <Icon icon="addBox" className="icon" />
+                                        {button.label}
+                                    </button>
+                                }
+                                eventType={button.type}
+                                isTemplate={button.isTemplate}
+                            />
+                        ))}
+                    </>
                 )}
-
-                {isMobile ? (
-                    <AddEventDrawer
-                        anchorEl={
-                            <button className="btn">
-                                <Icon icon="noteStackAdd" className="icon" />
-                                אירוע רב יומי
-                            </button>
-                        }
-                        eventType="single-day"
-                    />
-                ) : (
-                    <AddEventModal
-                        anchorEl={
-                            <button className="btn">
-                                <Icon icon="addBox" className="icon" />
-                                אירוע חד יומי
-                            </button>
-                        }
-                        eventType="single-day"
-                    />
-                )}
-                {isMobile ? (
-                    <AddEventDrawer
-                        anchorEl={
-                            <button className="btn">
-                                <Icon icon="noteStackAdd" className="icon" />
-                                אירוע רב יומי - תבנית
-                            </button>
-                        }
-                        eventType="single-day"
-                    />
-                ) : (
-                    <AddEventModal
-                        anchorEl={
-                            <button className="btn">
-                                <Icon icon="addBox" className="icon" />
-                                אירוע חד יומי - תבנית
-                            </button>
-                        }
-                        eventType="single-day"
-                        isTemplate={true}
-                    />
+                {!isMobile && (
+                    <>
+                        {buttonsArray.map((button, index) => (
+                            <AddEventModal
+                                key={index}
+                                anchorEl={
+                                    <button className="btn">
+                                        <Icon icon="addBox" className="icon" />
+                                        {button.label}
+                                    </button>
+                                }
+                                eventType={button.type}
+                                isTemplate={button.isTemplate}
+                            />
+                        ))}
+                    </>
                 )}
             </article>
         </section>
