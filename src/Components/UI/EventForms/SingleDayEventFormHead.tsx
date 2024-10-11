@@ -3,69 +3,58 @@ import {
     Input,
     Select,
     DatePicker,
-    Tooltip,
     Row,
     Col,
     Card,
-    InputNumber,
-    List,
     TimePicker,
 } from "antd"
 
-import VirtualList from "rc-virtual-list"
 import GooglePlacesInput, {
     IGooglePlaceOption,
 } from "../Other/GooglePlacesInput"
 import dayjs from "dayjs"
 import { districtOptions, eventTypes, tagOptions } from "../../../util/options"
-import {
-    EventFrequency,
-    formatMonthlyDate,
-    listOfDates,
-    repeatOptions,
-    repeatEventTooltip,
-} from "./SingleDayEventForm"
+
 import { IAddress } from "../../../util/interfaces"
-import { Icon } from "../Other/Icon"
 
 interface SingleDayEventFormHeadProps {
     form: any
     handleAddressSelect: (place: IGooglePlaceOption) => void
     handleDateChange: (date: dayjs.Dayjs) => void
     handleEndDateChange: (date: dayjs.Dayjs) => void
-    handleRepeatChange?: () => void
-    repeatOption?: EventFrequency
     eventDate: dayjs.Dayjs
     endDate: dayjs.Dayjs | null
     isEdit: boolean
     teachers: { label: string; value: string }[]
     address?: IAddress
+    isTemplate?: boolean
 }
 
 export default function SingleDayEventFormHead({
-    form,
     handleAddressSelect,
     handleDateChange,
-    handleEndDateChange,
-    handleRepeatChange,
     teachers,
-    repeatOption,
     eventDate,
-    endDate,
-    isEdit,
+    isTemplate,
     address,
 }: SingleDayEventFormHeadProps) {
     return (
         <div className="single-day-event-base-form">
             <Card
                 className="event-card"
-                title={<span className="event-title">הוספת אירוע חד יומי</span>}
+                title={
+                    <span className="event-title">
+                        {isTemplate
+                            ? "הוספת אירוע חד יומי - תבנית"
+                            : "הוספת אירוע חד יומי"}
+                    </span>
+                }
             >
                 <Form.Item
                     name="event-title"
                     rules={[{ required: true, message: "שדה חובה" }]}
                 >
-                    <Input placeholder="*כותרת " />
+                    <Input placeholder="*כותרת האירוע" />
                 </Form.Item>
 
                 <Form.Item name="event-description">
@@ -90,134 +79,20 @@ export default function SingleDayEventFormHead({
                     />
                 </Form.Item>
 
-                <Form.Item
-                    name="event-date"
-                    rules={[{ required: true, message: "שדה חובה" }]}
-                >
-                    <DatePicker
-                        format={"DD/MM"}
-                        minDate={dayjs()}
-                        maxDate={dayjs().add(3, "months")}
-                        onChange={handleDateChange}
-                        allowClear={false}
-                        defaultValue={dayjs(eventDate, "DD/MM")}
-                    />
-                </Form.Item>
-
-                {!isEdit && (
-                    <>
-                        <article className="row">
-                            <Form.Item
-                                className="form-item full-width"
-                                name="event-repeat"
-                                rules={[
-                                    { required: true, message: "שדה חובה" },
-                                ]}
-                            >
-                                <Select
-                                    options={repeatOptions}
-                                    onChange={handleRepeatChange}
-                                    placeholder="חזרה"
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                className="form-item "
-                                name="event-repeat"
-                            >
-                                <Tooltip title={repeatEventTooltip}>
-                                    <span>
-                                        <Icon icon="info" />
-                                    </span>
-                                </Tooltip>
-                            </Form.Item>
-                        </article>
-                        {repeatOption === EventFrequency.byWeek && (
-                            <Form.Item
-                                label="שבועות"
-                                name="event-repeat-week-interval"
-                                className="form-item"
-                                rules={[
-                                    { required: true, message: "שדה חובה" },
-                                ]}
-                            >
-                                <InputNumber min={1} precision={0} />
-                            </Form.Item>
-                        )}
-                        {repeatOption === EventFrequency.monthly && (
-                            <Form.Item
-                                label="תדירות"
-                                name="event-repeat-week-frequency"
-                                className="form-item"
-                            >
-                                <Input
-                                    placeholder={formatMonthlyDate(eventDate)}
-                                    disabled
-                                />
-                            </Form.Item>
-                        )}
-                        {repeatOption !== EventFrequency.none && (
-                            <>
-                                <Form.Item
-                                    name="event-repeat-end-date"
-                                    className="form-item"
-                                    rules={[
-                                        { required: true, message: "שדה חובה" },
-                                    ]}
-                                >
-                                    <DatePicker
-                                        placeholder="סיום חזרה"
-                                        format={"DD/MM"}
-                                        minDate={eventDate}
-                                        maxDate={dayjs().add(3, "months")}
-                                        onChange={handleEndDateChange}
-                                    />
-                                </Form.Item>
-                                <Form.Item
-                                    label="תאריכים"
-                                    name="event-list-of-dates"
-                                    className="form-item"
-                                >
-                                    {endDate && repeatOption && (
-                                        <List>
-                                            <VirtualList
-                                                data={listOfDates(
-                                                    eventDate,
-                                                    endDate,
-                                                    repeatOption,
-                                                    form.getFieldValue(
-                                                        "event-repeat-week-interval"
-                                                    )
-                                                )}
-                                                height={200}
-                                                itemHeight={47}
-                                                itemKey={(item) =>
-                                                    item.format("DD/MM/YYYY") +
-                                                    item.valueOf()
-                                                }
-                                            >
-                                                {(
-                                                    date: dayjs.Dayjs,
-                                                    index: number
-                                                ) => (
-                                                    <List.Item
-                                                        key={index}
-                                                        className="list-item"
-                                                    >
-                                                        <List.Item.Meta
-                                                            key={index}
-                                                            title={date.format(
-                                                                "DD/MM"
-                                                            )}
-                                                        />
-                                                    </List.Item>
-                                                )}
-                                            </VirtualList>
-                                        </List>
-                                    )}
-                                </Form.Item>
-                            </>
-                        )}
-                    </>
+                {!isTemplate && (
+                    <Form.Item
+                        name="event-date"
+                        rules={[{ required: true, message: "שדה חובה" }]}
+                    >
+                        <DatePicker
+                            format={"DD/MM"}
+                            minDate={dayjs()}
+                            maxDate={dayjs().add(3, "months")}
+                            onChange={handleDateChange}
+                            allowClear={false}
+                            defaultValue={dayjs(eventDate, "DD/MM")}
+                        />
+                    </Form.Item>
                 )}
             </Card>
 
@@ -260,7 +135,7 @@ export default function SingleDayEventFormHead({
                             <Select
                                 mode="tags"
                                 className="full-width"
-                                placeholder="מורים"
+                                placeholder="מורים - ניתן להוסיף מורים שלא נמצאים ברשימה"
                                 filterOption={(input, option) =>
                                     (option?.label ?? "")
                                         .toLowerCase()

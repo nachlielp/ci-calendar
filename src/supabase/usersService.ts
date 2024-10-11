@@ -7,7 +7,7 @@ export type ManageUserOption = {
     user_type: UserType
     email: string
 }
-export const userService = {
+export const usersService = {
     getUsers,
     getUser,
     updateUser,

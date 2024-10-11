@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { UserType } from "../../../util/interfaces"
 import { useUsers } from "../../../hooks/useUsers"
 import { useWindowSize } from "../../../hooks/useWindowSize"
-import { ManageUserOption, userService } from "../../../supabase/userService"
+import { ManageUserOption, usersService } from "../../../supabase/usersService"
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
@@ -64,7 +64,7 @@ function ManageUsers() {
     const onMakeAdmin = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(
+            const updatedUser = await usersService.updateUser(
                 selectedUser.user_id,
                 {
                     user_type: UserType.admin,
@@ -87,7 +87,7 @@ function ManageUsers() {
     const onMakeCreator = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(
+            const updatedUser = await usersService.updateUser(
                 selectedUser.user_id,
                 {
                     user_type: UserType.creator,
@@ -111,7 +111,7 @@ function ManageUsers() {
     const onMakeProfile = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(
+            const updatedUser = await usersService.updateUser(
                 selectedUser.user_id,
                 {
                     user_type: UserType.profile,
@@ -134,7 +134,7 @@ function ManageUsers() {
     const onMakeUser = async () => {
         if (!selectedUser) return
         try {
-            const updatedUser = await userService.updateUser(
+            const updatedUser = await usersService.updateUser(
                 selectedUser.user_id,
                 {
                     user_type: UserType.user,

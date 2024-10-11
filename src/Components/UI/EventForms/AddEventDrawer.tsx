@@ -1,35 +1,40 @@
-import { useState } from "react";
-import { Drawer } from "antd";
-import SingleDayEventForm from "./SingleDayEventForm";
-import MultiDayEventForm from "./MultiDayEventForm";
+import { useState } from "react"
+import { Drawer } from "antd"
+import SingleDayEventForm from "./SingleDayEventForm"
+import MultiDayEventForm from "./MultiDayEventForm"
 
 export function AddEventDrawer({
-  anchorEl,
-  eventType,
+    anchorEl,
+    eventType,
+    isTemplate,
 }: {
-  anchorEl: any;
-  eventType: string;
+    anchorEl: any
+    eventType: string
+    isTemplate?: boolean
 }) {
-  const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(false)
 
-  const showDrawer = () => {
-    setOpen(true);
-  };
+    const showDrawer = () => {
+        setOpen(true)
+    }
 
-  const onClose = () => {
-    setOpen(false);
-  };
+    const onClose = () => {
+        setOpen(false)
+    }
 
-  return (
-    <>
-      <div onClick={showDrawer}>{anchorEl}</div>
-      <Drawer onClose={onClose} open={open}>
-        {eventType === "single-day" ? (
-          <SingleDayEventForm />
-        ) : (
-          <MultiDayEventForm />
-        )}
-      </Drawer>
-    </>
-  );
+    return (
+        <>
+            <div onClick={showDrawer}>{anchorEl}</div>
+            <Drawer onClose={onClose} open={open}>
+                {eventType === "single-day" ? (
+                    <SingleDayEventForm
+                        closeForm={onClose}
+                        isTemplate={isTemplate}
+                    />
+                ) : (
+                    <MultiDayEventForm />
+                )}
+            </Drawer>
+        </>
+    )
 }

@@ -72,7 +72,7 @@ export default function EventSegmentsForm({
                                         <Select
                                             mode="tags"
                                             className="full-width"
-                                            placeholder="מורים"
+                                            placeholder="מורים - ניתן להוסיף מורים שלא נמצאים ברשימה"
                                             filterOption={(input, option) =>
                                                 (option?.label ?? "")
                                                     .toLowerCase()

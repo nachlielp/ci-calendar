@@ -66,26 +66,22 @@ export interface CIEvent {
     segments: CIEventSegments[]
     creator_id: string
     creator_name: string
+    source_template_id: string | null
 }
 export interface CITemplate {
-    id: string
+    template_id: string
     owners: UserOption[]
+    name: string
     title: string
     description: string
     address: IAddress
     created_at: string
-    updated_at: string
-    hide: boolean
-    start_date: string
-    end_date: string
-    //TODO add loc info to district
+    updated_at: string | null
     district: string
     type: string
     price: IPrice[]
     links: ILink[]
     segments: CIEventSegments[]
-    creator_id: string
-    creator_name: string
 }
 export enum District {
     north = "north",

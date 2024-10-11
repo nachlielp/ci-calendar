@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-import { userService } from "../supabase/userService"
+import { usersService } from "../supabase/usersService"
 
 export const useTeachersList = () => {
     const [teachers, setTeachers] = useState<
@@ -11,7 +11,7 @@ export const useTeachersList = () => {
     useEffect(() => {
         const fetchTeachers = async () => {
             try {
-                const teachers = await userService.getTaggableTeachers()
+                const teachers = await usersService.getTaggableTeachers()
                 setTeachers(teachers)
                 setLoading(false)
             } catch (error) {

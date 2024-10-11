@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { ManageUserOption, userService } from "../supabase/userService"
+import { ManageUserOption, usersService } from "../supabase/usersService"
 
 export const useUsers = () => {
     const [users, setUsers] = useState<ManageUserOption[]>([])
@@ -8,7 +8,7 @@ export const useUsers = () => {
     useEffect(() => {
         const fetchTeachers = async () => {
             try {
-                const users = await userService.getUsers()
+                const users = await usersService.getUsers()
                 setUsers(users)
                 setLoading(false)
             } catch (error) {

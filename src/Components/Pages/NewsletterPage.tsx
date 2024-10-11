@@ -3,7 +3,7 @@ import { Checkbox, Form, type FormProps, Input, Card, Select } from "antd"
 import { districtOptions, eventTypes } from "../../util/options"
 import { useState } from "react"
 import { useUser } from "../../context/UserContext"
-import { userService } from "../../supabase/userService"
+import { usersService } from "../../supabase/usersService"
 import { District, EventlyType, IMailingList } from "../../util/interfaces"
 
 type FieldType = {
@@ -40,7 +40,7 @@ export default function NewsletterPage() {
         updatedUser.phone = values.phone || ""
 
         try {
-            await userService.updateUser(user.user_id, updatedUser)
+            await usersService.updateUser(user.user_id, updatedUser)
         } catch (error) {
             console.error("UserForm.onFinish.error: ", error)
         }

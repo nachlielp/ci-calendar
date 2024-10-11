@@ -158,6 +158,7 @@ export default function EditMultiDayEventForm({
             district: values["district"],
             creator_id: user.user_id,
             creator_name: user.full_name,
+            source_template_id: eventData.source_template_id,
         }
         try {
             if (editType === EventAction.recycle) {

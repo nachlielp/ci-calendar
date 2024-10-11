@@ -3,7 +3,7 @@ import { UserBio, CIEvent, CIEventSegments } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService, FilterOptions } from "../supabase/cieventsService"
 import { supabase } from "../supabase/client"
-import { userService } from "../supabase/userService"
+import { usersService } from "../supabase/usersService"
 
 export const useEvents = (filterBy: FilterOptions = {}) => {
     const [events, setEvents] = useState<CIEvent[]>([])
@@ -27,7 +27,7 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
                     eventsTeacherIds.push(...teacherIds)
                 })
 
-                const viewableTeachers = await userService.getViewableTeachers(
+                const viewableTeachers = await usersService.getViewableTeachers(
                     eventsTeacherIds
                 )
                 setViewableTeachers(viewableTeachers)

@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom"
-import { Form } from "antd"
+import { Col, Form, Input, Row, Select } from "antd"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import { tagOptions } from "../../../util/options"
-import { IAddress, UserType } from "../../../util/interfaces"
+import { SelectOption, tagOptions } from "../../../util/options"
+import { CITemplate, IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import EventSegmentsForm from "./EventSegmentsForm"
@@ -18,6 +18,12 @@ import {
     cieventsService,
     CIEventWithoutId,
 } from "../../../supabase/cieventsService"
+import {
+    CITemplateWithoutId,
+    templateService,
+} from "../../../supabase/templateService"
+import useTemplates from "../../../hooks/useTemplates"
+import { reverseFormatTeachers } from "./EditSingleDayEventForm"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -29,17 +35,38 @@ const initialValues = {
     "event-tags": [tagOptions[0].value],
 }
 
-export default function SingleDayEventForm() {
+export default function SingleDayEventForm({
+    closeForm,
+    isTemplate,
+}: {
+    closeForm: () => void
+    isTemplate?: boolean
+}) {
     const [form] = Form.useForm()
     const { teachers } = useTeachersList()
-    const [repeatOption, setRepeatOption] = useState<EventFrequency>(
-        EventFrequency.none
-    )
+    // const [repeatOption, setRepeatOption] = useState<EventFrequency>(
+    //     EventFrequency.none
+    // )
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
+    // const [submitted, setSubmitted] = useState(false)
     const navigate = useNavigate()
     const { user } = useUser()
-    const [address, setAddress] = useState<IAddress>()
+    const { templates } = useTemplates()
+    const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
+    const [address, setAddress] = useState<IAddress | undefined>()
+    const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
+        null
+    )
+
+    useEffect(() => {
+        setTemplateOptions(
+            templates.map((template) => ({
+                value: template.template_id,
+                label: template.name,
+            }))
+        )
+    }, [templates])
 
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -52,17 +79,18 @@ export default function SingleDayEventForm() {
         navigate("/")
     }
 
-    const handleAddressSelect = (place: IGooglePlaceOption) => {
+    const handleAddressSelect = (place: IGooglePlaceOption | null) => {
+        if (!place) {
+            setAddress(undefined)
+            form.setFieldValue("address", undefined)
+            return
+        }
         const selectedAddress = {
             label: place.label,
             place_id: place.value.place_id,
         }
         setAddress(selectedAddress)
         form.setFieldValue("address", selectedAddress)
-    }
-
-    const handleRepeatChange = () => {
-        setRepeatOption(form.getFieldValue("event-repeat"))
     }
 
     const handleDateChange = (date: dayjs.Dayjs) => {
@@ -73,10 +101,28 @@ export default function SingleDayEventForm() {
         setEndDate(date)
     }
 
+    const clearForm = () => {
+        form.resetFields()
+        // setSubmitted(false)
+        setSourceTemplateId(null)
+        handleAddressSelect(null)
+    }
+
+    const handleTemplateChange = (value: string) => {
+        const template = templates.find((t) => t.template_id === value)
+        if (template) {
+            const { currentFormValues, address } =
+                templateToFormValues(template)
+            form.setFieldsValue(currentFormValues)
+            setAddress(address)
+            setSourceTemplateId(template.template_id)
+        }
+    }
+
     const handleSubmit = async (values: any) => {
         const baseDate = dayjs(values["event-date"]) // Clone the base date for consistent date manipulation
 
-        const segmentsTemplate = [
+        const segmentsArray = [
             {
                 startTime: baseDate
                     .clone()
@@ -96,7 +142,7 @@ export default function SingleDayEventForm() {
 
         if (values["segments"]) {
             values["segments"].forEach((segment: any) => {
-                segmentsTemplate.push({
+                segmentsArray.push({
                     type: segment.type,
                     tags: segment.tags || [],
                     teachers: formatTeachers(segment.teachers, teachers),
@@ -119,7 +165,7 @@ export default function SingleDayEventForm() {
         }
 
         try {
-            if (repeatOption === EventFrequency.none) {
+            if (!isTemplate) {
                 const event: CIEventWithoutId = {
                     start_date: eventDate
                         .hour(13)
@@ -141,68 +187,36 @@ export default function SingleDayEventForm() {
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     hide: false,
-                    segments: segmentsTemplate,
+                    segments: segmentsArray,
                     district: values["district"],
                     creator_id: user.user_id,
                     creator_name: user.full_name,
+                    source_template_id: sourceTemplateId,
                 }
-
+                // setSubmitted(true)
                 await cieventsService.createCIEvent(event)
-            } else if (endDate) {
-                const dates = listOfDates(
-                    eventDate,
-                    endDate,
-                    repeatOption,
-                    form.getFieldValue("event-repeat-week-interval")
-                )
-
-                for (const date of dates) {
-                    const segments = segmentsTemplate.map((segment) => ({
-                        ...segment,
-                        startTime: date
-                            .clone()
-                            .hour(dayjs(segment.startTime).hour())
-                            .minute(dayjs(segment.startTime).minute())
-                            .toISOString(),
-                        endTime: date
-                            .clone()
-                            .hour(dayjs(segment.endTime).hour())
-                            .minute(dayjs(segment.endTime).minute())
-                            .toISOString(),
-                    }))
-
-                    const event: CIEventWithoutId = {
-                        type: "",
-                        start_date: date
-                            .hour(13)
-                            .minute(0)
-                            .second(0)
-                            .format("YYYY-MM-DDTHH:mm:ss"),
-                        end_date: date
-                            .hour(13)
-                            .minute(0)
-                            .second(0)
-                            .format("YYYY-MM-DDTHH:mm:ss"),
-                        address: address,
-                        created_at: dayjs().toISOString(),
-                        updated_at: dayjs().toISOString(),
-                        title: values["event-title"],
-                        description: values["event-description"] || "",
-                        owners: [
-                            { value: user.user_id, label: user.full_name },
-                        ],
-                        links: values["links"] || [],
-                        price: values["prices"] || [],
-                        hide: false,
-                        segments: segments,
-                        district: values["district"],
-                        creator_id: user.user_id,
-                        creator_name: user.full_name,
-                    }
-                    await cieventsService.createCIEvent(event)
+                clearForm()
+                closeForm()
+            } else {
+                const template: CITemplateWithoutId = {
+                    type: "",
+                    address: address,
+                    created_at: dayjs().toISOString(),
+                    updated_at: null,
+                    name: values["template-name"],
+                    title: values["event-title"],
+                    description: values["event-description"] || "",
+                    owners: [{ value: user.user_id, label: user.full_name }],
+                    links: values["links"] || [],
+                    price: values["prices"] || [],
+                    segments: segmentsArray,
+                    district: values["district"],
                 }
+                // setSubmitted(true)
+                await templateService.createTemplate(template)
+                clearForm()
+                closeForm()
             }
-            navigate("/")
         } catch (error) {
             console.error("EventForm.handleSubmit.error: ", error)
             throw error
@@ -213,25 +227,64 @@ export default function SingleDayEventForm() {
         <div className="single-day-event-form">
             <section className="event-card">
                 <Form
-                    // {...formItemLayout}
                     form={form}
                     onFinish={handleSubmit}
                     variant="filled"
-                    // labelCol={{ span: 6, offset: 0 }}
-                    // wrapperCol={{ span: 16, offset: 0 }}
                     initialValues={initialValues}
                 >
+                    {isTemplate && (
+                        <Form.Item name="template-name" label="שם התבנית">
+                            <Input
+                                placeholder="לדוגמה - יום חמישי בקבוצה"
+                                allowClear
+                            />
+                            <button
+                                type="button"
+                                onClick={() => clearForm()}
+                                className="general-clear-btn"
+                            >
+                                ניקוי טופס
+                            </button>
+                        </Form.Item>
+                    )}
+                    {!isTemplate && (
+                        <Form.Item>
+                            <Row gutter={8}>
+                                <Col span={18}>
+                                    <Form.Item
+                                        name="template-description"
+                                        label="בחירת תבנית"
+                                    >
+                                        <Select
+                                            options={templateOptions}
+                                            onChange={handleTemplateChange}
+                                            allowClear
+                                        />
+                                    </Form.Item>
+                                </Col>
+                                <Col span={6}>
+                                    <button
+                                        type="button"
+                                        onClick={() => clearForm()}
+                                        className="general-clear-btn"
+                                    >
+                                        ניקוי טופס
+                                    </button>
+                                </Col>
+                            </Row>
+                        </Form.Item>
+                    )}
                     <SingleDayEventFormHead
                         form={form}
                         handleAddressSelect={handleAddressSelect}
                         handleDateChange={handleDateChange}
                         handleEndDateChange={handleEndDateChange}
-                        handleRepeatChange={handleRepeatChange}
-                        repeatOption={repeatOption}
+                        address={address}
                         eventDate={eventDate}
                         endDate={endDate}
                         isEdit={false}
                         teachers={teachers}
+                        isTemplate={isTemplate}
                     />
                     <EventSegmentsForm form={form} day="" teachers={teachers} />
                     <hr className="divider" />
@@ -253,8 +306,11 @@ export default function SingleDayEventForm() {
                             justifyContent: "flex-start",
                         }}
                     >
-                        <button type="submit" className="general-action-btn">
-                            יצירת אירוע
+                        <button type="submit" className={`general-action-btn`}>
+                            <label>
+                                {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                            </label>
+                            {/* <Spin percent="auto" spinning={submitted} /> */}
                         </button>
                     </Form.Item>
                 </Form>
@@ -398,4 +454,43 @@ export const formatMonthlyDate = (date: dayjs.Dayjs) => {
             break
     }
     return `יום ${day} ה${frequency} בחודש`
+}
+
+function templateToFormValues(template: CITemplate) {
+    const currentFormValues = {
+        "event-title": template.title,
+        "event-description": template.description,
+        address: template.address,
+        district: template.district,
+        "event-types": template.segments[0]?.type,
+        "event-tags": template.segments[0]?.tags,
+        teachers: reverseFormatTeachers(template.segments[0]?.teachers),
+        "event-date": dayjs.tz(
+            dayjs(template.segments[0]?.startTime),
+            "Asia/Jerusalem"
+        ),
+        "event-time": [
+            dayjs(template.segments[0]?.startTime).tz("Asia/Jerusalem"),
+            dayjs(template.segments[0]?.endTime).tz("Asia/Jerusalem"),
+        ],
+        segments: template.segments.slice(1).map((segment) => ({
+            type: segment.type,
+            tags: segment.tags,
+            teachers: reverseFormatTeachers(segment.teachers),
+            time: [
+                dayjs(segment.startTime).tz("Asia/Jerusalem"),
+                dayjs(segment.endTime).tz("Asia/Jerusalem"),
+            ],
+        })),
+        links: template.links.map((link) => ({
+            title: link.title,
+            link: link.link,
+        })),
+        prices: template.price.map((price) => ({
+            title: price.title,
+            sum: price.sum,
+        })),
+    }
+    // console.log("currentFormValues: ", currentFormValues);
+    return { currentFormValues, address: template.address }
 }

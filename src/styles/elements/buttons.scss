@@ -24,3 +24,32 @@
         color: white;
     }
 }
+
+.general-clear-btn {
+    width: auto;
+    font-family: Assistant;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20.93px;
+    text-align: right;
+
+    color: black;
+    border-radius: 6px;
+    padding: 5px 16px;
+    border: none;
+    &:hover {
+        background-color: #daa49a;
+        color: black;
+    }
+
+    &.loading {
+        background-color: rgb(163, 80, 65);
+        color: white;
+    }
+}
+
+.action-loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}

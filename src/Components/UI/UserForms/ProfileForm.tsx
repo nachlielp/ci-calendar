@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import CloudinaryUpload from "../Other/CloudinaryUpload"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { useUser } from "../../../context/UserContext"
-import { userService } from "../../../supabase/userService"
+import { usersService } from "../../../supabase/usersService"
 import { DbUser } from "../../../util/interfaces"
 
 type FieldType = {
@@ -60,7 +60,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
         }
         try {
             // await updateTeacher(newTeacher);
-            const updatedUser = await userService.updateUser(
+            const updatedUser = await usersService.updateUser(
                 user.user_id,
                 newTeacher
             )

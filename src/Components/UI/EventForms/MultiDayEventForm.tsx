@@ -130,6 +130,7 @@ export default function MultiDayEventForm() {
                 district: values["district"],
                 creator_id: user.user_id,
                 creator_name: user.full_name,
+                source_template_id: null,
             }
             console.log("MultiDayEventForm.handleSubmit.event: ", event)
             await cieventsService.createCIEvent(event)

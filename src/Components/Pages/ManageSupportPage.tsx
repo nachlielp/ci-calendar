@@ -22,7 +22,7 @@ import { SorterResult } from "antd/es/table/interface"
 import { Icon } from "../UI/Other/Icon"
 
 import { requestsService } from "../../supabase/requestsService"
-import { userService } from "../../supabase/userService"
+import { usersService } from "../../supabase/usersService"
 
 interface TableParams {
     pagination?: TablePaginationConfig
@@ -142,7 +142,7 @@ export default function ManageSupportPage() {
                     return
                 }
 
-                const userRes = await userService.updateUser(
+                const userRes = await usersService.updateUser(
                     request.created_by,
                     {
                         user_type: newUserType,
