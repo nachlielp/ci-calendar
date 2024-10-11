@@ -30,7 +30,6 @@ export interface CIEventSegments {
     endTime: string
     type: string
     startTime: string
-    //TODO add user option, or just name
     teachers: UserOption[]
     tags: string[]
 }
@@ -67,6 +66,8 @@ export interface CIEvent {
     creator_id: string
     creator_name: string
     source_template_id: string | null
+    is_multi_day: boolean
+    multi_day_teachers: UserOption[] | null
 }
 export interface CITemplate {
     template_id: string
@@ -82,6 +83,8 @@ export interface CITemplate {
     price: IPrice[]
     links: ILink[]
     segments: CIEventSegments[]
+    is_multi_day: boolean
+    multi_day_teachers: UserOption[] | null
 }
 export enum District {
     north = "north",

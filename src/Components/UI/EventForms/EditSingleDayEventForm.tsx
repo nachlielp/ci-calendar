@@ -173,6 +173,8 @@ export default function EditSingleDayEventForm({
             creator_id: user.user_id,
             creator_name: user.full_name,
             source_template_id: eventData.source_template_id,
+            is_multi_day: false,
+            multi_day_teachers: [],
         }
         try {
             // console.log("EventForm.handleSubmit.event: ", event);

@@ -10,7 +10,7 @@ export default function AddEventModal({
 }: {
     anchorEl: any
     eventType: string
-    isTemplate?: boolean
+    isTemplate: boolean
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -41,7 +41,10 @@ export default function AddEventModal({
                         isTemplate={isTemplate}
                     />
                 ) : (
-                    <MultiDayEventForm />
+                    <MultiDayEventForm
+                        closeForm={handleCancel}
+                        isTemplate={isTemplate}
+                    />
                 )}
             </Modal>
         </>

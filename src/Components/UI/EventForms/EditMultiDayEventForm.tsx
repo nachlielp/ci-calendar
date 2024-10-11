@@ -159,6 +159,8 @@ export default function EditMultiDayEventForm({
             creator_id: user.user_id,
             creator_name: user.full_name,
             source_template_id: eventData.source_template_id,
+            is_multi_day: true,
+            multi_day_teachers: values["multi-day-teachers"] || [],
         }
         try {
             if (editType === EventAction.recycle) {
@@ -189,9 +191,9 @@ export default function EditMultiDayEventForm({
                     <MultiDayFormHead
                         handleAddressSelect={handleAddressSelect}
                         handleDateChange={handleDateChange}
-                        // handleScheduleChange={handleScheduleChange}
-                        // schedule={schedule}
                         address={address}
+                        isTemplate={false}
+                        teachers={teachers}
                     />
 
                     <AddLinksForm />

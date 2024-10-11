@@ -52,7 +52,7 @@ export default function SingleDayEventForm({
     // const [submitted, setSubmitted] = useState(false)
     const navigate = useNavigate()
     const { user } = useUser()
-    const { templates } = useTemplates()
+    const { templates } = useTemplates({ isMultiDay: false })
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
     const [address, setAddress] = useState<IAddress | undefined>()
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
@@ -112,10 +112,12 @@ export default function SingleDayEventForm({
         const template = templates.find((t) => t.template_id === value)
         if (template) {
             const { currentFormValues, address } =
-                templateToFormValues(template)
+                singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
             setSourceTemplateId(template.template_id)
+        } else {
+            setSourceTemplateId(null)
         }
     }
 
@@ -192,6 +194,8 @@ export default function SingleDayEventForm({
                     creator_id: user.user_id,
                     creator_name: user.full_name,
                     source_template_id: sourceTemplateId,
+                    is_multi_day: false,
+                    multi_day_teachers: null,
                 }
                 // setSubmitted(true)
                 await cieventsService.createCIEvent(event)
@@ -211,6 +215,8 @@ export default function SingleDayEventForm({
                     price: values["prices"] || [],
                     segments: segmentsArray,
                     district: values["district"],
+                    is_multi_day: false,
+                    multi_day_teachers: null,
                 }
                 // setSubmitted(true)
                 await templateService.createTemplate(template)
@@ -462,7 +468,7 @@ export const formatMonthlyDate = (date: dayjs.Dayjs) => {
     return `יום ${day} ה${frequency} בחודש`
 }
 
-function templateToFormValues(template: CITemplate) {
+export function singleDayTemplateToFormValues(template: CITemplate) {
     const currentFormValues = {
         "event-title": template.title,
         "event-description": template.description,

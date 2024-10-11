@@ -10,7 +10,7 @@ export function AddEventDrawer({
 }: {
     anchorEl: any
     eventType: string
-    isTemplate?: boolean
+    isTemplate: boolean
 }) {
     const [open, setOpen] = useState(false)
 
@@ -32,7 +32,10 @@ export function AddEventDrawer({
                         isTemplate={isTemplate}
                     />
                 ) : (
-                    <MultiDayEventForm />
+                    <MultiDayEventForm
+                        closeForm={onClose}
+                        isTemplate={isTemplate}
+                    />
                 )}
             </Drawer>
         </>
