@@ -1,12 +1,17 @@
 import useTemplates from "../../../hooks/useTemplates"
 import { List, Skeleton } from "antd"
 import DeleteTemplateButton from "./DeleteTemplateButton"
-import { useNavigate } from "react-router-dom"
 import { Icon } from "./Icon"
+import FormModal from "../EventForms/FormModal"
+import { useWindowSize } from "../../../hooks/useWindowSize"
+import { ScreenSize } from "../../../util/options"
+import { FormDrawer } from "../EventForms/FormDrawer"
 
 export default function ManageTemplatesTable() {
     const { templates } = useTemplates({ isMultiDay: null })
-    const navigate = useNavigate()
+    const { width } = useWindowSize()
+    const isMobile = width < ScreenSize.mobile
+    console.log("isMobile", isMobile)
     return (
         <section className="manage-templates-table">
             <h2 className="list-title">תבניות</h2>
@@ -28,23 +33,43 @@ export default function ManageTemplatesTable() {
                                     >
                                         שיתוף
                                     </button>
-                                    <button
-                                        key="list-btn-edit"
-                                        className="list-btn"
-                                        onClick={() =>
-                                            navigate(
-                                                `/edit-${
-                                                    template.is_multi_day
-                                                        ? "multi"
-                                                        : "single"
-                                                }-day-template/${
-                                                    template.template_id
-                                                }`
-                                            )
-                                        }
-                                    >
-                                        <Icon icon="edit" />
-                                    </button>
+                                    {isMobile ? (
+                                        <FormDrawer
+                                            anchorEl={
+                                                <button
+                                                    key="list-btn-edit"
+                                                    className="list-btn"
+                                                >
+                                                    <Icon icon="edit" />
+                                                </button>
+                                            }
+                                            eventType={
+                                                template.is_multi_day
+                                                    ? "edit-multi-day"
+                                                    : "edit-single-day"
+                                            }
+                                            isTemplate={true}
+                                            itemId={template.template_id}
+                                        />
+                                    ) : (
+                                        <FormModal
+                                            anchorEl={
+                                                <button
+                                                    key="list-btn-edit"
+                                                    className="list-btn"
+                                                >
+                                                    <Icon icon="edit" />
+                                                </button>
+                                            }
+                                            eventType={
+                                                template.is_multi_day
+                                                    ? "edit-multi-day"
+                                                    : "edit-single-day"
+                                            }
+                                            isTemplate={true}
+                                            itemId={template.template_id}
+                                        />
+                                    )}
                                     <DeleteTemplateButton
                                         templateId={template.template_id}
                                     />

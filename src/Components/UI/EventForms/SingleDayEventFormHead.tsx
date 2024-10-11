@@ -45,7 +45,7 @@ export default function SingleDayEventFormHead({
                 title={
                     <span className="event-title">
                         {isTemplate
-                            ? "הוספת אירוע חד יומי - תבנית"
+                            ? "יצירת תבנית חד יומית"
                             : "הוספת אירוע חד יומי"}
                     </span>
                 }

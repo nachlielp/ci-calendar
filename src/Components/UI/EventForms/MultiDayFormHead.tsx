@@ -29,7 +29,7 @@ export default function MultiDayFormHead({
             className="multi-day-form-head-card"
             title={
                 <span className="multi-day-form-head-title">
-                    {isTemplate ? "תבנית רב יומית" : "ארוע רב יומי"}
+                    {isTemplate ? "יצירת תבנית רב יומית" : "ארוע רב יומי"}
                 </span>
             }
         >

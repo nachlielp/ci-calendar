@@ -281,6 +281,7 @@ export default function MultiDayEventForm({
 
 export function multiDayTemplateToFormValues(template: CITemplate) {
     const currentFormValues = {
+        "template-name": template.name,
         "event-title": template.title,
         "event-description": template.description,
         address: template.address,

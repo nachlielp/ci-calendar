@@ -1,7 +1,7 @@
 import { Icon } from "../UI/Other/Icon"
 import { useWindowSize } from "../../hooks/useWindowSize"
-import AddEventModal from "../UI/EventForms/AddEventModal"
-import { AddEventDrawer } from "../UI/EventForms/AddEventDrawer"
+import FormModal from "../UI/EventForms/FormModal"
+import { FormDrawer } from "../UI/EventForms/FormDrawer"
 import { ScreenSize } from "../../util/options"
 import ManageTemplatesTable from "../UI/Other/ManageTemplatesTable"
 export default function CreateEventsPage() {
@@ -10,13 +10,25 @@ export default function CreateEventsPage() {
 
     const buttonsArray = [
         {
-            type: "single-day",
+            type: "create-single-day",
             isTemplate: true,
             label: "אירוע חד יומי - תבנית",
         },
-        { type: "single-day", isTemplate: false, label: "אירוע חד יומי" },
-        { type: "multi-day", isTemplate: true, label: "אירוע רב יומי - תבנית" },
-        { type: "multi-day", isTemplate: false, label: "אירוע רב יומי" },
+        {
+            type: "create-single-day",
+            isTemplate: false,
+            label: "אירוע חד יומי",
+        },
+        {
+            type: "create-multi-day",
+            isTemplate: true,
+            label: "אירוע רב יומי - תבנית",
+        },
+        {
+            type: "create-multi-day",
+            isTemplate: false,
+            label: "אירוע רב יומי",
+        },
     ]
     return (
         <section className="create-events-page">
@@ -24,7 +36,7 @@ export default function CreateEventsPage() {
                 {isMobile && (
                     <>
                         {buttonsArray.map((button, index) => (
-                            <AddEventDrawer
+                            <FormDrawer
                                 key={index}
                                 anchorEl={
                                     <button className="btn">
@@ -41,7 +53,7 @@ export default function CreateEventsPage() {
                 {!isMobile && (
                     <>
                         {buttonsArray.map((button, index) => (
-                            <AddEventModal
+                            <FormModal
                                 key={index}
                                 anchorEl={
                                     <button className="btn">

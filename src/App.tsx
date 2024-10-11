@@ -154,10 +154,11 @@ export default function App() {
                                 }
                             />
                             <Route
-                                path="/edit-multi-day-event/:itemId"
+                                path="/edit-multi-day-event/:eventId"
                                 element={
                                     <EditMultiDayEventForm
                                         editType={EventAction.edit}
+                                        isTemplate={false}
                                     />
                                 }
                             />
@@ -166,6 +167,7 @@ export default function App() {
                                 element={
                                     <EditMultiDayEventForm
                                         editType={EventAction.recycle}
+                                        isTemplate={false}
                                     />
                                 }
                             />
@@ -173,6 +175,15 @@ export default function App() {
                                 path="/edit-single-day-template/:itemId"
                                 element={
                                     <EditSingleDayEventForm
+                                        editType={EventAction.edit}
+                                        isTemplate={true}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/edit-multi-day-template/:itemId"
+                                element={
+                                    <EditMultiDayEventForm
                                         editType={EventAction.edit}
                                         isTemplate={true}
                                     />

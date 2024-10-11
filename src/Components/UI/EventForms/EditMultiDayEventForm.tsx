@@ -1,8 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { Card, Form } from "antd"
+import { Card, Form, Input } from "antd"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { CIEvent, IAddress, CIEventSegments } from "../../../util/interfaces"
+import {
+    CIEvent,
+    IAddress,
+    CIEventSegments,
+    CITemplate,
+} from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
@@ -15,13 +20,20 @@ import { EventAction } from "../../../App"
 import { v4 as uuidv4 } from "uuid"
 import { useUser } from "../../../context/UserContext"
 import { cieventsService } from "../../../supabase/cieventsService.ts"
+import { templateService } from "../../../supabase/templateService.ts"
+import { multiDayTemplateToFormValues } from "./MultiDayEventForm.tsx"
 
 export default function EditMultiDayEventForm({
     editType,
+    isTemplate = false,
+    itemId,
+    closeForm,
 }: {
     editType: EventAction
+    isTemplate: boolean
+    itemId: string
+    closeForm: () => void
 }) {
-    console.log("EditMultiDayEventForm.editType: ", editType)
     const { teachers } = useTeachersList()
     const navigate = useNavigate()
     const { user } = useUser()
@@ -29,8 +41,8 @@ export default function EditMultiDayEventForm({
         throw new Error("user is null, make sure you're within a Provider")
     }
 
-    const { eventId } = useParams<{ eventId: string }>()
     const [eventData, setEventData] = useState<CIEvent | null>(null)
+    const [templateData, setTemplateData] = useState<CITemplate | null>(null)
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [currentFormValues, setCurrentFormValues] = useState<any>()
     const [address, setAddress] = useState<IAddress | undefined>()
@@ -39,8 +51,8 @@ export default function EditMultiDayEventForm({
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                if (eventId) {
-                    const res = await cieventsService.getCIEvent(eventId)
+                if (itemId && !isTemplate) {
+                    const res = await cieventsService.getCIEvent(itemId)
                     setEventData(res)
                     if (res) {
                         const { currentFormValues, address } =
@@ -53,18 +65,30 @@ export default function EditMultiDayEventForm({
                         setAddress(address)
                     }
                 }
+                if (itemId && isTemplate) {
+                    const templateData = await templateService.getTemplate(
+                        itemId
+                    )
+                    setTemplateData(templateData)
+                    if (templateData) {
+                        const { currentFormValues, address } =
+                            multiDayTemplateToFormValues(templateData)
+                        setCurrentFormValues(currentFormValues)
+                        setAddress(address)
+                    }
+                }
             } catch (error) {
                 console.error(
                     `EditMultiDayEventForm.fetchEvent.eventId: `,
-                    eventId
+                    itemId
                 )
                 throw error
             }
         }
         fetchEvent()
-    }, [eventId])
+    }, [itemId])
 
-    if (!eventData) return <Loading />
+    if (!eventData && !templateData) return <Loading />
 
     const handleAddressSelect = (place: IGooglePlaceOption) => {
         const selectedAddress = {
@@ -78,9 +102,6 @@ export default function EditMultiDayEventForm({
     const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
         setDates(dates)
     }
-
-    const submitedEventId =
-        editType === EventAction.recycle ? uuidv4() : eventData.id
 
     const handleSubmit = async (values: any) => {
         const segmentsTemplate: CIEventSegments[] = []
@@ -128,51 +149,86 @@ export default function EditMultiDayEventForm({
             })
         })
 
-        if (!address || !dates) {
-            return
-        }
-
-        const event: CIEvent = {
-            start_date: dates[0]
-                .hour(13)
-                .minute(0)
-                .second(0)
-                .format("YYYY-MM-DDTHH:mm:ss"),
-            end_date: dates[1]
-                .hour(13)
-                .minute(0)
-                .second(0)
-                .format("YYYY-MM-DDTHH:mm:ss"),
-            type: values["main-event-type"],
-            id: submitedEventId,
-            address: address,
-            created_at: eventData.created_at,
-            updated_at: dayjs().toISOString(),
-            title: values["event-title"],
-            description: values["event-description"] || "",
-            owners: [{ value: user.user_id, label: user.full_name }],
-            links: values["links"] || [],
-            price: values["prices"] || [],
-            hide: false,
-            segments: segmentsTemplate,
-            district: values["district"],
-            creator_id: user.user_id,
-            creator_name: user.full_name,
-            source_template_id: eventData.source_template_id,
-            is_multi_day: true,
-            multi_day_teachers: values["multi-day-teachers"] || [],
-        }
-        try {
-            if (editType === EventAction.recycle) {
-                await cieventsService.createCIEvent(event)
-                navigate("/manage-events")
-            } else {
-                await cieventsService.updateCIEvent(eventData.id, event)
-                navigate("/manage-events")
+        if (eventData) {
+            if (!address || !dates) {
+                return
             }
-        } catch (error) {
-            console.error("EventForm.handleSubmit.error: ", error)
-            throw error
+
+            const submitedEventId =
+                editType === EventAction.recycle ? uuidv4() : eventData.id
+
+            const event: CIEvent = {
+                start_date: dates[0]
+                    .hour(13)
+                    .minute(0)
+                    .second(0)
+                    .format("YYYY-MM-DDTHH:mm:ss"),
+                end_date: dates[1]
+                    .hour(13)
+                    .minute(0)
+                    .second(0)
+                    .format("YYYY-MM-DDTHH:mm:ss"),
+                type: values["main-event-type"],
+                id: submitedEventId,
+                address: address,
+                created_at: eventData.created_at,
+                updated_at: dayjs().toISOString(),
+                title: values["event-title"],
+                description: values["event-description"] || "",
+                owners: [{ value: user.user_id, label: user.full_name }],
+                links: values["links"] || [],
+                price: values["prices"] || [],
+                hide: false,
+                segments: segmentsTemplate,
+                district: values["district"],
+                creator_id: user.user_id,
+                creator_name: user.full_name,
+                source_template_id: eventData.source_template_id,
+                is_multi_day: true,
+                multi_day_teachers: values["multi-day-teachers"] || [],
+            }
+            try {
+                if (editType === EventAction.recycle) {
+                    await cieventsService.createCIEvent(event)
+                    closeForm()
+                } else {
+                    await cieventsService.updateCIEvent(eventData.id, event)
+                    closeForm()
+                }
+            } catch (error) {
+                console.error("EventForm.handleSubmit.error: ", error)
+                throw error
+            }
+        } else if (templateData) {
+            console.log("templateData", templateData)
+            const template: CITemplate = {
+                type: templateData.type,
+                template_id: templateData.template_id,
+                address: (address || templateData.address) as IAddress,
+                created_at: templateData.created_at,
+                updated_at: dayjs().toISOString(),
+                title: values["event-title"],
+                description: values["event-description"] || "",
+                owners: [{ value: user.user_id, label: user.full_name }],
+                links: values["links"] || [],
+                price: values["prices"] || [],
+                segments: [],
+                district: values["district"],
+                is_multi_day: true,
+                multi_day_teachers: values["multi-day-teachers"] || [],
+                name: values["template-name"],
+                created_by: user.user_id,
+            }
+
+            try {
+                await templateService.updateTemplate(template)
+                closeForm()
+            } catch (error) {
+                console.error(
+                    "EventForm.handleSubmit.updateTemplate.error: ",
+                    error
+                )
+            }
         }
     }
 
@@ -181,18 +237,23 @@ export default function EditMultiDayEventForm({
 
     return (
         <>
-            <Card className="event-card">
+            <Card className="edit-multi-day-event-form">
                 <Form
                     form={form}
                     variant="filled"
                     onFinish={handleSubmit}
                     initialValues={currentFormValues}
                 >
+                    {isTemplate && (
+                        <Form.Item name="template-name" label="שם התבנית">
+                            <Input allowClear />
+                        </Form.Item>
+                    )}
                     <MultiDayFormHead
                         handleAddressSelect={handleAddressSelect}
                         handleDateChange={handleDateChange}
                         address={address}
-                        isTemplate={false}
+                        isTemplate={isTemplate}
                         teachers={teachers}
                     />
 

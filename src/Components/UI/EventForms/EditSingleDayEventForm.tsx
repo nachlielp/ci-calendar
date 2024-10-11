@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { Card, Col, Form, Input, Row } from "antd"
+import { Card, Form, Input } from "antd"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from "uuid"
@@ -48,14 +48,18 @@ const formItemLayout = {
 export default function EditSingleDayEventForm({
     editType,
     isTemplate = false,
+    itemId,
+    closeForm,
 }: {
     editType: EventAction
     isTemplate?: boolean
+    itemId: string
+    closeForm: () => void
 }) {
     const navigate = useNavigate()
     const { teachers } = useTeachersList()
     const { user } = useUser()
-    const { itemId } = useParams<{ itemId: string }>()
+    // const { itemId } = useParams<{ itemId: string }>()
     const [eventData, setEventData] = useState<CIEvent | null>(null)
     const [templateData, setTemplateData] = useState<CITemplate | null>(null)
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
@@ -203,7 +207,7 @@ export default function EditSingleDayEventForm({
                 if (editType === EventAction.recycle) {
                     try {
                         await cieventsService.createCIEvent(event)
-                        navigate("/manage-events")
+                        closeForm()
                     } catch (error) {
                         console.error(
                             "EventForm.handleSubmit.createEvent.error: ",
@@ -214,7 +218,7 @@ export default function EditSingleDayEventForm({
                 } else {
                     try {
                         await cieventsService.updateCIEvent(eventId, event)
-                        navigate("/manage-events")
+                        closeForm()
                     } catch (error) {
                         console.error(
                             "EventForm.handleSubmit.updateEvent.error: ",
@@ -248,7 +252,7 @@ export default function EditSingleDayEventForm({
 
             try {
                 await templateService.updateTemplate(template)
-                navigate("/create-events")
+                closeForm()
             } catch (error) {
                 console.error(
                     "EventForm.handleSubmit.updateTemplate.error: ",
@@ -266,7 +270,7 @@ export default function EditSingleDayEventForm({
 
     return (
         <>
-            <Card className="event-card">
+            <Card className="edit-single-day-event-form">
                 <Form
                     {...formItemLayout}
                     form={form}
@@ -278,22 +282,7 @@ export default function EditSingleDayEventForm({
                 >
                     {isTemplate && (
                         <Form.Item name="template-name" label="שם התבנית">
-                            <Row gutter={8}>
-                                <Col span={24}>
-                                    <Form.Item name="template-name">
-                                        <Input allowClear />
-                                    </Form.Item>
-                                </Col>
-                                {/* <Col span={8}>
-                                    <button
-                                        type="button"
-                                        onClick={() => clearForm()}
-                                        className="general-clear-btn"
-                                    >
-                                        ניקוי טופס
-                                    </button>
-                                </Col> */}
-                            </Row>
+                            <Input allowClear />
                         </Form.Item>
                     )}
                     <SingleDayEventFormHead
