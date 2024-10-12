@@ -1,5 +1,5 @@
-import { Suspense, useEffect } from "react"
-import { Routes, Route, useNavigate } from "react-router-dom"
+import { Suspense } from "react"
+import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 import dayjs from "dayjs"
 import AppHeader from "./Components/UI/Other/AppHeader"
@@ -25,7 +25,6 @@ import FiltersAndNotificationsPage from "./Components/Pages/FiltersAndNotificati
 import BioPage from "./Components/Pages/BioPage"
 import AdminPage from "./Components/Pages/AdminPage"
 import ManageUsers from "./Components/UI/Other/ManageUsers"
-import { useUser } from "./context/UserContext"
 
 export enum EventAction {
     edit,
