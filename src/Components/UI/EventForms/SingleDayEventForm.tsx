@@ -22,8 +22,8 @@ import {
     CITemplateWithoutId,
     templateService,
 } from "../../../supabase/templateService"
-import useTemplates from "../../../hooks/useTemplates"
 import { utilService } from "../../../util/utilService"
+import useTemplates from "../../../hooks/useTemplates"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -52,7 +52,7 @@ export default function SingleDayEventForm({
     // const [submitted, setSubmitted] = useState(false)
     const navigate = useNavigate()
     const { user } = useUser()
-    const { templates } = useTemplates({ isMultiDay: false })
+    const templates = useTemplates({ isMultiDay: false })
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
     const [address, setAddress] = useState<IAddress | undefined>()
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(

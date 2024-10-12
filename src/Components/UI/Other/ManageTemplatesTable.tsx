@@ -1,11 +1,11 @@
-import useTemplates from "../../../hooks/useTemplates"
 import { List, Skeleton } from "antd"
 import DeleteTemplateButton from "./DeleteTemplateButton"
 import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"
+import useTemplates from "../../../hooks/useTemplates"
 
-export default function ManageTemplatesList() {
-    const { templates } = useTemplates({ isMultiDay: null })
+export default function ManageTemplatesTable() {
+    const templates = useTemplates({ isMultiDay: null })
     return (
         <section className="manage-templates-table">
             <h2 className="list-title">תבניות</h2>

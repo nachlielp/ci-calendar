@@ -1,12 +1,12 @@
-import useTemplates from "../../../hooks/useTemplates"
 import { List, Skeleton } from "antd"
 import DeleteTemplateButton from "./DeleteTemplateButton"
 import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"
+import useTemplates from "../../../hooks/useTemplates"
 // import { useEffect } from "react"
 
 export default function ManageTemplatesList() {
-    const { templates } = useTemplates({ isMultiDay: null })
+    const templates = useTemplates({ isMultiDay: null })
 
     // useEffect(() => {
     //     console.log("templates: ", templates)

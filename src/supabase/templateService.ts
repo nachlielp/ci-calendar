@@ -12,21 +12,18 @@ export const templateService = {
     updateTemplate,
 }
 
-async function getUserTemplates(
-    userId: string,
-    isMultiDay: boolean | null
-): Promise<CITemplate[]> {
+async function getUserTemplates(userId: string): Promise<CITemplate[]> {
     try {
         const query = supabase
             .from("templates")
             .select("*")
             .eq("created_by", userId)
 
-        if (isMultiDay === true) {
-            query.eq("is_multi_day", true)
-        } else if (isMultiDay === false) {
-            query.or("is_multi_day.eq.false,is_multi_day.is.null")
-        }
+        // if (isMultiDay === true) {
+        //     query.eq("is_multi_day", true)
+        // } else if (isMultiDay === false) {
+        //     query.or("is_multi_day.eq.false,is_multi_day.is.null")
+        // }
 
         const { data, error } = await query
         if (error) throw error

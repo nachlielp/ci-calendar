@@ -24,8 +24,8 @@ import {
     CITemplateWithoutId,
     templateService,
 } from "../../../supabase/templateService"
-import useTemplates from "../../../hooks/useTemplates"
 import { utilService } from "../../../util/utilService"
+import useTemplates from "../../../hooks/useTemplates"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -47,7 +47,7 @@ export default function MultiDayEventForm({
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const navigate = useNavigate()
     const { teachers } = useTeachersList()
-    const { templates } = useTemplates({ isMultiDay: true })
+    const templates = useTemplates({ isMultiDay: true })
 
     const { user } = useUser()
     const [address, setAddress] = useState<IAddress>()

@@ -1,5 +1,6 @@
 .manage-templates-table {
     max-width: 100%;
+    min-width: 250px;
     direction: rtl;
     background-color: white;
     padding: 20px;

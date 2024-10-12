@@ -1,19 +1,22 @@
-import React from "react";
-import { SessionProvider } from "./context/SessionContext";
-import { UserProvider } from "./context/UserContext";
-import { ConfigProvider } from "antd";
+import React from "react"
+import { SessionProvider } from "./context/SessionContext"
+import { UserProvider } from "./context/UserContext"
+import { ConfigProvider } from "antd"
+import { TemplatesProvider } from "./context/TempatesContext"
 interface ProvidersProps {
-  children: React.ReactNode;
+    children: React.ReactNode
 }
 
 const Providers: React.FC<ProvidersProps> = ({ children }) => {
-  return (
-    <ConfigProvider direction="rtl">
-      <SessionProvider>
-        <UserProvider>{children}</UserProvider>
-      </SessionProvider>
-    </ConfigProvider>
-  );
-};
+    return (
+        <ConfigProvider direction="rtl">
+            <SessionProvider>
+                <UserProvider>
+                    <TemplatesProvider>{children}</TemplatesProvider>
+                </UserProvider>
+            </SessionProvider>
+        </ConfigProvider>
+    )
+}
 
-export default Providers;
+export default Providers
