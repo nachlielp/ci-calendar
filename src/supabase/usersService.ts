@@ -14,6 +14,7 @@ export const usersService = {
     createUser,
     getTaggableTeachers,
     getViewableTeachers,
+    subscribeToUser,
 }
 
 async function getUser(id: string): Promise<DbUser | null> {
@@ -130,4 +131,19 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
         console.error("Error fetching viewable teachers:", error)
         throw error
     }
+}
+
+function subscribeToUser(userId: string, callback: (payload: any) => void) {
+    const channel = supabase
+        .channel(`public:users:user_id=eq.${userId}`)
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "users" },
+            (payload) => {
+                callback(payload)
+            }
+        )
+        .subscribe()
+
+    return channel
 }

@@ -2,7 +2,7 @@ import React from "react"
 import { SessionProvider } from "./context/SessionContext"
 import { UserProvider } from "./context/UserContext"
 import { ConfigProvider } from "antd"
-import { TemplatesProvider } from "./context/TempatesContext"
+import { TemplatesProvider } from "./context/TemplatesContext"
 interface ProvidersProps {
     children: React.ReactNode
 }

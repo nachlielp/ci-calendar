@@ -16,6 +16,8 @@ import { useWindowSize } from "../../hooks/useWindowSize"
 import EventDrawer from "../UI/DisplayEvents/EventDrawer"
 import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
+import { useNavigate } from "react-router-dom"
+import { useUser } from "../../context/UserContext"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -26,10 +28,13 @@ export default function EventsPage({
     events,
     viewableTeachers,
 }: IEventsPageProps) {
+    const navigate = useNavigate()
+    const { user } = useUser()
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
     const [isListView, setIsListView] = useState<boolean>(true)
 
     const { width } = useWindowSize()
+
     const {
         currentValues: currentEventFilters,
         removeOption: onRemoveEventFilter,
@@ -42,6 +47,19 @@ export default function EventsPage({
 
     const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs())
     const [todaysEvents, setTodaysEvents] = useState<CIEvent[]>([])
+
+    useEffect(() => {
+        if (user) {
+            const eventTypes = user.default_filter?.eventTypes || []
+            const districts = user.default_filter?.districts || []
+            const filterURL =
+                eventTypes
+                    .map((eventType) => `eventType=${eventType}`)
+                    .join("&") +
+                districts.map((district) => `&district=${district}`).join("")
+            navigate(`/?${filterURL}`)
+        }
+    }, [user])
 
     const onSelectDate = (value: Dayjs) => {
         setSelectedDay(value)

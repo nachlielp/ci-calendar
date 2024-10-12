@@ -82,6 +82,23 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         fetchUser()
     }, [session])
 
+    useEffect(() => {
+        if (!user) return
+        const channel = usersService.subscribeToUser(
+            user.user_id,
+            (payload) => {
+                switch (payload.eventType) {
+                    case "UPDATE":
+                        setUser(payload.new)
+                        break
+                }
+            }
+        )
+        return () => {
+            supabase.removeChannel(channel)
+        }
+    }, [user])
+
     return (
         <UserContext.Provider
             value={{ user, setUser, loading, updateUserContext, requests }}

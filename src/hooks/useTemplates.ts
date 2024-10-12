@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useTemplatesContext } from "../context/TempatesContext"
+import { useTemplatesContext } from "../context/TemplatesContext"
 import { CITemplate } from "../util/interfaces"
 
 export default function useTemplates({

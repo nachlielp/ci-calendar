@@ -39,23 +39,6 @@ export default function App() {
         hide: false,
     })
 
-    const { user } = useUser()
-    const navigate = useNavigate()
-
-    useEffect(() => {
-        if (user) {
-            const eventTypes = user.default_filter?.eventTypes || []
-            const districts = user.default_filter?.districts || []
-            const filterURL =
-                eventTypes
-                    .map((eventType) => `eventType=${eventType}`)
-                    .join("&") +
-                districts.map((district) => `&district=${district}`).join("")
-            console.log("url: ", filterURL)
-            navigate(`/?${filterURL}`)
-        }
-    }, [])
-
     if (loading) {
         return <Loading />
     }
