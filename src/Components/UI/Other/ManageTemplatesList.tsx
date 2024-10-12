@@ -27,12 +27,12 @@ export default function ManageTemplatesList() {
                                     {template.name}
                                 </h3>
                                 <div className="template-actions">
-                                    <button
+                                    {/* <button
                                         key="list-btn-share"
                                         className="list-btn"
                                     >
                                         שיתוף
-                                    </button>
+                                    </button> */}
                                     <FormContainer
                                         anchorEl={
                                             <button
