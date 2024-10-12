@@ -3,7 +3,7 @@ import { List, Skeleton } from "antd"
 import DeleteTemplateButton from "./DeleteTemplateButton"
 import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"
-import { useEffect } from "react"
+// import { useEffect } from "react"
 
 export default function ManageTemplatesList() {
     const { templates } = useTemplates({ isMultiDay: null })
