@@ -177,9 +177,19 @@ export default function FullEventCard({
                     <h3 className="section-title">מחיר</h3>
                     <article className="event-price">
                         {event.price.map((price, index) => (
-                            <label key={`${price.title}-${index}`}>
-                                {price.title} - {price.sum}&#8362;
-                            </label>
+                            <React.Fragment key={`${price.sum}-${index}`}>
+                                <label className="price-label">
+                                    <span className="price-title">
+                                        {price.title}
+                                    </span>
+                                    :&nbsp;
+                                    <span className="price-sum">
+                                        {price.sum}
+                                    </span>
+                                    ₪
+                                </label>
+                                {index < event.price.length - 1 && ", "}
+                            </React.Fragment>
                         ))}
                     </article>
                 </>
