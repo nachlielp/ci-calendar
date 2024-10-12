@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react"
+import { Suspense } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 import dayjs from "dayjs"
@@ -9,30 +9,22 @@ import { useEvents } from "./hooks/useEvents"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import CreateEventsPage from "./Components/Pages/CreateEventsPage"
 import BackgroundTiles from "./Components/UI/Other/BackgroundTiles"
-const Signup = lazy(() => import("./Components/Auth/Signup"))
-const Login = lazy(() => import("./Components/Auth/Login"))
-const ResetPasswordRequest = lazy(
-    () => import("./Components/Auth/ResetPasswordRequest")
-)
-const NewsletterPage = lazy(() => import("./Components/Pages/NewsletterPage"))
-const BioPage = lazy(() => import("./Components/Pages/BioPage"))
-const EditSingleDayEventForm = lazy(
-    () => import("./Components/UI/EventForms/EditSingleDayEventForm")
-)
-const Loading = lazy(() => import("./Components/UI/Other/Loading"))
-const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
-const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
-const EventsPage = lazy(() => import("./Components/Pages/EventsPage"))
-const EditMultiDayEventForm = lazy(
-    () => import("./Components/UI/EventForms/EditMultiDayEventForm")
-)
-const ManageEventsTable = lazy(
-    () => import("./Components/UI/DisplayEvents/ManageEventsTable")
-)
+
+import ManageEventsTable from "./Components/UI/DisplayEvents/ManageEventsTable"
+
 import SupportPage from "./Components/Pages/SupportPage"
 import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
 import ManageSupportPage from "./Components/Pages/ManageSupportPage"
+import Loading from "./Components/UI/Other/Loading"
+import ResetPasswordRequest from "./Components/Auth/ResetPasswordRequest"
+import Login from "./Components/Auth/Login"
+import Signup from "./Components/Auth/Signup"
+import EventsPage from "./Components/Pages/EventsPage"
+import NewsletterPage from "./Components/Pages/NewsletterPage"
+import BioPage from "./Components/Pages/BioPage"
+import AdminPage from "./Components/Pages/AdminPage"
+import ManageUsers from "./Components/UI/Other/ManageUsers"
 
 export enum EventAction {
     edit,
@@ -136,58 +128,6 @@ export default function App() {
                             <Route
                                 path="/create-events"
                                 element={<CreateEventsPage />}
-                            />
-                            <Route
-                                path="/edit-single-day-event/:itemId"
-                                element={
-                                    <EditSingleDayEventForm
-                                        editType={EventAction.edit}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/recycle-single-day-event/:itemId"
-                                element={
-                                    <EditSingleDayEventForm
-                                        editType={EventAction.recycle}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/edit-multi-day-event/:eventId"
-                                element={
-                                    <EditMultiDayEventForm
-                                        editType={EventAction.edit}
-                                        isTemplate={false}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/recycle-multi-day-event/:itemId"
-                                element={
-                                    <EditMultiDayEventForm
-                                        editType={EventAction.recycle}
-                                        isTemplate={false}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/edit-single-day-template/:itemId"
-                                element={
-                                    <EditSingleDayEventForm
-                                        editType={EventAction.edit}
-                                        isTemplate={true}
-                                    />
-                                }
-                            />
-                            <Route
-                                path="/edit-multi-day-template/:itemId"
-                                element={
-                                    <EditMultiDayEventForm
-                                        editType={EventAction.edit}
-                                        isTemplate={true}
-                                    />
-                                }
                             />
                         </Route>
 

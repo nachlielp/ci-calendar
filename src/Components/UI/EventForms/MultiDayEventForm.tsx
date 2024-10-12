@@ -6,8 +6,8 @@ import "../../../styles/overrides.css"
 import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import { SelectOption, tagOptions } from "../../../util/options"
-import { CITemplate, IAddress, UserType } from "../../../util/interfaces"
+import { eventTypes, SelectOption, tagOptions } from "../../../util/options"
+import { IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -25,6 +25,7 @@ import {
     templateService,
 } from "../../../supabase/templateService"
 import useTemplates from "../../../hooks/useTemplates"
+import { utilService } from "../../../util/utilService"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -32,7 +33,7 @@ dayjs.extend(customParseFormat)
 dayjs.tz.setDefault("Asia/Jerusalem")
 
 const initialValues = {
-    "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
+    "event-dates": dayjs.tz(dayjs(), "Asia/Jerusalem"),
     "event-tags": [tagOptions[0].value],
 }
 
@@ -104,8 +105,9 @@ export default function MultiDayEventForm({
     const handleTemplateChange = (value: string) => {
         const template = templates.find((t) => t.template_id === value)
         if (template) {
-            const { currentFormValues, address } =
-                multiDayTemplateToFormValues(template)
+            const { currentFormValues, address } = template.is_multi_day
+                ? utilService.multiDayTemplateToFormValues(template)
+                : utilService.singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
             setSourceTemplateId(template.template_id)
@@ -135,7 +137,10 @@ export default function MultiDayEventForm({
                         .minute(0)
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss"),
-                    type: values["main-event-type"],
+                    type:
+                        eventTypes.find(
+                            (type) => type.label === values["main-event-type"]
+                        )?.value || "",
                     address: address,
                     created_at: dayjs().toISOString(),
                     updated_at: dayjs().toISOString(),
@@ -151,9 +156,12 @@ export default function MultiDayEventForm({
                     creator_name: user.full_name,
                     source_template_id: sourceTemplateId,
                     is_multi_day: true,
-                    multi_day_teachers: values["multi-day-teachers"] || [],
+                    multi_day_teachers:
+                        utilService.formatTeachersForCIEvent(
+                            values["multi-day-event-teachers"],
+                            teachers
+                        ) || [],
                 }
-                console.log("event: ", event)
                 await cieventsService.createCIEvent(event)
                 clearForm()
                 closeForm()
@@ -172,7 +180,11 @@ export default function MultiDayEventForm({
                     segments: [],
                     district: values["district"],
                     is_multi_day: true,
-                    multi_day_teachers: values["multi-day-teachers"] || [],
+                    multi_day_teachers:
+                        utilService.formatTeachersForCIEvent(
+                            values["multi-day-event-teachers"],
+                            teachers
+                        ) || [],
                 }
                 // setSubmitted(true)
                 await templateService.createTemplate(template)
@@ -249,6 +261,7 @@ export default function MultiDayEventForm({
                         isTemplate={isTemplate}
                         address={address}
                         teachers={teachers}
+                        titleText="יצירת אירוע - רב יומי"
                     />
                     <hr className="divider" />
                     <label>
@@ -277,26 +290,4 @@ export default function MultiDayEventForm({
             </section>
         </>
     )
-}
-
-export function multiDayTemplateToFormValues(template: CITemplate) {
-    const currentFormValues = {
-        "template-name": template.name,
-        "event-title": template.title,
-        "event-description": template.description,
-        address: template.address,
-        district: template.district,
-        "multi-day-teachers": template.multi_day_teachers,
-        links: template.links.map((link) => ({
-            title: link.title,
-            link: link.link,
-        })),
-        prices: template.price.map((price) => ({
-            title: price.title,
-            sum: price.sum,
-        })),
-        "main-event-type": template.type,
-    }
-    // console.log("currentFormValues: ", currentFormValues);
-    return { currentFormValues, address: template.address }
 }

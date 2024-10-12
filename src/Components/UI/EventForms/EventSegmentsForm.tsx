@@ -4,16 +4,15 @@ import { Icon } from "../Other/Icon"
 
 interface EventSegmentsFormProps {
     form: any
-    day: string
     teachers: { label: string; value: string }[]
 }
+
 export default function EventSegmentsForm({
     form,
-    day,
     teachers,
 }: EventSegmentsFormProps) {
     return (
-        <Form.List name={day ? [day, "segments"] : "segments"}>
+        <Form.List name="segments">
             {(segments, { add, remove }) => (
                 <>
                     {segments.map(({ key, name }) => (
@@ -22,7 +21,7 @@ export default function EventSegmentsForm({
                                 <Col md={24} xs={24}>
                                     <Form.Item
                                         className="full-width"
-                                        name={[name, "type"]}
+                                        name={[name, "event-type"]}
                                         rules={[
                                             {
                                                 required: true,
@@ -41,7 +40,7 @@ export default function EventSegmentsForm({
                             <Row gutter={10} align="middle">
                                 <Col md={24} xs={24}>
                                     <Form.Item
-                                        name={[name, "time"]}
+                                        name={[name, "event-time"]}
                                         rules={[
                                             {
                                                 required: true,
@@ -88,7 +87,7 @@ export default function EventSegmentsForm({
                             <Row gutter={10} align="middle">
                                 <Col md={24} xs={24}>
                                     <Form.Item
-                                        name={[name, "tags"]}
+                                        name={[name, "event-tags"]}
                                         className="full-width"
                                     >
                                         <Select

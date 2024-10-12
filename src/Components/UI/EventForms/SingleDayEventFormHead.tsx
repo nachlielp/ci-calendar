@@ -28,6 +28,7 @@ interface SingleDayEventFormHeadProps {
     teachers: { label: string; value: string }[]
     address?: IAddress
     isTemplate?: boolean
+    titleText: string
 }
 
 export default function SingleDayEventFormHead({
@@ -37,18 +38,13 @@ export default function SingleDayEventFormHead({
     eventDate,
     isTemplate,
     address,
+    titleText,
 }: SingleDayEventFormHeadProps) {
     return (
         <div className="single-day-event-base-form">
             <Card
                 className="event-card"
-                title={
-                    <span className="event-title">
-                        {isTemplate
-                            ? "יצירת תבנית חד יומית"
-                            : "הוספת אירוע חד יומי"}
-                    </span>
-                }
+                title={<span className="event-title">{titleText}</span>}
             >
                 <Form.Item
                     name="event-title"
@@ -81,7 +77,7 @@ export default function SingleDayEventFormHead({
 
                 {!isTemplate && (
                     <Form.Item
-                        name="event-date"
+                        name="event-start-date"
                         rules={[{ required: true, message: "שדה חובה" }]}
                     >
                         <DatePicker
@@ -96,12 +92,13 @@ export default function SingleDayEventFormHead({
                 )}
             </Card>
 
+            {/* First Segment */}
             <Card className="event-card">
                 <Row gutter={10} align="middle">
                     <Col md={24} xs={24}>
                         <Form.Item
                             className="full-width"
-                            name="event-types"
+                            name="event-type"
                             rules={[{ required: true, message: "שדה חובה" }]}
                         >
                             <Select

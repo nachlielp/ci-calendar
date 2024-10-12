@@ -13,7 +13,7 @@ export default function HideEventButton({
     }
     return (
         <button
-            className="event-footer-action"
+            className="action-btn"
             onClick={handleHide}
             style={{ borderRadius: "5px 0px 0px 5px" }}
         >

@@ -9,6 +9,10 @@ interface UseTemplatesProps {
 export default function useTemplates({ isMultiDay }: UseTemplatesProps) {
     const [templates, setTemplates] = useState<CITemplate[]>([])
 
+    useEffect(() => {
+        console.log("templates: ", templates)
+    }, [templates])
+
     const { user } = useUser()
     useEffect(() => {
         if (!user) return
@@ -24,8 +28,34 @@ export default function useTemplates({ isMultiDay }: UseTemplatesProps) {
             const channel = templateService.subscribeToNewTemplates(
                 user.user_id,
                 (payload) => {
-                    //TODO handle updates
-                    setTemplates((prev) => [payload.new, ...prev])
+                    console.log("payload: ", payload)
+                    switch (payload.event) {
+                        case "UPDATE":
+                            setTemplates((prev) =>
+                                prev.map((template) =>
+                                    template.template_id ===
+                                    payload.new.template_id
+                                        ? payload.new
+                                        : template
+                                )
+                            )
+                            console.log("templates after update: ", templates)
+                            break
+                        case "DELETE":
+                            setTemplates((prev) =>
+                                prev.filter(
+                                    (template) =>
+                                        template.template_id !==
+                                        payload.old.template_id
+                                )
+                            )
+                            console.log("templates after delete: ", templates)
+                            break
+                        case "INSERT":
+                            setTemplates((prev) => [payload.new, ...prev])
+                            console.log("templates after insert: ", templates)
+                            break
+                    }
                 }
             )
             return channel

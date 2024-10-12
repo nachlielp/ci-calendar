@@ -12,6 +12,7 @@ interface IMultiDayFormHeadProps {
     address: IAddress | undefined
     isTemplate: boolean
     teachers: UserOption[]
+    titleText: string
 }
 
 export default function MultiDayFormHead({
@@ -20,6 +21,7 @@ export default function MultiDayFormHead({
     address,
     isTemplate,
     teachers,
+    titleText,
 }: IMultiDayFormHeadProps) {
     function onDatesChange(dates: [Dayjs, Dayjs]) {
         handleDateChange(dates)
@@ -28,9 +30,7 @@ export default function MultiDayFormHead({
         <Card
             className="multi-day-form-head-card"
             title={
-                <span className="multi-day-form-head-title">
-                    {isTemplate ? "יצירת תבנית רב יומית" : "ארוע רב יומי"}
-                </span>
+                <span className="multi-day-form-head-title">{titleText}</span>
             }
         >
             <Form.Item
@@ -61,7 +61,7 @@ export default function MultiDayFormHead({
             </Form.Item>
             {!isTemplate && (
                 <Form.Item
-                    name="event-date"
+                    name="event-dates"
                     rules={[
                         { required: true, message: "שדה חובה" },
                         {
@@ -105,7 +105,7 @@ export default function MultiDayFormHead({
             >
                 <Select options={eventTypes} placeholder="סוג האירוע" />
             </Form.Item>
-            <Form.Item name="multi-day-teachers" className="full-width">
+            <Form.Item name="multi-day-event-teachers" className="full-width">
                 <Select
                     mode="tags"
                     className="full-width"

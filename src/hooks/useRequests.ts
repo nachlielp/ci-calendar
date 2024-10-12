@@ -43,7 +43,6 @@ UseRequestsProps) {
             const channel = await requestsService.subscribeToAllRequests(
                 async (hasNewResponse) => {
                     if (hasNewResponse) {
-                        console.log("hasNewResponse: ", hasNewResponse)
                         await fetchRequests()
                     }
                 }

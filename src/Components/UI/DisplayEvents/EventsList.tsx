@@ -35,8 +35,6 @@ export default function EventsList({
         const visibleEvents = events.filter((event) => !event.hide)
         filteredEvents = useEventsFilter({ events: visibleEvents })
     }
-
-    // const adjustedItemWidth = Math.min(width / 1.2, 500);
     if (!filteredEvents.length && isEdit && !isAdmin) return <EmptyList />
     if (!filteredEvents) return <Loading />
 
@@ -52,7 +50,6 @@ export default function EventsList({
                             <EventPreview
                                 key={event.id}
                                 event={event}
-                                isEdit={isEdit}
                                 viewableTeachers={viewableTeachers}
                             />
                         }

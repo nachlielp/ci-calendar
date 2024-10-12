@@ -1,0 +1,174 @@
+.full-event-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 16px 0;
+    gap: 8px;
+
+    .event-header {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-bottom: 16px;
+    }
+
+    .event-title {
+        display: block;
+        font-weight: bold;
+        font-size: 26px;
+        font-weight: 400;
+        width: 100%;
+        margin: 0;
+        color: #bc3528;
+    }
+
+    .event-multi-day-teachers {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+
+        .event-labels {
+            padding-bottom: 4px;
+        }
+    }
+
+    .event-tags {
+        display: block;
+        width: 100%;
+    }
+
+    .event-tag {
+        display: inline-block;
+        margin-bottom: 0.25rem;
+    }
+
+    .event-dates,
+    .event-location,
+    .event-teachers {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: flex-start;
+        width: 100%;
+
+        .event-label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            margin-left: 8px;
+        }
+    }
+
+    .icon-component {
+        align-self: flex-start;
+
+        .event-icon {
+            margin-left: 4px;
+            margin-top: 6px;
+
+            .injected-svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    }
+
+    .event-tags {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 4px;
+
+        .event-tag {
+            align-self: flex-start;
+            background-color: #e5e5ea;
+            color: #000;
+            border: none;
+            font-size: 14px;
+            font-weight: 400;
+            padding: 6px 12px;
+            margin-bottom: 0;
+            border-radius: 8px;
+        }
+    }
+
+    .event-links {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+
+        .link-button {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+            text-decoration: none;
+            border: 2px solid #bc3528;
+            padding: 8px;
+
+            .link-label {
+                font-size: 16px;
+                font-weight: 400;
+                margin-left: 8px;
+            }
+
+            .link-icon {
+                .injected-svg {
+                    width: 16px;
+                    height: 16px;
+                }
+            }
+        }
+    }
+
+    .hr {
+        border: 1px solid #bc3528;
+        border-bottom: none;
+        margin: 16px 0;
+        width: 90%;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+
+    .event-description {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        word-wrap: break-word; // Add this line
+        overflow-wrap: break-word;
+        margin-left: 24px;
+
+        .event-label {
+            margin-bottom: 8px;
+        }
+    }
+
+    .event-card-footer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        cursor: pointer;
+        // gap: 8px;
+        .event-footer-action {
+            align-self: center;
+            background-color: #fff;
+            border: 1px solid #dd5239;
+            padding: 6px 8px 2px;
+            cursor: pointer;
+            .injected-svg {
+                color: #dd5239;
+                cursor: pointer;
+            }
+        }
+    }
+}

@@ -31,7 +31,7 @@ interface IDeleteEventProps {
 export default function DeleteEventButton({ eventId }: IDeleteEventProps) {
     return (
         <button
-            className="event-footer-action"
+            className="action-btn"
             onClick={() => showDeleteConfirm(eventId)}
             style={{ borderRadius: " 0px", borderLeft: "none" }}
         >

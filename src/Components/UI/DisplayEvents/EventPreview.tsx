@@ -1,23 +1,17 @@
 import React from "react"
-import { Card, Tag, Button } from "antd"
+import { Card, Tag } from "antd"
 import dayjs from "dayjs"
-import DeleteEventButton from "../Other/DeleteEventButton"
-import EditEvent from "../Other/EditEventButton"
-import RecycleEvent from "../Other/RecycleEventButton"
-import HideEventButton from "../Other/HideEventButton"
-import BioModal from "../DisplayUsers/BioModal"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { tagOptions, eventTypes } from "../../../util/options"
 import { Icon } from "../Other/Icon"
 import { utilService } from "../../../util/utilService"
 interface EventPreviewProps {
     event: CIEvent
-    isEdit: boolean
     viewableTeachers: UserBio[]
 }
 
 export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
-    ({ event, isEdit }, ref) => {
+    ({ event }, ref) => {
         // const openGoogleMaps = (placeId: string, address: string) => {
         //   const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
         //   const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
@@ -60,38 +54,13 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
 
         const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
             return teacher.label
-            // const isTeacher = viewableTeachers.find(
-            //     (t) => t.user_id === teacher.value
-            // )
-            // return isTeacher ? (
-            //     <BioModal key={teacher.value} teacher={isTeacher} />
-            // ) : (
-            //     teacher.label
-            // )
         })
-
-        const isMultiDay = event.start_date !== event.end_date
-
-        const footer = isEdit
-            ? [
-                  <div className="event-card-footer">
-                      <EditEvent eventId={event.id} isMultiDay={isMultiDay} />
-                      <RecycleEvent
-                          eventId={event.id}
-                          isMultiDay={isMultiDay}
-                      />
-                      <DeleteEventButton eventId={event.id} />
-                      <HideEventButton eventId={event.id} hide={event.hide} />
-                  </div>,
-              ]
-            : []
 
         return (
             <Card
                 ref={ref}
                 className="single-day-event-card"
                 style={{ width: "100%" }}
-                actions={footer}
             >
                 <article className="event-header">
                     <h2 className="event-title">{event.title}&nbsp;</h2>
@@ -124,122 +93,36 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         </>
                     )}
                 </article>
-                {isEdit &&
-                    segmentsLength > 0 &&
-                    Object.values(event.segments).map((segment, index) => (
-                        <div className="sub-event" key={index}>
-                            {/* <Icon icon="hov" className="sub-event-icon" /> */}
-                            <span>
-                                {dayjs(segment.endTime).format("HH:mm")}
-                                &nbsp;-&nbsp;
-                                {dayjs(segment.startTime).format("HH:mm")}
-                                &nbsp;
-                                {getType(segment.type as EventlyType)}
-                                {segment.teachers.length > 0 && (
-                                    <span>
-                                        &nbsp;עם
-                                        {segment.teachers.map(
-                                            (teacher, index, array) => {
-                                                // const isTeacher = teachers.find(
-                                                //     (t) => t.id === teacher.value
-                                                // )
-                                                const isTeacher = false
-                                                return (
-                                                    <React.Fragment
-                                                        key={teacher.value}
-                                                    >
-                                                        {isTeacher ? (
-                                                            <BioModal
-                                                                teacher={
-                                                                    isTeacher
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            teacher.label
-                                                        )}
-                                                        {index <
-                                                        array.length - 1
-                                                            ? ", "
-                                                            : ""}
-                                                    </React.Fragment>
-                                                )
-                                            }
-                                        )}
-                                    </span>
-                                )}
-                                {segment.tags && (
-                                    <span>
-                                        &nbsp;
-                                        {segment.tags.map((tag) => (
-                                            <Tag key={tag} color="green">
-                                                {getTag(tag)}
-                                            </Tag>
-                                        ))}
-                                    </span>
-                                )}
-                            </span>
-                        </div>
-                    ))}
 
                 <article className="event-location">
                     <Icon icon="pinDrop" className="event-icon" />
                     <label className="event-label">{event.address.label}</label>
-                    {/* <button
-          onClick={() => openGoogleMaps(event.address.place_id, event.address.label)}
-          className="event-location-button"
-        >
-          {event.address.label}
-        </button> */}
                 </article>
 
-                {!isEdit &&
-                    (teachersBioOrName.length > 0 ||
-                        nonRegestoredTeacherNames.length > 0) && (
-                        <article className="event-teachers">
-                            <Icon icon="person" className="event-icon" />
-                            <label className="event-label">
-                                עם{" "}
-                                {[
-                                    ...teachersBioOrName,
-                                    ...nonRegestoredTeacherNames,
-                                ].map((item, index, array) => (
-                                    <React.Fragment key={index}>
-                                        {item}
-                                        {index < array.length - 1 && ", "}
-                                    </React.Fragment>
-                                ))}
-                            </label>
-                        </article>
-                    )}
-
-                {isEdit && !isWhiteSpace(event.description) && (
-                    <div className="event-description">
-                        <Icon
-                            icon="description"
-                            className="event-description-icon"
-                        />
-                        <p>{event.description}</p>
-                    </div>
+                {(teachersBioOrName.length > 0 ||
+                    nonRegestoredTeacherNames.length > 0) && (
+                    <article className="event-teachers">
+                        <Icon icon="person" className="event-icon" />
+                        <label className="event-label">
+                            עם{" "}
+                            {[
+                                ...teachersBioOrName,
+                                ...nonRegestoredTeacherNames,
+                            ].map((item, index, array) => (
+                                <React.Fragment key={index}>
+                                    {item}
+                                    {index < array.length - 1 && ", "}
+                                </React.Fragment>
+                            ))}
+                        </label>
+                    </article>
                 )}
-
-                {/* {event.price.length > 0 && (
-        <div className="event-price">
-          <span className="event-price-currency">&#8362;</span>
-          <ul>
-            {event.price.map((price, index) => (
-              <li key={`${price.title}-${index}`}>
-                {price.title} - {price.sum}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )} */}
 
                 <article className="event-tags">
                     {getTypes(
-                        Object.values(event.segments).flatMap(
-                            (segment) => segment.type as EventlyType
-                        )
+                        Object.values(event.segments)
+                            .flatMap((segment) => segment.type as EventlyType)
+                            .concat(event.type as EventlyType)
                     ).map((type, index) => (
                         <Tag
                             color="blue"
@@ -250,27 +133,6 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         </Tag>
                     ))}
                 </article>
-
-                {isEdit && (
-                    <div style={{ marginTop: 16 }}>
-                        {event.links.length > 0 &&
-                            event.links.map((link) => (
-                                <Button
-                                    key={link.title}
-                                    type="default"
-                                    href={link.link}
-                                    target="_blank"
-                                    className="event-link-button"
-                                >
-                                    <Icon
-                                        icon="openInNew"
-                                        className="event-link-icon"
-                                        title={link.title}
-                                    />
-                                </Button>
-                            ))}
-                    </div>
-                )}
             </Card>
         )
     }

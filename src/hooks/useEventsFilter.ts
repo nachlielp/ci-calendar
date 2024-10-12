@@ -38,7 +38,6 @@ export const useEventsFilter = ({
         let filtered = events
 
         if (isWeekendPage) {
-            console.log("weekendTypes: ", weekendTypes)
             const weekendStart = dayjs().startOf("day")
             const weekendEnd = dayjs().add(1, "week").endOf("week").endOf("day")
             filtered = filtered.filter(

@@ -42,8 +42,6 @@ async function updateUser(
     id: string,
     user: Partial<DbUser>
 ): Promise<DbUser | null> {
-    console.log("updateUser: ", user)
-    console.log("id: ", id)
     try {
         const { data, error } = await supabase
             .from("users")
@@ -54,7 +52,6 @@ async function updateUser(
         if (error) {
             throw error
         }
-        console.log("Updated user data: ", data)
         return data[0] as DbUser
     } catch (error) {
         console.error("Error in updateUser:", error)

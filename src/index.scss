@@ -32,7 +32,6 @@
 @import "./styles/user-form.scss";
 @import "./styles/filter-drawer.scss";
 @import "./styles/event-page.scss";
-@import "./styles/full-single-day-event-card.scss";
 @import "./styles/event-drawer.scss";
 @import "./styles/menu-drawer.scss";
 @import "./styles/create-events-page.scss";
@@ -41,6 +40,8 @@
 @import "./styles/elements/title.scss";
 @import "./styles/menu-buttons.css";
 @import "./styles/manage-templates-table.css";
+@import "./styles/manage-event-actions.css";
+@import "./styles/full-event-card.scss";
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")

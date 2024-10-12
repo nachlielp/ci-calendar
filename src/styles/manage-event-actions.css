@@ -1,0 +1,26 @@
+.manage-event-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    .action-btn {
+        align-self: center;
+        background-color: #fff;
+        border: 1px solid #dd5239;
+        padding: 6px 8px 2px;
+        cursor: pointer;
+        .injected-svg {
+            color: #dd5239;
+            cursor: pointer;
+        }
+
+        &.edit-btn {
+            border-left: none;
+            border-radius: 0px 5px 4px 0px;
+        }
+
+        &.recycle-btn {
+            border-left: none;
+        }
+    }
+}

@@ -5,7 +5,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { SelectOption, tagOptions } from "../../../util/options"
-import { CITemplate, IAddress, UserType } from "../../../util/interfaces"
+import { IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -23,7 +23,7 @@ import {
     templateService,
 } from "../../../supabase/templateService"
 import useTemplates from "../../../hooks/useTemplates"
-import { reverseFormatTeachers } from "./EditSingleDayEventForm"
+import { utilService } from "../../../util/utilService"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -31,7 +31,7 @@ dayjs.extend(customParseFormat)
 dayjs.tz.setDefault("Asia/Jerusalem")
 
 const initialValues = {
-    "event-date": dayjs.tz(dayjs(), "Asia/Jerusalem"),
+    "event-dates": dayjs.tz(dayjs(), "Asia/Jerusalem"),
     "event-tags": [tagOptions[0].value],
 }
 
@@ -112,7 +112,7 @@ export default function SingleDayEventForm({
         const template = templates.find((t) => t.template_id === value)
         if (template) {
             const { currentFormValues, address } =
-                singleDayTemplateToFormValues(template)
+                utilService.singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
             setSourceTemplateId(template.template_id)
@@ -136,27 +136,33 @@ export default function SingleDayEventForm({
                     .hour(values["event-time"][1].hour())
                     .minute(values["event-time"][1].minute())
                     .toISOString(),
-                type: values["event-types"],
+                type: values["event-type"],
                 tags: values["event-tags"] || [],
-                teachers: formatTeachers(values["teachers"], teachers),
+                teachers: utilService.formatTeachersForCIEvent(
+                    values["teachers"],
+                    teachers
+                ),
             },
         ]
 
         if (values["segments"]) {
             values["segments"].forEach((segment: any) => {
                 segmentsArray.push({
-                    type: segment.type,
-                    tags: segment.tags || [],
-                    teachers: formatTeachers(segment.teachers, teachers),
+                    type: segment["event-type"],
+                    tags: segment["event-tags"] || [],
+                    teachers: utilService.formatTeachersForCIEvent(
+                        segment.teachers,
+                        teachers
+                    ),
                     startTime: baseDate
                         .clone()
-                        .hour(segment.time[0].hour())
-                        .minute(segment.time[0].minute())
+                        .hour(segment["event-time"][0].hour())
+                        .minute(segment["event-time"][0].minute())
                         .toISOString(),
                     endTime: baseDate
                         .clone()
-                        .hour(segment.time[1].hour())
-                        .minute(segment.time[1].minute())
+                        .hour(segment["event-time"][1].hour())
+                        .minute(segment["event-time"][1].minute())
                         .toISOString(),
                 })
             })
@@ -229,6 +235,10 @@ export default function SingleDayEventForm({
         }
     }
 
+    const titleText = isTemplate
+        ? "יצירת תבנית חד יומית"
+        : "הוספת אירוע חד יומי"
+
     return (
         <div className="single-day-event-form">
             <section className="event-card">
@@ -297,8 +307,9 @@ export default function SingleDayEventForm({
                         isEdit={false}
                         teachers={teachers}
                         isTemplate={isTemplate}
+                        titleText={titleText}
                     />
-                    <EventSegmentsForm form={form} day="" teachers={teachers} />
+                    <EventSegmentsForm form={form} teachers={teachers} />
                     <hr className="divider" />
                     <label>
                         <b>קישור</b> (יופיע ככפתור בעמוד האירוע)
@@ -329,181 +340,4 @@ export default function SingleDayEventForm({
             </section>
         </div>
     )
-}
-
-export const formatTeachers = (
-    selectedTeachers: string[],
-    teachers: { label: string; value: string }[]
-) => {
-    if (!selectedTeachers) return []
-    return selectedTeachers.map((teacher) => {
-        const teacherObj = teachers.find((t) => t.value === teacher)
-        if (teacherObj) {
-            return teacherObj
-        } else {
-            return { label: teacher, value: "NON_EXISTENT" }
-        }
-    })
-}
-
-export enum EventFrequency {
-    none = "none",
-    weekly = "weekly",
-    byWeek = "by-week",
-    monthly = "monthly",
-}
-
-export const repeatOptions = [
-    { value: EventFrequency.none, label: "אף פעם" },
-    { value: EventFrequency.weekly, label: "כל  שבוע" },
-    { value: EventFrequency.byWeek, label: "כל כמה שבועות" },
-    { value: EventFrequency.monthly, label: "כל חודש" },
-]
-
-export const repeatEventTooltip = (
-    <>
-        <p>* כל כמה שבועות - לדוגמה, כל שבועים ביום שלישי </p>
-        <p>* כל חודש - לדוגמה, השבת השניה של כל חודש</p>
-    </>
-)
-
-export function getDayAndWeekOfMonth(date: dayjs.Dayjs) {
-    const dayOfWeek = date.day() // 0 (Sunday) to 6 (Saturday)
-    const dayOfMonth = date.date()
-    const weekOfMonth = Math.ceil(dayOfMonth / 7)
-
-    return { dayOfWeek, weekOfMonth }
-}
-
-export function listOfDates(
-    start_date: dayjs.Dayjs,
-    end_date: dayjs.Dayjs,
-    repeatOption: EventFrequency,
-    repeatInterval?: number
-) {
-    const dates = []
-    let date = start_date
-    if (repeatOption === EventFrequency.weekly) {
-        while (!date.isAfter(end_date.add(1, "day"))) {
-            dates.push(date)
-            date = date.add(1, "week")
-        }
-    } else if (repeatOption === EventFrequency.byWeek && repeatInterval) {
-        while (!date.isAfter(end_date.add(1, "day"))) {
-            dates.push(date)
-            date = date.add(repeatInterval, "week")
-        }
-    } else if (repeatOption === EventFrequency.monthly) {
-        const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(start_date)
-        while (!date.isAfter(end_date)) {
-            dates.push(date)
-            date = date.add(1, "month")
-            date = moveToSameWeekAndDay(date, dayOfWeek, weekOfMonth)
-        }
-    }
-    return dates
-}
-
-export function moveToSameWeekAndDay(
-    date: dayjs.Dayjs,
-    dayOfWeek: number,
-    weekOfMonth: number
-): dayjs.Dayjs {
-    const monthStart = date.startOf("month")
-    let adjustedDate = monthStart.add((weekOfMonth - 1) * 7, "day")
-    while (adjustedDate.day() !== dayOfWeek) {
-        adjustedDate = adjustedDate.add(1, "day")
-    }
-    if (adjustedDate.month() !== monthStart.month()) {
-        adjustedDate = adjustedDate.subtract(1, "week")
-    }
-    return adjustedDate
-}
-
-export const formatMonthlyDate = (date: dayjs.Dayjs) => {
-    const { dayOfWeek, weekOfMonth } = getDayAndWeekOfMonth(date)
-    let day
-    switch (dayOfWeek) {
-        case 0:
-            day = "ראשון"
-            break
-        case 1:
-            day = "שני"
-            break
-        case 2:
-            day = "שלישי"
-            break
-        case 3:
-            day = "רביעי"
-            break
-        case 4:
-            day = "חמישי"
-            break
-        case 5:
-            day = "שישי"
-            break
-        case 6:
-            day = "שבת"
-            break
-    }
-
-    let frequency
-    switch (weekOfMonth) {
-        case 1:
-            frequency = "ראשונה"
-            break
-        case 2:
-            frequency = "שניה"
-            break
-        case 3:
-            frequency = "שלישית"
-            break
-        case 4:
-            frequency = "רביעית"
-            break
-        default:
-            frequency = "חמישית"
-            break
-    }
-    return `יום ${day} ה${frequency} בחודש`
-}
-
-export function singleDayTemplateToFormValues(template: CITemplate) {
-    const currentFormValues = {
-        "template-name": template.name,
-        "event-title": template.title,
-        "event-description": template.description,
-        address: template.address,
-        district: template.district,
-        "event-types": template.segments[0]?.type,
-        "event-tags": template.segments[0]?.tags,
-        teachers: reverseFormatTeachers(template.segments[0]?.teachers),
-        "event-date": dayjs.tz(
-            dayjs(template.segments[0]?.startTime),
-            "Asia/Jerusalem"
-        ),
-        "event-time": [
-            dayjs(template.segments[0]?.startTime).tz("Asia/Jerusalem"),
-            dayjs(template.segments[0]?.endTime).tz("Asia/Jerusalem"),
-        ],
-        segments: template.segments.slice(1).map((segment) => ({
-            type: segment.type,
-            tags: segment.tags,
-            teachers: reverseFormatTeachers(segment.teachers),
-            time: [
-                dayjs(segment.startTime).tz("Asia/Jerusalem"),
-                dayjs(segment.endTime).tz("Asia/Jerusalem"),
-            ],
-        })),
-        links: template.links.map((link) => ({
-            title: link.title,
-            link: link.link,
-        })),
-        prices: template.price.map((price) => ({
-            title: price.title,
-            sum: price.sum,
-        })),
-    }
-    // console.log("currentFormValues: ", currentFormValues);
-    return { currentFormValues, address: template.address }
 }

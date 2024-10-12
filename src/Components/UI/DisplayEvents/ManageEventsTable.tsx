@@ -13,6 +13,7 @@ import FullEventCard from "./FullEventCard"
 import { useUser } from "../../../context/UserContext"
 import { useEvents } from "../../../hooks/useEvents"
 import MenuButtons from "../Other/MenuButtons"
+import ManageEventActions from "./ManageEventActions"
 const { Option } = Select
 
 export default function ManageEventsTable() {
@@ -336,10 +337,9 @@ export default function ManageEventsTable() {
                         <div className="event-card-container" key={event.id}>
                             <FullEventCard
                                 event={event}
-                                isManageTable={true}
                                 viewableTeachers={[]}
                             />
-                            {/* <SingleDayEventCard key={event.id} event={event} isEdit={true} /> */}
+                            <ManageEventActions event={event} />
                         </div>
                     ),
                     expandedRowKeys: expandedRowKeys,

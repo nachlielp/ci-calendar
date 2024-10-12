@@ -4,27 +4,19 @@ import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
 import dayjs from "dayjs"
 import BioModal from "../DisplayUsers/BioModal"
-import EditEvent from "../Other/EditEventButton"
-import RecycleEvent from "../Other/RecycleEventButton"
-import DeleteEventButton from "../Other/DeleteEventButton"
-import HideEventButton from "../Other/HideEventButton"
 import React from "react"
 import { utilService } from "../../../util/utilService"
 export default function FullEventCard({
     event,
-    isManageTable,
     viewableTeachers,
 }: {
     event: CIEvent
-    isManageTable?: boolean
     viewableTeachers: UserBio[]
 }) {
     const segmentLen = event.segments.length
-
-    const isMultiDay = event.start_date !== event.end_date
-
+    const multiDayTeachersLen = event.multi_day_teachers || []
     return (
-        <section className="full-single-day-event-card" dir="rtl">
+        <section className="full-event-card" dir="rtl">
             <article className="event-header">
                 <div className="event-title">{event.title}&nbsp;</div>
             </article>
@@ -59,24 +51,32 @@ export default function FullEventCard({
                 <label className="event-label">{event.address.label}</label>
             </article>
 
-            {/* {subEventLen > 0 &&
-                <article className="event-teachers">
+            {multiDayTeachersLen.length > 0 && (
+                <article className="event-multi-day-teachers">
                     <Icon icon="person" className="event-icon" />
-                    <label className="event-label">
-                        עם {subEventLen > 1 && [...teachersBioOrName, ...nonRegestoredTeacherNames].map((item, index, array) => (
-                            <React.Fragment key={index}>
-                                {item}
-                                {index < array.length - 1 && ', '}
-                            </React.Fragment>
-                        ))}
+                    <label className="event-labels">
+                        {multiDayTeachersLen.map((teacher, index, array) => {
+                            const isTeacher = viewableTeachers?.find(
+                                (t) => t.user_id === teacher.value
+                            )
+                            return (
+                                <React.Fragment key={teacher.value}>
+                                    {isTeacher ? (
+                                        <BioModal teacher={isTeacher} />
+                                    ) : (
+                                        teacher.label
+                                    )}
+                                    {index < array.length - 1 ? ", " : ""}
+                                </React.Fragment>
+                            )
+                        })}
                     </label>
                 </article>
-            } */}
+            )}
 
             {segmentLen > 0 &&
                 event.segments.map((segment, index) => (
                     <div className="sub-event" key={index}>
-                        {/* <Icon icon="hov" className="sub-event-icon" /> */}
                         <span>
                             {dayjs(segment.endTime).format("HH:mm")}
                             &nbsp;-&nbsp;
@@ -129,9 +129,9 @@ export default function FullEventCard({
 
             <article className="event-tags">
                 {getTypes(
-                    event.segments.flatMap(
-                        (segment) => segment.type as EventlyType
-                    )
+                    event.segments
+                        .flatMap((segment) => segment.type as EventlyType)
+                        .concat(event.type as EventlyType)
                 ).map((type, index) => (
                     <Tag
                         color="blue"
@@ -183,14 +183,6 @@ export default function FullEventCard({
                         ))}
                     </article>
                 </>
-            )}
-            {isManageTable && (
-                <div className="event-card-footer">
-                    <EditEvent eventId={event.id} isMultiDay={isMultiDay} />
-                    <RecycleEvent eventId={event.id} isMultiDay={isMultiDay} />
-                    <DeleteEventButton eventId={event.id} />
-                    <HideEventButton eventId={event.id} hide={event.hide} />
-                </div>
             )}
         </section>
     )

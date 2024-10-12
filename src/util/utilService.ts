@@ -1,16 +1,120 @@
 import dayjs from "dayjs"
-import { DbUser, UserType } from "./interfaces"
+import { CIEvent, CITemplate, DbUser, UserType } from "./interfaces"
 import { User } from "@supabase/supabase-js"
-import { hebrewMonths, SelectOption } from "./options"
+import { eventTypes, hebrewMonths, SelectOption } from "./options"
 export const utilService = {
     createDbUserFromUser,
     deepCompare,
     formatHebrewDate,
     hebrewDay,
+    multiDayTemplateToFormValues,
+    singleDayTemplateToFormValues,
+    CIEventToFormValues,
+    reverseFormatTeachers,
+    formatTeachersForCIEvent,
+}
+
+function CIEventToFormValues(event: CIEvent) {
+    const segments = event.segments.slice(1).map((segment) => ({
+        "event-type": segment.type,
+        "event-tags": segment.tags,
+        teachers: reverseFormatTeachers(segment.teachers),
+        "event-time": [dayjs(segment.startTime), dayjs(segment.endTime)],
+    }))
+    const currentFormValues = {
+        created_at: event.created_at,
+        updated_at: dayjs().toISOString(),
+        "event-title": event.title,
+        "event-description": event.description,
+        district: event.district,
+        address: event.address,
+        "event-dates": [dayjs(event.start_date), dayjs(event.end_date)],
+        "event-start-date": dayjs(event.start_date),
+        "main-event-type": event.type,
+        "event-schedule": event.segments.length > 0,
+        links: event.links,
+        prices: event.price,
+        "event-type": event.segments[0]?.type,
+        "event-tags": event.segments[0]?.tags,
+        teachers: reverseFormatTeachers(event.segments[0]?.teachers),
+        "event-time": [
+            dayjs(event.segments[0]?.startTime),
+            dayjs(event.segments[0]?.endTime),
+        ],
+        "multi-day-event-teachers": event.multi_day_teachers,
+        segments: segments,
+    }
+    return { currentFormValues, address: event.address }
+}
+
+function reverseFormatTeachers(teachers: { label: string; value: string }[]) {
+    return teachers?.map((teacher) =>
+        teacher.value !== "NON_EXISTENT" ? teacher.value : teacher.label
+    )
+}
+
+function singleDayTemplateToFormValues(template: CITemplate) {
+    const currentFormValues = {
+        "template-name": template.name,
+        "event-title": template.title,
+        "event-description": template.description,
+        address: template.address,
+        district: template.district,
+        "event-type": template.segments[0]?.type,
+        "event-tags": template.segments[0]?.tags,
+        teachers: reverseFormatTeachers(template.segments[0]?.teachers),
+        "event-dates": dayjs.tz(
+            dayjs(template.segments[0]?.startTime),
+            "Asia/Jerusalem"
+        ),
+        "event-time": [
+            dayjs(template.segments[0]?.startTime).tz("Asia/Jerusalem"),
+            dayjs(template.segments[0]?.endTime).tz("Asia/Jerusalem"),
+        ],
+        segments: template.segments.slice(1).map((segment) => ({
+            "event-type": segment.type,
+            "event-tags": segment.tags,
+            teachers: reverseFormatTeachers(segment.teachers),
+            "event-time": [dayjs(segment.startTime), dayjs(segment.endTime)],
+        })),
+        links: template.links.map((link) => ({
+            title: link.title,
+            link: link.link,
+        })),
+        prices: template.price.map((price) => ({
+            title: price.title,
+            sum: price.sum,
+        })),
+    }
+    return { currentFormValues, address: template.address }
+}
+
+function multiDayTemplateToFormValues(template: CITemplate) {
+    const currentFormValues = {
+        "template-name": template.name,
+        "event-title": template.title,
+        "event-description": template.description,
+        address: template.address,
+        district: template.district,
+        "multi-day-event-teachers": template.multi_day_teachers?.map(
+            (teacher) => teacher.value
+        ),
+        links: template.links.map((link) => ({
+            title: link.title,
+            link: link.link,
+        })),
+        prices: template.price.map((price) => ({
+            title: price.title,
+            sum: price.sum,
+        })),
+        "main-event-type": eventTypes.find(
+            (type) => type.value === template.type
+        )?.label,
+    }
+    return { currentFormValues, address: template.address }
 }
 
 function createDbUserFromUser(user: User): DbUser {
-    console.log(user)
     return {
         user_id: user.id,
         user_type: UserType.user,
@@ -96,4 +200,20 @@ function hebrewDay(date: string) {
         default:
             return ""
     }
+}
+
+//allows to store teachers that dont exist in the teachers list as {label: teacherName, value: "NON_EXISTENT"}
+function formatTeachersForCIEvent(
+    selectedTeachers: string[],
+    teachers: { label: string; value: string }[]
+) {
+    if (!selectedTeachers) return []
+    return selectedTeachers.map((teacher) => {
+        const teacherObj = teachers.find((t) => t.value === teacher)
+        if (teacherObj) {
+            return teacherObj
+        } else {
+            return { label: teacher, value: "NON_EXISTENT" }
+        }
+    })
 }
