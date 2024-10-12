@@ -53,6 +53,11 @@ function ManageUsers() {
         setOptions(value ? searchResult(value, users) : [])
     }
 
+    const handleClear = () => {
+        setInputValue("")
+        setSelectedUser(null)
+    }
+
     const onSelect = (value: string) => {
         const user = users.find((user) => user.user_id === value)
         if (user) {
@@ -218,6 +223,8 @@ function ManageUsers() {
                         size="large"
                         placeholder="שם משתמש או כתובת מייל"
                         enterButton
+                        onClear={handleClear}
+                        allowClear
                     />
                 </AutoComplete>
                 {selectedUser && (
