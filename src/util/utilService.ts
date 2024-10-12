@@ -12,6 +12,7 @@ export const utilService = {
     CIEventToFormValues,
     reverseFormatTeachers,
     formatTeachersForCIEvent,
+    deepCompareArraysUnordered,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -139,6 +140,10 @@ function createDbUserFromUser(user: User): DbUser {
         img: "", // Add this line
         bio: "",
         provider: user.app_metadata["provider"] || "",
+        default_filter: {
+            districts: [],
+            eventTypes: [],
+        },
     }
 }
 
@@ -170,7 +175,14 @@ function deepCompare(obj1: any, obj2: any): boolean {
 
     return true
 }
-
+function deepCompareArraysUnordered<T>(arr1: T[], arr2: T[]): boolean {
+    if (arr1.length !== arr2.length) {
+        return false
+    }
+    const sortedArr1 = [...arr1].sort()
+    const sortedArr2 = [...arr2].sort()
+    return sortedArr1.every((value, index) => value === sortedArr2[index])
+}
 function formatHebrewDate(date: string) {
     const hebrewDate = dayjs(date)
     const day = hebrewDate.format("D")

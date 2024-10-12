@@ -110,6 +110,11 @@ export interface IMailingList {
     eventTypes: EventlyType[]
 }
 
+export interface DefaultFilter {
+    eventTypes: string[]
+    districts: string[]
+}
+
 export interface DbUser {
     user_id: string
     created_at: string
@@ -127,6 +132,7 @@ export interface DbUser {
     provider: string
     img: string
     bio: string
+    default_filter: DefaultFilter
 }
 
 export interface UserBio extends Partial<DbUser> {

@@ -36,7 +36,7 @@ export const tagOptions: SelectOption[] = [
     { value: "pre-registration", label: "הרשמה מראש" },
 ]
 
-export const districtOptions = [
+export const districtOptions: SelectOption[] = [
     { value: "north", label: "צפון" },
     { value: "south", label: "דרום" },
     { value: "center", label: "מרכז" },

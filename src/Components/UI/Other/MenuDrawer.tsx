@@ -92,8 +92,8 @@ export function MenuDrawer() {
         },
         {
             key: "newsletter",
-            icon: "mail",
-            label: "ניוזלטר",
+            icon: "notifications",
+            label: "התראות ופילטור",
             onClick: () => {
                 navigate("/newsletter")
                 setOpen(false)

@@ -1,5 +1,5 @@
-import { Suspense } from "react"
-import { Routes, Route } from "react-router-dom"
+import { Suspense, useEffect } from "react"
+import { Routes, Route, useNavigate } from "react-router-dom"
 import "./styles/overrides.css"
 import dayjs from "dayjs"
 import AppHeader from "./Components/UI/Other/AppHeader"
@@ -21,10 +21,11 @@ import ResetPasswordRequest from "./Components/Auth/ResetPasswordRequest"
 import Login from "./Components/Auth/Login"
 import Signup from "./Components/Auth/Signup"
 import EventsPage from "./Components/Pages/EventsPage"
-import NewsletterPage from "./Components/Pages/NewsletterPage"
+import FiltersAndNotificationsPage from "./Components/Pages/FiltersAndNotificationsPage"
 import BioPage from "./Components/Pages/BioPage"
 import AdminPage from "./Components/Pages/AdminPage"
 import ManageUsers from "./Components/UI/Other/ManageUsers"
+import { useUser } from "./context/UserContext"
 
 export enum EventAction {
     edit,
@@ -37,6 +38,23 @@ export default function App() {
         start_date: dayjs().format("YYYY-MM-DD"),
         hide: false,
     })
+
+    const { user } = useUser()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (user) {
+            const eventTypes = user.default_filter?.eventTypes || []
+            const districts = user.default_filter?.districts || []
+            const filterURL =
+                eventTypes
+                    .map((eventType) => `eventType=${eventType}`)
+                    .join("&") +
+                districts.map((district) => `&district=${district}`).join("")
+            console.log("url: ", filterURL)
+            navigate(`/?${filterURL}`)
+        }
+    }, [])
 
     if (loading) {
         return <Loading />
@@ -88,7 +106,7 @@ export default function App() {
                         >
                             <Route
                                 path="/newsletter"
-                                element={<NewsletterPage />}
+                                element={<FiltersAndNotificationsPage />}
                             />
                             <Route path="/request" element={<SupportPage />} />
                             <Route

@@ -1,0 +1,11 @@
+.filter-and-notifications-page {
+    margin: 50px;
+
+    .filter-section {
+        max-width: 400px;
+        .select-filter {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+    }
+}
