@@ -77,7 +77,7 @@ export default function NewsletterPage() {
                         />
                     </Form.Item>
 
-                    <Form.Item<FieldType>
+                    {/* <Form.Item<FieldType>
                         name="phone"
                         shouldUpdate={(prevValues, currentValues) =>
                             prevValues.active !== currentValues.active
@@ -95,7 +95,7 @@ export default function NewsletterPage() {
                         ]}
                     >
                         <Input placeholder="מספר פלאפון" />
-                    </Form.Item>
+                    </Form.Item> */}
 
                     <Form.Item<FieldType> name="districts">
                         <Select
