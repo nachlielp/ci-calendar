@@ -1,4 +1,4 @@
-import { Checkbox, Form, type FormProps, Input, Card, Select } from "antd"
+import { Checkbox, Form, type FormProps, Card, Select } from "antd"
 
 import { districtOptions, eventTypes } from "../../util/options"
 import { useState } from "react"
