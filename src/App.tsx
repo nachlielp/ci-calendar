@@ -65,7 +65,6 @@ export default function App() {
                             element={
                                 <EventsPage
                                     events={events}
-                                    isEdit={false}
                                     viewableTeachers={viewableTeachers}
                                 />
                             }
@@ -158,7 +157,6 @@ export default function App() {
                             element={
                                 <EventsPage
                                     events={events}
-                                    isEdit={false}
                                     viewableTeachers={viewableTeachers}
                                 />
                             }

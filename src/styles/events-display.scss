@@ -56,11 +56,20 @@
         margin-top: 1rem;
 
         .filter-tag {
-            padding: 0.2rem 1rem;
+            display: flex;
+            flex-direction: row;
+            padding: 2px 14px 0 10px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
+
+            .injected-svg {
+                padding-top: 3px;
+                padding-right: 4px;
+                width: 16px;
+                height: 16px;
+            }
         }
     }
 

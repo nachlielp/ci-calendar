@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router-dom"
-import { CIEvent, WeekendDistrict, WeekendEventType } from "../util/interfaces"
+import { CIEvent } from "../util/interfaces"
+// import { CIEvent, WeekendDistrict, WeekendEventType } from "../util/interfaces"
 import dayjs from "dayjs"
 import { useMemo } from "react"
 
@@ -14,52 +15,52 @@ export const useEventsFilter = ({
     events,
     showFuture,
     uids,
-    isWeekendPage,
-}: IUseEventsFilterProps) => {
+}: // isWeekendPage,
+IUseEventsFilterProps) => {
     const [searchParams] = useSearchParams()
 
     const filteredEvents = useMemo(() => {
         const eventTypes = searchParams.getAll("eventType")
         const districts = searchParams.getAll("district")
 
-        const weekendTypes = searchParams
-            .getAll("t")
-            .map(
-                (type) =>
-                    WeekendEventType[type as keyof typeof WeekendEventType]
-            )
-        const weekendDistricts = searchParams
-            .getAll("d")
-            .map(
-                (district) =>
-                    WeekendDistrict[district as keyof typeof WeekendDistrict]
-            )
+        // const weekendTypes = searchParams
+        //     .getAll("t")
+        //     .map(
+        //         (type) =>
+        //             WeekendEventType[type as keyof typeof WeekendEventType]
+        //     )
+        // const weekendDistricts = searchParams
+        //     .getAll("d")
+        //     .map(
+        //         (district) =>
+        //             WeekendDistrict[district as keyof typeof WeekendDistrict]
+        //     )
 
         let filtered = events
 
-        if (isWeekendPage) {
-            const weekendStart = dayjs().startOf("day")
-            const weekendEnd = dayjs().add(1, "week").endOf("week").endOf("day")
-            filtered = filtered.filter(
-                (event) =>
-                    dayjs(event.start_date) >= weekendStart &&
-                    dayjs(event.start_date) <= weekendEnd &&
-                    (!weekendTypes.length ||
-                        hasOverlap(
-                            weekendTypes,
-                            event.segments.map((segment) => segment.type)
-                        )) &&
-                    (!weekendDistricts.length ||
-                        hasOverlap(weekendDistricts, [event.district]))
-            )
-            return filtered
-        }
+        // if (isWeekendPage) {
+        //     const weekendStart = dayjs().startOf("day")
+        //     const weekendEnd = dayjs().add(1, "week").endOf("week").endOf("day")
+        //     filtered = filtered.filter(
+        //         (event) =>
+        //             dayjs(event.start_date) >= weekendStart &&
+        //             dayjs(event.start_date) <= weekendEnd &&
+        //             (!weekendTypes.length ||
+        //                 hasOverlap(
+        //                     weekendTypes,
+        //                     event.segments.map((segment) => segment.type)
+        //                 )) &&
+        //             (!weekendDistricts.length ||
+        //                 hasOverlap(weekendDistricts, [event.district]))
+        //     )
+        //     return filtered
+        // }
 
-        if (uids && uids.length > 0) {
-            filtered = filtered.filter((event) =>
-                uids.includes(event.creator_id)
-            )
-        }
+        // if (uids && uids.length > 0) {
+        //     filtered = filtered.filter((event) =>
+        //         uids.includes(event.creator_id)
+        //     )
+        // }
 
         if (showFuture !== undefined) {
             const now = dayjs()

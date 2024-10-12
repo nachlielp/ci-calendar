@@ -15,17 +15,16 @@ import FilterDrawer from "../UI/Other/FilterDrawer"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import EventDrawer from "../UI/DisplayEvents/EventDrawer"
 import MenuButtons from "../UI/Other/MenuButtons"
+import { Icon } from "../UI/Other/Icon"
 
 interface IEventsPageProps {
     events: CIEvent[]
     viewableTeachers: UserBio[]
-    isEdit: boolean
 }
 
 export default function EventsPage({
     events,
     viewableTeachers,
-    isEdit,
 }: IEventsPageProps) {
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
     const [isListView, setIsListView] = useState<boolean>(true)
@@ -109,12 +108,12 @@ export default function EventsPage({
                             className="filter-tag"
                             color="#913e2f"
                             key={eventType}
-                            closable
                             onClick={() =>
                                 onRemoveEventFilter("eventType", eventType)
                             }
                         >
                             {getLabelByValue(eventType, eventTypes)}
+                            <Icon icon="close" />
                         </Tag>
                     ))}
                     {currentDistrictValues?.map((district: any) => (
@@ -122,12 +121,12 @@ export default function EventsPage({
                             className="filter-tag"
                             color="#913e2f"
                             key={district}
-                            closable
                             onClick={() =>
                                 onRemoveDistrictFilter("district", district)
                             }
                         >
                             {getLabelByValue(district, districtOptions)}
+                            <Icon icon="close" />
                         </Tag>
                     ))}
                 </article>
@@ -141,7 +140,6 @@ export default function EventsPage({
                         />
                         <EventsList
                             events={todaysEvents}
-                            isEdit={isEdit}
                             isEvents={!!events.length}
                             onSelectEvent={onSelectEvent}
                             viewableTeachers={viewableTeachers}
@@ -150,7 +148,6 @@ export default function EventsPage({
                 ) : (
                     <EventsList
                         events={events}
-                        isEdit={isEdit}
                         isEvents={!!events.length}
                         onSelectEvent={onSelectEvent}
                         viewableTeachers={viewableTeachers}
