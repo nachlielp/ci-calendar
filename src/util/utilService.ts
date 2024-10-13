@@ -18,6 +18,7 @@ export const utilService = {
     isPWA,
     isFirstNotificationPermissionRequest,
     setFirstNotificationPermissionRequest,
+    getNotificationPermission,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -257,4 +258,7 @@ function isFirstNotificationPermissionRequest() {
 }
 function setFirstNotificationPermissionRequest(permission: string) {
     localStorage.setItem("notificationPermission", permission)
+}
+function getNotificationPermission() {
+    return localStorage.getItem("notificationPermission")
 }

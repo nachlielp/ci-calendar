@@ -1,30 +1,33 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import useMessagingPermission from "../../../hooks/useMessagingPermission"
 import { Icon } from "./Icon"
 import NotificationsBlockedModal from "./NotificationsBlockedModal"
+import { utilService } from "../../../util/utilService"
+import { PushNotificationPromission } from "../../../util/interfaces"
 
 const PushNotificationButton = () => {
     const { requestPermission, permissionStatus } = useMessagingPermission()
 
+    const [status, setStatus] = useState<PushNotificationPromission>(
+        utilService.getNotificationPermission() as PushNotificationPromission
+    )
     useEffect(() => {
-        console.log("__permissionStatus", permissionStatus)
+        setStatus(permissionStatus)
     }, [permissionStatus])
 
     return (
         <section className="notification-status-container">
-            {(permissionStatus === "default" || permissionStatus === null) && (
+            {(status === "default" || status === null) && (
                 <div onClick={requestPermission}>
                     <Icon icon="add_alert" />
                 </div>
             )}
-            {permissionStatus === "denied" && (
+            {status === "denied" && (
                 <NotificationsBlockedModal
                     anchorElement={<Icon icon="notificationsOff" />}
                 />
             )}
-            {permissionStatus === "granted" && (
-                <Icon icon="notifications_active" />
-            )}
+            {status === "granted" && <Icon icon="notifications_active" />}
         </section>
     )
 }
