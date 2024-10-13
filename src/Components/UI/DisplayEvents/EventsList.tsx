@@ -3,7 +3,10 @@ import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import { Empty } from "antd"
-import EventModalWrapper from "./EventModalWrapper"
+import FullEventCardModal from "./FullEventCardModal"
+import { useEffect, useRef, useState } from "react"
+import { useParams } from "react-router-dom"
+import FullEventCardContainer from "./FullEventCardContainer"
 
 interface IEventsListProps {
     onSelectEvent: (event: CIEvent) => void
@@ -17,6 +20,22 @@ export default function EventsList({
     onSelectEvent,
     viewableTeachers,
 }: IEventsListProps) {
+    const { eventId } = useParams<{ eventId: string }>()
+    const eventRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
+    const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (eventId) {
+            setSelectedEventId(eventId)
+            if (eventRefs.current[eventId]) {
+                eventRefs.current[eventId]?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "end",
+                })
+            }
+        }
+    }, [eventId])
+
     let filteredEvents = useEventsFilter({ events })
 
     const visibleEvents = events.filter((event) => !event.hide)
@@ -29,9 +48,13 @@ export default function EventsList({
         <div className="events-list-container">
             {!isEvents && emptyEventsList()}
             {filteredEvents.map((event) => (
-                <div key={event.id}>
-                    <EventModalWrapper
+                <div
+                    key={event.id}
+                    ref={(el) => (eventRefs.current[event.id] = el)}
+                >
+                    <FullEventCardContainer
                         event={event}
+                        viewableTeachers={viewableTeachers}
                         onSelectEvent={onSelectEvent}
                         anchorEl={
                             <EventPreview
@@ -40,7 +63,7 @@ export default function EventsList({
                                 viewableTeachers={viewableTeachers}
                             />
                         }
-                        viewableTeachers={viewableTeachers}
+                        selectedEventId={selectedEventId}
                     />
                 </div>
             ))}

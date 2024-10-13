@@ -13,7 +13,7 @@ import { useParamsHandler } from "../../hooks/useParamsHandler"
 import { districtOptions, eventTypes } from "../../util/options"
 import FilterDrawer from "../UI/Other/FilterDrawer"
 import { useWindowSize } from "../../hooks/useWindowSize"
-import EventDrawer from "../UI/DisplayEvents/EventDrawer"
+import FullEventCardDrawer from "../UI/DisplayEvents/FullEventCardDrawer"
 import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
 import { useNavigate } from "react-router-dom"
@@ -172,11 +172,11 @@ export default function EventsPage({
                     />
                 )}
             </section>
-            <EventDrawer
+            {/* <FullEventCardDrawer
                 event={selectedEvent}
                 onClose={onCloseEvent}
                 viewableTeachers={viewableTeachers}
-            />
+            /> */}
         </div>
     )
 }

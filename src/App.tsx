@@ -70,6 +70,15 @@ export default function App() {
                             }
                         />
                         <Route
+                            path="/:eventId"
+                            element={
+                                <EventsPage
+                                    events={events}
+                                    viewableTeachers={viewableTeachers}
+                                />
+                            }
+                        />
+                        <Route
                             path="/weekly-events"
                             element={<WeeklyEventsPage events={events} />}
                         />
