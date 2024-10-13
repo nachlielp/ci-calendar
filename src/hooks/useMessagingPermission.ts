@@ -18,29 +18,16 @@ export default function useMessagingPermission() {
     // TODO: use local storage to check if the user has already granted permission
     useEffect(() => {
         if (utilService.isFirstNotificationPermissionRequest()) {
-            console.log("isFirstNotificationPermissionRequest")
             setPermissionStatus("default")
         } else {
-            console.log("checkPermissionsAndToken")
             checkPermissionsAndToken()
         }
-        // if (permissionStatus === null) {
-        //     if (utilService.isFirstNotificationPermissionRequest()) {
-        //         console.log("isFirstNotificationPermissionRequest")
-        //         setPermissionStatus("default")
-        //     } else {
-        //         console.log("checkPermissionsAndToken")
-        //         checkPermissionsAndToken()
-        //     }
-        // }
     }, [user, permissionStatus])
 
     const requestPermission = async () => {
-        console.log("requestPermission")
         const permission = await Notification.requestPermission()
         setPermissionStatus(permission)
         utilService.setFirstNotificationPermissionRequest(permission)
-        console.log("useMessagingPermission.permission", permission)
     }
 
     const checkPermissionsAndToken = async () => {
@@ -80,8 +67,6 @@ async function checkAndUpdateToken(user: DbUser) {
     const existingToken = user.push_notification_tokens?.find(
         (token) => token.device_id === deviceId
     )?.token
-
-    console.log("Does token need update?: ", token && token !== existingToken)
 
     if (token && token !== existingToken) {
         await usersService.updateUser(user.user_id, {
