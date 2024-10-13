@@ -1,9 +1,14 @@
+import { useEffect } from "react"
 import useMessagingPermission from "../../../hooks/useMessagingPermission"
 import { Icon } from "./Icon"
 import NotificationsBlockedModal from "./NotificationsBlockedModal"
 
 const PushNotificationButton = () => {
     const { requestPermission, permissionStatus } = useMessagingPermission()
+
+    useEffect(() => {
+        console.log("__permissionStatus", permissionStatus)
+    }, [permissionStatus])
 
     return (
         <section className="notification-status-container">
