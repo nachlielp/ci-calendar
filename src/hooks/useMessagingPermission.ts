@@ -30,6 +30,7 @@ export default function useMessagingPermission() {
     const checkPermissionsAndToken = async () => {
         try {
             if (!user) {
+                console.log("no user")
                 setPermissionStatus(null)
                 return
             }
