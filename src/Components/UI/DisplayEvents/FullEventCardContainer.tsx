@@ -7,7 +7,6 @@ import FullEventCardModal from "./FullEventCardModal"
 interface FullEventCardContainerProps {
     viewableTeachers: UserBio[]
     event: CIEvent
-    onSelectEvent: (event: CIEvent) => void
     anchorEl: any | null
     selectedEventId: string | null
 }
@@ -15,7 +14,6 @@ interface FullEventCardContainerProps {
 export default function FullEventCardContainer({
     event,
     viewableTeachers,
-    onSelectEvent,
     anchorEl,
     selectedEventId,
 }: FullEventCardContainerProps) {
@@ -32,7 +30,6 @@ export default function FullEventCardContainer({
         <FullEventCardModal
             event={event}
             viewableTeachers={viewableTeachers}
-            onSelectEvent={onSelectEvent}
             anchorEl={anchorEl}
             isSelectedCard={selectedEventId === event.id}
         />

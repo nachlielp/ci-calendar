@@ -13,7 +13,6 @@ import { useParamsHandler } from "../../hooks/useParamsHandler"
 import { districtOptions, eventTypes } from "../../util/options"
 import FilterDrawer from "../UI/Other/FilterDrawer"
 import { useWindowSize } from "../../hooks/useWindowSize"
-import FullEventCardDrawer from "../UI/DisplayEvents/FullEventCardDrawer"
 import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
 import { useNavigate } from "react-router-dom"
@@ -30,7 +29,6 @@ export default function EventsPage({
 }: IEventsPageProps) {
     const navigate = useNavigate()
     const { user } = useUser()
-    const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
     const [isListView, setIsListView] = useState<boolean>(true)
 
     const { width } = useWindowSize()
@@ -63,14 +61,6 @@ export default function EventsPage({
 
     const onSelectDate = (value: Dayjs) => {
         setSelectedDay(value)
-    }
-
-    const onSelectEvent = (event: CIEvent) => {
-        setSelectedEvent(event)
-    }
-
-    const onCloseEvent = () => {
-        setSelectedEvent(null)
     }
 
     const visibleEvents = events.filter((event) => !event.hide)
@@ -159,7 +149,6 @@ export default function EventsPage({
                         <EventsList
                             events={todaysEvents}
                             isEvents={!!events.length}
-                            onSelectEvent={onSelectEvent}
                             viewableTeachers={viewableTeachers}
                         />
                     </>
@@ -167,16 +156,10 @@ export default function EventsPage({
                     <EventsList
                         events={events}
                         isEvents={!!events.length}
-                        onSelectEvent={onSelectEvent}
                         viewableTeachers={viewableTeachers}
                     />
                 )}
             </section>
-            {/* <FullEventCardDrawer
-                event={selectedEvent}
-                onClose={onCloseEvent}
-                viewableTeachers={viewableTeachers}
-            /> */}
         </div>
     )
 }

@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react"
 import { Modal } from "antd"
 import { CIEvent, UserBio } from "../../../util/interfaces"
-import { useWindowSize } from "../../../hooks/useWindowSize"
 import FullEventCard from "./FullEventCard"
 
 interface EventCardProps {
     event: CIEvent
     viewableTeachers: UserBio[]
-    onSelectEvent: (event: CIEvent) => void
     anchorEl: any | null
     isSelectedCard: boolean
 }
@@ -16,22 +14,16 @@ export default function FullEventCardModal({
     event,
     anchorEl,
     viewableTeachers,
-    onSelectEvent,
     isSelectedCard,
 }: EventCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(isSelectedCard)
-    const { width } = useWindowSize()
 
     useEffect(() => {
         setIsModalOpen(isSelectedCard)
     }, [isSelectedCard])
 
     const showModal = () => {
-        if (width > 768) {
-            setIsModalOpen(true)
-        } else {
-            onSelectEvent(event)
-        }
+        setIsModalOpen(true)
     }
 
     const handleCancel = () => {

@@ -3,13 +3,11 @@ import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import { Empty } from "antd"
-import FullEventCardModal from "./FullEventCardModal"
 import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
 
 interface IEventsListProps {
-    onSelectEvent: (event: CIEvent) => void
     events: CIEvent[]
     viewableTeachers: UserBio[]
     isEvents: boolean
@@ -17,7 +15,7 @@ interface IEventsListProps {
 export default function EventsList({
     events,
     isEvents,
-    onSelectEvent,
+
     viewableTeachers,
 }: IEventsListProps) {
     const { eventId } = useParams<{ eventId: string }>()
@@ -55,7 +53,6 @@ export default function EventsList({
                     <FullEventCardContainer
                         event={event}
                         viewableTeachers={viewableTeachers}
-                        onSelectEvent={onSelectEvent}
                         anchorEl={
                             <EventPreview
                                 key={event.id}
