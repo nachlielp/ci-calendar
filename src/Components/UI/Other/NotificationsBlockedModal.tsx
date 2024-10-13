@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { Modal } from "antd"
+import { utilService } from "../../../util/utilService"
 
 const MESSAGE_TITLE = "התראות מושבתות"
 
@@ -15,12 +16,9 @@ export default function NotificationsBlockedModal({
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [message, setMessage] = useState("")
-    useEffect(() => {
-        const ifPWA =
-            window.matchMedia("(display-mode: standalone)").matches ||
-            (window.navigator as any).standalone === true
 
-        setMessage(ifPWA ? MESSAGE_PWA : MESSAGE_BROWSER)
+    useEffect(() => {
+        setMessage(utilService.isPWA() ? MESSAGE_PWA : MESSAGE_BROWSER)
     }, [])
 
     const showModal = () => {

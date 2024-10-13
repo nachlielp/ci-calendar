@@ -15,6 +15,8 @@ export const utilService = {
     formatTeachersForCIEvent,
     deepCompareArraysUnordered,
     getDeviceId,
+    isPWA,
+    isFirstNotificationPermissionRequest,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -240,4 +242,15 @@ function getDeviceId() {
         localStorage.setItem("device_id", deviceId)
     }
     return deviceId
+}
+
+function isPWA() {
+    return (
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone === true
+    )
+}
+
+function isFirstNotificationPermissionRequest() {
+    return localStorage.getItem("notification_permission_requested") !== "true"
 }

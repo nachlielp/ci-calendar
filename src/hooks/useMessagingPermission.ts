@@ -11,7 +11,9 @@ export default function useMessagingPermission() {
 
     const { user } = useUser()
     useEffect(() => {
-        checkPermissionsAndToken()
+        if (Notification.permission === "granted") {
+            checkPermissionsAndToken()
+        }
     }, [])
 
     const checkPermissionsAndToken = async () => {
@@ -51,5 +53,5 @@ export default function useMessagingPermission() {
         }
     }
 
-    return { notificationPermissionGranted }
+    return { notificationPermissionGranted, checkPermissionsAndToken }
 }
