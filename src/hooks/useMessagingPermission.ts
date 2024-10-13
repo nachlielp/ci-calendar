@@ -20,6 +20,7 @@ export default function useMessagingPermission() {
         try {
             if (!user) return
             const permission = await Notification.requestPermission()
+            utilService.setFirstNotificationPermissionRequest(permission)
             if (permission === "granted") {
                 setNotificationPermissionGranted(true)
 

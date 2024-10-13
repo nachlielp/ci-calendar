@@ -17,6 +17,7 @@ export const utilService = {
     getDeviceId,
     isPWA,
     isFirstNotificationPermissionRequest,
+    setFirstNotificationPermissionRequest,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -252,5 +253,8 @@ function isPWA() {
 }
 
 function isFirstNotificationPermissionRequest() {
-    return localStorage.getItem("notification_permission_requested") !== "true"
+    return !localStorage.getItem("notification_permission_requested")
+}
+function setFirstNotificationPermissionRequest(permission: string) {
+    localStorage.setItem("notification_permission_requested", permission)
 }

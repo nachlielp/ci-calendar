@@ -2,21 +2,19 @@ import { useEffect, useState } from "react"
 import useMessagingPermission from "../../../hooks/useMessagingPermission"
 import { Icon } from "./Icon"
 import NotificationsBlockedModal from "./NotificationsBlockedModal"
+import { utilService } from "../../../util/utilService"
 
 const PushNotificationButton = () => {
-    const [status, setStatus] = useState<"granted" | "denied" | "unknown">(
-        "unknown"
-    )
+    const [isFirstRequest, setIsFirstRequest] = useState(false)
 
     const { notificationPermissionGranted, checkPermissionsAndToken } =
         useMessagingPermission()
 
     useEffect(() => {
-        console.log("Notification.permission: ", Notification.permission)
-        if (Notification.permission === "granted") {
-            setStatus("granted")
-        } else if (Notification.permission === "denied") {
-            setStatus("denied")
+        if (utilService.isFirstNotificationPermissionRequest()) {
+            setIsFirstRequest(true)
+        } else {
+            checkPermissionsAndToken()
         }
     }, [])
 
@@ -29,15 +27,17 @@ const PushNotificationButton = () => {
             }
         />
     )
+
     return (
         <section className="notification-status-container">
-            {status === "unknown" && (
+            {isFirstRequest && (
                 <div onClick={checkPermissionsAndToken}>{anchorElement}</div>
             )}
-            {status === "denied" && (
+
+            {!isFirstRequest && !notificationPermissionGranted && (
                 <NotificationsBlockedModal anchorElement={anchorElement} />
             )}
-            {status === "granted" && anchorElement}
+            {!isFirstRequest && notificationPermissionGranted && anchorElement}
         </section>
     )
 }
