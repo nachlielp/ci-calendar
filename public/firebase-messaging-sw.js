@@ -23,7 +23,7 @@ self.addEventListener("notificationclick", (event) => {
 })
 
 //TODO cach images and assets
-const cacheName = "ci-events-v1.0"
+const cacheName = "ci-events-v1.1"
 const filesToCache = []
 
 self.addEventListener("install", (e) => {
