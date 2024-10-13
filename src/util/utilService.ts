@@ -253,8 +253,8 @@ function isPWA() {
 }
 
 function isFirstNotificationPermissionRequest() {
-    return !localStorage.getItem("notification_permission_requested")
+    return !localStorage.getItem("notificationPermission")
 }
 function setFirstNotificationPermissionRequest(permission: string) {
-    localStorage.setItem("notification_permission_requested", permission)
+    localStorage.setItem("notificationPermission", permission)
 }
