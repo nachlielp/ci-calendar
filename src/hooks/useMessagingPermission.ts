@@ -10,8 +10,10 @@ export default function useMessagingPermission() {
         useState<boolean>(false)
 
     const { user } = useUser()
+
+    // TODO: use local storage to check if the user has already granted permission
     useEffect(() => {
-        if (Notification.permission === "granted") {
+        if (utilService.isFirstNotificationPermissionRequest()) {
             checkPermissionsAndToken()
         }
     }, [])
@@ -34,6 +36,11 @@ export default function useMessagingPermission() {
                     (token) => token.device_id === deviceId
                 )?.token
 
+                console.log(
+                    "does need update: ",
+                    token && token !== existingToken
+                )
+
                 if (token && token !== existingToken) {
                     await usersService.updateUser(user.user_id, {
                         push_notification_tokens: [
@@ -42,6 +49,7 @@ export default function useMessagingPermission() {
                                 device_id: utilService.getDeviceId(),
                                 token,
                                 created_at: new Date().toISOString(),
+                                is_pwa: utilService.isPWA(),
                             },
                         ],
                     })

@@ -119,6 +119,7 @@ export interface PushNotificationToken {
     token: string
     created_at: string
     device_id: string
+    is_pwa: boolean
 }
 
 export interface DbUser {
