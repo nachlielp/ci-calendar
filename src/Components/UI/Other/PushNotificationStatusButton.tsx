@@ -5,7 +5,7 @@ import NotificationsBlockedModal from "./NotificationsBlockedModal"
 import { utilService } from "../../../util/utilService"
 import { PushNotificationPromission } from "../../../util/interfaces"
 
-const PushNotificationButton = () => {
+const PushNotificationStatusButton = () => {
     const { requestPermission, permissionStatus } = useMessagingPermission()
 
     const [status, setStatus] = useState<PushNotificationPromission>(
@@ -27,9 +27,13 @@ const PushNotificationButton = () => {
                     anchorElement={<Icon icon="notificationsOff" />}
                 />
             )}
-            {status === "granted" && <Icon icon="notifications_active" />}
+            {status === "granted" && (
+                <div onClick={requestPermission}>
+                    <Icon icon="notifications_active" />
+                </div>
+            )}
         </section>
     )
 }
 
-export default PushNotificationButton
+export default PushNotificationStatusButton
