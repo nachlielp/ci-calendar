@@ -5,6 +5,7 @@ import { DbUser } from "../../../util/interfaces"
 import { Icon } from "./Icon"
 import { MenuDrawer } from "./MenuDrawer"
 import { useUser } from "../../../context/UserContext"
+import PushNotificationButton from "./PushNotificationStatus"
 
 export default function AppHeader() {
     const { user } = useUser()
@@ -41,10 +42,15 @@ export default function AppHeader() {
                     </LinkButton>
                 )}
             {user && (
-                <div className="header-actions">
-                    <UserInfo user={user} />
-                    <MenuDrawer />
-                </div>
+                <>
+                    <article className="header-notification-container">
+                        <PushNotificationButton />
+                    </article>
+                    <div className="header-actions">
+                        <UserInfo user={user} />
+                        <MenuDrawer />
+                    </div>
+                </>
             )}
         </section>
     )

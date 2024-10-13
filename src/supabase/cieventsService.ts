@@ -24,7 +24,7 @@ export const cieventsService = {
 async function getCIEvent(id: string): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
-            .from("ci-events")
+            .from("ci_events")
             .select("*")
             .eq("id", id)
             .single()
@@ -38,7 +38,7 @@ async function getCIEvent(id: string): Promise<CIEvent> {
 
 async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
     try {
-        let query = supabase.from("ci-events").select("*")
+        let query = supabase.from("ci_events").select("*")
 
         if (filterBy?.start_date) {
             query = query.gte("start_date", filterBy.start_date)
@@ -70,7 +70,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
 async function createCIEvent(event: CIEventWithoutId): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
-            .from("ci-events")
+            .from("ci_events")
             .insert(event)
             .select("*")
             .single()
@@ -89,7 +89,7 @@ async function updateCIEvent(
 ): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
-            .from("ci-events")
+            .from("ci_events")
             .update(eventUpdate)
             .eq("id", id)
             .select("*")
@@ -109,7 +109,7 @@ async function updateMultipleCIEvents(
 ): Promise<CIEvent[]> {
     try {
         const { data, error } = await supabase
-            .from("ci-events")
+            .from("ci_events")
             .update(eventUpdate)
             .in("id", ids)
             .select("*")
@@ -125,7 +125,7 @@ async function updateMultipleCIEvents(
 async function deleteCIEvent(id: string): Promise<void> {
     try {
         const { error } = await supabase
-            .from("ci-events")
+            .from("ci_events")
             .delete()
             .eq("id", id)
             .single()
@@ -140,7 +140,7 @@ async function deleteCIEvent(id: string): Promise<void> {
 async function deleteMultipleCIEvents(ids: string[]): Promise<string[]> {
     try {
         const { data, error } = await supabase
-            .from("ci-events")
+            .from("ci_events")
             .delete()
             .in("id", ids)
             .select("id")

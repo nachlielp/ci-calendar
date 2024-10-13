@@ -6,6 +6,7 @@ import { useWindowSize } from "../../../hooks/useWindowSize"
 import { supabase } from "../../../supabase/client"
 import { useUser } from "../../../context/UserContext"
 import { UserType } from "../../../util/interfaces"
+import { ScreenSize } from "../../../util/options"
 
 export function MenuDrawer() {
     const [open, setOpen] = React.useState<boolean>(false)
@@ -24,7 +25,7 @@ export function MenuDrawer() {
         }
     }, [requests])
 
-    const isMobile = width < 768
+    const isMobile = width < ScreenSize.mobile
     const isAdmin = user?.user_type === UserType.admin
     const isCreator =
         user?.user_type === UserType.admin ||

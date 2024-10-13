@@ -115,6 +115,12 @@ export interface DefaultFilter {
     districts: string[]
 }
 
+export interface PushNotificationToken {
+    token: string
+    created_at: string
+    device_id: string
+}
+
 export interface DbUser {
     user_id: string
     created_at: string
@@ -133,6 +139,7 @@ export interface DbUser {
     img: string
     bio: string
     default_filter: DefaultFilter
+    push_notification_tokens: PushNotificationToken[]
 }
 
 export interface UserBio extends Partial<DbUser> {

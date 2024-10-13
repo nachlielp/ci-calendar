@@ -42,7 +42,7 @@ import search from "../../../assets/svgs/search.svg"
 import search_off from "../../../assets/svgs/search_off.svg"
 import close from "../../../assets/svgs/close.svg"
 import notifications from "../../../assets/svgs/notifications.svg"
-
+import notificationsOff from "../../../assets/svgs/notifications_off.svg"
 export const Icon = ({
     icon,
     className,
@@ -99,6 +99,7 @@ export const Icon = ({
         search_off,
         close,
         notifications,
+        notificationsOff,
     }
     return (
         <label className="icon-component" onClick={onClick}>

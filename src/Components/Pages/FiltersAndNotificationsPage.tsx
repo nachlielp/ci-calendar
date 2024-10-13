@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"
 import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../UI/Other/DoubleBindedSelectProps"
-import { debounce } from "lodash"
+import debounce from "lodash/debounce"
 
 export default function FiltersAndNotificationsPage() {
     const { user } = useUser()

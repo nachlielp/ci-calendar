@@ -1,4 +1,5 @@
 import dayjs from "dayjs"
+import { v4 as uuidv4 } from "uuid"
 import { CIEvent, CITemplate, DbUser, UserType } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import { eventTypes, hebrewMonths, SelectOption } from "./options"
@@ -13,6 +14,7 @@ export const utilService = {
     reverseFormatTeachers,
     formatTeachersForCIEvent,
     deepCompareArraysUnordered,
+    getDeviceId,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -144,6 +146,7 @@ function createDbUserFromUser(user: User): DbUser {
             districts: [],
             eventTypes: [],
         },
+        push_notification_tokens: [],
     }
 }
 
@@ -228,4 +231,13 @@ function formatTeachersForCIEvent(
             return { label: teacher, value: "NON_EXISTENT" }
         }
     })
+}
+
+function getDeviceId() {
+    let deviceId = localStorage.getItem("device_id")
+    if (!deviceId) {
+        deviceId = uuidv4()
+        localStorage.setItem("device_id", deviceId)
+    }
+    return deviceId
 }
