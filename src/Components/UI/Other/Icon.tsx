@@ -43,6 +43,10 @@ import search_off from "../../../assets/svgs/search_off.svg"
 import close from "../../../assets/svgs/close.svg"
 import notifications from "../../../assets/svgs/notifications.svg"
 import notificationsOff from "../../../assets/svgs/notifications_off.svg"
+import edit_otifications from "../../../assets/svgs/edit_notifications.svg"
+import add_alert from "../../../assets/svgs/add_alert.svg"
+import notifications_active from "../../../assets/svgs/notifications_active.svg"
+
 export const Icon = ({
     icon,
     className,
@@ -100,6 +104,9 @@ export const Icon = ({
         close,
         notifications,
         notificationsOff,
+        edit_otifications,
+        add_alert,
+        notifications_active,
     }
     return (
         <label className="icon-component" onClick={onClick}>

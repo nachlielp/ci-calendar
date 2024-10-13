@@ -24,8 +24,10 @@ const PushNotificationButton = () => {
     const anchorElement = (
         <Icon
             icon={
-                notificationPermissionGranted
-                    ? "notifications"
+                isFirstRequest
+                    ? "add_alert"
+                    : notificationPermissionGranted
+                    ? "notifications_active"
                     : "notificationsOff"
             }
         />
