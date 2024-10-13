@@ -32,7 +32,10 @@ export default function useMessagingPermission() {
             utilService.setFirstNotificationPermissionRequest(permission)
             if (permission === "granted") {
                 setNotificationPermissionGranted(true)
-
+                console.log(
+                    "vapidKey: ",
+                    import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY
+                )
                 const token = await getToken(messaging, {
                     vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
                 })
