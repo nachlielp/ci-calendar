@@ -4,7 +4,7 @@ import { useUser } from "../context/UserContext"
 import { getToken } from "firebase/messaging"
 import { usersService } from "../supabase/usersService"
 import { messaging } from "../firebase.messaging"
-import { PushNotificationPromission } from "../util/interfaces"
+import { DbUser, PushNotificationPromission } from "../util/interfaces"
 
 export default function useMessagingPermission() {
     const [permissionStatus, setPermissionStatus] =
@@ -17,16 +17,23 @@ export default function useMessagingPermission() {
 
     // TODO: use local storage to check if the user has already granted permission
     useEffect(() => {
-        if (permissionStatus === null) {
-            if (utilService.isFirstNotificationPermissionRequest()) {
-                console.log("isFirstNotificationPermissionRequest")
-                setPermissionStatus("default")
-            } else {
-                console.log("checkPermissionsAndToken")
-                checkPermissionsAndToken()
-            }
+        if (utilService.isFirstNotificationPermissionRequest()) {
+            console.log("isFirstNotificationPermissionRequest")
+            setPermissionStatus("default")
+        } else {
+            console.log("checkPermissionsAndToken")
+            checkPermissionsAndToken()
         }
-    }, [permissionStatus])
+        // if (permissionStatus === null) {
+        //     if (utilService.isFirstNotificationPermissionRequest()) {
+        //         console.log("isFirstNotificationPermissionRequest")
+        //         setPermissionStatus("default")
+        //     } else {
+        //         console.log("checkPermissionsAndToken")
+        //         checkPermissionsAndToken()
+        //     }
+        // }
+    }, [user, permissionStatus])
 
     const requestPermission = async () => {
         console.log("requestPermission")
@@ -47,34 +54,7 @@ export default function useMessagingPermission() {
             setPermissionStatus(permission)
             utilService.setFirstNotificationPermissionRequest(permission)
             if (permission === "granted") {
-                const token = await getToken(messaging, {
-                    vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
-                })
-
-                const deviceId = utilService.getDeviceId()
-
-                const existingToken = user.push_notification_tokens?.find(
-                    (token) => token.device_id === deviceId
-                )?.token
-
-                console.log(
-                    "does need update: ",
-                    token && token !== existingToken
-                )
-
-                if (token && token !== existingToken) {
-                    await usersService.updateUser(user.user_id, {
-                        push_notification_tokens: [
-                            ...(user.push_notification_tokens || []),
-                            {
-                                device_id: utilService.getDeviceId(),
-                                token,
-                                created_at: new Date().toISOString(),
-                                is_pwa: utilService.isPWA(),
-                            },
-                        ],
-                    })
-                }
+                await checkAndUpdateToken(user)
             } else {
                 console.error("Permission not granted for Notification")
             }
@@ -87,5 +67,35 @@ export default function useMessagingPermission() {
         permissionStatus,
         requestPermission,
         checkPermissionsAndToken,
+    }
+}
+
+async function checkAndUpdateToken(user: DbUser) {
+    const token = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
+    })
+
+    const deviceId = utilService.getDeviceId()
+
+    const existingToken = user.push_notification_tokens?.find(
+        (token) => token.device_id === deviceId
+    )?.token
+
+    console.log("Does token need update?: ", token && token !== existingToken)
+
+    if (token && token !== existingToken) {
+        await usersService.updateUser(user.user_id, {
+            push_notification_tokens: [
+                ...(user.push_notification_tokens || []).filter(
+                    (token) => token.device_id !== deviceId
+                ),
+                {
+                    device_id: utilService.getDeviceId(),
+                    token,
+                    created_at: new Date().toISOString(),
+                    is_pwa: utilService.isPWA(),
+                },
+            ],
+        })
     }
 }
