@@ -8,7 +8,7 @@ self.addEventListener("push", function (event) {
         icon: "/icon-192.png",
         badge: "/icon-192.png",
     }
-    console.log("options:1.0 ", options)
+    console.log("options:1.3 ", options)
     event.waitUntil(self.registration.showNotification(data.title, options))
 })
 
@@ -23,7 +23,7 @@ self.addEventListener("notificationclick", (event) => {
 })
 
 //TODO cach images and assets
-const cacheName = "ci-events-v1.1"
+const cacheName = "ci-events-v1.3"
 const filesToCache = []
 
 self.addEventListener("install", (e) => {
