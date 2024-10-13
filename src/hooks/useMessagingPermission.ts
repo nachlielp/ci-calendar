@@ -8,7 +8,13 @@ import { PushNotificationPromission } from "../util/interfaces"
 
 export default function useMessagingPermission() {
     const [permissionStatus, setPermissionStatus] =
-        useState<PushNotificationPromission>(null)
+        useState<PushNotificationPromission>(() => {
+            return (
+                (localStorage.getItem(
+                    "notificationPermission"
+                ) as PushNotificationPromission) || null
+            )
+        })
 
     const { user } = useUser()
 
