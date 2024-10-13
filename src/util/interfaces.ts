@@ -193,3 +193,4 @@ export enum RequestStatusHebrew {
     closed = "סגור",
     pending = "בטיפול",
 }
+export type PushNotificationPromission = "granted" | "denied" | "default" | null

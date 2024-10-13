@@ -3,46 +3,39 @@ import useMessagingPermission from "../../../hooks/useMessagingPermission"
 import { Icon } from "./Icon"
 import NotificationsBlockedModal from "./NotificationsBlockedModal"
 import { utilService } from "../../../util/utilService"
+import { PushNotificationPromission } from "../../../util/interfaces"
 
 const PushNotificationButton = () => {
-    const [isFirstRequest, setIsFirstRequest] = useState(false)
+    const [status, setStatus] = useState<PushNotificationPromission | null>(
+        null
+    )
 
-    const {
-        notificationPermissionGranted,
-        checkPermissionsAndToken,
-        requestPermission,
-    } = useMessagingPermission()
+    const { checkPermissionsAndToken, requestPermission } =
+        useMessagingPermission()
 
     useEffect(() => {
         if (utilService.isFirstNotificationPermissionRequest()) {
-            setIsFirstRequest(true)
+            setStatus("default")
         } else {
-            checkPermissionsAndToken()
+            checkPermissionsAndToken().then((status) => setStatus(status))
         }
     }, [])
 
-    const anchorElement = (
-        <Icon
-            icon={
-                isFirstRequest
-                    ? "add_alert"
-                    : notificationPermissionGranted
-                    ? "notifications_active"
-                    : "notificationsOff"
-            }
-        />
-    )
-
     return (
         <section className="notification-status-container">
-            {isFirstRequest && (
-                <div onClick={requestPermission}>{anchorElement}</div>
-            )}
+            {status === "default" ||
+                (status === null && (
+                    <div onClick={requestPermission}>
+                        <Icon icon="add_alert" />
+                    </div>
+                ))}
 
-            {!isFirstRequest && !notificationPermissionGranted && (
-                <NotificationsBlockedModal anchorElement={anchorElement} />
+            {status === "denied" && (
+                <NotificationsBlockedModal
+                    anchorElement={<Icon icon="notificationsOff" />}
+                />
             )}
-            {!isFirstRequest && notificationPermissionGranted && anchorElement}
+            {status === "granted" && <Icon icon="notifications_active" />}
         </section>
     )
 }
