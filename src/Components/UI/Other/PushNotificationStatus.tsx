@@ -23,12 +23,11 @@ const PushNotificationButton = () => {
 
     return (
         <section className="notification-status-container">
-            {status === "default" ||
-                (status === null && (
-                    <div onClick={requestPermission}>
-                        <Icon icon="add_alert" />
-                    </div>
-                ))}
+            {(status === "default" || status === null) && (
+                <div onClick={requestPermission}>
+                    <Icon icon="add_alert" />
+                </div>
+            )}
 
             {status === "denied" && (
                 <NotificationsBlockedModal
