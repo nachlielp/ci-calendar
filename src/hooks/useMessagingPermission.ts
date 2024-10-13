@@ -28,6 +28,7 @@ export default function useMessagingPermission() {
         try {
             if (!user) return
             const { permission } = Notification
+            console.log("permission: ", permission)
             utilService.setFirstNotificationPermissionRequest(permission)
             if (permission === "granted") {
                 setNotificationPermissionGranted(true)
@@ -36,8 +37,11 @@ export default function useMessagingPermission() {
                     vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
                 })
 
+                console.log("token: ", token)
+
                 const deviceId = utilService.getDeviceId()
 
+                console.log("deviceId: ", deviceId)
                 const existingToken = user.push_notification_tokens?.find(
                     (token) => token.device_id === deviceId
                 )?.token
