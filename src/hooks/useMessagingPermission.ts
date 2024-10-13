@@ -79,6 +79,7 @@ async function checkAndUpdateToken(user: DbUser) {
                     token,
                     created_at: new Date().toISOString(),
                     is_pwa: utilService.isPWA(),
+                    breanch: import.meta.env.VITE_BRANCH,
                 },
             ],
         })
