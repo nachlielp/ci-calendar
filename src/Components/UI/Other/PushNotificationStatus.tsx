@@ -7,8 +7,11 @@ import { utilService } from "../../../util/utilService"
 const PushNotificationButton = () => {
     const [isFirstRequest, setIsFirstRequest] = useState(false)
 
-    const { notificationPermissionGranted, checkPermissionsAndToken } =
-        useMessagingPermission()
+    const {
+        notificationPermissionGranted,
+        checkPermissionsAndToken,
+        requestPermission,
+    } = useMessagingPermission()
 
     useEffect(() => {
         if (utilService.isFirstNotificationPermissionRequest()) {
@@ -31,7 +34,7 @@ const PushNotificationButton = () => {
     return (
         <section className="notification-status-container">
             {isFirstRequest && (
-                <div onClick={checkPermissionsAndToken}>{anchorElement}</div>
+                <div onClick={requestPermission}>{anchorElement}</div>
             )}
 
             {!isFirstRequest && !notificationPermissionGranted && (
