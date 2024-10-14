@@ -94,14 +94,11 @@ async function getTaggableTeachers(): Promise<
     { label: string; value: string }[]
 > {
     try {
-        const { data: currentUser, error: userError } =
-            await supabase.auth.getUser()
-        if (userError) throw userError
-
         const { data, error } = await supabase
             .from("users")
-            .select("user_id, full_name, user_type, allow_tagging")
-            .or(`allow_tagging.eq.true,user_id.eq.${currentUser.user.id}`)
+            .select("user_id, full_name, user_type")
+            .eq("show_profile", true)
+            .neq("user_type", "user")
 
         if (error) throw error
 

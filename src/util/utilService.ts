@@ -156,6 +156,7 @@ function createDbUserFromUser(user: User): DbUser {
         },
         push_notification_tokens: [],
         notifications: [],
+        subscriptions: [],
     }
 }
 

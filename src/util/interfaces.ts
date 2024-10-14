@@ -154,6 +154,7 @@ export interface DbUser {
     default_filter: DefaultFilter
     push_notification_tokens: PushNotificationToken[]
     notifications: Notification[]
+    subscriptions: string[]
 }
 
 export interface UserBio extends Partial<DbUser> {

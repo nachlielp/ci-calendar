@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 
 import { usersService } from "../supabase/usersService"
 
-export const useTeachersList = () => {
+export const useTeachersList = ({ addSelf }: { addSelf: boolean }) => {
     const [teachers, setTeachers] = useState<
         { label: string; value: string }[]
     >([])
@@ -12,6 +12,9 @@ export const useTeachersList = () => {
         const fetchTeachers = async () => {
             try {
                 const teachers = await usersService.getTaggableTeachers()
+                if (addSelf) {
+                    teachers.push({ label: "עצמי", value: "self" })
+                }
                 setTeachers(teachers)
                 setLoading(false)
             } catch (error) {

@@ -46,7 +46,7 @@ export default function MultiDayEventForm({
 }) {
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const navigate = useNavigate()
-    const { teachers } = useTeachersList()
+    const { teachers } = useTeachersList({ addSelf: true })
     const templates = useTemplates({ isMultiDay: true })
 
     const { user } = useUser()

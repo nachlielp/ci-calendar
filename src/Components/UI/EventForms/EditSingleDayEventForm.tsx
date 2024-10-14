@@ -56,7 +56,7 @@ export default function EditSingleDayEventForm({
     closeForm: () => void
 }) {
     const navigate = useNavigate()
-    const { teachers } = useTeachersList()
+    const { teachers } = useTeachersList({ addSelf: true })
     const { user } = useUser()
 
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)

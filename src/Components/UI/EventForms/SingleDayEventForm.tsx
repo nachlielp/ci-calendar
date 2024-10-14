@@ -43,7 +43,7 @@ export default function SingleDayEventForm({
     isTemplate?: boolean
 }) {
     const [form] = Form.useForm()
-    const { teachers } = useTeachersList()
+    const { teachers } = useTeachersList({ addSelf: true })
     // const [repeatOption, setRepeatOption] = useState<EventFrequency>(
     //     EventFrequency.none
     // )

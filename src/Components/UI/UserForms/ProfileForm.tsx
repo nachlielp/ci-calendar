@@ -7,14 +7,13 @@ import { usersService } from "../../../supabase/usersService"
 import { DbUser } from "../../../util/interfaces"
 
 type FieldType = {
-    full_name?: string
-    bio?: string
-    img?: string
+    full_name: string
+    bio: string
+    img: string
     page_url?: string
     page_title?: string
-    upload?: string
-    show_profile?: string
-    allow_tagging?: string
+    upload: string
+    show_profile: string
 }
 
 interface ProfileFormProps {
@@ -40,14 +39,8 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
     const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
         if (!user) return
-        const {
-            full_name,
-            bio,
-            page_url,
-            page_title,
-            show_profile,
-            allow_tagging,
-        } = values
+        console.log("values: ", values)
+        const { full_name, bio, page_url, page_title, show_profile } = values
         const newTeacher: Partial<DbUser> = {
             full_name: full_name || user.full_name,
             bio: bio || "",
@@ -55,7 +48,6 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
             page_url: page_url || "",
             page_title: page_title || "",
             show_profile: show_profile?.toString() === "true",
-            allow_tagging: allow_tagging?.toString() === "true",
             updated_at: new Date().toISOString(),
         }
         try {
@@ -83,8 +75,6 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const clearImage = () => {
         setImageUrl("")
     }
-
-    // const cardWidth = width > 600 ? 500 : 300;
 
     return (
         <>

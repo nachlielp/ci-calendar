@@ -6,6 +6,7 @@ import { useUser } from "../../context/UserContext"
 import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../UI/Other/DoubleBindedSelectProps"
 import debounce from "lodash/debounce"
+import SubscribeToTeachers from "../UI/Other/SubscribeToTeachers"
 
 export default function FiltersAndNotificationsPage() {
     const { user } = useUser()
@@ -75,6 +76,8 @@ export default function FiltersAndNotificationsPage() {
                     placeholder="בחירת ארועים"
                     className="select-filter"
                 />
+                <h3>הרשמה למורים</h3>
+                <SubscribeToTeachers />
             </Card>
         </div>
     )

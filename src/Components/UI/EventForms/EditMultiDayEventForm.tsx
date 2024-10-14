@@ -28,7 +28,7 @@ export default function EditMultiDayEventForm({
     template?: CITemplate
     closeForm: () => void
 }) {
-    const { teachers } = useTeachersList()
+    const { teachers } = useTeachersList({ addSelf: true })
     const { user } = useUser()
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
