@@ -221,7 +221,9 @@ export default function FullEventCard({
                 {utilService.isPWA() && (
                     <button
                         className="event-share-button"
-                        onClick={() => utilService.handleShareEvent(event.id)}
+                        onClick={() =>
+                            utilService.handleShareEvent(event.id, event.title)
+                        }
                     >
                         <Icon
                             icon={utilService.isIos() ? "ios_share" : "share"}

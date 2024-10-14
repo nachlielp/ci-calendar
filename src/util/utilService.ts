@@ -291,14 +291,14 @@ function isIos() {
     return /(iPhone|iPad|iPod)/.test(navigator.userAgent)
 }
 
-function handleShareEvent(eventId: string) {
+function handleShareEvent(eventId: string, eventTitle: string) {
     const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
 
     if (navigator.share) {
         navigator
             .share({
                 title: "Check out this event!",
-                text: "Here's an event you might be interested in.",
+                text: `${eventTitle}`,
                 url: shareUrl, // Use the constructed URL
             })
             .then(() => console.log("Successful share"))
