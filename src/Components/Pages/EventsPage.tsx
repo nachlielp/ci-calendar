@@ -17,6 +17,7 @@ import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
 import { useNavigate } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
+import { utilService } from "../../util/utilService"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -93,6 +94,7 @@ export default function EventsPage({
             <header className="header">
                 <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
                 <p className="subtitle">כל האירועים במקום אחד</p>
+                <p>isPWA: {utilService.isPWA() ? "true" : "false"}</p>
                 <main className="menu-container">
                     <MenuButtons
                         onSelectKey={onSelectKey}
