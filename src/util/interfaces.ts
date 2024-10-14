@@ -123,6 +123,17 @@ export interface PushNotificationToken {
     breanch: string
 }
 
+export interface Notification {
+    id: string
+    event_id: string
+    title: string
+    body: string
+    created_at: string
+    send_at: string
+    dispose_at: string
+    timezone: string
+}
+
 export interface DbUser {
     user_id: string
     created_at: string
@@ -142,6 +153,7 @@ export interface DbUser {
     bio: string
     default_filter: DefaultFilter
     push_notification_tokens: PushNotificationToken[]
+    notifications: Notification[]
 }
 
 export interface UserBio extends Partial<DbUser> {
