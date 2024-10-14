@@ -1,5 +1,5 @@
 import React from "react"
-import { Card, Tag } from "antd"
+import { Button, Card, Tag } from "antd"
 import dayjs from "dayjs"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { tagOptions, eventTypes } from "../../../util/options"
@@ -12,25 +12,25 @@ interface EventPreviewProps {
 
 export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
     ({ event }, ref) => {
-        // const openGoogleMaps = (placeId: string, address: string) => {
-        //   const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
-        //   const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
-        //   const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+        const openGoogleMaps = (placeId: string, address: string) => {
+            const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`
+            const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`
+            const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`
 
-        //   if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
-        //     setTimeout(() => {
-        //       window.location.href = fallbackUrl;
-        //     }, 25);
-        //     window.open(iosUrl, '_blank');
-        //   } else if (/Android/.test(navigator.userAgent)) {
-        //     setTimeout(() => {
-        //       window.location.href = fallbackUrl;
-        //     }, 25);
-        //     window.open(androidUrl, '_blank');
-        //   } else {
-        //     window.open(fallbackUrl, '_blank');
-        //   }
-        // };
+            if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
+                setTimeout(() => {
+                    window.location.href = fallbackUrl
+                }, 25)
+                window.open(iosUrl, "_blank")
+            } else if (/Android/.test(navigator.userAgent)) {
+                setTimeout(() => {
+                    window.location.href = fallbackUrl
+                }, 25)
+                window.open(androidUrl, "_blank")
+            } else {
+                window.open(fallbackUrl, "_blank")
+            }
+        }
 
         const segmentsLength = Object.values(event.segments).length
 
@@ -97,6 +97,17 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                 <article className="event-location">
                     <Icon icon="pinDrop" className="event-icon" />
                     <label className="event-label">{event.address.label}</label>
+                    <Button
+                        type="link"
+                        onClick={() =>
+                            openGoogleMaps(
+                                event.address.place_id,
+                                event.address.label
+                            )
+                        }
+                    >
+                        Open in Maps
+                    </Button>
                 </article>
 
                 {(teachersBioOrName.length > 0 ||
