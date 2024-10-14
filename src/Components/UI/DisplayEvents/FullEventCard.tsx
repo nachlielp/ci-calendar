@@ -15,6 +15,7 @@ export default function FullEventCard({
 }) {
     const segmentLen = event.segments.length
     const multiDayTeachersLen = event.multi_day_teachers || []
+
     return (
         <section className="full-event-card" dir="rtl">
             <article className="event-header">
@@ -49,6 +50,19 @@ export default function FullEventCard({
             <article className="event-location">
                 <Icon icon="pinDrop" className="event-icon" />
                 <label className="event-label">{event.address.label}</label>
+                {utilService.isPWA() && (
+                    <button
+                        className="event-location-button"
+                        onClick={() =>
+                            utilService.openGoogleMaps(
+                                event.address.place_id,
+                                event.address.label
+                            )
+                        }
+                    >
+                        פתיחה במפת Google
+                    </button>
+                )}
             </article>
 
             {multiDayTeachersLen.length > 0 && (
