@@ -20,6 +20,9 @@ export const utilService = {
     setFirstNotificationPermissionRequest,
     getNotificationPermission,
     openGoogleMaps,
+    isIos,
+    handleShareEvent,
+    copyToClipboard,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -282,4 +285,32 @@ function openGoogleMaps(placeId: string, address: string) {
     } else {
         window.open(fallbackUrl, "_blank")
     }
+}
+
+function isIos() {
+    return /(iPhone|iPad|iPod)/.test(navigator.userAgent)
+}
+
+function handleShareEvent(eventId: string) {
+    const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
+
+    if (navigator.share) {
+        navigator
+            .share({
+                title: "Check out this event!",
+                text: "Here's an event you might be interested in.",
+                url: shareUrl, // Use the constructed URL
+            })
+            .then(() => console.log("Successful share"))
+            .catch((error) => console.log("Error sharing", error))
+    } else {
+        console.log("Web Share API not supported in this browser.")
+        // Fallback for browsers that do not support the Web Share API
+    }
+}
+
+function copyToClipboard(eventId: string, info: () => void) {
+    const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
+    navigator.clipboard.writeText(shareUrl)
+    info()
 }

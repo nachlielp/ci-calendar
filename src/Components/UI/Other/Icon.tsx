@@ -46,7 +46,8 @@ import notificationsOff from "../../../assets/svgs/notifications_off.svg"
 import edit_otifications from "../../../assets/svgs/edit_notifications.svg"
 import add_alert from "../../../assets/svgs/add_alert.svg"
 import notifications_active from "../../../assets/svgs/notifications_active.svg"
-
+import ios_share from "../../../assets/svgs/ios_share.svg"
+import share from "../../../assets/svgs/share.svg"
 export const Icon = ({
     icon,
     className,
@@ -107,6 +108,8 @@ export const Icon = ({
         edit_otifications,
         add_alert,
         notifications_active,
+        ios_share,
+        share,
     }
     return (
         <label className="icon-component" onClick={onClick}>

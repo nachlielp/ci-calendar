@@ -1,4 +1,4 @@
-import { Button, Tag } from "antd"
+import { Button, Tag, message } from "antd"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
@@ -6,6 +6,7 @@ import dayjs from "dayjs"
 import BioModal from "../DisplayUsers/BioModal"
 import React from "react"
 import { utilService } from "../../../util/utilService"
+
 export default function FullEventCard({
     event,
     viewableTeachers,
@@ -13,8 +14,14 @@ export default function FullEventCard({
     event: CIEvent
     viewableTeachers: UserBio[]
 }) {
+    const [messageApi, contextHolder] = message.useMessage()
+
     const segmentLen = event.segments.length
     const multiDayTeachersLen = event.multi_day_teachers || []
+
+    const info = () => {
+        messageApi.info("הקישור הועתק בהצלחה")
+    }
 
     return (
         <section className="full-event-card" dir="rtl">
@@ -50,19 +57,6 @@ export default function FullEventCard({
             <article className="event-location">
                 <Icon icon="pinDrop" className="event-icon" />
                 <label className="event-label">{event.address.label}</label>
-                {utilService.isPWA() && (
-                    <button
-                        className="event-location-button"
-                        onClick={() =>
-                            utilService.openGoogleMaps(
-                                event.address.place_id,
-                                event.address.label
-                            )
-                        }
-                    >
-                        פתיחה במפת Google
-                    </button>
-                )}
             </article>
 
             {multiDayTeachersLen.length > 0 && (
@@ -208,6 +202,44 @@ export default function FullEventCard({
                     </article>
                 </>
             )}
+
+            <article className="event-card-footer">
+                {contextHolder}
+                {utilService.isPWA() && (
+                    <button
+                        className="event-location-button"
+                        onClick={() =>
+                            utilService.openGoogleMaps(
+                                event.address.place_id,
+                                event.address.label
+                            )
+                        }
+                    >
+                        פתיחה במפת Google
+                    </button>
+                )}
+                {utilService.isPWA() && (
+                    <button
+                        className="event-share-button"
+                        onClick={() => utilService.handleShareEvent(event.id)}
+                    >
+                        <Icon
+                            icon={utilService.isIos() ? "ios_share" : "share"}
+                            className="event-icon"
+                        />
+                    </button>
+                )}
+                {!utilService.isPWA() && (
+                    <button
+                        className="event-share-button"
+                        onClick={() =>
+                            utilService.copyToClipboard(event.id, info)
+                        }
+                    >
+                        <Icon icon="contentCopy" className="event-icon" />
+                    </button>
+                )}
+            </article>
         </section>
     )
 }
