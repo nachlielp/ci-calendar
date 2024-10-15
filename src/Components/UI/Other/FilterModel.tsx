@@ -12,9 +12,6 @@ export default function FilterModel() {
 
     const isEmptyFilter = !currentValues.length
 
-    const clearAllSearchParams = () => {
-        clearAllSearchParams()
-    }
     const isSelectedFilter = currentValues.length
 
     return (
@@ -32,14 +29,7 @@ export default function FilterModel() {
                 open={modalOpen}
                 onOk={() => setModalOpen(false)}
                 onCancel={() => setModalOpen(false)}
-                footer={
-                    <Button
-                        onClick={clearAllSearchParams}
-                        className={`footer-btn ${isEmptyFilter && "disabled"}`}
-                    >
-                        נקה הכל
-                    </Button>
-                }
+                footer={null}
             >
                 <article className="filter-tags-container">
                     <h3 className="sub-title">סוג אירוע</h3>
