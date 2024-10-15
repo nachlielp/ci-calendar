@@ -90,7 +90,7 @@ export default function SingleDayEventFormHead({
                             maxDate={dayjs().add(3, "months")}
                             onChange={handleDateChange}
                             allowClear={false}
-                            defaultValue={dayjs(eventDate, "DD/MM")}
+                            defaultValue={null}
                         />
                     </Form.Item>
                 )}
