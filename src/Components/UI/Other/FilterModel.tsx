@@ -10,8 +10,6 @@ export default function FilterModel() {
     const { currentValues, selectOption, removeOption } =
         useParamsFilterHandler()
 
-    const isEmptyFilter = !currentValues.length
-
     const isSelectedFilter = currentValues.length
 
     return (
