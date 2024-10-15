@@ -7,12 +7,14 @@ interface FullEventCardContainerProps {
     viewableTeachers: UserBio[]
     event: CIEvent
     anchorEl: any | null
+    isSelectedEvent?: boolean
 }
 
 export default function FullEventCardContainer({
     event,
     viewableTeachers,
     anchorEl,
+    isSelectedEvent = false,
 }: FullEventCardContainerProps) {
     const isMobile = useIsMobile()
     return isMobile ? (
@@ -20,12 +22,14 @@ export default function FullEventCardContainer({
             event={event}
             viewableTeachers={viewableTeachers}
             anchorEl={anchorEl}
+            isSelectedEvent={isSelectedEvent}
         />
     ) : (
         <FullEventCardModal
             event={event}
             viewableTeachers={viewableTeachers}
             anchorEl={anchorEl}
+            isSelectedEvent={isSelectedEvent}
         />
     )
 }

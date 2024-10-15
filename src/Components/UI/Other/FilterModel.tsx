@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Button, Modal, Tag } from "antd"
 import { eventTypes, districtOptions } from "../../../util/options"
-import { useParamsHandler } from "../../../hooks/useParamsHandler"
+import { useParamsFilterHandler } from "../../../hooks/useParamsFilterHandler"
 import { Icon } from "./Icon"
 
 export default function FilterModel() {
@@ -12,7 +12,7 @@ export default function FilterModel() {
         selectOption: onEventTypeOptionsChange,
         removeOption: onEventTypeOptionsRemove,
         clearSearchParams,
-    } = useParamsHandler({
+    } = useParamsFilterHandler({
         title: "eventType",
         options: eventTypes.filter((eventType) => eventType.value !== "warmup"),
     })
@@ -21,7 +21,7 @@ export default function FilterModel() {
         currentValues: currentDistrictValues,
         selectOption: onDistrictOptionsChange,
         removeOption: onDistrictOptionsRemove,
-    } = useParamsHandler({ title: "district", options: districtOptions })
+    } = useParamsFilterHandler({ title: "district", options: districtOptions })
 
     const isEmptyFilter =
         !currentEventTypeValues.length && !currentDistrictValues.length

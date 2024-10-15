@@ -1,11 +1,10 @@
 import { EventPreview } from "./EventPreview"
-import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import { CIEvent, UserBio } from "../../../util/interfaces"
-import Loading from "../Other/Loading"
 import { Empty } from "antd"
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
+import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 
 interface IEventsListProps {
     events: CIEvent[]
@@ -21,29 +20,12 @@ export default function EventsList({
     const { eventId } = useParams<{ eventId: string }>()
     const eventRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
-    useEffect(() => {
-        if (eventId) {
-            if (eventRefs.current[eventId]) {
-                eventRefs.current[eventId]?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "end",
-                })
-            }
-        }
-    }, [eventId])
-
-    let filteredEvents = useEventsFilter({ events })
-
-    const visibleEvents = events.filter((event) => !event.hide)
-
-    filteredEvents = useEventsFilter({ events: visibleEvents })
-
-    if (!filteredEvents) return <Loading />
+    useScrollToEventById(eventId || "", eventRefs)
 
     return (
         <div className="events-list-container">
             {!isEvents && emptyEventsList()}
-            {filteredEvents.map((event) => (
+            {events.map((event) => (
                 <div
                     key={event.id}
                     ref={(el) => (eventRefs.current[event.id] = el)}

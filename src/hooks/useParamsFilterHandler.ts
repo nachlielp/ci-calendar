@@ -15,7 +15,7 @@ interface IUseParamsHandler {
     removeOption: (type: string, value: string) => void
 }
 
-export const useParamsHandler = ({
+export const useParamsFilterHandler = ({
     title,
     options,
 }: IUseParamsHandlerProps): IUseParamsHandler => {
@@ -51,7 +51,6 @@ export const useParamsHandler = ({
     }
 
     const removeOption = (type: string, value: string) => {
-        console.log("removeOption", type, value)
         const newSearchParams = new URLSearchParams(searchParams)
         const values = newSearchParams.getAll(type).filter((v) => v !== value)
         newSearchParams.delete(type)

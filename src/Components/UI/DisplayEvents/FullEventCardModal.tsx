@@ -26,29 +26,6 @@ export default function FullEventCardModal({
         setIsModalOpen(false)
     }
 
-    // const openGoogleMaps = (placeId: string, address: string) => {
-    //     const iosUrl = `comgooglemaps://?q=${encodeURIComponent(address)}`;
-    //     const androidUrl = `geo:0,0?q=${encodeURIComponent(address)}`;
-    //     const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`;
-
-    //     if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
-    //         setTimeout(() => {
-    //             window.location.href = fallbackUrl;
-    //         }, 25);
-    //         window.open(iosUrl, '_blank');
-    //     } else if (/Android/.test(navigator.userAgent)) {
-    //         setTimeout(() => {
-    //             window.location.href = fallbackUrl;
-    //         }, 25);
-    //         window.open(androidUrl, '_blank');
-    //     } else {
-    //         window.open(fallbackUrl, '_blank');
-    //     }
-    // };
-
-    // const subEventLen = Object.values(event.subEvents).length;
-    // const teachersIds = getEventTeachersIds(event);
-
     return (
         <>
             <div

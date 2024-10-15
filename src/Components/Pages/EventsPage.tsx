@@ -5,20 +5,20 @@ import { getLabelByValue } from "../../util/helpers"
 import { CIEvent, UserBio } from "../../util/interfaces"
 import CalendarView from "../UI/Other/CalendarView"
 import EventsList from "../UI/DisplayEvents/EventsList"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useEventsFilter } from "../../hooks/useEventsFilter"
 import FilterModel from "../UI/Other/FilterModel"
 import { Tag } from "antd"
-import { useParamsHandler } from "../../hooks/useParamsHandler"
+import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
 import { districtOptions, eventTypes } from "../../util/options"
 import FilterDrawer from "../UI/Other/FilterDrawer"
 import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
 import { useDefaultFilter } from "../../hooks/useDefaultFilter"
-import FullEventCardDrawer from "../UI/DisplayEvents/FullEventCardDrawer"
-import FullEventCardModal from "../UI/DisplayEvents/FullEventCardModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import { useSetSelectedEvent } from "../../hooks/useSetSelectedEvent"
+import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByParams"
+import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
+import FullEventCardContainer from "../UI/DisplayEvents/FullEventCardContainer"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -29,44 +29,30 @@ export default function EventsPage({
     events,
     viewableTeachers,
 }: IEventsPageProps) {
-    const { selectedEvent } = useSetSelectedEvent(events)
+    const { selectedEvent } = useSetSelectedEventByParams(events)
     const isMobile = useIsMobile()
-    console.log("isMobile", isMobile)
     useDefaultFilter()
 
     const [isListView, setIsListView] = useState<boolean>(true)
+    const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs())
 
     const {
         currentValues: currentEventFilters,
         removeOption: onRemoveEventFilter,
-    } = useParamsHandler({ title: "eventType", options: eventTypes })
+    } = useParamsFilterHandler({ title: "eventType", options: eventTypes })
 
     const {
         currentValues: currentDistrictValues,
         removeOption: onRemoveDistrictFilter,
-    } = useParamsHandler({ title: "district", options: districtOptions })
+    } = useParamsFilterHandler({ title: "district", options: districtOptions })
 
-    const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs())
-    const [todaysEvents, setTodaysEvents] = useState<CIEvent[]>([])
+    const filteredEvents = useEventsFilter({ events })
+
+    const selectedDayEvents = useSelectedDayEvents(filteredEvents, selectedDay)
 
     const onSelectDate = (value: Dayjs) => {
         setSelectedDay(value)
     }
-
-    const visibleEvents = events.filter((event) => !event.hide)
-    const filteredEvents = useEventsFilter({ events: visibleEvents })
-
-    useEffect(() => {
-        const todaysEvents = filteredEvents.filter((event) =>
-            dayjs(selectedDay).isBetween(
-                dayjs(event.start_date),
-                dayjs(event.end_date),
-                "day",
-                "[]"
-            )
-        )
-        setTodaysEvents(todaysEvents)
-    }, [selectedDay])
 
     function onSelectKey(key: string) {
         if (key === "list") {
@@ -130,35 +116,27 @@ export default function EventsPage({
                 </article>
             </header>
             <section className="events-display-list">
-                {!isListView ? (
+                {isListView ? (
+                    <EventsList
+                        events={filteredEvents}
+                        isEvents={!!filteredEvents.length}
+                        viewableTeachers={viewableTeachers}
+                    />
+                ) : (
                     <>
                         <CalendarView
                             events={filteredEvents}
                             onSelect={onSelectDate}
                         />
                         <EventsList
-                            events={todaysEvents}
-                            isEvents={!!events.length}
+                            events={selectedDayEvents}
+                            isEvents={!!selectedDayEvents.length}
                             viewableTeachers={viewableTeachers}
                         />
                     </>
-                ) : (
-                    <EventsList
-                        events={events}
-                        isEvents={!!events.length}
-                        viewableTeachers={viewableTeachers}
-                    />
                 )}
-                {isMobile && selectedEvent && (
-                    <FullEventCardDrawer
-                        isSelectedEvent={true}
-                        event={selectedEvent}
-                        viewableTeachers={viewableTeachers}
-                        anchorEl={<></>}
-                    />
-                )}
-                {!isMobile && selectedEvent && (
-                    <FullEventCardModal
+                {selectedEvent && (
+                    <FullEventCardContainer
                         isSelectedEvent={true}
                         event={selectedEvent}
                         viewableTeachers={viewableTeachers}

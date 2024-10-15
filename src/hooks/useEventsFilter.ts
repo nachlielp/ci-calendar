@@ -23,44 +23,7 @@ IUseEventsFilterProps) => {
         const eventTypes = searchParams.getAll("eventType")
         const districts = searchParams.getAll("district")
 
-        // const weekendTypes = searchParams
-        //     .getAll("t")
-        //     .map(
-        //         (type) =>
-        //             WeekendEventType[type as keyof typeof WeekendEventType]
-        //     )
-        // const weekendDistricts = searchParams
-        //     .getAll("d")
-        //     .map(
-        //         (district) =>
-        //             WeekendDistrict[district as keyof typeof WeekendDistrict]
-        //     )
-
         let filtered = events
-
-        // if (isWeekendPage) {
-        //     const weekendStart = dayjs().startOf("day")
-        //     const weekendEnd = dayjs().add(1, "week").endOf("week").endOf("day")
-        //     filtered = filtered.filter(
-        //         (event) =>
-        //             dayjs(event.start_date) >= weekendStart &&
-        //             dayjs(event.start_date) <= weekendEnd &&
-        //             (!weekendTypes.length ||
-        //                 hasOverlap(
-        //                     weekendTypes,
-        //                     event.segments.map((segment) => segment.type)
-        //                 )) &&
-        //             (!weekendDistricts.length ||
-        //                 hasOverlap(weekendDistricts, [event.district]))
-        //     )
-        //     return filtered
-        // }
-
-        // if (uids && uids.length > 0) {
-        //     filtered = filtered.filter((event) =>
-        //         uids.includes(event.creator_id)
-        //     )
-        // }
 
         if (showFuture !== undefined) {
             const now = dayjs()
