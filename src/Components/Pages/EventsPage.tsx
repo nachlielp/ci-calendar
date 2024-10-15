@@ -31,6 +31,7 @@ export default function EventsPage({
 }: IEventsPageProps) {
     const { selectedEvent } = useSetSelectedEvent(events)
     const isMobile = useIsMobile()
+    console.log("isMobile", isMobile)
     useDefaultFilter()
 
     const [isListView, setIsListView] = useState<boolean>(true)
@@ -97,7 +98,7 @@ export default function EventsPage({
                         ]}
                         defaultKey="list"
                     />
-                    {isMobile ? <FilterModel /> : <FilterDrawer />}
+                    {isMobile ? <FilterDrawer /> : <FilterModel />}
                 </main>
                 <article className="selected-filters">
                     {currentEventFilters?.map((eventType: any) => (
