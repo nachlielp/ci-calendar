@@ -51,10 +51,10 @@ export default function EventsList({
 const emptyEventsList = () => {
     return (
         <Empty
-            imageStyle={{ height: 60, marginTop: "10rem" }}
+            imageStyle={{ height: 120, marginTop: "78px" }}
             description={<span></span>}
         >
-            <span style={{ fontSize: "1.5rem" }}>אופס, נראה שיש לנו בעיה</span>
+            <span style={{ fontSize: "1.5rem" }}></span>
         </Empty>
     )
 }
