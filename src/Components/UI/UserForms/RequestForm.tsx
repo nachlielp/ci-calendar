@@ -39,7 +39,7 @@ export default function RequestForm() {
             message: values.description || "",
             phone: values.phone || user.phone || "",
             email: user.email || "",
-            full_name: user.full_name || "",
+            name: user.full_name || "",
         }
         console.log("requestPayload: ", requestPayload)
         try {
@@ -48,7 +48,9 @@ export default function RequestForm() {
             )
             if (error) {
                 setIsSubmitted(RequestResponse.error)
-                throw new Error(`RequestForm.onFinish.error: ${error}`)
+                throw new Error(
+                    `RequestForm.onFinish.error: ${JSON.stringify(error)}`
+                )
             }
             if (data) {
                 setIsSubmitted(RequestResponse.success)
