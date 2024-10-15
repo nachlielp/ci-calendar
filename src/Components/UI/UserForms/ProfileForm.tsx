@@ -1,10 +1,10 @@
 import { Button, Form, type FormProps, Input, Card, Image, Switch } from "antd"
 import { useEffect, useState } from "react"
 import CloudinaryUpload from "../Other/CloudinaryUpload"
-import { useWindowSize } from "../../../hooks/useWindowSize"
 import { useUser } from "../../../context/UserContext"
 import { usersService } from "../../../supabase/usersService"
 import { DbUser } from "../../../util/interfaces"
+import { useIsMobile } from "../../../hooks/useIsMobile"
 
 type FieldType = {
     full_name: string
@@ -22,7 +22,7 @@ interface ProfileFormProps {
 
 //TODO add cropper (react-easy-crop)
 export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
-    const { width } = useWindowSize()
+    const isMobile = useIsMobile()
     const { user, setUser } = useUser()
     if (!user) throw new Error("TeacherForm.user")
 
@@ -81,7 +81,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
             {user && (
                 <Card
                     className={`teacher-form ${
-                        width > 600 ? "desktop" : "mobile"
+                        isMobile ? "mobile" : "desktop"
                     }`}
                 >
                     <Form

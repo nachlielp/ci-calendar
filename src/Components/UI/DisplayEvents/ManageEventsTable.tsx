@@ -3,21 +3,21 @@ import { Table, Select, Breakpoint } from "antd"
 import DeleteMultipleEventsButton from "../Other/DeleteMultipleEventsButton"
 import HideMultipleEventsButton from "../Other/HideMultipleEvents"
 import UnHideMultipleEventsButton from "../Other/UnHideMultipleEventsButton"
-import { useWindowSize } from "../../../hooks/useWindowSize"
 import { CIEvent, UserType } from "../../../util/interfaces"
 import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import dayjs from "dayjs"
 import { Icon } from "../Other/Icon"
-import { ScreenSize, SelectOption } from "../../../util/options"
+import { SelectOption } from "../../../util/options"
 import FullEventCard from "./FullEventCard"
 import { useUser } from "../../../context/UserContext"
 import { useEvents } from "../../../hooks/useEvents"
 import MenuButtons from "../Other/MenuButtons"
 import ManageEventActions from "./ManageEventActions"
+import { useIsMobile } from "../../../hooks/useIsMobile"
 const { Option } = Select
 
 export default function ManageEventsTable() {
-    const { width } = useWindowSize()
+    const isPhone = useIsMobile()
     const { user } = useUser()
     const { events } = useEvents()
 
@@ -55,8 +55,6 @@ export default function ManageEventsTable() {
     }, [filteredEvents, selectedTeacher?.value])
 
     const uniqueTeachers = getUniqueTeachers(filteredEvents)
-
-    const isPhone = width < ScreenSize.mobile
 
     function onSelectChange(newSelectedRowKeys: React.Key[]) {
         if (showFuture) {

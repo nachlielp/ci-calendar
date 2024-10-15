@@ -2,16 +2,14 @@ import React, { useEffect, useState } from "react"
 import { Badge, Drawer } from "antd"
 import { Icon } from "../Other/Icon"
 import { useNavigate } from "react-router-dom"
-import { useWindowSize } from "../../../hooks/useWindowSize"
 import { supabase } from "../../../supabase/client"
 import { useUser } from "../../../context/UserContext"
 import { UserType } from "../../../util/interfaces"
-import { ScreenSize } from "../../../util/options"
+import { useIsMobile } from "../../../hooks/useIsMobile"
 
 export function MenuDrawer() {
     const [open, setOpen] = React.useState<boolean>(false)
     const { user, requests } = useUser()
-    const { width } = useWindowSize()
     const [isNewResponse, setIsNewResponse] = useState<boolean>(false)
 
     useEffect(() => {
@@ -25,7 +23,7 @@ export function MenuDrawer() {
         }
     }, [requests])
 
-    const isMobile = width < ScreenSize.mobile
+    const isMobile = useIsMobile()
     const isAdmin = user?.user_type === UserType.admin
     const isCreator =
         user?.user_type === UserType.admin ||

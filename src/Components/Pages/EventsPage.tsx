@@ -12,11 +12,13 @@ import { Tag } from "antd"
 import { useParamsHandler } from "../../hooks/useParamsHandler"
 import { districtOptions, eventTypes } from "../../util/options"
 import FilterDrawer from "../UI/Other/FilterDrawer"
-import { useWindowSize } from "../../hooks/useWindowSize"
 import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
-import { useNavigate } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
+import { useDefaultFilter } from "../../hooks/useDefaultFilter"
+import FullEventCardDrawer from "../UI/DisplayEvents/FullEventCardDrawer"
+import FullEventCardModal from "../UI/DisplayEvents/FullEventCardModal"
+import { useIsMobile } from "../../hooks/useIsMobile"
+import { useSetSelectedEvent } from "../../hooks/useSetSelectedEvent"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -27,11 +29,11 @@ export default function EventsPage({
     events,
     viewableTeachers,
 }: IEventsPageProps) {
-    const navigate = useNavigate()
-    const { user } = useUser()
-    const [isListView, setIsListView] = useState<boolean>(true)
+    const { selectedEvent } = useSetSelectedEvent(events)
+    const isMobile = useIsMobile()
+    useDefaultFilter()
 
-    const { width } = useWindowSize()
+    const [isListView, setIsListView] = useState<boolean>(true)
 
     const {
         currentValues: currentEventFilters,
@@ -45,19 +47,6 @@ export default function EventsPage({
 
     const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs())
     const [todaysEvents, setTodaysEvents] = useState<CIEvent[]>([])
-
-    useEffect(() => {
-        if (user) {
-            const eventTypes = user.default_filter?.eventTypes || []
-            const districts = user.default_filter?.districts || []
-            const filterURL =
-                eventTypes
-                    .map((eventType) => `eventType=${eventType}`)
-                    .join("&") +
-                districts.map((district) => `&district=${district}`).join("")
-            navigate(`/?${filterURL}`)
-        }
-    }, [user])
 
     const onSelectDate = (value: Dayjs) => {
         setSelectedDay(value)
@@ -108,7 +97,7 @@ export default function EventsPage({
                         ]}
                         defaultKey="list"
                     />
-                    {width > 768 ? <FilterModel /> : <FilterDrawer />}
+                    {isMobile ? <FilterModel /> : <FilterDrawer />}
                 </main>
                 <article className="selected-filters">
                     {currentEventFilters?.map((eventType: any) => (
@@ -157,6 +146,22 @@ export default function EventsPage({
                         events={events}
                         isEvents={!!events.length}
                         viewableTeachers={viewableTeachers}
+                    />
+                )}
+                {isMobile && selectedEvent && (
+                    <FullEventCardDrawer
+                        isSelectedEvent={true}
+                        event={selectedEvent}
+                        viewableTeachers={viewableTeachers}
+                        anchorEl={<></>}
+                    />
+                )}
+                {!isMobile && selectedEvent && (
+                    <FullEventCardModal
+                        isSelectedEvent={true}
+                        event={selectedEvent}
+                        viewableTeachers={viewableTeachers}
+                        anchorEl={<></>}
                     />
                 )}
             </section>

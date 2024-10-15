@@ -1,6 +1,5 @@
-import { useWindowSize } from "../../../hooks/useWindowSize"
+import { useIsMobile } from "../../../hooks/useIsMobile"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
-import { ScreenSize } from "../../../util/options"
 import { FormDrawer } from "./FormDrawer"
 import FormModal from "./FormModal"
 
@@ -17,8 +16,7 @@ export default function FormContainer({
     event?: CIEvent
     template?: CITemplate
 }) {
-    const { width } = useWindowSize()
-    const isMobile = width < ScreenSize.mobile
+    const isMobile = useIsMobile()
     return isMobile ? (
         <FormDrawer
             anchorEl={anchorEl}

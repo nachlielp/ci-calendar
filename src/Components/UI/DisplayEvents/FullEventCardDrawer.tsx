@@ -3,29 +3,25 @@ import FullEventCard from "./FullEventCard"
 
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 interface EventDrawerProps {
     event: CIEvent | null
     viewableTeachers: UserBio[]
     anchorEl: any | null
-    isSelectedCard: boolean
+    isSelectedEvent?: boolean
 }
 
 export default function FullEventCardDrawer({
     event,
     viewableTeachers,
     anchorEl,
-    isSelectedCard,
+    isSelectedEvent = false,
 }: EventDrawerProps) {
     if (!event) {
         return null
     }
-    const [isModalOpen, setIsModalOpen] = useState(false)
-
-    useEffect(() => {
-        setIsModalOpen(isSelectedCard)
-    }, [isSelectedCard])
+    const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
 
     return (
         <>

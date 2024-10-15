@@ -3,7 +3,7 @@ import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import Loading from "../Other/Loading"
 import { Empty } from "antd"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
 
@@ -20,11 +20,9 @@ export default function EventsList({
 }: IEventsListProps) {
     const { eventId } = useParams<{ eventId: string }>()
     const eventRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
-    const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
 
     useEffect(() => {
         if (eventId) {
-            setSelectedEventId(eventId)
             if (eventRefs.current[eventId]) {
                 eventRefs.current[eventId]?.scrollIntoView({
                     behavior: "smooth",
@@ -60,7 +58,6 @@ export default function EventsList({
                                 viewableTeachers={viewableTeachers}
                             />
                         }
-                        selectedEventId={selectedEventId}
                     />
                 </div>
             ))}

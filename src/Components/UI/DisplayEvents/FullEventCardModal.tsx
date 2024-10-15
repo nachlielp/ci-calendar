@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Modal } from "antd"
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
@@ -7,20 +7,16 @@ interface EventCardProps {
     event: CIEvent
     viewableTeachers: UserBio[]
     anchorEl: any | null
-    isSelectedCard: boolean
+    isSelectedEvent?: boolean
 }
 
 export default function FullEventCardModal({
     event,
     anchorEl,
     viewableTeachers,
-    isSelectedCard,
+    isSelectedEvent = false,
 }: EventCardProps) {
-    const [isModalOpen, setIsModalOpen] = useState(isSelectedCard)
-
-    useEffect(() => {
-        setIsModalOpen(isSelectedCard)
-    }, [isSelectedCard])
+    const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
 
     const showModal = () => {
         setIsModalOpen(true)
