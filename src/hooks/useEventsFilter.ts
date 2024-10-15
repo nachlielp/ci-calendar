@@ -1,70 +1,76 @@
 import { useSearchParams } from "react-router-dom"
 import { CIEvent } from "../util/interfaces"
-// import { CIEvent, WeekendDistrict, WeekendEventType } from "../util/interfaces"
 import dayjs from "dayjs"
 import { useMemo } from "react"
+import { districtOptions } from "../util/options"
+import { eventOptions } from "../util/options"
 
 interface IUseEventsFilterProps {
     events: CIEvent[]
-    showFuture?: boolean
+    showPast?: boolean
     uids?: string[]
-    isWeekendPage?: boolean
 }
 
 export const useEventsFilter = ({
     events,
-    showFuture,
+    showPast,
     uids,
-}: // isWeekendPage,
-IUseEventsFilterProps) => {
+}: IUseEventsFilterProps) => {
     const [searchParams] = useSearchParams()
 
     const filteredEvents = useMemo(() => {
-        const eventTypes = searchParams.getAll("eventType")
-        const districts = searchParams.getAll("district")
+        const filters = searchParams.getAll("f")
+
+        const eventTypes = eventOptions
+            .filter((option) => filters.includes(option.value))
+            .map((option) => option.value)
+        const districts = districtOptions
+            .filter((option) => filters.includes(option.value))
+            .map((option) => option.value)
 
         let filtered = events
 
-        if (showFuture !== undefined) {
-            const now = dayjs()
-            const startOfToday = dayjs().startOf("day")
-            if (showFuture) {
-                filtered = filtered.filter(
-                    (event) => dayjs(event.end_date) >= startOfToday
-                )
-            } else {
-                filtered = filtered.filter(
-                    (event) => dayjs(event.start_date) < now
-                )
-            }
-        }
+        const now = dayjs()
 
         filtered = filtered.filter((event) => {
-            const eventTypeList =
-                event.start_date === event.end_date
-                    ? event.segments.map((segment) => segment.type)
-                    : [event.type]
-            if (event.type !== "") {
-                eventTypeList.push(event.type)
-            }
-            if (eventTypes.length === 0 && districts.length === 0) {
-                return true
-            }
-            if (eventTypes.length === 0) {
-                return hasOverlap(districts, [event.district])
-            }
-            if (districts.length === 0) {
-                return hasOverlap(eventTypes, eventTypeList)
+            const eventTypeList = event.is_multi_day
+                ? [event.type]
+                : event.segments.map((segment) => segment.type)
+
+            const eventDistrict = event.district
+
+            if (
+                districts.length > 0 &&
+                !districts.some((district) => district === eventDistrict)
+            ) {
+                return false
             }
 
-            return (
-                hasOverlap(districts, [event.district]) &&
-                hasOverlap(eventTypes, eventTypeList)
-            )
+            if (
+                eventTypes.length > 0 &&
+                !hasOverlap(eventTypes, eventTypeList)
+            ) {
+                return false
+            }
+
+            if (uids && !uids.includes(event.creator_id)) {
+                return false
+            }
+
+            if (showPast === true) {
+                return dayjs(event.end_date).endOf("day") <= now
+            } else {
+                return dayjs(event.end_date) > now
+            }
         })
 
+        if (showPast) {
+            filtered = filtered.sort((a, b) =>
+                dayjs(b.start_date).diff(dayjs(a.start_date))
+            )
+        }
         return filtered
-    }, [events, showFuture, searchParams, uids])
+    }, [events, showPast, searchParams, uids])
 
     return filteredEvents
 }

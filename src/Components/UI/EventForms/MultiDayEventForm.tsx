@@ -6,7 +6,7 @@ import "../../../styles/overrides.css"
 import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import { eventTypes, SelectOption, tagOptions } from "../../../util/options"
+import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
 import { IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useEffect, useState } from "react"
@@ -138,7 +138,7 @@ export default function MultiDayEventForm({
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss"),
                     type:
-                        eventTypes.find(
+                        eventOptions.find(
                             (type) => type.label === values["main-event-type"]
                         )?.value || "",
                     address: address,

@@ -1,5 +1,5 @@
 import { Form, Select, Card, Row, Col, TimePicker } from "antd"
-import { eventTypes, tagOptions } from "../../../util/options"
+import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../Other/Icon"
 
 interface EventSegmentsFormProps {
@@ -30,7 +30,7 @@ export default function EventSegmentsForm({
                                         ]}
                                     >
                                         <Select
-                                            options={eventTypes}
+                                            options={eventOptions}
                                             placeholder="סוג האירוע"
                                         />
                                     </Form.Item>

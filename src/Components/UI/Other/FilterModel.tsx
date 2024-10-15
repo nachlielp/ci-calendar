@@ -1,36 +1,21 @@
 import { useState } from "react"
 import { Button, Modal, Tag } from "antd"
-import { eventTypes, districtOptions } from "../../../util/options"
+import { eventOptions, districtOptions } from "../../../util/options"
 import { useParamsFilterHandler } from "../../../hooks/useParamsFilterHandler"
 import { Icon } from "./Icon"
 
 export default function FilterModel() {
     const [modalOpen, setModalOpen] = useState(false)
 
-    const {
-        currentValues: currentEventTypeValues,
-        selectOption: onEventTypeOptionsChange,
-        removeOption: onEventTypeOptionsRemove,
-        clearSearchParams,
-    } = useParamsFilterHandler({
-        title: "eventType",
-        options: eventTypes.filter((eventType) => eventType.value !== "warmup"),
-    })
+    const { currentValues, selectOption, removeOption } =
+        useParamsFilterHandler()
 
-    const {
-        currentValues: currentDistrictValues,
-        selectOption: onDistrictOptionsChange,
-        removeOption: onDistrictOptionsRemove,
-    } = useParamsFilterHandler({ title: "district", options: districtOptions })
-
-    const isEmptyFilter =
-        !currentEventTypeValues.length && !currentDistrictValues.length
+    const isEmptyFilter = !currentValues.length
 
     const clearAllSearchParams = () => {
-        clearSearchParams(["eventType", "district"])
+        clearAllSearchParams()
     }
-    const isSelectedFilter =
-        currentEventTypeValues.length || currentDistrictValues.length
+    const isSelectedFilter = currentValues.length
 
     return (
         <div className="filter-model-container">
@@ -47,7 +32,6 @@ export default function FilterModel() {
                 open={modalOpen}
                 onOk={() => setModalOpen(false)}
                 onCancel={() => setModalOpen(false)}
-                // title={<h2 className="filter-modal-title">סינון</h2>}
                 footer={
                     <Button
                         onClick={clearAllSearchParams}
@@ -60,20 +44,17 @@ export default function FilterModel() {
                 <article className="filter-tags-container">
                     <h3 className="sub-title">סוג אירוע</h3>
                     <div className="filter-model-tags">
-                        {eventTypes
+                        {eventOptions
                             .filter((eventType) => eventType.value !== "warmup")
                             .map((eventType) => {
-                                return currentEventTypeValues.includes(
+                                return currentValues.includes(
                                     eventType.value
                                 ) ? (
                                     <Tag
                                         className="selected tag"
                                         key={eventType.value}
                                         onClick={() =>
-                                            onEventTypeOptionsRemove(
-                                                "eventType",
-                                                eventType.value
-                                            )
+                                            removeOption(eventType.value)
                                         }
                                     >
                                         {eventType.label}
@@ -83,10 +64,7 @@ export default function FilterModel() {
                                         className="un-selected tag"
                                         key={eventType.value}
                                         onClick={() =>
-                                            onEventTypeOptionsChange(
-                                                "eventType",
-                                                eventType.value
-                                            )
+                                            selectOption(eventType.value)
                                         }
                                     >
                                         {eventType.label}
@@ -97,18 +75,11 @@ export default function FilterModel() {
                     <h3 className="sub-title">אזור</h3>
                     <div className="filter-model-tags">
                         {districtOptions.map((district) => {
-                            return currentDistrictValues.includes(
-                                district.value
-                            ) ? (
+                            return currentValues.includes(district.value) ? (
                                 <Tag
                                     className="selected tag"
                                     key={district.value}
-                                    onClick={() =>
-                                        onDistrictOptionsRemove(
-                                            "district",
-                                            district.value
-                                        )
-                                    }
+                                    onClick={() => removeOption(district.value)}
                                 >
                                     {district.label}
                                 </Tag>
@@ -116,12 +87,7 @@ export default function FilterModel() {
                                 <Tag
                                     className="un-selected tag"
                                     key={district.value}
-                                    onClick={() =>
-                                        onDistrictOptionsChange(
-                                            "district",
-                                            district.value
-                                        )
-                                    }
+                                    onClick={() => selectOption(district.value)}
                                 >
                                     {district.label}
                                 </Tag>

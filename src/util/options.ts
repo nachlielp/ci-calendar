@@ -2,7 +2,7 @@ export interface SelectOption {
     value: string
     label: string
 }
-export const eventTypes: SelectOption[] = [
+export const eventOptions: SelectOption[] = [
     { value: "class", label: "שיעור" },
     { value: "jame", label: "ג'אם" },
     { value: "underscore", label: "אנדרסקור" },

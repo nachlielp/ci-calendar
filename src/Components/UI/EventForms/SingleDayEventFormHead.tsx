@@ -13,7 +13,11 @@ import GooglePlacesInput, {
     IGooglePlaceOption,
 } from "../Other/GooglePlacesInput"
 import dayjs from "dayjs"
-import { districtOptions, eventTypes, tagOptions } from "../../../util/options"
+import {
+    districtOptions,
+    eventOptions,
+    tagOptions,
+} from "../../../util/options"
 
 import { IAddress } from "../../../util/interfaces"
 
@@ -102,7 +106,7 @@ export default function SingleDayEventFormHead({
                             rules={[{ required: true, message: "שדה חובה" }]}
                         >
                             <Select
-                                options={eventTypes}
+                                options={eventOptions}
                                 placeholder="סוג האירוע"
                             />
                         </Form.Item>

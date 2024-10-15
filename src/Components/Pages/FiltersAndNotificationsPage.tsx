@@ -1,6 +1,6 @@
 import { Card } from "antd"
 
-import { districtOptions, eventTypes } from "../../util/options"
+import { districtOptions, eventOptions } from "../../util/options"
 import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"
 import { usersService } from "../../supabase/usersService"
@@ -66,7 +66,7 @@ export default function FiltersAndNotificationsPage() {
                     className="select-filter"
                 />
                 <DoubleBindedSelect
-                    options={eventTypes.filter(
+                    options={eventOptions.filter(
                         (event) => event.value !== "warmup"
                     )}
                     selectedValues={ciEventTypes}

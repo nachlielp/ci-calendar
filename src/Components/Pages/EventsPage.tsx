@@ -1,7 +1,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
-import { getLabelByValue } from "../../util/helpers"
 import { CIEvent, UserBio } from "../../util/interfaces"
 import CalendarView from "../UI/Other/CalendarView"
 import EventsList from "../UI/DisplayEvents/EventsList"
@@ -10,7 +9,6 @@ import { useEventsFilter } from "../../hooks/useEventsFilter"
 import FilterModel from "../UI/Other/FilterModel"
 import { Tag } from "antd"
 import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
-import { districtOptions, eventTypes } from "../../util/options"
 import FilterDrawer from "../UI/Other/FilterDrawer"
 import MenuButtons from "../UI/Other/MenuButtons"
 import { Icon } from "../UI/Other/Icon"
@@ -19,6 +17,7 @@ import { useIsMobile } from "../../hooks/useIsMobile"
 import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByParams"
 import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
 import FullEventCardContainer from "../UI/DisplayEvents/FullEventCardContainer"
+import { utilService } from "../../util/utilService"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -36,15 +35,8 @@ export default function EventsPage({
     const [isListView, setIsListView] = useState<boolean>(true)
     const [selectedDay, setSelectedDay] = useState<Dayjs>(dayjs())
 
-    const {
-        currentValues: currentEventFilters,
-        removeOption: onRemoveEventFilter,
-    } = useParamsFilterHandler({ title: "eventType", options: eventTypes })
-
-    const {
-        currentValues: currentDistrictValues,
-        removeOption: onRemoveDistrictFilter,
-    } = useParamsFilterHandler({ title: "district", options: districtOptions })
+    const { currentValues: currentFilterValues, removeOption: onRemoveFilter } =
+        useParamsFilterHandler()
 
     const filteredEvents = useEventsFilter({ events })
 
@@ -87,29 +79,14 @@ export default function EventsPage({
                     {isMobile ? <FilterDrawer /> : <FilterModel />}
                 </main>
                 <article className="selected-filters">
-                    {currentEventFilters?.map((eventType: any) => (
+                    {currentFilterValues?.map((eventType: any) => (
                         <Tag
                             className="filter-tag"
                             color="#913e2f"
                             key={eventType}
-                            onClick={() =>
-                                onRemoveEventFilter("eventType", eventType)
-                            }
+                            onClick={() => onRemoveFilter(eventType)}
                         >
-                            {getLabelByValue(eventType, eventTypes)}
-                            <Icon icon="close" />
-                        </Tag>
-                    ))}
-                    {currentDistrictValues?.map((district: any) => (
-                        <Tag
-                            className="filter-tag"
-                            color="#913e2f"
-                            key={district}
-                            onClick={() =>
-                                onRemoveDistrictFilter("district", district)
-                            }
-                        >
-                            {getLabelByValue(district, districtOptions)}
+                            {utilService.getLabelByValue(eventType)}
                             <Icon icon="close" />
                         </Tag>
                     ))}

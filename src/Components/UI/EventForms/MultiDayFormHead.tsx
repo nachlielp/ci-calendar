@@ -1,6 +1,6 @@
 import { Form, Input, Select, DatePicker, Card } from "antd"
 import dayjs, { Dayjs } from "dayjs"
-import { districtOptions, eventTypes } from "../../../util/options"
+import { districtOptions, eventOptions } from "../../../util/options"
 import GooglePlacesInput, {
     IGooglePlaceOption,
 } from "../Other/GooglePlacesInput"
@@ -103,7 +103,7 @@ export default function MultiDayFormHead({
                 name="main-event-type"
                 rules={[{ required: true, message: "שדה חובה" }]}
             >
-                <Select options={eventTypes} placeholder="סוג האירוע" />
+                <Select options={eventOptions} placeholder="סוג האירוע" />
             </Form.Item>
             <Form.Item name="multi-day-event-teachers" className="full-width">
                 <Select

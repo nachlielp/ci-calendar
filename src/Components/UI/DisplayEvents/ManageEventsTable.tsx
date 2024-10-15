@@ -28,8 +28,13 @@ export default function ManageEventsTable() {
                 : [],
         [user]
     )
-    const [showFuture, setShowFuture] = useState(true)
-    const filteredEvents = useEventsFilter({ events, showFuture, uids: uid })
+    const [showPast, setShowPast] = useState(false)
+
+    const filteredEvents = useEventsFilter({
+        events,
+        showPast,
+        uids: uid,
+    })
     const [teachersEvents, setTeachersEvents] = useState<CIEvent[]>([])
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<
         React.Key[]
@@ -57,7 +62,7 @@ export default function ManageEventsTable() {
     const uniqueTeachers = getUniqueTeachers(filteredEvents)
 
     function onSelectChange(newSelectedRowKeys: React.Key[]) {
-        if (showFuture) {
+        if (showPast) {
             setSelectedRowKeysFuture(newSelectedRowKeys)
         } else {
             setSelectedRowKeysPast(newSelectedRowKeys)
@@ -119,31 +124,30 @@ export default function ManageEventsTable() {
     }
 
     function onSelectTimeframe(key: string) {
-        setShowFuture(key === "future")
+        console.log("key", key)
+        setShowPast(key === "past")
     }
 
     const rowSelection = {
-        selectedRowKeys: showFuture
-            ? selectedRowKeysFuture
-            : selectedRowKeysPast,
+        selectedRowKeys: showPast ? selectedRowKeysFuture : selectedRowKeysPast,
         onChange: onSelectChange,
     }
 
-    const visableEventsToHide = showFuture
+    const visableEventsToHide = showPast
         ? filteredEvents.filter(
               (event) => selectedRowKeysFuture.includes(event.id) && !event.hide
           )
         : filteredEvents.filter(
               (event) => selectedRowKeysPast.includes(event.id) && !event.hide
           )
-    const hiddenEventsToShow = showFuture
+    const hiddenEventsToShow = showPast
         ? filteredEvents.filter(
               (event) => selectedRowKeysFuture.includes(event.id) && event.hide
           )
         : filteredEvents.filter(
               (event) => selectedRowKeysPast.includes(event.id) && event.hide
           )
-    const selectedEventsToDelete = showFuture
+    const selectedEventsToDelete = showPast
         ? filteredEvents.filter((event) =>
               selectedRowKeysFuture.includes(event.id)
           )
@@ -219,7 +223,7 @@ export default function ManageEventsTable() {
         return Array.from(teacherMap.values())
     }
 
-    const isActiveActions = showFuture
+    const isActiveActions = showPast
         ? selectedRowKeysFuture.length > 0
         : selectedRowKeysPast.length > 0
 
@@ -281,7 +285,7 @@ export default function ManageEventsTable() {
                             isActiveActions ? "active" : ""
                         }`}
                         disabled={
-                            showFuture
+                            showPast
                                 ? selectedRowKeysFuture.length === 0
                                 : selectedRowKeysPast.length === 0
                         }
@@ -293,7 +297,7 @@ export default function ManageEventsTable() {
                             isActiveActions ? "active" : ""
                         }`}
                         disabled={
-                            showFuture
+                            showPast
                                 ? selectedRowKeysFuture.length === 0
                                 : selectedRowKeysPast.length === 0
                         }
@@ -304,7 +308,7 @@ export default function ManageEventsTable() {
                             isActiveActions ? "active" : ""
                         }`}
                         disabled={
-                            showFuture
+                            showPast
                                 ? selectedRowKeysFuture.length === 0
                                 : selectedRowKeysPast.length === 0
                         }

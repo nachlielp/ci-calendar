@@ -2,7 +2,7 @@ import React from "react"
 import { Card, Tag } from "antd"
 import dayjs from "dayjs"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
-import { tagOptions, eventTypes } from "../../../util/options"
+import { tagOptions, eventOptions } from "../../../util/options"
 import { Icon } from "../Other/Icon"
 import { utilService } from "../../../util/utilService"
 interface EventPreviewProps {
@@ -128,12 +128,13 @@ export const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
     return (
         types
             .filter((type) => !!type)
-            .map((type) => eventTypes.find((et) => et.value === type)?.label) ||
-        []
+            .map(
+                (type) => eventOptions.find((et) => et.value === type)?.label
+            ) || []
     )
 }
 export const getType = (type: EventlyType) => {
-    return eventTypes.find((et) => et.value === type)?.label
+    return eventOptions.find((et) => et.value === type)?.label
 }
 export const getTag = (tag: string) => {
     return tagOptions.find((t) => t.value === tag)?.label

@@ -1,36 +1,24 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import { SelectOption } from "../util/options"
+import { utilService } from "../util/utilService"
 
-interface IUseParamsHandlerProps {
-    title: string
-    options: SelectOption[]
-}
-
-interface IUseParamsHandler {
+interface IUseParamsFilterHandler {
     currentValues: string[]
     onOptionsChange: (type: string) => (values: string[]) => void
     clearSearchParams: (titles: string[]) => void
-    selectOption: (type: string, value: string) => void
-    removeOption: (type: string, value: string) => void
+    selectOption: (value: string) => void
+    removeOption: (value: string) => void
 }
 
-export const useParamsFilterHandler = ({
-    title,
-    options,
-}: IUseParamsHandlerProps): IUseParamsHandler => {
+export const useParamsFilterHandler = (): IUseParamsFilterHandler => {
     const [searchParams, setSearchParams] = useSearchParams()
     const [currentValues, setCurrentValues] = useState<string[]>([])
 
-    const getInitialValues = useCallback(
-        (paramName: string, options: SelectOption[]) => {
-            const params = searchParams.getAll(paramName)
-            return options
-                .filter((option) => params.includes(option.value))
-                .map((option) => option.value)
-        },
-        [searchParams]
-    )
+    const getInitialValues = useCallback(() => {
+        const filters = searchParams.getAll("f")
+        return filters
+    }, [searchParams])
+
     const onOptionsChange = (type: string) => (values: string[]) => {
         const newSearchParams = new URLSearchParams(searchParams)
         newSearchParams.delete(type)
@@ -38,23 +26,24 @@ export const useParamsFilterHandler = ({
         setSearchParams(newSearchParams, { replace: true })
     }
 
-    const selectOption = (type: string, value: string) => {
+    const selectOption = (value: string) => {
+        const type = utilService.getFilterItemType(value)
         const newSearchParams = new URLSearchParams(searchParams)
         const existingValues = newSearchParams.getAll(type)
 
         // Check if the value already exists to avoid duplicates
         if (!existingValues.includes(value)) {
-            newSearchParams.append(type, value)
+            newSearchParams.append("f", value)
         }
 
         setSearchParams(newSearchParams, { replace: true })
     }
 
-    const removeOption = (type: string, value: string) => {
+    const removeOption = (value: string) => {
         const newSearchParams = new URLSearchParams(searchParams)
-        const values = newSearchParams.getAll(type).filter((v) => v !== value)
-        newSearchParams.delete(type)
-        values.forEach((v) => newSearchParams.append(type, v))
+        const values = newSearchParams.getAll("f").filter((v) => v !== value)
+        newSearchParams.delete("f")
+        values.forEach((v) => newSearchParams.append("f", v))
         setSearchParams(newSearchParams, { replace: true })
     }
     // Clearing based on instance search params rewrites other instances' search params
@@ -65,7 +54,7 @@ export const useParamsFilterHandler = ({
         setSearchParams(newSearchParams, { replace: true })
     }
     useEffect(() => {
-        const initialValues = getInitialValues(`${title}`, options)
+        const initialValues = getInitialValues()
         setCurrentValues(initialValues)
     }, [searchParams, getInitialValues])
 

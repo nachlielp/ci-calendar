@@ -2,7 +2,7 @@ import { useEventsFilter } from "../../hooks/useEventsFilter"
 import { CIEvent } from "../../util/interfaces"
 
 export function WeeklyEventsPage({ events }: { events: CIEvent[] }) {
-    let filteredEvents = useEventsFilter({ events, isWeekendPage: true })
+    let filteredEvents = useEventsFilter({ events })
 
     return (
         <div style={{ direction: "rtl" }}>

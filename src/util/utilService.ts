@@ -2,7 +2,12 @@ import dayjs from "dayjs"
 import { v4 as uuidv4 } from "uuid"
 import { CIEvent, CITemplate, DbUser, UserType } from "./interfaces"
 import { User } from "@supabase/supabase-js"
-import { eventTypes, hebrewMonths, SelectOption } from "./options"
+import {
+    districtOptions,
+    eventOptions,
+    hebrewMonths,
+    SelectOption,
+} from "./options"
 export const utilService = {
     createDbUserFromUser,
     deepCompare,
@@ -23,6 +28,8 @@ export const utilService = {
     isIos,
     handleShareEvent,
     copyToClipboard,
+    getFilterItemType,
+    getLabelByValue,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -118,7 +125,7 @@ function multiDayTemplateToFormValues(template: CITemplate) {
             title: price.title,
             sum: price.sum,
         })),
-        "main-event-type": eventTypes.find(
+        "main-event-type": eventOptions.find(
             (type) => type.value === template.type
         )?.label,
     }
@@ -315,4 +322,21 @@ function copyToClipboard(eventId: string, info: () => void) {
     const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
     navigator.clipboard.writeText(shareUrl)
     info()
+}
+
+function getFilterItemType(item: string) {
+    if (eventOptions.some((option) => option.value === item)) {
+        return "eventType"
+    } else if (districtOptions.some((option) => option.value === item)) {
+        return "district"
+    } else {
+        console.error("Invalid item type")
+        return ""
+    }
+}
+
+function getLabelByValue(value: string) {
+    return [...eventOptions, ...districtOptions].find(
+        (option) => option.value === value
+    )?.label
 }

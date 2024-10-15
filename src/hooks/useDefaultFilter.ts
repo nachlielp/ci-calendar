@@ -9,10 +9,8 @@ export const useDefaultFilter = () => {
             const eventTypes = user.default_filter?.eventTypes || []
             const districts = user.default_filter?.districts || []
             const filterURL =
-                eventTypes
-                    .map((eventType) => `eventType=${eventType}`)
-                    .join("&") +
-                districts.map((district) => `&district=${district}`).join("")
+                eventTypes.map((eventType) => `f=${eventType}`).join("&") +
+                districts.map((district) => `&f=${district}`).join("")
             navigate(`/?${filterURL}`)
         }
     }, [user])
