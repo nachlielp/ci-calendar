@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom"
-import { Card, Form, Input } from "antd"
+import Card from "antd/es/card"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { useState } from "react"
 import { v4 as uuidv4 } from "uuid"

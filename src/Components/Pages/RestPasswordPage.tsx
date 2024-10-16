@@ -1,4 +1,7 @@
-import { Alert, Card, Form, Input } from "antd"
+import Alert from "antd/es/alert"
+import Card from "antd/es/card"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
 import { supabase } from "../../supabase/client"
 import { useState } from "react"
 

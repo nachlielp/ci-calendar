@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
-import { Table, Select, Breakpoint } from "antd"
+import Table from "antd/es/table"
+import Select from "antd/es/select"
+import { Breakpoint } from "antd/es/_util/responsiveObserver"
 import DeleteMultipleEventsButton from "../Other/DeleteMultipleEventsButton"
 import HideMultipleEventsButton from "../Other/HideMultipleEvents"
 import UnHideMultipleEventsButton from "../Other/UnHideMultipleEventsButton"

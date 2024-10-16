@@ -1,5 +1,4 @@
-import { Card } from "antd"
-
+import Card from "antd/es/card"
 import { districtOptions, eventOptions } from "../../util/options"
 import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"

@@ -1,5 +1,5 @@
-import { Image } from "antd"
-import { Typography } from "antd"
+import Image from "antd/es/image"
+import Typography from "antd/es/typography"
 import { Icon } from "../Other/Icon"
 import { UserBio } from "../../../util/interfaces"
 const { Text } = Typography

@@ -1,4 +1,8 @@
-import { Card, Row, Col, Form, Input } from "antd"
+import Card from "antd/es/card"
+import Row from "antd/es/row"
+import Col from "antd/es/col"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
 import { Icon } from "../Other/Icon"
 
 export default function AddLinksForm() {

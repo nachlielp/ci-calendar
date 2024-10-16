@@ -1,4 +1,8 @@
-import { Form, Input, Select, DatePicker, Card } from "antd"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
+import Select from "antd/es/select"
+import DatePicker from "antd/es/date-picker"
+import Card from "antd/es/card"
 import dayjs, { Dayjs } from "dayjs"
 import { districtOptions, eventOptions } from "../../../util/options"
 import GooglePlacesInput, {

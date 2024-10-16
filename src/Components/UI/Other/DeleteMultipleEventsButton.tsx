@@ -1,4 +1,4 @@
-import { Modal } from "antd"
+import Modal from "antd/es/modal"
 import { Icon } from "./Icon"
 import { cieventsService } from "../../../supabase/cieventsService"
 

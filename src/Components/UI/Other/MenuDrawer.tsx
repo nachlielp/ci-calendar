@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
-import { Badge, Drawer } from "antd"
+import Badge from "antd/es/badge"
+import Drawer from "antd/es/drawer"
 import { Icon } from "../Other/Icon"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../../supabase/client"

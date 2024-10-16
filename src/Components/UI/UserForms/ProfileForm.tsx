@@ -1,10 +1,15 @@
-import { Button, Form, type FormProps, Input, Card, Image, Switch } from "antd"
 import { useEffect, useState } from "react"
-import CloudinaryUpload from "../Other/CloudinaryUpload"
+import Button from "antd/es/button"
+import Form, { FormProps } from "antd/es/form"
+import Input from "antd/es/input"
+import Card from "antd/es/card"
+import Image from "antd/es/image"
+import Switch from "antd/es/switch"
 import { useUser } from "../../../context/UserContext"
 import { usersService } from "../../../supabase/usersService"
 import { DbUser } from "../../../util/interfaces"
 import { useIsMobile } from "../../../hooks/useIsMobile"
+import CloudinaryUpload from "../Other/CloudinaryUpload"
 
 type FieldType = {
     full_name: string

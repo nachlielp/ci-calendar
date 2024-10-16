@@ -1,5 +1,7 @@
 import { useState } from "react"
-import { Button, Drawer, Tag } from "antd"
+import Button from "antd/es/button"
+import Drawer from "antd/es/drawer"
+import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../../util/options"
 import { useParamsFilterHandler } from "../../../hooks/useParamsFilterHandler"
 import { Icon } from "./Icon"

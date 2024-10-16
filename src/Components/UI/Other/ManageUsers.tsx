@@ -1,9 +1,13 @@
-import { AutoComplete, Button, Card, Input, SelectProps } from "antd"
+import AutoComplete from "antd/es/auto-complete"
+import Button from "antd/es/button"
+import Card from "antd/es/card"
+import Input from "antd/es/input"
 import { useEffect, useState } from "react"
 import { UserType } from "../../../util/interfaces"
 import { useUsers } from "../../../hooks/useUsers"
 import { useWindowSize } from "../../../hooks/useWindowSize"
 import { ManageUserOption, usersService } from "../../../supabase/usersService"
+import { SelectProps } from "antd/es/select"
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users

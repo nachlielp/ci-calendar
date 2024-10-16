@@ -1,5 +1,5 @@
-import { Badge, Table } from "antd"
-import type { TableColumnsType } from "antd"
+import Badge from "antd/es/badge"
+import Table from "antd/es/table"
 
 import dayjs from "dayjs"
 import {
@@ -12,6 +12,7 @@ import {
 import { useState } from "react"
 import { requestsService } from "../../../supabase/requestsService"
 import { useUser } from "../../../context/UserContext"
+import { TableColumnsType } from "antd/lib"
 
 const columns: TableColumnsType<CIRequest> = [
     {

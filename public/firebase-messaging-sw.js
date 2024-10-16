@@ -26,8 +26,9 @@ self.addEventListener("notificationclick", (event) => {
 const cacheName = "ci-events-v1.5"
 
 const filesToCache = [
-    "./assets/img/Background_2.png", // Add the image to the cache
-    // ... other files to cache ...
+    "./assets/img/Background_2.png",
+    "./assets/img/icon-192.png",
+    "./assets/img/icon-512.png",
 ]
 
 self.addEventListener("install", (e) => {

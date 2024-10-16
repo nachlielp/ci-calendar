@@ -1,6 +1,6 @@
 import { EventPreview } from "./EventPreview"
 import { CIEvent, UserBio } from "../../../util/interfaces"
-import { Empty } from "antd"
+import Empty from "antd/es/empty"
 import { useRef } from "react"
 import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"

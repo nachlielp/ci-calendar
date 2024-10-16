@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router-dom"
-import { Col, Form, Input, Row, Select } from "antd"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
+import Row from "antd/es/row"
+import Col from "antd/es/col"
+import Select from "antd/es/select"
+
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"

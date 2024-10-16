@@ -1,4 +1,6 @@
-import { Card, Form, Input } from "antd"
+import Card from "antd/es/card"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import { CIEvent, IAddress, CITemplate } from "../../../util/interfaces"

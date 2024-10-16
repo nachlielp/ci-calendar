@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { Modal } from "antd"
-import { utilService } from "../../../util/utilService"
 
+import { utilService } from "../../../util/utilService"
+import Modal from "antd/es/modal"
 const MESSAGE_TITLE = "התראות מושבתות"
 
 const MESSAGE_BROWSER =

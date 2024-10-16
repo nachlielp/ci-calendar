@@ -1,7 +1,7 @@
 import { useState } from "react"
 import ProfileForm from "../UI/UserForms/ProfileForm"
 import BioSelfPreview from "../UI/DisplayUsers/BioSelfPreview"
-import { Card } from "antd"
+import Card from "antd/es/card"
 
 export default function BioPage() {
     const [editProfile, setEditProfile] = useState(false)

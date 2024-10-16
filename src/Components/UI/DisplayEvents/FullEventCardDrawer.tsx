@@ -1,4 +1,4 @@
-import { Drawer } from "antd"
+import Drawer from "antd/es/drawer"
 import FullEventCard from "./FullEventCard"
 
 import { CIEvent, UserBio } from "../../../util/interfaces"

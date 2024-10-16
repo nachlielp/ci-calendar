@@ -1,4 +1,9 @@
-import { Form, Select, Card, Row, Col, TimePicker } from "antd"
+import Form from "antd/es/form"
+import Select from "antd/es/select"
+import Card from "antd/es/card"
+import Row from "antd/es/row"
+import Col from "antd/es/col"
+import TimePicker from "antd/es/time-picker"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../Other/Icon"
 

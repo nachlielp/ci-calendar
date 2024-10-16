@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Modal } from "antd"
+import Modal from "antd/es/modal"
 import { UserBio } from "../../../util/interfaces"
 import BioCard from "./BioCard"
 

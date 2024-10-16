@@ -1,5 +1,6 @@
 import React from "react"
-import { Card, Tag } from "antd"
+import Card from "antd/es/card"
+import Tag from "antd/es/tag"
 import dayjs from "dayjs"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { tagOptions, eventOptions } from "../../../util/options"

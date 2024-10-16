@@ -1,13 +1,11 @@
-import {
-    Form,
-    Input,
-    Select,
-    DatePicker,
-    Row,
-    Col,
-    Card,
-    TimePicker,
-} from "antd"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
+import Select from "antd/es/select"
+import DatePicker from "antd/es/date-picker"
+import Card from "antd/es/card"
+import Row from "antd/es/row"
+import Col from "antd/es/col"
+import TimePicker from "antd/es/time-picker"
 
 import GooglePlacesInput, {
     IGooglePlaceOption,

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Modal } from "antd"
+import Modal from "antd/es/modal"
 import SingleDayEventForm from "./SingleDayEventForm"
 import MultiDayEventForm from "./MultiDayEventForm"
 import EditSingleDayEventForm from "./EditSingleDayEventForm"

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Modal } from "antd"
+import Modal from "antd/es/modal"
 import { CIEvent, UserBio } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
 

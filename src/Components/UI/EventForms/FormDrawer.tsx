@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Drawer } from "antd"
+import Drawer from "antd/es/drawer"
 import SingleDayEventForm from "./SingleDayEventForm"
 import MultiDayEventForm from "./MultiDayEventForm"
 import EditSingleDayEventForm from "./EditSingleDayEventForm"

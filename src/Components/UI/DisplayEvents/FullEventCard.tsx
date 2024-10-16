@@ -1,4 +1,6 @@
-import { Button, Tag, message } from "antd"
+import Button from "antd/es/button"
+import Tag from "antd/es/tag"
+import message from "antd/es/message"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"

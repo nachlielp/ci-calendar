@@ -1,4 +1,5 @@
-import { List, Skeleton } from "antd"
+import List from "antd/es/list"
+import Skeleton from "antd/es/skeleton"
 import DeleteTemplateButton from "./DeleteTemplateButton"
 import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"

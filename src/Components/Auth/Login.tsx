@@ -1,6 +1,9 @@
 import { useState, useRef } from "react"
-import { Alert, Button, Card, Form, Input, InputRef } from "antd"
-// import { Button, Card } from "antd";
+import Alert from "antd/es/alert"
+import Button from "antd/es/button"
+import Card from "antd/es/card"
+import Form from "antd/es/form"
+import Input, { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router-dom"
 import { LinkButton } from "../UI/Other/LinkButton"
 import { supabase } from "../../supabase/client"

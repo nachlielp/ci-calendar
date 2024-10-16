@@ -1,12 +1,8 @@
-import {
-    TableColumnsType,
-    Table,
-    TablePaginationConfig,
-    TableProps,
-    GetProp,
-    Input,
-    Space,
-} from "antd"
+import type { ColumnsType } from "antd/es/table/interface"
+// import type { ColumnsType } from "antd/es/table/interface"
+import Table, { TablePaginationConfig, TableProps } from "antd/es/table"
+import Input from "antd/es/input"
+import Space from "antd/es/space"
 import {
     CIRequest,
     RequestType,
@@ -22,6 +18,7 @@ import { SorterResult } from "antd/es/table/interface"
 import { Icon } from "../UI/Other/Icon"
 
 import { requestsService } from "../../supabase/requestsService"
+import { GetProp } from "antd/es/_util/type"
 import { usersService } from "../../supabase/usersService"
 
 interface TableParams {
@@ -33,7 +30,7 @@ interface TableParams {
     }
 }
 
-const getColumns = (tableParams: TableParams): TableColumnsType<CIRequest> => [
+const getColumns = (tableParams: TableParams): ColumnsType<CIRequest> => [
     {
         title: "בקשה",
         dataIndex: "type",

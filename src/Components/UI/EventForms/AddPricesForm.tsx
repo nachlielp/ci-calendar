@@ -1,4 +1,9 @@
-import { Form, Input, Card, Row, Col, InputNumber } from "antd"
+import Form from "antd/es/form"
+import Input from "antd/es/input"
+import Card from "antd/es/card"
+import Row from "antd/es/row"
+import Col from "antd/es/col"
+import InputNumber from "antd/es/input-number"
 import { Icon } from "../Other/Icon"
 
 export default function AddPricesForm() {
