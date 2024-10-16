@@ -38,141 +38,144 @@ export default function App() {
         hide: false,
     })
 
-    if (loading) {
-        return <Loading />
-    }
-
     return (
         <div className="app">
             <SpeedInsights />
             <BackgroundTiles />
-            <div
-                className="app-content"
-                style={{ width: "100%", maxWidth: "500px" }}
-            >
-                <Suspense fallback={<Loading />}>
-                    <AppHeader />
-                    <Routes>
-                        <Route path="signup" element={<Signup />} />
-                        <Route path="login" element={<Login />} />
+            {loading ? (
+                <Loading />
+            ) : (
+                <div
+                    className="app-content"
+                    style={{ width: "100%", maxWidth: "500px" }}
+                >
+                    <Suspense fallback={<Loading />}>
+                        <AppHeader />
+                        <Routes>
+                            <Route path="signup" element={<Signup />} />
+                            <Route path="login" element={<Login />} />
 
-                        <Route
-                            path="reset-password-request"
-                            element={<ResetPasswordRequest />}
-                        />
-                        <Route
-                            path="/"
-                            element={
-                                <EventsPage
-                                    events={events}
-                                    viewableTeachers={viewableTeachers}
-                                />
-                            }
-                        />
-                        <Route
-                            path="/:eventId"
-                            element={
-                                <EventsPage
-                                    events={events}
-                                    viewableTeachers={viewableTeachers}
-                                />
-                            }
-                        />
-                        <Route
-                            path="/weekly-events"
-                            element={<WeeklyEventsPage events={events} />}
-                        />
-                        {/* User privet routes */}
-                        <Route
-                            element={
-                                <PrivateRoutes
-                                    requiredRoles={[
-                                        UserType.admin,
-                                        UserType.creator,
-                                        UserType.user,
-                                        UserType.profile,
-                                    ]}
-                                />
-                            }
-                        >
                             <Route
-                                path="/newsletter"
-                                element={<FiltersAndNotificationsPage />}
+                                path="reset-password-request"
+                                element={<ResetPasswordRequest />}
                             />
-                            <Route path="/request" element={<SupportPage />} />
                             <Route
-                                path="/reset-password"
-                                element={<ResetPasswordPage />}
+                                path="/"
+                                element={
+                                    <EventsPage
+                                        events={events}
+                                        viewableTeachers={viewableTeachers}
+                                    />
+                                }
                             />
-                        </Route>
+                            <Route
+                                path="/:eventId"
+                                element={
+                                    <EventsPage
+                                        events={events}
+                                        viewableTeachers={viewableTeachers}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/weekly-events"
+                                element={<WeeklyEventsPage events={events} />}
+                            />
+                            {/* User privet routes */}
+                            <Route
+                                element={
+                                    <PrivateRoutes
+                                        requiredRoles={[
+                                            UserType.admin,
+                                            UserType.creator,
+                                            UserType.user,
+                                            UserType.profile,
+                                        ]}
+                                    />
+                                }
+                            >
+                                <Route
+                                    path="/newsletter"
+                                    element={<FiltersAndNotificationsPage />}
+                                />
+                                <Route
+                                    path="/request"
+                                    element={<SupportPage />}
+                                />
+                                <Route
+                                    path="/reset-password"
+                                    element={<ResetPasswordPage />}
+                                />
+                            </Route>
 
-                        {/* Profile privet routes */}
-                        <Route
-                            element={
-                                <PrivateRoutes
-                                    requiredRoles={[
-                                        UserType.profile,
-                                        UserType.admin,
-                                        UserType.creator,
-                                    ]}
-                                />
-                            }
-                        >
-                            <Route path="/bio" element={<BioPage />} />
-                        </Route>
+                            {/* Profile privet routes */}
+                            <Route
+                                element={
+                                    <PrivateRoutes
+                                        requiredRoles={[
+                                            UserType.profile,
+                                            UserType.admin,
+                                            UserType.creator,
+                                        ]}
+                                    />
+                                }
+                            >
+                                <Route path="/bio" element={<BioPage />} />
+                            </Route>
 
-                        {/* Creator privet routes */}
+                            {/* Creator privet routes */}
 
-                        <Route
-                            element={
-                                <PrivateRoutes
-                                    requiredRoles={[
-                                        UserType.admin,
-                                        UserType.creator,
-                                    ]}
-                                />
-                            }
-                        >
                             <Route
-                                path="/create-events"
-                                element={<CreateEventsPage />}
-                            />
-                        </Route>
+                                element={
+                                    <PrivateRoutes
+                                        requiredRoles={[
+                                            UserType.admin,
+                                            UserType.creator,
+                                        ]}
+                                    />
+                                }
+                            >
+                                <Route
+                                    path="/create-events"
+                                    element={<CreateEventsPage />}
+                                />
+                            </Route>
 
-                        {/* Admin privet routes */}
-                        <Route
-                            element={
-                                <PrivateRoutes
-                                    requiredRoles={[UserType.admin]}
+                            {/* Admin privet routes */}
+                            <Route
+                                element={
+                                    <PrivateRoutes
+                                        requiredRoles={[UserType.admin]}
+                                    />
+                                }
+                            >
+                                <Route path="/admin" element={<AdminPage />} />
+                                <Route
+                                    path="/manage-users"
+                                    element={<ManageUsers />}
                                 />
-                            }
-                        >
-                            <Route path="/admin" element={<AdminPage />} />
-                            <Route
-                                path="/manage-users"
-                                element={<ManageUsers />}
-                            />
-                            <Route
-                                path="/manage-events"
-                                element={<ManageEventsTable />}
-                            />
-                            <Route
-                                path="/manage-support"
-                                element={<ManageSupportPage />}
-                            />
-                        </Route>
-                        <Route
-                            path="*"
-                            element={
-                                <EventsPage
-                                    events={events}
-                                    viewableTeachers={viewableTeachers}
+                                <Route
+                                    path="/manage-events"
+                                    element={<ManageEventsTable />}
                                 />
-                            }
-                        />
-                    </Routes>
-                </Suspense>
-            </div>
+                                <Route
+                                    path="/manage-support"
+                                    element={<ManageSupportPage />}
+                                />
+                            </Route>
+                            <Route
+                                path="*"
+                                element={
+                                    <EventsPage
+                                        events={events}
+                                        viewableTeachers={viewableTeachers}
+                                    />
+                                }
+                            />
+                        </Routes>
+                    </Suspense>
+                </div>
+            )}
         </div>
     )
 }
