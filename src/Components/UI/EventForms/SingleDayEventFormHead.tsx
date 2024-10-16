@@ -39,7 +39,6 @@ export default function SingleDayEventFormHead({
     handleAddressSelect,
     handleDateChange,
     teachers,
-    eventDate,
     isTemplate,
     address,
     titleText,
