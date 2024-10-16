@@ -1,4 +1,4 @@
-import { Suspense } from "react"
+import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 import dayjs from "dayjs"
@@ -7,24 +7,36 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
 import { useEvents } from "./hooks/useEvents"
 import { SpeedInsights } from "@vercel/speed-insights/react"
-import CreateEventsPage from "./Components/Pages/CreateEventsPage"
+const CreateEventsPage = lazy(
+    () => import("./Components/Pages/CreateEventsPage")
+)
 import BackgroundTiles from "./Components/UI/Other/BackgroundTiles"
 
-import ManageEventsTable from "./Components/UI/DisplayEvents/ManageEventsTable"
+const ManageEventsTable = lazy(
+    () => import("./Components/UI/DisplayEvents/ManageEventsTable")
+)
 
-import SupportPage from "./Components/Pages/SupportPage"
-import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
-import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
-import ManageSupportPage from "./Components/Pages/ManageSupportPage"
+const SupportPage = lazy(() => import("./Components/Pages/SupportPage"))
+const ResetPasswordPage = lazy(
+    () => import("./Components/Pages/RestPasswordPage")
+)
+// import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
+const ManageSupportPage = lazy(
+    () => import("./Components/Pages/ManageSupportPage")
+)
 import Loading from "./Components/UI/Other/Loading"
-import ResetPasswordRequest from "./Components/Auth/ResetPasswordRequest"
-import Login from "./Components/Auth/Login"
-import Signup from "./Components/Auth/Signup"
+const ResetPasswordRequest = lazy(
+    () => import("./Components/Auth/ResetPasswordRequest")
+)
+const Login = lazy(() => import("./Components/Auth/Login"))
+const Signup = lazy(() => import("./Components/Auth/Signup"))
 import EventsPage from "./Components/Pages/EventsPage"
-import FiltersAndNotificationsPage from "./Components/Pages/FiltersAndNotificationsPage"
-import BioPage from "./Components/Pages/BioPage"
-import AdminPage from "./Components/Pages/AdminPage"
-import ManageUsers from "./Components/UI/Other/ManageUsers"
+const FiltersAndNotificationsPage = lazy(
+    () => import("./Components/Pages/FiltersAndNotificationsPage")
+)
+const BioPage = lazy(() => import("./Components/Pages/BioPage"))
+const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
+const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
 
 export enum EventAction {
     edit,
@@ -52,12 +64,30 @@ export default function App() {
                     <Suspense fallback={<Loading />}>
                         <AppHeader />
                         <Routes>
-                            <Route path="signup" element={<Signup />} />
-                            <Route path="login" element={<Login />} />
+                            <Route
+                                path="signup"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <Signup />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path="login"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <Login />
+                                    </Suspense>
+                                }
+                            />
 
                             <Route
                                 path="reset-password-request"
-                                element={<ResetPasswordRequest />}
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <ResetPasswordRequest />
+                                    </Suspense>
+                                }
                             />
                             <Route
                                 path="/"
@@ -77,10 +107,10 @@ export default function App() {
                                     />
                                 }
                             />
-                            <Route
+                            {/* <Route
                                 path="/weekly-events"
                                 element={<WeeklyEventsPage events={events} />}
-                            />
+                            /> */}
                             {/* User privet routes */}
                             <Route
                                 element={
@@ -120,7 +150,14 @@ export default function App() {
                                     />
                                 }
                             >
-                                <Route path="/bio" element={<BioPage />} />
+                                <Route
+                                    path="/bio"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <BioPage />
+                                        </Suspense>
+                                    }
+                                />
                             </Route>
 
                             {/* Creator privet routes */}
@@ -137,7 +174,11 @@ export default function App() {
                             >
                                 <Route
                                     path="/create-events"
-                                    element={<CreateEventsPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <CreateEventsPage />
+                                        </Suspense>
+                                    }
                                 />
                             </Route>
 
@@ -149,18 +190,37 @@ export default function App() {
                                     />
                                 }
                             >
-                                <Route path="/admin" element={<AdminPage />} />
+                                <Route
+                                    path="/admin"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <AdminPage />
+                                        </Suspense>
+                                    }
+                                />
                                 <Route
                                     path="/manage-users"
-                                    element={<ManageUsers />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <ManageUsers />
+                                        </Suspense>
+                                    }
                                 />
                                 <Route
                                     path="/manage-events"
-                                    element={<ManageEventsTable />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <ManageEventsTable />
+                                        </Suspense>
+                                    }
                                 />
                                 <Route
                                     path="/manage-support"
-                                    element={<ManageSupportPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <ManageSupportPage />
+                                        </Suspense>
+                                    }
                                 />
                             </Route>
                             <Route
