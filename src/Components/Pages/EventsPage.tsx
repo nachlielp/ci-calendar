@@ -91,15 +91,16 @@ export default function EventsPage({
                         </Tag>
                     ))}
                 </article>
-            </header>
-            <section className="events-display-list">
-                {isListView ? (
+                {isListView && (
                     <EventsList
                         events={filteredEvents}
                         isEvents={!!filteredEvents.length}
                         viewableTeachers={viewableTeachers}
                     />
-                ) : (
+                )}
+            </header>
+            <section className="events-display-list">
+                {!isListView && (
                     <>
                         <CalendarView
                             events={filteredEvents}
