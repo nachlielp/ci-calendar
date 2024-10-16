@@ -1,36 +1,32 @@
 import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
-import dayjs from "dayjs"
+import Loading from "./Components/UI/Other/Loading"
 import AppHeader from "./Components/UI/Other/AppHeader"
+import ResetPasswordRequest from "./Components/Auth/ResetPasswordRequest"
+import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
+import Login from "./Components/Auth/Login"
+import Signup from "./Components/Auth/Signup"
+import BackgroundTiles from "./Components/UI/Other/BackgroundTiles"
+import dayjs from "dayjs"
+
+import EventsPage from "./Components/Pages/EventsPage"
+
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
 import { useEvents } from "./hooks/useEvents"
 import { SpeedInsights } from "@vercel/speed-insights/react"
+
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
 )
-import BackgroundTiles from "./Components/UI/Other/BackgroundTiles"
-
 const ManageEventsTable = lazy(
     () => import("./Components/UI/DisplayEvents/ManageEventsTable")
 )
-
 const SupportPage = lazy(() => import("./Components/Pages/SupportPage"))
-const ResetPasswordPage = lazy(
-    () => import("./Components/Pages/RestPasswordPage")
-)
-// import { WeeklyEventsPage } from "./Components/Pages/WeeklyEventsPage"
 const ManageSupportPage = lazy(
     () => import("./Components/Pages/ManageSupportPage")
 )
-import Loading from "./Components/UI/Other/Loading"
-const ResetPasswordRequest = lazy(
-    () => import("./Components/Auth/ResetPasswordRequest")
-)
-const Login = lazy(() => import("./Components/Auth/Login"))
-const Signup = lazy(() => import("./Components/Auth/Signup"))
-import EventsPage from "./Components/Pages/EventsPage"
 const FiltersAndNotificationsPage = lazy(
     () => import("./Components/Pages/FiltersAndNotificationsPage")
 )
@@ -64,30 +60,12 @@ export default function App() {
                     <Suspense fallback={<Loading />}>
                         <AppHeader />
                         <Routes>
-                            <Route
-                                path="signup"
-                                element={
-                                    <Suspense fallback={<Loading />}>
-                                        <Signup />
-                                    </Suspense>
-                                }
-                            />
-                            <Route
-                                path="login"
-                                element={
-                                    <Suspense fallback={<Loading />}>
-                                        <Login />
-                                    </Suspense>
-                                }
-                            />
+                            <Route path="signup" element={<Signup />} />
+                            <Route path="login" element={<Login />} />
 
                             <Route
                                 path="reset-password-request"
-                                element={
-                                    <Suspense fallback={<Loading />}>
-                                        <ResetPasswordRequest />
-                                    </Suspense>
-                                }
+                                element={<ResetPasswordRequest />}
                             />
                             <Route
                                 path="/"
