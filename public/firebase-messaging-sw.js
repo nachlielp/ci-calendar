@@ -24,7 +24,11 @@ self.addEventListener("notificationclick", (event) => {
 
 //TODO cach images and assets
 const cacheName = "ci-events-v1.5"
-const filesToCache = []
+
+const filesToCache = [
+    "./assets/img/Background_2.png", // Add the image to the cache
+    // ... other files to cache ...
+]
 
 self.addEventListener("install", (e) => {
     console.log("[ServiceWorker] - Install")
