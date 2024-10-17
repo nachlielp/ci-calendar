@@ -288,10 +288,14 @@ function openGoogleMaps(placeId: string, address: string) {
         }, 25)
         window.open(iosUrl, "_blank")
     } else if (/Android/.test(navigator.userAgent)) {
+        // setTimeout(() => {
+        //     window.location.href = fallbackUrl
+        // }, 25)
+        // window.open(androidUrl, "_blank")
+        window.location.href = androidUrl
         setTimeout(() => {
             window.location.href = fallbackUrl
-        }, 25)
-        window.open(androidUrl, "_blank")
+        }, 500)
     } else {
         window.open(fallbackUrl, "_blank")
     }
