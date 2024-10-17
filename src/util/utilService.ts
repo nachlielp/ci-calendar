@@ -30,6 +30,7 @@ export const utilService = {
     copyToClipboard: copyURLToClipboard,
     getFilterItemType,
     getLabelByValue,
+    saveFiltersToLocalStorage,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -339,4 +340,11 @@ function getLabelByValue(value: string) {
     return [...eventOptions, ...districtOptions].find(
         (option) => option.value === value
     )?.label
+}
+function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
+    const filters = {
+        districts,
+        eventTypes,
+    }
+    localStorage.setItem("defaultFilters", JSON.stringify(filters))
 }

@@ -1,8 +1,8 @@
 import MenuButtons from "../Other/MenuButtons"
-// import Tag from "antd/es/tag"
-// import { utilService } from "../../../util/utilService"
 import { Icon } from "../Other/Icon"
 import Button from "antd/es/button"
+import Skeleton from "antd/es/skeleton"
+import Card from "antd/es/card"
 
 export default function EventsPageHeader() {
     return (
@@ -25,6 +25,7 @@ export default function EventsPageHeader() {
                             flexDirection: "row",
                             alignItems: "center",
                             justifyContent: "space-between",
+                            marginBottom: "16px",
                         }}
                     >
                         <MenuButtons
@@ -55,19 +56,18 @@ export default function EventsPageHeader() {
                             </Button>
                         </div>
                     </main>
-                    {/* <article className="selected-filters">
-                        {[1, 3]?.map((eventType: any) => (
-                            <Tag
-                                className="filter-tag"
-                                color="#913e2f"
-                                key={eventType}
-                                onClick={() => {}}
-                            >
-                                {utilService.getLabelByValue(eventType)}
-                                <Icon icon="close" />
-                            </Tag>
-                        ))}
-                    </article> */}
+                    <Card
+                        className="single-day-event-card"
+                        style={{ width: "100%" }}
+                    >
+                        <Skeleton active />
+                    </Card>
+                    <Card
+                        className="single-day-event-card"
+                        style={{ width: "100%" }}
+                    >
+                        <Skeleton active />
+                    </Card>
                 </section>
             </div>
         </div>

@@ -23,6 +23,7 @@ export default function FiltersAndNotificationsPage() {
 
     useEffect(() => {
         debouncedSaveFilters()
+        saveFiltersToLocalStorage()
     }, [districts, ciEventTypes])
 
     function debouncedSaveFilters() {
@@ -48,6 +49,14 @@ export default function FiltersAndNotificationsPage() {
         }, 1000)
 
         saveFilters()
+    }
+
+    function saveFiltersToLocalStorage() {
+        const filters = {
+            districts,
+            eventTypes: ciEventTypes,
+        }
+        localStorage.setItem("defaultFilters", JSON.stringify(filters))
     }
 
     return (
