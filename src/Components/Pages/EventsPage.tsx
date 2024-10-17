@@ -91,13 +91,6 @@ export default function EventsPage({
                         </Tag>
                     ))}
                 </article>
-                {isListView && (
-                    <EventsList
-                        events={filteredEvents}
-                        isEvents={!!filteredEvents.length}
-                        viewableTeachers={viewableTeachers}
-                    />
-                )}
             </header>
             <section className="events-display-list">
                 {!isListView && (
@@ -112,6 +105,13 @@ export default function EventsPage({
                             viewableTeachers={viewableTeachers}
                         />
                     </>
+                )}
+                {isListView && (
+                    <EventsList
+                        events={filteredEvents}
+                        isEvents={!!filteredEvents.length}
+                        viewableTeachers={viewableTeachers}
+                    />
                 )}
                 {selectedEvent && (
                     <FullEventCardContainer

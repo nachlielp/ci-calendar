@@ -16,6 +16,7 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
 import { useEvents } from "./hooks/useEvents"
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import EventsPageSkeleton from "./Components/UI/DisplayEvents/EventsPageSkeleton"
 
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
@@ -51,7 +52,7 @@ export default function App() {
             <SpeedInsights />
             <BackgroundTiles />
             {loading ? (
-                <Loading />
+                <EventsPageSkeleton />
             ) : (
                 <div
                     className="app-content"
