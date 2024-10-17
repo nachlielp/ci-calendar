@@ -209,21 +209,10 @@ export default function FullEventCard({
 
             <article className="event-card-footer">
                 {utilService.isPWA() && (
-                    // <button
-                    //     className="event-location-button"
-                    //     onClick={() =>
-                    //         utilService.openGoogleMaps(
-                    //             ci_event.address.place_id,
-                    //             ci_event.address.label
-                    //         )
-                    //     }
-                    // >
-                    //     פתיחה במפת Google
-                    // </button>
                     <SecondaryButton
-                        label="פתיחה במפת Google"
-                        successLabel="פתיחה במפת Google"
-                        icon={utilService.isIos() ? "ios_share" : "share"}
+                        label=""
+                        successLabel=""
+                        icon={"map"}
                         successIcon="check"
                         callback={() =>
                             utilService.openGoogleMaps(
@@ -235,8 +224,8 @@ export default function FullEventCard({
                 )}
                 {utilService.isPWA() && (
                     <SecondaryButton
-                        label="שיתוף"
-                        successLabel="שותף"
+                        label=""
+                        successLabel=""
                         icon={utilService.isIos() ? "ios_share" : "share"}
                         successIcon="check"
                         callback={() =>
