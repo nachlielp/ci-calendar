@@ -73,6 +73,7 @@
     justify-content: center;
     transition: background-color 0.2s;
     outline: none;
+    margin: 0 8px;
 
     &:hover {
         background-color: #dcb8b1;
@@ -80,7 +81,7 @@
 
     .injected-svg {
         margin-top: 6px;
-        margin-right: 4px;
+        // margin-right: 4px;
         width: 16px;
         height: 16px;
     }
