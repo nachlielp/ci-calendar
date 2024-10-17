@@ -291,11 +291,7 @@ function openGoogleMaps(placeId: string, address: string) {
         // setTimeout(() => {
         //     window.location.href = fallbackUrl
         // }, 25)
-        // window.open(androidUrl, "_blank")
-        window.location.href = androidUrl
-        setTimeout(() => {
-            window.location.href = fallbackUrl
-        }, 500)
+        window.open(androidUrl, "_blank")
     } else {
         window.open(fallbackUrl, "_blank")
     }
