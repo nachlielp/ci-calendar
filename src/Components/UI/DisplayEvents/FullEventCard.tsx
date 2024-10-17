@@ -209,33 +209,43 @@ export default function FullEventCard({
 
             <article className="event-card-footer">
                 {utilService.isPWA() && (
-                    <button
-                        className="event-location-button"
-                        onClick={() =>
+                    // <button
+                    //     className="event-location-button"
+                    //     onClick={() =>
+                    //         utilService.openGoogleMaps(
+                    //             ci_event.address.place_id,
+                    //             ci_event.address.label
+                    //         )
+                    //     }
+                    // >
+                    //     פתיחה במפת Google
+                    // </button>
+                    <SecondaryButton
+                        label="פתיחה במפת Google"
+                        successLabel="פתיחה במפת Google"
+                        icon={utilService.isIos() ? "ios_share" : "share"}
+                        successIcon="check"
+                        callback={() =>
                             utilService.openGoogleMaps(
                                 ci_event.address.place_id,
                                 ci_event.address.label
                             )
                         }
-                    >
-                        פתיחה במפת Google
-                    </button>
+                    />
                 )}
                 {utilService.isPWA() && (
-                    <button
-                        className="event-share-button"
-                        onClick={() =>
+                    <SecondaryButton
+                        label="שיתוף"
+                        successLabel="שותף"
+                        icon={utilService.isIos() ? "ios_share" : "share"}
+                        successIcon="check"
+                        callback={() =>
                             utilService.handleShareEvent(
                                 ci_event.id,
                                 ci_event.title
                             )
                         }
-                    >
-                        <Icon
-                            icon={utilService.isIos() ? "ios_share" : "share"}
-                            className="event-icon"
-                        />
-                    </button>
+                    />
                 )}
                 {!utilService.isPWA() && (
                     <SecondaryButton
