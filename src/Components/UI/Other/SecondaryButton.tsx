@@ -29,12 +29,12 @@ export default function SecondaryButton({
             <button onClick={handleAction} className="secondary-action-btn">
                 {isAction ? (
                     <>
-                        <label>{successLabel}</label>
+                        <label className="label">{successLabel}</label>
                         <Icon icon={successIcon} />
                     </>
                 ) : (
                     <>
-                        <label>{label}</label>
+                        <label className="label">{label}</label>
                         <Icon icon={icon} />
                     </>
                 )}
