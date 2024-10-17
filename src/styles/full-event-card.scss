@@ -52,7 +52,7 @@
         width: 100%;
 
         .event-label {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 600;
             margin-bottom: 2px;
             margin-left: 8px;
@@ -67,10 +67,14 @@
             margin-top: 6px;
 
             .injected-svg {
-                width: 16px;
-                height: 16px;
+                width: 20px;
+                height: 20px;
             }
         }
+    }
+
+    .sub-event {
+        font-size: 18px;
     }
 
     .event-tags {
@@ -85,7 +89,7 @@
             background-color: #e5e5ea;
             color: #000;
             border: none;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 400;
             padding: 6px 12px;
             margin-bottom: 0;
@@ -112,7 +116,7 @@
             padding: 8px;
 
             .link-label {
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: 400;
                 margin-left: 8px;
             }
@@ -134,7 +138,7 @@
     }
 
     .section-title {
-        font-size: 16px;
+        font-size: 20px;
         font-weight: 600;
         margin: 8px 0;
     }
@@ -147,6 +151,7 @@
         word-wrap: break-word; // Add this line
         overflow-wrap: break-word;
         margin-left: 24px;
+        font-size: 18px;
 
         .event-label {
             margin-bottom: 8px;
@@ -170,5 +175,12 @@
                 cursor: pointer;
             }
         }
+    }
+
+    .f-18 {
+        font-size: 18px;
+    }
+    .f-20 {
+        font-size: 20px;
     }
 }

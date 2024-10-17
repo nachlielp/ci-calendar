@@ -129,7 +129,11 @@ export default function FullEventCard({
                                 <span>
                                     &nbsp;
                                     {segment.tags.map((tag) => (
-                                        <Tag key={tag} color="green">
+                                        <Tag
+                                            key={tag}
+                                            color="green"
+                                            className="f-18"
+                                        >
                                             {getTag(tag)}
                                         </Tag>
                                     ))}
@@ -148,7 +152,7 @@ export default function FullEventCard({
                     <Tag
                         color="blue"
                         key={`${type}-${index}`}
-                        className="event-tag"
+                        className="event-tag "
                     >
                         {type}
                     </Tag>
@@ -187,7 +191,7 @@ export default function FullEventCard({
                 <>
                     <hr className="hr" />
                     <h3 className="section-title">מחיר</h3>
-                    <article className="event-price">
+                    <article className="event-price f-18">
                         {ci_event.price.map((price, index) => (
                             <React.Fragment key={`${price.sum}-${index}`}>
                                 <label className="price-label">
