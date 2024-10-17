@@ -283,14 +283,11 @@ function openGoogleMaps(placeId: string, address: string) {
     const fallbackUrl = `https://www.google.com/maps/place/?q=place_id:${placeId}`
 
     if (/(iPhone|iPad|iPod)/.test(navigator.userAgent)) {
-        setTimeout(() => {
-            window.location.href = fallbackUrl
-        }, 25)
-        window.open(iosUrl, "_blank")
-    } else if (/Android/.test(navigator.userAgent)) {
         // setTimeout(() => {
         //     window.location.href = fallbackUrl
         // }, 25)
+        window.open(iosUrl, "_blank")
+    } else if (/Android/.test(navigator.userAgent)) {
         window.open(androidUrl, "_blank")
     } else {
         window.open(fallbackUrl, "_blank")
