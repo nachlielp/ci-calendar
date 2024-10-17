@@ -213,7 +213,7 @@ export default function FullEventCard({
                         label=""
                         successLabel=""
                         icon={"map"}
-                        successIcon=""
+                        successIcon={"map"}
                         callback={() =>
                             utilService.openGoogleMaps(
                                 ci_event.address.place_id,
@@ -227,7 +227,9 @@ export default function FullEventCard({
                         label=""
                         successLabel=""
                         icon={utilService.isIos() ? "ios_share" : "share"}
-                        successIcon=""
+                        successIcon={
+                            utilService.isIos() ? "ios_share" : "share"
+                        }
                         callback={() =>
                             utilService.handleShareEvent(
                                 ci_event.id,

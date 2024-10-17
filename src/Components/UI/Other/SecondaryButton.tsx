@@ -3,10 +3,10 @@ import { Icon } from "./Icon"
 
 interface CopyButtonProps {
     label: string
-    successLabel?: string
+    successLabel: string
     callback: () => void
     icon: string
-    successIcon?: string
+    successIcon: string
 }
 
 export default function SecondaryButton({
@@ -29,8 +29,8 @@ export default function SecondaryButton({
             <button onClick={handleAction} className="secondary-action-btn">
                 {isAction ? (
                     <>
-                        <label>{successLabel ?? label}</label>
-                        <Icon icon={successIcon ?? icon} />
+                        <label>{successLabel}</label>
+                        <Icon icon={successIcon} />
                     </>
                 ) : (
                     <>
