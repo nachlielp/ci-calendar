@@ -58,7 +58,7 @@ export default function App() {
                     className="app-content"
                     style={{ width: "100%", maxWidth: "500px" }}
                 >
-                    <Suspense fallback={<Loading />}>
+                    <Suspense fallback={<EventsPageSkeleton />}>
                         <AppHeader />
                         <Routes>
                             <Route path="signup" element={<Signup />} />
