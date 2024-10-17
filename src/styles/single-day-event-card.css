@@ -16,7 +16,7 @@
         display: block;
         font-weight: bold;
         font-size: 26px;
-        font-weight: 400;
+        font-weight: 500;
         width: 100%;
         margin: 0;
         color: #bc3528;
@@ -43,7 +43,7 @@
 
         .event-label {
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 400;
             margin-bottom: 2px;
             margin-left: 8px;
         }
