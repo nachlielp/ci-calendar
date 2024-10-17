@@ -58,3 +58,30 @@
     width: 16px;
     height: 16px;
 }
+
+.secondary-action-btn {
+    background-color: #e5e7eb;
+    color: #1f2937;
+    border: none;
+    border-radius: 10px;
+    padding: 4px 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    outline: none;
+
+    &:hover {
+        background-color: #d1d5db;
+    }
+
+    .injected-svg {
+        margin-top: 6px;
+        margin-right: 4px;
+        width: 16px;
+        height: 16px;
+    }
+}

@@ -1,6 +1,5 @@
 import Button from "antd/es/button"
 import Tag from "antd/es/tag"
-import message from "antd/es/message"
 import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
@@ -8,41 +7,44 @@ import dayjs from "dayjs"
 import BioModal from "../DisplayUsers/BioModal"
 import React from "react"
 import { utilService } from "../../../util/utilService"
+import SecondaryButton from "../Other/SecondaryButton"
 
 export default function FullEventCard({
-    event,
+    event: ci_event,
     viewableTeachers,
 }: {
     event: CIEvent
     viewableTeachers: UserBio[]
 }) {
-    const [messageApi, contextHolder] = message.useMessage()
+    const segmentLen = ci_event.segments.length
+    const multiDayTeachersLen = ci_event.multi_day_teachers || []
 
-    const segmentLen = event.segments.length
-    const multiDayTeachersLen = event.multi_day_teachers || []
-
-    const info = () => {
-        messageApi.info("הקישור הועתק בהצלחה")
+    const handleCopy = async () => {
+        await navigator.clipboard.writeText(
+            `${window.location.origin}/${ci_event.id}`
+        )
     }
 
     return (
         <section className="full-event-card" dir="rtl">
             <article className="event-header">
-                <div className="event-title">{event.title}&nbsp;</div>
+                <div className="event-title">{ci_event.title}&nbsp;</div>
             </article>
             <article className="event-dates">
-                {event.segments.length > 0 ? (
+                {ci_event.segments.length > 0 ? (
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {utilService.formatHebrewDate(event.start_date)}
+                            {utilService.formatHebrewDate(ci_event.start_date)}
                         </label>
                         <Icon icon="schedule" className="event-icon" />
                         <label className="event-label">
-                            {dayjs(event.segments[0].startTime).format("HH:mm")}
+                            {dayjs(ci_event.segments[0].startTime).format(
+                                "HH:mm"
+                            )}
                             &nbsp;-&nbsp;
                             {dayjs(
-                                event.segments[segmentLen - 1].endTime
+                                ci_event.segments[segmentLen - 1].endTime
                             ).format("HH:mm")}
                         </label>
                     </>
@@ -50,15 +52,15 @@ export default function FullEventCard({
                     <>
                         <Icon icon="calendar" className="event-icon" />
                         <label className="event-label">
-                            {utilService.formatHebrewDate(event.start_date)} -{" "}
-                            {utilService.formatHebrewDate(event.end_date)}
+                            {utilService.formatHebrewDate(ci_event.start_date)}{" "}
+                            - {utilService.formatHebrewDate(ci_event.end_date)}
                         </label>
                     </>
                 )}
             </article>
             <article className="event-location">
                 <Icon icon="pinDrop" className="event-icon" />
-                <label className="event-label">{event.address.label}</label>
+                <label className="event-label">{ci_event.address.label}</label>
             </article>
 
             {multiDayTeachersLen.length > 0 && (
@@ -85,7 +87,7 @@ export default function FullEventCard({
             )}
 
             {segmentLen > 0 &&
-                event.segments.map((segment, index) => (
+                ci_event.segments.map((segment, index) => (
                     <div className="sub-event" key={index}>
                         <span>
                             {dayjs(segment.endTime).format("HH:mm")}
@@ -139,9 +141,9 @@ export default function FullEventCard({
 
             <article className="event-tags">
                 {getTypes(
-                    event.segments
+                    ci_event.segments
                         .flatMap((segment) => segment.type as EventlyType)
-                        .concat(event.type as EventlyType)
+                        .concat(ci_event.type as EventlyType)
                 ).map((type, index) => (
                     <Tag
                         color="blue"
@@ -154,8 +156,8 @@ export default function FullEventCard({
             </article>
 
             <article className="event-links">
-                {event.links.length > 0 &&
-                    event.links.map((link) => (
+                {ci_event.links.length > 0 &&
+                    ci_event.links.map((link) => (
                         <Button
                             key={link.title}
                             type="default"
@@ -169,24 +171,24 @@ export default function FullEventCard({
                     ))}
             </article>
 
-            {event.description.length > 0 && (
+            {ci_event.description.length > 0 && (
                 <>
                     <hr className="hr" />
                     <h3 className="section-title">פרטים נוספים</h3>
                     <article className="event-description">
                         <label className="event-label">
-                            {event.description}
+                            {ci_event.description}
                         </label>
                     </article>
                 </>
             )}
 
-            {event.price.length > 0 && (
+            {ci_event.price.length > 0 && (
                 <>
                     <hr className="hr" />
                     <h3 className="section-title">מחיר</h3>
                     <article className="event-price">
-                        {event.price.map((price, index) => (
+                        {ci_event.price.map((price, index) => (
                             <React.Fragment key={`${price.sum}-${index}`}>
                                 <label className="price-label">
                                     <span className="price-title">
@@ -198,7 +200,7 @@ export default function FullEventCard({
                                     </span>
                                     ₪
                                 </label>
-                                {index < event.price.length - 1 && ", "}
+                                {index < ci_event.price.length - 1 && ", "}
                             </React.Fragment>
                         ))}
                     </article>
@@ -206,14 +208,13 @@ export default function FullEventCard({
             )}
 
             <article className="event-card-footer">
-                {contextHolder}
                 {utilService.isPWA() && (
                     <button
                         className="event-location-button"
                         onClick={() =>
                             utilService.openGoogleMaps(
-                                event.address.place_id,
-                                event.address.label
+                                ci_event.address.place_id,
+                                ci_event.address.label
                             )
                         }
                     >
@@ -224,7 +225,10 @@ export default function FullEventCard({
                     <button
                         className="event-share-button"
                         onClick={() =>
-                            utilService.handleShareEvent(event.id, event.title)
+                            utilService.handleShareEvent(
+                                ci_event.id,
+                                ci_event.title
+                            )
                         }
                     >
                         <Icon
@@ -234,14 +238,13 @@ export default function FullEventCard({
                     </button>
                 )}
                 {!utilService.isPWA() && (
-                    <button
-                        className="event-share-button"
-                        onClick={() =>
-                            utilService.copyToClipboard(event.id, info)
-                        }
-                    >
-                        <Icon icon="contentCopy" className="event-icon" />
-                    </button>
+                    <SecondaryButton
+                        label="העתקת קישור"
+                        successLabel="קישור הועתק"
+                        icon="contentCopy"
+                        successIcon="check"
+                        callback={handleCopy}
+                    />
                 )}
             </article>
         </section>

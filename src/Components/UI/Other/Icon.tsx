@@ -48,6 +48,8 @@ import add_alert from "../../../assets/svgs/add_alert.svg"
 import notifications_active from "../../../assets/svgs/notifications_active.svg"
 import ios_share from "../../../assets/svgs/ios_share.svg"
 import share from "../../../assets/svgs/share.svg"
+import check from "../../../assets/svgs/check.svg"
+
 export const Icon = ({
     icon,
     className,
@@ -110,6 +112,7 @@ export const Icon = ({
         notifications_active,
         ios_share,
         share,
+        check,
     }
     return (
         <label className="icon-component" onClick={onClick}>

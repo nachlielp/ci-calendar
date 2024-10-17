@@ -27,7 +27,7 @@ export const utilService = {
     openGoogleMaps,
     isIos,
     handleShareEvent,
-    copyToClipboard,
+    copyToClipboard: copyURLToClipboard,
     getFilterItemType,
     getLabelByValue,
 }
@@ -318,7 +318,7 @@ function handleShareEvent(eventId: string, eventTitle: string) {
     }
 }
 
-function copyToClipboard(eventId: string, info: () => void) {
+function copyURLToClipboard(eventId: string, info: () => void) {
     const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
     navigator.clipboard.writeText(shareUrl)
     info()
