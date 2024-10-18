@@ -168,7 +168,13 @@ export interface UserBio extends Partial<DbUser> {
     bio: string
 }
 
-export type CIRequest = {
+export interface CIRequestResponse {
+    response: string
+    created_at: string
+    created_by: string
+}
+
+export interface CIRequest {
     request_id: string
     created_at: string
     request_type: string
@@ -177,7 +183,7 @@ export type CIRequest = {
     status: RequestStatus
     message: string
     user_id: string
-    response: string
+    responses: CIRequestResponse[]
     phone: string
     email: string
     name: string

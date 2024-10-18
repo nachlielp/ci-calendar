@@ -99,6 +99,10 @@
     outline: none;
     margin: 16px 16px;
 
+    &.low-margin {
+        margin: 4px;
+    }
+
     &:hover {
         background-color: #dcb8b1;
     }
@@ -135,4 +139,14 @@
     .loading-spinner {
         animation: spin 1s linear infinite;
     }
+}
+
+.general-icon-btn {
+    background-color: #e7d1cd;
+    color: #1f2937;
+    border: none;
+    border-radius: 10px;
+    padding: 4px 6px;
+    font-size: 14px;
+    font-weight: 500;
 }

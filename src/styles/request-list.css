@@ -1,0 +1,44 @@
+.request-list {
+    margin-top: 20px;
+    min-width: 90%;
+}
+
+.request-list-cell-container {
+    .message-container {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 4px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        margin-left: 50px;
+        background-color: #f0f0f0;
+        .message {
+            .sub-title {
+                display: block;
+                margin-bottom: 4px;
+            }
+            .content {
+                margin-right: 10px;
+                display: block;
+            }
+        }
+    }
+    .request-list-item {
+        padding: 4px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        margin-left: 50px;
+        background-color: #f0f0f0;
+
+        .sub-title {
+            display: block;
+        }
+        .content {
+            margin-right: 10px;
+        }
+    }
+}

@@ -66,7 +66,7 @@ export default function RequestsList() {
     }
 
     return (
-        <div style={{ direction: "rtl", marginTop: "20px" }}>
+        <div className="request-list">
             <Table
                 dataSource={requests}
                 columns={columns}
@@ -74,28 +74,45 @@ export default function RequestsList() {
                 rowKey={(record) => record.request_id}
                 expandable={{
                     expandedRowRender: (record) => (
-                        <>
-                            <p style={{ margin: 0 }}>
-                                בקשה מס׳ : {record.request_id}
-                                <br />
-                                <span style={{ marginRight: "10px" }}>
+                        <section className="request-list-cell-container">
+                            <p className="message-container">
+                                <label className="sub-title">
+                                    בקשה מס׳ : {record.request_id}
+                                </label>
+                                <span className="message">
                                     {record.message}
                                 </span>
                             </p>
-                            {record.response && (
-                                <p style={{ margin: 0 }}>
+                            {record.responses.length > 0 && (
+                                <p>
                                     תשובה :
-                                    <br />
                                     <span
                                         style={{
                                             paddingRight: "10px",
                                         }}
                                     >
-                                        {record.response}
+                                        {record.responses.map((response) => (
+                                            <article
+                                                key={response.created_at}
+                                                className="request-list-item"
+                                            >
+                                                <label className="sub-title">
+                                                    {response.created_by} ב{" "}
+                                                    {dayjs(
+                                                        response.created_at
+                                                    ).format(
+                                                        "DD/MM/YYYY HH:mm"
+                                                    )}
+                                                </label>
+                                                <label className="content">
+                                                    {response.response}
+                                                </label>
+                                            </article>
+                                        ))}
                                     </span>
                                 </p>
                             )}
-                        </>
+                        </section>
                     ),
                     expandedRowKeys: expandedRowKeys,
                     onExpand: handleExpand,

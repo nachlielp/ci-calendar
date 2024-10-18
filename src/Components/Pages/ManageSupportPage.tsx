@@ -10,6 +10,7 @@ import {
     RequestStatus,
     RequestStatusHebrew,
     UserType,
+    DbUser,
 } from "../../util/interfaces"
 import useRequests from "../../hooks/useRequests"
 import { useState } from "react"
@@ -20,6 +21,9 @@ import { Icon } from "../UI/Other/Icon"
 import { requestsService } from "../../supabase/requestsService"
 import { GetProp } from "antd/es/_util/type"
 import { usersService } from "../../supabase/usersService"
+import AddResponseToSupportReqModal from "../UI/Other/AddResponseToSupportReqModal"
+import { useUser } from "../../context/UserContext"
+import dayjs from "dayjs"
 
 interface TableParams {
     pagination?: TablePaginationConfig
@@ -77,6 +81,7 @@ const getColumns = (tableParams: TableParams): ColumnsType<CIRequest> => [
 ]
 
 export default function ManageSupportPage() {
+    const { user } = useUser()
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
@@ -130,43 +135,60 @@ export default function ManageSupportPage() {
                         ? UserType.creator
                         : null
 
-                if (!newUserType) {
-                    console.error(
-                        "ManageSupportPage.handleAction.newUserType.error: ",
-                        request.type,
-                        " does not match any user type"
+                if (newUserType) {
+                    const userRes = await usersService.updateUser(
+                        request.created_by,
+                        {
+                            user_type: newUserType,
+                        }
                     )
-                    return
-                }
-
-                const userRes = await usersService.updateUser(
-                    request.created_by,
-                    {
-                        user_type: newUserType,
+                    if (!userRes) {
+                        console.error(
+                            "ManageSupportPage.handleAction.userRes.error: ",
+                            userRes
+                        )
+                        return
                     }
-                )
-                if (!userRes) {
-                    console.error(
-                        "ManageSupportPage.handleAction.userRes.error: ",
-                        userRes
-                    )
-                    return
                 }
 
-                const newResponseMessage =
-                    (request.response || "") + "\n" + "הבקשה אושרה"
+                const newResponseApprovedMessage = [
+                    ...request.responses,
+                    {
+                        response: "הבקשה אושרה",
+                        created_at: new Date().toISOString(),
+                        created_by: user?.full_name || "",
+                    },
+                ]
                 const newRequest: CIRequest = {
                     ...request,
                     status: RequestStatus.closed,
-                    response: newResponseMessage,
+                    responses: newResponseApprovedMessage,
                     viewed_response: false,
                 }
                 await requestsService.updateRequest(newRequest)
                 break
+
             case "add_response":
                 await requestsService.updateRequest({
                     request_id: request.request_id,
-                    response: request.response,
+                    responses: request.responses,
+                    viewed_response: false,
+                })
+                break
+
+            case "close":
+                const newDeclineResponseMessage = [
+                    ...request.responses,
+                    {
+                        response: "הבקשה נדחתה",
+                        created_at: new Date().toISOString(),
+                        created_by: user?.full_name || "",
+                    },
+                ]
+                await requestsService.updateRequest({
+                    request_id: request.request_id,
+                    status: RequestStatus.closed,
+                    responses: newDeclineResponseMessage,
                     viewed_response: false,
                 })
                 break
@@ -185,6 +207,7 @@ export default function ManageSupportPage() {
                         <ManageSupportCell
                             record={record}
                             handleAction={handleAction}
+                            user={user}
                         />
                     ),
                     expandedRowKeys: expandedRowKeys,
@@ -199,14 +222,14 @@ export default function ManageSupportPage() {
 const ManageSupportCell = ({
     record,
     handleAction,
+    user,
 }: {
     record: CIRequest
     handleAction: (action: string, request: CIRequest) => void
+    user: DbUser | null
 }) => {
-    const [showInput, setShowInput] = useState(false)
-    const [inputValue, setInputValue] = useState("")
     return (
-        <>
+        <section className="manage-support-cell">
             <p style={{ margin: 0 }}>
                 בקשה מס׳ : {record.request_id}
                 <br />
@@ -214,77 +237,84 @@ const ManageSupportCell = ({
                 <br />
                 פלאפון : {record.phone}
                 <br />
-                <br />
-                הודעה :
-                <span style={{ marginRight: "10px" }}>{record.message}</span>
+                <span className="manage-support-cell-request">
+                    <label className="sub-title">
+                        {dayjs(record.created_at).format("DD/MM/YYYY HH:mm")}
+                    </label>
+                    {record.message}
+                </span>
             </p>
-            {record.response && (
+            {record.responses.length > 0 && (
                 <p style={{ margin: 0 }}>
-                    תשובה :
-                    <br />
+                    <b> תשובה</b>
                     <span
                         style={{
                             paddingRight: "10px",
+                            whiteSpace: "pre-wrap",
+                            wordWrap: "break-word",
                         }}
                     >
-                        {record.response}
+                        {record.responses.map((response) => (
+                            <article
+                                key={response.created_at}
+                                className="manage-support-cell-response"
+                            >
+                                <label className="sub-title">
+                                    {response.created_by} ב{" "}
+                                    {dayjs(response.created_at).format(
+                                        "DD/MM/YYYY HH:mm"
+                                    )}
+                                </label>
+                                <label className="content">
+                                    {response.response}
+                                </label>
+                            </article>
+                        ))}
                     </span>
                 </p>
             )}
-            {!showInput && (
-                <article className="manage-support-cell-actions">
-                    <button
-                        className="support-action-btn"
-                        onClick={() => handleAction("in_progress", record)}
-                    >
-                        בטיפול
-                    </button>
-                    <button
-                        className="support-action-btn"
-                        onClick={() => handleAction("approved", record)}
-                    >
-                        אישור וסגירה
-                    </button>
-                    <button
-                        className="support-action-btn"
-                        onClick={() => setShowInput(true)}
-                    >
-                        הוספת תשובה
-                    </button>
-                </article>
-            )}
-            {showInput && (
-                <article>
-                    <Input
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                    />
-                    <button
-                        className="support-action-btn"
-                        onClick={() => {
-                            setInputValue("")
-                            setShowInput(false)
-                        }}
-                    >
-                        ביטול
-                    </button>
-                    <button
-                        className="support-action-btn"
-                        onClick={() => {
-                            handleAction("add_response", {
-                                ...record,
-                                response:
-                                    (record.response || "") + "\n" + inputValue,
-                            })
-                            setInputValue("")
-                            setShowInput(false)
-                        }}
-                    >
-                        שליחה
-                    </button>
-                </article>
-            )}
-        </>
+            <article
+                className="manage-support-cell-actions"
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                }}
+            >
+                <button
+                    className="secondary-action-btn low-margin"
+                    onClick={() => handleAction("in_progress", record)}
+                >
+                    בטיפול
+                </button>
+                <button
+                    className="secondary-action-btn low-margin"
+                    onClick={() => handleAction("approved", record)}
+                >
+                    אישור וסגירה
+                </button>
+                <AddResponseToSupportReqModal
+                    onSubmit={(response) =>
+                        handleAction("add_response", {
+                            ...record,
+                            responses: [
+                                ...record.responses,
+                                {
+                                    response,
+                                    created_at: new Date().toISOString(),
+                                    created_by: user?.full_name || "",
+                                },
+                            ],
+                        })
+                    }
+                />
+                <button
+                    className="secondary-action-btn low-margin"
+                    onClick={() => handleAction("close", record)}
+                >
+                    סגירה
+                </button>
+            </article>
+        </section>
     )
 }
 
@@ -299,6 +329,10 @@ const filterDropdown = ({
     confirm: () => void
     clearFilters?: () => void
 }) => {
+    const onClear = () => {
+        clearFilters?.()
+        confirm()
+    }
     return (
         <div style={{ padding: 8 }}>
             <Input
@@ -311,14 +345,11 @@ const filterDropdown = ({
                 style={{ marginBottom: 8, display: "block" }}
             />
             <Space>
-                <button onClick={() => confirm()} style={{ width: 90 }}>
+                <button onClick={() => confirm()} className="general-icon-btn">
                     <Icon icon="search" className="filter-search-icon-btn" />
                 </button>
 
-                <button
-                    onClick={() => clearFilters && clearFilters()}
-                    style={{ width: 90 }}
-                >
+                <button onClick={onClear} className="general-icon-btn">
                     <Icon
                         icon="search_off"
                         className="filter-search-icon-btn"

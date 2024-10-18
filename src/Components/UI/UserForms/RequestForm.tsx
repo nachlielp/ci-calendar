@@ -47,6 +47,7 @@ export default function RequestForm() {
             phone: values.phone || user.phone || "",
             email: user.email || "",
             name: user.full_name || "",
+            responses: [],
         }
         try {
             setIsSubmitting(true)
@@ -77,7 +78,7 @@ export default function RequestForm() {
     return (
         <div className="request-form">
             <Card
-                style={{ width: 300, marginTop: "1rem" }}
+                style={{ width: "300px", marginTop: "1rem" }}
                 id="request-form-card"
             >
                 {!isSubmitted && (
