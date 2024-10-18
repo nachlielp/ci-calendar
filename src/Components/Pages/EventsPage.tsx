@@ -18,6 +18,7 @@ import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByPa
 import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
 import FullEventCardContainer from "../UI/DisplayEvents/FullEventCardContainer"
 import { utilService } from "../../util/utilService"
+import { InstallPWAButton } from "../UI/Other/InstallPWAButton"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -61,6 +62,7 @@ export default function EventsPage({
             <header className="header">
                 <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
                 <p className="subtitle">כל האירועים במקום אחד</p>
+                <InstallPWAButton />
                 <main className="menu-container">
                     <MenuButtons
                         onSelectKey={onSelectKey}
