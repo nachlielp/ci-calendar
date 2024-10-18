@@ -137,7 +137,7 @@ function createDbUserFromUser(user: User): DbUser {
     return {
         user_id: user.id,
         user_type: UserType.user,
-        full_name: user.user_metadata.name || "",
+        full_name: user.user_metadata.full_name || "",
         email: user.email || "",
         phone: user.phone || "",
         created_at: user.created_at,
