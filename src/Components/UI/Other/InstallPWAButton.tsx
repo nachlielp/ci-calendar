@@ -2,10 +2,12 @@ import { useState, useEffect } from "react"
 
 export function InstallPWAButton() {
     const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible, setIsVisible] = useState(true)
 
     useEffect(() => {
+        console.log("useEffect")
         const handleBeforeInstallPrompt = (e: Event) => {
+            console.log("handleBeforeInstallPrompt.e", e)
             e.preventDefault()
             setDeferredPrompt(e)
             setIsVisible(true)
