@@ -180,7 +180,7 @@ export default function ManageSupportPage() {
                 const newDeclineResponseMessage = [
                     ...request.responses,
                     {
-                        response: "הבקשה נדחתה",
+                        response: "הבקשה נסגרה",
                         created_at: new Date().toISOString(),
                         created_by: user?.full_name || "",
                     },
