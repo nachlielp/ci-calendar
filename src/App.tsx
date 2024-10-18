@@ -14,9 +14,9 @@ import EventsPage from "./Components/Pages/EventsPage"
 
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
-import { useEvents } from "./hooks/useEvents"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 import EventsPageSkeleton from "./Components/UI/DisplayEvents/EventsPageSkeleton"
+import { useCIEvents } from "./context/CIEventsContext"
 
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
@@ -42,10 +42,7 @@ export enum EventAction {
 }
 
 export default function App() {
-    const { events, loading, viewableTeachers } = useEvents({
-        start_date: dayjs().format("YYYY-MM-DD"),
-        hide: false,
-    })
+    const { ci_events, loading, viewableTeachers } = useCIEvents()
 
     return (
         <div className="app">
@@ -72,7 +69,7 @@ export default function App() {
                                 path="/"
                                 element={
                                     <EventsPage
-                                        events={events}
+                                        events={ci_events}
                                         viewableTeachers={viewableTeachers}
                                     />
                                 }
@@ -81,7 +78,7 @@ export default function App() {
                                 path="/:eventId"
                                 element={
                                     <EventsPage
-                                        events={events}
+                                        events={ci_events}
                                         viewableTeachers={viewableTeachers}
                                     />
                                 }
@@ -206,7 +203,7 @@ export default function App() {
                                 path="*"
                                 element={
                                     <EventsPage
-                                        events={events}
+                                        events={ci_events}
                                         viewableTeachers={viewableTeachers}
                                     />
                                 }

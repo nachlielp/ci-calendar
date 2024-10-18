@@ -6,6 +6,7 @@ export interface FilterOptions {
     end_date?: string
     creator_id?: string
     sort_by?: string
+    sort_direction?: "asc" | "desc"
     hide?: boolean
 }
 
@@ -44,14 +45,17 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             query = query.gte("start_date", filterBy.start_date)
         }
         if (filterBy?.end_date) {
-            query = query.lte("end_date", filterBy.end_date)
+            query = query.lt("end_date", filterBy.end_date)
         }
         if (filterBy?.creator_id) {
             query = query.eq("creator_id", filterBy.creator_id)
         }
         if (filterBy?.sort_by) {
-            query = query.order(filterBy.sort_by)
+            query = query.order(filterBy.sort_by, {
+                ascending: filterBy.sort_direction === "asc",
+            })
         }
+
         if (filterBy?.hide) {
             query = query.eq("hide", filterBy.hide)
         }

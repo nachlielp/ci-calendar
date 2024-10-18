@@ -12,16 +12,23 @@ import { Icon } from "../Other/Icon"
 import { SelectOption } from "../../../util/options"
 import FullEventCard from "./FullEventCard"
 import { useUser } from "../../../context/UserContext"
-import { useEvents } from "../../../hooks/useEvents"
 import MenuButtons from "../Other/MenuButtons"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
+import { useCIPastEvents } from "../../../hooks/useCIPastEvents"
+import { useCIEvents } from "../../../context/CIEventsContext"
 const { Option } = Select
 
+//TODO fix mess - change the past hook to enclude fuature and past and have its own subsciption
 export default function ManageEventsTable() {
     const isPhone = useIsMobile()
     const { user } = useUser()
-    const { events } = useEvents()
+    const { ci_events } = useCIEvents()
+    const { ci_past_events } = useCIPastEvents({
+        creator_id: user?.user_type === "creator" ? user?.user_id : undefined,
+        sort_direction: "desc",
+        start_date: dayjs().format("YYYY-MM-DD"),
+    })
 
     const uid = useMemo(
         () =>
@@ -33,7 +40,7 @@ export default function ManageEventsTable() {
     const [showPast, setShowPast] = useState(false)
 
     const filteredEvents = useEventsFilter({
-        events,
+        events: showPast ? ci_past_events : ci_events,
         showPast,
         uids: uid,
     })
@@ -331,10 +338,17 @@ export default function ManageEventsTable() {
             <Table
                 rowSelection={rowSelection}
                 columns={filteredColumns}
-                dataSource={teachersEvents.map((event) => ({
-                    ...event,
-                    key: event.id,
-                }))}
+                dataSource={
+                    showPast
+                        ? ci_past_events.map((event) => ({
+                              ...event,
+                              key: event.id,
+                          }))
+                        : teachersEvents.map((event) => ({
+                              ...event,
+                              key: event.id,
+                          }))
+                }
                 pagination={false}
                 expandable={{
                     expandedRowRender: (event) => (

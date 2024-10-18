@@ -1,20 +1,40 @@
-import { useEffect, useState } from "react"
-import { UserBio, CIEvent, CIEventSegments } from "../util/interfaces"
+import { createContext, useContext, useEffect, useState } from "react"
+import { CIEvent, CIEventSegments, UserBio } from "../util/interfaces"
 import dayjs from "dayjs"
-import { cieventsService, FilterOptions } from "../supabase/cieventsService"
-import { supabase } from "../supabase/client"
+import { cieventsService } from "../supabase/cieventsService"
 import { usersService } from "../supabase/usersService"
+import { supabase } from "../supabase/client"
 
-export const useEvents = (filterBy: FilterOptions = {}) => {
-    const [events, setEvents] = useState<CIEvent[]>([])
+interface CIEventsContextType {
+    ci_events: CIEvent[]
+    loading: boolean
+    viewableTeachers: UserBio[]
+}
+
+export const CIEventsContext = createContext<CIEventsContextType>({
+    ci_events: [],
+    loading: true,
+    viewableTeachers: [],
+})
+
+export const useCIEvents = () => {
+    return useContext(CIEventsContext)
+}
+
+export const CIEventsProvider = ({
+    children,
+}: {
+    children: React.ReactNode
+}) => {
+    const [ci_events, setCievents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
     const [viewableTeachers, setViewableTeachers] = useState<UserBio[]>([])
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const fetchedEvents = await cieventsService.getCIEvents(
-                    filterBy
-                )
+                const fetchedEvents = await cieventsService.getCIEvents({
+                    start_date: dayjs().startOf("day").toISOString(),
+                })
                 sortAndSetEvents(fetchedEvents)
 
                 const eventsTeacherIds: string[] = []
@@ -40,12 +60,11 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
 
         fetchEvents()
 
-        // Set up real-time subscription
         const subscription = supabase
             .channel("cievents-changes")
             .on(
                 "postgres_changes",
-                { event: "*", schema: "public", table: "ci-events" },
+                { event: "*", schema: "public", table: "ci_events" },
                 handleChange
             )
             .subscribe()
@@ -57,8 +76,9 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
     }, [])
 
     const handleChange = async (_: any) => {
-        // Fetch all events again when there's a change
-        const fetchedEvents = await cieventsService.getCIEvents(filterBy)
+        const fetchedEvents = await cieventsService.getCIEvents({
+            start_date: dayjs().startOf("day").toISOString(),
+        })
         sortAndSetEvents(fetchedEvents)
     }
 
@@ -66,8 +86,14 @@ export const useEvents = (filterBy: FilterOptions = {}) => {
         const sortedEvents = fetchedEvents.sort((a, b) =>
             dayjs(a.start_date).diff(dayjs(b.start_date))
         )
-        setEvents(sortedEvents)
+        setCievents(sortedEvents)
     }
 
-    return { events, loading, viewableTeachers }
+    return (
+        <CIEventsContext.Provider
+            value={{ ci_events, loading, viewableTeachers }}
+        >
+            {children}
+        </CIEventsContext.Provider>
+    )
 }
