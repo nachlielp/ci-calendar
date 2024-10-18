@@ -85,6 +85,7 @@ export default function EditMultiDayEventForm({
                 editType === EventAction.recycle ? uuidv4() : event.id
 
             const updatedEvent: CIEvent = {
+                is_notified: event.is_notified,
                 start_date:
                     newDates?.[0]
                         ?.hour(13)

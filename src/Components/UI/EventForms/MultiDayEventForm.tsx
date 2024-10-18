@@ -136,6 +136,7 @@ export default function MultiDayEventForm({
                     throw new Error("dates are null")
                 }
                 const event: CIEventWithoutId = {
+                    is_notified: false,
                     start_date: dates[0]
                         .hour(13)
                         .minute(0)

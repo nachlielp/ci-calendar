@@ -173,6 +173,7 @@ export default function EditSingleDayEventForm({
             const eventId =
                 editType === EventAction.recycle ? uuidv4() : event.id
             const updatedEvent: CIEvent = {
+                is_notified: event.is_notified,
                 start_date: baseDate
                     .hour(13)
                     .minute(0)

@@ -68,6 +68,7 @@ export interface CIEvent {
     source_template_id: string | null
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
+    is_notified: boolean
 }
 export interface CITemplate {
     template_id: string
