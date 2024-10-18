@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react"
 
 import { usersService } from "../supabase/usersService"
+import { useUser } from "../context/UserContext"
 
 export const useTeachersList = ({ addSelf }: { addSelf: boolean }) => {
     const [teachers, setTeachers] = useState<
         { label: string; value: string }[]
     >([])
     const [loading, setLoading] = useState(true)
+    const { user } = useUser()
 
     useEffect(() => {
+        if (!user) return
         const fetchTeachers = async () => {
             try {
                 const teachers = await usersService.getTaggableTeachers()
                 if (addSelf) {
-                    teachers.push({ label: "עצמי", value: "self" })
+                    teachers.push({
+                        label: `${user.full_name}`,
+                        value: user.user_id,
+                    })
                 }
                 setTeachers(teachers)
                 setLoading(false)
