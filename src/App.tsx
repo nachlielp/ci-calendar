@@ -140,7 +140,6 @@ export default function App() {
                             </Route>
 
                             {/* Creator privet routes */}
-
                             <Route
                                 element={
                                     <PrivateRoutes
@@ -151,6 +150,14 @@ export default function App() {
                                     />
                                 }
                             >
+                                <Route
+                                    path="/manage-events"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <ManageEventsTable />
+                                        </Suspense>
+                                    }
+                                />
                                 <Route
                                     path="/create-events"
                                     element={
@@ -185,14 +192,7 @@ export default function App() {
                                         </Suspense>
                                     }
                                 />
-                                <Route
-                                    path="/manage-events"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <ManageEventsTable />
-                                        </Suspense>
-                                    }
-                                />
+
                                 <Route
                                     path="/manage-support"
                                     element={
