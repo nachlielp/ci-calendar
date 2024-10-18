@@ -135,7 +135,12 @@ function subscribeToUser(userId: string, callback: (payload: any) => void) {
         .channel(`public:users:user_id=eq.${userId}`)
         .on(
             "postgres_changes",
-            { event: "*", schema: "public", table: "users" },
+            {
+                event: "*",
+                schema: "public",
+                table: "users",
+                filter: `user_id=eq.${userId}`,
+            },
             (payload) => {
                 callback(payload)
             }
