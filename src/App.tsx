@@ -8,7 +8,6 @@ import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 import Login from "./Components/Auth/Login"
 import Signup from "./Components/Auth/Signup"
 import BackgroundTiles from "./Components/UI/Other/BackgroundTiles"
-import dayjs from "dayjs"
 
 import EventsPage from "./Components/Pages/EventsPage"
 
