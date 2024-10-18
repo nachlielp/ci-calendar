@@ -27,6 +27,8 @@ import { cieventsService } from "../../../supabase/cieventsService"
 import { useTeachersList } from "../../../hooks/useTeachersList"
 import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
+import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
+import Alert from "antd/es/alert"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -64,6 +66,8 @@ export default function EditSingleDayEventForm({
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [form] = Form.useForm()
 
     //TODO move to custom hook
@@ -104,6 +108,7 @@ export default function EditSingleDayEventForm({
     }
 
     const handleSubmit = async (values: any) => {
+        setIsSubmitting(true)
         console.log("EditSingleDayEventForm.handleSubmit.values: ", values)
         // const eventDateString = Array.isArray(values["event-date"])
         //     ? values["event-date"][0]
@@ -226,6 +231,8 @@ export default function EditSingleDayEventForm({
                 }
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
+            } finally {
+                setIsSubmitting(false)
             }
         } else if (template) {
             const updatedTemplate: CITemplate = {
@@ -258,8 +265,14 @@ export default function EditSingleDayEventForm({
                     "EventForm.handleSubmit.updateTemplate.error: ",
                     error
                 )
+            } finally {
+                setIsSubmitting(false)
             }
         }
+    }
+
+    const onFinishFailed = () => {
+        setInputErrors(true)
     }
 
     const submitText = isTemplate
@@ -285,6 +298,7 @@ export default function EditSingleDayEventForm({
                     labelCol={{ span: 6, offset: 0 }}
                     wrapperCol={{ span: 16, offset: 0 }}
                     initialValues={currentFormValues}
+                    onFinishFailed={onFinishFailed}
                 >
                     {isTemplate && (
                         <Form.Item name="template-name" label="שם התבנית">
@@ -307,7 +321,13 @@ export default function EditSingleDayEventForm({
                     <EventSegmentsForm form={form} teachers={teachers} />
                     <AddLinksForm />
                     <AddPricesForm />
-
+                    {inputErrors && (
+                        <Alert
+                            message="ערכים שגויים, נא לבדוק את הטופס"
+                            type="error"
+                            style={{ margin: "10px 0" }}
+                        />
+                    )}
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
@@ -316,9 +336,9 @@ export default function EditSingleDayEventForm({
                             justifyContent: "flex-start",
                         }}
                     >
-                        <button type="submit" className="general-action-btn">
+                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
                             {submitText}
-                        </button>
+                        </AsyncFormSubmitButton>
                     </Form.Item>
                 </Form>
             </Card>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import Button from "antd/es/button"
 import Form, { FormProps } from "antd/es/form"
 import Input from "antd/es/input"
 import Card from "antd/es/card"
@@ -10,6 +9,8 @@ import { usersService } from "../../../supabase/usersService"
 import { DbUser } from "../../../util/interfaces"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import CloudinaryUpload from "../Other/CloudinaryUpload"
+import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
+import Alert from "antd/es/alert"
 
 type FieldType = {
     full_name: string
@@ -29,6 +30,8 @@ interface ProfileFormProps {
 export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const isMobile = useIsMobile()
     const { user, setUser } = useUser()
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [inputErrors, setInputErrors] = useState<boolean>(false)
     if (!user) throw new Error("TeacherForm.user")
 
     const [imageUrl, setImageUrl] = useState<string>(user?.img || "")
@@ -42,8 +45,10 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
         setImageUrl(url)
     }
 
-    const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
+    const handleSubmit: FormProps<FieldType>["onFinish"] = async (values) => {
         if (!user) return
+
+        setIsSubmitting(true)
         console.log("values: ", values)
         const { full_name, bio, page_url, page_title, show_profile } = values
         const newTeacher: Partial<DbUser> = {
@@ -66,6 +71,8 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
             closeEditProfile()
         } catch (error) {
             console.error("UserForm.onFinish.error: ", error)
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -74,6 +81,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
         errorInfo
     ) => {
         console.log("Failed:", errorInfo)
+        setInputErrors(true)
     }
 
     //TODO clear form service !!!
@@ -94,6 +102,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         onFinishFailed={onFinishFailed}
                         form={form}
                         autoComplete="off"
+                        onFinish={handleSubmit}
                         initialValues={{
                             full_name: user.full_name,
                             bio: user.bio,
@@ -201,14 +210,16 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                                 defaultChecked={user?.show_profile}
                             />
                         </Form.Item>
-
-                        <Button
-                            htmlType="submit"
-                            className="teacher-form-submit"
-                            onClick={() => form.validateFields().then(onFinish)}
-                        >
+                        {inputErrors && (
+                            <Alert
+                                message="ערכים שגויים, נא לבדוק את הטופס"
+                                type="error"
+                                style={{ marginBottom: 10 }}
+                            />
+                        )}
+                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
                             שמירת שינויים
-                        </Button>
+                        </AsyncFormSubmitButton>
                     </Form>
                 </Card>
             )}

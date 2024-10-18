@@ -14,6 +14,10 @@
     border-radius: 6px;
     padding: 5px 16px;
     border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+
     &:hover {
         background-color: #c6280c;
         color: white;
@@ -27,6 +31,26 @@
     &.disabled {
         background-color: #e0e0e0;
         color: #9e9e9e;
+    }
+    .general-action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .general-action-btn svg {
+        margin-right: 8px;
+        width: 16px;
+        height: 16px;
+    }
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    .loading-spinner {
+        animation: spin 1s linear infinite;
     }
 }
 
@@ -88,5 +112,27 @@
         // margin-right: 4px;
         width: 24px;
         height: 24px;
+    }
+
+    //async
+    .secondary-action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .secondary-action-btn svg {
+        margin-right: 8px;
+        width: 16px;
+        height: 16px;
+    }
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    .loading-spinner {
+        animation: spin 1s linear infinite;
     }
 }

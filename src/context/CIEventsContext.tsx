@@ -4,6 +4,11 @@ import dayjs from "dayjs"
 import { cieventsService } from "../supabase/cieventsService"
 import { usersService } from "../supabase/usersService"
 import { supabase } from "../supabase/client"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
+
+dayjs.extend(timezone)
+dayjs.extend(utc)
 
 interface CIEventsContextType {
     ci_events: CIEvent[]
@@ -29,11 +34,12 @@ export const CIEventsProvider = ({
     const [ci_events, setCievents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
     const [viewableTeachers, setViewableTeachers] = useState<UserBio[]>([])
+
     useEffect(() => {
         const fetchEvents = async () => {
             try {
                 const fetchedEvents = await cieventsService.getCIEvents({
-                    start_date: dayjs().startOf("day").toISOString(),
+                    start_date: dayjs().format("YYYY-MM-DD"),
                 })
                 sortAndSetEvents(fetchedEvents)
 

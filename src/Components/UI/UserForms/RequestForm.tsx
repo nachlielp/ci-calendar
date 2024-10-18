@@ -7,6 +7,8 @@ import { useUser } from "../../../context/UserContext"
 import { requestsService } from "../../../supabase/requestsService"
 import { RequestType } from "../../../util/interfaces"
 import { useState } from "react"
+import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
+import Alert from "antd/es/alert"
 
 type RequestFieldType = {
     requestType: RequestType
@@ -28,6 +30,8 @@ export default function RequestForm() {
     const { user } = useUser()
     const [type, setType] = useState<RequestType | null>(null)
     const [isSubmitted, setIsSubmitted] = useState<RequestResponse | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+    const [inputErrors, setInputErrors] = useState<boolean>(false)
 
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -44,8 +48,8 @@ export default function RequestForm() {
             email: user.email || "",
             name: user.full_name || "",
         }
-        console.log("requestPayload: ", requestPayload)
         try {
+            setIsSubmitting(true)
             const { data, error } = await requestsService.createRequest(
                 requestPayload
             )
@@ -60,8 +64,15 @@ export default function RequestForm() {
             }
         } catch (error) {
             console.error("RequestForm.onFinish.error: ", error)
+        } finally {
+            setIsSubmitting(false)
         }
     }
+
+    const onFinishFailed: FormProps<RequestFieldType>["onFinishFailed"] =
+        () => {
+            setInputErrors(true)
+        }
 
     return (
         <div className="request-form">
@@ -79,6 +90,7 @@ export default function RequestForm() {
                             email: user.email,
                         }}
                         style={{ minHeight: "130px" }}
+                        onFinishFailed={onFinishFailed}
                     >
                         <Form.Item<RequestFieldType>
                             name="requestType"
@@ -118,7 +130,15 @@ export default function RequestForm() {
                         )}
                         {type && (
                             <>
-                                <Form.Item<RequestFieldType> name="description">
+                                <Form.Item<RequestFieldType>
+                                    name="description"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "נא להזין תיאור ",
+                                        },
+                                    ]}
+                                >
                                     <Input.TextArea
                                         placeholder={
                                             type === RequestType.support
@@ -128,6 +148,13 @@ export default function RequestForm() {
                                         rows={6}
                                     />
                                 </Form.Item>
+                                {inputErrors && (
+                                    <Alert
+                                        message="ערכים שגויים, נא לבדוק את הטופס"
+                                        type="error"
+                                        style={{ margin: "10px 0" }}
+                                    />
+                                )}
                                 <Form.Item
                                     wrapperCol={{ span: 24 }}
                                     className="submit-button-container"
@@ -136,12 +163,11 @@ export default function RequestForm() {
                                         justifyContent: "flex-start",
                                     }}
                                 >
-                                    <button
-                                        type="submit"
-                                        className="general-action-btn"
+                                    <AsyncFormSubmitButton
+                                        isSubmitting={isSubmitting}
                                     >
                                         הגשה
-                                    </button>
+                                    </AsyncFormSubmitButton>
                                 </Form.Item>
                             </>
                         )}

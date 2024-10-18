@@ -16,6 +16,8 @@ import { useUser } from "../../../context/UserContext"
 import { cieventsService } from "../../../supabase/cieventsService.ts"
 import { templateService } from "../../../supabase/templateService.ts"
 import { utilService } from "../../../util/utilService"
+import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton.tsx"
+import Alert from "antd/es/alert/Alert"
 
 export default function EditMultiDayEventForm({
     editType,
@@ -37,6 +39,8 @@ export default function EditMultiDayEventForm({
     }
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
     const [newDates, setNewDates] = useState<[Dayjs, Dayjs] | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [inputErrors, setInputErrors] = useState<boolean>(false)
 
     useEffect(() => {
         if (event) {
@@ -71,6 +75,7 @@ export default function EditMultiDayEventForm({
 
     const handleSubmit = async (values: any) => {
         if (event) {
+            setIsSubmitting(true)
             if (!newDates && !values["event-dates"]) {
                 console.error("dates are null")
                 return
@@ -126,8 +131,11 @@ export default function EditMultiDayEventForm({
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
                 throw error
+            } finally {
+                setIsSubmitting(false)
             }
         } else if (template) {
+            setIsSubmitting(true)
             const updatedTemplate: CITemplate = {
                 type: values["main-event-type"].value,
                 template_id: template.template_id,
@@ -159,8 +167,14 @@ export default function EditMultiDayEventForm({
                     "EventForm.handleSubmit.updateTemplate.error: ",
                     error
                 )
+            } finally {
+                setIsSubmitting(false)
             }
         }
+    }
+
+    const onFinishFailed = () => {
+        setInputErrors(true)
     }
 
     const submitText = isTemplate
@@ -183,6 +197,7 @@ export default function EditMultiDayEventForm({
                     variant="filled"
                     onFinish={handleSubmit}
                     initialValues={currentFormValues}
+                    onFinishFailed={onFinishFailed}
                 >
                     {isTemplate && (
                         <Form.Item name="template-name" label="שם התבנית">
@@ -200,6 +215,13 @@ export default function EditMultiDayEventForm({
 
                     <AddLinksForm />
                     <AddPricesForm />
+                    {inputErrors && (
+                        <Alert
+                            message="ערכים שגויים, נא לבדוק את הטופס"
+                            type="error"
+                            style={{ margin: "10px 0" }}
+                        />
+                    )}
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
@@ -208,9 +230,9 @@ export default function EditMultiDayEventForm({
                             justifyContent: "flex-start",
                         }}
                     >
-                        <button type="submit" className="general-action-btn">
+                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
                             {submitText}
-                        </button>
+                        </AsyncFormSubmitButton>
                     </Form.Item>
                 </Form>
             </Card>

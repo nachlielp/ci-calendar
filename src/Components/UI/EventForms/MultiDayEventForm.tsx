@@ -30,6 +30,8 @@ import {
 } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import useTemplates from "../../../hooks/useTemplates"
+import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
+import Alert from "antd/es/alert"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -49,6 +51,9 @@ export default function MultiDayEventForm({
     isTemplate: boolean
 }) {
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [inputErrors, setInputErrors] = useState<boolean>(false)
+
     const navigate = useNavigate()
     const { teachers } = useTeachersList({ addSelf: true })
     const templates = useTemplates({ isMultiDay: true })
@@ -124,7 +129,7 @@ export default function MultiDayEventForm({
         if (!address) {
             return
         }
-
+        setIsSubmitting(true)
         try {
             if (!isTemplate) {
                 if (!dates) {
@@ -198,7 +203,13 @@ export default function MultiDayEventForm({
         } catch (error) {
             console.error("EventForm.handleSubmit.error: ", error)
             throw error
+        } finally {
+            setIsSubmitting(false)
         }
+    }
+
+    const onFinishFailed = () => {
+        setInputErrors(true)
     }
 
     return (
@@ -209,6 +220,7 @@ export default function MultiDayEventForm({
                     onFinish={handleSubmit}
                     variant="filled"
                     initialValues={initialValues}
+                    onFinishFailed={onFinishFailed}
                 >
                     {isTemplate && (
                         <Form.Item name="template-name">
@@ -277,6 +289,13 @@ export default function MultiDayEventForm({
                         <b>מחיר</b>
                     </label>
                     <AddPricesForm />
+                    {inputErrors && (
+                        <Alert
+                            message="ערכים שגויים, נא לבדוק את הטופס"
+                            type="error"
+                            style={{ margin: "10px 0" }}
+                        />
+                    )}
 
                     <Form.Item
                         wrapperCol={{ span: 24 }}
@@ -286,9 +305,9 @@ export default function MultiDayEventForm({
                             justifyContent: "flex-start",
                         }}
                     >
-                        <button type="submit" className="general-action-btn">
+                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
                             {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                        </button>
+                        </AsyncFormSubmitButton>
                     </Form.Item>
                 </Form>
             </section>

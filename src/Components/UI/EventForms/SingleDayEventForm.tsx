@@ -29,6 +29,8 @@ import {
 } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import useTemplates from "../../../hooks/useTemplates"
+import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
+import Alert from "antd/es/alert"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -52,8 +54,11 @@ export default function SingleDayEventForm({
     // const [repeatOption, setRepeatOption] = useState<EventFrequency>(
     //     EventFrequency.none
     // )
+    const [isSubmitting, setIsSubmitting] = useState(false)
+
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
+    const [inputErrors, setInputErrors] = useState<boolean>(false)
     // const [submitted, setSubmitted] = useState(false)
     const navigate = useNavigate()
     const { user } = useUser()
@@ -127,6 +132,7 @@ export default function SingleDayEventForm({
     }
 
     const handleSubmit = async (values: any) => {
+        setIsSubmitting(true)
         const baseDate = dayjs(values["event-date"]) // Clone the base date for consistent date manipulation
 
         const segmentsArray = [
@@ -237,7 +243,13 @@ export default function SingleDayEventForm({
         } catch (error) {
             console.error("EventForm.handleSubmit.error: ", error)
             throw error
+        } finally {
+            setIsSubmitting(false)
         }
+    }
+
+    const onFinishFailed = () => {
+        setInputErrors(true)
     }
 
     const titleText = isTemplate
@@ -250,6 +262,7 @@ export default function SingleDayEventForm({
                 <Form
                     form={form}
                     onFinish={handleSubmit}
+                    onFinishFailed={onFinishFailed}
                     variant="filled"
                     initialValues={initialValues}
                 >
@@ -326,6 +339,14 @@ export default function SingleDayEventForm({
                     </label>
                     <AddPricesForm />
 
+                    {inputErrors && (
+                        <Alert
+                            message="ערכים שגויים, נא לבדוק את הטופס"
+                            type="error"
+                            style={{ margin: "10px 0" }}
+                        />
+                    )}
+
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
@@ -334,12 +355,9 @@ export default function SingleDayEventForm({
                             justifyContent: "flex-start",
                         }}
                     >
-                        <button type="submit" className={`general-action-btn`}>
-                            <label>
-                                {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                            </label>
-                            {/* <Spin percent="auto" spinning={submitted} /> */}
-                        </button>
+                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
+                            {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                        </AsyncFormSubmitButton>
                     </Form.Item>
                 </Form>
             </section>
