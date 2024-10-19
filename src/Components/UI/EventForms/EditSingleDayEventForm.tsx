@@ -102,7 +102,8 @@ export default function EditSingleDayEventForm({
 
     if (
         user.user_type !== UserType.admin &&
-        user.user_type !== UserType.creator
+        user.user_type !== UserType.creator &&
+        user.user_type !== UserType.org
     ) {
         navigate("/")
     }

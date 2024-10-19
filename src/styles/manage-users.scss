@@ -15,8 +15,9 @@
         height: 48px;
         white-space: normal; // Allow text to wrap
         text-align: center; // Center the text
-        padding: 0 8px;
-        margin: 0 8px;
+        padding: 0 2px;
+        margin: 0 2px;
+        cursor: pointer;
     }
 
     .manage-users-card {

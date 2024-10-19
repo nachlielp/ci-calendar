@@ -101,6 +101,7 @@ export enum UserType {
     admin = "admin",
     creator = "creator",
     profile = "profile",
+    org = "org",
     user = "user",
 }
 
@@ -158,7 +159,6 @@ export interface DbUser {
     push_notification_tokens: PushNotificationToken[]
     notifications: Notification[]
     subscriptions: string[]
-    is_org: boolean
 }
 
 export interface UserBio extends Partial<DbUser> {
@@ -170,7 +170,6 @@ export interface UserBio extends Partial<DbUser> {
     allow_tagging: boolean
     img: string
     bio: string
-    is_org: boolean
 }
 
 export interface CIRequestResponse {
@@ -199,12 +198,14 @@ export interface CIRequest {
 export enum RequestType {
     make_profile = "make_profile",
     make_creator = "make_creator",
+    make_org = "make_org",
     support = "support",
 }
 
 export enum RequestTypeHebrew {
     make_profile = "הרשמה כמורה",
     make_creator = "הרשמה כמורה ויוצר ארועים",
+    make_org = "הרשמה כארגון",
     support = "תמיכה",
 }
 

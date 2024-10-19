@@ -43,7 +43,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         let query = supabase
             .from("ci_events")
             .select(
-                "*, user_list:ci_events_users_junction!inner(users(user_id, full_name, img, bio, page_url, page_title, show_profile, allow_tagging,is_org))"
+                "*, user_list:ci_events_users_junction!inner(users(user_id, full_name, img, bio, page_url, page_title, show_profile, allow_tagging))"
             )
             .eq("ci_events_users_junction.users.show_profile", true)
 

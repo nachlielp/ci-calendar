@@ -25,14 +25,20 @@ export default function ManageEventsTable() {
     const { user } = useUser()
     const { ci_events } = useCIEvents()
     const { ci_past_events } = useCIPastEvents({
-        creator_id: user?.user_type === "creator" ? user?.user_id : undefined,
+        creator_id:
+            user?.user_type === UserType.creator ||
+            user?.user_type === UserType.org
+                ? user?.user_id
+                : undefined,
         sort_direction: "desc",
         start_date: dayjs().format("YYYY-MM-DD"),
     })
 
     const uid = useMemo(
         () =>
-            user?.user_type === "creator" || user?.user_type === "admin"
+            user?.user_type === UserType.creator ||
+            user?.user_type === UserType.admin ||
+            user?.user_type === UserType.org
                 ? [user.user_id]
                 : [],
         [user]

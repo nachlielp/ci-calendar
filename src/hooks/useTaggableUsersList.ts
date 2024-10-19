@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 
 import { usersService } from "../supabase/usersService"
 import { useUser } from "../context/UserContext"
+import { UserType } from "../util/interfaces"
 
 export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
     const [teachers, setTeachers] = useState<
@@ -17,13 +18,13 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
             try {
                 const users = await usersService.getTaggableUsers()
                 const teachers = users
-                    .filter((user) => !user.is_org)
+                    .filter((user) => user.user_type !== UserType.org)
                     .map((user) => ({
                         label: `${user.full_name}`,
                         value: user.user_id,
                     }))
                 const orgs = users
-                    .filter((user) => user.is_org)
+                    .filter((user) => user.user_type === UserType.org)
                     .map((user) => ({
                         label: `${user.full_name}`,
                         value: user.user_id,
@@ -35,7 +36,7 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
                         .includes(user.user_id) &&
                     addSelf
                 ) {
-                    if (user.is_org) {
+                    if (user.user_type === UserType.org) {
                         orgs.push({
                             label: `${user.full_name}`,
                             value: user.user_id,

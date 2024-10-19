@@ -19,6 +19,7 @@ type RequestFieldType = {
 const requestOptions = [
     { label: "הרשמה כמורה", value: "make_profile" },
     { label: "הרשמה כמורה ויוצר ארועים", value: "make_creator" },
+    { label: "הרשמה כארגון", value: "make_org" },
     { label: "תמיכה", value: "support" },
 ]
 
@@ -112,7 +113,8 @@ export default function RequestForm() {
                         </Form.Item>
 
                         {(type === RequestType.make_creator ||
-                            type === RequestType.make_profile) && (
+                            type === RequestType.make_profile ||
+                            type === RequestType.make_org) && (
                             <Form.Item<RequestFieldType>
                                 name="phone"
                                 rules={[

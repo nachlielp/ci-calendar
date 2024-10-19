@@ -91,14 +91,14 @@ async function getUsers(): Promise<ManageUserOption[]> {
 }
 
 async function getTaggableUsers(): Promise<
-    { user_id: string; full_name: string; is_org: boolean }[]
+    { user_id: string; full_name: string; user_type: UserType }[]
 > {
     try {
         const { data, error } = await supabase
             .from("users")
-            .select("user_id, full_name, is_org")
+            .select("user_id, full_name, user_type")
             .eq("show_profile", true)
-            .neq("user_type", "user")
+            .neq("user_type", UserType.user)
 
         if (error) throw error
 

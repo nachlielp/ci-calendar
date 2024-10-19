@@ -133,6 +133,8 @@ export default function ManageSupportPage() {
                         ? UserType.profile
                         : request.type === RequestType.make_creator
                         ? UserType.creator
+                        : request.type === RequestType.make_org
+                        ? UserType.org
                         : null
 
                 if (newUserType) {

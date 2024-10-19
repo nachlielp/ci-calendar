@@ -140,6 +140,31 @@ function ManageUsers() {
             throw error
         }
     }
+
+    const onMakeOrg = async () => {
+        if (!selectedUser) return
+        try {
+            const updatedUser = await usersService.updateUser(
+                selectedUser.user_id,
+                {
+                    user_type: UserType.org,
+                }
+            )
+            if (!updatedUser) return
+            const partialUser = {
+                user_id: updatedUser.user_id,
+                full_name: updatedUser.full_name,
+                email: updatedUser.email,
+                user_type: updatedUser.user_type,
+            }
+
+            setSelectedUser(partialUser)
+        } catch (error) {
+            console.error(`ManageUsers.onMakeOrg.error: `, error)
+            throw error
+        }
+    }
+
     const onMakeUser = async () => {
         if (!selectedUser) return
         try {
@@ -184,6 +209,15 @@ function ManageUsers() {
             הגדרה כיוצר
         </Button>
     )
+    const makeOrg = (
+        <Button
+            disabled={selectedUser?.user_type === UserType.org}
+            onClick={onMakeOrg}
+            className="user-btn"
+        >
+            הגדרה כארגון
+        </Button>
+    )
 
     const makeProfile = (
         <Button
@@ -204,7 +238,7 @@ function ManageUsers() {
         </Button>
     )
     const footer = selectedUser
-        ? [makeAdmin, makeCreator, makeProfile, makeUser]
+        ? [makeAdmin, makeOrg, makeCreator, makeProfile, makeUser]
         : []
 
     return (

@@ -83,6 +83,7 @@ export default function App() {
                                         requiredRoles={[
                                             UserType.admin,
                                             UserType.creator,
+                                            UserType.org,
                                             UserType.user,
                                             UserType.profile,
                                         ]}
@@ -111,6 +112,7 @@ export default function App() {
                                             UserType.profile,
                                             UserType.admin,
                                             UserType.creator,
+                                            UserType.org,
                                         ]}
                                     />
                                 }
@@ -132,6 +134,7 @@ export default function App() {
                                         requiredRoles={[
                                             UserType.admin,
                                             UserType.creator,
+                                            UserType.org,
                                         ]}
                                     />
                                 }

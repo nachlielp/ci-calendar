@@ -84,7 +84,8 @@ export default function SingleDayEventForm({
 
     if (
         user.user_type !== UserType.admin &&
-        user.user_type !== UserType.creator
+        user.user_type !== UserType.creator &&
+        user.user_type !== UserType.org
     ) {
         navigate("/")
     }
@@ -238,7 +239,7 @@ export default function SingleDayEventForm({
                     segments: segmentsArray,
                     district: values["district"],
                     is_multi_day: false,
-                    multi_day_teachers: null,
+                    multi_day_teachers: [],
                     organisations:
                         utilService.formatUsersForCIEvent(
                             values["event-orgs"],
