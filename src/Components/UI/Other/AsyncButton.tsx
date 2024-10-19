@@ -2,19 +2,21 @@ interface AsyncButtonProps {
     isSubmitting: boolean
     callback: (args?: any) => void
     children: React.ReactNode
+    disabled?: boolean
 }
 
 export default function AsyncButton({
     isSubmitting,
     callback,
     children,
+    disabled,
 }: AsyncButtonProps) {
     return (
         <>
             <button
                 onClick={callback}
                 className="general-action-btn"
-                disabled={isSubmitting}
+                disabled={isSubmitting || disabled}
             >
                 {isSubmitting ? (
                     <>

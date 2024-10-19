@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import Form, { FormProps } from "antd/es/form"
+import { useEffect, useRef, useState } from "react"
+import Form from "antd/es/form"
 import Input from "antd/es/input"
 import Card from "antd/es/card"
 import Image from "antd/es/image"
@@ -9,7 +9,6 @@ import { usersService } from "../../../supabase/usersService"
 import { DbUser } from "../../../util/interfaces"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import CloudinaryUpload from "../Other/CloudinaryUpload"
-import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
 import AsyncButton from "../Other/AsyncButton"
 
@@ -31,6 +30,7 @@ interface ProfileFormProps {
 export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const isMobile = useIsMobile()
     const { user, setUser } = useUser()
+    const originalImageUrl = useRef<string>(user?.img || "")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     if (!user) throw new Error("TeacherForm.user")
@@ -41,6 +41,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
     useEffect(() => {
         setImageUrl(user?.img || "")
+        originalImageUrl.current = user?.img || ""
     }, [user])
 
     const uploadNewImage = (url: string) => {
@@ -52,8 +53,12 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
         return values
     }
 
-    const handleSubmit: FormProps<FieldType>["onFinish"] = async () => {
+    const handleSubmit = async () => {
         const values = getCurrentFormValues()
+        if (!values.full_name) {
+            setInputErrors(true)
+            return
+        }
         if (!user) return
 
         setIsSubmitting(true)
@@ -69,13 +74,26 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
             updated_at: new Date().toISOString(),
         }
         try {
-            // await updateTeacher(newTeacher);
+            // try {
+            //     cloudinary.config({
+            //         cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
+            //         api_key: import.meta.env.VITE_CLOUDINARY_API_KEY,
+            //         api_secret: import.meta.env.VITE_CLOUDINARY_API_SECRET,
+            //     })
+            //     const res = await cloudinary.uploader.destroy(
+            //         "t45nwiz4gzk8vms2pta0"
+            //     )
+            //     console.log("res: ", res)
+            // } catch (error) {
+            //     console.error("ProfileForm.handleSubmit.error: ", error)
+            // }
+
             const updatedUser = await usersService.updateUser(
                 user.user_id,
                 newTeacher
             )
-            console.log("updatedUser: ", updatedUser)
             setUser(updatedUser)
+
             closeEditProfile()
         } catch (error) {
             console.error("UserForm.onFinish.error: ", error)
@@ -84,15 +102,6 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
         }
     }
 
-    //TODO handle error - image to large!!
-    const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
-        errorInfo
-    ) => {
-        console.log("Failed:", errorInfo)
-        setInputErrors(true)
-    }
-
-    //TODO clear form service !!!
     const clearImage = () => {
         setImageUrl("")
     }
