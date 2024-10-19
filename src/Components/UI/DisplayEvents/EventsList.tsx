@@ -1,5 +1,5 @@
 import { EventPreview } from "./EventPreview"
-import { CIEvent, UserBio } from "../../../util/interfaces"
+import { CIEvent } from "../../../util/interfaces"
 import Empty from "antd/es/empty"
 import { useRef } from "react"
 import { useParams } from "react-router-dom"
@@ -8,15 +8,9 @@ import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 
 interface IEventsListProps {
     events: CIEvent[]
-    viewableTeachers: UserBio[]
     isEvents: boolean
 }
-export default function EventsList({
-    events,
-    isEvents,
-
-    viewableTeachers,
-}: IEventsListProps) {
+export default function EventsList({ events, isEvents }: IEventsListProps) {
     const { eventId } = useParams<{ eventId: string }>()
     const eventRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
@@ -32,14 +26,7 @@ export default function EventsList({
                 >
                     <FullEventCardContainer
                         event={event}
-                        viewableTeachers={viewableTeachers}
-                        anchorEl={
-                            <EventPreview
-                                key={event.id}
-                                event={event}
-                                viewableTeachers={viewableTeachers}
-                            />
-                        }
+                        anchorEl={<EventPreview key={event.id} event={event} />}
                     />
                 </div>
             ))}

@@ -10,7 +10,7 @@
 @import "./styles/manage-events-table.scss";
 @import "./styles/multi-day-event-card.scss";
 @import "./styles/multi-day-modal-card.css";
-@import "./styles/single-day-event-card.css";
+// @import "./styles/single-day-event-card.css";
 @import "./styles/single-day-modal-card.css";
 @import "./styles/bio-page.css";
 @import "./styles/bio-card.css";
@@ -44,6 +44,7 @@
 @import "./styles/manage-support-page.css";
 @import "./styles/full-event-card.scss";
 @import "./styles/request-list.css";
+@import "./styles/event-preview.css";
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")

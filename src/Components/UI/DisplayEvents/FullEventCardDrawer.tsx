@@ -1,20 +1,18 @@
 import Drawer from "antd/es/drawer"
 import FullEventCard from "./FullEventCard"
 
-import { CIEvent, UserBio } from "../../../util/interfaces"
+import { CIEvent } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 import { useState } from "react"
 
 interface EventDrawerProps {
     event: CIEvent | null
-    viewableTeachers: UserBio[]
     anchorEl: any | null
     isSelectedEvent?: boolean
 }
 
 export default function FullEventCardDrawer({
     event,
-    viewableTeachers,
     anchorEl,
     isSelectedEvent = false,
 }: EventDrawerProps) {
@@ -35,10 +33,7 @@ export default function FullEventCardDrawer({
                     <Icon icon="chevron_right" className="event-drawer-close" />
                 }
             >
-                <FullEventCard
-                    event={event}
-                    viewableTeachers={viewableTeachers}
-                />
+                <FullEventCard event={event} />
             </Drawer>
         </>
     )

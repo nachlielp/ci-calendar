@@ -8,6 +8,7 @@ import {
     hebrewMonths,
     SelectOption,
 } from "./options"
+import { CIEventWithoutId } from "../supabase/cieventsService"
 export const utilService = {
     createDbUserFromUser,
     deepCompare,
@@ -31,6 +32,7 @@ export const utilService = {
     getFilterItemType,
     getLabelByValue,
     saveFiltersToLocalStorage,
+    getCIEventTeachers,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -344,4 +346,21 @@ function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
         eventTypes,
     }
     localStorage.setItem("defaultFilters", JSON.stringify(filters))
+}
+
+function getCIEventTeachers(cievent: CIEvent | CIEventWithoutId) {
+    const singleDayEventTeachers = cievent.segments
+        .map((segment) => segment.teachers)
+        .flat()
+        .map((teacher) => teacher.value)
+
+    const multiDayEventTeachers =
+        cievent.multi_day_teachers?.map((teacher) => teacher.value) || []
+
+    // Combine and filter out "NON_EXISTENT" values, then remove duplicates
+    const uniqueTeachers = Array.from(
+        new Set([...singleDayEventTeachers, ...multiDayEventTeachers])
+    ).filter((teacher) => teacher !== "NON_EXISTENT")
+
+    return uniqueTeachers
 }

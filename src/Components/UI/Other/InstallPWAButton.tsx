@@ -6,12 +6,14 @@ export function InstallPWAButton() {
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (evt: Event) => {
+            console.log("handleBeforeInstallPrompt.evt", evt)
             evt.preventDefault()
             setDeferredPrompt(evt)
             setIsVisible(true)
         }
 
         if ("onbeforeinstallprompt" in window) {
+            console.log("onbeforeinstallprompt in window")
             window.addEventListener(
                 "beforeinstallprompt",
                 handleBeforeInstallPrompt

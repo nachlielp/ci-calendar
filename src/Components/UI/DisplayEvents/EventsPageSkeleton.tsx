@@ -58,13 +58,13 @@ export default function EventsPageHeader() {
                     </main>
                     <Card
                         className="single-day-event-card"
-                        style={{ width: "100%" }}
+                        style={{ width: "100%", marginBottom: "16px" }}
                     >
                         <Skeleton active />
                     </Card>
                     <Card
                         className="single-day-event-card"
-                        style={{ width: "100%" }}
+                        style={{ width: "100%", marginBottom: "16px" }}
                     >
                         <Skeleton active />
                     </Card>

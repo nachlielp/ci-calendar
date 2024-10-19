@@ -1,6 +1,6 @@
 import Button from "antd/es/button"
 import Tag from "antd/es/tag"
-import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
+import { EventlyType, CIEvent } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
 import dayjs from "dayjs"
@@ -9,13 +9,7 @@ import React from "react"
 import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../Other/SecondaryButton"
 
-export default function FullEventCard({
-    event: ci_event,
-    viewableTeachers,
-}: {
-    event: CIEvent
-    viewableTeachers: UserBio[]
-}) {
+export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
 
@@ -68,7 +62,7 @@ export default function FullEventCard({
                     <Icon icon="person" className="event-icon" />
                     <label className="event-labels">
                         {multiDayTeachersLen.map((teacher, index, array) => {
-                            const isTeacher = viewableTeachers?.find(
+                            const isTeacher = ci_event.users?.find(
                                 (t) => t.user_id === teacher.value
                             )
                             return (
@@ -100,7 +94,7 @@ export default function FullEventCard({
                                     {segment.teachers.map(
                                         (teacher, index, array) => {
                                             const isTeacher =
-                                                viewableTeachers?.find(
+                                                ci_event.users?.find(
                                                     (t) =>
                                                         t.user_id ===
                                                         teacher.value

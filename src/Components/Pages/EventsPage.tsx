@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
-import { CIEvent, UserBio } from "../../util/interfaces"
+import { CIEvent } from "../../util/interfaces"
 import CalendarView from "../UI/Other/CalendarView"
 import EventsList from "../UI/DisplayEvents/EventsList"
 import { useState } from "react"
@@ -18,17 +18,12 @@ import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByPa
 import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
 import FullEventCardContainer from "../UI/DisplayEvents/FullEventCardContainer"
 import { utilService } from "../../util/utilService"
-import { InstallPWAButton } from "../UI/Other/InstallPWAButton"
 
 interface IEventsPageProps {
     events: CIEvent[]
-    viewableTeachers: UserBio[]
 }
 
-export default function EventsPage({
-    events,
-    viewableTeachers,
-}: IEventsPageProps) {
+export default function EventsPage({ events }: IEventsPageProps) {
     const { selectedEvent } = useSetSelectedEventByParams(events)
     const isMobile = useIsMobile()
     useDefaultFilter()
@@ -62,7 +57,6 @@ export default function EventsPage({
             <header className="header">
                 <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
                 <p className="subtitle">כל האירועים במקום אחד</p>
-                <InstallPWAButton />
                 <main className="menu-container">
                     <MenuButtons
                         onSelectKey={onSelectKey}
@@ -104,7 +98,6 @@ export default function EventsPage({
                         <EventsList
                             events={selectedDayEvents}
                             isEvents={!!selectedDayEvents.length}
-                            viewableTeachers={viewableTeachers}
                         />
                     </>
                 )}
@@ -112,14 +105,12 @@ export default function EventsPage({
                     <EventsList
                         events={filteredEvents}
                         isEvents={!!filteredEvents.length}
-                        viewableTeachers={viewableTeachers}
                     />
                 )}
                 {selectedEvent && (
                     <FullEventCardContainer
                         isSelectedEvent={true}
                         event={selectedEvent}
-                        viewableTeachers={viewableTeachers}
                         anchorEl={<></>}
                     />
                 )}

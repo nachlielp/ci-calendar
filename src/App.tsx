@@ -41,7 +41,7 @@ export enum EventAction {
 }
 
 export default function App() {
-    const { ci_events, loading, viewableTeachers } = useCIEvents()
+    const { ci_events, loading } = useCIEvents()
 
     return (
         <div className="app">
@@ -66,21 +66,11 @@ export default function App() {
                             />
                             <Route
                                 path="/"
-                                element={
-                                    <EventsPage
-                                        events={ci_events}
-                                        viewableTeachers={viewableTeachers}
-                                    />
-                                }
+                                element={<EventsPage events={ci_events} />}
                             />
                             <Route
                                 path="/:eventId"
-                                element={
-                                    <EventsPage
-                                        events={ci_events}
-                                        viewableTeachers={viewableTeachers}
-                                    />
-                                }
+                                element={<EventsPage events={ci_events} />}
                             />
                             {/* <Route
                                 path="/weekly-events"
@@ -200,12 +190,7 @@ export default function App() {
                             </Route>
                             <Route
                                 path="*"
-                                element={
-                                    <EventsPage
-                                        events={ci_events}
-                                        viewableTeachers={viewableTeachers}
-                                    />
-                                }
+                                element={<EventsPage events={ci_events} />}
                             />
                         </Routes>
                     </Suspense>

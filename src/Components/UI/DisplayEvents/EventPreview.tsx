@@ -2,13 +2,12 @@ import React from "react"
 import Card from "antd/es/card"
 import Tag from "antd/es/tag"
 import dayjs from "dayjs"
-import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
+import { EventlyType, CIEvent } from "../../../util/interfaces"
 import { tagOptions, eventOptions } from "../../../util/options"
 import { Icon } from "../Other/Icon"
 import { utilService } from "../../../util/utilService"
 interface EventPreviewProps {
     event: CIEvent
-    viewableTeachers: UserBio[]
 }
 
 export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
@@ -38,14 +37,14 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         })
 
         return (
-            <Card
-                ref={ref}
-                className="single-day-event-card"
-                style={{ width: "100%" }}
-            >
+            <Card ref={ref} className="event-preview" style={{ width: "100%" }}>
                 <article className="event-header">
                     <h2 className="event-title">{event.title}&nbsp;</h2>
                 </article>
+                {/* <article className="event-org">
+                    <Icon icon="domain" className="event-icon" />
+                    <label className="event-label">{event.creator_name}</label>
+                </article> */}
                 <article className="event-dates">
                     {event.segments.length > 0 ? (
                         <>
