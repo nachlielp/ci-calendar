@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useTeachersList } from "../../../hooks/useTeachersList"
+import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { useUser } from "../../../context/UserContext"
 import debounce from "lodash/debounce"
 import { usersService } from "../../../supabase/usersService"
@@ -7,7 +7,7 @@ import DoubleBindedSelect from "./DoubleBindedSelectProps"
 
 export default function SubscribeToTeachers() {
     const { user } = useUser()
-    const { teachers } = useTeachersList({ addSelf: false })
+    const { teachers } = useTaggableUsersList({ addSelf: false })
     console.log("teachers: ", teachers)
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>(
         user?.subscriptions || []

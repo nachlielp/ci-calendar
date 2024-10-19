@@ -12,7 +12,6 @@ import SecondaryButton from "../Other/SecondaryButton"
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
-
     const handleCopy = async () => {
         await navigator.clipboard.writeText(
             `${window.location.origin}/${ci_event.id}`
@@ -24,6 +23,28 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
             <article className="event-header">
                 <div className="event-title">{ci_event.title}&nbsp;</div>
             </article>
+            {ci_event.organisations.length > 0 && (
+                <article className="event-org">
+                    <Icon icon="domain" className="event-icon" />
+                    <label className="event-label">
+                        {ci_event.organisations.map((org, index, array) => {
+                            const isOrg = ci_event.users?.find(
+                                (t) => t.user_id === org.value
+                            )
+                            return (
+                                <React.Fragment key={org.value}>
+                                    {isOrg ? (
+                                        <BioModal teacher={isOrg} />
+                                    ) : (
+                                        org.label
+                                    )}
+                                    {index < array.length - 1 ? ", " : ""}
+                                </React.Fragment>
+                            )
+                        })}
+                    </label>
+                </article>
+            )}
             <article className="event-dates">
                 {ci_event.segments.length > 0 ? (
                     <>

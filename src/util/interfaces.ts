@@ -69,6 +69,7 @@ export interface CIEvent {
     source_template_id: string | null
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
+    organisations: UserOption[]
 }
 export interface CITemplate {
     template_id: string
@@ -85,8 +86,9 @@ export interface CITemplate {
     links: ILink[]
     segments: CIEventSegments[]
     is_multi_day: boolean
-    multi_day_teachers: UserOption[] | null
     created_by: string
+    multi_day_teachers: UserOption[]
+    organisations: UserOption[]
 }
 export enum District {
     north = "north",
@@ -156,6 +158,7 @@ export interface DbUser {
     push_notification_tokens: PushNotificationToken[]
     notifications: Notification[]
     subscriptions: string[]
+    is_org: boolean
 }
 
 export interface UserBio extends Partial<DbUser> {
@@ -167,6 +170,7 @@ export interface UserBio extends Partial<DbUser> {
     allow_tagging: boolean
     img: string
     bio: string
+    is_org: boolean
 }
 
 export interface CIRequestResponse {

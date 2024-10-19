@@ -28,15 +28,16 @@ interface SingleDayEventFormHeadProps {
     endDate: dayjs.Dayjs | null
     isEdit: boolean
     teachers: { label: string; value: string }[]
+    orgs: { label: string; value: string }[]
     address?: IAddress
     isTemplate?: boolean
     titleText: string
 }
-
 export default function SingleDayEventFormHead({
     handleAddressSelect,
     handleDateChange,
     teachers,
+    orgs,
     isTemplate,
     address,
     titleText,
@@ -91,6 +92,20 @@ export default function SingleDayEventFormHead({
                         />
                     </Form.Item>
                 )}
+
+                <Form.Item name="event-orgs" className="full-width">
+                    <Select
+                        mode="multiple"
+                        className="full-width"
+                        placeholder="ארגונים"
+                        filterOption={(input, option) =>
+                            (option?.label ?? "")
+                                .toLowerCase()
+                                .indexOf(input.toLowerCase()) >= 0
+                        }
+                        options={orgs}
+                    />
+                </Form.Item>
             </Card>
 
             {/* First Segment */}

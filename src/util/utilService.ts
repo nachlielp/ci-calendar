@@ -18,7 +18,7 @@ export const utilService = {
     singleDayTemplateToFormValues,
     CIEventToFormValues,
     reverseFormatTeachers,
-    formatTeachersForCIEvent,
+    formatUsersForCIEvent,
     deepCompareArraysUnordered,
     getDeviceId,
     isPWA,
@@ -33,6 +33,7 @@ export const utilService = {
     getLabelByValue,
     saveFiltersToLocalStorage,
     getCIEventTeachers,
+    notAUserId,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -64,13 +65,14 @@ function CIEventToFormValues(event: CIEvent) {
         ],
         "multi-day-event-teachers": event.multi_day_teachers,
         segments: segments,
+        "event-orgs": event.organisations?.map((org) => org.value),
     }
     return { currentFormValues, address: event.address }
 }
 
 function reverseFormatTeachers(teachers: { label: string; value: string }[]) {
     return teachers?.map((teacher) =>
-        teacher.value !== "NON_EXISTENT" ? teacher.value : teacher.label
+        utilService.notAUserId(teacher.value) ? teacher.label : teacher.value
     )
 }
 
@@ -167,6 +169,7 @@ function createDbUserFromUser(user: User): DbUser {
         push_notification_tokens: [],
         notifications: [],
         subscriptions: [],
+        is_org: false,
     }
 }
 
@@ -237,20 +240,25 @@ function hebrewDay(date: string) {
     }
 }
 
-//allows to store teachers that dont exist in the teachers list as {label: teacherName, value: "NON_EXISTENT"}
-function formatTeachersForCIEvent(
-    selectedTeachers: string[],
-    teachers: { label: string; value: string }[]
+//allows to store teachers that dont exist in the teachers list as {label: teacherName, value: "NON_EXISTENT"+uuid4()}
+function formatUsersForCIEvent(
+    selectedUsers: string[],
+    users: { label: string; value: string }[]
 ) {
-    if (!selectedTeachers) return []
-    return selectedTeachers.map((teacher) => {
-        const teacherObj = teachers.find((t) => t.value === teacher)
-        if (teacherObj) {
-            return teacherObj
-        } else {
-            return { label: teacher, value: "NON_EXISTENT" }
-        }
-    })
+    console.log("selectedUsers: ", selectedUsers)
+    console.log("users: ", users)
+    if (!selectedUsers) return []
+    const formattedUsers: { label: string; value: string }[] =
+        selectedUsers.map((user) => {
+            const userObj = users.find((t) => t.value === user)
+            if (userObj) {
+                return userObj
+            } else {
+                return { label: user, value: "NON_EXISTENT" + uuidv4() }
+            }
+        })
+    console.log("formattedUsers: ", formattedUsers)
+    return formattedUsers
 }
 
 function getDeviceId() {
@@ -357,10 +365,22 @@ function getCIEventTeachers(cievent: CIEvent | CIEventWithoutId) {
     const multiDayEventTeachers =
         cievent.multi_day_teachers?.map((teacher) => teacher.value) || []
 
+    const organisations = cievent.organisations
+        .map((org) => org.value)
+        .filter((org) => org !== "NON_EXISTENT")
+
     // Combine and filter out "NON_EXISTENT" values, then remove duplicates
     const uniqueTeachers = Array.from(
-        new Set([...singleDayEventTeachers, ...multiDayEventTeachers])
-    ).filter((teacher) => teacher !== "NON_EXISTENT")
+        new Set([
+            ...singleDayEventTeachers,
+            ...multiDayEventTeachers,
+            ...organisations,
+        ])
+    ).filter((teacher) => !utilService.notAUserId(teacher))
 
     return uniqueTeachers
+}
+
+function notAUserId(userId: string) {
+    return userId.startsWith("NON_EXISTENT")
 }

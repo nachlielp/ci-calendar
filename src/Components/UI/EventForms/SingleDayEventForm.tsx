@@ -17,7 +17,7 @@ import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
-import { useTeachersList } from "../../../hooks/useTeachersList"
+import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { useUser } from "../../../context/UserContext"
 import {
     cieventsService,
@@ -50,7 +50,7 @@ export default function SingleDayEventForm({
     isTemplate?: boolean
 }) {
     const [form] = Form.useForm()
-    const { teachers } = useTeachersList({ addSelf: true })
+    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     // const [repeatOption, setRepeatOption] = useState<EventFrequency>(
     //     EventFrequency.none
     // )
@@ -149,7 +149,7 @@ export default function SingleDayEventForm({
                     .toISOString(),
                 type: values["event-type"],
                 tags: values["event-tags"] || [],
-                teachers: utilService.formatTeachersForCIEvent(
+                teachers: utilService.formatUsersForCIEvent(
                     values["teachers"],
                     teachers
                 ),
@@ -161,7 +161,7 @@ export default function SingleDayEventForm({
                 segmentsArray.push({
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
-                    teachers: utilService.formatTeachersForCIEvent(
+                    teachers: utilService.formatUsersForCIEvent(
                         segment.teachers,
                         teachers
                     ),
@@ -213,6 +213,11 @@ export default function SingleDayEventForm({
                     source_template_id: sourceTemplateId,
                     is_multi_day: false,
                     multi_day_teachers: null,
+                    organisations:
+                        utilService.formatUsersForCIEvent(
+                            values["event-orgs"],
+                            orgs
+                        ) || [],
                 }
                 // setSubmitted(true)
                 await cieventsService.createCIEvent(event)
@@ -234,6 +239,11 @@ export default function SingleDayEventForm({
                     district: values["district"],
                     is_multi_day: false,
                     multi_day_teachers: null,
+                    organisations:
+                        utilService.formatUsersForCIEvent(
+                            values["event-orgs"],
+                            orgs
+                        ) || [],
                 }
                 // setSubmitted(true)
                 await templateService.createTemplate(template)
@@ -326,6 +336,7 @@ export default function SingleDayEventForm({
                         teachers={teachers}
                         isTemplate={isTemplate}
                         titleText={titleText}
+                        orgs={orgs}
                     />
                     <EventSegmentsForm form={form} teachers={teachers} />
                     <hr className="divider" />

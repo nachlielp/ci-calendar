@@ -24,7 +24,7 @@ import EventSegmentsForm from "./EventSegmentsForm"
 import { EventAction } from "../../../App"
 import { useUser } from "../../../context/UserContext"
 import { cieventsService } from "../../../supabase/cieventsService"
-import { useTeachersList } from "../../../hooks/useTeachersList"
+import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
@@ -60,7 +60,7 @@ export default function EditSingleDayEventForm({
     closeForm: () => void
 }) {
     const navigate = useNavigate()
-    const { teachers } = useTeachersList({ addSelf: true })
+    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const { user } = useUser()
 
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
@@ -133,7 +133,7 @@ export default function EditSingleDayEventForm({
                     .toISOString(),
                 type: values["event-type"] || "",
                 tags: values["event-tags"] || [],
-                teachers: utilService.formatTeachersForCIEvent(
+                teachers: utilService.formatUsersForCIEvent(
                     values["teachers"],
                     teachers
                 ),
@@ -151,7 +151,7 @@ export default function EditSingleDayEventForm({
                 segments.push({
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
-                    teachers: utilService.formatTeachersForCIEvent(
+                    teachers: utilService.formatUsersForCIEvent(
                         segment.teachers,
                         teachers
                     ),
@@ -201,6 +201,11 @@ export default function EditSingleDayEventForm({
                 source_template_id: event.source_template_id,
                 is_multi_day: false,
                 multi_day_teachers: [],
+                organisations:
+                    utilService.formatUsersForCIEvent(
+                        values["event-orgs"],
+                        orgs
+                    ) || [],
             }
             try {
                 if (editType === EventAction.recycle) {
@@ -252,6 +257,11 @@ export default function EditSingleDayEventForm({
                 multi_day_teachers: [],
                 name: values["template-name"],
                 created_by: user.user_id,
+                organisations:
+                    utilService.formatUsersForCIEvent(
+                        values["event-orgs"],
+                        orgs
+                    ) || [],
             }
             console.log(
                 "EditSingleDayEventForm.handleSubmit.updatedTemplate: ",
@@ -317,6 +327,7 @@ export default function EditSingleDayEventForm({
                         address={address || ({} as IAddress)}
                         titleText={titleText}
                         isTemplate={isTemplate}
+                        orgs={orgs}
                     />
                     <EventSegmentsForm form={form} teachers={teachers} />
                     <AddLinksForm />

@@ -9,7 +9,7 @@ import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import MultiDayFormHead from "./MultiDayFormHead"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
-import { useTeachersList } from "../../../hooks/useTeachersList"
+import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList.ts"
 import { EventAction } from "../../../App"
 import { v4 as uuidv4 } from "uuid"
 import { useUser } from "../../../context/UserContext"
@@ -32,7 +32,7 @@ export default function EditMultiDayEventForm({
     template?: CITemplate
     closeForm: () => void
 }) {
-    const { teachers } = useTeachersList({ addSelf: true })
+    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const { user } = useUser()
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -115,11 +115,17 @@ export default function EditMultiDayEventForm({
                 source_template_id: event.source_template_id,
                 is_multi_day: true,
                 multi_day_teachers:
-                    utilService.formatTeachersForCIEvent(
+                    utilService.formatUsersForCIEvent(
                         values["multi-day-event-teachers"],
                         teachers
                     ) || [],
+                organisations:
+                    utilService.formatUsersForCIEvent(
+                        values["event-orgs"],
+                        orgs
+                    ) || [],
             }
+            console.log("updatedEvent: ", updatedEvent)
             try {
                 if (editType === EventAction.recycle) {
                     await cieventsService.createCIEvent(updatedEvent)
@@ -151,14 +157,18 @@ export default function EditMultiDayEventForm({
                 district: values["district"],
                 is_multi_day: true,
                 multi_day_teachers:
-                    utilService.formatTeachersForCIEvent(
+                    utilService.formatUsersForCIEvent(
                         values["multi-day-event-teachers"],
                         teachers
                     ) || [],
                 name: values["template-name"],
                 created_by: user.user_id,
+                organisations:
+                    utilService.formatUsersForCIEvent(
+                        values["event-orgs"],
+                        orgs
+                    ) || [],
             }
-
             try {
                 await templateService.updateTemplate(updatedTemplate)
                 closeForm()
@@ -210,6 +220,7 @@ export default function EditMultiDayEventForm({
                         address={address || ({} as IAddress)}
                         isTemplate={isTemplate}
                         teachers={teachers}
+                        orgs={orgs}
                         titleText={titleText}
                     />
 

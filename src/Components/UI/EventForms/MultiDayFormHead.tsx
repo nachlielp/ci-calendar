@@ -16,6 +16,7 @@ interface IMultiDayFormHeadProps {
     address: IAddress | undefined
     isTemplate: boolean
     teachers: UserOption[]
+    orgs: UserOption[]
     titleText: string
 }
 
@@ -25,6 +26,7 @@ export default function MultiDayFormHead({
     address,
     isTemplate,
     teachers,
+    orgs,
     titleText,
 }: IMultiDayFormHeadProps) {
     function onDatesChange(dates: [Dayjs, Dayjs]) {
@@ -120,6 +122,19 @@ export default function MultiDayFormHead({
                             .indexOf(input.toLowerCase()) >= 0
                     }
                     options={teachers}
+                />
+            </Form.Item>
+            <Form.Item name="event-orgs" className="full-width">
+                <Select
+                    mode="tags"
+                    className="full-width"
+                    placeholder="ארגונים"
+                    filterOption={(input, option) =>
+                        (option?.label ?? "")
+                            .toLowerCase()
+                            .indexOf(input.toLowerCase()) >= 0
+                    }
+                    options={orgs}
                 />
             </Form.Item>
         </Card>

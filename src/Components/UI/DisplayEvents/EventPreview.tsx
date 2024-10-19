@@ -18,7 +18,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             new Set(
                 Object.values(event.segments)
                     .flatMap((segment) => segment.teachers)
-                    .filter((teacher) => teacher.value === "NON_EXISTENT")
+                    .filter((teacher) => utilService.notAUserId(teacher.value))
                     .map((teacher) => teacher.label)
             )
         )
@@ -27,7 +27,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             new Map(
                 Object.values(event.segments)
                     .flatMap((segment) => segment.teachers)
-                    .filter((teacher) => teacher.value !== "NON_EXISTENT")
+                    .filter((teacher) => utilService.notAUserId(teacher.value))
                     .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
             ).values()
         )
@@ -41,10 +41,16 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                 <article className="event-header">
                     <h2 className="event-title">{event.title}&nbsp;</h2>
                 </article>
-                {/* <article className="event-org">
-                    <Icon icon="domain" className="event-icon" />
-                    <label className="event-label">{event.creator_name}</label>
-                </article> */}
+                {event.organisations.length > 0 && (
+                    <article className="event-org">
+                        <Icon icon="domain" className="event-icon" />
+                        <label className="event-label">
+                            {event.organisations
+                                .map((org) => org.label)
+                                .join(", ")}
+                        </label>
+                    </article>
+                )}
                 <article className="event-dates">
                     {event.segments.length > 0 ? (
                         <>
@@ -146,5 +152,5 @@ export const getEventTeachersIds = (event: CIEvent) => {
     return event.segments
         .flatMap((segment) => segment.teachers)
         .map((teacher) => teacher.value)
-        .filter((teacher) => teacher !== "NON_EXISTENT")
+        .filter((teacher) => utilService.notAUserId(teacher))
 }
