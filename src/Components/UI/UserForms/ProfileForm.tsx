@@ -11,6 +11,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile"
 import CloudinaryUpload from "../Other/CloudinaryUpload"
 import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
+import AsyncButton from "../Other/AsyncButton"
 
 type FieldType = {
     full_name: string
@@ -35,6 +36,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     if (!user) throw new Error("TeacherForm.user")
 
     const [imageUrl, setImageUrl] = useState<string>(user?.img || "")
+
     const [form] = Form.useForm()
 
     useEffect(() => {
@@ -44,12 +46,18 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const uploadNewImage = (url: string) => {
         setImageUrl(url)
     }
+    const getCurrentFormValues = () => {
+        const values = form.getFieldsValue()
+        console.log("Current form values: ", values)
+        return values
+    }
 
-    const handleSubmit: FormProps<FieldType>["onFinish"] = async (values) => {
+    const handleSubmit: FormProps<FieldType>["onFinish"] = async () => {
+        const values = getCurrentFormValues()
         if (!user) return
 
         setIsSubmitting(true)
-        console.log("values: ", values)
+
         const { full_name, bio, page_url, page_title, show_profile } = values
         const newTeacher: Partial<DbUser> = {
             full_name: full_name || user.full_name,
@@ -98,11 +106,8 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                     }`}
                 >
                     <Form
-                        // onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
                         form={form}
                         autoComplete="off"
-                        onFinish={handleSubmit}
                         initialValues={{
                             full_name: user.full_name,
                             bio: user.bio,
@@ -194,6 +199,10 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                             <CloudinaryUpload
                                 uploadNewImage={uploadNewImage}
                                 clearImage={clearImage}
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation() // Prevent form submission
+                                }}
                             />
                         </Form.Item>
 
@@ -217,9 +226,12 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                                 style={{ marginBottom: 10 }}
                             />
                         )}
-                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
+                        <AsyncButton
+                            isSubmitting={isSubmitting}
+                            callback={handleSubmit}
+                        >
                             שמירת שינויים
-                        </AsyncFormSubmitButton>
+                        </AsyncButton>
                     </Form>
                 </Card>
             )}

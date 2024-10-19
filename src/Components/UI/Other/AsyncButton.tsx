@@ -1,16 +1,18 @@
-interface AsyncFormSubmitButtonProps {
+interface AsyncButtonProps {
     isSubmitting: boolean
+    callback: (args?: any) => void
     children: React.ReactNode
 }
 
-export default function AsyncFormSubmitButton({
+export default function AsyncButton({
     isSubmitting,
+    callback,
     children,
-}: AsyncFormSubmitButtonProps) {
+}: AsyncButtonProps) {
     return (
         <>
             <button
-                type="submit"
+                onClick={callback}
                 className="general-action-btn"
                 disabled={isSubmitting}
             >
