@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
-import { CIEvent, UserBio } from "../../util/interfaces"
+import { CIEvent } from "../../util/interfaces"
 import CalendarView from "../UI/Other/CalendarView"
 import EventsList from "../UI/DisplayEvents/EventsList"
 import { useState } from "react"
@@ -21,13 +21,9 @@ import { utilService } from "../../util/utilService"
 
 interface IEventsPageProps {
     events: CIEvent[]
-    viewableTeachers: UserBio[]
 }
 
-export default function EventsPage({
-    events,
-    viewableTeachers,
-}: IEventsPageProps) {
+export default function EventsPage({ events }: IEventsPageProps) {
     const { selectedEvent } = useSetSelectedEventByParams(events)
     const isMobile = useIsMobile()
     useDefaultFilter()
@@ -102,7 +98,6 @@ export default function EventsPage({
                         <EventsList
                             events={selectedDayEvents}
                             isEvents={!!selectedDayEvents.length}
-                            viewableTeachers={viewableTeachers}
                         />
                     </>
                 )}
@@ -110,14 +105,12 @@ export default function EventsPage({
                     <EventsList
                         events={filteredEvents}
                         isEvents={!!filteredEvents.length}
-                        viewableTeachers={viewableTeachers}
                     />
                 )}
                 {selectedEvent && (
                     <FullEventCardContainer
                         isSelectedEvent={true}
                         event={selectedEvent}
-                        viewableTeachers={viewableTeachers}
                         anchorEl={<></>}
                     />
                 )}

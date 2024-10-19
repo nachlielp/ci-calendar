@@ -1,4 +1,4 @@
-.single-day-event-card {
+.event-preview {
     margin-top: 1rem;
     width: 100%;
     /* display: flex;
@@ -32,6 +32,7 @@
         margin-bottom: 0.25rem;
     }
 
+    .event-org,
     .event-dates,
     .event-location,
     .event-teachers {

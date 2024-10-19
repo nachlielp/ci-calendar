@@ -1,5 +1,6 @@
 import { supabase } from "./client"
 import { CIEvent } from "../util/interfaces"
+import { utilService } from "../util/utilService"
 
 export interface FilterOptions {
     start_date?: string
@@ -39,7 +40,12 @@ async function getCIEvent(id: string): Promise<CIEvent> {
 
 async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
     try {
-        let query = supabase.from("ci_events").select("*")
+        let query = supabase
+            .from("ci_events")
+            .select(
+                "*, user_list:ci_events_users_junction!inner(users(user_id, full_name, img, bio, page_url, page_title, show_profile, allow_tagging))"
+            )
+            .eq("ci_events_users_junction.users.show_profile", true)
 
         if (filterBy?.start_date) {
             query = query.gte("start_date", filterBy.start_date)
@@ -64,7 +70,14 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
 
         if (error) throw error
 
-        return data as CIEvent[]
+        const eventsWithUsers = data.map((event) => {
+            const { user_list } = event
+            const users = user_list.map((user: any) => user.users)
+            delete event.user_list
+            return { ...event, users }
+        })
+
+        return eventsWithUsers as CIEvent[]
     } catch (error) {
         console.error("Error fetching CI events:", error)
         throw error
@@ -80,6 +93,22 @@ async function createCIEvent(event: CIEventWithoutId): Promise<CIEvent> {
             .single()
 
         if (error) throw error
+
+        const cieventId = data.id
+        const teacherIds = utilService.getCIEventTeachers(event)
+        const junctionData = teacherIds.map((teacherId) => {
+            return {
+                ci_event_id: cieventId,
+                user_id: teacherId,
+            }
+        })
+
+        const { error: junctionError } = await supabase
+            .from("ci_events_users_junction")
+            .insert(junctionData)
+
+        if (junctionError) throw junctionError
+
         return data as CIEvent
     } catch (error) {
         console.error("Error creating CI event:", error)
@@ -100,6 +129,37 @@ async function updateCIEvent(
             .single()
 
         if (error) throw error
+
+        const cieventId = data.id
+        const teacherIds = utilService.getCIEventTeachers(data as CIEvent)
+
+        for (const teacherId of teacherIds) {
+            console.log("teacherId: ", teacherId)
+            // Check if the junction already exists
+            const { data: existingJunction, error: fetchError } = await supabase
+                .from("ci_events_users_junction")
+                .select("id")
+                .eq("ci_event_id", cieventId)
+                .eq("user_id", teacherId)
+
+            if (fetchError) {
+                console.error("Error checking existing junction:", fetchError)
+                throw fetchError
+            }
+
+            // If the junction does not exist, insert it
+            if (!existingJunction.length) {
+                const { error: insertError } = await supabase
+                    .from("ci_events_users_junction")
+                    .insert({ ci_event_id: cieventId, user_id: teacherId })
+
+                if (insertError) {
+                    console.error("Error inserting junction:", insertError)
+                    throw insertError
+                }
+            }
+        }
+        //TODO remove - removed teachers
         return data as CIEvent
     } catch (error) {
         console.error("Error updating CI event:", error)

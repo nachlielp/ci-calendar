@@ -48,6 +48,7 @@ export interface IAddress {
 }
 export interface CIEvent {
     id: string
+    users?: UserBio[]
     owners: UserOption[]
     title: string
     description: string
@@ -68,7 +69,7 @@ export interface CIEvent {
     source_template_id: string | null
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
-    is_notified: boolean
+    organisations: UserOption[]
 }
 export interface CITemplate {
     template_id: string
@@ -85,8 +86,9 @@ export interface CITemplate {
     links: ILink[]
     segments: CIEventSegments[]
     is_multi_day: boolean
-    multi_day_teachers: UserOption[] | null
     created_by: string
+    multi_day_teachers: UserOption[]
+    organisations: UserOption[]
 }
 export enum District {
     north = "north",
@@ -99,6 +101,7 @@ export enum UserType {
     admin = "admin",
     creator = "creator",
     profile = "profile",
+    org = "org",
     user = "user",
 }
 
@@ -195,12 +198,14 @@ export interface CIRequest {
 export enum RequestType {
     make_profile = "make_profile",
     make_creator = "make_creator",
+    make_org = "make_org",
     support = "support",
 }
 
 export enum RequestTypeHebrew {
     make_profile = "הרשמה כמורה",
     make_creator = "הרשמה כמורה ויוצר ארועים",
+    make_org = "הרשמה כארגון",
     support = "תמיכה",
 }
 

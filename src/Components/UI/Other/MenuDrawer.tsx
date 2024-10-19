@@ -25,15 +25,19 @@ export function MenuDrawer() {
     }, [requests])
 
     const isMobile = useIsMobile()
+
     const isAdmin = user?.user_type === UserType.admin
+
     const isCreator =
         user?.user_type === UserType.admin ||
-        user?.user_type === UserType.creator
+        user?.user_type === UserType.creator ||
+        user?.user_type === UserType.org
 
     const isProfile =
         user?.user_type === UserType.profile ||
         user?.user_type === UserType.admin ||
-        user?.user_type === UserType.creator
+        user?.user_type === UserType.creator ||
+        user?.user_type === UserType.org
 
     const isEmailProvider = user?.provider === "email"
 
@@ -43,6 +47,7 @@ export function MenuDrawer() {
         navigate("/")
         setOpen(false)
     }
+
     let mapOfMenu = [
         {
             key: "all-events",

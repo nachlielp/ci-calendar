@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react"
-import { UserBio, CIEvent, CIEventSegments } from "../util/interfaces"
+import { CIEvent } from "../util/interfaces"
 import { cieventsService, FilterOptions } from "../supabase/cieventsService"
-import { usersService } from "../supabase/usersService"
 
 export const useCIPastEvents = (filterBy: FilterOptions = {}) => {
     const [ci_past_events, setCIPastEvents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
-    const [viewableTeachers, setViewableTeachers] = useState<UserBio[]>([])
     useEffect(() => {
         const fetchEvents = async () => {
             try {
@@ -14,21 +12,6 @@ export const useCIPastEvents = (filterBy: FilterOptions = {}) => {
                     filterBy
                 )
                 setCIPastEvents(fetchedEvents)
-
-                const eventsTeacherIds: string[] = []
-                fetchedEvents.forEach((event) => {
-                    const teacherIds = event.segments
-                        .flatMap((segment: CIEventSegments) => segment.teachers)
-                        .map((teacher: { value: string }) => teacher.value)
-                        .filter((teacher: string) => teacher !== "NON_EXISTENT")
-
-                    eventsTeacherIds.push(...teacherIds)
-                })
-
-                const viewableTeachers = await usersService.getViewableTeachers(
-                    eventsTeacherIds
-                )
-                setViewableTeachers(viewableTeachers)
             } catch (error) {
                 console.error("Error fetching events:", error)
             } finally {
@@ -46,5 +29,5 @@ export const useCIPastEvents = (filterBy: FilterOptions = {}) => {
     //     setCIPastEvents(sortedEvents)
     // }
 
-    return { ci_past_events, loading, viewableTeachers }
+    return { ci_past_events, loading }
 }

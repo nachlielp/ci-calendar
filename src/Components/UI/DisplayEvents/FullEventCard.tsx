@@ -1,6 +1,6 @@
 import Button from "antd/es/button"
 import Tag from "antd/es/tag"
-import { EventlyType, CIEvent, UserBio } from "../../../util/interfaces"
+import { EventlyType, CIEvent } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
 import dayjs from "dayjs"
@@ -9,16 +9,9 @@ import React from "react"
 import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../Other/SecondaryButton"
 
-export default function FullEventCard({
-    event: ci_event,
-    viewableTeachers,
-}: {
-    event: CIEvent
-    viewableTeachers: UserBio[]
-}) {
+export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
-
     const handleCopy = async () => {
         await navigator.clipboard.writeText(
             `${window.location.origin}/${ci_event.id}`
@@ -30,6 +23,28 @@ export default function FullEventCard({
             <article className="event-header">
                 <div className="event-title">{ci_event.title}&nbsp;</div>
             </article>
+            {ci_event.organisations.length > 0 && (
+                <article className="event-org">
+                    <Icon icon="domain" className="event-icon" />
+                    <label className="event-label">
+                        {ci_event.organisations.map((org, index, array) => {
+                            const isOrg = ci_event.users?.find(
+                                (t) => t.user_id === org.value
+                            )
+                            return (
+                                <React.Fragment key={org.value}>
+                                    {isOrg ? (
+                                        <BioModal teacher={isOrg} />
+                                    ) : (
+                                        org.label
+                                    )}
+                                    {index < array.length - 1 ? ", " : ""}
+                                </React.Fragment>
+                            )
+                        })}
+                    </label>
+                </article>
+            )}
             <article className="event-dates">
                 {ci_event.segments.length > 0 ? (
                     <>
@@ -68,7 +83,7 @@ export default function FullEventCard({
                     <Icon icon="person" className="event-icon" />
                     <label className="event-labels">
                         {multiDayTeachersLen.map((teacher, index, array) => {
-                            const isTeacher = viewableTeachers?.find(
+                            const isTeacher = ci_event.users?.find(
                                 (t) => t.user_id === teacher.value
                             )
                             return (
@@ -100,7 +115,7 @@ export default function FullEventCard({
                                     {segment.teachers.map(
                                         (teacher, index, array) => {
                                             const isTeacher =
-                                                viewableTeachers?.find(
+                                                ci_event.users?.find(
                                                     (t) =>
                                                         t.user_id ===
                                                         teacher.value

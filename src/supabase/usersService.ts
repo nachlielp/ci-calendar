@@ -12,7 +12,7 @@ export const usersService = {
     getUser,
     updateUser,
     createUser,
-    getTaggableTeachers,
+    getTaggableUsers,
     getViewableTeachers,
     subscribeToUser,
 }
@@ -90,22 +90,19 @@ async function getUsers(): Promise<ManageUserOption[]> {
     }
 }
 
-async function getTaggableTeachers(): Promise<
-    { label: string; value: string }[]
+async function getTaggableUsers(): Promise<
+    { user_id: string; full_name: string; user_type: UserType }[]
 > {
     try {
         const { data, error } = await supabase
             .from("users")
             .select("user_id, full_name, user_type")
             .eq("show_profile", true)
-            .neq("user_type", "user")
+            .neq("user_type", UserType.user)
 
         if (error) throw error
 
-        return data.map((user) => ({
-            label: user.full_name,
-            value: user.user_id,
-        }))
+        return data || []
     } catch (error) {
         console.error("Error fetching taggable teachers:", error)
         throw error

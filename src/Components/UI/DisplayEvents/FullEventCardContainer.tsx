@@ -1,10 +1,9 @@
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { CIEvent, UserBio } from "../../../util/interfaces"
+import { CIEvent } from "../../../util/interfaces"
 import FullEventCardDrawer from "./FullEventCardDrawer"
 import FullEventCardModal from "./FullEventCardModal"
 
 interface FullEventCardContainerProps {
-    viewableTeachers: UserBio[]
     event: CIEvent
     anchorEl: any | null
     isSelectedEvent?: boolean
@@ -12,7 +11,6 @@ interface FullEventCardContainerProps {
 
 export default function FullEventCardContainer({
     event,
-    viewableTeachers,
     anchorEl,
     isSelectedEvent = false,
 }: FullEventCardContainerProps) {
@@ -20,14 +18,12 @@ export default function FullEventCardContainer({
     return isMobile ? (
         <FullEventCardDrawer
             event={event}
-            viewableTeachers={viewableTeachers}
             anchorEl={anchorEl}
             isSelectedEvent={isSelectedEvent}
         />
     ) : (
         <FullEventCardModal
             event={event}
-            viewableTeachers={viewableTeachers}
             anchorEl={anchorEl}
             isSelectedEvent={isSelectedEvent}
         />

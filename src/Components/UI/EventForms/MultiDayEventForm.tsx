@@ -17,7 +17,7 @@ import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import MultiDayFormHead from "./MultiDayFormHead"
-import { useTeachersList } from "../../../hooks/useTeachersList"
+import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 
 import { useUser } from "../../../context/UserContext"
 import {
@@ -55,7 +55,7 @@ export default function MultiDayEventForm({
     const [inputErrors, setInputErrors] = useState<boolean>(false)
 
     const navigate = useNavigate()
-    const { teachers } = useTeachersList({ addSelf: true })
+    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const templates = useTemplates({ isMultiDay: true })
 
     const { user } = useUser()
@@ -79,7 +79,8 @@ export default function MultiDayEventForm({
 
     if (
         user.user_type !== UserType.admin &&
-        user.user_type !== UserType.creator
+        user.user_type !== UserType.creator &&
+        user.user_type !== UserType.org
     ) {
         navigate("/")
     }
@@ -167,14 +168,20 @@ export default function MultiDayEventForm({
                     source_template_id: sourceTemplateId,
                     is_multi_day: true,
                     multi_day_teachers:
-                        utilService.formatTeachersForCIEvent(
+                        utilService.formatUsersForCIEvent(
                             values["multi-day-event-teachers"],
                             teachers
                         ) || [],
+                    organisations:
+                        utilService.formatUsersForCIEvent(
+                            values["event-orgs"],
+                            orgs
+                        ) || [],
                 }
+                // console.log("values: ", values)
+                // console.log("event: ", event)
                 await cieventsService.createCIEvent(event)
                 clearForm()
-                closeForm()
             } else {
                 const template: CITemplateWithoutId = {
                     type: values["main-event-type"],
@@ -191,9 +198,14 @@ export default function MultiDayEventForm({
                     district: values["district"],
                     is_multi_day: true,
                     multi_day_teachers:
-                        utilService.formatTeachersForCIEvent(
+                        utilService.formatUsersForCIEvent(
                             values["multi-day-event-teachers"],
                             teachers
+                        ) || [],
+                    organisations:
+                        utilService.formatUsersForCIEvent(
+                            values["event-orgs"],
+                            orgs
                         ) || [],
                 }
                 // setSubmitted(true)
@@ -278,6 +290,7 @@ export default function MultiDayEventForm({
                         isTemplate={isTemplate}
                         address={address}
                         teachers={teachers}
+                        orgs={orgs}
                         titleText="יצירת אירוע - רב יומי"
                     />
                     <hr className="divider" />
