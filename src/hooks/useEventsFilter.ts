@@ -30,7 +30,7 @@ export const useEventsFilter = ({
 
         let filtered = events
 
-        const now = dayjs()
+        const now = dayjs().tz("Asia/Jerusalem").add(3, "hours")
 
         filtered = filtered.filter((event) => {
             const eventTypeList = event.is_multi_day
@@ -57,10 +57,25 @@ export const useEventsFilter = ({
                 return false
             }
 
-            if (showPast === true) {
-                return dayjs(event.end_date).endOf("day") <= now
+            const now = dayjs()
+                .tz("Asia/Jerusalem")
+                .add(3, "hours")
+                .toISOString()
+            const endOfSingleDay = dayjs(
+                event?.segments[event.segments.length - 1]?.endTime
+            )
+                .add(3, "hours")
+                .toISOString()
+            const endOfMultiDay = dayjs(event.end_date)
+                .add(3, "hours")
+                .toISOString()
+
+            const isOngoing = now < endOfSingleDay || now < endOfMultiDay
+
+            if (showPast === true && !isOngoing) {
+                return true
             } else {
-                return dayjs(event.end_date) > now
+                return isOngoing
             }
         })
 

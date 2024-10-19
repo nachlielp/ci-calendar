@@ -1,6 +1,7 @@
 import { supabase } from "./client"
 import { CIEvent } from "../util/interfaces"
 import { utilService } from "../util/utilService"
+import dayjs from "dayjs"
 
 export interface FilterOptions {
     start_date?: string
@@ -48,7 +49,10 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             .eq("ci_events_users_junction.users.show_profile", true)
 
         if (filterBy?.start_date) {
-            query = query.gte("start_date", filterBy.start_date)
+            query = query.gte(
+                "start_date",
+                dayjs(filterBy.start_date).format("YYYY-MM-DD")
+            )
         }
         if (filterBy?.end_date) {
             query = query.lt("end_date", filterBy.end_date)

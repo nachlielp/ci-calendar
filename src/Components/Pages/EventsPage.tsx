@@ -34,7 +34,7 @@ export default function EventsPage({ events }: IEventsPageProps) {
     const { currentValues: currentFilterValues, removeOption: onRemoveFilter } =
         useParamsFilterHandler()
 
-    const filteredEvents = useEventsFilter({ events })
+    const filteredEvents = useEventsFilter({ events, showPast: false })
 
     const selectedDayEvents = useSelectedDayEvents(filteredEvents, selectedDay)
 

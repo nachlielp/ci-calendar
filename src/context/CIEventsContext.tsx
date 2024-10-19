@@ -35,7 +35,10 @@ export const CIEventsProvider = ({
         const fetchEvents = async () => {
             try {
                 const fetchedEvents = await cieventsService.getCIEvents({
-                    start_date: dayjs().format("YYYY-MM-DD"),
+                    start_date: dayjs()
+                        .tz("Asia/Jerusalem")
+                        .add(3, "hours")
+                        .toISOString(),
                 })
                 sortAndSetEvents(fetchedEvents)
             } catch (error) {

@@ -34,6 +34,15 @@ const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
 const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
 
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+dayjs.tz.setDefault("Asia/Jerusalem")
+
 export enum EventAction {
     edit,
     create,
