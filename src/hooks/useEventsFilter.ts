@@ -30,8 +30,6 @@ export const useEventsFilter = ({
 
         let filtered = events
 
-        const now = dayjs().tz("Asia/Jerusalem").add(3, "hours")
-
         filtered = filtered.filter((event) => {
             const eventTypeList = event.is_multi_day
                 ? [event.type]
