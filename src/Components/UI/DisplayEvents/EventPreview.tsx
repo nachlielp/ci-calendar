@@ -32,6 +32,13 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             ).values()
         )
 
+        const orgs = event.organisations.map((org) => {
+            const publicOrg = event?.users?.find(
+                (user) => user.user_id === org.value
+            )
+            return publicOrg?.full_name || org.label
+        })
+
         const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
             return teacher.label
         })
@@ -41,14 +48,10 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                 <article className="event-header">
                     <h2 className="event-title">{event.title}&nbsp;</h2>
                 </article>
-                {event.organisations.length > 0 && (
+                {orgs.length > 0 && (
                     <article className="event-org">
                         <Icon icon="domain" className="event-icon" />
-                        <label className="event-label">
-                            {event.organisations
-                                .map((org) => org.label)
-                                .join(", ")}
-                        </label>
+                        <label className="event-label">{orgs.join(", ")}</label>
                     </article>
                 )}
                 <article className="event-dates">
