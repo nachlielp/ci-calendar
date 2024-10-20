@@ -19,7 +19,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
                 purpose: "monochrome",
             },
             {
-                src: "/ci-circle-192.png",
+                src: "/192.png",
                 sizes: "192x192",
                 type: "image/png",
                 purpose: "monochrome",
