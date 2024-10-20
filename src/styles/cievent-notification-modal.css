@@ -1,0 +1,26 @@
+.notification-modal-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.set-notification-timeframe-modal {
+    .notification-modal-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .notification-icon {
+            padding-top: 4px;
+        }
+        .label-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: end;
+        gap: 10px;
+    }
+}

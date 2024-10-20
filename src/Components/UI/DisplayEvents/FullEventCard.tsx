@@ -8,6 +8,7 @@ import BioModal from "../DisplayUsers/BioModal"
 import React from "react"
 import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../Other/SecondaryButton"
+import CIEventNotificationModal from "../Other/CIEventNotificationModal"
 
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const segmentLen = ci_event.segments.length
@@ -227,6 +228,7 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
             )}
 
             <article className="event-card-footer">
+                {utilService.isPWA() && <CIEventNotificationModal />}
                 {utilService.isPWA() && (
                     <SecondaryButton
                         label=""
