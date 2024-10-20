@@ -41,7 +41,6 @@ async function getCIEvent(id: string): Promise<CIEvent> {
 
 //TODO get users/ orgs with left join
 async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
-    console.log("filterBy: ", filterBy)
     try {
         let query = supabase
             .from("ci_events")
@@ -70,7 +69,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         }
 
         const { data, error } = await query
-        console.log("data: ", data)
+
         if (error) throw error
 
         const eventsWithUsers = data.map((event) => {
