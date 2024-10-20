@@ -130,14 +130,21 @@ export interface PushNotificationToken {
 
 export interface Notification {
     id: string
-    event_id: string
+    created_at: string
+    ci_event_id: string
+    user_id: string
+    remind_in_hours: number
     title: string
     body: string
-    created_at: string
     send_at: string
-    dispose_at: string
     timezone: string
 }
+
+export interface NotificationDB
+    extends Omit<
+        Notification,
+        "id" | "title" | "body" | "send_at" | "timezone"
+    > {}
 
 export interface DbUser {
     user_id: string
