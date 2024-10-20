@@ -11,8 +11,8 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 -   The app is a PWA, installable to the home screen on iOS and Android and enabling push notifications regarding upcoming events
 -   List and calendar view of upcoming event previews by date
 -   Events can be filtered by region and type (workshop, jame, etc.)
--   Event previews open to a modal on desktop, and a side page (drawer) on mobile, containing full details, linke to share, and google maps link
--   Users can set notifications for new events of selected Teachers and Organizers
+-   Event previews open to a modal on desktop, and a side page (drawer) on mobile, containing full details, linke to share, and google maps link (maps and share in PWA only)
+-   Users can set notifications for new events of selected Teachers and Organizers (in PWA only)
 -   Users can set default filters for event list
 -   Users can submit support tickets and ask to be configerd as teachers or organizers
 

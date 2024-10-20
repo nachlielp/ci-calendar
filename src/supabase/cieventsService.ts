@@ -39,15 +39,15 @@ async function getCIEvent(id: string): Promise<CIEvent> {
     }
 }
 
+//TODO get users/ orgs with left join
 async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
+    console.log("filterBy: ", filterBy)
     try {
         let query = supabase
             .from("ci_events")
-            .select(
-                "*, user_list:ci_events_users_junction!inner(users(user_id, full_name, img, bio, page_url, page_title, show_profile, allow_tagging))"
-            )
-            .eq("ci_events_users_junction.users.show_profile", true)
+            .select("*, ci_events_users_junction(user_id)")
 
+        // Apply filters
         if (filterBy?.start_date) {
             query = query.gte(
                 "start_date",
@@ -65,19 +65,20 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
                 ascending: filterBy.sort_direction === "asc",
             })
         }
-
         if (filterBy?.hide) {
             query = query.eq("hide", filterBy.hide)
         }
 
         const { data, error } = await query
-
+        console.log("data: ", data)
         if (error) throw error
 
         const eventsWithUsers = data.map((event) => {
-            const { user_list } = event
-            const users = user_list.map((user: any) => user.users)
-            delete event.user_list
+            const { ci_events_users_junction } = event
+            const users = ci_events_users_junction.map(
+                (user: any) => user.user_id
+            )
+            delete event.ci_events_users_junction
             return { ...event, users }
         })
 
