@@ -14,22 +14,32 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
     ({ event }, ref) => {
         const segmentsLength = Object.values(event.segments).length
 
-        const nonRegestoredTeacherNames = Array.from(
+        const singleDayTeacherNames = Array.from(
             new Set(
                 Object.values(event.segments)
                     .flatMap((segment) => segment.teachers)
-                    .filter((teacher) => utilService.notAUserId(teacher.value))
-                    .map((teacher) => teacher.label)
+                    .map((teacher) => {
+                        const user = event.users?.find(
+                            (user) => user.user_id === teacher.value
+                        )
+                        return user?.full_name || teacher.label
+                    })
             )
         )
 
-        const regestoredTeacherOptions = Array.from(
-            new Map(
-                Object.values(event.segments)
-                    .flatMap((segment) => segment.teachers)
-                    .filter((teacher) => utilService.notAUserId(teacher.value))
-                    .map((teacher) => [teacher.value, teacher]) // Use teacher.value as the key
-            ).values()
+        const multiDayTeacherNames = Array.from(
+            new Set(
+                Object.values(event.multi_day_teachers || {}).map((teacher) => {
+                    const user = event.users?.find(
+                        (user) => user.user_id === teacher.value
+                    )
+                    return user?.full_name || teacher.label
+                })
+            )
+        )
+
+        const teachers = Array.from(
+            new Set([...multiDayTeacherNames, ...singleDayTeacherNames])
         )
 
         const orgs = event.organisations.map((org) => {
@@ -37,10 +47,6 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                 (user) => user.user_id === org.value
             )
             return publicOrg?.full_name || org.label
-        })
-
-        const teachersBioOrName = regestoredTeacherOptions.map((teacher) => {
-            return teacher.label
         })
 
         return (
@@ -88,16 +94,12 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     <label className="event-label">{event.address.label}</label>
                 </article>
 
-                {(teachersBioOrName.length > 0 ||
-                    nonRegestoredTeacherNames.length > 0) && (
+                {(teachers.length > 0 || singleDayTeacherNames.length > 0) && (
                     <article className="event-teachers">
                         <Icon icon="person" className="event-icon" />
                         <label className="event-label">
                             עם{" "}
-                            {[
-                                ...teachersBioOrName,
-                                ...nonRegestoredTeacherNames,
-                            ].map((item, index, array) => (
+                            {teachers.map((item, index, array) => (
                                 <React.Fragment key={index}>
                                     {item}
                                     {index < array.length - 1 && ", "}
