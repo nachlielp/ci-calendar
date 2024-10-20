@@ -5,8 +5,8 @@ self.addEventListener("push", function (event) {
         body: data.body,
         title: data.title,
         data: { url: data.url },
-        icon: "/icon-192.png",
-        badge: "/icon-192.png",
+        icon: "/192.png",
+        badge: "/192.png",
     }
     console.log("options:1.5 ", options)
     event.waitUntil(self.registration.showNotification(data.title, options))

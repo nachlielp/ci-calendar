@@ -5,7 +5,7 @@
 	"description": "CI Events near you",
 	"icons": [
 		{
-			"src": "/192.png",
+			"src": "/ci-circle-192.png",
 			"sizes": "192x192",
 			"type": "image/png",
 			"purpose": "monochrome"
@@ -17,7 +17,7 @@
 			"purpose": "any"
 		},
 		{
-			"src": "/192.png",
+			"src": "/ci-circle-192.png",
 			"sizes": "192x192",
 			"type": "image/png",
 			"purpose": "maskable"
