@@ -51,30 +51,7 @@ export const useEventsFilter = ({
                 return false
             }
 
-            if (uids && !uids.includes(event.creator_id)) {
-                return false
-            }
-
-            const now = dayjs()
-                .tz("Asia/Jerusalem")
-                .add(3, "hours")
-                .toISOString()
-            const endOfSingleDay = dayjs(
-                event?.segments[event.segments.length - 1]?.endTime
-            )
-                .add(3, "hours")
-                .toISOString()
-            const endOfMultiDay = dayjs(event.end_date)
-                .add(3, "hours")
-                .toISOString()
-
-            const isOngoing = now < endOfSingleDay || now < endOfMultiDay
-
-            if (showPast === true && !isOngoing) {
-                return true
-            } else {
-                return isOngoing
-            }
+            return true
         })
 
         if (showPast) {

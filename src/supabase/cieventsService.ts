@@ -98,7 +98,6 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             delete event.ci_events_users_junction
             return { ...event, users }
         })
-
         return eventsWithUsers as CIEvent[]
     } catch (error) {
         console.error("Error fetching CI events:", error)
