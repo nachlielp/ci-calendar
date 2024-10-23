@@ -125,6 +125,7 @@ export default function EditMultiDayEventForm({
                         values["event-orgs"],
                         orgs
                     ) || [],
+                users: [],
             }
             console.log("updatedEvent: ", updatedEvent)
             try {

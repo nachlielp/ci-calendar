@@ -44,7 +44,25 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
     try {
         let query = supabase
             .from("ci_events")
-            .select("*, ci_events_users_junction(user_id)")
+            .select(
+                `
+                *,
+                ci_events_users_junction (
+                    user_id,
+                    users (
+                        user_id,
+                        full_name,
+                        img,
+                        bio,
+                        page_url,
+                        page_title,
+                        show_profile,
+                        allow_tagging
+                    )
+                )
+            `
+            )
+            .eq("ci_events_users_junction.users.show_profile", true)
 
         // Apply filters
         if (filterBy?.start_date) {
@@ -74,9 +92,9 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
 
         const eventsWithUsers = data.map((event) => {
             const { ci_events_users_junction } = event
-            const users = ci_events_users_junction.map(
-                (user: any) => user.user_id
-            )
+            const users = ci_events_users_junction
+                .map((user: any) => user.users)
+                .filter((user: any) => user)
             delete event.ci_events_users_junction
             return { ...event, users }
         })

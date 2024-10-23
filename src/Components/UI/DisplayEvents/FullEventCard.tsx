@@ -28,21 +28,26 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                 <article className="event-org">
                     <Icon icon="domain" className="event-icon" />
                     <label className="event-label">
-                        {ci_event.organisations.map((org, index, array) => {
-                            const isOrg = ci_event.users?.find(
-                                (t) => t.user_id === org.value
-                            )
-                            return (
-                                <React.Fragment key={org.value}>
-                                    {isOrg ? (
-                                        <BioModal teacher={isOrg} />
-                                    ) : (
-                                        org.label
-                                    )}
-                                    {index < array.length - 1 ? ", " : ""}
-                                </React.Fragment>
-                            )
-                        })}
+                        {ci_event.organisations.map(
+                            (orgOption, index, array) => {
+                                const orgId = orgOption.value
+
+                                const org = ci_event.users?.find(
+                                    (u) => u.user_id === orgId
+                                )
+
+                                return (
+                                    <React.Fragment key={orgOption.value}>
+                                        {org ? (
+                                            <BioModal teacher={org} />
+                                        ) : (
+                                            orgOption.label
+                                        )}
+                                        {index < array.length - 1 ? ", " : ""}
+                                    </React.Fragment>
+                                )
+                            }
+                        )}
                     </label>
                 </article>
             )}

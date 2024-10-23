@@ -187,6 +187,7 @@ export default function SingleDayEventForm({
         try {
             if (!isTemplate) {
                 const event: CIEventWithoutId = {
+                    users: [],
                     is_notified: false,
                     start_date: eventDate
                         .hour(13)

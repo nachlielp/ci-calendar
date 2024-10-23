@@ -39,8 +39,11 @@ export const CIEventsProvider = ({
                         .tz("Asia/Jerusalem")
                         .add(3, "hours")
                         .toISOString(),
+                    sort_by: "start_date",
+                    sort_direction: "asc",
                 })
-                sortAndSetEvents(fetchedEvents)
+                setCievents(fetchedEvents)
+                // sortAndSetEvents(fetchedEvents)
             } catch (error) {
                 console.error("Error fetching events:", error)
             } finally {
