@@ -47,7 +47,6 @@ export default function DeleteMultipleEventsButton({
     disabled,
     onDelete,
 }: IDeleteEventProps) {
-    // const { deleteMultipleEventlys } = useAuthContext();
     return (
         <button
             className={`${className}`}

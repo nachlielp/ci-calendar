@@ -11,9 +11,11 @@ import MultiDayFormHead from "./MultiDayFormHead"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList.ts"
 import { EventAction } from "../../../App"
-import { v4 as uuidv4 } from "uuid"
 import { useUser } from "../../../context/UserContext"
-import { cieventsService } from "../../../supabase/cieventsService.ts"
+import {
+    cieventsService,
+    DBCIEvent,
+} from "../../../supabase/cieventsService.ts"
 import { templateService } from "../../../supabase/templateService.ts"
 import { utilService } from "../../../util/utilService"
 import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton.tsx"
@@ -81,10 +83,7 @@ export default function EditMultiDayEventForm({
                 return
             }
 
-            const submitedEventId =
-                editType === EventAction.recycle ? uuidv4() : event.id
-
-            const updatedEvent: CIEvent = {
+            const updatedEvent: DBCIEvent = {
                 is_notified: event.is_notified,
                 start_date:
                     newDates?.[0]
@@ -99,7 +98,6 @@ export default function EditMultiDayEventForm({
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss") ?? "",
                 type: values["main-event-type"],
-                id: submitedEventId,
                 address: (newAddress || address) as IAddress,
                 created_at: event.created_at,
                 updated_at: dayjs().toISOString(),
@@ -112,7 +110,6 @@ export default function EditMultiDayEventForm({
                 segments: [],
                 district: values["district"],
                 creator_id: user.user_id,
-                creator_name: user.full_name,
                 source_template_id: event.source_template_id,
                 is_multi_day: true,
                 multi_day_teachers:
@@ -125,7 +122,6 @@ export default function EditMultiDayEventForm({
                         values["event-orgs"],
                         orgs
                     ) || [],
-                users: [],
             }
             console.log("updatedEvent: ", updatedEvent)
             try {

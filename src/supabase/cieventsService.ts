@@ -2,6 +2,7 @@ import { supabase } from "./client"
 import { CIEvent } from "../util/interfaces"
 import { utilService } from "../util/utilService"
 import dayjs from "dayjs"
+import { SelectOption } from "../util/options"
 
 export interface FilterOptions {
     start_date?: string
@@ -10,9 +11,11 @@ export interface FilterOptions {
     sort_by?: string
     sort_direction?: "asc" | "desc"
     hide?: boolean
+    future_events?: boolean
+    creator_name?: string
 }
 
-export type CIEventWithoutId = Omit<CIEvent, "id">
+export type DBCIEvent = Omit<CIEvent, "id" | "users" | "creator">
 
 export const cieventsService = {
     getCIEvent,
@@ -22,6 +25,7 @@ export const cieventsService = {
     deleteCIEvent,
     deleteMultipleCIEvents,
     updateMultipleCIEvents,
+    getCIEventsCreators,
 }
 
 async function getCIEvent(id: string): Promise<CIEvent> {
@@ -46,42 +50,56 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             .from("ci_events")
             .select(
                 `
-                *,
-                ci_events_users_junction (
+            *,
+            creator:users (
+                    full_name,
+                    user_id
+                ),
+            ci_events_users_junction (
+                user_id,
+                users (
                     user_id,
-                    users (
-                        user_id,
-                        full_name,
-                        img,
-                        bio,
-                        page_url,
-                        page_title,
-                        show_profile,
-                        allow_tagging
-                    )
+                    full_name,
+                    img,
+                    bio,
+                    page_url,
+                    page_title,
+                    show_profile,
+                    allow_tagging
                 )
-            `
+            )
+        `
             )
             .eq("ci_events_users_junction.users.show_profile", true)
+        // .eq("creator.user_id", "creator_id") // Ensure the join condition is correct
 
         // Apply filters
         if (filterBy?.start_date) {
-            query = query.gte(
-                "start_date",
-                dayjs(filterBy.start_date).format("YYYY-MM-DD")
-            )
+            query = filterBy.future_events
+                ? query.gte(
+                      "start_date",
+                      dayjs(filterBy.start_date).format("YYYY-MM-DD")
+                  )
+                : query.lte(
+                      "start_date",
+                      dayjs(filterBy.start_date).format("YYYY-MM-DD")
+                  )
         }
         if (filterBy?.end_date) {
-            query = query.lt("end_date", filterBy.end_date)
+            query = filterBy.future_events
+                ? query.gt("end_date", filterBy.end_date)
+                : query.lt("end_date", filterBy.end_date)
         }
-        if (filterBy?.creator_id) {
+        if (filterBy?.creator_id && filterBy.creator_id.length) {
             query = query.eq("creator_id", filterBy.creator_id)
         }
+
         if (filterBy?.sort_by) {
-            query = query.order(filterBy.sort_by, {
+            query.order(filterBy.sort_by, {
                 ascending: filterBy.sort_direction === "asc",
             })
         }
+
         if (filterBy?.hide) {
             query = query.eq("hide", filterBy.hide)
         }
@@ -91,12 +109,12 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         if (error) throw error
 
         const eventsWithUsers = data.map((event) => {
-            const { ci_events_users_junction } = event
+            const { creator, ci_events_users_junction } = event
             const users = ci_events_users_junction
                 .map((user: any) => user.users)
                 .filter((user: any) => user)
             delete event.ci_events_users_junction
-            return { ...event, users }
+            return { ...event, creator_name: creator.full_name, users }
         })
         return eventsWithUsers as CIEvent[]
     } catch (error) {
@@ -105,7 +123,39 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
     }
 }
 
-async function createCIEvent(event: CIEventWithoutId): Promise<CIEvent> {
+async function getCIEventsCreators(): Promise<SelectOption[]> {
+    try {
+        const { data, error } = await supabase.from("ci_events")
+            .select(`creator:users (
+            full_name,
+            user_id
+        )`)
+
+        if (error) throw error
+
+        const creators = new Map<string, string>()
+
+        data.forEach((event) => {
+            const { creator } = event
+            if (creator) {
+                const { user_id, full_name } = creator as unknown as {
+                    user_id: string
+                    full_name: string
+                }
+                creators.set(user_id, full_name)
+            }
+        })
+        return Array.from(creators.entries()).map(([value, label]) => ({
+            value,
+            label,
+        })) as SelectOption[]
+    } catch (error) {
+        console.error("Error fetching CI events creators:", error)
+        throw error
+    }
+}
+
+async function createCIEvent(event: DBCIEvent): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
             .from("ci_events")

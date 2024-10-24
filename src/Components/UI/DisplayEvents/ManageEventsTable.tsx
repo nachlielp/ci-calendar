@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from "react"
-import Table from "antd/es/table"
-import Select from "antd/es/select"
+import { useEffect, useState } from "react"
+import Table, { ColumnsType, TableProps } from "antd/es/table"
 import { Breakpoint } from "antd/es/_util/responsiveObserver"
 import DeleteMultipleEventsButton from "../Other/DeleteMultipleEventsButton"
 import HideMultipleEventsButton from "../Other/HideMultipleEvents"
 import UnHideMultipleEventsButton from "../Other/UnHideMultipleEventsButton"
 import { CIEvent, UserType } from "../../../util/interfaces"
-import { useEventsFilter } from "../../../hooks/useEventsFilter"
 import dayjs from "dayjs"
 import { Icon } from "../Other/Icon"
 import { SelectOption } from "../../../util/options"
@@ -15,66 +13,114 @@ import { useUser } from "../../../context/UserContext"
 import MenuButtons from "../Other/MenuButtons"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { useCIPastEvents } from "../../../hooks/useCIPastEvents"
-import { useCIEvents } from "../../../context/CIEventsContext"
-const { Option } = Select
+import { useCIManageEvents } from "../../../hooks/useCIManageEvents"
+import Loading from "../Other/Loading"
+import { SorterResult, TablePaginationConfig } from "antd/lib/table/interface"
+import { GetProp } from "antd/es/_util/type"
+
+interface TableParams {
+    pagination?: TablePaginationConfig
+    sortField?: SorterResult<any>["field"]
+    sortOrder?: SorterResult<any>["order"]
+    filters?: Parameters<GetProp<TableProps, "onChange">>[1] & {
+        creator_id?: string[]
+    }
+}
+
+const getColumns = (
+    tableParams: TableParams,
+    teacherOptions: SelectOption[],
+    hideOwners: boolean
+): ColumnsType<CIEvent> => [
+    {
+        title: "בעלים",
+        dataIndex: "creator_name",
+        key: "creator_id",
+        render: (text: string) => {
+            return <span>{text}</span>
+        },
+        filters: teacherOptions.map((teacher) => ({
+            text: teacher.label,
+            value: teacher.value,
+        })),
+        filteredValue: tableParams.filters?.creator_id || null,
+        filterMultiple: false,
+        hidden: hideOwners,
+    },
+    {
+        title: "פרטי אירוע",
+        dataIndex: "title",
+        key: "eventDetails",
+        render: (title: string, record: CIEvent) => {
+            const start_date = dayjs(record.start_date).format("DD/MM/YYYY")
+            const end_date = dayjs(record.end_date).format("DD/MM/YYYY")
+            const dateString =
+                start_date === end_date
+                    ? start_date
+                    : `${start_date} - ${end_date}`
+
+            return (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                    <span className="event-title">{title}</span>
+                    <span className="event-date">
+                        {dateString}
+                        {record.hide && (
+                            <span className="visibility-off-icon-container">
+                                <Icon
+                                    icon="visibilityOff"
+                                    className="visibility-off-icon minimise-icon"
+                                />
+                                אירוע מוסתר
+                            </span>
+                        )}
+                    </span>
+                </div>
+            )
+        },
+        responsive: ["xl", "lg", "md", "sm", "xs"] as Breakpoint[],
+    },
+]
 
 //TODO fix mess - change the past hook to enclude fuature and past and have its own subsciption
 export default function ManageEventsTable() {
     const isPhone = useIsMobile()
     const { user } = useUser()
-    const { ci_events } = useCIEvents()
-    const { ci_past_events } = useCIPastEvents({
-        creator_id:
-            user?.user_type === UserType.creator ||
-            user?.user_type === UserType.org
-                ? user?.user_id
-                : undefined,
-        sort_direction: "desc",
-        start_date: dayjs().format("YYYY-MM-DD"),
+    const [tableParams, setTableParams] = useState<TableParams>({
+        pagination: {
+            current: 1,
+            pageSize: 10,
+        },
+        filters: {
+            creator_id: [],
+        },
     })
 
-    const uid = useMemo(
-        () =>
-            user?.user_type === UserType.creator ||
-            user?.user_type === UserType.admin ||
-            user?.user_type === UserType.org
-                ? [user.user_id]
-                : [],
-        [user]
-    )
+    const nonAdminUserId =
+        user?.user_type !== UserType.admin ? user?.user_id : undefined
+
+    const { ci_past_events, ci_future_events, ci_events_teachers, loading } =
+        useCIManageEvents({
+            creator_id: nonAdminUserId || tableParams.filters?.creator_id?.[0],
+        })
+
     const [showPast, setShowPast] = useState(false)
 
-    const filteredEvents = useEventsFilter({
-        events: showPast ? ci_past_events : ci_events,
-        showPast,
-        uids: uid,
-    })
-    const [teachersEvents, setTeachersEvents] = useState<CIEvent[]>([])
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<
         React.Key[]
     >([])
+
+    useEffect(() => {
+        console.log("selectedRowKeysFuture", selectedRowKeysFuture)
+    }, [selectedRowKeysFuture])
     const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>(
         []
     )
-    const [selectedTeacher, setSelectedTeacher] = useState<SelectOption | null>(
-        null
-    )
+
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
 
-    useEffect(() => {
-        if (selectedTeacher === null) {
-            setTeachersEvents(filteredEvents)
-        } else {
-            setTeachersEvents(
-                filteredEvents.filter(
-                    (event) => event.creator_id === selectedTeacher.value
-                )
-            )
-        }
-    }, [filteredEvents, selectedTeacher?.value])
-
-    const uniqueTeachers = getUniqueTeachers(filteredEvents)
+    if (loading) {
+        return <Loading />
+    }
 
     function onSelectChange(newSelectedRowKeys: React.Key[]) {
         if (showPast) {
@@ -84,10 +130,7 @@ export default function ManageEventsTable() {
         }
     }
 
-    function onClear() {
-        setSelectedTeacher(null)
-        setTeachersEvents(filteredEvents)
-    }
+    // function onClear() {}
 
     function onDelete() {
         setSelectedRowKeysFuture([])
@@ -95,51 +138,27 @@ export default function ManageEventsTable() {
         setExpandedRowKeys([])
     }
 
-    function onSelectTeacher(selectedTeacherId: string) {
-        const teacher = uniqueTeachers.find(
-            (teacher) => teacher.value === selectedTeacherId
-        )
-        teacher ? setSelectedTeacher(teacher) : setSelectedTeacher(null)
-
-        teacher
-            ? setTeachersEvents(
-                  filteredEvents.filter(
-                      (event) => event.creator_id === selectedTeacherId
-                  )
-              )
-            : setTeachersEvents(filteredEvents)
-
-        if (selectedTeacher !== null && selectedTeacherId !== undefined) {
-            setSelectedRowKeysFuture([])
-            setSelectedRowKeysPast([])
-        } else if (
-            selectedTeacher === null &&
-            selectedTeacherId !== undefined &&
-            teacher
-        ) {
-            setSelectedRowKeysFuture(
-                selectedRowKeysFuture.filter((key) =>
-                    filteredEvents.some(
-                        (event) =>
-                            event.id === key &&
-                            event.creator_id === selectedTeacherId
-                    )
-                )
-            )
-            setSelectedRowKeysPast(
-                selectedRowKeysPast.filter((key) =>
-                    filteredEvents.some(
-                        (event) =>
-                            event.id === key &&
-                            event.creator_id === selectedTeacherId
-                    )
-                )
-            )
+    const handleTableChange: TableProps<CIEvent>["onChange"] = (
+        pagination,
+        filters
+    ) => {
+        const { creator_id } = filters
+        if (creator_id) {
+            setTableParams((prev) => ({
+                ...prev,
+                pagination,
+                filters: { creator_id: creator_id as string[] },
+            }))
+        } else {
+            setTableParams((prev) => ({
+                ...prev,
+                pagination,
+                filters: {},
+            }))
         }
     }
 
     function onSelectTimeframe(key: string) {
-        console.log("key", key)
         setShowPast(key === "past")
     }
 
@@ -148,94 +167,8 @@ export default function ManageEventsTable() {
         onChange: onSelectChange,
     }
 
-    const visableEventsToHide = showPast
-        ? filteredEvents.filter(
-              (event) => selectedRowKeysFuture.includes(event.id) && !event.hide
-          )
-        : filteredEvents.filter(
-              (event) => selectedRowKeysPast.includes(event.id) && !event.hide
-          )
-    const hiddenEventsToShow = showPast
-        ? filteredEvents.filter(
-              (event) => selectedRowKeysFuture.includes(event.id) && event.hide
-          )
-        : filteredEvents.filter(
-              (event) => selectedRowKeysPast.includes(event.id) && event.hide
-          )
-    const selectedEventsToDelete = showPast
-        ? filteredEvents.filter((event) =>
-              selectedRowKeysFuture.includes(event.id)
-          )
-        : filteredEvents.filter((event) =>
-              selectedRowKeysPast.includes(event.id)
-          )
-
     function onExpand(expanded: boolean, record: CIEvent) {
         setExpandedRowKeys(expanded ? [record.id] : [])
-    }
-
-    const columns = [
-        {
-            title: "בעלים",
-            dataIndex: "creator_name",
-            key: "creator_name",
-            render: (creator_name: string) => creator_name,
-            responsive: ["xl", "lg", "md"] as Breakpoint[],
-        },
-        {
-            title: "פרטי אירוע",
-            dataIndex: "title",
-            key: "eventDetails",
-            render: (title: string, record: CIEvent) => {
-                const start_date = dayjs(record.start_date).format("DD/MM/YYYY")
-                const end_date = dayjs(record.end_date).format("DD/MM/YYYY")
-                const dateString =
-                    start_date === end_date
-                        ? start_date
-                        : `${start_date} - ${end_date}`
-
-                return (
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                        <span className="event-title">{title}</span>
-                        <span className="event-date">
-                            {dateString}
-                            {record.hide && (
-                                <span className="visibility-off-icon-container">
-                                    <Icon
-                                        icon="visibilityOff"
-                                        className="visibility-off-icon minimise-icon"
-                                    />
-                                    אירוע מוסתר
-                                </span>
-                            )}
-                        </span>
-                    </div>
-                )
-            },
-            sorter: (a: CIEvent, b: CIEvent) =>
-                dayjs(a.start_date).diff(dayjs(b.start_date), "day"),
-            responsive: ["xl", "lg", "md", "sm", "xs"] as Breakpoint[],
-        },
-    ]
-
-    const filteredColumns =
-        user && user.user_type === "creator"
-            ? columns.filter((column) => column.key !== "creator_name")
-            : columns
-
-    function getUniqueTeachers(events: CIEvent[]): SelectOption[] {
-        const teacherMap = new Map<string, SelectOption>()
-
-        events.forEach((event) => {
-            if (event.creator_id && event.creator_name) {
-                teacherMap.set(event.creator_id, {
-                    label: event.creator_name,
-                    value: event.creator_id,
-                })
-            }
-        })
-
-        return Array.from(teacherMap.values())
     }
 
     const isActiveActions = showPast
@@ -263,39 +196,15 @@ export default function ManageEventsTable() {
                     ]}
                     defaultKey="future"
                 />
-                <div className="user-select-container">
-                    {user && user.user_type === UserType.admin && (
-                        <Select
-                            id="select-teacher"
-                            className="select-teacher"
-                            value={selectedTeacher?.value}
-                            onChange={onSelectTeacher}
-                            placeholder="סינון לפי משתמש"
-                            allowClear
-                            onClear={onClear}
-                            showSearch
-                            filterOption={(input, option) =>
-                                (option?.children as unknown as string)
-                                    .toLowerCase()
-                                    .indexOf(input.toLowerCase()) >= 0
-                            }
-                        >
-                            {uniqueTeachers.map((teacher) => (
-                                <Option
-                                    key={teacher.value}
-                                    value={teacher.value}
-                                >
-                                    {teacher.label}
-                                </Option>
-                            ))}
-                        </Select>
-                    )}
-                </div>
+
                 <div className="actions-row">
+                    {/* todo: add visable and hidden events */}
                     <DeleteMultipleEventsButton
-                        eventIds={selectedEventsToDelete.map(
-                            (event) => event.id
-                        )}
+                        eventIds={
+                            showPast
+                                ? selectedRowKeysFuture.map(String)
+                                : selectedRowKeysPast.map(String)
+                        }
                         className={`multiple-events-action-btn ${
                             isActiveActions ? "active" : ""
                         }`}
@@ -307,7 +216,11 @@ export default function ManageEventsTable() {
                         onDelete={onDelete}
                     />
                     <HideMultipleEventsButton
-                        eventIds={visableEventsToHide.map((event) => event.id)}
+                        eventIds={
+                            showPast
+                                ? selectedRowKeysFuture.map(String)
+                                : selectedRowKeysPast.map(String)
+                        }
                         className={`multiple-events-action-btn ${
                             isActiveActions ? "active" : ""
                         }`}
@@ -318,7 +231,11 @@ export default function ManageEventsTable() {
                         }
                     />
                     <UnHideMultipleEventsButton
-                        eventIds={hiddenEventsToShow.map((event) => event.id)}
+                        eventIds={
+                            showPast
+                                ? selectedRowKeysFuture.map(String)
+                                : selectedRowKeysPast.map(String)
+                        }
                         className={`multiple-events-action-btn ${
                             isActiveActions ? "active" : ""
                         }`}
@@ -343,14 +260,18 @@ export default function ManageEventsTable() {
 
             <Table
                 rowSelection={rowSelection}
-                columns={filteredColumns}
+                columns={getColumns(
+                    tableParams,
+                    ci_events_teachers,
+                    !!nonAdminUserId
+                )}
                 dataSource={
                     showPast
                         ? ci_past_events.map((event) => ({
                               ...event,
                               key: event.id,
                           }))
-                        : teachersEvents.map((event) => ({
+                        : ci_future_events.map((event) => ({
                               ...event,
                               key: event.id,
                           }))
@@ -366,6 +287,7 @@ export default function ManageEventsTable() {
                     expandedRowKeys: expandedRowKeys,
                     onExpand: onExpand,
                 }}
+                onChange={handleTableChange}
             />
         </section>
     )

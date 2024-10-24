@@ -20,10 +20,7 @@ import MultiDayFormHead from "./MultiDayFormHead"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 
 import { useUser } from "../../../context/UserContext"
-import {
-    cieventsService,
-    CIEventWithoutId,
-} from "../../../supabase/cieventsService"
+import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import {
     CITemplateWithoutId,
     templateService,
@@ -136,8 +133,7 @@ export default function MultiDayEventForm({
                 if (!dates) {
                     throw new Error("dates are null")
                 }
-                const event: CIEventWithoutId = {
-                    users: [],
+                const event: DBCIEvent = {
                     is_notified: false,
                     start_date: dates[0]
                         .hour(13)
@@ -165,7 +161,6 @@ export default function MultiDayEventForm({
                     segments: [],
                     district: values["district"],
                     creator_id: user.user_id,
-                    creator_name: user.full_name,
                     source_template_id: sourceTemplateId,
                     is_multi_day: true,
                     multi_day_teachers:

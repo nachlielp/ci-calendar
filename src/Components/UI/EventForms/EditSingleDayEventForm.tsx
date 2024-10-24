@@ -23,7 +23,7 @@ import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import EventSegmentsForm from "./EventSegmentsForm"
 import { EventAction } from "../../../App"
 import { useUser } from "../../../context/UserContext"
-import { cieventsService } from "../../../supabase/cieventsService"
+import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
@@ -173,8 +173,7 @@ export default function EditSingleDayEventForm({
         if (event) {
             const eventId =
                 editType === EventAction.recycle ? uuidv4() : event.id
-            const updatedEvent: CIEvent = {
-                users: [],
+            const updatedEvent: DBCIEvent = {
                 is_notified: event.is_notified,
                 start_date: baseDate
                     .hour(13)
@@ -187,7 +186,6 @@ export default function EditSingleDayEventForm({
                     .second(0)
                     .format("YYYY-MM-DDTHH:mm:ss"),
                 type: "",
-                id: eventId,
                 address: (newAddress || address) as IAddress,
                 created_at: event.created_at,
                 updated_at: dayjs().toISOString(),
@@ -200,7 +198,6 @@ export default function EditSingleDayEventForm({
                 segments: segments,
                 district: values["district"],
                 creator_id: user.user_id,
-                creator_name: user.full_name,
                 source_template_id: event.source_template_id,
                 is_multi_day: false,
                 multi_day_teachers: [],

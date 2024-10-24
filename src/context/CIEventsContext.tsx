@@ -41,6 +41,7 @@ export const CIEventsProvider = ({
                         .toISOString(),
                     sort_by: "start_date",
                     sort_direction: "asc",
+                    future_events: true,
                 })
                 setCievents(fetchedEvents)
                 // sortAndSetEvents(fetchedEvents)

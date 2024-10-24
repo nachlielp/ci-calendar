@@ -19,10 +19,7 @@ import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { useUser } from "../../../context/UserContext"
-import {
-    cieventsService,
-    CIEventWithoutId,
-} from "../../../supabase/cieventsService"
+import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import {
     CITemplateWithoutId,
     templateService,
@@ -186,8 +183,7 @@ export default function SingleDayEventForm({
 
         try {
             if (!isTemplate) {
-                const event: CIEventWithoutId = {
-                    users: [],
+                const event: DBCIEvent = {
                     is_notified: false,
                     start_date: eventDate
                         .hour(13)
@@ -212,7 +208,6 @@ export default function SingleDayEventForm({
                     segments: segmentsArray,
                     district: values["district"],
                     creator_id: user.user_id,
-                    creator_name: user.full_name,
                     source_template_id: sourceTemplateId,
                     is_multi_day: false,
                     multi_day_teachers: null,

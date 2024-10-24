@@ -65,12 +65,15 @@ export interface CIEvent {
     links: ILink[]
     segments: CIEventSegments[]
     creator_id: string
-    creator_name: string
     source_template_id: string | null
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
     organisations: UserOption[]
     is_notified: boolean
+    creator: {
+        user_id: string
+        full_name: string
+    }
 }
 export interface CITemplate {
     template_id: string

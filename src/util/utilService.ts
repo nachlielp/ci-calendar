@@ -8,7 +8,7 @@ import {
     hebrewMonths,
     SelectOption,
 } from "./options"
-import { CIEventWithoutId } from "../supabase/cieventsService"
+import { DBCIEvent } from "../supabase/cieventsService"
 export const utilService = {
     createDbUserFromUser,
     deepCompare,
@@ -34,6 +34,7 @@ export const utilService = {
     saveFiltersToLocalStorage,
     getCIEventTeachers,
     notAUserId,
+    getUniqueTeachersList: getUniqueOwnersList,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -355,7 +356,7 @@ function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
     localStorage.setItem("defaultFilters", JSON.stringify(filters))
 }
 
-function getCIEventTeachers(cievent: CIEvent | CIEventWithoutId) {
+function getCIEventTeachers(cievent: CIEvent | DBCIEvent) {
     const singleDayEventTeachers = cievent.segments
         .map((segment) => segment.teachers)
         .flat()
@@ -382,4 +383,17 @@ function getCIEventTeachers(cievent: CIEvent | CIEventWithoutId) {
 
 function notAUserId(userId: string) {
     return userId.startsWith("NON_EXISTENT")
+}
+
+function getUniqueOwnersList(events: CIEvent[]): SelectOption[] {
+    const uniqueOwners = new Set<string>()
+    events.forEach((event) => {
+        uniqueOwners.add(event.creator.user_id)
+    })
+    return Array.from(uniqueOwners).map((user_id) => ({
+        value: user_id,
+        label:
+            events.find((event) => event.creator.user_id === user_id)?.creator
+                .full_name || "",
+    }))
 }
