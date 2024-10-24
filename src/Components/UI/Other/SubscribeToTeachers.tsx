@@ -4,18 +4,38 @@ import { useUser } from "../../../context/UserContext"
 import debounce from "lodash/debounce"
 import { usersService } from "../../../supabase/usersService"
 import DoubleBindedSelect from "./DoubleBindedSelectProps"
+import Loading from "./Loading"
 
 export default function SubscribeToTeachers() {
     const { user } = useUser()
-    const { teachers } = useTaggableUsersList({ addSelf: false })
-    console.log("teachers: ", teachers)
+    const { teachers, loading, orgs } = useTaggableUsersList({ addSelf: false })
+
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>(
+        user?.subscriptions || []
+    )
+    const [selectedOrgs, setSelectedOrgs] = useState<string[]>(
         user?.subscriptions || []
     )
 
     useEffect(() => {
+        if (user) {
+            console.log("user: ", user)
+            setSelectedTeachers(
+                user?.subscriptions.filter((sub) =>
+                    teachers.map((t) => t.value).includes(sub)
+                ) || []
+            )
+            setSelectedOrgs(
+                user?.subscriptions.filter((sub) =>
+                    orgs.map((o) => o.value).includes(sub)
+                ) || []
+            )
+        }
+    }, [])
+
+    useEffect(() => {
         debouncedSaveFilters()
-    }, [selectedTeachers])
+    }, [selectedTeachers, selectedOrgs])
 
     function debouncedSaveFilters() {
         const saveFilters = debounce(async () => {
@@ -26,7 +46,7 @@ export default function SubscribeToTeachers() {
             }
             try {
                 await usersService.updateUser(user.user_id, {
-                    subscriptions: selectedTeachers,
+                    subscriptions: [...selectedTeachers, ...selectedOrgs],
                 })
             } catch (error) {
                 console.error(
@@ -38,6 +58,11 @@ export default function SubscribeToTeachers() {
 
         saveFilters()
     }
+
+    if (loading) {
+        return <Loading />
+    }
+
     return (
         <div>
             <DoubleBindedSelect
@@ -48,6 +73,16 @@ export default function SubscribeToTeachers() {
                     setSelectedTeachers(selectedTeachers)
                 }}
                 placeholder="בחירת מורים"
+                className="select-filter"
+            />
+            <DoubleBindedSelect
+                options={orgs}
+                selectedValues={selectedOrgs}
+                onChange={(values: string[]) => {
+                    const selectedOrgs = values
+                    setSelectedOrgs(selectedOrgs)
+                }}
+                placeholder="בחירת ארגונים"
                 className="select-filter"
             />
         </div>
