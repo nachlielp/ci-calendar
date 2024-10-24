@@ -9,29 +9,13 @@ import Loading from "./Loading"
 export default function SubscribeToTeachers() {
     const { user } = useUser()
     const { teachers, loading, orgs } = useTaggableUsersList({ addSelf: false })
-
+    console.log("teachers: ", teachers)
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>(
-        user?.subscriptions || []
+        user?.subscriptions.teachers || []
     )
     const [selectedOrgs, setSelectedOrgs] = useState<string[]>(
-        user?.subscriptions || []
+        user?.subscriptions.orgs || []
     )
-
-    useEffect(() => {
-        if (user) {
-            console.log("user: ", user)
-            setSelectedTeachers(
-                user?.subscriptions.filter((sub) =>
-                    teachers.map((t) => t.value).includes(sub)
-                ) || []
-            )
-            setSelectedOrgs(
-                user?.subscriptions.filter((sub) =>
-                    orgs.map((o) => o.value).includes(sub)
-                ) || []
-            )
-        }
-    }, [])
 
     useEffect(() => {
         debouncedSaveFilters()
@@ -46,7 +30,10 @@ export default function SubscribeToTeachers() {
             }
             try {
                 await usersService.updateUser(user.user_id, {
-                    subscriptions: [...selectedTeachers, ...selectedOrgs],
+                    subscriptions: {
+                        teachers: [...selectedTeachers],
+                        orgs: [...selectedOrgs],
+                    },
                 })
             } catch (error) {
                 console.error(
