@@ -1,22 +1,69 @@
-.install-pwa-btn {
-    width: auto;
-    font-family: Assistant;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 20.93px;
-    text-align: right;
-    background-color: #dd5239;
-    color: white;
-    border-radius: 6px;
-    padding: 5px 16px;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    margin: 0 20px;
-
-    &:hover {
-        background-color: #c6280c;
+.install-pwa-button {
+    .install-pwa-btn {
+        width: auto;
+        font-family: Assistant;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 20.93px;
+        text-align: right;
+        background-color: #dd5239;
         color: white;
+        border-radius: 6px;
+        padding: 5px 16px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        margin: 0 20px;
+
+        &:hover {
+            background-color: #c6280c;
+            color: white;
+        }
+    }
+}
+.install-pwa-modal-container {
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    align-items: start;
+
+    .install-pwa-modal-title {
+        margin: 0;
+    }
+    .install-pwa-modal-li {
+        display: flex;
+        justify-content: left;
+        flex-direction: row;
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 28px;
+        display: block;
+
+        .install-share-icon-wrapper {
+            background-color: #fbf9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0;
+            margin: 3px;
+
+            .ios-share-icon {
+                display: inline-flex;
+                margin-right: 5px;
+                .injected-svg {
+                    width: 14px;
+                    height: 14px;
+                    margin-left: 5px;
+                }
+            }
+        }
+
+        .install-pwa-action-text {
+            background-color: #fbf9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0 2px;
+            margin: 3px;
+        }
     }
 }

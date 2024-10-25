@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { utilService } from "../../../util/utilService"
 import Modal from "antd/es/modal"
+import ios_share from "../../../assets/svgs/ios_share.svg"
+import { ReactSVG } from "react-svg"
 
 export function InstallPWAButton() {
     const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
@@ -32,7 +34,7 @@ export function InstallPWAButton() {
     }, [])
 
     const handleInstallClick = async () => {
-        if (true) {
+        if (utilService.isIos()) {
             setIsOpen(true)
             return
         }
@@ -65,7 +67,7 @@ export function InstallPWAButton() {
     }
 
     return (
-        <>
+        <section className="install-pwa-button">
             <button
                 id="install-button"
                 className="install-pwa-btn"
@@ -79,10 +81,31 @@ export function InstallPWAButton() {
                 onCancel={() => setIsOpen(false)}
                 footer={null}
             >
-                <div>
-                    <h2>{navigator.userAgent}</h2>
+                <div className="install-pwa-modal-container">
+                    <h2 className="install-pwa-modal-title">התקנה באייפון</h2>
+                    <ol>
+                        <li className="install-pwa-modal-li">
+                            1. פיתחו את האתר ב- Safari
+                        </li>
+                        <li className="install-pwa-modal-li">
+                            2. לחצו על
+                            <label className="install-share-icon-wrapper">
+                                <ReactSVG
+                                    src={ios_share}
+                                    className="ios-share-icon"
+                                />
+                            </label>
+                            בסרגל הכרטיסיות
+                        </li>
+                        <li className="install-pwa-modal-li">
+                            3. גללו מטה ובחרו ב
+                            <label className="install-pwa-action-text ">
+                                הוספה למסך הבית
+                            </label>
+                        </li>
+                    </ol>
                 </div>
             </Modal>
-        </>
+        </section>
     )
 }

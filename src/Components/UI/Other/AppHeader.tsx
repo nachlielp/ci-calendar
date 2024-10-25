@@ -6,6 +6,7 @@ import { Icon } from "./Icon"
 import { MenuDrawer } from "./MenuDrawer"
 import { useUser } from "../../../context/UserContext"
 import { InstallPWAButton } from "./InstallPWAButton"
+import { utilService } from "../../../util/utilService"
 
 export default function AppHeader() {
     const { user } = useUser()
@@ -40,7 +41,7 @@ export default function AppHeader() {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
-            <InstallPWAButton />
+            {utilService.isMobileBrowser() && <InstallPWAButton />}
             {user && (
                 <>
                     <div className="header-actions">

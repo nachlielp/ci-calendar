@@ -39,7 +39,8 @@ export const utilService = {
     saveFiltersToLocalStorage,
     getCIEventTeachers,
     notAUserId,
-    getUniqueTeachersList: getUniqueOwnersList,
+    getUniqueOwnersList,
+    isMobileBrowser,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -307,7 +308,11 @@ function openGoogleMaps(placeId: string, address: string) {
 function isIos() {
     return /(iPhone|iPad|iPod)/.test(navigator.userAgent)
 }
-
+function isMobileBrowser() {
+    const regex =
+        /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+    return regex.test(navigator.userAgent)
+}
 function handleShareEvent(eventId: string, eventTitle: string) {
     const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
 
