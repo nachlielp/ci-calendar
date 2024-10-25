@@ -188,7 +188,7 @@ const MenuItem = ({ item, isBadge }: { item: any; isBadge: boolean }) => {
             <Badge count={!isBadge && 0} size="small">
                 <Icon icon={item.icon} />
             </Badge>
-            <p>{item.label}</p>
+            <p style={{ fontSize: "18px" }}>{item.label}</p>
         </article>
     )
 }
