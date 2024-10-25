@@ -9,7 +9,6 @@ import Loading from "./Loading"
 export default function SubscribeToTeachers() {
     const { user } = useUser()
     const { teachers, loading, orgs } = useTaggableUsersList({ addSelf: false })
-    console.log("teachers: ", teachers)
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>(
         user?.subscriptions.teachers || []
     )

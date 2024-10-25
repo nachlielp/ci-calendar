@@ -5,8 +5,6 @@ import { DbUser } from "../../../util/interfaces"
 import { Icon } from "./Icon"
 import { MenuDrawer } from "./MenuDrawer"
 import { useUser } from "../../../context/UserContext"
-import PushNotificationStatusButton from "./PushNotificationStatusButton"
-import { utilService } from "../../../util/utilService"
 
 export default function AppHeader() {
     const { user } = useUser()
@@ -44,11 +42,6 @@ export default function AppHeader() {
                 )}
             {user && (
                 <>
-                    <article className="header-notification-container">
-                        {utilService.isPWA() && (
-                            <PushNotificationStatusButton />
-                        )}
-                    </article>
                     <div className="header-actions">
                         <UserInfo user={user} />
                         <MenuDrawer />

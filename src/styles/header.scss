@@ -70,12 +70,22 @@
     margin-right: 1.5rem;
     margin-left: 1.5rem;
 }
+
 .notification-status-container {
     margin: 12px;
     margin-right: auto;
-    .injected-svg {
-        width: 20px;
-        height: 20px;
+
+    .notification-switch-icon {
+        .injected-svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        &.active {
+            .injected-svg {
+                padding-top: 2px;
+            }
+        }
     }
 }
 .user-name {

@@ -37,6 +37,11 @@ export default function useMessagingPermission() {
                 setPermissionStatus(null)
                 return
             }
+
+            if (!utilService.isPWA()) {
+                setPermissionStatus("denied")
+                return
+            }
             const { permission } = Notification
             setPermissionStatus(permission)
             utilService.setFirstNotificationPermissionRequest(permission)
