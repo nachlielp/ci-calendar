@@ -65,3 +65,19 @@ self.addEventListener("activate", (e) => {
     )
     self.clients.claim()
 })
+
+window.addEventListener("load", () => {
+    console.log("Load => nav to page")
+    const urlParams = new URLSearchParams(window.location.search)
+    const page = urlParams.get("page")
+    console.log("page", page)
+    console.log("window.location", window.location)
+    if (page) {
+        navigateToPage(page)
+    }
+})
+
+function navigateToPage(page) {
+    console.log(`Navigating to page: ${page}`)
+    navigator.navigate(page)
+}
