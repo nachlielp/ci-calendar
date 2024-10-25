@@ -1,5 +1,10 @@
 import { supabase } from "./client"
-import { UserBio, DbUser, UserType } from "../util/interfaces"
+import {
+    UserBio,
+    DbUser,
+    UserType,
+    DbUserWithoutNotifications,
+} from "../util/interfaces"
 
 export type ManageUserOption = {
     user_id: string
@@ -21,8 +26,19 @@ async function getUser(id: string): Promise<DbUser | null> {
     try {
         const { data, error } = await supabase
             .from("users")
-            .select("*")
+            .select(
+                `
+            *,
+            notifications:notifications (
+                id,
+                ci_event_id,
+                remind_in_hours,
+                is_sent
+            )
+        `
+            )
             .eq("user_id", id)
+            .eq("notifications.is_sent", false)
             .single()
 
         if (error) {
@@ -32,7 +48,7 @@ async function getUser(id: string): Promise<DbUser | null> {
             }
             throw error
         }
-        return data as DbUser
+        return data as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
         return null
@@ -60,7 +76,9 @@ async function updateUser(
     }
 }
 
-async function createUser(user: DbUser): Promise<DbUser | null> {
+async function createUser(
+    user: DbUserWithoutNotifications
+): Promise<DbUser | null> {
     try {
         const { data, error } = await supabase
             .from("users")
@@ -138,8 +156,22 @@ function subscribeToUser(userId: string, callback: (payload: any) => void) {
                 table: "users",
                 filter: `user_id=eq.${userId}`,
             },
+
             (payload) => {
-                callback(payload)
+                callback({ table: "users", payload })
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "notifications",
+                filter: `user_id=eq.${userId}`,
+            },
+
+            (payload) => {
+                callback({ table: "notifications", payload })
             }
         )
         .subscribe()

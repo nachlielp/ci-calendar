@@ -29,7 +29,7 @@ interface ProfileFormProps {
 //TODO add cropper (react-easy-crop)
 export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const isMobile = useIsMobile()
-    const { user, setUser } = useUser()
+    const { user, updateUser } = useUser()
     const originalImageUrl = useRef<string>(user?.img || "")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
@@ -49,7 +49,6 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     }
     const getCurrentFormValues = () => {
         const values = form.getFieldsValue()
-        console.log("Current form values: ", values)
         return values
     }
 
@@ -92,7 +91,9 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                 user.user_id,
                 newTeacher
             )
-            setUser(updatedUser)
+            if (updatedUser) {
+                updateUser(updatedUser)
+            }
 
             closeEditProfile()
         } catch (error) {

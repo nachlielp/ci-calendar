@@ -9,7 +9,7 @@ import useUserRequests from "../hooks/useUserRequests"
 interface IUserContextType {
     user: DbUser | null
     requests: CIRequest[]
-    setUser: (user: DbUser | null) => void
+    updateUser: (updatedUser: Partial<DbUser>) => void
     loading: boolean
     updateUserContext: (updatedUser: Partial<DbUser>) => Promise<void>
 }
@@ -17,7 +17,7 @@ interface IUserContextType {
 const UserContext = createContext<IUserContextType>({
     user: null,
     requests: [],
-    setUser: () => {},
+    updateUser: () => {},
     loading: true,
     updateUserContext: async () => {},
 })
@@ -34,10 +34,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<DbUser | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const { session } = useSession()
-    //requests are in user context because they are used in multiple components but the subscription events can be caught by a single instance
     const { requests } = useUserRequests(user?.user_id || "")
 
+    function updateUser(updatedUser: Partial<DbUser>) {
+        if (user) {
+            setUser({ ...user, ...updatedUser })
+        }
+    }
+
     const updateUserContext = async (updatedUser: Partial<DbUser>) => {
+        console.log("updating user context")
         try {
             if (user && user.user_id) {
                 const updatedUserData = await usersService.updateUser(
@@ -45,7 +51,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                     updatedUser
                 )
                 if (updatedUserData) {
-                    setUser(updatedUserData)
+                    const newUser = { ...user, ...updatedUserData }
+                    setUser(newUser)
                 }
             }
         } catch (error) {
@@ -90,10 +97,39 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         if (!user) return
         const channel = usersService.subscribeToUser(
             user.user_id,
-            (payload) => {
-                switch (payload.eventType) {
-                    case "UPDATE":
-                        setUser(payload.new)
+            async ({ table, payload }) => {
+                switch (table) {
+                    case "users":
+                        setUser({ ...user, ...payload.new })
+                        break
+                    case "notifications":
+                        if (payload.eventType === "UPDATE") {
+                            const newUser = { ...user }
+                            newUser.notifications = newUser.notifications.map(
+                                (n) => {
+                                    if (n.id === payload.new.id) {
+                                        return payload.new
+                                    }
+                                    return n
+                                }
+                            )
+                            setUser(newUser)
+                        } else if (payload.eventType === "DELETE") {
+                            setUser({
+                                ...user,
+                                notifications: user.notifications.filter(
+                                    (n) => n.id !== payload.old.id
+                                ),
+                            })
+                        } else if (payload.eventType === "INSERT") {
+                            setUser({
+                                ...user,
+                                notifications: [
+                                    ...user.notifications,
+                                    payload.new,
+                                ],
+                            })
+                        }
                         break
                 }
             }
@@ -105,7 +141,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <UserContext.Provider
-            value={{ user, setUser, loading, updateUserContext, requests }}
+            value={{ user, updateUser, loading, updateUserContext, requests }}
         >
             {children}
         </UserContext.Provider>

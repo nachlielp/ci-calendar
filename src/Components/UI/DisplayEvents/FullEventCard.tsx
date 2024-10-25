@@ -233,7 +233,9 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
             )}
 
             <article className="event-card-footer">
-                {utilService.isPWA() && <CIEventNotificationModal />}
+                {utilService.isPWA() && (
+                    <CIEventNotificationModal eventId={ci_event.id} />
+                )}
                 {utilService.isPWA() && (
                     <SecondaryButton
                         label=""

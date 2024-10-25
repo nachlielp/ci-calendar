@@ -6,21 +6,30 @@
 .set-notification-timeframe-modal {
     .notification-modal-container {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 10px;
 
         .notification-icon {
             padding-top: 4px;
         }
+
+        .notification-modal-title {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+        }
         .label-text {
             font-size: 18px;
             font-weight: 600;
+            display: block;
         }
     }
 
     .modal-footer {
         display: flex;
-        justify-content: end;
+        justify-content: center;
         gap: 10px;
     }
 }

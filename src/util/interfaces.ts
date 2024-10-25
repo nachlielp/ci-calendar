@@ -136,18 +136,33 @@ export interface Notification {
     created_at: string
     ci_event_id: string
     user_id: string
-    remind_in_hours: number
+    remind_in_hours: string
     title: string
     body: string
     send_at: string
     timezone: string
+    is_sent: boolean
 }
+
+export interface UserNotification
+    extends Omit<
+        Notification,
+        "user_id" | "title" | "body" | "send_at" | "timezone" | "is_sent"
+    > {}
 
 export interface NotificationDB
     extends Omit<
         Notification,
-        "id" | "title" | "body" | "send_at" | "timezone"
-    > {}
+        | "id"
+        | "created_at"
+        | "title"
+        | "body"
+        | "send_at"
+        | "timezone"
+        | "is_sent"
+    > {
+    id?: string
+}
 
 export interface DbUserWithoutNotifications
     extends Omit<DbUser, "notifications"> {}
@@ -170,7 +185,7 @@ export interface DbUser {
     bio: string
     default_filter: DefaultFilter
     push_notification_tokens: PushNotificationToken[]
-    notifications: Notification[]
+    notifications: UserNotification[]
     subscriptions: {
         teachers: string[]
         orgs: string[]

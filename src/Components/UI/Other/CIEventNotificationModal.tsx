@@ -3,39 +3,81 @@ import SecondaryButton from "./SecondaryButton"
 import { useState } from "react"
 import { Icon } from "./Icon"
 import Select from "antd/es/select"
+import { useUser } from "../../../context/UserContext"
+import { notificationService } from "../../../supabase/notificationService"
 
 const notificationOptions = [
-    { label: "1 שעה", value: "1" },
-    { label: "2 שעות", value: "2" },
-    { label: "4 שעות", value: "4" },
-    { label: "יום", value: "24" },
-    { label: "יומיים", value: "48" },
+    { label: " לא רוצה התראה", value: "0" },
+    { label: "שעה לפני הארוע", value: "1" },
+    { label: "שעתיים לפני הארוע", value: "2" },
+    { label: "4 שעות לפני הארוע", value: "4" },
+    { label: "יום לפני הארוע", value: "24" },
+    { label: "יומיים לפני הארוע", value: "48" },
 ]
 
-//TODO WIP
-export default function CIEventNotificationModal() {
+export default function CIEventNotificationModal({
+    eventId,
+}: {
+    eventId: string
+}) {
+    const { user } = useUser()
+
+    if (!user) return null
+
     const [isOpen, setIsOpen] = useState(false)
+    const [remindInHours, setRemindInHours] = useState<string>("1")
+
+    const isActive = () => {
+        const notification = user.notifications?.find(
+            (n) => n.ci_event_id === eventId
+        )
+        return notification && notification?.remind_in_hours !== "0"
+    }
 
     const openModal = () => {
+        const notification = user.notifications?.find(
+            (n) => n.ci_event_id === eventId
+        )
+        setRemindInHours(notification?.remind_in_hours || "1")
         setIsOpen(true)
+    }
+
+    const handleOk = async () => {
+        const currentNotification = user.notifications.find(
+            (n) => n.ci_event_id === eventId
+        )
+        if (
+            currentNotification &&
+            remindInHours === currentNotification.remind_in_hours
+        ) {
+            setIsOpen(false)
+            return
+        }
+        if (currentNotification) {
+            await notificationService.updateNotification({
+                id: currentNotification.id,
+                remind_in_hours: remindInHours,
+                ci_event_id: eventId,
+                user_id: user.user_id,
+            })
+        } else {
+            await notificationService.createNotification({
+                ci_event_id: eventId,
+                user_id: user.user_id,
+                remind_in_hours: remindInHours,
+            })
+        }
+        setIsOpen(false)
     }
 
     const modalFooter = (
         <article className="modal-footer">
             <SecondaryButton
-                label="שמירת התראה"
-                successLabel="שמירת התראה"
+                label="אישור"
+                successLabel="אישור"
                 icon={"check"}
                 successIcon={"check"}
-                callback={() => setIsOpen(false)}
-            />
-
-            <SecondaryButton
-                label="ביטול התראה"
-                successLabel="ביטול התראה"
-                icon={"close"}
-                successIcon={"close"}
-                callback={() => setIsOpen(false)}
+                callback={handleOk}
             />
         </article>
     )
@@ -45,8 +87,10 @@ export default function CIEventNotificationModal() {
             <SecondaryButton
                 label=""
                 successLabel=""
-                icon={"notifications_active"}
-                successIcon={"notifications_active"}
+                icon={isActive() ? "notifications_active" : "notifications"}
+                successIcon={
+                    isActive() ? "notifications_active" : "notifications"
+                }
                 callback={openModal}
             />
             <Modal
@@ -56,14 +100,21 @@ export default function CIEventNotificationModal() {
                 className="set-notification-timeframe-modal"
             >
                 <section className="notification-modal-container">
-                    <Icon icon="notifications" className="notification-icon" />
-                    <label className="label-text">אני רוצה לקבל התראה</label>
+                    <article className="notification-modal-title">
+                        <Icon
+                            icon="notifications"
+                            className="notification-icon"
+                        />
+                        <label className="label-text">
+                            אני רוצה לקבל התראה
+                        </label>
+                    </article>
                     <Select
                         options={notificationOptions}
-                        defaultValue="1"
-                        style={{ width: "120px" }}
+                        value={remindInHours.toString()}
+                        style={{ width: "200px" }}
+                        onChange={(value) => setRemindInHours(value)}
                     />
-                    <label className="label-text">לפני הארוע</label>
                 </section>
             </Modal>
         </section>
