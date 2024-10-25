@@ -32,4 +32,8 @@
         justify-content: center;
         gap: 10px;
     }
+
+    .notification-modal-button {
+        margin: 0;
+    }
 }

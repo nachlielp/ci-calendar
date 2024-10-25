@@ -7,6 +7,8 @@ interface CopyButtonProps {
     callback: () => void
     icon: string
     successIcon: string
+    disabled?: boolean
+    className?: string
 }
 
 export default function SecondaryButton({
@@ -15,6 +17,8 @@ export default function SecondaryButton({
     callback,
     icon,
     successIcon,
+    disabled,
+    className,
 }: CopyButtonProps) {
     const [isAction, setIsAction] = useState(false)
 
@@ -26,7 +30,11 @@ export default function SecondaryButton({
 
     return (
         <>
-            <button onClick={handleAction} className="secondary-action-btn">
+            <button
+                onClick={handleAction}
+                className={`secondary-action-btn ${className}`}
+                disabled={disabled}
+            >
                 {isAction ? (
                     <>
                         <label className="label">{successLabel}</label>

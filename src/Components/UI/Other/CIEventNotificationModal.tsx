@@ -5,6 +5,7 @@ import { Icon } from "./Icon"
 import Select from "antd/es/select"
 import { useUser } from "../../../context/UserContext"
 import { notificationService } from "../../../supabase/notificationService"
+import Alert from "antd/es/alert/Alert"
 
 const notificationOptions = [
     { label: " לא רוצה התראה", value: "0" },
@@ -14,6 +15,9 @@ const notificationOptions = [
     { label: "יום לפני הארוע", value: "24" },
     { label: "יומיים לפני הארוע", value: "48" },
 ]
+
+const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
+    "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור התראה"
 
 export default function CIEventNotificationModal({
     eventId,
@@ -70,18 +74,6 @@ export default function CIEventNotificationModal({
         setIsOpen(false)
     }
 
-    const modalFooter = (
-        <article className="modal-footer">
-            <SecondaryButton
-                label="אישור"
-                successLabel="אישור"
-                icon={"check"}
-                successIcon={"check"}
-                callback={handleOk}
-            />
-        </article>
-    )
-
     return (
         <section className="notification-modal-button">
             <SecondaryButton
@@ -96,7 +88,7 @@ export default function CIEventNotificationModal({
             <Modal
                 open={isOpen}
                 onCancel={() => setIsOpen(false)}
-                footer={modalFooter}
+                footer={null}
                 className="set-notification-timeframe-modal"
             >
                 <section className="notification-modal-container">
@@ -115,6 +107,24 @@ export default function CIEventNotificationModal({
                         style={{ width: "200px" }}
                         onChange={(value) => setRemindInHours(value)}
                     />
+
+                    {!user.receive_notifications && (
+                        <Alert
+                            message={NOTIFICATION_MODAL_BUTTON_OFF_ALERT}
+                            type="warning"
+                        />
+                    )}
+                    {user.receive_notifications && (
+                        <SecondaryButton
+                            label="אישור"
+                            successLabel="אישור"
+                            icon={"check"}
+                            successIcon={"check"}
+                            callback={handleOk}
+                            disabled={!user?.receive_notifications}
+                            className="notification-modal-button"
+                        />
+                    )}
                 </section>
             </Modal>
         </section>
