@@ -100,7 +100,7 @@ export default function App() {
                                 }
                             >
                                 <Route
-                                    path="/newsletter"
+                                    path="/filters-and-notifications"
                                     element={<FiltersAndNotificationsPage />}
                                 />
                                 <Route

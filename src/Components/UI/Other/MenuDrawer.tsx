@@ -96,11 +96,11 @@ export function MenuDrawer() {
             disabled: !isProfile,
         },
         {
-            key: "newsletter",
+            key: "filters-and-notifications",
             icon: "notifications",
             label: "התראות ופילטור",
             onClick: () => {
-                navigate("/newsletter")
+                navigate("/filters-and-notifications")
                 setOpen(false)
             },
         },

@@ -149,6 +149,9 @@ export interface NotificationDB
         "id" | "title" | "body" | "send_at" | "timezone"
     > {}
 
+export interface DbUserWithoutNotifications
+    extends Omit<DbUser, "notifications"> {}
+
 export interface DbUser {
     user_id: string
     created_at: string
@@ -158,7 +161,6 @@ export interface DbUser {
     phone: string
     email: string
     subscribed_for_updates_at: string
-    newsletter: IMailingList
     page_url: string
     page_title: string
     show_profile: boolean
@@ -173,6 +175,7 @@ export interface DbUser {
         teachers: string[]
         orgs: string[]
     }
+    receive_notifications: boolean
 }
 
 export interface UserBio extends Partial<DbUser> {

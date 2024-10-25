@@ -1,6 +1,11 @@
 import dayjs from "dayjs"
 import { v4 as uuidv4 } from "uuid"
-import { CIEvent, CITemplate, DbUser, UserType } from "./interfaces"
+import {
+    CIEvent,
+    CITemplate,
+    DbUserWithoutNotifications,
+    UserType,
+} from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
     districtOptions,
@@ -138,7 +143,7 @@ function multiDayTemplateToFormValues(template: CITemplate) {
     return { currentFormValues, address: template.address }
 }
 
-function createDbUserFromUser(user: User): DbUser {
+function createDbUserFromUser(user: User): DbUserWithoutNotifications {
     return {
         user_id: user.id,
         user_type: UserType.user,
@@ -148,14 +153,6 @@ function createDbUserFromUser(user: User): DbUser {
         created_at: user.created_at,
         updated_at: new Date().toISOString(),
         subscribed_for_updates_at: new Date().toISOString(),
-        newsletter: {
-            createdAt: "",
-            updatedAt: "",
-            subscribedForUpdatesAt: "",
-            active: false,
-            districts: [],
-            eventTypes: [],
-        },
         page_url: "",
         page_title: "",
         show_profile: false,
@@ -168,11 +165,11 @@ function createDbUserFromUser(user: User): DbUser {
             eventTypes: [],
         },
         push_notification_tokens: [],
-        notifications: [],
         subscriptions: {
             teachers: [],
             orgs: [],
         },
+        receive_notifications: false,
     }
 }
 
