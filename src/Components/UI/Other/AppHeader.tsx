@@ -5,6 +5,7 @@ import { DbUser } from "../../../util/interfaces"
 import { Icon } from "./Icon"
 import { MenuDrawer } from "./MenuDrawer"
 import { useUser } from "../../../context/UserContext"
+import { InstallPWAButton } from "./InstallPWAButton"
 
 export default function AppHeader() {
     const { user } = useUser()
@@ -27,7 +28,6 @@ export default function AppHeader() {
                         <Icon icon="account" className="icon-main" />
                     </LinkButton>
                 )}
-
             {!user &&
                 ["/login", "/signup", "/reset-password-request"].includes(
                     currentPath
@@ -40,6 +40,7 @@ export default function AppHeader() {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
+            <InstallPWAButton />
             {user && (
                 <>
                     <div className="header-actions">
