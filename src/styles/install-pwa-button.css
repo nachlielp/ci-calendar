@@ -65,5 +65,14 @@
             padding: 0 2px;
             margin: 3px;
         }
+        .add-to-home-screen-icon {
+            display: inline-flex;
+            margin-right: 5px;
+            .injected-svg {
+                width: 14px;
+                height: 14px;
+                margin-left: 5px;
+            }
+        }
     }
 }

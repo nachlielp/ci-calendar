@@ -50,6 +50,7 @@ import ios_share from "../../../assets/svgs/ios_share.svg"
 import share from "../../../assets/svgs/share.svg"
 import check from "../../../assets/svgs/check.svg"
 import domain from "../../../assets/svgs/domain.svg"
+import more_vert from "../../../assets/svgs/more_vert.svg"
 export const Icon = ({
     icon,
     className,
@@ -114,6 +115,7 @@ export const Icon = ({
         share,
         check,
         domain,
+        more_vert,
     }
     return (
         <label className="icon-component" onClick={onClick}>
