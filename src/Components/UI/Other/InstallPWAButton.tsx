@@ -6,7 +6,7 @@ import Modal from "antd/es/modal"
 import ios_share from "../../../assets/svgs/ios_share.svg"
 import more_vert from "../../../assets/svgs/more_vert.svg"
 import add_to_home_screen from "../../../assets/svgs/add_to_home_screen.svg"
-
+import add_box from "../../../assets/svgs/add_box.svg"
 import { ReactSVG } from "react-svg"
 
 export function InstallPWAButton() {
@@ -87,6 +87,10 @@ export function InstallPWAButton() {
                     3. גללו מטה ובחרו ב
                     <label className="install-pwa-action-text ">
                         הוספה למסך הבית
+                        <ReactSVG
+                            src={add_box}
+                            className="add-to-home-screen-icon"
+                        />
                     </label>
                 </li>
             </ol>
