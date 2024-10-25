@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react"
 import { utilService } from "../../../util/utilService"
+import Modal from "antd/es/modal"
 
 export function InstallPWAButton() {
     const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
+    const [isOpen, setIsOpen] = useState(false)
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (evt: Event) => {
@@ -30,6 +32,10 @@ export function InstallPWAButton() {
     }, [])
 
     const handleInstallClick = async () => {
+        if (true) {
+            setIsOpen(true)
+            return
+        }
         if (deferredPrompt) {
             const promptEvent = deferredPrompt as any // TypeScript workaround
             try {
@@ -59,13 +65,24 @@ export function InstallPWAButton() {
     }
 
     return (
-        <button
-            id="install-button"
-            className="install-pwa-btn"
-            style={{ display: !utilService.isPWA() ? "block" : "none" }}
-            onClick={handleInstallClick}
-        >
-            התקנה
-        </button>
+        <>
+            <button
+                id="install-button"
+                className="install-pwa-btn"
+                style={{ display: !utilService.isPWA() ? "block" : "none" }}
+                onClick={handleInstallClick}
+            >
+                התקנה
+            </button>
+            <Modal
+                open={isOpen}
+                onCancel={() => setIsOpen(false)}
+                footer={null}
+            >
+                <div>
+                    <h2>{navigator.userAgent}</h2>
+                </div>
+            </Modal>
+        </>
     )
 }
