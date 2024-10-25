@@ -15,7 +15,7 @@ const android_notification_error =
     "ההרשאות לאפליקציה הזו חסומות, ניתן להפעיל אותם בהגדרות => עדכונים => ניהול עדכונים => גלילה מטה אל האפליקציה CI, ולחיצה על ״קבלת עדכונים״"
 
 const browser_notification_error =
-    "ניתן להפעיל התראות באפליקציה שמותקנת בסלולרי בלבד"
+    "ניתן להדליק התראות באפליקציה שמותקנת בסלולרי בלבד"
 
 const PushNotificationStatusButton = () => {
     const { user } = useUser()
@@ -94,7 +94,7 @@ const PushNotificationStatusButton = () => {
                     style={{ marginTop: "10px" }}
                 />
             )}
-            {!utilService.isPWA() && (
+            {!utilService.isPWA() && !checked && (
                 <Alert
                     message={browser_notification_error}
                     type="warning"
