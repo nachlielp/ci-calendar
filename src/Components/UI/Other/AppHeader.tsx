@@ -6,7 +6,6 @@ import { Icon } from "./Icon"
 import { MenuDrawer } from "./MenuDrawer"
 import { useUser } from "../../../context/UserContext"
 import { InstallPWAButton } from "./InstallPWAButton"
-import { utilService } from "../../../util/utilService"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 
 export default function AppHeader() {
