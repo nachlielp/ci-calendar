@@ -1,4 +1,11 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react"
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react"
 import { CIEvent } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService } from "../supabase/cieventsService"
@@ -34,7 +41,7 @@ export const CIEventsProvider = ({
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const fetchEvents = async () => {
             try {
                 const fetchedEvents = await cieventsService.getCIEvents({
@@ -63,6 +70,7 @@ export const CIEventsProvider = ({
             if (document.visibilityState === "visible") {
                 console.log("Tab is in view")
                 clearInterval(subscriptionRef.current)
+                fetchEvents()
                 subscriptionRef.current = setInterval(
                     () => fetchEvents(),
                     MINUTE_MS * 1
@@ -84,19 +92,26 @@ export const CIEventsProvider = ({
                 handleVisibilityChange
             )
         }
-        //     .channel("cievents-changes")
-        //     .on(
-        //         "postgres_changes",
-        //         { event: "*", schema: "public", table: "ci_events" },
-        //         handleChange
-        //     )
-        //     .subscribe()
-
-        // // Cleanup function
-        // return () => {
-        //     subscription.unsubscribe()
-        // }
     }, [])
+
+    // useLayoutEffect(() => {
+    //     console.log("useLayoutEffect: Adding visibilitychange event listener")
+    //     const handleVisibilityChange = () => {
+    //         console.log("Visibility changed:", document.visibilityState)
+    //     }
+
+    //     document.addEventListener("visibilitychange", handleVisibilityChange)
+
+    //     return () => {
+    //         console.log(
+    //             "useLayoutEffect: Removing visibilitychange event listener"
+    //         )
+    //         document.removeEventListener(
+    //             "visibilitychange",
+    //             handleVisibilityChange
+    //         )
+    //     }
+    // }, [])
 
     // const handleChange = async (_: any) => {
     //     const fetchedEvents = await cieventsService.getCIEvents({
