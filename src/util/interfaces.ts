@@ -164,8 +164,8 @@ export interface NotificationDB
     id?: string
 }
 
-export interface DbUserWithoutNotifications
-    extends Omit<DbUser, "notifications"> {}
+export interface DbUserWithoutJoin
+    extends Omit<DbUser, "notifications" | "requests"> {}
 
 export interface DbUser {
     user_id: string
@@ -191,6 +191,7 @@ export interface DbUser {
         orgs: string[]
     }
     receive_notifications: boolean
+    requests: CIRequest[]
 }
 
 export interface UserBio extends Partial<DbUser> {

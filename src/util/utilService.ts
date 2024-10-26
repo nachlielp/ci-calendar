@@ -1,11 +1,6 @@
 import dayjs from "dayjs"
 import { v4 as uuidv4 } from "uuid"
-import {
-    CIEvent,
-    CITemplate,
-    DbUserWithoutNotifications,
-    UserType,
-} from "./interfaces"
+import { CIEvent, CITemplate, DbUserWithoutJoin, UserType } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
     districtOptions,
@@ -143,7 +138,7 @@ function multiDayTemplateToFormValues(template: CITemplate) {
     return { currentFormValues, address: template.address }
 }
 
-function createDbUserFromUser(user: User): DbUserWithoutNotifications {
+function createDbUserFromUser(user: User): DbUserWithoutJoin {
     return {
         user_id: user.id,
         user_type: UserType.user,

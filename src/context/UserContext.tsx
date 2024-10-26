@@ -1,14 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react"
-import { CIRequest, DbUser } from "../util/interfaces"
+import { DbUser } from "../util/interfaces"
 import { supabase } from "../supabase/client"
 import { useSession } from "./SessionContext"
 import { usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
-import useUserRequests from "../hooks/useUserRequests"
 
 interface IUserContextType {
     user: DbUser | null
-    requests: CIRequest[]
     updateUser: (updatedUser: Partial<DbUser>) => void
     loading: boolean
     updateUserContext: (updatedUser: Partial<DbUser>) => Promise<void>
@@ -16,7 +14,6 @@ interface IUserContextType {
 
 const UserContext = createContext<IUserContextType>({
     user: null,
-    requests: [],
     updateUser: () => {},
     loading: true,
     updateUserContext: async () => {},
@@ -34,7 +31,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<DbUser | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const { session } = useSession()
-    const { requests } = useUserRequests(user?.user_id || "")
 
     function updateUser(updatedUser: Partial<DbUser>) {
         if (user) {
@@ -102,6 +98,18 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                     case "users":
                         setUser({ ...user, ...payload.new })
                         break
+                    case "requests":
+                        console.log("requests", payload.new)
+                        setUser({
+                            ...user,
+                            requests: user.requests.map((r) => {
+                                if (r.request_id === payload.old.request_id) {
+                                    return payload.new
+                                }
+                                return r
+                            }),
+                        })
+                        break
                     case "notifications":
                         if (payload.eventType === "UPDATE") {
                             const newUser = { ...user }
@@ -141,7 +149,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <UserContext.Provider
-            value={{ user, updateUser, loading, updateUserContext, requests }}
+            value={{ user, updateUser, loading, updateUserContext }}
         >
             {children}
         </UserContext.Provider>

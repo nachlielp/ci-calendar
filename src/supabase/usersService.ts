@@ -3,7 +3,7 @@ import {
     UserBio,
     DbUser,
     UserType,
-    DbUserWithoutNotifications,
+    DbUserWithoutJoin,
 } from "../util/interfaces"
 
 export type ManageUserOption = {
@@ -34,6 +34,9 @@ async function getUser(id: string): Promise<DbUser | null> {
                 ci_event_id,
                 remind_in_hours,
                 is_sent
+            ),
+            requests:requests (
+                *
             )
         `
             )
@@ -48,6 +51,7 @@ async function getUser(id: string): Promise<DbUser | null> {
             }
             throw error
         }
+        console.log("data", data)
         return data as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
@@ -76,9 +80,7 @@ async function updateUser(
     }
 }
 
-async function createUser(
-    user: DbUserWithoutNotifications
-): Promise<DbUser | null> {
+async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
     try {
         const { data, error } = await supabase
             .from("users")
@@ -172,6 +174,18 @@ function subscribeToUser(userId: string, callback: (payload: any) => void) {
 
             (payload) => {
                 callback({ table: "notifications", payload })
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "UPDATE",
+                schema: "public",
+                table: "requests",
+                filter: `created_by=eq.${userId}`,
+            },
+            (payload) => {
+                callback({ table: "requests", payload })
             }
         )
         .subscribe()

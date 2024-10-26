@@ -10,19 +10,19 @@ import { useIsMobile } from "../../../hooks/useIsMobile"
 
 export function MenuDrawer() {
     const [open, setOpen] = React.useState<boolean>(false)
-    const { user, requests } = useUser()
+    const { user } = useUser()
     const [isNewResponse, setIsNewResponse] = useState<boolean>(false)
 
     useEffect(() => {
-        if (requests.length > 0) {
+        if (user && user.requests.length > 0) {
             setIsNewResponse(
-                requests.some(
+                user.requests.some(
                     (request) =>
                         request.status === "closed" && !request.viewed_response
                 )
             )
         }
-    }, [requests])
+    }, [user?.requests])
 
     const isMobile = useIsMobile()
 

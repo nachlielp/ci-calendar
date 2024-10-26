@@ -12,7 +12,7 @@ export interface UseRequestsProps {
     pageSize?: number
 }
 
-export default function useUserRequests({
+export default function useRequests({
     status,
     type,
     name,
@@ -39,6 +39,7 @@ UseRequestsProps) {
             setRequests(data || [])
         }
 
+        //TODO replace with polling
         const subscribeToRequests = async () => {
             const channel = await requestsService.subscribeToAllRequests(
                 async (hasNewResponse) => {

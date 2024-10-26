@@ -51,7 +51,7 @@ const columns: TableColumnsType<CIRequest> = [
 ]
 
 export default function RequestsList() {
-    const { user, requests } = useUser()
+    const { user } = useUser()
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
     }
@@ -68,7 +68,7 @@ export default function RequestsList() {
     return (
         <div className="request-list">
             <Table
-                dataSource={requests}
+                dataSource={user.requests}
                 columns={columns}
                 pagination={false}
                 rowKey={(record) => record.request_id}
