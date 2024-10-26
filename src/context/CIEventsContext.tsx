@@ -14,8 +14,7 @@ import utc from "dayjs/plugin/utc"
 dayjs.extend(timezone)
 dayjs.extend(utc)
 
-// const MINUTE_MS = 1000 * 60
-const MINUTE_MS = 1000
+const MINUTE_MS = 1000 * 60
 
 interface CIEventsContextType {
     ci_events: CIEvent[]
@@ -81,7 +80,6 @@ export const CIEventsProvider = ({
                 const intervalCallback = async () => {
                     await fetchEvents()
                     callCount++
-                    console.log("Call count:", callCount)
                     // Clear and set new interval with updated duration
                     clearInterval(subscriptionRef.current)
                     subscriptionRef.current = setInterval(
@@ -99,7 +97,9 @@ export const CIEventsProvider = ({
                 clearInterval(subscriptionRef.current)
             }
         }
+
         document.addEventListener("visibilitychange", handleVisibilityChange)
+
         handleVisibilityChange() // Explicitly call it once after adding the listener
 
         return () => {
