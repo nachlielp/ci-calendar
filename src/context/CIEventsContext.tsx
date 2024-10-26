@@ -78,6 +78,7 @@ export const CIEventsProvider = ({
                 subscriptionRef.current = setInterval(() => {
                     fetchEvents()
                     callCount++
+                    console.log("callCount", callCount)
                     clearInterval(subscriptionRef.current)
                     subscriptionRef.current = setInterval(
                         fetchEvents,
