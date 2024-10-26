@@ -8,7 +8,6 @@ import {
 import { CIEvent } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService } from "../supabase/cieventsService"
-// import { supabase } from "../supabase/client"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 
@@ -39,7 +38,6 @@ export const CIEventsProvider = ({
     const [ci_events, setCievents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
-    const testRef = useRef<any>(null)
 
     useLayoutEffect(() => {
         const fetchEvents = async () => {
@@ -55,15 +53,12 @@ export const CIEventsProvider = ({
                 })
                 console.log("fetchedEvents", fetchedEvents)
                 setCievents(fetchedEvents)
-                // sortAndSetEvents(fetchedEvents)
             } catch (error) {
                 console.error("Error fetching events:", error)
             } finally {
                 setLoading(false)
             }
         }
-
-        fetchEvents()
 
         const handleVisibilityChange = () => {
             console.log("handleVisibilityChange")
@@ -80,59 +75,18 @@ export const CIEventsProvider = ({
                 clearInterval(subscriptionRef.current)
             }
         }
-
-        // subscriptionRef.current = setInterval(fetchEvents, 1000 * 60 * 3)
+        handleVisibilityChange()
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
 
-        const test = () => {
-            console.log("test interval", dayjs().format("HH:mm:ss"))
-        }
-        clearInterval(testRef.current)
-        testRef.current = setInterval(test, MINUTE_MS * 1)
-
         return () => {
             clearInterval(subscriptionRef.current)
-            clearInterval(testRef.current)
             document.removeEventListener(
                 "visibilitychange",
                 handleVisibilityChange
             )
         }
     }, [])
-
-    // useLayoutEffect(() => {
-    //     console.log("useLayoutEffect: Adding visibilitychange event listener")
-    //     const handleVisibilityChange = () => {
-    //         console.log("Visibility changed:", document.visibilityState)
-    //     }
-
-    //     document.addEventListener("visibilitychange", handleVisibilityChange)
-
-    //     return () => {
-    //         console.log(
-    //             "useLayoutEffect: Removing visibilitychange event listener"
-    //         )
-    //         document.removeEventListener(
-    //             "visibilitychange",
-    //             handleVisibilityChange
-    //         )
-    //     }
-    // }, [])
-
-    // const handleChange = async (_: any) => {
-    //     const fetchedEvents = await cieventsService.getCIEvents({
-    //         start_date: dayjs().startOf("day").toISOString(),
-    //     })
-    //     sortAndSetEvents(fetchedEvents)
-    // }
-
-    // const sortAndSetEvents = (fetchedEvents: CIEvent[]) => {
-    //     const sortedEvents = fetchedEvents.sort((a, b) =>
-    //         dayjs(a.start_date).diff(dayjs(b.start_date))
-    //     )
-    //     setCievents(sortedEvents)
-    // }
 
     return (
         <CIEventsContext.Provider value={{ ci_events, loading }}>
