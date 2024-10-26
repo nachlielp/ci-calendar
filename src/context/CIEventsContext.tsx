@@ -9,6 +9,8 @@ import utc from "dayjs/plugin/utc"
 dayjs.extend(timezone)
 dayjs.extend(utc)
 
+const MINUTE_MS = 1000 * 60
+
 interface CIEventsContextType {
     ci_events: CIEvent[]
     loading: boolean
@@ -56,10 +58,31 @@ export const CIEventsProvider = ({
 
         fetchEvents()
 
-        subscriptionRef.current = setInterval(fetchEvents, 1000 * 60 * 3)
+        const handleVisibilityChange = () => {
+            console.log("handleVisibilityChange")
+            if (document.visibilityState === "visible") {
+                console.log("Tab is in view")
+                clearInterval(subscriptionRef.current)
+                subscriptionRef.current = setInterval(
+                    () => fetchEvents(),
+                    MINUTE_MS * 1
+                )
+            } else {
+                console.log("Tab is not in view")
+                clearInterval(subscriptionRef.current)
+            }
+        }
+
+        // subscriptionRef.current = setInterval(fetchEvents, 1000 * 60 * 3)
+
+        document.addEventListener("visibilitychange", handleVisibilityChange)
 
         return () => {
             clearInterval(subscriptionRef.current)
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            )
         }
         //     .channel("cievents-changes")
         //     .on(
