@@ -52,6 +52,7 @@ export const CIEventsProvider = ({
                     future_events: true,
                 })
                 console.log("fetchedEvents", fetchedEvents)
+                console.log("time", dayjs().format("HH:mm:ss"))
                 setCievents(fetchedEvents)
             } catch (error) {
                 console.error("Error fetching events:", error)
@@ -66,18 +67,31 @@ export const CIEventsProvider = ({
                 console.log("Tab is in view")
                 clearInterval(subscriptionRef.current)
                 fetchEvents()
-                subscriptionRef.current = setInterval(
-                    () => fetchEvents(),
-                    MINUTE_MS * 1
-                )
+                let callCount = 0
+                const getInterval = () => {
+                    if (callCount < 2) return MINUTE_MS * 1
+                    if (callCount < 4) return MINUTE_MS * 3
+                    if (callCount < 6) return MINUTE_MS * 5
+                    if (callCount < 8) return MINUTE_MS * 10
+                    return MINUTE_MS * 60
+                }
+                subscriptionRef.current = setInterval(() => {
+                    fetchEvents()
+                    callCount++
+                    clearInterval(subscriptionRef.current)
+                    subscriptionRef.current = setInterval(
+                        fetchEvents,
+                        getInterval()
+                    )
+                }, getInterval())
             } else {
                 console.log("Tab is not in view")
                 clearInterval(subscriptionRef.current)
             }
         }
-        handleVisibilityChange()
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
+        handleVisibilityChange() // Explicitly call it once after adding the listener
 
         return () => {
             clearInterval(subscriptionRef.current)
