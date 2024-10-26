@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { CIEvent } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService } from "../supabase/cieventsService"
-import { supabase } from "../supabase/client"
+// import { supabase } from "../supabase/client"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 
@@ -30,6 +30,7 @@ export const CIEventsProvider = ({
 }) => {
     const [ci_events, setCievents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
+    const subscriptionRef = useRef<any>(null)
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -43,6 +44,7 @@ export const CIEventsProvider = ({
                     sort_direction: "asc",
                     future_events: true,
                 })
+                console.log("fetchedEvents", fetchedEvents)
                 setCievents(fetchedEvents)
                 // sortAndSetEvents(fetchedEvents)
             } catch (error) {
@@ -54,34 +56,38 @@ export const CIEventsProvider = ({
 
         fetchEvents()
 
-        const subscription = supabase
-            .channel("cievents-changes")
-            .on(
-                "postgres_changes",
-                { event: "*", schema: "public", table: "ci_events" },
-                handleChange
-            )
-            .subscribe()
+        subscriptionRef.current = setInterval(fetchEvents, 1000 * 60 * 3)
 
-        // Cleanup function
         return () => {
-            subscription.unsubscribe()
+            clearInterval(subscriptionRef.current)
         }
+        //     .channel("cievents-changes")
+        //     .on(
+        //         "postgres_changes",
+        //         { event: "*", schema: "public", table: "ci_events" },
+        //         handleChange
+        //     )
+        //     .subscribe()
+
+        // // Cleanup function
+        // return () => {
+        //     subscription.unsubscribe()
+        // }
     }, [])
 
-    const handleChange = async (_: any) => {
-        const fetchedEvents = await cieventsService.getCIEvents({
-            start_date: dayjs().startOf("day").toISOString(),
-        })
-        sortAndSetEvents(fetchedEvents)
-    }
+    // const handleChange = async (_: any) => {
+    //     const fetchedEvents = await cieventsService.getCIEvents({
+    //         start_date: dayjs().startOf("day").toISOString(),
+    //     })
+    //     sortAndSetEvents(fetchedEvents)
+    // }
 
-    const sortAndSetEvents = (fetchedEvents: CIEvent[]) => {
-        const sortedEvents = fetchedEvents.sort((a, b) =>
-            dayjs(a.start_date).diff(dayjs(b.start_date))
-        )
-        setCievents(sortedEvents)
-    }
+    // const sortAndSetEvents = (fetchedEvents: CIEvent[]) => {
+    //     const sortedEvents = fetchedEvents.sort((a, b) =>
+    //         dayjs(a.start_date).diff(dayjs(b.start_date))
+    //     )
+    //     setCievents(sortedEvents)
+    // }
 
     return (
         <CIEventsContext.Provider value={{ ci_events, loading }}>
