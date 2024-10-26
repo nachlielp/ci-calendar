@@ -3,7 +3,6 @@ import { CIEvent } from "../util/interfaces"
 import { cieventsService, FilterOptions } from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import { SelectOption } from "../util/options"
-import { supabase } from "../supabase/client"
 
 export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
     const [ci_past_events, setCIPastEvents] = useState<CIEvent[]>([])
@@ -49,20 +48,20 @@ export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
 
         fetchEvents()
 
-        const subscription = supabase
-            .channel("ci_events")
-            .on(
-                "postgres_changes",
-                { event: "*", schema: "public", table: "ci_events" },
-                (_) => {
-                    fetchEvents()
-                }
-            )
-            .subscribe()
+        // const subscription = supabase
+        //     .channel("ci_events")
+        //     .on(
+        //         "postgres_changes",
+        //         { event: "*", schema: "public", table: "ci_events" },
+        //         (_) => {
+        //             fetchEvents()
+        //         }
+        //     )
+        //     .subscribe()
 
-        return () => {
-            supabase.removeChannel(subscription)
-        }
+        // return () => {
+        //     supabase.removeChannel(subscription)
+        // }
     }, [filterBy.creator_id])
 
     // const sortAndSetEvents = (fetchedEvents: CIEvent[]) => {
