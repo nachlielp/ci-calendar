@@ -39,6 +39,7 @@ export const CIEventsProvider = ({
     const [ci_events, setCievents] = useState<CIEvent[]>([])
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
+    const testRef = useRef<any>(null)
 
     useLayoutEffect(() => {
         const fetchEvents = async () => {
@@ -84,8 +85,15 @@ export const CIEventsProvider = ({
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
 
+        const test = () => {
+            console.log("test interval", dayjs().format("HH:mm:ss"))
+        }
+        clearInterval(testRef.current)
+        testRef.current = setInterval(test, MINUTE_MS * 1)
+
         return () => {
             clearInterval(subscriptionRef.current)
+            clearInterval(testRef.current)
             document.removeEventListener(
                 "visibilitychange",
                 handleVisibilityChange
