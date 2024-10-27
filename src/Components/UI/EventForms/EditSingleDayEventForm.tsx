@@ -52,12 +52,14 @@ export default function EditSingleDayEventForm({
     event,
     template,
     closeForm,
+    updateEventState,
 }: {
     editType: EventAction
     isTemplate?: boolean
     event?: CIEvent
     template?: CITemplate
     closeForm: () => void
+    updateEventState: (eventId: string, event: DBCIEvent) => void
 }) {
     const navigate = useNavigate()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
@@ -225,6 +227,7 @@ export default function EditSingleDayEventForm({
                             eventId,
                             updatedEvent
                         )
+                        updateEventState(eventId, updatedEvent)
                         closeForm()
                     } catch (error) {
                         console.error(

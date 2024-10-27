@@ -6,6 +6,7 @@ import EditSingleDayEventForm from "./EditSingleDayEventForm"
 import { EventAction } from "../../../App"
 import EditMultiDayEventForm from "./EditMultiDayEventForm"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
+import { DBCIEvent } from "../../../supabase/cieventsService"
 
 export default function FormModal({
     anchorEl,
@@ -13,12 +14,14 @@ export default function FormModal({
     isTemplate,
     event,
     template,
+    updateEventState,
 }: {
     anchorEl: any
     eventType: string
     isTemplate: boolean
     event?: CIEvent
     template?: CITemplate
+    updateEventState?: (eventId: string, event: DBCIEvent) => void
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -62,6 +65,7 @@ export default function FormModal({
                         event={event}
                         template={template}
                         closeForm={onClose}
+                        updateEventState={updateEventState!}
                     />
                 )}
                 {eventType === "edit-multi-day" && (
@@ -71,26 +75,9 @@ export default function FormModal({
                         event={event}
                         template={template}
                         closeForm={onClose}
+                        updateEventState={updateEventState!}
                     />
                 )}
-                {/* {eventType === "recycle-single-day" && (
-                    <EditSingleDayEventForm
-                        editType={EventAction.recycle}
-                        isTemplate={isTemplate}
-                        event={event}
-                        template={template}
-                        closeForm={onClose}
-                    />
-                )}
-                {eventType === "recycle-multi-day" && (
-                    <EditMultiDayEventForm
-                        editType={EventAction.recycle}
-                        isTemplate={isTemplate}
-                        event={event}
-                        template={template}
-                        closeForm={onClose}
-                    />
-                )} */}
             </Modal>
         </>
     )

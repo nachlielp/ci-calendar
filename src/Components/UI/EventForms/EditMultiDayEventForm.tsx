@@ -27,12 +27,14 @@ export default function EditMultiDayEventForm({
     event,
     template,
     closeForm,
+    updateEventState,
 }: {
     editType: EventAction
     isTemplate: boolean
     event?: CIEvent
     template?: CITemplate
     closeForm: () => void
+    updateEventState: (eventId: string, event: DBCIEvent) => void
 }) {
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const { user } = useUser()
@@ -130,6 +132,7 @@ export default function EditMultiDayEventForm({
                     closeForm()
                 } else {
                     await cieventsService.updateCIEvent(event.id, updatedEvent)
+                    updateEventState(event.id, updatedEvent)
                     closeForm()
                 }
             } catch (error) {

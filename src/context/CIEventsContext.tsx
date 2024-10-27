@@ -1,13 +1,7 @@
-import {
-    createContext,
-    useContext,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from "react"
+import { createContext, useContext, useRef, useEffect, useState } from "react"
 import { CIEvent } from "../util/interfaces"
 import dayjs from "dayjs"
-import { cieventsService } from "../supabase/cieventsService"
+import { cieventsService, DBCIEvent } from "../supabase/cieventsService"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 
@@ -19,11 +13,17 @@ const MINUTE_MS = 1000 * 60
 interface CIEventsContextType {
     ci_events: CIEvent[]
     loading: boolean
+    addEventState: (event: CIEvent) => void
+    updateEventState: (eventId: string, event: DBCIEvent) => void
+    removeEventState: (eventId: string) => void
 }
 
 export const CIEventsContext = createContext<CIEventsContextType>({
     ci_events: [],
     loading: true,
+    addEventState: () => {},
+    updateEventState: () => {},
+    removeEventState: () => {},
 })
 
 export const useCIEvents = () => {
@@ -39,7 +39,7 @@ export const CIEventsProvider = ({
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         let callCount = 0
 
         const getInterval = () => {
@@ -59,8 +59,8 @@ export const CIEventsProvider = ({
                     sort_direction: "asc",
                     future_events: true,
                 })
-                console.log("fetchedEvents", fetchedEvents)
-                console.log("time: ", dayjs().format("HH:mm:ss"))
+                // console.log("fetchedEvents", fetchedEvents)
+                // console.log("time: ", dayjs().format("HH:mm:ss"))
                 setCievents(fetchedEvents)
             } catch (error) {
                 console.error("Error fetching events:", error)
@@ -73,7 +73,6 @@ export const CIEventsProvider = ({
         const handleVisibilityChange = () => {
             console.log("handleVisibilityChange")
             if (document.visibilityState === "visible") {
-                console.log("Tab is in view")
                 clearInterval(subscriptionRef.current)
                 fetchEvents()
 
@@ -93,7 +92,6 @@ export const CIEventsProvider = ({
                     getInterval()
                 )
             } else {
-                console.log("Tab is not in view")
                 clearInterval(subscriptionRef.current)
             }
         }
@@ -111,8 +109,34 @@ export const CIEventsProvider = ({
         }
     }, [])
 
+    function addEventState(event: CIEvent) {
+        setCievents((prev) =>
+            [event, ...prev].sort((a, b) =>
+                dayjs(a.start_date).diff(dayjs(b.start_date))
+            )
+        )
+    }
+
+    function updateEventState(eventId: string, event: DBCIEvent) {
+        setCievents((prev) =>
+            prev.map((e) => (e.id === eventId ? { ...e, ...event } : e))
+        )
+    }
+
+    function removeEventState(eventId: string) {
+        setCievents((prev) => prev.filter((e) => e.id !== eventId))
+    }
+
     return (
-        <CIEventsContext.Provider value={{ ci_events, loading }}>
+        <CIEventsContext.Provider
+            value={{
+                ci_events,
+                loading,
+                addEventState,
+                updateEventState,
+                removeEventState,
+            }}
+        >
             {children}
         </CIEventsContext.Provider>
     )

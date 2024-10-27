@@ -98,10 +98,16 @@ export default function ManageEventsTable() {
     const nonAdminUserId =
         user?.user_type !== UserType.admin ? user?.user_id : undefined
 
-    const { ci_past_events, ci_future_events, ci_events_teachers, loading } =
-        useCIManageEvents({
-            creator_id: nonAdminUserId || tableParams.filters?.creator_id?.[0],
-        })
+    const {
+        ci_past_events,
+        ci_future_events,
+        ci_events_teachers,
+        loading,
+        updateEventState,
+        removeEventState,
+    } = useCIManageEvents({
+        creator_id: nonAdminUserId || tableParams.filters?.creator_id?.[0],
+    })
 
     const [showPast, setShowPast] = useState(false)
 
@@ -109,9 +115,7 @@ export default function ManageEventsTable() {
         React.Key[]
     >([])
 
-    useEffect(() => {
-        console.log("selectedRowKeysFuture", selectedRowKeysFuture)
-    }, [selectedRowKeysFuture])
+    useEffect(() => {}, [selectedRowKeysFuture])
     const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>(
         []
     )
@@ -136,6 +140,18 @@ export default function ManageEventsTable() {
         setSelectedRowKeysFuture([])
         setSelectedRowKeysPast([])
         setExpandedRowKeys([])
+    }
+
+    function handleHideEventState(eventId: string, hide: boolean) {
+        const event = ci_future_events.find((e) => e.id === eventId)
+        if (event) {
+            updateEventState(event.id, { ...event, hide })
+        } else {
+            const event = ci_past_events.find((e) => e.id === eventId)
+            if (event) {
+                updateEventState(event.id, { ...event, hide })
+            }
+        }
     }
 
     const handleTableChange: TableProps<CIEvent>["onChange"] = (
@@ -214,6 +230,7 @@ export default function ManageEventsTable() {
                                 : selectedRowKeysPast.length === 0
                         }
                         onDelete={onDelete}
+                        removeEventState={removeEventState}
                     />
                     <HideMultipleEventsButton
                         eventIds={
@@ -281,7 +298,12 @@ export default function ManageEventsTable() {
                     expandedRowRender: (event) => (
                         <div className="event-card-container" key={event.id}>
                             <FullEventCard event={event} />
-                            <ManageEventActions event={event} />
+                            <ManageEventActions
+                                event={event}
+                                updateEventState={updateEventState}
+                                updateEventHideState={handleHideEventState}
+                                removeEventState={removeEventState}
+                            />
                         </div>
                     ),
                     expandedRowKeys: expandedRowKeys,

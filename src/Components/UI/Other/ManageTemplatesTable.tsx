@@ -3,20 +3,26 @@ import Skeleton from "antd/es/skeleton"
 import DeleteTemplateButton from "./DeleteTemplateButton"
 import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"
-import useTemplates from "../../../hooks/useTemplates"
+import { useCIEvents } from "../../../context/CIEventsContext"
+import { useUser } from "../../../context/UserContext"
 
 export default function ManageTemplatesTable() {
-    const templates = useTemplates({ isMultiDay: null })
+    const { updateEventState } = useCIEvents()
+    const { user } = useUser()
+    if (!user) {
+        return null
+    }
+
     return (
         <section className="manage-templates-table">
             <h2 className="list-title">תבניות</h2>
             <List
                 className="demo-loadmore-list"
                 itemLayout="horizontal"
-                dataSource={templates}
+                dataSource={user.templates}
                 renderItem={(template) => (
                     <List.Item>
-                        <Skeleton loading={!templates}>
+                        <Skeleton loading={!user.templates}>
                             <article className="template-item">
                                 <h3 className="template-name">
                                     {template.name}
@@ -44,6 +50,7 @@ export default function ManageTemplatesTable() {
                                         }
                                         isTemplate={true}
                                         template={template}
+                                        updateEventState={updateEventState}
                                     />
                                     <DeleteTemplateButton
                                         templateId={template.template_id}

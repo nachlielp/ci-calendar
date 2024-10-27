@@ -10,7 +10,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { SelectOption, tagOptions } from "../../../util/options"
-import { IAddress, UserType } from "../../../util/interfaces"
+import { CIEvent, IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -25,9 +25,9 @@ import {
     templateService,
 } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
-import useTemplates from "../../../hooks/useTemplates"
 import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
+import { useCIEvents } from "../../../context/CIEventsContext"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -56,10 +56,9 @@ export default function SingleDayEventForm({
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    // const [submitted, setSubmitted] = useState(false)
+    const { addEventState } = useCIEvents()
     const navigate = useNavigate()
     const { user } = useUser()
-    const templates = useTemplates({ isMultiDay: false })
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
     const [address, setAddress] = useState<IAddress | undefined>()
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
@@ -68,12 +67,14 @@ export default function SingleDayEventForm({
 
     useEffect(() => {
         setTemplateOptions(
-            templates.map((template) => ({
-                value: template.template_id,
-                label: template.name,
-            }))
+            user?.templates
+                .filter((template) => !template.is_multi_day)
+                .map((template) => ({
+                    value: template.template_id,
+                    label: template.name,
+                })) || []
         )
-    }, [templates])
+    }, [user])
 
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -117,7 +118,7 @@ export default function SingleDayEventForm({
     }
 
     const handleTemplateChange = (value: string) => {
-        const template = templates.find((t) => t.template_id === value)
+        const template = user?.templates.find((t) => t.template_id === value)
         if (template) {
             const { currentFormValues, address } =
                 utilService.singleDayTemplateToFormValues(template)
@@ -218,7 +219,8 @@ export default function SingleDayEventForm({
                         ) || [],
                 }
                 // setSubmitted(true)
-                await cieventsService.createCIEvent(event)
+                const newEvent = await cieventsService.createCIEvent(event)
+                addEventState(newEvent as CIEvent)
                 clearForm()
                 closeForm()
             } else {

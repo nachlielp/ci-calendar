@@ -11,7 +11,7 @@ import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
-import { IAddress, UserType } from "../../../util/interfaces"
+import { CIEvent, IAddress, UserType } from "../../../util/interfaces"
 import { IGooglePlaceOption } from "../Other/GooglePlacesInput"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -26,9 +26,9 @@ import {
     templateService,
 } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
-import useTemplates from "../../../hooks/useTemplates"
 import AsyncFormSubmitButton from "../Other/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
+import { useCIEvents } from "../../../context/CIEventsContext"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -50,10 +50,9 @@ export default function MultiDayEventForm({
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-
+    const { addEventState } = useCIEvents()
     const navigate = useNavigate()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
-    const templates = useTemplates({ isMultiDay: true })
 
     const { user } = useUser()
     const [address, setAddress] = useState<IAddress>()
@@ -63,12 +62,14 @@ export default function MultiDayEventForm({
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
 
     useEffect(() => {
-        const newTemplateOptions = templates.map((template) => ({
-            value: template.template_id,
-            label: template.name,
-        }))
-        setTemplateOptions(newTemplateOptions)
-    }, [templates])
+        const newTemplateOptions = user?.templates
+            .filter((template) => template.is_multi_day)
+            .map((template) => ({
+                value: template.template_id,
+                label: template.name,
+            }))
+        setTemplateOptions(newTemplateOptions || [])
+    }, [user])
 
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
@@ -110,7 +111,7 @@ export default function MultiDayEventForm({
     }
 
     const handleTemplateChange = (value: string) => {
-        const template = templates.find((t) => t.template_id === value)
+        const template = user?.templates.find((t) => t.template_id === value)
         if (template) {
             const { currentFormValues, address } = template.is_multi_day
                 ? utilService.multiDayTemplateToFormValues(template)
@@ -176,7 +177,8 @@ export default function MultiDayEventForm({
                 }
                 // console.log("values: ", values)
                 // console.log("event: ", event)
-                await cieventsService.createCIEvent(event)
+                const newEvent = await cieventsService.createCIEvent(event)
+                addEventState(newEvent as CIEvent)
                 clearForm()
             } else {
                 const template: CITemplateWithoutId = {

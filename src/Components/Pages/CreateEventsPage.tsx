@@ -1,7 +1,9 @@
 import { Icon } from "../UI/Other/Icon"
 import ManageTemplatesList from "../UI/Other/ManageTemplatesList"
 import FormContainer from "../UI/EventForms/FormContainer"
+import { useCIEvents } from "../../context/CIEventsContext"
 export default function CreateEventsPage() {
+    const { updateEventState } = useCIEvents()
     const buttonsArray = [
         {
             type: "create-single-day",
@@ -38,6 +40,7 @@ export default function CreateEventsPage() {
                         }
                         eventType={button.type}
                         isTemplate={button.isTemplate}
+                        updateEventState={updateEventState}
                     />
                 ))}
             </article>

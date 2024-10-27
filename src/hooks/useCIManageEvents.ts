@@ -1,8 +1,15 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { CIEvent } from "../util/interfaces"
-import { cieventsService, FilterOptions } from "../supabase/cieventsService"
+import {
+    cieventsService,
+    DBCIEvent,
+    FilterOptions,
+} from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import { SelectOption } from "../util/options"
+import { useCIEvents } from "../context/CIEventsContext"
+
+const MINUTE_MS = 1000 * 60
 
 export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
     const [ci_past_events, setCIPastEvents] = useState<CIEvent[]>([])
@@ -10,8 +17,23 @@ export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
     const [ci_events_teachers, setCIEventsTeachers] = useState<SelectOption[]>(
         []
     )
+    const {
+        updateEventState: updateMainPageEventState,
+        removeEventState: removeMainPageEventState,
+    } = useCIEvents()
     const [loading, setLoading] = useState(true)
+
+    const subscriptionRef = useRef<any>(null)
+
     useEffect(() => {
+        let callCount = 0
+
+        const getInterval = () => {
+            if (callCount < 5) return MINUTE_MS * 2
+            if (callCount < 10) return MINUTE_MS * 5
+            return MINUTE_MS * 60
+        }
+
         const fetchEvents = async () => {
             try {
                 const fetchedEvents = await cieventsService.getCIEvents(
@@ -46,30 +68,76 @@ export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
             }
         }
 
-        fetchEvents()
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                clearInterval(subscriptionRef.current)
+                fetchEvents()
 
-        // const subscription = supabase
-        //     .channel("ci_events")
-        //     .on(
-        //         "postgres_changes",
-        //         { event: "*", schema: "public", table: "ci_events" },
-        //         (_) => {
-        //             fetchEvents()
-        //         }
-        //     )
-        //     .subscribe()
+                const intervalCallback = async () => {
+                    await fetchEvents()
+                    callCount++
+                    // Clear and set new interval with updated duration
+                    clearInterval(subscriptionRef.current)
+                    subscriptionRef.current = setInterval(
+                        intervalCallback,
+                        getInterval()
+                    )
+                }
 
-        // return () => {
-        //     supabase.removeChannel(subscription)
-        // }
+                subscriptionRef.current = setInterval(
+                    intervalCallback,
+                    getInterval()
+                )
+            } else {
+                clearInterval(subscriptionRef.current)
+            }
+        }
+
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+
+        handleVisibilityChange() // Explicitly call it once after adding the listener
+
+        return () => {
+            clearInterval(subscriptionRef.current)
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            )
+        }
     }, [filterBy.creator_id])
 
-    // const sortAndSetEvents = (fetchedEvents: CIEvent[]) => {
-    //     const sortedEvents = fetchedEvents.sort((a, b) =>
-    //         dayjs(a.start_date).diff(dayjs(b.start_date))
-    //     )
-    //     setCIPastEvents(sortedEvents)
-    // }
+    function updateEventState(eventId: string, event: DBCIEvent) {
+        setCIPastEvents((prev) =>
+            prev.map((e) => (e.id === eventId ? { ...e, ...event } : e))
+        )
 
-    return { ci_past_events, ci_future_events, ci_events_teachers, loading }
+        setCIFutureEvents((prev) =>
+            prev.map((e) => (e.id === eventId ? { ...e, ...event } : e))
+        )
+        updateMainPageEventState(eventId, event)
+    }
+
+    function removeEventState(eventId: string) {
+        setCIPastEvents((prev) => prev.filter((e) => e.id !== eventId))
+        setCIFutureEvents((prev) => prev.filter((e) => e.id !== eventId))
+        removeMainPageEventState(eventId)
+    }
+
+    function addEventState(event: CIEvent) {
+        setCIFutureEvents((prev) =>
+            [event, ...prev].sort((a, b) =>
+                dayjs(a.start_date).diff(dayjs(b.start_date))
+            )
+        )
+    }
+
+    return {
+        ci_past_events,
+        ci_future_events,
+        ci_events_teachers,
+        loading,
+        updateEventState,
+        removeEventState,
+        addEventState,
+    }
 }

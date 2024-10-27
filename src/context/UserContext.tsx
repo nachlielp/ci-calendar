@@ -110,6 +110,57 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                             }),
                         })
                         break
+                    case "templates":
+                        switch (payload.eventType) {
+                            case "UPDATE":
+                                setUser((prev) =>
+                                    prev
+                                        ? {
+                                              ...prev,
+                                              templates: prev.templates.map(
+                                                  (t) => {
+                                                      if (
+                                                          t.template_id ===
+                                                          payload.old
+                                                              .template_id
+                                                      ) {
+                                                          return payload.new
+                                                      }
+                                                      return t
+                                                  }
+                                              ),
+                                          }
+                                        : null
+                                )
+                                break
+                            case "DELETE":
+                                setUser((prev) =>
+                                    prev
+                                        ? {
+                                              ...prev,
+                                              templates: prev.templates.filter(
+                                                  (t) =>
+                                                      t.template_id !==
+                                                      payload.old.template_id
+                                              ),
+                                          }
+                                        : null
+                                )
+                                break
+                            case "INSERT":
+                                setUser((prev) =>
+                                    prev
+                                        ? {
+                                              ...prev,
+                                              templates: [
+                                                  ...prev.templates,
+                                                  payload.new,
+                                              ],
+                                          }
+                                        : null
+                                )
+                        }
+                        break
                     case "notifications":
                         if (payload.eventType === "UPDATE") {
                             const newUser = { ...user }

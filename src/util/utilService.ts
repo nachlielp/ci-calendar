@@ -240,8 +240,6 @@ function formatUsersForCIEvent(
     selectedUsers: string[],
     users: { label: string; value: string }[]
 ) {
-    console.log("selectedUsers: ", selectedUsers)
-    console.log("users: ", users)
     if (!selectedUsers) return []
     const formattedUsers: { label: string; value: string }[] =
         selectedUsers.map((user) => {
@@ -252,7 +250,6 @@ function formatUsersForCIEvent(
                 return { label: user, value: "NON_EXISTENT" + uuidv4() }
             }
         })
-    console.log("formattedUsers: ", formattedUsers)
     return formattedUsers
 }
 

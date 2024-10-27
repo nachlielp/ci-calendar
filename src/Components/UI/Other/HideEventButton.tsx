@@ -4,12 +4,15 @@ import { Icon } from "./Icon"
 export default function HideEventButton({
     eventId,
     hide,
+    updateEventHideState,
 }: {
     eventId: string
     hide: boolean
+    updateEventHideState: (eventId: string, hide: boolean) => void
 }) {
-    const handleHide = () => {
-        cieventsService.updateCIEvent(eventId, { hide: !hide })
+    const handleHide = async () => {
+        await cieventsService.updateCIEvent(eventId, { hide: !hide })
+        updateEventHideState(eventId, !hide)
     }
     return (
         <button

@@ -4,7 +4,11 @@ import { cieventsService } from "../../../supabase/cieventsService"
 
 const { confirm } = Modal
 
-const showDeleteConfirm = (eventIds: string[], onDelete: () => void) => {
+const showDeleteConfirm = (
+    eventIds: string[],
+    onDelete: () => void,
+    removeEventState: (eventId: string) => void
+) => {
     const text =
         eventIds.length > 1 ? (
             <div>האם למחוק {eventIds.length} ארועים?</div>
@@ -25,6 +29,7 @@ const showDeleteConfirm = (eventIds: string[], onDelete: () => void) => {
         direction: "rtl",
         async onOk() {
             await cieventsService.deleteMultipleCIEvents(eventIds)
+            eventIds.forEach((eventId) => removeEventState(eventId))
             onDelete()
         },
         onCancel() {
@@ -40,17 +45,21 @@ interface IDeleteEventProps {
     className?: string
     disabled?: boolean
     onDelete: () => void
+    removeEventState: (eventId: string) => void
 }
 export default function DeleteMultipleEventsButton({
     eventIds,
     className,
     disabled,
     onDelete,
+    removeEventState,
 }: IDeleteEventProps) {
     return (
         <button
             className={`${className}`}
-            onClick={() => showDeleteConfirm(eventIds, onDelete)}
+            onClick={() =>
+                showDeleteConfirm(eventIds, onDelete, removeEventState)
+            }
             disabled={disabled}
         >
             <Icon icon="deleteIcon" />

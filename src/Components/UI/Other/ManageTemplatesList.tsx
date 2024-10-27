@@ -3,15 +3,15 @@ import Skeleton from "antd/es/skeleton"
 import DeleteTemplateButton from "./DeleteTemplateButton"
 import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"
-import useTemplates from "../../../hooks/useTemplates"
-// import { useEffect } from "react"
+import { useUser } from "../../../context/UserContext"
+import { useCIEvents } from "../../../context/CIEventsContext"
 
 export default function ManageTemplatesList() {
-    const templates = useTemplates({ isMultiDay: null })
-
-    // useEffect(() => {
-    //     console.log("templates: ", templates)
-    // }, [templates])
+    const { updateEventState } = useCIEvents()
+    const { user } = useUser()
+    if (!user) {
+        return null
+    }
 
     return (
         <section className="manage-templates-table">
@@ -19,10 +19,10 @@ export default function ManageTemplatesList() {
             <List
                 className="demo-loadmore-list"
                 itemLayout="horizontal"
-                dataSource={templates}
+                dataSource={user?.templates}
                 renderItem={(template) => (
                     <List.Item>
-                        <Skeleton loading={!templates}>
+                        <Skeleton loading={!user.templates}>
                             <article className="template-item">
                                 <h3 className="template-name">
                                     {template.name}
@@ -50,6 +50,7 @@ export default function ManageTemplatesList() {
                                         }
                                         isTemplate={true}
                                         template={template}
+                                        updateEventState={updateEventState}
                                     />
                                     <DeleteTemplateButton
                                         templateId={template.template_id}

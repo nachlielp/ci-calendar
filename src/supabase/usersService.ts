@@ -38,6 +38,9 @@ async function getUser(id: string): Promise<DbUser | null> {
             requests:requests (
                 *
             )
+            ,templates:templates (
+                *
+            )
         `
             )
             .eq("user_id", id)
@@ -186,6 +189,20 @@ function subscribeToUser(userId: string, callback: (payload: any) => void) {
             },
             (payload) => {
                 callback({ table: "requests", payload })
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "templates",
+                filter: `created_by=eq.${userId}`,
+            },
+            (payload) => {
+                //TODO handle delete
+                console.log("templates payload", payload)
+                callback({ table: "templates", payload })
             }
         )
         .subscribe()

@@ -25,7 +25,6 @@ export const requestsService = {
     getOpenRequestsByType,
     markAsViewedRequestByAdmin,
     markAsViewedResponseByUser,
-    subscribeToResponses,
     getAllRequests,
     subscribeToAllRequests,
 }
@@ -38,32 +37,6 @@ async function getUserRequests(userId: string) {
         .order("created_at", { ascending: false })
 
     return { data, error }
-}
-
-function subscribeToResponses(
-    userId: string,
-    callback: (hasNewResponse: boolean) => void
-) {
-    const channel = supabase
-        .channel(`public:requests:created_by=eq.${userId}`)
-        .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "requests" },
-            (payload) => {
-                if (
-                    payload.eventType === "INSERT" ||
-                    (payload.eventType === "UPDATE" &&
-                        payload.new.status === "closed")
-                ) {
-                    callback(true)
-                } else {
-                    callback(false)
-                }
-            }
-        )
-        .subscribe()
-
-    return channel
 }
 
 async function getAllRequests({
