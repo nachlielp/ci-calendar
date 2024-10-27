@@ -5,12 +5,23 @@ import { Icon } from "./Icon"
 import FormContainer from "../EventForms/FormContainer"
 import { useUser } from "../../../context/UserContext"
 import { useCIEvents } from "../../../context/CIEventsContext"
+import { templateService } from "../../../supabase/templateService"
 
 export default function ManageTemplatesList() {
     const { updateEventState } = useCIEvents()
-    const { user } = useUser()
+    const { user, updateUserState } = useUser()
     if (!user) {
         return null
+    }
+
+    async function handleDeleteTemplate(templateId: string) {
+        await templateService.deleteTemplate(templateId)
+        updateUserState({
+            user_id: user?.user_id,
+            templates: user?.templates.filter(
+                (t) => t.template_id !== templateId
+            ),
+        })
     }
 
     return (
@@ -28,12 +39,6 @@ export default function ManageTemplatesList() {
                                     {template.name}
                                 </h3>
                                 <div className="template-actions">
-                                    {/* <button
-                                        key="list-btn-share"
-                                        className="list-btn"
-                                    >
-                                        שיתוף
-                                    </button> */}
                                     <FormContainer
                                         anchorEl={
                                             <button
@@ -54,6 +59,9 @@ export default function ManageTemplatesList() {
                                     />
                                     <DeleteTemplateButton
                                         templateId={template.template_id}
+                                        handleDeleteTemplate={
+                                            handleDeleteTemplate
+                                        }
                                     />
                                 </div>
                             </article>

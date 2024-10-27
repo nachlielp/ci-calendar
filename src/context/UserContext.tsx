@@ -10,6 +10,7 @@ interface IUserContextType {
     updateUser: (updatedUser: Partial<DbUser>) => void
     loading: boolean
     updateUserContext: (updatedUser: Partial<DbUser>) => Promise<void>
+    updateUserState: (updatedUser: Partial<DbUser>) => void
 }
 
 const UserContext = createContext<IUserContextType>({
@@ -17,6 +18,7 @@ const UserContext = createContext<IUserContextType>({
     updateUser: () => {},
     loading: true,
     updateUserContext: async () => {},
+    updateUserState: async () => {},
 })
 
 export const useUser = () => {
@@ -54,6 +56,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         } catch (error) {
             console.error("Error updating user context:", error)
         }
+    }
+
+    const updateUserState = async (updatedUser: Partial<DbUser>) => {
+        setUser((prev) => (prev ? { ...prev, ...updatedUser } : null))
     }
 
     useEffect(() => {
@@ -200,7 +206,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <UserContext.Provider
-            value={{ user, updateUser, loading, updateUserContext }}
+            value={{
+                user,
+                updateUser,
+                loading,
+                updateUserContext,
+                updateUserState,
+            }}
         >
             {children}
         </UserContext.Provider>

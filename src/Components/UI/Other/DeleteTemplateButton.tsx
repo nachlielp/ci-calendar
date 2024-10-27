@@ -1,10 +1,12 @@
 import Modal from "antd/es/modal"
 import { Icon } from "./Icon"
-import { templateService } from "../../../supabase/templateService"
 
 const { confirm } = Modal
 
-const showDeleteConfirm = (templateId: string) => {
+const showDeleteConfirm = (
+    templateId: string,
+    handleDeleteTemplate: (templateId: string) => void
+) => {
     confirm({
         title: <div>מחיקת תבנית</div>,
         icon: <Icon icon="warning" />,
@@ -19,7 +21,7 @@ const showDeleteConfirm = (templateId: string) => {
         cancelText: "ביטול",
         direction: "rtl",
         onOk() {
-            templateService.deleteTemplate(templateId)
+            handleDeleteTemplate(templateId)
         },
         onCancel() {
             console.log(
@@ -31,15 +33,17 @@ const showDeleteConfirm = (templateId: string) => {
 
 interface IDeleteTemplateProps {
     templateId: string
+    handleDeleteTemplate: (templateId: string) => void
 }
 
 export default function DeleteTemplateButton({
     templateId,
+    handleDeleteTemplate,
 }: IDeleteTemplateProps) {
     return (
         <button
             className="list-btn"
-            onClick={() => showDeleteConfirm(templateId)}
+            onClick={() => showDeleteConfirm(templateId, handleDeleteTemplate)}
         >
             <Icon icon="deleteIcon" />
         </button>
