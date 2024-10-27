@@ -7,7 +7,6 @@ export const templateService = {
     getUserTemplates,
     createTemplate,
     deleteTemplate,
-    subscribeToNewTemplates,
     getTemplate,
     updateTemplate,
 }
@@ -77,24 +76,6 @@ async function deleteTemplate(templateId: string): Promise<string> {
         console.error("Error deleting CI template:", error)
         throw error
     }
-}
-
-function subscribeToNewTemplates(
-    userId: string,
-    callback: (payload: any) => void
-) {
-    const channel = supabase
-        .channel(`public:templates:created_by=eq.${userId}`)
-        .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "templates" },
-            (payload) => {
-                callback(payload)
-            }
-        )
-        .subscribe()
-
-    return channel
 }
 
 async function updateTemplate(template: CITemplate): Promise<CITemplate> {
