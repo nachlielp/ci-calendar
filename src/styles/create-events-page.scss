@@ -4,6 +4,13 @@
     align-items: center;
     max-width: 100%;
     height: calc(100vh - 56px);
+    margin: 0 auto;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     .btns-container {
         margin-top: 70px;
