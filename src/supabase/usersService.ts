@@ -54,7 +54,6 @@ async function getUser(id: string): Promise<DbUser | null> {
             }
             throw error
         }
-        console.log("data", data)
         return data as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
@@ -150,7 +149,10 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
     }
 }
 
-function subscribeToUser(userId: string, callback: (payload: any) => void) {
+async function subscribeToUser(
+    userId: string,
+    callback: (payload: any) => void
+) {
     const channel = supabase
         .channel(`public:users:user_id=eq.${userId}`)
         .on(

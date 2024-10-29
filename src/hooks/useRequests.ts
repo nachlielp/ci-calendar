@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { requestsService } from "../supabase/requestsService"
 import { CIRequest, RequestStatus, RequestType } from "../util/interfaces"
 import { RealtimeChannel } from "@supabase/supabase-js"
@@ -21,6 +21,7 @@ export default function useRequests({
 // pageSize,
 UseRequestsProps) {
     const [requests, setRequests] = useState<CIRequest[]>([])
+    const subscriptionRef = useRef<RealtimeChannel | null>(null)
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -39,8 +40,8 @@ UseRequestsProps) {
             setRequests(data || [])
         }
 
-        //TODO replace with polling
         const subscribeToRequests = async () => {
+            console.log("subscribeToRequests on status change")
             const channel = await requestsService.subscribeToAllRequests(
                 async (hasNewResponse) => {
                     if (hasNewResponse) {
@@ -51,17 +52,29 @@ UseRequestsProps) {
             return channel
         }
 
-        let subscription: RealtimeChannel | null = null
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                subscribeToRequests().then((channel) => {
+                    subscriptionRef.current = channel
+                })
+            } else {
+                if (subscriptionRef.current) {
+                    subscriptionRef.current.unsubscribe()
+                }
+            }
+        }
+
+        document.addEventListener("visibilitychange", handleVisibilityChange)
 
         subscribeToRequests().then((channel) => {
-            subscription = channel
+            subscriptionRef.current = channel
         })
 
         fetchRequests()
 
         return () => {
-            if (subscription) {
-                subscription.unsubscribe()
+            if (subscriptionRef.current) {
+                subscriptionRef.current.unsubscribe()
             }
         }
     }, [status])

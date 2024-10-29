@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { DbUser } from "../util/interfaces"
 import { supabase } from "../supabase/client"
 import { useSession } from "./SessionContext"
 import { usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
+import { RealtimeChannel } from "@supabase/supabase-js"
 
 interface IUserContextType {
     user: DbUser | null
@@ -32,6 +33,8 @@ export const useUser = () => {
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<DbUser | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
+    const subscriptionRef = useRef<RealtimeChannel | null>(null)
+
     const { session } = useSession()
 
     function updateUser(updatedUser: Partial<DbUser>) {
@@ -96,114 +99,142 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, [session])
 
     useEffect(() => {
-        if (!user) return
-        const channel = usersService.subscribeToUser(
-            user.user_id,
-            async ({ table, payload }) => {
-                switch (table) {
-                    case "users":
-                        setUser({ ...user, ...payload.new })
-                        break
-                    case "requests":
-                        console.log("requests", payload.new)
-                        setUser({
-                            ...user,
-                            requests: user.requests.map((r) => {
-                                if (r.request_id === payload.old.request_id) {
-                                    return payload.new
-                                }
-                                return r
-                            }),
-                        })
-                        break
-                    case "templates":
-                        switch (payload.eventType) {
-                            case "UPDATE":
-                                setUser((prev) =>
-                                    prev
-                                        ? {
-                                              ...prev,
-                                              templates: prev.templates.map(
-                                                  (t) => {
-                                                      if (
-                                                          t.template_id ===
-                                                          payload.old
-                                                              .template_id
-                                                      ) {
-                                                          return payload.new
-                                                      }
-                                                      return t
-                                                  }
-                                              ),
-                                          }
-                                        : null
-                                )
-                                break
-                            case "DELETE":
-                                setUser((prev) =>
-                                    prev
-                                        ? {
-                                              ...prev,
-                                              templates: prev.templates.filter(
-                                                  (t) =>
-                                                      t.template_id !==
-                                                      payload.old.template_id
-                                              ),
-                                          }
-                                        : null
-                                )
-                                break
-                            case "INSERT":
-                                setUser((prev) =>
-                                    prev
-                                        ? {
-                                              ...prev,
-                                              templates: [
-                                                  ...prev.templates,
-                                                  payload.new,
-                                              ],
-                                          }
-                                        : null
-                                )
-                        }
-                        break
-                    case "notifications":
-                        if (payload.eventType === "UPDATE") {
-                            const newUser = { ...user }
-                            newUser.notifications = newUser.notifications.map(
-                                (n) => {
-                                    if (n.id === payload.new.id) {
-                                        return payload.new
-                                    }
-                                    return n
-                                }
-                            )
-                            setUser(newUser)
-                        } else if (payload.eventType === "DELETE") {
-                            setUser({
-                                ...user,
-                                notifications: user.notifications.filter(
-                                    (n) => n.id !== payload.old.id
-                                ),
-                            })
-                        } else if (payload.eventType === "INSERT") {
-                            setUser({
-                                ...user,
-                                notifications: [
-                                    ...user.notifications,
-                                    payload.new,
-                                ],
-                            })
-                        }
-                        break
+        if (loading || !user) return
+
+        const subscribeToUserData = async () => {
+            if (!user) return
+            const channel = usersService.subscribeToUser(
+                user.user_id,
+                handleSubscriptionUpdates
+            )
+            return channel
+        }
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                subscribeToUserData().then((channel) => {
+                    if (channel) {
+                        subscriptionRef.current = channel
+                    }
+                })
+            } else {
+                if (subscriptionRef.current) {
+                    subscriptionRef.current.unsubscribe()
                 }
             }
-        )
-        return () => {
-            supabase.removeChannel(channel)
         }
-    }, [user])
 
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+
+        subscribeToUserData().then((channel) => {
+            if (channel) {
+                subscriptionRef.current = channel
+            }
+        })
+
+        return () => {
+            if (subscriptionRef.current) {
+                subscriptionRef.current.unsubscribe()
+            }
+        }
+    }, [loading])
+
+    async function handleSubscriptionUpdates(payloadObj: any) {
+        console.log("handleSubscriptionUpdates", payloadObj)
+        if (!user) return
+        const { table, payload } = payloadObj
+
+        switch (table) {
+            case "users":
+                setUser({ ...user, ...payload.new })
+                break
+            case "requests":
+                console.log("requests", payload.new)
+                setUser({
+                    ...user,
+                    requests: user.requests.map((r) => {
+                        if (r.request_id === payload.old.request_id) {
+                            return payload.new
+                        }
+                        return r
+                    }),
+                })
+                break
+            case "templates":
+                switch (payload.eventType) {
+                    case "UPDATE":
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      templates: prev.templates.map((t) => {
+                                          if (
+                                              t.template_id ===
+                                              payload.old.template_id
+                                          ) {
+                                              return payload.new
+                                          }
+                                          return t
+                                      }),
+                                  }
+                                : null
+                        )
+                        break
+                    case "DELETE":
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      templates: prev.templates.filter(
+                                          (t) =>
+                                              t.template_id !==
+                                              payload.old.template_id
+                                      ),
+                                  }
+                                : null
+                        )
+                        break
+                    case "INSERT":
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      templates: [
+                                          ...prev.templates,
+                                          payload.new,
+                                      ],
+                                  }
+                                : null
+                        )
+                }
+                break
+            case "notifications":
+                if (payload.eventType === "UPDATE") {
+                    const newUser = { ...user }
+                    newUser.notifications = newUser?.notifications?.map((n) => {
+                        if (n.id === payload.new.id) {
+                            return payload.new
+                        }
+                        return n
+                    })
+
+                    setUser(newUser)
+                } else if (payload.eventType === "DELETE") {
+                    setUser({
+                        ...user,
+                        notifications: user.notifications.filter(
+                            (n) => n.id !== payload.old.id
+                        ),
+                    })
+                } else if (payload.eventType === "INSERT") {
+                    setUser({
+                        ...user,
+                        notifications: [...user.notifications, payload.new],
+                    })
+                }
+                break
+        }
+    }
     return (
         <UserContext.Provider
             value={{
