@@ -66,7 +66,8 @@ self.addEventListener("activate", (e) => {
     self.clients.claim()
 })
 
-window.addEventListener("load", () => {
+//TODO: for navigation with notification links
+self.addEventListener("load", () => {
     console.log("Load => nav to page")
     const urlParams = new URLSearchParams(window.location.search)
     const page = urlParams.get("page")
