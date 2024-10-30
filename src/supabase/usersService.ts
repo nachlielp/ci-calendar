@@ -4,12 +4,11 @@ import {
     DbUser,
     UserType,
     DbUserWithoutJoin,
-    CITemplate,
 } from "../util/interfaces"
 
 export type ManageUserOption = {
     user_id: string
-    full_name: string
+    user_name: string
     user_type: UserType
     email: string
 }
@@ -41,13 +40,16 @@ async function getUser(id: string): Promise<DbUser | null> {
             )
             ,templates:templates (
                 *
+            ),
+            bio:public_bio (
+                *
             )
         `
             )
             .eq("user_id", id)
             .eq("notifications.is_sent", false)
             .single()
-
+        console.log("data", data)
         if (error) {
             if (error.code === "PGRST116") {
                 console.log("No user found with id:", id)
@@ -106,7 +108,7 @@ async function getUsers(): Promise<ManageUserOption[]> {
     try {
         const { data } = await supabase
             .from("users")
-            .select("user_id,full_name,user_type,email")
+            .select("user_id,user_name,user_type,email")
         return data as ManageUserOption[]
     } catch (error) {
         console.error("Error in getUsers:", error)
@@ -115,18 +117,37 @@ async function getUsers(): Promise<ManageUserOption[]> {
 }
 
 async function getTaggableUsers(): Promise<
-    { user_id: string; full_name: string; user_type: UserType }[]
+    { user_id: string; bio_name: string; user_type: UserType }[]
 > {
     try {
         const { data, error } = await supabase
-            .from("users")
-            .select("user_id, full_name, user_type")
-            .eq("show_profile", true)
-            .neq("user_type", UserType.user)
+            .from("public_bio")
+            .select(
+                `
+            created_by,
+            bio_name,
+            users!inner (
+                user_type
+            )
+        `
+            )
+            .eq("allow_tagging", true)
 
         if (error) throw error
 
-        return data || []
+        const teachers = data.map((teacher) => {
+            const { created_by, bio_name, users } = teacher
+            const { user_type } = users as unknown as { user_type: UserType }
+
+            return {
+                user_id: teacher.created_by,
+                bio_name: teacher.bio_name,
+                user_type: user_type,
+            }
+        })
+        console.log("teachers", teachers)
+        // return data || []
+        return teachers
     } catch (error) {
         console.error("Error fetching taggable teachers:", error)
         throw error
@@ -138,7 +159,7 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
         const { data, error } = await supabase
             .from("users")
             .select(
-                "user_id, full_name, img, bio, page_url, page_title, show_profile, allow_tagging"
+                "user_id, bio_name, img, bio, page_url, page_title, show_profile, allow_tagging"
             )
             .in("user_id", teacherIds)
             .eq("show_profile", true)

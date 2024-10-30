@@ -13,7 +13,7 @@ const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
         .filter(
             (user) =>
-                user.full_name.toLowerCase().includes(query.toLowerCase()) ||
+                user.user_name.toLowerCase().includes(query.toLowerCase()) ||
                 user.email.toLowerCase().includes(query.toLowerCase())
         )
         .map((user) => ({
@@ -23,7 +23,7 @@ const searchResult = (query: string, users: ManageUserOption[]) => {
                     style={{ display: "flex", justifyContent: "space-between" }}
                 >
                     <span>
-                        {user.full_name} - {user.email}
+                        {user.user_name} - {user.email}
                     </span>
                 </div>
             ),
@@ -46,7 +46,7 @@ function ManageUsers() {
             setOptions(
                 users.map((user) => ({
                     value: user.user_id,
-                    label: `${user.full_name} - ${user.email}`,
+                    label: `${user.user_name} - ${user.email}`,
                 }))
             )
         }
@@ -66,7 +66,7 @@ function ManageUsers() {
         const user = users.find((user) => user.user_id === value)
         if (user) {
             setSelectedUser(user)
-            setInputValue(user.full_name)
+            setInputValue(user.user_name)
         }
     }
 
@@ -82,7 +82,7 @@ function ManageUsers() {
             if (!updatedUser) return
             const partialUser = {
                 user_id: updatedUser.user_id,
-                full_name: updatedUser.full_name,
+                user_name: updatedUser.user_name,
                 email: updatedUser.email,
                 user_type: updatedUser.user_type,
             }
@@ -105,7 +105,7 @@ function ManageUsers() {
             if (!updatedUser) return
             const partialUser = {
                 user_id: updatedUser.user_id,
-                full_name: updatedUser.full_name,
+                user_name: updatedUser.user_name,
                 email: updatedUser.email,
                 user_type: updatedUser.user_type,
             }
@@ -129,7 +129,7 @@ function ManageUsers() {
             if (!updatedUser) return
             const partialUser = {
                 user_id: updatedUser.user_id,
-                full_name: updatedUser.full_name,
+                user_name: updatedUser.user_name,
                 email: updatedUser.email,
                 user_type: updatedUser.user_type,
             }
@@ -153,7 +153,7 @@ function ManageUsers() {
             if (!updatedUser) return
             const partialUser = {
                 user_id: updatedUser.user_id,
-                full_name: updatedUser.full_name,
+                user_name: updatedUser.user_name,
                 email: updatedUser.email,
                 user_type: updatedUser.user_type,
             }
@@ -177,7 +177,7 @@ function ManageUsers() {
             if (!updatedUser) return
             const partialUser = {
                 user_id: updatedUser.user_id,
-                full_name: updatedUser.full_name,
+                user_name: updatedUser.user_name,
                 email: updatedUser.email,
                 user_type: updatedUser.user_type,
             }
@@ -267,7 +267,7 @@ function ManageUsers() {
                 </AutoComplete>
                 {selectedUser && (
                     <div>
-                        <p>{selectedUser.full_name}</p>
+                        <p>{selectedUser.user_name}</p>
                         <p>{selectedUser.email}</p>
                         <p>{selectedUser.user_type}</p>
                     </div>

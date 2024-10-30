@@ -13,7 +13,7 @@ import Alert from "antd/es/alert"
 import AsyncButton from "../Other/AsyncButton"
 
 type FieldType = {
-    full_name: string
+    bio_name: string
     bio: string
     img: string
     page_url?: string
@@ -54,7 +54,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
     const handleSubmit = async () => {
         const values = getCurrentFormValues()
-        if (!values.full_name) {
+        if (!values.bio_name) {
             setInputErrors(true)
             return
         }
@@ -62,9 +62,9 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
 
         setIsSubmitting(true)
 
-        const { full_name, bio, page_url, page_title, show_profile } = values
+        const { bio_name, bio, page_url, page_title, show_profile } = values
         const newTeacher: Partial<DbUser> = {
-            full_name: full_name || user.full_name,
+            bio_name: bio_name || user.user_name,
             bio: bio || "",
             img: imageUrl || "",
             page_url: page_url || "",
@@ -119,7 +119,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         form={form}
                         autoComplete="off"
                         initialValues={{
-                            full_name: user.full_name,
+                            bio_name: user.bio_name,
                             bio: user.bio,
                             img: user.img,
                             page_url: user.page_url,
@@ -129,7 +129,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         }}
                     >
                         <Form.Item<FieldType>
-                            name="full_name"
+                            name="bio_name"
                             rules={[{ required: true, message: "נא להזין שם" }]}
                         >
                             <Input placeholder="*שם מלא" />

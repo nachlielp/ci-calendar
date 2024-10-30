@@ -19,6 +19,10 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
         )
     }
 
+    if (ci_event.id === "5cb0e362-f378-44d5-87ee-fef0d495328f") {
+        console.log("ci_event: ", ci_event)
+    }
+
     return (
         <section className="full-event-card" dir="rtl">
             <article className="event-header">
@@ -126,6 +130,7 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                                                         t.user_id ===
                                                         teacher.value
                                                 )
+
                                             return (
                                                 <React.Fragment
                                                     key={teacher.value}

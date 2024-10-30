@@ -165,14 +165,27 @@ export interface NotificationDB
 }
 
 export interface DbUserWithoutJoin
-    extends Omit<DbUser, "notifications" | "requests" | "templates"> {}
+    extends Omit<
+        DbUser,
+        | "notifications"
+        | "requests"
+        | "templates"
+        | "bio_name"
+        | "page_url"
+        | "page_title"
+        | "show_profile"
+        | "allow_tagging"
+        | "img"
+        | "bio"
+    > {}
 
 export interface DbUser {
     user_id: string
     created_at: string
     updated_at: string
     user_type: UserType
-    full_name: string
+    user_name: string
+    bio_name: string
     phone: string
     email: string
     subscribed_for_updates_at: string
@@ -197,7 +210,7 @@ export interface DbUser {
 
 export interface UserBio extends Partial<DbUser> {
     user_id: string
-    full_name: string
+    bio_name: string
     page_url: string
     page_title: string
     show_profile: boolean

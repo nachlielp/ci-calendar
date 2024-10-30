@@ -4,25 +4,10 @@ import { CITemplate } from "../util/interfaces"
 export type CITemplateWithoutId = Omit<CITemplate, "template_id" | "created_by">
 
 export const templateService = {
-    getUserTemplates,
     createTemplate,
     deleteTemplate,
     getTemplate,
     updateTemplate,
-}
-
-async function getUserTemplates(userId: string): Promise<CITemplate[]> {
-    try {
-        const query = supabase.from("templates").select("*")
-        // .eq("created_by", userId)
-
-        const { data, error } = await query
-        if (error) throw error
-        return data || []
-    } catch (error) {
-        console.error("Error fetching CI templates:", error)
-        throw error
-    }
 }
 
 async function getTemplate(templateId: string): Promise<CITemplate> {

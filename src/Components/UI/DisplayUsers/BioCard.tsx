@@ -8,7 +8,7 @@ function BioCard({ teacher }: { teacher: UserBio }) {
     return (
         <section className="bio-card" style={{ direction: "rtl" }}>
             <div className="bio-card-content">
-                <label className="bio-card-title">{teacher.full_name}</label>
+                <label className="bio-card-title">{teacher.bio_name}</label>
 
                 {teacher?.img && (
                     <Image
@@ -35,7 +35,7 @@ function BioCard({ teacher }: { teacher: UserBio }) {
 
                 <hr className="bio-card-hr" />
                 <label className="bio-card-subtitle">
-                    אודות {teacher.full_name}
+                    אודות {teacher.bio_name}
                 </label>
                 <Text>{teacher.bio}</Text>
             </div>

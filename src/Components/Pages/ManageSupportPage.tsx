@@ -158,7 +158,7 @@ export default function ManageSupportPage() {
                     {
                         response: "הבקשה אושרה",
                         created_at: new Date().toISOString(),
-                        created_by: user?.full_name || "",
+                        created_by: user?.user_name || "",
                     },
                 ]
                 const newRequest: CIRequest = {
@@ -184,7 +184,7 @@ export default function ManageSupportPage() {
                     {
                         response: "הבקשה נסגרה",
                         created_at: new Date().toISOString(),
-                        created_by: user?.full_name || "",
+                        created_by: user?.user_name || "",
                     },
                 ]
                 await requestsService.updateRequest({
@@ -303,7 +303,7 @@ const ManageSupportCell = ({
                                 {
                                     response,
                                     created_at: new Date().toISOString(),
-                                    created_by: user?.full_name || "",
+                                    created_by: user?.user_name || "",
                                 },
                             ],
                         })

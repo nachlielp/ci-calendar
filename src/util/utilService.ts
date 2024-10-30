@@ -142,18 +142,12 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
     return {
         user_id: user.id,
         user_type: UserType.user,
-        full_name: user.user_metadata.full_name || "",
+        user_name: user.user_metadata.full_name || "",
         email: user.email || "",
         phone: user.phone || "",
         created_at: user.created_at,
         updated_at: new Date().toISOString(),
         subscribed_for_updates_at: new Date().toISOString(),
-        page_url: "",
-        page_title: "",
-        show_profile: false,
-        allow_tagging: false,
-        img: "", // Add this line
-        bio: "",
         provider: user.app_metadata["provider"] || "",
         default_filter: {
             districts: [],

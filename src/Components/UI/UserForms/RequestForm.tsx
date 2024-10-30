@@ -47,7 +47,7 @@ export default function RequestForm() {
             message: values.description || "",
             phone: values.phone || user.phone || "",
             email: user.email || "",
-            name: user.full_name || "",
+            name: user.user_name || "",
             responses: [],
         }
         try {
@@ -88,7 +88,7 @@ export default function RequestForm() {
                         onFinish={onFinish}
                         autoComplete="off"
                         initialValues={{
-                            full_name: user.full_name,
+                            user_name: user.user_name,
                             email: user.email,
                         }}
                         style={{ minHeight: "130px" }}

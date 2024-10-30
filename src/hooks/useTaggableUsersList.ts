@@ -20,13 +20,13 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
                 const teachers = users
                     .filter((user) => user.user_type !== UserType.org)
                     .map((user) => ({
-                        label: `${user.full_name}`,
+                        label: `${user.bio_name}`,
                         value: user.user_id,
                     }))
                 const orgs = users
                     .filter((user) => user.user_type === UserType.org)
                     .map((user) => ({
-                        label: `${user.full_name}`,
+                        label: `${user.bio_name}`,
                         value: user.user_id,
                     }))
 
@@ -38,12 +38,12 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
                 ) {
                     if (user.user_type === UserType.org) {
                         orgs.push({
-                            label: `${user.full_name}`,
+                            label: `${user.bio_name}`,
                             value: user.user_id,
                         })
                     } else {
                         teachers.push({
-                            label: `${user.full_name}`,
+                            label: `${user.bio_name}`,
                             value: user.user_id,
                         })
                     }

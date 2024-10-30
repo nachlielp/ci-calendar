@@ -22,7 +22,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         const user = event.users?.find(
                             (user) => user.user_id === teacher.value
                         )
-                        return user?.full_name || teacher.label
+                        return user?.bio_name || teacher.label
                     })
             )
         )
@@ -33,7 +33,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     const user = event.users?.find(
                         (user) => user.user_id === teacher.value
                     )
-                    return user?.full_name || teacher.label
+                    return user?.bio_name || teacher.label
                 })
             )
         )
@@ -46,7 +46,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             const publicOrg = event?.users?.find(
                 (user) => user.user_id === org.value
             )
-            return publicOrg?.full_name || org.label
+            return publicOrg?.bio_name || org.label
         })
 
         return (
