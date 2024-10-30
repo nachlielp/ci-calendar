@@ -51,29 +51,22 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             .select(
                 `
             *,
-            creator:users (
-                user_name,
-                user_id
-            ),
             ci_events_users_junction (
-                user_id,
-                users (
-                    user_id,
-                    user_type,
-                    public_bio (
-                        bio_name,
-                        img,
-                        page_url,
-                        page_title,
-                        show_profile,
-                        allow_tagging,
-                        about
-                    )
+                ci_event_id,
+                public_bio (
+                    bio_name,
+                    img,
+                    page_url,
+                    page_title,
+                    show_profile,
+                    allow_tagging,
+                    about,
+                    user_id
                 )
             )
         `
             )
-            .eq("ci_events_users_junction.users.public_bio.show_profile", true)
+            .eq("ci_events_users_junction.public_bio.show_profile", true) // Updated filter path
 
         // Apply filters
         if (filterBy?.start_date) {
@@ -112,13 +105,9 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         const eventsWithUsers = data.map((event) => {
             const { ci_events_users_junction } = event
             const users = ci_events_users_junction
-                .map((user: any) => user.users)
-                .map((user_bio: any) => ({
-                    ...user_bio.public_bio,
-                    user_type: user_bio.user_type,
-                    user_id: user_bio.user_id,
-                }))
-                .filter((user: any) => user.bio_name)
+                .map((junction: any) => junction.public_bio) // Changed from user.users to junction.public_bio
+                .filter((bio: any) => bio && bio.bio_name) // Add null check
+
             delete event.ci_events_users_junction
 
             return { ...event, users }

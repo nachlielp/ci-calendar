@@ -124,25 +124,20 @@ async function getTaggableUsers(): Promise<
             .from("public_bio")
             .select(
                 `
-            user_id,
-            bio_name,
-            users!inner (
+                user_id,
+                bio_name,
                 user_type
-            )
-        `
+            `
             )
             .eq("allow_tagging", true)
 
         if (error) throw error
 
         const teachers = data.map((teacher) => {
-            const { users } = teacher
-            const { user_type } = users as unknown as { user_type: UserType }
-
             return {
                 user_id: teacher.user_id,
                 bio_name: teacher.bio_name,
-                user_type: user_type,
+                user_type: teacher.user_type,
             }
         })
 

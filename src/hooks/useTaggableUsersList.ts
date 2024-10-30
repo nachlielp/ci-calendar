@@ -17,6 +17,7 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
         const fetchTeachers = async () => {
             try {
                 const users = await usersService.getTaggableUsers()
+
                 const teachers = users
                     .filter((user) => user.user_type !== UserType.org)
                     .map((user) => ({
