@@ -185,17 +185,12 @@ export interface DbUser {
     updated_at: string
     user_type: UserType
     user_name: string
-    bio_name: string
     phone: string
     email: string
     subscribed_for_updates_at: string
-    page_url: string
-    page_title: string
-    show_profile: boolean
     allow_tagging: boolean
     provider: string
-    img: string
-    bio: string
+    bio: UserBio
     default_filter: DefaultFilter
     push_notification_tokens: PushNotificationToken[]
     notifications: UserNotification[]
@@ -208,7 +203,7 @@ export interface DbUser {
     templates: CITemplate[]
 }
 
-export interface UserBio extends Partial<DbUser> {
+export interface UserBio {
     user_id: string
     bio_name: string
     page_url: string
@@ -216,7 +211,7 @@ export interface UserBio extends Partial<DbUser> {
     show_profile: boolean
     allow_tagging: boolean
     img: string
-    bio: string
+    about: string
 }
 
 export interface CIRequestResponse {

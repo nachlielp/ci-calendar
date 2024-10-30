@@ -66,7 +66,8 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
                         page_url,
                         page_title,
                         show_profile,
-                        allow_tagging
+                        allow_tagging,
+                        about
                     )
                 )
             )

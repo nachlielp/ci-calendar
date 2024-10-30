@@ -37,7 +37,7 @@ function BioCard({ teacher }: { teacher: UserBio }) {
                 <label className="bio-card-subtitle">
                     אודות {teacher.bio_name}
                 </label>
-                <Text>{teacher.bio}</Text>
+                <Text>{teacher.about}</Text>
             </div>
         </section>
     )

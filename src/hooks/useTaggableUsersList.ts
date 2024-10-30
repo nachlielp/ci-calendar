@@ -38,12 +38,12 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
                 ) {
                     if (user.user_type === UserType.org) {
                         orgs.push({
-                            label: `${user.bio_name}`,
+                            label: `${user.bio.bio_name}`,
                             value: user.user_id,
                         })
                     } else {
                         teachers.push({
-                            label: `${user.bio_name}`,
+                            label: `${user.bio.bio_name}`,
                             value: user.user_id,
                         })
                     }

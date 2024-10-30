@@ -6,7 +6,6 @@ import Card from "antd/es/card"
 export default function BioPage() {
     const [editProfile, setEditProfile] = useState(false)
     const handleSubmitEdit = () => {
-        console.log("handleSubmitEdit")
         setEditProfile(false)
     }
     return (

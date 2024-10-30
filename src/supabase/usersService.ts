@@ -42,14 +42,14 @@ async function getUser(id: string): Promise<DbUser | null> {
                 *
             ),
             bio:public_bio (
-                *
+              *
             )
         `
             )
             .eq("user_id", id)
             .eq("notifications.is_sent", false)
             .single()
-        console.log("data", data)
+
         if (error) {
             if (error.code === "PGRST116") {
                 console.log("No user found with id:", id)
@@ -124,7 +124,7 @@ async function getTaggableUsers(): Promise<
             .from("public_bio")
             .select(
                 `
-            created_by,
+            user_id,
             bio_name,
             users!inner (
                 user_type
@@ -140,13 +140,12 @@ async function getTaggableUsers(): Promise<
             const { user_type } = users as unknown as { user_type: UserType }
 
             return {
-                user_id: teacher.created_by,
+                user_id: teacher.user_id,
                 bio_name: teacher.bio_name,
                 user_type: user_type,
             }
         })
-        console.log("teachers", teachers)
-        // return data || []
+
         return teachers
     } catch (error) {
         console.error("Error fetching taggable teachers:", error)
@@ -159,7 +158,7 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
         const { data, error } = await supabase
             .from("users")
             .select(
-                "user_id, bio_name, img, bio, page_url, page_title, show_profile, allow_tagging"
+                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging"
             )
             .in("user_id", teacherIds)
             .eq("show_profile", true)
@@ -226,7 +225,6 @@ async function subscribeToUser(
             },
             (payload) => {
                 //TODO handle delete
-                console.log("templates payload", payload)
                 callback({ table: "templates", payload })
             }
         )

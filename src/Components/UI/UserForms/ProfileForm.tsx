@@ -5,16 +5,16 @@ import Card from "antd/es/card"
 import Image from "antd/es/image"
 import Switch from "antd/es/switch"
 import { useUser } from "../../../context/UserContext"
-import { usersService } from "../../../supabase/usersService"
-import { DbUser } from "../../../util/interfaces"
+import { UserBio } from "../../../util/interfaces"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import CloudinaryUpload from "../Other/CloudinaryUpload"
 import Alert from "antd/es/alert"
 import AsyncButton from "../Other/AsyncButton"
+import { publicBioService } from "../../../supabase/publicBioService"
 
 type FieldType = {
     bio_name: string
-    bio: string
+    about: string
     img: string
     page_url?: string
     page_title?: string
@@ -30,19 +30,21 @@ interface ProfileFormProps {
 export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const isMobile = useIsMobile()
     const { user, updateUser } = useUser()
-    const originalImageUrl = useRef<string>(user?.img || "")
+    const originalImageUrl = useRef<string>(user?.bio?.img || "")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     if (!user) throw new Error("TeacherForm.user")
 
-    const [imageUrl, setImageUrl] = useState<string>(user?.img || "")
+    const [imageUrl, setImageUrl] = useState<string>(user?.bio?.img || "")
 
     const [form] = Form.useForm()
 
     useEffect(() => {
-        setImageUrl(user?.img || "")
-        originalImageUrl.current = user?.img || ""
+        setImageUrl(user?.bio?.img || "")
+        originalImageUrl.current = user?.bio?.img || ""
     }, [user])
+
+    if (!user) return
 
     const uploadNewImage = (url: string) => {
         setImageUrl(url)
@@ -59,42 +61,32 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
             return
         }
         if (!user) return
-
         setIsSubmitting(true)
-
-        const { bio_name, bio, page_url, page_title, show_profile } = values
-        const newTeacher: Partial<DbUser> = {
+        const {
+            bio_name,
+            about,
+            page_url,
+            page_title,
+            show_profile,
+            allow_tagging,
+        } = values
+        const newTeacher: UserBio = {
             bio_name: bio_name || user.user_name,
-            bio: bio || "",
+            about: about || "",
             img: imageUrl || "",
             page_url: page_url || "",
             page_title: page_title || "",
-            show_profile: show_profile?.toString() === "true",
-            updated_at: new Date().toISOString(),
+            show_profile: Boolean(show_profile),
+            allow_tagging: Boolean(allow_tagging),
+            user_id: user.user_id,
         }
         try {
-            // try {
-            //     cloudinary.config({
-            //         cloud_name: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME,
-            //         api_key: import.meta.env.VITE_CLOUDINARY_API_KEY,
-            //         api_secret: import.meta.env.VITE_CLOUDINARY_API_SECRET,
-            //     })
-            //     const res = await cloudinary.uploader.destroy(
-            //         "t45nwiz4gzk8vms2pta0"
-            //     )
-            //     console.log("res: ", res)
-            // } catch (error) {
-            //     console.error("ProfileForm.handleSubmit.error: ", error)
-            // }
-
-            const updatedUser = await usersService.updateUser(
-                user.user_id,
+            const updatedUser = await publicBioService.updateTeacherBio(
                 newTeacher
             )
             if (updatedUser) {
-                updateUser(updatedUser)
+                updateUser({ bio: updatedUser })
             }
-
             closeEditProfile()
         } catch (error) {
             console.error("UserForm.onFinish.error: ", error)
@@ -106,6 +98,8 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
     const clearImage = () => {
         setImageUrl("")
     }
+
+    if (!user) return <></>
 
     return (
         <>
@@ -119,13 +113,13 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         form={form}
                         autoComplete="off"
                         initialValues={{
-                            bio_name: user.bio_name,
-                            bio: user.bio,
-                            img: user.img,
-                            page_url: user.page_url,
-                            page_title: user.page_title,
-                            show_profile: user.show_profile,
-                            allow_tagging: user.allow_tagging,
+                            bio_name: user.bio.bio_name,
+                            about: user.bio.about,
+                            img: user.bio.img,
+                            page_url: user.bio.page_url,
+                            page_title: user.bio.page_title,
+                            show_profile: user.bio.show_profile,
+                            allow_tagging: user.bio.allow_tagging,
                         }}
                     >
                         <Form.Item<FieldType>
@@ -134,7 +128,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         >
                             <Input placeholder="*שם מלא" />
                         </Form.Item>
-                        <Form.Item<FieldType> name="bio">
+                        <Form.Item<FieldType> name="about">
                             <Input.TextArea
                                 rows={7}
                                 placeholder="אודות"
@@ -226,7 +220,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                             <Switch
                                 checkedChildren="גלוי"
                                 unCheckedChildren="מוסתר"
-                                defaultChecked={user?.show_profile}
+                                defaultChecked={user?.bio.show_profile}
                             />
                         </Form.Item>
                         {inputErrors && (

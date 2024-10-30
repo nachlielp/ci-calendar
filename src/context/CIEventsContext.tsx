@@ -69,7 +69,6 @@ export const CIEventsProvider = ({
 
         //NOTICE inorder to avoid using realtime channels, we use polling instead
         const handleVisibilityChange = () => {
-            console.log("handleVisibilityChange")
             if (document.visibilityState === "visible") {
                 clearInterval(subscriptionRef.current)
                 fetchEvents()
