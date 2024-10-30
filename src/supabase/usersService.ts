@@ -4,6 +4,7 @@ import {
     DbUser,
     UserType,
     DbUserWithoutJoin,
+    CITemplate,
 } from "../util/interfaces"
 
 export type ManageUserOption = {
@@ -54,6 +55,7 @@ async function getUser(id: string): Promise<DbUser | null> {
             }
             throw error
         }
+
         return data as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)

@@ -59,8 +59,6 @@ export const CIEventsProvider = ({
                     sort_direction: "asc",
                     future_events: true,
                 })
-                // console.log("fetchedEvents", fetchedEvents)
-                // console.log("time: ", dayjs().format("HH:mm:ss"))
                 setCievents(fetchedEvents)
             } catch (error) {
                 console.error("Error fetching events:", error)
