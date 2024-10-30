@@ -35,6 +35,7 @@ export const utilService = {
     getCIEventTeachers,
     notAUserId,
     getUniqueOwnersList,
+    removeDuplicates,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -382,4 +383,8 @@ function getUniqueOwnersList(events: CIEvent[]): SelectOption[] {
             events.find((event) => event.creator.user_id === user_id)?.creator
                 .full_name || "",
     }))
+}
+
+function removeDuplicates(values: string[]) {
+    return Array.from(new Set(values))
 }

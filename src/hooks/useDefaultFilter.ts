@@ -1,32 +1,36 @@
 import { useEffect } from "react"
-import { useUser } from "../context/UserContext"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { utilService } from "../util/utilService"
+
 export const useDefaultFilter = () => {
-    const { user } = useUser()
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
     useEffect(() => {
-        if (user) {
-            const eventTypes = user.default_filter?.eventTypes || []
-            const districts = user.default_filter?.districts || []
-            const filterURL =
-                eventTypes.map((eventType) => `f=${eventType}`).join("&") +
-                districts.map((district) => `&f=${district}`).join("")
-            utilService.saveFiltersToLocalStorage(districts, eventTypes)
-            navigate(`/?${filterURL}`)
-        } else {
-            const defaultFilterObj = JSON.parse(
-                localStorage.getItem("defaultFilters") || "{}"
+        if (searchParams?.get("f")) {
+            const filters = searchParams.get("f")?.split(",")
+            const eventTypes = filters?.filter(
+                (filter) =>
+                    utilService.getFilterItemType(filter) === "eventType"
             )
+            const districts = filters?.filter(
+                (filter) => utilService.getFilterItemType(filter) === "district"
+            )
+            localStorage.setItem("eventType", JSON.stringify(eventTypes))
+            localStorage.setItem("district", JSON.stringify(districts))
+        } else {
+            const eventTypes = localStorage.getItem("eventType") || "[]"
+            const districts = localStorage.getItem("district") || "[]"
             const defaultFilter = [
-                ...(defaultFilterObj.eventTypes || []),
-                ...(defaultFilterObj.districts || []),
+                ...utilService.removeDuplicates(JSON.parse(eventTypes)),
+                ...utilService.removeDuplicates(JSON.parse(districts)),
             ]
+
             navigate(
                 `/?${defaultFilter
                     .map((filterItem: any) => `f=${filterItem}`)
                     .join("&")}`
             )
         }
-    }, [user])
+    }, [])
 }

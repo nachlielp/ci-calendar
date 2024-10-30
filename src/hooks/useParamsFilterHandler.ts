@@ -24,6 +24,7 @@ export const useParamsFilterHandler = (): IUseParamsFilterHandler => {
         newSearchParams.delete(type)
         values.forEach((value) => newSearchParams.append(type, value))
         setSearchParams(newSearchParams, { replace: true })
+        localStorage.setItem(type, JSON.stringify(values))
     }
 
     const selectOption = (value: string) => {
@@ -37,6 +38,9 @@ export const useParamsFilterHandler = (): IUseParamsFilterHandler => {
         }
 
         setSearchParams(newSearchParams, { replace: true })
+        const storedValues = JSON.parse(localStorage.getItem(type) || "[]")
+
+        localStorage.setItem(type, JSON.stringify([...storedValues, value]))
     }
 
     const removeOption = (value: string) => {
@@ -45,6 +49,10 @@ export const useParamsFilterHandler = (): IUseParamsFilterHandler => {
         newSearchParams.delete("f")
         values.forEach((v) => newSearchParams.append("f", v))
         setSearchParams(newSearchParams, { replace: true })
+        const type = utilService.getFilterItemType(value)
+        const storedValues = JSON.parse(localStorage.getItem(type) || "[]")
+        const newValues = storedValues.filter((v: string) => v !== value)
+        localStorage.setItem(type, JSON.stringify(newValues))
     }
     // Clearing based on instance search params rewrites other instances' search params
     // so i pass all of the titles to clear
