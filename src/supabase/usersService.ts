@@ -55,7 +55,6 @@ async function getUser(id: string): Promise<DbUser | null> {
                 console.log("No user found with id:", id)
                 return null
             }
-            throw error
         }
 
         return data as unknown as DbUser

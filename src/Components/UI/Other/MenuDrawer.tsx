@@ -14,7 +14,7 @@ export function MenuDrawer() {
     const [isNewResponse, setIsNewResponse] = useState<boolean>(false)
 
     useEffect(() => {
-        if (user && user.requests.length > 0) {
+        if (user && user?.requests?.length > 0) {
             setIsNewResponse(
                 user.requests.some(
                     (request) =>

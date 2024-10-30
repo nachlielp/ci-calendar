@@ -49,16 +49,14 @@ export default function Signup() {
                 throw new Error("Email or password is null")
             }
             //TODO add method that creates user and passes name not create user in supabase
-            const { data, error } = await supabase.auth.signUp({
+            const { error } = await supabase.auth.signUp({
                 email,
                 password,
                 options: { data: { full_name: name } },
             })
-            console.log("signup data", data)
             if (error) {
                 throw error
             }
-            console.log("signup data", data)
             navigate("/")
         } catch (e) {
             if (e instanceof Error) {
