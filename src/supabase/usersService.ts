@@ -136,7 +136,7 @@ async function getTaggableUsers(): Promise<
         if (error) throw error
 
         const teachers = data.map((teacher) => {
-            const { created_by, bio_name, users } = teacher
+            const { users } = teacher
             const { user_type } = users as unknown as { user_type: UserType }
 
             return {
