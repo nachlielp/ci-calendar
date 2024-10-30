@@ -6,8 +6,9 @@ import { useEffect, useState } from "react"
 import { UserType } from "../../../util/interfaces"
 import { useUsers } from "../../../hooks/useUsers"
 import { useWindowSize } from "../../../hooks/useWindowSize"
-import { ManageUserOption, usersService } from "../../../supabase/usersService"
+import { ManageUserOption } from "../../../supabase/usersService"
 import { SelectProps } from "antd/es/select"
+import userRoleService from "../../../supabase/userRoleService"
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
@@ -70,131 +71,28 @@ function ManageUsers() {
         }
     }
 
-    const onMakeAdmin = async () => {
+    const onSetRole = async (user_type: UserType, role_id: number) => {
         if (!selectedUser) return
-        try {
-            const updatedUser = await usersService.updateUser(
-                selectedUser.user_id,
-                {
-                    user_type: UserType.admin,
-                }
-            )
-            if (!updatedUser) return
-            const partialUser = {
-                user_id: updatedUser.user_id,
-                user_name: updatedUser.user_name,
-                email: updatedUser.email,
-                user_type: updatedUser.user_type,
-            }
-
-            setSelectedUser(partialUser)
-        } catch (error) {
-            console.error(`ManageUsers.onMakeAdmin.error: `, error)
-            throw error
-        }
+        await userRoleService.setUserRole({
+            user_id: selectedUser.user_id,
+            user_type: user_type,
+            role_id: role_id,
+        })
+        setSelectedUser((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      user_type: user_type,
+                  }
+                : null
+        )
     }
-    const onMakeCreator = async () => {
-        if (!selectedUser) return
-        try {
-            const updatedUser = await usersService.updateUser(
-                selectedUser.user_id,
-                {
-                    user_type: UserType.creator,
-                }
-            )
-            if (!updatedUser) return
-            const partialUser = {
-                user_id: updatedUser.user_id,
-                user_name: updatedUser.user_name,
-                email: updatedUser.email,
-                user_type: updatedUser.user_type,
-            }
-
-            setSelectedUser(partialUser)
-        } catch (error) {
-            console.error(`ManageUsers.onMakeCreator.error: `, error)
-            throw error
-        }
-    }
-
-    const onMakeProfile = async () => {
-        if (!selectedUser) return
-        try {
-            const updatedUser = await usersService.updateUser(
-                selectedUser.user_id,
-                {
-                    user_type: UserType.profile,
-                }
-            )
-            if (!updatedUser) return
-            const partialUser = {
-                user_id: updatedUser.user_id,
-                user_name: updatedUser.user_name,
-                email: updatedUser.email,
-                user_type: updatedUser.user_type,
-            }
-
-            setSelectedUser(partialUser)
-        } catch (error) {
-            console.error(`ManageUsers.onMakeProfile.error: `, error)
-            throw error
-        }
-    }
-
-    const onMakeOrg = async () => {
-        if (!selectedUser) return
-        try {
-            const updatedUser = await usersService.updateUser(
-                selectedUser.user_id,
-                {
-                    user_type: UserType.org,
-                }
-            )
-            if (!updatedUser) return
-            const partialUser = {
-                user_id: updatedUser.user_id,
-                user_name: updatedUser.user_name,
-                email: updatedUser.email,
-                user_type: updatedUser.user_type,
-            }
-
-            setSelectedUser(partialUser)
-        } catch (error) {
-            console.error(`ManageUsers.onMakeOrg.error: `, error)
-            throw error
-        }
-    }
-
-    const onMakeUser = async () => {
-        if (!selectedUser) return
-        try {
-            const updatedUser = await usersService.updateUser(
-                selectedUser.user_id,
-                {
-                    user_type: UserType.user,
-                }
-            )
-            if (!updatedUser) return
-            const partialUser = {
-                user_id: updatedUser.user_id,
-                user_name: updatedUser.user_name,
-                email: updatedUser.email,
-                user_type: updatedUser.user_type,
-            }
-
-            setSelectedUser(partialUser)
-        } catch (error) {
-            console.error(`ManageUsers.onMakeUser.error: `, error)
-            throw error
-        }
-    }
-
     const cardWidth = Math.min(width * 0.9, 500)
 
     const makeAdmin = (
         <Button
             disabled={selectedUser?.user_type === UserType.admin}
-            onClick={onMakeAdmin}
+            onClick={() => onSetRole(UserType.admin, 1)}
             className="user-btn"
         >
             הגדרה כמנהל
@@ -203,7 +101,7 @@ function ManageUsers() {
     const makeCreator = (
         <Button
             disabled={selectedUser?.user_type === UserType.creator}
-            onClick={onMakeCreator}
+            onClick={() => onSetRole(UserType.creator, 2)}
             className="user-btn"
         >
             הגדרה כיוצר
@@ -212,7 +110,7 @@ function ManageUsers() {
     const makeOrg = (
         <Button
             disabled={selectedUser?.user_type === UserType.org}
-            onClick={onMakeOrg}
+            onClick={() => onSetRole(UserType.org, 3)}
             className="user-btn"
         >
             הגדרה כארגון
@@ -222,7 +120,7 @@ function ManageUsers() {
     const makeProfile = (
         <Button
             disabled={selectedUser?.user_type === UserType.profile}
-            onClick={onMakeProfile}
+            onClick={() => onSetRole(UserType.profile, 4)}
             className="user-btn"
         >
             הגדרה כפרופיל
@@ -231,7 +129,7 @@ function ManageUsers() {
     const makeUser = (
         <Button
             disabled={selectedUser?.user_type === UserType.user}
-            onClick={onMakeUser}
+            onClick={() => onSetRole(UserType.user, 5)}
             className="user-btn"
         >
             הגדרה כמשתמש
@@ -255,7 +153,7 @@ function ManageUsers() {
                     onSelect={onSelect}
                     onSearch={handleSearch}
                     size="large"
-                    value={inputValue} // Controlled component
+                    value={inputValue}
                 >
                     <Input.Search
                         size="large"
