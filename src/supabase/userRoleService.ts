@@ -1,3 +1,4 @@
+import { PostgrestError } from "@supabase/supabase-js"
 import { UserType } from "../util/interfaces"
 import { supabase } from "./client"
 
@@ -39,12 +40,31 @@ async function setUserRole({
         if (userError) throw userError
 
         // Update public_bio table
-        const { error: bioError } = await supabase
-            .from("public_bio")
-            .update({ user_type: user_type })
-            .eq("user_id", user_id)
+        if (user_type !== UserType.user) {
+            const { error: updateError, data: updateData } = await supabase
+                .from("public_bio")
+                .update({
+                    user_type: user_type,
+                    show_profile: true,
+                })
+                .eq("user_id", user_id)
+                .select()
+                .single()
 
-        if (bioError) throw bioError
+            const { code } = updateError as PostgrestError
+            // If no rows were updated, do an insert
+            if (code === "PGRST116" && !updateData) {
+                const { error: insertError } = await supabase
+                    .from("public_bio")
+                    .insert({
+                        user_id: user_id,
+                        user_type: user_type,
+                    })
+                if (insertError) throw insertError
+            } else if (updateError) {
+                throw updateError
+            }
+        }
 
         return roleData
     } catch (error) {
