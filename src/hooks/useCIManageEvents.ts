@@ -104,7 +104,7 @@ export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
                 handleVisibilityChange
             )
         }
-    }, [filterBy.creator_id])
+    }, [filterBy.user_id])
 
     function updateEventState(eventId: string, event: DBCIEvent) {
         setCIPastEvents((prev) =>

@@ -111,7 +111,7 @@ export default function EditMultiDayEventForm({
                 hide: false,
                 segments: [],
                 district: values["district"],
-                creator_id: user.user_id,
+                user_id: user.user_id,
                 source_template_id: event.source_template_id,
                 is_multi_day: true,
                 multi_day_teachers:
@@ -163,7 +163,7 @@ export default function EditMultiDayEventForm({
                         teachers
                     ) || [],
                 name: values["template-name"],
-                created_by: user.user_id,
+                user_id: user.user_id,
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],

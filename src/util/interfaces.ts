@@ -64,7 +64,7 @@ export interface CIEvent {
     price: IPrice[]
     links: ILink[]
     segments: CIEventSegments[]
-    creator_id: string
+    user_id: string
     source_template_id: string | null
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
@@ -90,7 +90,7 @@ export interface CITemplate {
     links: ILink[]
     segments: CIEventSegments[]
     is_multi_day: boolean
-    created_by: string
+    user_id: string
     multi_day_teachers: UserOption[]
     organisations: UserOption[]
 }
@@ -217,18 +217,17 @@ export interface UserBio {
 export interface CIRequestResponse {
     response: string
     created_at: string
-    created_by: string
+    responder_name: string
 }
 
 export interface CIRequest {
     request_id: string
     created_at: string
     request_type: string
-    created_by: string
+    user_id: string
     type: RequestType
     status: RequestStatus
     message: string
-    user_id: string
     responses: CIRequestResponse[]
     phone: string
     email: string

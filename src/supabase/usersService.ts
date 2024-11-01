@@ -29,25 +29,29 @@ async function getUser(id: string): Promise<DbUser | null> {
             .select(
                 `
             *,
-            notifications:notifications (
+            notifications!left (
                 id,
                 ci_event_id,
                 remind_in_hours,
                 is_sent
             ),
-            requests:requests (
-                *
-            )
-            ,templates:templates (
+            requests!left (
                 *
             ),
-            bio:public_bio (
-              *
+            templates!left (
+                *
+            ),
+            bio:public_bio!left (
+                *
             )
         `
             )
             .eq("user_id", id)
+            .eq("notifications.user_id", id)
             .eq("notifications.is_sent", false)
+            .eq("requests.user_id", id)
+            .eq("templates.user_id", id)
+            .eq("public_bio.user_id", id)
             .single()
 
         if (error) {
@@ -203,7 +207,7 @@ async function subscribeToUser(
                 event: "UPDATE",
                 schema: "public",
                 table: "requests",
-                filter: `created_by=eq.${userId}`,
+                filter: `user_id=eq.${userId}`,
             },
             (payload) => {
                 callback({ table: "requests", payload })
@@ -215,7 +219,7 @@ async function subscribeToUser(
                 event: "*",
                 schema: "public",
                 table: "templates",
-                filter: `created_by=eq.${userId}`,
+                filter: `user_id=eq.${userId}`,
             },
             (payload) => {
                 //TODO handle delete

@@ -23,7 +23,7 @@ interface TableParams {
     sortField?: SorterResult<any>["field"]
     sortOrder?: SorterResult<any>["order"]
     filters?: Parameters<GetProp<TableProps, "onChange">>[1] & {
-        creator_id?: string[]
+        user_id?: string[]
     }
 }
 
@@ -35,7 +35,7 @@ const getColumns = (
     {
         title: "בעלים",
         dataIndex: "creator_name",
-        key: "creator_id",
+        key: "user_id",
         render: (text: string) => {
             return <span>{text}</span>
         },
@@ -43,7 +43,7 @@ const getColumns = (
             text: teacher.label,
             value: teacher.value,
         })),
-        filteredValue: tableParams.filters?.creator_id || null,
+        filteredValue: tableParams.filters?.user_id || null,
         filterMultiple: false,
         hidden: hideOwners,
     },
@@ -91,7 +91,7 @@ export default function ManageEventsTable() {
             pageSize: 10,
         },
         filters: {
-            creator_id: [],
+            user_id: [],
         },
     })
 
@@ -106,7 +106,7 @@ export default function ManageEventsTable() {
         updateEventState,
         removeEventState,
     } = useCIManageEvents({
-        creator_id: nonAdminUserId || tableParams.filters?.creator_id?.[0],
+        user_id: nonAdminUserId || tableParams.filters?.user_id?.[0],
     })
 
     const [showPast, setShowPast] = useState(false)
@@ -158,12 +158,12 @@ export default function ManageEventsTable() {
         pagination,
         filters
     ) => {
-        const { creator_id } = filters
-        if (creator_id) {
+        const { user_id } = filters
+        if (user_id) {
             setTableParams((prev) => ({
                 ...prev,
                 pagination,
-                filters: { creator_id: creator_id as string[] },
+                filters: { user_id: user_id as string[] },
             }))
         } else {
             setTableParams((prev) => ({

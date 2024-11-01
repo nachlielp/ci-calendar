@@ -73,9 +73,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                     return
                 }
                 const { data } = await supabase.auth.getUser()
-
+                console.log("auth.getUser.data", data)
                 if (data?.user?.id) {
                     const user = await usersService.getUser(data.user.id)
+                    console.log("user", user)
                     if (user) {
                         setUser(user)
                     } else {

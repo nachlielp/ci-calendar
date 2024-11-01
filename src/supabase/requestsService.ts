@@ -33,7 +33,7 @@ async function getUserRequests(userId: string) {
     const { data, error } = await supabase
         .from("requests")
         .select("*")
-        .eq("created_by", userId)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
 
     return { data, error }

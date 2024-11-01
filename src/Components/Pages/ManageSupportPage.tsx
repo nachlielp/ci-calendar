@@ -139,7 +139,7 @@ export default function ManageSupportPage() {
 
                 if (newUserType) {
                     const userRes = await usersService.updateUser(
-                        request.created_by,
+                        request.user_id,
                         {
                             user_type: newUserType,
                         }
@@ -158,7 +158,7 @@ export default function ManageSupportPage() {
                     {
                         response: "הבקשה אושרה",
                         created_at: new Date().toISOString(),
-                        created_by: user?.user_name || "",
+                        responder_name: user?.user_name || "",
                     },
                 ]
                 const newRequest: CIRequest = {
@@ -184,7 +184,7 @@ export default function ManageSupportPage() {
                     {
                         response: "הבקשה נסגרה",
                         created_at: new Date().toISOString(),
-                        created_by: user?.user_name || "",
+                        responder_name: user?.user_name || "",
                     },
                 ]
                 await requestsService.updateRequest({
@@ -262,7 +262,7 @@ const ManageSupportCell = ({
                                 className="manage-support-cell-response"
                             >
                                 <label className="sub-title">
-                                    {response.created_by} ב{" "}
+                                    {response.responder_name} ב{" "}
                                     {dayjs(response.created_at).format(
                                         "DD/MM/YYYY HH:mm"
                                     )}
@@ -303,7 +303,7 @@ const ManageSupportCell = ({
                                 {
                                     response,
                                     created_at: new Date().toISOString(),
-                                    created_by: user?.user_name || "",
+                                    responder_name: user?.user_name || "",
                                 },
                             ],
                         })

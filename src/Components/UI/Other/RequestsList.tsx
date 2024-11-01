@@ -97,7 +97,7 @@ export default function RequestsList() {
                                                 className="request-list-item"
                                             >
                                                 <label className="sub-title">
-                                                    {response.created_by} ב{" "}
+                                                    {response.responder_name} ב{" "}
                                                     {dayjs(
                                                         response.created_at
                                                     ).format(

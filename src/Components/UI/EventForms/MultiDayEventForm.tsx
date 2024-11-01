@@ -161,7 +161,7 @@ export default function MultiDayEventForm({
                     hide: false,
                     segments: [],
                     district: values["district"],
-                    creator_id: user.user_id,
+                    user_id: user.user_id,
                     source_template_id: sourceTemplateId,
                     is_multi_day: true,
                     multi_day_teachers:

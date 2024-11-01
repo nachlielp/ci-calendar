@@ -7,7 +7,7 @@ import { SelectOption } from "../util/options"
 export interface FilterOptions {
     start_date?: string
     end_date?: string
-    creator_id?: string
+    user_id?: string
     sort_by?: string
     sort_direction?: "asc" | "desc"
     hide?: boolean
@@ -85,8 +85,8 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
                 ? query.gt("end_date", filterBy.end_date)
                 : query.lt("end_date", filterBy.end_date)
         }
-        if (filterBy?.creator_id && filterBy.creator_id.length) {
-            query = query.eq("creator_id", filterBy.creator_id)
+        if (filterBy?.user_id && filterBy.user_id.length) {
+            query = query.eq("user_id", filterBy.user_id)
         }
 
         if (filterBy?.sort_by) {

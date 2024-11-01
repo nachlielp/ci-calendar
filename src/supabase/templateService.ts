@@ -1,7 +1,7 @@
 import { supabase } from "./client"
 import { CITemplate } from "../util/interfaces"
 
-export type CITemplateWithoutId = Omit<CITemplate, "template_id" | "created_by">
+export type CITemplateWithoutId = Omit<CITemplate, "template_id" | "user_id">
 
 export const templateService = {
     createTemplate,

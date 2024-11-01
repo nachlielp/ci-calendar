@@ -208,7 +208,7 @@ export default function SingleDayEventForm({
                     hide: false,
                     segments: segmentsArray,
                     district: values["district"],
-                    creator_id: user.user_id,
+                    user_id: user.user_id,
                     source_template_id: sourceTemplateId,
                     is_multi_day: false,
                     multi_day_teachers: null,
