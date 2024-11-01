@@ -58,7 +58,6 @@ export interface CIEvent {
     hide: boolean
     start_date: string
     end_date: string
-    //TODO add loc info to district
     district: string
     type: string
     price: IPrice[]
