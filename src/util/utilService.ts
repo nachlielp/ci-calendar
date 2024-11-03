@@ -110,6 +110,7 @@ function singleDayTemplateToFormValues(template: CITemplate) {
             title: price.title,
             sum: price.sum,
         })),
+        "event-orgs": template.organisations?.map((org) => org.value),
     }
     return { currentFormValues, address: template.address }
 }
