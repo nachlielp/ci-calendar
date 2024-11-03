@@ -34,10 +34,11 @@ const getColumns = (
 ): ColumnsType<CIEvent> => [
     {
         title: "בעלים",
-        dataIndex: "creator_name",
+        dataIndex: "user_id",
         key: "user_id",
-        render: (text: string) => {
-            return <span>{text}</span>
+        render: (user_id: string) => {
+            const user = teacherOptions.find((t) => t.value === user_id)
+            return <span>{user?.label}</span>
         },
         filters: teacherOptions.map((teacher) => ({
             text: teacher.label,
@@ -85,6 +86,7 @@ const getColumns = (
 export default function ManageEventsTable() {
     const isPhone = useIsMobile()
     const { user } = useUser()
+    const isAdmin = user?.user_type === UserType.admin
     const [tableParams, setTableParams] = useState<TableParams>({
         pagination: {
             current: 1,
@@ -95,8 +97,7 @@ export default function ManageEventsTable() {
         },
     })
 
-    const nonAdminUserId =
-        user?.user_type !== UserType.admin ? user?.user_id : undefined
+    const nonAdminUserId = !isAdmin ? user?.user_id : undefined
 
     const {
         ci_past_events,
@@ -213,70 +214,74 @@ export default function ManageEventsTable() {
                     defaultKey="future"
                 />
 
-                <div className="actions-row">
-                    {/* todo: add visable and hidden events */}
-                    <DeleteMultipleEventsButton
-                        eventIds={
-                            showPast
-                                ? selectedRowKeysFuture.map(String)
-                                : selectedRowKeysPast.map(String)
-                        }
-                        className={`multiple-events-action-btn ${
-                            isActiveActions ? "active" : ""
-                        }`}
-                        disabled={
-                            showPast
-                                ? selectedRowKeysFuture.length === 0
-                                : selectedRowKeysPast.length === 0
-                        }
-                        onDelete={onDelete}
-                        removeEventState={removeEventState}
-                    />
-                    <HideMultipleEventsButton
-                        eventIds={
-                            showPast
-                                ? selectedRowKeysFuture.map(String)
-                                : selectedRowKeysPast.map(String)
-                        }
-                        className={`multiple-events-action-btn ${
-                            isActiveActions ? "active" : ""
-                        }`}
-                        disabled={
-                            showPast
-                                ? selectedRowKeysFuture.length === 0
-                                : selectedRowKeysPast.length === 0
-                        }
-                    />
-                    <UnHideMultipleEventsButton
-                        eventIds={
-                            showPast
-                                ? selectedRowKeysFuture.map(String)
-                                : selectedRowKeysPast.map(String)
-                        }
-                        className={`multiple-events-action-btn ${
-                            isActiveActions ? "active" : ""
-                        }`}
-                        disabled={
-                            showPast
-                                ? selectedRowKeysFuture.length === 0
-                                : selectedRowKeysPast.length === 0
-                        }
-                    />
-                </div>
-                <div className="selected-events-count-container">
-                    <span
-                        id="selected-events-count"
-                        className="selected-events-count"
-                    >
-                        {isActiveActions
-                            ? `נבחרו ${selectedRowKeysFuture.length} אירועים`
-                            : `נבחרו ${selectedRowKeysPast.length} אירועים`}
-                    </span>
-                </div>
+                {isAdmin && (
+                    <>
+                        <div className="actions-row">
+                            <DeleteMultipleEventsButton
+                                eventIds={
+                                    showPast
+                                        ? selectedRowKeysFuture.map(String)
+                                        : selectedRowKeysPast.map(String)
+                                }
+                                className={`multiple-events-action-btn ${
+                                    isActiveActions ? "active" : ""
+                                }`}
+                                disabled={
+                                    showPast
+                                        ? selectedRowKeysFuture.length === 0
+                                        : selectedRowKeysPast.length === 0
+                                }
+                                onDelete={onDelete}
+                                removeEventState={removeEventState}
+                            />
+                            <HideMultipleEventsButton
+                                eventIds={
+                                    showPast
+                                        ? selectedRowKeysFuture.map(String)
+                                        : selectedRowKeysPast.map(String)
+                                }
+                                className={`multiple-events-action-btn ${
+                                    isActiveActions ? "active" : ""
+                                }`}
+                                disabled={
+                                    showPast
+                                        ? selectedRowKeysFuture.length === 0
+                                        : selectedRowKeysPast.length === 0
+                                }
+                            />
+                            <UnHideMultipleEventsButton
+                                eventIds={
+                                    showPast
+                                        ? selectedRowKeysFuture.map(String)
+                                        : selectedRowKeysPast.map(String)
+                                }
+                                className={`multiple-events-action-btn ${
+                                    isActiveActions ? "active" : ""
+                                }`}
+                                disabled={
+                                    showPast
+                                        ? selectedRowKeysFuture.length === 0
+                                        : selectedRowKeysPast.length === 0
+                                }
+                            />
+                        </div>
+
+                        <div className="selected-events-count-container">
+                            <span
+                                id="selected-events-count"
+                                className="selected-events-count"
+                            >
+                                {isActiveActions
+                                    ? `נבחרו ${selectedRowKeysFuture.length} אירועים`
+                                    : `נבחרו ${selectedRowKeysPast.length} אירועים`}
+                            </span>
+                        </div>
+                    </>
+                )}
             </header>
 
             <Table
-                rowSelection={rowSelection}
+                rowSelection={isAdmin ? rowSelection : undefined}
                 columns={getColumns(
                     tableParams,
                     ci_events_teachers,
