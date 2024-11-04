@@ -1,4 +1,3 @@
-import { PostgrestError } from "@supabase/supabase-js"
 import { UserType } from "../util/interfaces"
 import { supabase } from "./client"
 

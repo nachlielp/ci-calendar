@@ -58,23 +58,23 @@ export function MenuDrawer() {
         {
             key: "edit-events",
             icon: "calendar",
-            label: "ניהול ארועים",
+            label: "הארועים שלי",
             onClick: () => {
                 navigate("/manage-events")
                 setOpen(false)
             },
             disabled: !isCreator,
         },
-        {
-            key: "create-event",
-            icon: "calendar_add_on",
-            label: "הוספת אירוע",
-            onClick: () => {
-                navigate("/create-events")
-                setOpen(false)
-            },
-            disabled: !isCreator,
-        },
+        // {
+        //     key: "create-event",
+        //     icon: "calendar_add_on",
+        //     label: "הוספת אירוע",
+        //     onClick: () => {
+        //         navigate("/create-events")
+        //         setOpen(false)
+        //     },
+        //     disabled: !isCreator,
+        // },
         {
             key: "manage-users",
             icon: "group",
@@ -103,6 +103,7 @@ export function MenuDrawer() {
                 navigate("/filters-and-notifications")
                 setOpen(false)
             },
+            disabled: true,
         },
         {
             key: "request",

@@ -17,6 +17,8 @@ import { useCIManageEvents } from "../../../hooks/useCIManageEvents"
 import Loading from "../Other/Loading"
 import { SorterResult, TablePaginationConfig } from "antd/lib/table/interface"
 import { GetProp } from "antd/es/_util/type"
+import { LinkButton } from "../Other/LinkButton"
+import { useNavigate } from "react-router-dom"
 
 interface TableParams {
     pagination?: TablePaginationConfig
@@ -84,6 +86,7 @@ const getColumns = (
 
 //TODO fix mess - change the past hook to enclude fuature and past and have its own subsciption
 export default function ManageEventsTable() {
+    const navigate = useNavigate()
     const isPhone = useIsMobile()
     const { user } = useUser()
     const isAdmin = user?.user_type === UserType.admin
@@ -192,6 +195,10 @@ export default function ManageEventsTable() {
         ? selectedRowKeysFuture.length > 0
         : selectedRowKeysPast.length > 0
 
+    function onGoToCreateEvent() {
+        navigate("/create-events")
+    }
+
     return (
         <section className={`manage-events-table `}>
             <header
@@ -199,21 +206,30 @@ export default function ManageEventsTable() {
                     isPhone ? "header-phone" : "header-desktop"
                 }`}
             >
-                <MenuButtons
-                    onSelectKey={onSelectTimeframe}
-                    options={[
-                        {
-                            key: "past",
-                            title: "עבר",
-                        },
-                        {
-                            key: "future",
-                            title: "עתיד",
-                        },
-                    ]}
-                    defaultKey="future"
-                />
-
+                <div className="header-buttons-container">
+                    <button
+                        className="general-action-btn"
+                        onClick={onGoToCreateEvent}
+                    >
+                        <label className="create-event-label">
+                            יצירת אירוע
+                        </label>
+                    </button>
+                    <MenuButtons
+                        onSelectKey={onSelectTimeframe}
+                        options={[
+                            {
+                                key: "past",
+                                title: "עבר",
+                            },
+                            {
+                                key: "future",
+                                title: "עתיד",
+                            },
+                        ]}
+                        defaultKey="future"
+                    />
+                </div>
                 {isAdmin && (
                     <>
                         <div className="actions-row">
