@@ -10,15 +10,12 @@ import { Icon } from "../Other/Icon"
 import { SelectOption } from "../../../util/options"
 import FullEventCard from "./FullEventCard"
 import { useUser } from "../../../context/UserContext"
-import MenuButtons from "../Other/MenuButtons"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import { useCIManageEvents } from "../../../hooks/useCIManageEvents"
 import Loading from "../Other/Loading"
 import { SorterResult, TablePaginationConfig } from "antd/lib/table/interface"
 import { GetProp } from "antd/es/_util/type"
-import { LinkButton } from "../Other/LinkButton"
-import { useNavigate } from "react-router-dom"
 
 interface TableParams {
     pagination?: TablePaginationConfig
@@ -86,7 +83,6 @@ const getColumns = (
 
 //TODO fix mess - change the past hook to enclude fuature and past and have its own subsciption
 export default function ManageEventsTable() {
-    const navigate = useNavigate()
     const isPhone = useIsMobile()
     const { user } = useUser()
     const isAdmin = user?.user_type === UserType.admin
@@ -103,7 +99,6 @@ export default function ManageEventsTable() {
     const nonAdminUserId = !isAdmin ? user?.user_id : undefined
 
     const {
-        ci_past_events,
         ci_future_events,
         ci_events_teachers,
         loading,
@@ -113,16 +108,11 @@ export default function ManageEventsTable() {
         user_id: nonAdminUserId || tableParams.filters?.user_id?.[0],
     })
 
-    const [showPast, setShowPast] = useState(false)
-
     const [selectedRowKeysFuture, setSelectedRowKeysFuture] = useState<
         React.Key[]
     >([])
 
     useEffect(() => {}, [selectedRowKeysFuture])
-    const [selectedRowKeysPast, setSelectedRowKeysPast] = useState<React.Key[]>(
-        []
-    )
 
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
 
@@ -131,18 +121,13 @@ export default function ManageEventsTable() {
     }
 
     function onSelectChange(newSelectedRowKeys: React.Key[]) {
-        if (showPast) {
-            setSelectedRowKeysFuture(newSelectedRowKeys)
-        } else {
-            setSelectedRowKeysPast(newSelectedRowKeys)
-        }
+        setSelectedRowKeysFuture(newSelectedRowKeys)
     }
 
     // function onClear() {}
 
     function onDelete() {
         setSelectedRowKeysFuture([])
-        setSelectedRowKeysPast([])
         setExpandedRowKeys([])
     }
 
@@ -150,11 +135,6 @@ export default function ManageEventsTable() {
         const event = ci_future_events.find((e) => e.id === eventId)
         if (event) {
             updateEventState(event.id, { ...event, hide })
-        } else {
-            const event = ci_past_events.find((e) => e.id === eventId)
-            if (event) {
-                updateEventState(event.id, { ...event, hide })
-            }
         }
     }
 
@@ -178,12 +158,8 @@ export default function ManageEventsTable() {
         }
     }
 
-    function onSelectTimeframe(key: string) {
-        setShowPast(key === "past")
-    }
-
     const rowSelection = {
-        selectedRowKeys: showPast ? selectedRowKeysFuture : selectedRowKeysPast,
+        selectedRowKeys: selectedRowKeysFuture,
         onChange: onSelectChange,
     }
 
@@ -191,13 +167,7 @@ export default function ManageEventsTable() {
         setExpandedRowKeys(expanded ? [record.id] : [])
     }
 
-    const isActiveActions = showPast
-        ? selectedRowKeysFuture.length > 0
-        : selectedRowKeysPast.length > 0
-
-    function onGoToCreateEvent() {
-        navigate("/create-events")
-    }
+    const isActiveActions = selectedRowKeysFuture.length > 0
 
     return (
         <section className={`manage-events-table `}>
@@ -206,114 +176,50 @@ export default function ManageEventsTable() {
                     isPhone ? "header-phone" : "header-desktop"
                 }`}
             >
-                <div className="header-buttons-container">
-                    <button
-                        className="general-action-btn"
-                        onClick={onGoToCreateEvent}
-                    >
-                        <label className="create-event-label">
-                            יצירת אירוע
-                        </label>
-                    </button>
-                    <MenuButtons
-                        onSelectKey={onSelectTimeframe}
-                        options={[
-                            {
-                                key: "past",
-                                title: "עבר",
-                            },
-                            {
-                                key: "future",
-                                title: "עתיד",
-                            },
-                        ]}
-                        defaultKey="future"
+                <h2>ניהול אירועים</h2>
+                <div className="actions-row">
+                    <div className="selected-events-count-container">
+                        <span className="selected-events-count">
+                            {`נבחרו ${selectedRowKeysFuture.length} אירועים`}
+                        </span>
+                    </div>
+                    <DeleteMultipleEventsButton
+                        eventIds={selectedRowKeysFuture.map(String)}
+                        className={`multiple-events-action-btn ${
+                            isActiveActions ? "active" : ""
+                        }`}
+                        disabled={selectedRowKeysFuture.length === 0}
+                        onDelete={onDelete}
+                        removeEventState={removeEventState}
+                    />
+                    <HideMultipleEventsButton
+                        eventIds={selectedRowKeysFuture.map(String)}
+                        className={`multiple-events-action-btn ${
+                            isActiveActions ? "active" : ""
+                        }`}
+                        disabled={selectedRowKeysFuture.length === 0}
+                    />
+                    <UnHideMultipleEventsButton
+                        eventIds={selectedRowKeysFuture.map(String)}
+                        className={`multiple-events-action-btn ${
+                            isActiveActions ? "active" : ""
+                        }`}
+                        disabled={selectedRowKeysFuture.length === 0}
                     />
                 </div>
-                {isAdmin && (
-                    <>
-                        <div className="actions-row">
-                            <DeleteMultipleEventsButton
-                                eventIds={
-                                    showPast
-                                        ? selectedRowKeysFuture.map(String)
-                                        : selectedRowKeysPast.map(String)
-                                }
-                                className={`multiple-events-action-btn ${
-                                    isActiveActions ? "active" : ""
-                                }`}
-                                disabled={
-                                    showPast
-                                        ? selectedRowKeysFuture.length === 0
-                                        : selectedRowKeysPast.length === 0
-                                }
-                                onDelete={onDelete}
-                                removeEventState={removeEventState}
-                            />
-                            <HideMultipleEventsButton
-                                eventIds={
-                                    showPast
-                                        ? selectedRowKeysFuture.map(String)
-                                        : selectedRowKeysPast.map(String)
-                                }
-                                className={`multiple-events-action-btn ${
-                                    isActiveActions ? "active" : ""
-                                }`}
-                                disabled={
-                                    showPast
-                                        ? selectedRowKeysFuture.length === 0
-                                        : selectedRowKeysPast.length === 0
-                                }
-                            />
-                            <UnHideMultipleEventsButton
-                                eventIds={
-                                    showPast
-                                        ? selectedRowKeysFuture.map(String)
-                                        : selectedRowKeysPast.map(String)
-                                }
-                                className={`multiple-events-action-btn ${
-                                    isActiveActions ? "active" : ""
-                                }`}
-                                disabled={
-                                    showPast
-                                        ? selectedRowKeysFuture.length === 0
-                                        : selectedRowKeysPast.length === 0
-                                }
-                            />
-                        </div>
-
-                        <div className="selected-events-count-container">
-                            <span
-                                id="selected-events-count"
-                                className="selected-events-count"
-                            >
-                                {isActiveActions
-                                    ? `נבחרו ${selectedRowKeysFuture.length} אירועים`
-                                    : `נבחרו ${selectedRowKeysPast.length} אירועים`}
-                            </span>
-                        </div>
-                    </>
-                )}
             </header>
 
             <Table
-                rowSelection={isAdmin ? rowSelection : undefined}
+                rowSelection={rowSelection}
                 columns={getColumns(
                     tableParams,
                     ci_events_teachers,
                     !!nonAdminUserId
                 )}
-                dataSource={
-                    showPast
-                        ? ci_past_events.map((event) => ({
-                              ...event,
-                              key: event.id,
-                          }))
-                        : ci_future_events.map((event) => ({
-                              ...event,
-                              key: event.id,
-                          }))
-                }
+                dataSource={ci_future_events.map((event) => ({
+                    ...event,
+                    key: event.id,
+                }))}
                 pagination={false}
                 expandable={{
                     expandedRowRender: (event) => (

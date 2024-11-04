@@ -200,6 +200,7 @@ export interface DbUser {
     receive_notifications: boolean
     requests: CIRequest[]
     templates: CITemplate[]
+    ci_events: CIEvent[]
 }
 
 export interface UserBio {

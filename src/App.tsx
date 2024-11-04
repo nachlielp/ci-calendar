@@ -20,9 +20,7 @@ import { useCIEvents } from "./context/CIEventsContext"
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
 )
-const ManageEventsTable = lazy(
-    () => import("./Components/UI/DisplayEvents/ManageEventsTable")
-)
+
 const SupportPage = lazy(() => import("./Components/Pages/SupportPage"))
 const ManageSupportPage = lazy(
     () => import("./Components/Pages/ManageSupportPage")
@@ -37,6 +35,8 @@ const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
+import ManageAllEventsPage from "./Components/Pages/ManageAllEventsPage"
+import UserEventsTable from "./Components/UI/DisplayEvents/UserEventsTable"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -152,7 +152,7 @@ export default function App() {
                                     path="/manage-events"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            <ManageEventsTable />
+                                            <UserEventsTable />
                                         </Suspense>
                                     }
                                 />
@@ -179,6 +179,14 @@ export default function App() {
                                     element={
                                         <Suspense fallback={<Loading />}>
                                             <AdminPage />
+                                        </Suspense>
+                                    }
+                                />
+                                <Route
+                                    path="/manage-all-events"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <ManageAllEventsPage />
                                         </Suspense>
                                     }
                                 />

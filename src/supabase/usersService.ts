@@ -60,6 +60,9 @@ async function getUser(id: string): Promise<DbUser | null> {
             ),
             bio:public_bio!left (
                 *
+            ),
+            ci_events:ci_events!left (
+                *
             )
         `
             )
@@ -69,6 +72,7 @@ async function getUser(id: string): Promise<DbUser | null> {
             .eq("requests.user_id", id)
             .eq("templates.user_id", id)
             .eq("public_bio.user_id", id)
+            .eq("ci_events.user_id", id)
             .single()
 
         if (error) {
@@ -77,7 +81,7 @@ async function getUser(id: string): Promise<DbUser | null> {
                 return null
             }
         }
-
+        console.log(data)
         return data as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
@@ -232,6 +236,19 @@ async function subscribeToUser(
 
             (payload) => {
                 callback({ table: "users", payload })
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "ci_events",
+                filter: `user_id=eq.${userId}`,
+            },
+
+            (payload) => {
+                callback({ table: "ci_events", payload })
             }
         )
         .on(

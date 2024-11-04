@@ -148,8 +148,52 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             case "users":
                 setUser({ ...user, ...payload.new })
                 break
+            case "ci_events":
+                //TODO handle ci_events
+                switch (payload.eventType) {
+                    case "UPDATE":
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      ci_events: prev.ci_events.map((e) => {
+                                          if (e.id === payload.new.id) {
+                                              return payload.new
+                                          }
+                                          return e
+                                      }),
+                                  }
+                                : null
+                        )
+                        break
+                    case "DELETE":
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      ci_events: prev.ci_events.filter(
+                                          (e) => e.id !== payload.old.id
+                                      ),
+                                  }
+                                : null
+                        )
+                        break
+                    case "INSERT":
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      ci_events: [
+                                          ...prev.ci_events,
+                                          payload.new,
+                                      ],
+                                  }
+                                : null
+                        )
+                        break
+                }
+                break
             case "requests":
-                console.log("requests", payload.new)
                 setUser({
                     ...user,
                     requests: user.requests.map((r) => {

@@ -10,6 +10,7 @@ export default function HideMultipleEventsButton({
     className?: string
     disabled?: boolean
 }) {
+    console.log(eventIds)
     const handleHide = () => {
         cieventsService.updateMultipleCIEvents(eventIds, { hide: true })
     }

@@ -65,16 +65,16 @@ export function MenuDrawer() {
             },
             disabled: !isCreator,
         },
-        // {
-        //     key: "create-event",
-        //     icon: "calendar_add_on",
-        //     label: "הוספת אירוע",
-        //     onClick: () => {
-        //         navigate("/create-events")
-        //         setOpen(false)
-        //     },
-        //     disabled: !isCreator,
-        // },
+        {
+            key: "manage-all-events",
+            icon: "calendar_add_on",
+            label: "ניהול אירועים",
+            onClick: () => {
+                navigate("/manage-all-events")
+                setOpen(false)
+            },
+            disabled: !isAdmin,
+        },
         {
             key: "manage-users",
             icon: "group",
