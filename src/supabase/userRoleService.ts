@@ -39,31 +39,33 @@ async function setUserRole({
 
         if (userError) throw userError
 
+        console.log("t1")
         // Update public_bio table
-        if (user_type !== UserType.user) {
-            const { error: updateError, data: updateData } = await supabase
-                .from("public_bio")
-                .update({
-                    user_type: user_type,
-                    show_profile: true,
-                })
-                .eq("user_id", user_id)
-                .select()
-                .single()
+        const { error: updateError } = await supabase
+            .from("public_bio")
+            .update({ user_type: user_type })
+            .eq("user_id", user_id)
+            .select()
+            .single()
 
-            const { code } = updateError as PostgrestError
-            // If no rows were updated, do an insert
-            if (code === "PGRST116" && !updateData) {
-                const { error: insertError } = await supabase
-                    .from("public_bio")
-                    .insert({
-                        user_id: user_id,
-                        user_type: user_type,
-                    })
-                if (insertError) throw insertError
-            } else if (updateError) {
-                throw updateError
-            }
+        if (updateError) {
+            throw updateError
+        }
+        if (user_type !== UserType.user) {
+            // if (updateError) {
+            //     const { code } = updateError as PostgrestError
+            //     if (code === "PGRST116" && !updateData) {
+            //         const { error: insertError } = await supabase
+            //             .from("public_bio")
+            //             .insert({
+            //                 user_id: user_id,
+            //                 user_type: user_type,
+            //             })
+            //     } else if (updateError) {
+            //         throw updateError
+            //     }
+            //     // If no rows were updated, do an insert
+            // }
         }
 
         return roleData

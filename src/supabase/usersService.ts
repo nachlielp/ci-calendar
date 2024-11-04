@@ -11,6 +11,10 @@ export type ManageUserOption = {
     user_name: string
     user_type: UserType
     email: string
+    role: {
+        id: number
+        role: string
+    }
 }
 export const usersService = {
     getUsers,
@@ -20,6 +24,19 @@ export const usersService = {
     getTaggableUsers,
     getViewableTeachers,
     subscribeToUser,
+}
+
+interface UserWithRole {
+    user_id: string
+    user_name: string
+    user_type: UserType
+    email: string
+    user_role: {
+        role: {
+            id: number
+            role: string
+        }
+    }
 }
 
 async function getUser(id: string): Promise<DbUser | null> {
@@ -109,10 +126,39 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
 
 async function getUsers(): Promise<ManageUserOption[]> {
     try {
-        const { data } = await supabase
-            .from("users")
-            .select("user_id,user_name,user_type,email")
-        return data as ManageUserOption[]
+        const { data } = (await supabase.from("users").select(`
+            user_id,
+            user_name,
+            user_type,
+            email,
+            user_role:user_roles(
+                role:roles(
+                id,
+                    role
+                )
+            )
+        `)) as { data: UserWithRole[] }
+
+        if (!data) return []
+
+        const users = data.map((user) => {
+            if (!user.user_role) {
+                const newUser = { ...user, role: null } as Partial<UserWithRole>
+                delete newUser.user_role
+                return newUser
+            }
+
+            const { role } = user.user_role
+
+            const newUser = { ...user, role: null } as Partial<UserWithRole>
+            if (newUser.user_role) delete newUser.user_role
+            return {
+                ...newUser,
+                role: role,
+            }
+        })
+
+        return users as ManageUserOption[]
     } catch (error) {
         console.error("Error in getUsers:", error)
         return []

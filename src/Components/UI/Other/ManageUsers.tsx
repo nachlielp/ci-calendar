@@ -73,16 +73,21 @@ function ManageUsers() {
 
     const onSetRole = async (user_type: UserType, role_id: number) => {
         if (!selectedUser) return
+
         await userRoleService.setUserRole({
             user_id: selectedUser.user_id,
             user_type: user_type,
             role_id: role_id,
         })
+
         setSelectedUser((prev) =>
             prev
                 ? {
                       ...prev,
-                      user_type: user_type,
+                      role: {
+                          id: role_id,
+                          role: user_type,
+                      },
                   }
                 : null
         )
@@ -91,7 +96,7 @@ function ManageUsers() {
 
     const makeAdmin = (
         <Button
-            disabled={selectedUser?.user_type === UserType.admin}
+            disabled={selectedUser?.role?.id === 1}
             onClick={() => onSetRole(UserType.admin, 1)}
             className="user-btn"
         >
@@ -100,7 +105,7 @@ function ManageUsers() {
     )
     const makeCreator = (
         <Button
-            disabled={selectedUser?.user_type === UserType.creator}
+            disabled={selectedUser?.role?.id === 2}
             onClick={() => onSetRole(UserType.creator, 2)}
             className="user-btn"
         >
@@ -109,7 +114,7 @@ function ManageUsers() {
     )
     const makeOrg = (
         <Button
-            disabled={selectedUser?.user_type === UserType.org}
+            disabled={selectedUser?.role?.id === 3}
             onClick={() => onSetRole(UserType.org, 3)}
             className="user-btn"
         >
@@ -119,7 +124,7 @@ function ManageUsers() {
 
     const makeProfile = (
         <Button
-            disabled={selectedUser?.user_type === UserType.profile}
+            disabled={selectedUser?.role?.id === 4}
             onClick={() => onSetRole(UserType.profile, 4)}
             className="user-btn"
         >
@@ -128,7 +133,7 @@ function ManageUsers() {
     )
     const makeUser = (
         <Button
-            disabled={selectedUser?.user_type === UserType.user}
+            disabled={selectedUser?.role?.id === 5 || !selectedUser?.role}
             onClick={() => onSetRole(UserType.user, 5)}
             className="user-btn"
         >
@@ -167,7 +172,11 @@ function ManageUsers() {
                     <div>
                         <p>{selectedUser.user_name}</p>
                         <p>{selectedUser.email}</p>
-                        <p>{selectedUser.user_type}</p>
+                        <p>
+                            {selectedUser.role
+                                ? selectedUser.role.role
+                                : "user"}
+                        </p>
                     </div>
                 )}
             </Card>
