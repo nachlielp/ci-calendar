@@ -20,6 +20,7 @@ type FieldType = {
     page_title?: string
     upload: string
     show_profile: string
+    allow_tagging: string
 }
 
 interface ProfileFormProps {
@@ -221,6 +222,17 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                                 checkedChildren="גלוי"
                                 unCheckedChildren="מוסתר"
                                 defaultChecked={user?.bio.show_profile}
+                            />
+                        </Form.Item>
+                        <Form.Item<FieldType>
+                            label="אפשרות לתיוג על ידי מורים אחרים"
+                            name="allow_tagging"
+                            valuePropName="checked"
+                        >
+                            <Switch
+                                checkedChildren="גלוי"
+                                unCheckedChildren="מוסתר"
+                                defaultChecked={user?.bio.allow_tagging}
                             />
                         </Form.Item>
                         {inputErrors && (

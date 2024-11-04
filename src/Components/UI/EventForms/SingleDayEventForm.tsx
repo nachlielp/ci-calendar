@@ -48,9 +48,6 @@ export default function SingleDayEventForm({
 }) {
     const [form] = Form.useForm()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
-    // const [repeatOption, setRepeatOption] = useState<EventFrequency>(
-    //     EventFrequency.none
-    // )
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [eventDate, setEventDate] = useState(dayjs())
