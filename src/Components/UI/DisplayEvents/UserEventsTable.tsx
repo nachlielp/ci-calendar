@@ -9,7 +9,6 @@ import { useUser } from "../../../context/UserContext"
 import MenuButtons from "../Other/MenuButtons"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { useCIManageEvents } from "../../../hooks/useCIManageEvents"
 import Loading from "../Other/Loading"
 import { useNavigate } from "react-router-dom"
 
@@ -52,31 +51,21 @@ const getColumns = (): ColumnsType<CIEvent> => [
 export default function UserEventsTable() {
     const navigate = useNavigate()
     const isPhone = useIsMobile()
-    const { user } = useUser()
-
-    const {
-        ci_past_events,
-        ci_future_events,
-        loading,
-        updateEventState,
-        removeEventState,
-    } = useCIManageEvents({
-        user_id: user?.user_id,
-    })
+    const { user, updateUserState } = useUser()
 
     const [showPast, setShowPast] = useState(false)
 
     const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
 
-    if (loading) {
+    if (!user) {
         return <Loading />
     }
 
-    function handleHideEventState(eventId: string, hide: boolean) {
-        const event = ci_future_events.find((e) => e.id === eventId)
-        if (event) {
-            updateEventState(event.id, { ...event, hide })
-        }
+    function removeEventState(eventId: string) {
+        if (!user) return
+        updateUserState({
+            ci_events: user.ci_events.filter((e) => e.id !== eventId),
+        })
     }
 
     function onSelectTimeframe(key: string) {
@@ -128,14 +117,32 @@ export default function UserEventsTable() {
                 columns={getColumns()}
                 dataSource={
                     showPast
-                        ? ci_past_events.map((event) => ({
-                              ...event,
-                              key: event.id,
-                          }))
-                        : ci_future_events.map((event) => ({
-                              ...event,
-                              key: event.id,
-                          }))
+                        ? user.ci_events
+                              .filter((e) => dayjs(e.start_date) < dayjs())
+                              .sort((a, b) =>
+                                  dayjs(a.start_date).isBefore(
+                                      dayjs(b.start_date)
+                                  )
+                                      ? 1
+                                      : -1
+                              )
+                              .map((event) => ({
+                                  ...event,
+                                  key: event.id,
+                              }))
+                        : user.ci_events
+                              .filter((e) => dayjs(e.start_date) >= dayjs())
+                              .sort((a, b) =>
+                                  dayjs(a.start_date).isBefore(
+                                      dayjs(b.start_date)
+                                  )
+                                      ? -1
+                                      : 1
+                              )
+                              .map((event) => ({
+                                  ...event,
+                                  key: event.id,
+                              }))
                 }
                 pagination={false}
                 expandable={{
@@ -144,8 +151,8 @@ export default function UserEventsTable() {
                             <FullEventCard event={event} />
                             <ManageEventActions
                                 event={event}
-                                updateEventState={updateEventState}
-                                updateEventHideState={handleHideEventState}
+                                updateEventState={() => {}}
+                                updateEventHideState={() => {}}
                                 removeEventState={removeEventState}
                             />
                         </div>
