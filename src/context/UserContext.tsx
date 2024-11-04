@@ -149,7 +149,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 setUser({ ...user, ...payload.new })
                 break
             case "ci_events":
-                //TODO handle ci_events
                 switch (payload.eventType) {
                     case "UPDATE":
                         setUser((prev) =>

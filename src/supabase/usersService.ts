@@ -81,7 +81,6 @@ async function getUser(id: string): Promise<DbUser | null> {
                 return null
             }
         }
-        console.log(data)
         return data as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
