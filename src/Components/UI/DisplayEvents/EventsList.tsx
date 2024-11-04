@@ -19,17 +19,23 @@ export default function EventsList({ events, isEvents }: IEventsListProps) {
     return (
         <div className="events-list-container">
             {!isEvents && emptyEventsList()}
-            {events.map((event) => (
-                <div
-                    key={event.id}
-                    ref={(el) => (eventRefs.current[event.id] = el)}
-                >
-                    <FullEventCardContainer
-                        event={event}
-                        anchorEl={<EventPreview key={event.id} event={event} />}
-                    />
-                </div>
-            ))}
+            {events.map((event) =>
+                event.cancelled ? (
+                    <EventPreview key={event.id} event={event} />
+                ) : (
+                    <div
+                        key={event.id}
+                        ref={(el) => (eventRefs.current[event.id] = el)}
+                    >
+                        <FullEventCardContainer
+                            event={event}
+                            anchorEl={
+                                <EventPreview key={event.id} event={event} />
+                            }
+                        />
+                    </div>
+                )
+            )}
             <div className="events-list-footer"></div>
         </div>
     )

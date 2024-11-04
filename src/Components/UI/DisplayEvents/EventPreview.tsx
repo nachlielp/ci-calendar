@@ -50,7 +50,16 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         })
 
         return (
-            <Card ref={ref} className="event-preview" style={{ width: "100%" }}>
+            <Card
+                ref={ref}
+                className={`event-preview ${event.cancelled && "cancelled"}`}
+                style={{ width: "100%" }}
+            >
+                {event.cancelled && (
+                    <article className="cancelled-event-label">
+                        האירוע בוטל
+                    </article>
+                )}
                 <article className="event-header">
                     <h2 className="event-title">{event.title}&nbsp;</h2>
                 </article>

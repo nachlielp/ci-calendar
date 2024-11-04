@@ -214,8 +214,8 @@ export default function SingleDayEventForm({
                             values["event-orgs"],
                             orgs
                         ) || [],
+                    cancelled: false,
                 }
-                // setSubmitted(true)
                 const newEvent = await cieventsService.createCIEvent(event)
                 addEventState(newEvent as CIEvent)
                 clearForm()

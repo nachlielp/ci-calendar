@@ -136,6 +136,7 @@ export default function MultiDayEventForm({
                 }
                 const event: DBCIEvent = {
                     is_notified: false,
+                    cancelled: false,
                     start_date: dates[0]
                         .hour(13)
                         .minute(0)

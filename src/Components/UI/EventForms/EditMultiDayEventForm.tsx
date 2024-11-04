@@ -87,6 +87,7 @@ export default function EditMultiDayEventForm({
 
             const updatedEvent: DBCIEvent = {
                 is_notified: event.is_notified,
+                cancelled: event.cancelled,
                 start_date:
                     newDates?.[0]
                         ?.hour(13)

@@ -177,6 +177,7 @@ export default function EditSingleDayEventForm({
                 editType === EventAction.recycle ? uuidv4() : event.id
             const updatedEvent: DBCIEvent = {
                 is_notified: event.is_notified,
+                cancelled: event.cancelled,
                 start_date: baseDate
                     .hour(13)
                     .minute(0)
