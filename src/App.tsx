@@ -29,7 +29,6 @@ const FiltersAndNotificationsPage = lazy(
     () => import("./Components/Pages/FiltersAndNotificationsPage")
 )
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
-const AdminPage = lazy(() => import("./Components/Pages/AdminPage"))
 const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
 
 import dayjs from "dayjs"
@@ -174,14 +173,6 @@ export default function App() {
                                     />
                                 }
                             >
-                                <Route
-                                    path="/admin"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <AdminPage />
-                                        </Suspense>
-                                    }
-                                />
                                 <Route
                                     path="/manage-all-events"
                                     element={

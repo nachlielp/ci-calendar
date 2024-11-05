@@ -1,5 +1,4 @@
 import AutoComplete from "antd/es/auto-complete"
-import Button from "antd/es/button"
 import Card from "antd/es/card"
 import Input from "antd/es/input"
 import { useEffect, useState } from "react"
@@ -95,50 +94,50 @@ function ManageUsers() {
     const cardWidth = Math.min(width * 0.9, 500)
 
     const makeAdmin = (
-        <Button
+        <button
             disabled={selectedUser?.role?.id === 1}
             onClick={() => onSetRole(UserType.admin, 1)}
             className="user-btn"
         >
-            הגדרה כמנהל
-        </Button>
+            מנהל
+        </button>
     )
     const makeCreator = (
-        <Button
+        <button
             disabled={selectedUser?.role?.id === 2}
             onClick={() => onSetRole(UserType.creator, 2)}
             className="user-btn"
         >
-            הגדרה כיוצר
-        </Button>
+            יוצר
+        </button>
     )
     const makeOrg = (
-        <Button
+        <button
             disabled={selectedUser?.role?.id === 3}
             onClick={() => onSetRole(UserType.org, 3)}
             className="user-btn"
         >
-            הגדרה כארגון
-        </Button>
+            ארגון
+        </button>
     )
 
     const makeProfile = (
-        <Button
+        <button
             disabled={selectedUser?.role?.id === 4}
             onClick={() => onSetRole(UserType.profile, 4)}
             className="user-btn"
         >
-            הגדרה כפרופיל
-        </Button>
+            פרופיל
+        </button>
     )
     const makeUser = (
-        <Button
+        <button
             disabled={selectedUser?.role?.id === 5 || !selectedUser?.role}
             onClick={() => onSetRole(UserType.user, 5)}
             className="user-btn"
         >
-            הגדרה כמשתמש
-        </Button>
+            משתמש
+        </button>
     )
     const footer = selectedUser
         ? [makeAdmin, makeOrg, makeCreator, makeProfile, makeUser]

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import Alert from "antd/es/alert"
-import Button from "antd/es/button"
 import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
@@ -144,12 +143,11 @@ export default function Signup() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="general-action-btn"
+                        className="general-action-btn large-btn"
                     >
                         הרשמה
                     </button>
-                    <Button
-                        type="default"
+                    <button
                         onClick={onSupabaseGoogleSignIn}
                         disabled={loading}
                         className="google-button"
@@ -160,9 +158,8 @@ export default function Signup() {
                             icon="google_color"
                             className="icon-main google-icon"
                         />
-                    </Button>
+                    </button>
                 </article>
-                <Form.Item></Form.Item>
             </Form>
         </Card>
     )

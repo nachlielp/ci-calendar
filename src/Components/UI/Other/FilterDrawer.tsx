@@ -1,5 +1,4 @@
 import { useState } from "react"
-import Button from "antd/es/button"
 import Drawer from "antd/es/drawer"
 import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../../util/options"
@@ -16,13 +15,13 @@ export default function FilterDrawer() {
 
     return (
         <div className="filter-drawer">
-            <Button
+            <button
                 onClick={() => setModalOpen(true)}
                 className={`anchor-btn ${isSelectedFilter && "active"}`}
             >
                 <p className="text">סינון</p>
                 <Icon icon="instantMix" className="filter-drawer-icon" />
-            </Button>
+            </button>
 
             <Drawer
                 title={<h2 className="filter-drawer-title">סינון</h2>}

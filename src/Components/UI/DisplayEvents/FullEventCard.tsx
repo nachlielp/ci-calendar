@@ -1,4 +1,3 @@
-import Button from "antd/es/button"
 import Tag from "antd/es/tag"
 import { EventlyType, CIEvent } from "../../../util/interfaces"
 import { Icon } from "../Other/Icon"
@@ -184,16 +183,15 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
             <article className="event-links">
                 {ci_event.links.length > 0 &&
                     ci_event.links.map((link) => (
-                        <Button
+                        <a
                             key={link.title}
-                            type="default"
                             href={link.link}
                             target="_blank"
                             className="link-button"
                         >
                             <label className="link-label">{link.title}</label>
                             <Icon icon="openInNew" className="link-icon" />
-                        </Button>
+                        </a>
                     ))}
             </article>
 

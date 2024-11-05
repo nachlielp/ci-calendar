@@ -1,4 +1,3 @@
-import Button from "antd/es/button"
 import { Link } from "react-router-dom"
 
 interface ILinkButtonProps {
@@ -17,22 +16,21 @@ export const LinkButton = ({
     label,
     className,
     disabled,
-    shape,
     onClick,
     children,
 }: ILinkButtonProps) => {
     return (
         <Link to={to} className="link-btn" style={{ textDecoration: "none" }}>
-            <Button
-                className={`${className} `} // Add flexbox utilities
+            <button
+                className={`btn ${className} `} // Add flexbox utilities
                 disabled={disabled}
-                shape={shape}
+                // shape={shape}
                 onClick={onClick}
                 title={label}
                 style={{ textDecoration: "none" }}
             >
                 {children}
-            </Button>
+            </button>
         </Link>
     )
 }

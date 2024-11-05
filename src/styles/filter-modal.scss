@@ -12,6 +12,9 @@
         background: none;
         color: #000;
         border: 1px solid #000 !important;
+        border-radius: 6px;
+        cursor: pointer;
+
         &.active {
             background: rgba(0, 0, 0, 0.2);
         }
@@ -27,6 +30,7 @@
         font-size: 1.125rem;
         font-weight: 500;
         margin-right: 0.4rem;
+        cursor: pointer;
     }
 
     .filter-model-button.active {
@@ -37,22 +41,8 @@
         width: 24px;
         height: 24px;
         color: #fff;
+        cursor: pointer;
     }
-
-    // .filter-model-title {
-    //     font-size: 1.125rem;
-    //     /* font-family: 'Rubik', sans-serif; */
-
-    // }
-
-    // .filter-model-checkbox {
-    //     transform: scale(1.2);
-    //     margin: 6px;
-    // }
-
-    // .filter-model-checkbox-label {
-    //     font-size: 1.125rem;
-    // }
 }
 
 .filter-model {

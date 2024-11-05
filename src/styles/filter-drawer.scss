@@ -20,6 +20,9 @@
         background: none;
         color: #000;
         border: 1px solid #000 !important;
+        border-radius: 6px;
+        cursor: pointer;
+
         &.active {
             background: rgba(0, 0, 0, 0.2);
         }
@@ -34,11 +37,13 @@
             font-size: 1.125rem;
             font-weight: 500;
             margin-right: 0.4rem;
+            cursor: pointer;
         }
 
         .filter-drawer-icon {
             width: 24px;
             height: 24px;
+            cursor: pointer;
         }
     }
 

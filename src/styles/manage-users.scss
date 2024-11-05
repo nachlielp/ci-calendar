@@ -15,9 +15,16 @@
         height: 48px;
         white-space: normal; // Allow text to wrap
         text-align: center; // Center the text
-        padding: 0 2px;
+        padding: 0 16px;
         margin: 0 2px;
         cursor: pointer;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 400;
+        &:hover {
+            background-color: #e3d7d7;
+        }
     }
 
     .manage-users-card {

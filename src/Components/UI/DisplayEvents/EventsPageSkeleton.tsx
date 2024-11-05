@@ -1,6 +1,5 @@
 import MenuButtons from "../Other/MenuButtons"
 import { Icon } from "../Other/Icon"
-import Button from "antd/es/button"
 import Skeleton from "antd/es/skeleton"
 import Card from "antd/es/card"
 
@@ -43,17 +42,20 @@ export default function EventsPageHeader() {
                             defaultKey="list"
                         />
                         <div className="filter-model-container">
-                            <Button
+                            <button
                                 onClick={() => {}}
                                 className={`anchor-btn `}
                                 disabled
+                                style={{
+                                    borderRadius: "6px",
+                                }}
                             >
                                 <p className="text">סינון</p>
                                 <Icon
                                     icon="instantMix"
                                     className="filter-model-icon"
                                 />
-                            </Button>
+                            </button>
                         </div>
                     </main>
                     <Card

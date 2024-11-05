@@ -1,6 +1,5 @@
 import { useState, useRef } from "react"
 import Alert from "antd/es/alert"
-import Button from "antd/es/button"
 import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
@@ -59,18 +58,17 @@ export default function Login() {
         <Card id="login-form" className="login-form">
             <h1 className="login-title">כניסה והזדהות</h1>
             <div>
-                <Button
-                    type="default"
+                <button
                     onClick={onSupabaseGoogleSignIn}
                     disabled={loading}
-                    className="google-button default-font"
+                    className="google-button default-font "
                 >
                     <label className="google-button-label">כניסה עם </label>
                     <Icon
                         icon="google_color"
                         className="icon-main google-icon"
                     />
-                </Button>
+                </button>
             </div>
             <Form
                 name="basic"
@@ -111,7 +109,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="general-action-btn"
+                        className="general-action-btn "
                     >
                         כניסה
                     </button>

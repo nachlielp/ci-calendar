@@ -1,5 +1,4 @@
 import { useState } from "react"
-import Button from "antd/es/button"
 import Modal from "antd/es/modal"
 import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../../util/options"
@@ -16,13 +15,13 @@ export default function FilterModel() {
 
     return (
         <div className="filter-model-container">
-            <Button
+            <button
                 onClick={() => setModalOpen(true)}
                 className={`anchor-btn ${isSelectedFilter && "active"}`}
             >
                 <p className="text">סינון</p>
                 <Icon icon="instantMix" className="filter-model-icon" />
-            </Button>
+            </button>
 
             <Modal
                 className="filter-model"

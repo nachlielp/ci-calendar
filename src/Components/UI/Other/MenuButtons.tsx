@@ -1,4 +1,3 @@
-import Button from "antd/es/button"
 import { Icon } from "./Icon"
 import { useState } from "react"
 
@@ -27,7 +26,7 @@ export default function MenuButtons({
     return (
         <div className={`menu-btns ${direction}`}>
             {options.map((option, index) => (
-                <Button
+                <button
                     key={option.key}
                     onClick={() => {
                         setSelectedBtn(option.key)
@@ -45,7 +44,7 @@ export default function MenuButtons({
                     {option.icon && (
                         <Icon icon={option.icon} className="menu-btn-icon" />
                     )}
-                </Button>
+                </button>
             ))}
         </div>
     )

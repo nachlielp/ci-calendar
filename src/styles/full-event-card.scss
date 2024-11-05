@@ -115,18 +115,25 @@
             margin-bottom: 4px;
             text-decoration: none;
             border: 2px solid #bc3528;
-            padding: 8px;
+            padding: 0 4px;
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
 
             .link-label {
                 font-size: 18px;
                 font-weight: 400;
                 margin-left: 8px;
+                color: #000;
+                cursor: pointer;
             }
 
             .link-icon {
                 .injected-svg {
-                    width: 16px;
-                    height: 16px;
+                    margin-top: 6px;
+                    width: 20px;
+                    height: 20px;
+                    cursor: pointer;
                 }
             }
         }
