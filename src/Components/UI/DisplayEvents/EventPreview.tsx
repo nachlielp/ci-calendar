@@ -52,7 +52,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         return (
             <Card
                 ref={ref}
-                className={`event-preview ${event.cancelled && "cancelled"}`}
+                className={`event-preview `}
                 style={{ width: "100%" }}
             >
                 {event.cancelled && (
@@ -60,79 +60,100 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         האירוע בוטל
                     </article>
                 )}
-                <article className="event-header">
-                    <h2 className="event-title">{event.title}&nbsp;</h2>
-                </article>
-                {orgs.length > 0 && (
-                    <article className="event-org">
-                        <Icon icon="domain" className="event-icon" />
-                        <label className="event-label">{orgs.join(", ")}</label>
+                <section
+                    className={`event-preview-content ${
+                        event.cancelled && "cancelled"
+                    }`}
+                >
+                    <article className="event-header">
+                        <h2 className="event-title">{event.title}&nbsp;</h2>
                     </article>
-                )}
-                <article className="event-dates">
-                    {event.segments.length > 0 ? (
-                        <>
-                            <Icon icon="calendar" className="event-icon" />
+                    {orgs.length > 0 && (
+                        <article className="event-org">
+                            <Icon icon="domain" className="event-icon" />
                             <label className="event-label">
-                                {utilService.formatHebrewDate(event.start_date)}
+                                {orgs.join(", ")}
                             </label>
-                            <Icon icon="schedule" className="event-icon" />
-                            <label className="event-label">
-                                {dayjs(event.segments[0].startTime).format(
-                                    "HH:mm"
-                                )}
-                                &nbsp;-&nbsp;
-                                {dayjs(
-                                    event.segments[segmentsLength - 1].endTime
-                                ).format("HH:mm")}
-                            </label>
-                        </>
-                    ) : (
-                        <>
-                            <Icon icon="calendar" className="event-icon" />
-                            <label className="event-label">
-                                {utilService.formatHebrewDate(event.start_date)}{" "}
-                                - {utilService.formatHebrewDate(event.end_date)}
-                            </label>
-                        </>
+                        </article>
                     )}
-                </article>
+                    <article className="event-dates">
+                        {event.segments.length > 0 ? (
+                            <>
+                                <Icon icon="calendar" className="event-icon" />
+                                <label className="event-label">
+                                    {utilService.formatHebrewDate(
+                                        event.start_date
+                                    )}
+                                </label>
+                                <Icon icon="schedule" className="event-icon" />
+                                <label className="event-label">
+                                    {dayjs(event.segments[0].startTime).format(
+                                        "HH:mm"
+                                    )}
+                                    &nbsp;-&nbsp;
+                                    {dayjs(
+                                        event.segments[segmentsLength - 1]
+                                            .endTime
+                                    ).format("HH:mm")}
+                                </label>
+                            </>
+                        ) : (
+                            <>
+                                <Icon icon="calendar" className="event-icon" />
+                                <label className="event-label">
+                                    {utilService.formatHebrewDate(
+                                        event.start_date
+                                    )}{" "}
+                                    -{" "}
+                                    {utilService.formatHebrewDate(
+                                        event.end_date
+                                    )}
+                                </label>
+                            </>
+                        )}
+                    </article>
 
-                <article className="event-location">
-                    <Icon icon="pinDrop" className="event-icon" />
-                    <label className="event-label">{event.address.label}</label>
-                </article>
-
-                {(teachers.length > 0 || singleDayTeacherNames.length > 0) && (
-                    <article className="event-teachers">
-                        <Icon icon="person" className="event-icon" />
+                    <article className="event-location">
+                        <Icon icon="pinDrop" className="event-icon" />
                         <label className="event-label">
-                            עם{" "}
-                            {teachers.map((item, index, array) => (
-                                <React.Fragment key={index}>
-                                    {item}
-                                    {index < array.length - 1 && ", "}
-                                </React.Fragment>
-                            ))}
+                            {event.address.label}
                         </label>
                     </article>
-                )}
 
-                <article className="event-tags">
-                    {getTypes(
-                        Object.values(event.segments)
-                            .flatMap((segment) => segment.type as EventlyType)
-                            .concat(event.type as EventlyType)
-                    ).map((type, index) => (
-                        <Tag
-                            color="blue"
-                            key={`${type}-${index}`}
-                            className="event-tag"
-                        >
-                            {type}
-                        </Tag>
-                    ))}
-                </article>
+                    {(teachers.length > 0 ||
+                        singleDayTeacherNames.length > 0) && (
+                        <article className="event-teachers">
+                            <Icon icon="person" className="event-icon" />
+                            <label className="event-label">
+                                עם{" "}
+                                {teachers.map((item, index, array) => (
+                                    <React.Fragment key={index}>
+                                        {item}
+                                        {index < array.length - 1 && ", "}
+                                    </React.Fragment>
+                                ))}
+                            </label>
+                        </article>
+                    )}
+
+                    <article className="event-tags">
+                        {getTypes(
+                            Object.values(event.segments)
+                                .flatMap(
+                                    (segment) => segment.type as EventlyType
+                                )
+                                .concat(event.type as EventlyType)
+                        ).map((type, index) => (
+                            <Tag
+                                color="blue"
+                                key={`${type}-${index}`}
+                                className="event-tag"
+                            >
+                                {type}
+                            </Tag>
+                        ))}
+                    </article>
+                </section>
             </Card>
         )
     }

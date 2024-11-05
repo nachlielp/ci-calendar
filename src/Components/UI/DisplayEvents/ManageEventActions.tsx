@@ -1,6 +1,7 @@
 import { DBCIEvent } from "../../../supabase/cieventsService"
 import { CIEvent } from "../../../util/interfaces"
 import FormContainer from "../EventForms/FormContainer"
+import CancelledEventButton from "../Other/CancelleEventButton"
 import DeleteEventButton from "../Other/DeleteEventButton"
 import HideEventButton from "../Other/HideEventButton"
 import { Icon } from "../Other/Icon"
@@ -9,11 +10,13 @@ export default function ManageEventActions({
     event,
     updateEventState,
     updateEventHideState,
+    updateEventCancelledState,
     removeEventState,
 }: {
     event: CIEvent
     updateEventState: (eventId: string, event: DBCIEvent) => void
     updateEventHideState: (eventId: string, hide: boolean) => void
+    updateEventCancelledState: (eventId: string, cancelled: boolean) => void
     removeEventState: (eventId: string) => void
 }) {
     const buttonsArray = [
@@ -45,6 +48,11 @@ export default function ManageEventActions({
             <DeleteEventButton
                 eventId={event.id}
                 removeEventState={removeEventState}
+            />
+            <CancelledEventButton
+                eventId={event.id}
+                cancelled={event.cancelled}
+                updateEventCancelledState={updateEventCancelledState}
             />
             <HideEventButton
                 eventId={event.id}

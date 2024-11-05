@@ -202,7 +202,6 @@ async function updateCIEvent(
         const teacherIds = utilService.getCIEventTeachers(data as CIEvent)
 
         for (const teacherId of teacherIds) {
-            console.log("teacherId: ", teacherId)
             // Check if the junction already exists
             const { data: existingJunction, error: fetchError } = await supabase
                 .from("ci_events_users_junction")

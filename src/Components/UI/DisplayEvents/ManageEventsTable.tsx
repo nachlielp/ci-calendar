@@ -64,13 +64,20 @@ const getColumns = (
                     <span className="event-title">{title}</span>
                     <span className="event-date">
                         {dateString}
+                        &nbsp;
                         {record.hide && (
                             <span className="visibility-off-icon-container">
+                                |
                                 <Icon
                                     icon="visibilityOff"
                                     className="visibility-off-icon minimise-icon"
                                 />
-                                אירוע מוסתר
+                                אירוע מוסתר &nbsp;
+                            </span>
+                        )}
+                        {record.cancelled && (
+                            <span className="cancelled-icon-container">
+                                | אירוע מבוטל &nbsp;
                             </span>
                         )}
                     </span>
@@ -135,6 +142,13 @@ export default function ManageEventsTable() {
         const event = ci_future_events.find((e) => e.id === eventId)
         if (event) {
             updateEventState(event.id, { ...event, hide })
+        }
+    }
+
+    function handleCancelledEventState(eventId: string, cancelled: boolean) {
+        const event = ci_future_events.find((e) => e.id === eventId)
+        if (event) {
+            updateEventState(event.id, { ...event, cancelled })
         }
     }
 
@@ -229,6 +243,9 @@ export default function ManageEventsTable() {
                                 event={event}
                                 updateEventState={updateEventState}
                                 updateEventHideState={handleHideEventState}
+                                updateEventCancelledState={
+                                    handleCancelledEventState
+                                }
                                 removeEventState={removeEventState}
                             />
                         </div>
