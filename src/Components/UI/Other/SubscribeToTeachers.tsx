@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react"
-import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { useUser } from "../../../context/UserContext"
 import debounce from "lodash/debounce"
 import { usersService } from "../../../supabase/usersService"
 import DoubleBindedSelect from "./DoubleBindedSelectProps"
 import Loading from "./Loading"
+import { usePublicBioList } from "../../../hooks/usePublicBioList"
 
 export default function SubscribeToTeachers() {
     const { user } = useUser()
-    const { teachers, loading, orgs } = useTaggableUsersList({ addSelf: false })
+    const { teachers, loading, orgs } = usePublicBioList()
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>(
         user?.subscriptions.teachers || []
     )

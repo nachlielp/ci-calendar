@@ -80,6 +80,7 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
             show_profile: Boolean(show_profile),
             allow_tagging: Boolean(allow_tagging),
             user_id: user.user_id,
+            user_type: user.user_type,
         }
         try {
             const updatedUser = await publicBioService.updateTeacherBio(

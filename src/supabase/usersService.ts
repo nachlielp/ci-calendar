@@ -23,6 +23,7 @@ export const usersService = {
     createUser,
     getTaggableUsers,
     getViewableTeachers,
+    getPublicBioList,
     subscribeToUser,
 }
 
@@ -205,13 +206,31 @@ async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
         const { data, error } = await supabase
             .from("users")
             .select(
-                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging"
+                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging,user_type"
             )
             .in("user_id", teacherIds)
             .eq("show_profile", true)
 
         if (error) throw error
         return data as UserBio[]
+    } catch (error) {
+        console.error("Error fetching viewable teachers:", error)
+        throw error
+    }
+}
+async function getPublicBioList(): Promise<UserBio[]> {
+    try {
+        const { data, error } = await supabase
+            .from("public_bio")
+            .select(
+                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging,user_type"
+            )
+            .eq("show_profile", true)
+
+        if (error) throw error
+
+        const filteredData = data.filter((user) => user.bio_name !== "")
+        return filteredData as UserBio[]
     } catch (error) {
         console.error("Error fetching viewable teachers:", error)
         throw error

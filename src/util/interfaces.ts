@@ -213,6 +213,7 @@ export interface UserBio {
     allow_tagging: boolean
     img: string
     about: string
+    user_type: UserType
 }
 
 export interface CIRequestResponse {

@@ -44,18 +44,23 @@ const PushNotificationStatusButton = () => {
     if (!user) return <></>
 
     async function handleChange(checked: boolean) {
-        if (!utilService.isPWA()) {
-            if (!checked && user) {
-                await usersService.updateUser(user.user_id, {
-                    receive_notifications: checked,
-                })
-                setChecked(checked)
-            }
+        if (!utilService.isPWA() && !checked && user) {
+            await usersService.updateUser(user.user_id, {
+                receive_notifications: checked,
+            })
+            setChecked(checked)
             return
         }
-        setChecked(checked)
-        if (checked && status === "default") {
-            requestPermission()
+
+        if (checked) {
+            requestPermission().then(() => {
+                if (user) {
+                    usersService.updateUser(user.user_id, {
+                        receive_notifications: checked,
+                    })
+                }
+                setChecked(checked)
+            })
         } else if (checked && status === "denied") {
             setChecked(false)
         }
@@ -63,6 +68,7 @@ const PushNotificationStatusButton = () => {
             await usersService.updateUser(user.user_id, {
                 receive_notifications: checked,
             })
+            setChecked(checked)
         }
     }
     return (
