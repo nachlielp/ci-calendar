@@ -103,7 +103,7 @@ export function MenuDrawer() {
                 navigate("/filters-and-notifications")
                 setOpen(false)
             },
-            disabled: false,
+            disabled: true,
         },
         {
             key: "request",
