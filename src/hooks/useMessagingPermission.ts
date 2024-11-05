@@ -17,11 +17,7 @@ export default function useMessagingPermission() {
 
     // TODO: use local storage to check if the user has already granted permission
     useEffect(() => {
-        if (utilService.isFirstNotificationPermissionRequest()) {
-            setPermissionStatus("default")
-        } else {
-            checkPermissionsAndToken()
-        }
+        checkPermissionsAndToken()
     }, [user, permissionStatus])
 
     const requestPermission = async () => {
