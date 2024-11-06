@@ -35,7 +35,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import ManageAllEventsPage from "./Components/Pages/ManageAllEventsPage"
-import UserEventsTable from "./Components/UI/DisplayEvents/UserEventsTable"
+import UserEventsList from "./Components/UI/DisplayEvents/UserEventList"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -151,7 +151,8 @@ export default function App() {
                                     path="/manage-events"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            <UserEventsTable />
+                                            {/* <UserEventsTable /> */}
+                                            <UserEventsList />
                                         </Suspense>
                                     }
                                 />

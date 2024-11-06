@@ -9,7 +9,13 @@ import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../Other/SecondaryButton"
 import CIEventNotificationModal from "../Other/CIEventNotificationModal"
 
-export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
+export default function FullEventCard({
+    event: ci_event,
+    showPast,
+}: {
+    event: CIEvent
+    showPast?: boolean
+}) {
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
@@ -231,50 +237,52 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                 </>
             )}
 
-            <article className="event-card-footer">
-                {utilService.isPWA() && (
-                    <CIEventNotificationModal eventId={ci_event.id} />
-                )}
-                {utilService.isPWA() && (
-                    <SecondaryButton
-                        label=""
-                        successLabel=""
-                        icon={"map"}
-                        successIcon={"map"}
-                        callback={() =>
-                            utilService.openGoogleMaps(
-                                ci_event.address.place_id,
-                                ci_event.address.label
-                            )
-                        }
-                    />
-                )}
-                {utilService.isPWA() && (
-                    <SecondaryButton
-                        label=""
-                        successLabel=""
-                        icon={utilService.isIos() ? "ios_share" : "share"}
-                        successIcon={
-                            utilService.isIos() ? "ios_share" : "share"
-                        }
-                        callback={() =>
-                            utilService.handleShareEvent(
-                                ci_event.id,
-                                ci_event.title
-                            )
-                        }
-                    />
-                )}
-                {!utilService.isPWA() && (
-                    <SecondaryButton
-                        label="העתקת קישור"
-                        successLabel="קישור הועתק"
-                        icon="contentCopy"
-                        successIcon="check"
-                        callback={handleCopy}
-                    />
-                )}
-            </article>
+            {!showPast && (
+                <article className="event-card-footer">
+                    {utilService.isPWA() && (
+                        <CIEventNotificationModal eventId={ci_event.id} />
+                    )}
+                    {utilService.isPWA() && (
+                        <SecondaryButton
+                            label=""
+                            successLabel=""
+                            icon={"map"}
+                            successIcon={"map"}
+                            callback={() =>
+                                utilService.openGoogleMaps(
+                                    ci_event.address.place_id,
+                                    ci_event.address.label
+                                )
+                            }
+                        />
+                    )}
+                    {utilService.isPWA() && (
+                        <SecondaryButton
+                            label=""
+                            successLabel=""
+                            icon={utilService.isIos() ? "ios_share" : "share"}
+                            successIcon={
+                                utilService.isIos() ? "ios_share" : "share"
+                            }
+                            callback={() =>
+                                utilService.handleShareEvent(
+                                    ci_event.id,
+                                    ci_event.title
+                                )
+                            }
+                        />
+                    )}
+                    {!utilService.isPWA() && (
+                        <SecondaryButton
+                            label="העתקת קישור"
+                            successLabel="קישור הועתק"
+                            icon="contentCopy"
+                            successIcon="check"
+                            callback={handleCopy}
+                        />
+                    )}
+                </article>
+            )}
         </section>
     )
 }
