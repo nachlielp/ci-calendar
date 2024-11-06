@@ -1,0 +1,240 @@
+.manage-events-list {
+    max-width: 100%;
+    height: calc(100vh - 56px);
+    margin: 0 auto;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .manage-events-header {
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        margin-right: 1rem;
+
+        .manage-events-header-title {
+            width: 100%;
+            text-align: center;
+        }
+        .header-buttons-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 1rem;
+
+            .create-event-label {
+                font-weight: 400;
+                font-size: 16px;
+                line-height: 21px;
+                padding-top: 3px;
+            }
+        }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 40px;
+            background: none;
+            color: #000;
+            border: 1px solid #000;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 21px;
+            color: #000;
+
+            &.active {
+                position: relative;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.2);
+                    pointer-events: none;
+                    z-index: 0;
+                    color: #000;
+                }
+
+                .injected-svg {
+                    position: relative;
+                    z-index: 1;
+                    fill: #fff;
+                }
+
+                &.right {
+                    border-radius: 0 5px 5px 0;
+                }
+
+                &.left {
+                    border-radius: 5px 0 0 5px;
+                }
+            }
+
+            &.right {
+                border-radius: 0 5px 5px 0;
+            }
+
+            &.left {
+                border-radius: 5px 0 0 5px;
+            }
+
+            &:hover {
+                color: #220505;
+                background: none;
+            }
+        }
+    }
+
+    .filters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        margin-left: 10px;
+
+        .filter-select {
+            width: 90%;
+        }
+
+        .filter-input {
+            width: 100%;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .filters-container {
+            flex-direction: row;
+        }
+    }
+
+    .events-container {
+        display: flex;
+        width: 90%;
+        flex-direction: column;
+        background-color: #ffffff;
+        border-radius: 6px;
+        direction: rtl;
+        .event-item {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .event-summary {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            &:first-child {
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+            }
+            &:last-child {
+                border-bottom-left-radius: 6px;
+                border-bottom-right-radius: 6px;
+            }
+
+            &:hover {
+                background-color: #f5f5f5;
+            }
+            &.active {
+                border-bottom: 1px solid #e47764;
+            }
+        }
+
+        .chevron-icon {
+            font-size: 24px;
+            color: #757575;
+            margin-right: 16px;
+            rotate: 180deg;
+            font-size: 32px;
+
+            &.active {
+                rotate: 90deg;
+                margin-left: 6px;
+            }
+        }
+
+        .event-details {
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .event-title {
+            color: #ff0000;
+            font-weight: 500;
+            margin: 0 0 4px 0;
+        }
+
+        .event-meta {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 14px;
+            color: #757575;
+        }
+
+        .event-status {
+            display: flex;
+            align-items: center;
+            margin-right: 8px;
+        }
+
+        .separator {
+            margin: 0 4px;
+        }
+
+        .status-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+        }
+
+        .event-expanded {
+            padding: 16px;
+            background-color: #f5f5f5;
+        }
+    }
+    .no-events-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        align-self: center;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 21px;
+
+        .no-events-message-label {
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 21px;
+        }
+    }
+    @media (max-width: 768px) {
+        .header-phone {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-phone .create-event-button {
+            margin-bottom: 8px;
+        }
+    }
+}

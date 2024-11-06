@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useUser } from "../../../context/UserContext"
 import debounce from "lodash/debounce"
 import { usersService } from "../../../supabase/usersService"
-import DoubleBindedSelect from "./DoubleBindedSelectProps"
+import DoubleBindedSelect from "./DoubleBindedSelect"
 import Loading from "./Loading"
 import { usePublicBioList } from "../../../hooks/usePublicBioList"
 

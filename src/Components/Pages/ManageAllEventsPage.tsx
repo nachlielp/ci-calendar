@@ -1,5 +1,5 @@
-import ManageEventsTable from "../UI/DisplayEvents/ManageEventsTable"
+import ManageEventsList from "../UI/DisplayEvents/ManageEventsList"
 
 export default function ManageAllEventsPage() {
-    return <ManageEventsTable />
+    return <ManageEventsList />
 }

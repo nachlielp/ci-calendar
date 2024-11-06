@@ -151,7 +151,6 @@ export default function App() {
                                     path="/manage-events"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            {/* <UserEventsTable /> */}
                                             <UserEventsList />
                                         </Suspense>
                                     }

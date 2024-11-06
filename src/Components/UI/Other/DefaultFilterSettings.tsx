@@ -1,4 +1,4 @@
-import DoubleBindedSelect from "./DoubleBindedSelectProps"
+import DoubleBindedSelect from "./DoubleBindedSelect"
 import { districtOptions, eventOptions } from "../../../util/options"
 import { useEffect, useState } from "react"
 import debounce from "lodash/debounce"
