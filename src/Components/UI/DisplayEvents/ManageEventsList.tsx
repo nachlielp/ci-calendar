@@ -79,6 +79,7 @@ export default function ManageEventsList() {
             >
                 <h2 className="manage-events-header-title">ניהול אירועים</h2>
                 <div className="filters-container">
+                    {/* TODO - save in local storage for better UX */}
                     <DoubleBindedSelect
                         options={ci_events_teachers}
                         selectedValues={selectedTeachers}
