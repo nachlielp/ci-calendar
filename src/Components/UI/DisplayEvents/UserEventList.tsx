@@ -60,7 +60,8 @@ export default function UserEventsList() {
     }
 
     function onGoToCreateEvent() {
-        navigate("/create-event")
+        console.log("onGoToCreateEvent")
+        navigate("/create-events")
     }
 
     const filteredEvents = pastFutureEvents(user.ci_events, showPast)
@@ -171,6 +172,14 @@ export default function UserEventsList() {
                     </div>
                 ))}
             </div>
+            {!showPast && filteredEvents.length === 0 && (
+                <div className="no-events-message">
+                    <Icon icon="crazy_monster_1" />
+                    <label className="no-events-message-label">
+                        נראה שעדיין אין לכם אירועים
+                    </label>
+                </div>
+            )}
         </section>
     )
 }

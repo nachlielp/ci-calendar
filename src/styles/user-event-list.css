@@ -176,6 +176,25 @@
             background-color: #f5f5f5;
         }
     }
+    .no-events-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        align-self: center;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 21px;
+
+        .no-events-message-label {
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 400;
+            line-height: 21px;
+        }
+    }
     @media (max-width: 768px) {
         .header-phone {
             flex-direction: column;

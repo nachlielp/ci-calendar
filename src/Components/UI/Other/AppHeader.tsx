@@ -42,7 +42,7 @@ export default function AppHeader() {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
-            {isMobile && <InstallPWAButton />}
+            {isMobile && location.pathname === "/" && <InstallPWAButton />}
             {user && (
                 <>
                     <div className="header-actions">
