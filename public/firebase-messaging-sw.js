@@ -1,3 +1,12 @@
+const CACHE_VERSION = "v1" // You can update this to trigger cache refresh
+const CACHE_NAME = `ci-calendar-cache-${CACHE_VERSION}`
+const FILES_TO_CACHE = [
+    // "/",
+    // "/index.html",
+    "./assets/img/Background_2.png",
+    "./assets/img/icon-192.png",
+    "./assets/img/icon-512.png",
+]
 self.addEventListener("push", function (event) {
     const { data } = event.data.json()
 
@@ -32,13 +41,18 @@ const filesToCache = [
 ]
 
 self.addEventListener("install", (e) => {
-    console.log("[ServiceWorker] - Install")
+    console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
     self.skipWaiting()
+
     e.waitUntil(
         (async () => {
-            const cache = await caches.open(cacheName)
-            console.log("[ServiceWorker] - Caching app shell")
-            await cache.addAll(filesToCache)
+            try {
+                const cache = await caches.open(CACHE_NAME)
+                console.log("[ServiceWorker] - Caching app shell")
+                await cache.addAll(FILES_TO_CACHE)
+            } catch (error) {
+                console.error("[ServiceWorker] - Cache failed:", error)
+            }
         })()
     )
 })
@@ -47,23 +61,24 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
     e.waitUntil(
         (async () => {
-            // await self.registration.unregister();
-            console.log("[ServiceWorker] - Unregistered old service worker")
+            console.log("[ServiceWorker] - Checking caches")
 
             const keyList = await caches.keys()
             await Promise.all(
                 keyList.map((key) => {
-                    console.log(key)
-
-                    if (key !== cacheName) {
+                    // Only delete caches that start with 'my-app-cache-' but aren't the current version
+                    if (
+                        key.startsWith("ci-calendar-cache-") &&
+                        key !== CACHE_NAME
+                    ) {
                         console.log("[ServiceWorker] - Removing old cache", key)
                         return caches.delete(key)
                     }
+                    return Promise.resolve()
                 })
             )
         })()
     )
-    self.clients.claim()
 })
 
 //TODO: for navigation with notification links
