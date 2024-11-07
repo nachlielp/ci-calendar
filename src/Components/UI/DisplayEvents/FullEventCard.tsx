@@ -7,7 +7,7 @@ import BioModal from "../DisplayUsers/BioModal"
 import React from "react"
 import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../Other/SecondaryButton"
-import CIEventNotificationModal from "../Other/CIEventNotificationModal"
+// import CIEventNotificationModal from "../Other/CIEventNotificationModal"
 
 export default function FullEventCard({
     event: ci_event,
