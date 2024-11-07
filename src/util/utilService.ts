@@ -161,7 +161,6 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
             orgs: [],
         },
         receive_notifications: false,
-        ci_events: [],
     }
 }
 

@@ -177,6 +177,7 @@ export interface DbUserWithoutJoin
         | "allow_tagging"
         | "img"
         | "bio"
+        | "ci_events"
     > {}
 
 export interface DbUser {
