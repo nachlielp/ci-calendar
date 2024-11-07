@@ -239,9 +239,9 @@ export default function FullEventCard({
 
             {!showPast && (
                 <article className="event-card-footer">
-                    {utilService.isPWA() && (
+                    {/* {utilService.isPWA() && (
                         <CIEventNotificationModal eventId={ci_event.id} />
-                    )}
+                    )} */}
                     {utilService.isPWA() && (
                         <SecondaryButton
                             label=""
