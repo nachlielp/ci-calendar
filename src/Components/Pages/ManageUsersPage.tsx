@@ -2,12 +2,12 @@ import AutoComplete from "antd/es/auto-complete"
 import Card from "antd/es/card"
 import Input from "antd/es/input"
 import { useEffect, useState } from "react"
-import { UserType } from "../../../util/interfaces"
-import { useUsers } from "../../../hooks/useUsers"
-import { useWindowSize } from "../../../hooks/useWindowSize"
-import { ManageUserOption } from "../../../supabase/usersService"
+import { UserType } from "../../util/interfaces"
+import { useUsers } from "../../hooks/useUsers"
+import { useWindowSize } from "../../hooks/useWindowSize"
+import { ManageUserOption } from "../../supabase/usersService"
 import { SelectProps } from "antd/es/select"
-import userRoleService from "../../../supabase/userRoleService"
+import userRoleService from "../../supabase/userRoleService"
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
@@ -30,7 +30,7 @@ const searchResult = (query: string, users: ManageUserOption[]) => {
         }))
 }
 
-function ManageUsers() {
+function ManageUsersPage() {
     const [options, setOptions] = useState<
         SelectProps<ManageUserOption>["options"]
     >([])
@@ -183,4 +183,4 @@ function ManageUsers() {
     )
 }
 
-export default ManageUsers
+export default ManageUsersPage

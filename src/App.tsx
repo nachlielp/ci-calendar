@@ -29,7 +29,7 @@ const FiltersAndNotificationsPage = lazy(
     () => import("./Components/Pages/FiltersAndNotificationsPage")
 )
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
-const ManageUsers = lazy(() => import("./Components/UI/Other/ManageUsers"))
+const ManageUsers = lazy(() => import("./Components/Pages/ManageUsersPage"))
 
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
