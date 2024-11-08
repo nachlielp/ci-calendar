@@ -1,22 +1,22 @@
 "use client"
 
 import { useState } from "react"
-import { CIEvent } from "../../../util/interfaces"
+import { CIEvent } from "../../util/interfaces"
 import dayjs from "dayjs"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
-import { Icon } from "../Other/Icon"
-import FullEventCard from "./FullEventCard"
-import { useUser } from "../../../context/UserContext"
-import MenuButtons from "../Other/MenuButtons"
-import ManageEventActions from "./ManageEventActions"
-import { useIsMobile } from "../../../hooks/useIsMobile"
-import Loading from "../Other/Loading"
+import { Icon } from "../UI/Other/Icon"
+import FullEventCard from "../UI/DisplayEvents/FullEventCard"
+import { useUser } from "../../context/UserContext"
+import MenuButtons from "../UI/Other/MenuButtons"
+import ManageEventActions from "../UI/DisplayEvents/ManageEventActions"
+import { useIsMobile } from "../../hooks/useIsMobile"
+import Loading from "../UI/Other/Loading"
 import { useNavigate } from "react-router-dom"
-import { useCIManageEvents } from "../../../hooks/useCIManageEvents"
+import { useCIManageEvents } from "../../hooks/useCIManageEvents"
 
 dayjs.extend(isSameOrAfter)
 
-export default function UserEventsList() {
+export default function UserEventsListPage() {
     const navigate = useNavigate()
     const isPhone = useIsMobile()
     const { user, updateUserState } = useUser()
