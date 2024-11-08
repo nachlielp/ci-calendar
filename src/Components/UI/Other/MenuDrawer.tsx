@@ -149,7 +149,11 @@ export function MenuDrawer() {
 
     return (
         <>
-            <button onClick={() => setOpen(true)} className="menu-drawer-btn">
+            <button
+                onClick={() => setOpen(true)}
+                className="menu-drawer-btn"
+                aria-label="פתח תפריט"
+            >
                 <Badge count={!isNewResponse && 0} size="small">
                     <Icon icon="menu" className="menu-drawer-icon" />
                 </Badge>

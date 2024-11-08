@@ -6,6 +6,7 @@ interface MenuButtonsProps {
         key: string
         title?: string
         icon?: string
+        ariaLabel?: string
     }[]
     defaultKey: string
     size?: "small" | "medium" | "large"
@@ -37,6 +38,7 @@ export default function MenuButtons({
                     } ${size} ${
                         selectedBtn === option.key ? "active" : ""
                     } ${btnClassName}`}
+                    aria-label={option.ariaLabel}
                 >
                     {option.title && (
                         <label className="label">{option.title}</label>

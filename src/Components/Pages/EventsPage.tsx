@@ -64,10 +64,12 @@ export default function EventsPage({ events }: IEventsPageProps) {
                             {
                                 key: "list",
                                 icon: "viewDay",
+                                ariaLabel: "צפייה ברשימת אירועים",
                             },
                             {
                                 key: "calendar",
                                 icon: "calendar",
+                                ariaLabel: "צפייה באירועים לפי לוח שנה",
                             },
                         ]}
                         defaultKey="list"
