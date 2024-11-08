@@ -187,12 +187,10 @@
 
     .injected-svg {
         margin-top: 6px;
-        // margin-right: 4px;
         width: 24px;
         height: 24px;
     }
 
-    //async
     .secondary-action-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;

@@ -20,9 +20,9 @@
         }
 
         &:hover {
-            color: #000 !important; // Ensure text color remains white on hover
-            border: 1px solid #000 !important; // Ensure border is white on hover
-            background: none !important; // Ensure background is black on hover
+            color: #000 !important;
+            border: 1px solid #000 !important;
+            background: none !important;
         }
     }
 
@@ -106,7 +106,6 @@
             border: none;
             border-bottom: 1px solid #000;
             border-radius: 0;
-            // text-decoration: underline !important;
             box-shadow: none;
             color: #000;
             &.disabled {

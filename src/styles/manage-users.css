@@ -2,7 +2,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    //   justify-content: center;
 
     height: calc(100vh - 56px);
     overflow-y: auto;
@@ -13,8 +12,8 @@
 
     .user-btn {
         height: 48px;
-        white-space: normal; // Allow text to wrap
-        text-align: center; // Center the text
+        white-space: normal;
+        text-align: center;
         padding: 0 16px;
         margin: 0 2px;
         cursor: pointer;
