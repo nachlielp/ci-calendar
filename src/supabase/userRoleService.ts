@@ -38,12 +38,13 @@ async function setUserRole({
 
         if (userError) throw userError
 
-        console.log("t1")
         // Update public_bio table
         const { error: updateError } = await supabase
             .from("public_bio")
-            .update({ user_type: user_type })
-            .eq("user_id", user_id)
+            .upsert(
+                { user_type: user_type, user_id: user_id },
+                { onConflict: "user_id" }
+            )
             .select()
             .single()
 
