@@ -144,6 +144,9 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                         <label className="bio-card-subtitle">
                             <b>קישור</b> (יופיע ככפתור בעמוד הפרופיל)
                         </label>
+                        <Form.Item<FieldType> name="page_title">
+                            <Input placeholder="כותרת" />
+                        </Form.Item>
                         <Form.Item<FieldType>
                             name="page_url"
                             rules={[
@@ -177,9 +180,6 @@ export default function ProfileForm({ closeEditProfile }: ProfileFormProps) {
                             ]}
                         >
                             <Input placeholder="קישור לדף פרופיל" />
-                        </Form.Item>
-                        <Form.Item<FieldType> name="page_title">
-                            <Input placeholder="כותרת קישור לדף פרופיל" />
                         </Form.Item>
 
                         <hr className="bio-card-hr" />
