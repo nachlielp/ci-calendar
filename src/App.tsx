@@ -36,7 +36,7 @@ import Loading from "./Components/Common/Loading"
 import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
 import { useCIEvents } from "./Context/CIEventsContext"
-import BackgroundTiles from "./Components/UI/Layout/BackgroundTiles"
+import BackgroundTiles from "./Components/Layout/BackgroundTiles"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
