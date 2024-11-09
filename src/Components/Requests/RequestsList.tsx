@@ -8,10 +8,10 @@ import {
     RequestType,
     RequestTypeHebrew,
     RequestStatusHebrew,
-} from "../../../util/interfaces"
+} from "../../util/interfaces"
 import { useState } from "react"
-import { requestsService } from "../../../supabase/requestsService"
-import { useUser } from "../../../context/UserContext"
+import { requestsService } from "../../supabase/requestsService"
+import { useUser } from "../../context/UserContext"
 import { TableColumnsType } from "antd/lib"
 
 const columns: TableColumnsType<CIRequest> = [

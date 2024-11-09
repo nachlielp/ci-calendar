@@ -20,10 +20,10 @@ import { SorterResult } from "antd/es/table/interface"
 import { requestsService } from "../../supabase/requestsService"
 import { GetProp } from "antd/es/_util/type"
 import { usersService } from "../../supabase/usersService"
-import AddResponseToSupportReqModal from "../Auth/Requests/AddResponseToSupportReqModal"
 import { useUser } from "../../context/UserContext"
 import dayjs from "dayjs"
 import { Icon } from "../Common/Icon"
+import AddResponseToSupportReqModal from "../Requests/AddResponseToSupportReqModal"
 
 interface TableParams {
     pagination?: TablePaginationConfig

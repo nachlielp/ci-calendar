@@ -3,12 +3,12 @@ import Input from "antd/es/input"
 import Card from "antd/es/card"
 import Select from "antd/es/select"
 
-import { useUser } from "../../../context/UserContext"
-import { requestsService } from "../../../supabase/requestsService"
-import { RequestType } from "../../../util/interfaces"
+import { useUser } from "../../context/UserContext"
+import { requestsService } from "../../supabase/requestsService"
+import { RequestType } from "../../util/interfaces"
 import { useState } from "react"
 import Alert from "antd/es/alert"
-import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
+import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
 
 type RequestFieldType = {
     requestType: RequestType

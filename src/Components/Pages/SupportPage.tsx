@@ -1,6 +1,6 @@
 import { useState } from "react"
-import RequestForm from "../Auth/Requests/RequestForm"
-import RequestsList from "../Auth/Requests/RequestsList"
+import RequestForm from "../Requests/RequestForm"
+import RequestsList from "../Requests/RequestsList"
 import MenuButtons from "../Common/MenuButtons"
 
 export default function SupportPage() {
