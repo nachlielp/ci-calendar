@@ -1,21 +1,17 @@
 import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
-import Loading from "./Components/UI/Other/Loading"
-import AppHeader from "./Components/UI/Other/AppHeader"
+
 import ResetPasswordRequest from "./Components/Auth/ResetPasswordRequest"
 import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 import Login from "./Components/Auth/Login"
 import Signup from "./Components/Auth/Signup"
-import BackgroundTiles from "./Components/UI/Other/BackgroundTiles"
 
 import EventsPage from "./Components/Pages/EventsPage"
 
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"
-import EventsPageSkeleton from "./Components/UI/DisplayEvents/EventsPageSkeleton"
-import { useCIEvents } from "./context/CIEventsContext"
 
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
@@ -29,13 +25,18 @@ const FiltersAndNotificationsPage = lazy(
     () => import("./Components/Pages/FiltersAndNotificationsPage")
 )
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
-const ManageUsers = lazy(() => import("./Components/Pages/ManageUsersPage"))
+const ManageUsersPage = lazy(() => import("./Components/Pages/ManageUsersPage"))
 
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import ManageAllEventsPage from "./Components/Pages/ManageAllEventsPage"
 import UserEventsListPage from "./Components/Pages/UserEventListPage"
+import Loading from "./Components/Common/Loading"
+import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
+import AppHeader from "./Components/Layout/AppHeader"
+import { useCIEvents } from "./Context/CIEventsContext"
+import BackgroundTiles from "./Components/UI/Layout/BackgroundTiles"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -185,7 +186,7 @@ export default function App() {
                                     path="/manage-users"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            <ManageUsers />
+                                            <ManageUsersPage />
                                         </Suspense>
                                     }
                                 />

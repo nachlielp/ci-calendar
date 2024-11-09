@@ -16,14 +16,14 @@ import useRequests from "../../hooks/useRequests"
 import { useState } from "react"
 import { SorterResult } from "antd/es/table/interface"
 // import Highlighter from "react-highlight-words"
-import { Icon } from "../UI/Other/Icon"
 
 import { requestsService } from "../../supabase/requestsService"
 import { GetProp } from "antd/es/_util/type"
 import { usersService } from "../../supabase/usersService"
-import AddResponseToSupportReqModal from "../UI/Other/AddResponseToSupportReqModal"
-import { useUser } from "../../context/UserContext"
+import AddResponseToSupportReqModal from "../Auth/Requests/AddResponseToSupportReqModal"
+import { useUser } from "../../Context/UserContext"
 import dayjs from "dayjs"
+import { Icon } from "../Common/Icon"
 
 interface TableParams {
     pagination?: TablePaginationConfig

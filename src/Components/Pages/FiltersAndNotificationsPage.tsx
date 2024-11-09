@@ -1,6 +1,6 @@
 import Card from "antd/es/card"
-import SubscribeToTeachers from "../UI/Other/SubscribeToTeachers"
-import PushNotificationStatusButton from "../UI/Other/PushNotificationStatusButton"
+import PushNotificationStatusButton from "../Common/PushNotificationStatusButton"
+import SubscribeToTeachers from "../Users/SubscribeToTeachers"
 
 export default function FiltersAndNotificationsPage() {
     return (

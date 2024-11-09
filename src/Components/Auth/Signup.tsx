@@ -5,9 +5,9 @@ import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
 import { supabase } from "../../supabase/client"
-import { Icon } from "../UI/Other/Icon"
+import { useUser } from "../../Context/UserContext"
+import { Icon } from "../Common/Icon"
 
 enum SignupError {
     none = "",

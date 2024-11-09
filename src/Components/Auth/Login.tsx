@@ -4,9 +4,9 @@ import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router-dom"
-import { LinkButton } from "../UI/Other/LinkButton"
 import { supabase } from "../../supabase/client"
-import { Icon } from "../UI/Other/Icon"
+import { Icon } from "../Common/Icon"
+import { LinkButton } from "../Common/LinkButton"
 
 enum LoginError {
     none = "",

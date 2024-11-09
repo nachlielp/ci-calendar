@@ -1,7 +1,7 @@
 import { useState } from "react"
-import RequestForm from "../UI/UserForms/RequestForm"
-import RequestsList from "../UI/Other/RequestsList"
-import MenuButtons from "../UI/Other/MenuButtons"
+import RequestForm from "../Auth/Requests/RequestForm"
+import RequestsList from "../Auth/Requests/RequestsList"
+import MenuButtons from "../Common/MenuButtons"
 
 export default function SupportPage() {
     const [createRequest, setCreateRequest] = useState<boolean>(false)

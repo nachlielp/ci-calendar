@@ -1,4 +1,4 @@
-import ManageEventsList from "../UI/DisplayEvents/ManageEventsList"
+import ManageEventsList from "../Events/Management/ManageEventsList"
 
 export default function ManageAllEventsPage() {
     return <ManageEventsList />

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { supabase } from "../supabase/client"
 import { Session } from "@supabase/supabase-js"
-import Loading from "../Components/UI/Other/Loading"
+import Loading from "../Components/Common/Loading"
 import { useUser } from "./UserContext"
 
 const SessionContext = createContext<{
@@ -19,6 +19,7 @@ export const useSession = () => {
 }
 
 type Props = { children: React.ReactNode }
+
 export const SessionProvider = ({ children }: Props) => {
     const [session, setSession] = useState<Session | null>(null)
     const [isLoading, setIsLoading] = useState(true)

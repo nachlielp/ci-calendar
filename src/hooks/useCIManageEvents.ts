@@ -7,7 +7,7 @@ import {
 } from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import { SelectOption } from "../util/options"
-import { useCIEvents } from "../context/CIEventsContext"
+import { useCIEvents } from "../Context/CIEventsContext"
 
 const MINUTE_MS = 1000 * 60
 

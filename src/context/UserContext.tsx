@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react"
 import { DbUser } from "../util/interfaces"
 import { supabase } from "../supabase/client"
-import { useSession } from "./SessionContext"
 import { usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
 import { RealtimeChannel } from "@supabase/supabase-js"
+import { useSession } from "./SessionContext"
 
 interface IUserContextType {
     user: DbUser | null

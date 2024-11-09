@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { utilService } from "../util/utilService"
-import { useUser } from "../context/UserContext"
+import { useUser } from "../Context/UserContext"
 import { getToken } from "firebase/messaging"
 import { usersService } from "../supabase/usersService"
 import { messaging } from "../firebase.messaging"
