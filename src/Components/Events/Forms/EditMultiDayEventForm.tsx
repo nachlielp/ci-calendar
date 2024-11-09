@@ -11,7 +11,7 @@ import MultiDayFormHead from "./MultiDayFormHead.tsx"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList.ts"
 import { EventAction } from "../../../App.tsx"
-import { useUser } from "../../../Context/UserContext.tsx"
+import { useUser } from "../../../context/UserContext.tsx"
 import {
     cieventsService,
     DBCIEvent,

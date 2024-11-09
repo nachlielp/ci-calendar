@@ -1,11 +1,11 @@
 import Modal from "antd/es/modal"
-import SecondaryButton from "../Common/SecondaryButton"
 import { useState } from "react"
-import { Icon } from "../Common/Icon"
 import Select from "antd/es/select"
-import { useUser } from "../../context/UserContext"
-import { notificationService } from "../../supabase/notificationService"
+import { useUser } from "../../../context/UserContext"
+import { notificationService } from "../../../supabase/notificationService"
 import Alert from "antd/es/alert/Alert"
+import { Icon } from "../../Common/Icon"
+import SecondaryButton from "../../Common/SecondaryButton"
 
 const notificationOptions = [
     { label: " לא רוצה התראה", value: "0" },

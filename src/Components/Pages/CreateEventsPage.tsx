@@ -1,6 +1,6 @@
 import ManageTemplatesList from "../Events/Management/ManageTemplatesList"
 import FormContainer from "../Events/Forms/FormContainer"
-import { useCIEvents } from "../../Context/CIEventsContext"
+import { useCIEvents } from "../../context/CIEventsContext"
 import { Icon } from "../Common/Icon"
 export default function CreateEventsPage() {
     const { updateEventState } = useCIEvents()

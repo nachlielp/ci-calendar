@@ -16,11 +16,11 @@ import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 
-import { useUser } from "../../../Context/UserContext"
+import { useUser } from "../../../context/UserContext"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 
 import Alert from "antd/es/alert"
-import { useCIEvents } from "../../../Context/CIEventsContext"
+import { useCIEvents } from "../../../context/CIEventsContext"
 import {
     CITemplateWithoutId,
     templateService,

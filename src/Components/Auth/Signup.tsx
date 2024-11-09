@@ -6,7 +6,7 @@ import Input from "antd/es/input"
 import { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../supabase/client"
-import { useUser } from "../../Context/UserContext"
+import { useUser } from "../../context/UserContext"
 import { Icon } from "../Common/Icon"
 
 enum SignupError {

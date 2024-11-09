@@ -1,4 +1,4 @@
-import { useUser } from "../../Context/UserContext"
+import { useUser } from "../../context/UserContext"
 import BioCard from "./BioCard"
 
 export default function BioSelfPreview() {

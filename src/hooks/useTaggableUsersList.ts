@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { usersService } from "../supabase/usersService"
-import { useUser } from "../Context/UserContext"
+import { useUser } from "../context/UserContext"
 import { UserType } from "../util/interfaces"
 
 export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {

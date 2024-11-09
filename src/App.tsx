@@ -12,7 +12,7 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
 import BackgroundTiles from "./Components/Layout/BackgroundTiles"
-import { useCIEvents } from "./Context/CIEventsContext"
+import { useCIEvents } from "./context/CIEventsContext"
 
 import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"

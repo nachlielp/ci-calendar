@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useUser } from "../../Context/UserContext"
+import { useUser } from "../../context/UserContext"
 import debounce from "lodash/debounce"
 import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"

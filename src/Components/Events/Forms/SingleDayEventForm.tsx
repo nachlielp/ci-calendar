@@ -18,7 +18,7 @@ import AddPricesForm from "./AddPricesForm"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
-import { useUser } from "../../../Context/UserContext"
+import { useUser } from "../../../context/UserContext"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import {
     CITemplateWithoutId,
@@ -27,7 +27,7 @@ import {
 import { utilService } from "../../../util/utilService"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
-import { useCIEvents } from "../../../Context/CIEventsContext"
+import { useCIEvents } from "../../../context/CIEventsContext"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

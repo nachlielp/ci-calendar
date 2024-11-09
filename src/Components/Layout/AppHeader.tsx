@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom"
-import { useUser } from "../../Context/UserContext"
+import { useUser } from "../../context/UserContext"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { DbUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"

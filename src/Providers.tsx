@@ -1,8 +1,8 @@
 import React from "react"
-import { UserProvider } from "./Context/UserContext"
+import { UserProvider } from "./context/UserContext"
 import ConfigProvider from "antd/es/config-provider"
-import { CIEventsProvider } from "./Context/CIEventsContext"
-import { SessionProvider } from "./Context/SessionContext"
+import { CIEventsProvider } from "./context/CIEventsContext"
+import { SessionProvider } from "./context/SessionContext"
 interface ProvidersProps {
     children: React.ReactNode
 }

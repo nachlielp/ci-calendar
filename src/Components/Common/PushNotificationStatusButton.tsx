@@ -4,7 +4,7 @@ import { Icon } from "../Common/Icon"
 import { utilService } from "../../util/utilService"
 import { PushNotificationPromission } from "../../util/interfaces"
 import Switch from "antd/es/switch"
-import { useUser } from "../../Context/UserContext"
+import { useUser } from "../../context/UserContext"
 import Alert from "antd/es/alert"
 import { usersService } from "../../supabase/usersService"
 
