@@ -125,10 +125,6 @@ export default function UserEventsListPage() {
                                     {event.hide && (
                                         <span className="event-status">
                                             <span className="separator">|</span>
-                                            <Icon
-                                                icon="visibilityOff"
-                                                className="status-icon"
-                                            />
                                             <span>אירוע מוסתר</span>
                                         </span>
                                     )}

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import dayjs from "dayjs"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
-import { Icon } from "../../Common/Icon"
 import FullEventCard from "../Display/FullEventCard"
 import { useUser } from "../../../context/UserContext"
 import ManageEventActions from "./ManageEventActions"
@@ -136,10 +135,6 @@ export default function ManageEventsList() {
                                     {event.hide && (
                                         <span className="event-status">
                                             <span className="separator">|</span>
-                                            <Icon
-                                                icon="visibilityOff"
-                                                className="status-icon"
-                                            />
                                             <span>אירוע מוסתר</span>
                                         </span>
                                     )}
