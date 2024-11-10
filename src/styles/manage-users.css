@@ -37,6 +37,13 @@
         margin-top: 100px;
     }
 
+    .manage-users-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
     @media (max-width: 640px) {
         .manage-users-card {
             max-width: 90%;

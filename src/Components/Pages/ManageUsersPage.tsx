@@ -149,7 +149,6 @@ function ManageUsersPage() {
                 className="manage-users-card"
                 style={{ maxWidth: `${cardWidth}px` }}
                 title="הגדרת משתמשים"
-                actions={footer}
             >
                 <AutoComplete
                     style={{ width: "100%" }}
@@ -178,6 +177,7 @@ function ManageUsersPage() {
                         </p>
                     </div>
                 )}
+                <div className="manage-users-actions">{footer}</div>
             </Card>
         </div>
     )
