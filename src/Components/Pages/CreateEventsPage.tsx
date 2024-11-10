@@ -2,8 +2,15 @@ import ManageTemplatesList from "../Events/Management/ManageTemplatesList"
 import FormContainer from "../Events/Forms/FormContainer"
 import { useCIEvents } from "../../context/CIEventsContext"
 import { Icon } from "../Common/Icon"
+import { useUser } from "../../context/UserContext"
+import Alert from "antd/es/alert"
+
 export default function CreateEventsPage() {
     const { updateEventState } = useCIEvents()
+    const { user } = useUser()
+
+    const isMissingProfile = !user?.bio?.bio_name || user?.bio?.bio_name === ""
+
     const buttonsArray = [
         {
             type: "create-single-day",
@@ -26,8 +33,16 @@ export default function CreateEventsPage() {
             label: "אירוע רב יומי",
         },
     ]
+
     return (
         <section className="create-events-page">
+            {isMissingProfile && (
+                <Alert
+                    message="על מנת לתייג את עצמכם בארועים צריך ליצור קודם פרופיל"
+                    type="warning"
+                    showIcon
+                />
+            )}
             <article className="btns-container">
                 {buttonsArray.map((button, index) => (
                     <FormContainer

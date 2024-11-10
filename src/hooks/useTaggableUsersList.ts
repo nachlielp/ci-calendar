@@ -11,6 +11,7 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
     const [orgs, setOrgs] = useState<{ label: string; value: string }[]>([])
     const [loading, setLoading] = useState(true)
     const { user } = useUser()
+    const hasProfile = !!user?.bio?.bio_name && user?.bio?.bio_name !== ""
 
     useEffect(() => {
         if (!user) return
@@ -35,7 +36,8 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
                     !users
                         .map((teacher) => teacher.user_id)
                         .includes(user.user_id) &&
-                    addSelf
+                    addSelf &&
+                    hasProfile
                 ) {
                     if (user.user_type === UserType.org) {
                         orgs.push({
