@@ -98,6 +98,7 @@ function ManageUsersPage() {
             disabled={selectedUser?.role?.id === 1}
             onClick={() => onSetRole(UserType.admin, 1)}
             className="user-btn"
+            key="admin"
         >
             מנהל
         </button>
@@ -107,6 +108,7 @@ function ManageUsersPage() {
             disabled={selectedUser?.role?.id === 2}
             onClick={() => onSetRole(UserType.creator, 2)}
             className="user-btn"
+            key="creator"
         >
             יוצר
         </button>
@@ -116,6 +118,7 @@ function ManageUsersPage() {
             disabled={selectedUser?.role?.id === 3}
             onClick={() => onSetRole(UserType.org, 3)}
             className="user-btn"
+            key="org"
         >
             ארגון
         </button>
@@ -126,6 +129,7 @@ function ManageUsersPage() {
             disabled={selectedUser?.role?.id === 4}
             onClick={() => onSetRole(UserType.profile, 4)}
             className="user-btn"
+            key="profile"
         >
             פרופיל
         </button>
@@ -135,6 +139,7 @@ function ManageUsersPage() {
             disabled={selectedUser?.role?.id === 5 || !selectedUser?.role}
             onClick={() => onSetRole(UserType.user, 5)}
             className="user-btn"
+            key="user"
         >
             משתמש
         </button>
