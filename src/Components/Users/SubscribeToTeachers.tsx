@@ -9,12 +9,23 @@ import { usePublicBioList } from "../../hooks/usePublicBioList"
 export default function SubscribeToTeachers() {
     const { user } = useUser()
     const { teachers, loading, orgs } = usePublicBioList()
-    const [selectedTeachers, setSelectedTeachers] = useState<string[]>(
-        user?.subscriptions.teachers || []
-    )
-    const [selectedOrgs, setSelectedOrgs] = useState<string[]>(
-        user?.subscriptions.orgs || []
-    )
+
+    const [selectedTeachers, setSelectedTeachers] = useState<string[]>([])
+    const [selectedOrgs, setSelectedOrgs] = useState<string[]>([])
+
+    useEffect(() => {
+        if (loading) return
+        setSelectedTeachers(
+            user?.subscriptions.teachers?.filter((id) =>
+                teachers.some((t) => t.value === id)
+            ) || []
+        )
+        setSelectedOrgs(
+            user?.subscriptions.orgs?.filter((id) =>
+                orgs.some((o) => o.value === id)
+            ) || []
+        )
+    }, [loading])
 
     useEffect(() => {
         debouncedSaveFilters()
