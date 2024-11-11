@@ -17,7 +17,6 @@ export const usePublicBioList = () => {
         const fetchTeachers = async () => {
             try {
                 const public_bios = await usersService.getPublicBioList()
-                console.log("public_bios", public_bios)
                 const teachers = public_bios
                     .filter((user) => user.user_type !== UserType.org)
                     .map((user) => ({

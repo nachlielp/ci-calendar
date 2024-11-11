@@ -140,7 +140,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }, [loading])
 
     async function handleSubscriptionUpdates(payloadObj: any) {
-        console.log("handleSubscriptionUpdates", payloadObj)
         if (!user) return
         const { table, payload } = payloadObj
 
