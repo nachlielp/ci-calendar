@@ -72,15 +72,12 @@ async function checkAndUpdateToken(user: DbUser) {
     if (token && token !== existingToken) {
         await usersService.updateUser(user.user_id, {
             push_notification_tokens: [
-                ...(user.push_notification_tokens || []).filter(
-                    (token) => token.device_id !== deviceId
-                ),
                 {
                     device_id: utilService.getDeviceId(),
                     token,
                     created_at: new Date().toISOString(),
                     is_pwa: utilService.isPWA(),
-                    breanch: import.meta.env.VITE_BRANCH,
+                    branch: import.meta.env.VITE_BRANCH,
                 },
             ],
         })

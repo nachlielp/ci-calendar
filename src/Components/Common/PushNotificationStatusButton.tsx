@@ -64,15 +64,6 @@ const PushNotificationStatusButton = () => {
             if (user) {
                 usersService.updateUser(user.user_id, {
                     receive_notifications: checked,
-                    push_notification_tokens: [
-                        {
-                            token: "",
-                            created_at: new Date().toISOString(),
-                            device_id: "",
-                            is_pwa: true,
-                            breanch: "",
-                        },
-                    ],
                 })
             }
             setChecked(false)
@@ -96,7 +87,7 @@ const PushNotificationStatusButton = () => {
                         className="notification-switch-icon"
                     />
                 }
-                disabled={!utilService.isPWA()}
+                // disabled={!utilService.isPWA()}
             />
             {utilService.isPWA() && status === "denied" && (
                 <Alert
