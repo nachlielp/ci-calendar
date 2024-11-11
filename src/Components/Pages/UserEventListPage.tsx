@@ -8,11 +8,11 @@ import { useNavigate } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
 import { useCIManageEvents } from "../../hooks/useCIManageEvents"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import { Icon } from "../Common/Icon"
 import Loading from "../Common/Loading"
 import MenuButtons from "../Common/MenuButtons"
 import FullEventCard from "../Events/Display/FullEventCard"
 import ManageEventActions from "../Events/Management/ManageEventActions"
+import catButtGif from "../../assets/img/cat-butt.gif"
 
 dayjs.extend(isSameOrAfter)
 
@@ -168,9 +168,14 @@ export default function UserEventsListPage() {
                     </div>
                 ))}
             </div>
-            {!showPast && filteredEvents.length === 0 && (
+            {filteredEvents.length === 0 && (
                 <div className="no-events-message">
-                    <Icon icon="crazy_monster_1" />
+                    <div
+                        className="no-events-message-gif"
+                        style={{
+                            backgroundImage: `url(${catButtGif})`,
+                        }}
+                    ></div>
                     <label className="no-events-message-label">
                         נראה שעדיין אין לכם אירועים
                     </label>

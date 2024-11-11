@@ -6,6 +6,7 @@ const FILES_TO_CACHE = [
     "./assets/img/Background_2.png",
     "./assets/img/icon-192.png",
     "./assets/img/icon-512.png",
+    "./assets/img/cat-butt.gif",
 ]
 self.addEventListener("push", function (event) {
     const { data } = event.data.json()

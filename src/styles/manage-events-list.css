@@ -215,9 +215,24 @@
         justify-content: center;
         width: 100%;
         align-self: center;
+        margin: 20px 0;
         font-size: 16px;
         font-weight: 400;
         line-height: 21px;
+        background-color: #fffdfe;
+        padding: 20px 0;
+        border-radius: 6px;
+
+        .no-events-message-gif {
+            width: 300px;
+            height: 300px;
+            background-size: cover;
+            background-position: center;
+            background-color: transparent;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
 
         .no-events-message-label {
             width: 100%;

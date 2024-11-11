@@ -2,6 +2,7 @@ import { useUser } from "../../context/UserContext"
 import { UserNotification } from "../../util/interfaces"
 import { notificationOptions, SelectOption } from "../../util/options"
 import { utilService } from "../../util/utilService"
+
 import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 
 export default function UserNotificationsList() {
@@ -51,6 +52,12 @@ export default function UserNotificationsList() {
                         </div>
                     </article>
                 ))}
+
+            {user?.notifications.length === 0 && (
+                <div className="user-notifications-list-empty">
+                    <label>נראה שאין לכם התראות פעילות</label>
+                </div>
+            )}
         </section>
     )
 }
