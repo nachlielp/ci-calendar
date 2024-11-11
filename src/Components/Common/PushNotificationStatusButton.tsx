@@ -15,7 +15,7 @@ const android_notification_error =
     "ההרשאות לאפליקציה הזו חסומות, ניתן להפעיל אותם בהגדרות => עדכונים => ניהול עדכונים => גלילה מטה אל האפליקציה CI, ולחיצה על ״קבלת עדכונים״"
 
 const browser_notification_error =
-    "ניתן להדליק התראות באפליקציה שמותקנת בסלולרי בלבד"
+    "ניתן להפעיל ולכבות התראות באפליקציה שמותקנת בסלולרי בלבד"
 
 const PushNotificationStatusButton = () => {
     const { user } = useUser()
@@ -44,11 +44,7 @@ const PushNotificationStatusButton = () => {
     if (!user) return <></>
 
     async function handleChange(checked: boolean) {
-        if (!utilService.isPWA() && !checked && user) {
-            await usersService.updateUser(user.user_id, {
-                receive_notifications: checked,
-            })
-            setChecked(checked)
+        if (!utilService.isPWA()) {
             return
         }
 
@@ -63,14 +59,17 @@ const PushNotificationStatusButton = () => {
             })
         } else if (checked && status === "denied") {
             setChecked(false)
-        }
-        if (user) {
-            await usersService.updateUser(user.user_id, {
-                receive_notifications: checked,
-            })
-            setChecked(checked)
+        } else if (!checked) {
+            if (user) {
+                usersService.updateUser(user.user_id, {
+                    receive_notifications: checked,
+                    push_notification_tokens: [],
+                })
+            }
+            setChecked(false)
         }
     }
+
     return (
         <section className="notification-status-container">
             <Switch
@@ -88,6 +87,7 @@ const PushNotificationStatusButton = () => {
                         className="notification-switch-icon"
                     />
                 }
+                disabled={!utilService.isPWA()}
             />
             {utilService.isPWA() && status === "denied" && (
                 <Alert
@@ -100,7 +100,7 @@ const PushNotificationStatusButton = () => {
                     style={{ marginTop: "10px" }}
                 />
             )}
-            {!utilService.isPWA() && !checked && (
+            {!utilService.isPWA() && (
                 <Alert
                     message={browser_notification_error}
                     type="warning"
