@@ -54,3 +54,12 @@ export enum ScreenSize {
     tablet = 900,
     desktop = 1200,
 }
+
+export const notificationOptions: SelectOption[] = [
+    { label: " לא רוצה התראה", value: "0" },
+    { label: "שעה לפני הארוע", value: "1" },
+    { label: "שעתיים לפני הארוע", value: "2" },
+    { label: "4 שעות לפני הארוע", value: "4" },
+    { label: "יום לפני הארוע", value: "24" },
+    { label: "יומיים לפני הארוע", value: "48" },
+]

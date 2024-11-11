@@ -51,7 +51,11 @@ async function getUser(id: string): Promise<DbUser | null> {
                 id,
                 ci_event_id,
                 remind_in_hours,
-                is_sent
+                is_sent,
+                ci_events!inner (
+                    title,
+                    start_date
+                )
             ),
             requests!left (
                 *
@@ -82,7 +86,19 @@ async function getUser(id: string): Promise<DbUser | null> {
                 return null
             }
         }
-        return data as unknown as DbUser
+
+        const notifications = data?.notifications.map((notification: any) => {
+            const title = notification.ci_events.title
+            const start_date = notification.ci_events.start_date
+            const formattedNotification = {
+                ...notification,
+                title,
+                start_date,
+            }
+            delete formattedNotification.ci_events
+            return formattedNotification
+        })
+        return { ...data, notifications } as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
         return null

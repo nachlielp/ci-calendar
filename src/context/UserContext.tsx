@@ -44,7 +44,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const updateUserContext = async (updatedUser: Partial<DbUser>) => {
-        console.log("updating user context")
         try {
             if (user && user.user_id) {
                 const updatedUserData = await usersService.updateUser(
@@ -255,7 +254,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                     const newUser = { ...user }
                     newUser.notifications = newUser?.notifications?.map((n) => {
                         if (n.id === payload.new.id) {
-                            return payload.new
+                            return { ...n, ...payload.new }
                         }
                         return n
                     })

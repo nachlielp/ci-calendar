@@ -145,21 +145,15 @@ export interface Notification {
 }
 
 export interface UserNotification
-    extends Omit<
-        Notification,
-        "user_id" | "title" | "body" | "send_at" | "timezone" | "is_sent"
-    > {}
+    extends Omit<Notification, "user_id" | "body" | "send_at" | "timezone"> {
+    title: string
+    start_date: string
+}
 
 export interface NotificationDB
     extends Omit<
         Notification,
-        | "id"
-        | "created_at"
-        | "title"
-        | "body"
-        | "send_at"
-        | "timezone"
-        | "is_sent"
+        "id" | "created_at" | "title" | "body" | "send_at" | "timezone"
     > {
     id?: string
 }

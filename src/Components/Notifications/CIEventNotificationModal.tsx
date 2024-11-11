@@ -6,15 +6,7 @@ import Select from "antd/es/select"
 import { useUser } from "../../context/UserContext"
 import { notificationService } from "../../supabase/notificationService"
 import Alert from "antd/es/alert/Alert"
-
-const notificationOptions = [
-    { label: " לא רוצה התראה", value: "0" },
-    { label: "שעה לפני הארוע", value: "1" },
-    { label: "שעתיים לפני הארוע", value: "2" },
-    { label: "4 שעות לפני הארוע", value: "4" },
-    { label: "יום לפני הארוע", value: "24" },
-    { label: "יומיים לפני הארוע", value: "48" },
-]
+import { notificationOptions } from "../../util/options"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור התראה"
@@ -63,12 +55,14 @@ export default function CIEventNotificationModal({
                 remind_in_hours: remindInHours,
                 ci_event_id: eventId,
                 user_id: user.user_id,
+                is_sent: false,
             })
         } else {
             await notificationService.createNotification({
                 ci_event_id: eventId,
                 user_id: user.user_id,
                 remind_in_hours: remindInHours,
+                is_sent: false,
             })
         }
         setIsOpen(false)

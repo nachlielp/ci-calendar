@@ -7,6 +7,7 @@ import React from "react"
 import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../../Common/SecondaryButton"
 import BioModal from "../../Users/BioModal"
+import CIEventNotificationModal from "../../Notifications/CIEventNotificationModal"
 // import CIEventNotificationModal from "../Other/CIEventNotificationModal"
 
 export default function FullEventCard({
@@ -239,9 +240,9 @@ export default function FullEventCard({
 
             {!showPast && (
                 <article className="event-card-footer">
-                    {/* {utilService.isPWA() && (
+                    {utilService.isPWA() && (
                         <CIEventNotificationModal eventId={ci_event.id} />
-                    )} */}
+                    )}
                     {utilService.isPWA() && (
                         <SecondaryButton
                             label=""
