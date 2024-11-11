@@ -26,28 +26,28 @@ export default function UserNotificationsList() {
                             <label className="user-notification-title">
                                 {notification.title}
                             </label>
-                            <label className="user-notification-date">
-                                <label>
-                                    {utilService.formatHebrewDate(
-                                        notification.start_date
-                                    )}
+                            <div className="notification-actions">
+                                <label className="user-notification-date">
+                                    <label>
+                                        {utilService.formatHebrewDate(
+                                            notification.start_date
+                                        )}
+                                    </label>
+                                    {" - "}
+                                    <label className="user-notification-remind-in-hours">
+                                        {
+                                            notificationOptions.find(
+                                                (option: SelectOption) =>
+                                                    option.value ===
+                                                    notification.remind_in_hours
+                                            )?.label
+                                        }
+                                    </label>
                                 </label>
-                                {" - "}
-                                <label className="user-notification-remind-in-hours">
-                                    {
-                                        notificationOptions.find(
-                                            (option: SelectOption) =>
-                                                option.value ===
-                                                notification.remind_in_hours
-                                        )?.label
-                                    }
-                                </label>
-                            </label>
-                        </div>
-                        <div className="notification-actions">
-                            <CIEventNotificationModal
-                                eventId={notification.ci_event_id}
-                            />
+                                <CIEventNotificationModal
+                                    eventId={notification.ci_event_id}
+                                />
+                            </div>
                         </div>
                     </article>
                 ))}

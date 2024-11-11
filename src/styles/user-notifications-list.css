@@ -1,7 +1,7 @@
 .user-notifications-list {
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 8px;
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -20,7 +20,7 @@
 
     .user-notification {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         gap: 5px;
         background-color: #ffffff;
         border: 1px solid #e0e0e0;
@@ -36,8 +36,20 @@
         }
 
         .user-notification-title {
-            font-size: 1.2em;
+            font-size: 20px;
             font-weight: bold;
+        }
+
+        .user-notification-date {
+            font-size: 20px;
+        }
+
+        .notification-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
         }
     }
 }
