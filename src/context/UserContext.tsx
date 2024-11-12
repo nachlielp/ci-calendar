@@ -271,28 +271,29 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                         ),
                     })
                 } else if (payload.eventType === "INSERT") {
-                    if (
-                        user.notifications.find((n) => n.id === payload.new.id)
-                    ) {
-                        console.log("notification already exists")
-                        return
-                    }
-                    console.log(
-                        "adding new notification to state: ",
-                        payload.new
-                    )
-
-                    setUser((prev) =>
-                        prev
-                            ? {
-                                  ...prev,
-                                  notifications: [
-                                      ...prev.notifications,
-                                      payload.new,
-                                  ],
-                              }
-                            : null
-                    )
+                    //Cant update without date and title
+                    // console.log("inserting new notification")
+                    // if (
+                    //     user.notifications.find((n) => n.id === payload.new.id)
+                    // ) {
+                    //     console.log("notification already exists")
+                    //     return
+                    // }
+                    // console.log(
+                    //     "adding new notification to state: ",
+                    //     payload.new
+                    // )
+                    // setUser((prev) =>
+                    //     prev
+                    //         ? {
+                    //               ...prev,
+                    //               notifications: [
+                    //                   ...prev.notifications,
+                    //                   payload.new,
+                    //               ],
+                    //           }
+                    //         : null
+                    // )
                 }
                 break
         }

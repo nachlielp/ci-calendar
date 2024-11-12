@@ -48,6 +48,8 @@ export default function UserNotificationsList() {
                                 </label>
                                 <CIEventNotificationModal
                                     eventId={notification.ci_event_id}
+                                    eventTitle={notification.title}
+                                    eventStartDate={notification.start_date}
                                 />
                             </div>
                         </div>

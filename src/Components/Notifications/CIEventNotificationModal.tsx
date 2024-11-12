@@ -13,8 +13,12 @@ const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
 
 export default function CIEventNotificationModal({
     eventId,
+    eventTitle,
+    eventStartDate,
 }: {
     eventId: string
+    eventTitle: string
+    eventStartDate: string
 }) {
     const { user, updateUserState } = useUser()
 
@@ -81,7 +85,14 @@ export default function CIEventNotificationModal({
                     is_sent: false,
                 })
             updateUserState({
-                notifications: [...user.notifications, newNotification],
+                notifications: [
+                    ...user.notifications,
+                    {
+                        ...newNotification,
+                        title: eventTitle,
+                        start_date: eventStartDate,
+                    },
+                ],
             })
         }
         setIsOpen(false)
