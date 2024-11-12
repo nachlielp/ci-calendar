@@ -17,7 +17,7 @@ export default function UserNotificationsList() {
 
             {user?.notifications
                 .sort((a: UserNotification, b: UserNotification) =>
-                    dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1
+                    dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
                 )
                 .map((notification: UserNotification) => (
                     <article
