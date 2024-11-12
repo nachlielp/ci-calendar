@@ -61,8 +61,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const updateUserState = async (updatedUser: Partial<DbUser>) => {
-        console.log("updating user state", updatedUser)
-        setUser((prev) => (prev ? { ...prev, ...updatedUser } : null))
+        console.log("updating user state with", updatedUser)
+        setUser((prev) => {
+            if (!prev) {
+                console.warn("User state is null, cannot update")
+                return null
+            }
+            const newState = { ...prev, ...updatedUser }
+            console.log("new user state", newState)
+            return newState
+        })
     }
 
     useEffect(() => {
