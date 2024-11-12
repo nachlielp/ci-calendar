@@ -61,6 +61,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const updateUserState = async (updatedUser: Partial<DbUser>) => {
+        console.log("updating user state", updatedUser)
         setUser((prev) => (prev ? { ...prev, ...updatedUser } : null))
     }
 
