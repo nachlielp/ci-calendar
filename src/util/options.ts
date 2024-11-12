@@ -56,7 +56,7 @@ export enum ScreenSize {
 }
 
 export const notificationOptions: SelectOption[] = [
-    { label: " לא רוצה התראה", value: "0" },
+    { label: "  התראה מבוטלת", value: "0" },
     { label: "שעה לפני הארוע", value: "1" },
     { label: "שעתיים לפני הארוע", value: "2" },
     { label: "4 שעות לפני הארוע", value: "4" },

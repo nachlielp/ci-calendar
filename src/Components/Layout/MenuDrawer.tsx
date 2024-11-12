@@ -98,7 +98,7 @@ export function MenuDrawer() {
         {
             key: "filters-and-notifications",
             icon: "notifications",
-            label: "התראות ופילטור",
+            label: "התראות ",
             onClick: () => {
                 navigate("/filters-and-notifications")
                 setOpen(false)

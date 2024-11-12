@@ -1,6 +1,6 @@
 import Modal from "antd/es/modal"
 import SecondaryButton from "../Common/SecondaryButton"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Icon } from "../Common/Icon"
 import Select from "antd/es/select"
 import { useUser } from "../../context/UserContext"
@@ -21,7 +21,14 @@ export default function CIEventNotificationModal({
     if (!user) return null
 
     const [isOpen, setIsOpen] = useState(false)
-    const [remindInHours, setRemindInHours] = useState<string>("1")
+    const [remindInHours, setRemindInHours] = useState<string | null>(null)
+
+    useEffect(() => {
+        const userNotification = user.notifications?.find(
+            (n) => n.ci_event_id === eventId
+        )
+        setRemindInHours(userNotification?.remind_in_hours || "1")
+    }, [user])
 
     const isActive = () => {
         const notification = user.notifications?.find(
@@ -39,6 +46,7 @@ export default function CIEventNotificationModal({
     }
 
     const handleOk = async () => {
+        if (!remindInHours) return
         const currentNotification = user.notifications.find(
             (n) => n.ci_event_id === eventId
         )
@@ -57,7 +65,7 @@ export default function CIEventNotificationModal({
                 user_id: user.user_id,
                 is_sent: false,
             })
-        } else {
+        } else if (!user.notifications.find((n) => n.ci_event_id === eventId)) {
             await notificationService.createNotification({
                 ci_event_id: eventId,
                 user_id: user.user_id,
@@ -97,7 +105,7 @@ export default function CIEventNotificationModal({
                     </article>
                     <Select
                         options={notificationOptions}
-                        value={remindInHours.toString()}
+                        value={remindInHours?.toString() || "1"}
                         style={{ width: "200px" }}
                         onChange={(value) => setRemindInHours(value)}
                     />

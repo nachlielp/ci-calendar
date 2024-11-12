@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { useUser } from "../../context/UserContext"
 import { UserNotification } from "../../util/interfaces"
 import { notificationOptions, SelectOption } from "../../util/options"
@@ -16,7 +17,7 @@ export default function UserNotificationsList() {
 
             {user?.notifications
                 .sort((a: UserNotification, b: UserNotification) =>
-                    a.start_date.localeCompare(b.start_date)
+                    dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1
                 )
                 .map((notification: UserNotification) => (
                     <article
