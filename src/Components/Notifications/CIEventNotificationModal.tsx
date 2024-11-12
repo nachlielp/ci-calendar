@@ -16,7 +16,7 @@ export default function CIEventNotificationModal({
 }: {
     eventId: string
 }) {
-    const { user } = useUser()
+    const { user, updateUserState } = useUser()
 
     if (!user) return null
 
@@ -65,12 +65,23 @@ export default function CIEventNotificationModal({
                 user_id: user.user_id,
                 is_sent: false,
             })
+            updateUserState({
+                notifications: user.notifications.map((n) =>
+                    n.id === currentNotification.id
+                        ? { ...n, remind_in_hours: remindInHours }
+                        : n
+                ),
+            })
         } else if (!user.notifications.find((n) => n.ci_event_id === eventId)) {
-            await notificationService.createNotification({
-                ci_event_id: eventId,
-                user_id: user.user_id,
-                remind_in_hours: remindInHours,
-                is_sent: false,
+            const newNotification =
+                await notificationService.createNotification({
+                    ci_event_id: eventId,
+                    user_id: user.user_id,
+                    remind_in_hours: remindInHours,
+                    is_sent: false,
+                })
+            updateUserState({
+                notifications: [...user.notifications, newNotification],
             })
         }
         setIsOpen(false)

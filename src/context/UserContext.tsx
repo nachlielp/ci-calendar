@@ -140,6 +140,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function handleSubscriptionUpdates(payloadObj: any) {
         if (!user) return
+        console.log("_sub, user before update", user)
+        console.log("_sub, payloadObj", payloadObj)
         const { table, payload } = payloadObj
 
         switch (table) {
@@ -250,6 +252,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 }
                 break
             case "notifications":
+                console.log("payload", payload)
                 if (payload.eventType === "UPDATE") {
                     const newUser = { ...user }
                     newUser.notifications = newUser?.notifications?.map((n) => {
@@ -268,6 +271,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                         ),
                     })
                 } else if (payload.eventType === "INSERT") {
+                    if (user.notifications.find((n) => n.id === payload.new.id))
+                        return
+
                     setUser({
                         ...user,
                         notifications: [...user.notifications, payload.new],
@@ -275,6 +281,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 }
                 break
         }
+        console.log("_sub, user after update", user)
     }
     return (
         <UserContext.Provider

@@ -11,6 +11,9 @@ async function createNotification(notification: NotificationDB) {
         const { data, error } = await supabase
             .from("notifications")
             .insert(notification)
+            .select()
+            .single()
+
         if (error) throw error
         return data
     } catch (error) {
