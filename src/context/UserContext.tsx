@@ -277,6 +277,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                         console.log("notification already exists")
                         return
                     }
+                    console.log(
+                        "adding new notification to state: ",
+                        payload.new
+                    )
 
                     setUser((prev) =>
                         prev
