@@ -271,13 +271,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                         ),
                     })
                 } else if (payload.eventType === "INSERT") {
-                    if (user.notifications.find((n) => n.id === payload.new.id))
+                    if (
+                        user.notifications.find((n) => n.id === payload.new.id)
+                    ) {
+                        console.log("notification already exists")
                         return
+                    }
 
-                    setUser({
-                        ...user,
-                        notifications: [...user.notifications, payload.new],
-                    })
+                    setUser((prev) =>
+                        prev
+                            ? {
+                                  ...prev,
+                                  notifications: [
+                                      ...prev.notifications,
+                                      payload.new,
+                                  ],
+                              }
+                            : null
+                    )
                 }
                 break
         }
