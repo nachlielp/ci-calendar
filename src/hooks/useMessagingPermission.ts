@@ -17,10 +17,15 @@ export default function useMessagingPermission() {
 
     // TODO: use local storage to check if the user has already granted permission
     useEffect(() => {
-        checkPermissionsAndToken()
+        if (utilService.isPWA()) {
+            checkPermissionsAndToken()
+        }
     }, [user, permissionStatus])
 
     const requestPermission = async () => {
+        if (!utilService.isPWA()) {
+            return
+        }
         const permission = await Notification.requestPermission()
         setPermissionStatus(permission)
         utilService.setFirstNotificationPermissionRequest(permission)
@@ -59,6 +64,9 @@ export default function useMessagingPermission() {
 }
 
 async function checkAndUpdateToken(user: DbUser) {
+    if (!utilService.isPWA()) {
+        return
+    }
     const token = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
     })

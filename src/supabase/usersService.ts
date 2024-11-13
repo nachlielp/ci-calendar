@@ -55,7 +55,8 @@ async function getUser(id: string): Promise<DbUser | null> {
                 is_sent,
                 ci_events!inner (
                     title,
-                    start_date
+                    start_date,
+                    segments
                 )
             ),
             requests!left (
@@ -97,6 +98,7 @@ async function getUser(id: string): Promise<DbUser | null> {
                     ...notification,
                     title,
                     start_date,
+                    firstSegment: notification.ci_events.segments[0],
                 }
                 delete formattedNotification.ci_events
                 return formattedNotification

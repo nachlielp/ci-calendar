@@ -148,6 +148,7 @@ export interface UserNotification
     extends Omit<Notification, "user_id" | "body" | "send_at" | "timezone"> {
     title: string
     start_date: string
+    firstSegment: CIEventSegments
 }
 
 export interface NotificationDB
