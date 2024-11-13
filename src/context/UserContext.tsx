@@ -5,6 +5,7 @@ import { usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
 import { RealtimeChannel } from "@supabase/supabase-js"
 import { useSession } from "./SessionContext"
+import { notificationService } from "../supabase/notificationService"
 
 interface IUserContextType {
     user: DbUser | null
@@ -39,7 +40,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     function updateUser(updatedUser: Partial<DbUser>) {
         if (user) {
-            setUser({ ...user, ...updatedUser })
+            setUser((prev) => {
+                return { ...prev, ...updatedUser } as DbUser
+            })
         }
     }
 
@@ -51,8 +54,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                     updatedUser
                 )
                 if (updatedUserData) {
-                    const newUser = { ...user, ...updatedUserData }
-                    setUser(newUser)
+                    setUser((prev) => ({ ...prev, ...updatedUserData }))
                 }
             }
         } catch (error) {
@@ -61,15 +63,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     const updateUserState = async (updatedUser: Partial<DbUser>) => {
-        console.log("updating user state with", updatedUser)
         setUser((prev) => {
-            if (!prev) {
-                console.warn("User state is null, cannot update")
-                return null
-            }
-            const newState = { ...prev, ...updatedUser }
-            console.log("new user state", newState)
-            return newState
+            if (!prev) return null // Ensure prev is not null
+            return { ...prev, ...updatedUser } as DbUser // Type assertion
         })
     }
 
@@ -149,13 +145,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function handleSubscriptionUpdates(payloadObj: any) {
         if (!user) return
-        console.log("_sub, user before update", user)
-        console.log("_sub, payloadObj", payloadObj)
+
         const { table, payload } = payloadObj
 
         switch (table) {
             case "users":
-                setUser({ ...user, ...payload.new })
+                setUser((prev) => ({ ...prev, ...payload.new }))
                 break
             case "ci_events":
                 switch (payload.eventType) {
@@ -202,15 +197,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 }
                 break
             case "requests":
-                setUser({
-                    ...user,
-                    requests: user.requests.map((r) => {
-                        if (r.request_id === payload.old.request_id) {
-                            return payload.new
-                        }
-                        return r
-                    }),
-                })
+                setUser((prev) =>
+                    prev
+                        ? {
+                              ...prev,
+                              requests: prev.requests.map((r) => {
+                                  if (r.request_id === payload.old.request_id) {
+                                      return payload.new
+                                  }
+                                  return r
+                              }),
+                          }
+                        : null
+                )
                 break
             case "templates":
                 switch (payload.eventType) {
@@ -261,7 +260,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 }
                 break
             case "notifications":
-                console.log("payload", payload)
                 if (payload.eventType === "UPDATE") {
                     const newUser = { ...user }
                     newUser.notifications = newUser?.notifications?.map((n) => {
@@ -271,42 +269,59 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                         return n
                     })
 
-                    setUser(newUser)
-                } else if (payload.eventType === "DELETE") {
-                    setUser({
-                        ...user,
-                        notifications: user.notifications.filter(
-                            (n) => n.id !== payload.old.id
-                        ),
+                    const notifications = user.notifications.map((n) => {
+                        if (n.id === payload.new.id) {
+                            return { ...n, ...payload.new }
+                        }
+                        return n
                     })
+
+                    setUser((prev) =>
+                        prev
+                            ? {
+                                  ...prev,
+                                  notifications: notifications,
+                              }
+                            : null
+                    )
+                } else if (payload.eventType === "DELETE") {
+                    setUser((prev) =>
+                        prev
+                            ? {
+                                  ...user,
+                                  notifications: user.notifications.filter(
+                                      (n) => n.id !== payload.old.id
+                                  ),
+                              }
+                            : null
+                    )
                 } else if (payload.eventType === "INSERT") {
-                    //Cant update without date and title
-                    // console.log("inserting new notification")
-                    // if (
-                    //     user.notifications.find((n) => n.id === payload.new.id)
-                    // ) {
-                    //     console.log("notification already exists")
-                    //     return
-                    // }
-                    // console.log(
-                    //     "adding new notification to state: ",
-                    //     payload.new
-                    // )
-                    // setUser((prev) =>
-                    //     prev
-                    //         ? {
-                    //               ...prev,
-                    //               notifications: [
-                    //                   ...prev.notifications,
-                    //                   payload.new,
-                    //               ],
-                    //           }
-                    //         : null
-                    // )
+                    const notification =
+                        await notificationService.getNotificationById(
+                            payload.new.id
+                        )
+
+                    if (
+                        user.notifications.find((n) => n.id === payload.new.id)
+                    ) {
+                        console.log("notification already exists")
+                        return
+                    }
+
+                    setUser((prev) =>
+                        prev
+                            ? {
+                                  ...prev,
+                                  notifications: [
+                                      ...prev.notifications,
+                                      notification,
+                                  ],
+                              }
+                            : null
+                    )
                 }
                 break
         }
-        console.log("_sub, user after update", user)
     }
     return (
         <UserContext.Provider

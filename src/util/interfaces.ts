@@ -258,3 +258,24 @@ export enum RequestStatusHebrew {
     pending = "בטיפול",
 }
 export type PushNotificationPromission = "granted" | "denied" | "default" | null
+
+export interface NotificationPayload {
+    schema: string
+    table: string
+    commit_timestamp: string
+    eventType: "INSERT" | "UPDATE" | "DELETE" // Assuming these are the possible event types
+    new: {
+        ci_event_id: string
+        created_at: string
+        id: string
+        is_sent: boolean
+        remind_in_hours: string
+        user_id: string
+        title?: string
+        start_date?: string
+    }
+    old?: {
+        id?: string
+    }
+    errors: any | null
+}

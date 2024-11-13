@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"
-import debounce from "lodash/debounce"
 import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import Loading from "../Common/Loading"
 import { usePublicBioList } from "../../hooks/usePublicBioList"
+import AsyncButton from "../Common/AsyncButton"
 
 export default function SubscribeToTeachers() {
     const { user } = useUser()
     const { teachers, loading, orgs } = usePublicBioList()
-
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [subscriptionsEqual, setSubscriptionsEqual] = useState(false)
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>([])
     const [selectedOrgs, setSelectedOrgs] = useState<string[]>([])
 
@@ -28,32 +29,47 @@ export default function SubscribeToTeachers() {
     }, [loading])
 
     useEffect(() => {
-        debouncedSaveFilters()
+        setSubscriptionsEqual(isSubscriptionsEqual())
     }, [selectedTeachers, selectedOrgs])
 
-    function debouncedSaveFilters() {
-        const saveFilters = debounce(async () => {
-            if (!user) {
-                throw new Error(
-                    "user is null, make sure you're within a Provider"
-                )
-            }
-            try {
-                await usersService.updateUser(user.user_id, {
-                    subscriptions: {
-                        teachers: [...selectedTeachers],
-                        orgs: [...selectedOrgs],
-                    },
-                })
-            } catch (error) {
-                console.error(
-                    "SubscribeToTeachers.debouncedSaveFilters.error: ",
-                    error
-                )
-            }
-        }, 1000)
+    async function saveFilters() {
+        if (!user) {
+            throw new Error("user is null, make sure you're within a Provider")
+        }
 
-        saveFilters()
+        try {
+            setIsSubmitting(true)
+            await usersService.updateUser(user.user_id, {
+                subscriptions: {
+                    teachers: [...selectedTeachers],
+                    orgs: [...selectedOrgs],
+                },
+            })
+            setSubscriptionsEqual(true)
+        } catch (error) {
+            console.error(
+                "SubscribeToTeachers.debouncedSaveFilters.error: ",
+                error
+            )
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    function isSubscriptionsEqual() {
+        if (!user) {
+            throw new Error("user is null, make sure you're within a Provider")
+        }
+
+        const currentTeachers = user?.subscriptions.teachers
+        const currentOrgs = user?.subscriptions.orgs
+
+        return (
+            JSON.stringify(currentTeachers?.sort()) ===
+                JSON.stringify(selectedTeachers.sort()) &&
+            JSON.stringify(currentOrgs?.sort()) ===
+                JSON.stringify(selectedOrgs.sort())
+        )
     }
 
     if (loading) {
@@ -82,6 +98,13 @@ export default function SubscribeToTeachers() {
                 placeholder="בחירת ארגונים"
                 className="select-filter"
             />
+            <AsyncButton
+                isSubmitting={isSubmitting}
+                callback={saveFilters}
+                disabled={subscriptionsEqual}
+            >
+                שמירה
+            </AsyncButton>
         </div>
     )
 }

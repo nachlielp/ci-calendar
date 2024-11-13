@@ -4,6 +4,7 @@ import { supabase } from "./client"
 export const notificationService = {
     createNotification,
     updateNotification,
+    getNotificationById,
 }
 
 async function createNotification(notification: NotificationDB) {
@@ -29,6 +30,28 @@ async function updateNotification(notification: NotificationDB) {
             .eq("id", notification.id)
         if (error) throw error
         return data
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+async function getNotificationById(id: string) {
+    try {
+        const { data, error } = await supabase
+            .from("notifications")
+            .select("*, ci_events!inner (title, start_date)")
+            .eq("id", id)
+            .single()
+
+        if (error) throw error
+
+        const formattedData = {
+            ...data,
+            title: data?.ci_events?.title,
+            start_date: data?.ci_events?.start_date,
+        }
+        delete formattedData.ci_events
+        return formattedData
     } catch (error) {
         console.error(error)
     }
