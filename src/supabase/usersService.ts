@@ -5,6 +5,7 @@ import {
     UserType,
     DbUserWithoutJoin,
 } from "../util/interfaces"
+import dayjs from "dayjs"
 
 export type ManageUserOption = {
     user_id: string
@@ -87,17 +88,26 @@ async function getUser(id: string): Promise<DbUser | null> {
             }
         }
 
-        const notifications = data?.notifications.map((notification: any) => {
-            const title = notification.ci_events.title
-            const start_date = notification.ci_events.start_date
-            const formattedNotification = {
-                ...notification,
-                title,
-                start_date,
-            }
-            delete formattedNotification.ci_events
-            return formattedNotification
-        })
+        const notifications = data?.notifications
+            .map((notification: any) => {
+                const title = notification.ci_events.title
+                const start_date = notification.ci_events.start_date
+
+                const formattedNotification = {
+                    ...notification,
+                    title,
+                    start_date,
+                }
+                delete formattedNotification.ci_events
+                return formattedNotification
+            })
+            .filter((notification: any) => {
+                if (notification.start_date)
+                    return dayjs(notification.start_date)
+                        .endOf("day")
+                        .isAfter(dayjs())
+                return true
+            })
         return { ...data, notifications } as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
