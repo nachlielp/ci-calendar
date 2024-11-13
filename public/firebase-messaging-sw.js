@@ -22,14 +22,43 @@ self.addEventListener("push", function (event) {
     event.waitUntil(self.registration.showNotification(data.title, options))
 })
 
-self.addEventListener("notificationclick", (event) => {
-    console.log("notificationData.event: ", event)
-    const notificationData = event.notification.data
-    if (notificationData.url) {
-        clients.openWindow(notificationData.url)
-    }
+// self.addEventListener("notificationclick", (event) => {
+//     console.log("notificationData.event: ", event)
+//     const notificationData = event.notification.data
+//     if (notificationData.url) {
+//         clients.openWindow(notificationData.url)
+//     }
 
+//     event.notification.close()
+// })
+
+self.addEventListener("notificationclick", (event) => {
     event.notification.close()
+
+    const urlToOpen = new URL(event.notification.data.url, self.location.origin)
+        .href
+
+    const promiseChain = clients
+        .matchAll({
+            type: "window",
+            includeUncontrolled: true,
+        })
+        .then((windowClients) => {
+            // Check if there is already a window/tab open with the target URL
+            let matchingClient = windowClients.find((client) => {
+                return client.url === urlToOpen
+            })
+
+            // If a matching window is found, focus it
+            if (matchingClient) {
+                return matchingClient.focus()
+            }
+
+            // If no matching window is found, open a new one
+            return clients.openWindow(urlToOpen)
+        })
+
+    event.waitUntil(promiseChain)
 })
 
 //TODO cach images and assets

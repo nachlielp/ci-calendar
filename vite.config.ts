@@ -43,7 +43,36 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
         scope: "/",
         start_url: "/",
         orientation: "portrait",
+        related_applications: [],
+        prefer_related_applications: false,
+        shortcuts: [],
+        categories: [],
+        share_target: {
+            action: "/",
+            method: "GET",
+            params: {
+                title: "title",
+                text: "text",
+                url: "url",
+            },
+        },
     },
+    workbox: {
+        runtimeCaching: [
+            {
+                urlPattern: ({ url }) => true, // Match all routes
+                handler: "NetworkFirst",
+                options: {
+                    cacheName: "api-cache",
+                },
+            },
+        ],
+        navigateFallback: "index.html",
+        cleanupOutdatedCaches: true,
+    },
+    // Add notification related strategies
+    strategies: "generateSW",
+    includeManifestIcons: true,
 }
 
 export default defineConfig({
