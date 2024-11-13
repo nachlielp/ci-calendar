@@ -15,7 +15,6 @@ export default function useMessagingPermission() {
 
     const { user } = useUser()
 
-    // TODO: use local storage to check if the user has already granted permission
     useEffect(() => {
         if (utilService.isPWA()) {
             checkPermissionsAndToken()
