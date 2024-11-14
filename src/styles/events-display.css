@@ -1,6 +1,7 @@
 .events-display {
     padding: 0 16px;
     align-self: center;
+    position: relative;
 
     height: calc(100vh - 56px);
     overflow-y: auto;

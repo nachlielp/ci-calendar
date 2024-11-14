@@ -17,9 +17,10 @@ import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByPa
 import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
 import FullEventCardContainer from "../Events/Display/FullEventCardContainer"
 import { utilService } from "../../util/utilService"
+
+import AlertsAnchor from "../Alerts/AlertsAnchor"
 import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
-import OpenAlerts from "../Alerts/OpenAlerts"
 
 interface IEventsPageProps {
     events: CIEvent[]
@@ -56,8 +57,8 @@ export default function EventsPage({ events }: IEventsPageProps) {
 
     return (
         <div className="events-display">
-            <OpenAlerts />
             <header className="header">
+                <AlertsAnchor />
                 <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
                 <p className="subtitle">כל האירועים במקום אחד</p>
                 <main className="menu-container">

@@ -362,6 +362,18 @@ async function subscribeToUser(
                 callback({ table: "templates", payload })
             }
         )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "alerts",
+                filter: `user_id=eq.${userId}`,
+            },
+            (payload) => {
+                callback({ table: "alerts", payload })
+            }
+        )
         .subscribe()
 
     return channel

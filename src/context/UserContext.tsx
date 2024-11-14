@@ -6,6 +6,7 @@ import { utilService } from "../util/utilService"
 import { RealtimeChannel } from "@supabase/supabase-js"
 import { useSession } from "./SessionContext"
 import { notificationService } from "../supabase/notificationService"
+import { alertsService } from "../supabase/alertsService"
 
 interface IUserContextType {
     user: DbUser | null
@@ -316,6 +317,36 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                                       ...prev.notifications,
                                       notification,
                                   ],
+                              }
+                            : null
+                    )
+                }
+                break
+            case "alerts":
+                if (payload.eventType === "UPDATE") {
+                    setUser((prev) =>
+                        prev
+                            ? {
+                                  ...prev,
+                                  alerts: prev.alerts.map((a) => {
+                                      if (a.id === payload.new.id) {
+                                          return payload.new
+                                      }
+                                      return a
+                                  }),
+                              }
+                            : null
+                    )
+                }
+                if (payload.eventType === "INSERT") {
+                    const alert = await alertsService.getAlertById(
+                        payload.new.id
+                    )
+                    setUser((prev) =>
+                        prev
+                            ? {
+                                  ...prev,
+                                  alerts: [...prev.alerts, alert],
                               }
                             : null
                     )

@@ -13,6 +13,8 @@ export const useSetSelectedEventByParams = (events: CIEvent[]) => {
             if (event) {
                 setSelectedEvent(event)
             }
+        } else {
+            setSelectedEvent(null)
         }
     }, [eventId])
 

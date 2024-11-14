@@ -1,9 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react"
 import { supabase } from "../supabase/client"
 import { Session } from "@supabase/supabase-js"
-import Loading from "../Components/Common/Loading"
 import { useUser } from "./UserContext"
-
+import Loading from "../Components/Common/Loading"
 const SessionContext = createContext<{
     session: Session | null
 }>({

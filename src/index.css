@@ -49,7 +49,7 @@
 @import "./styles/user-event-list.css";
 @import "./styles/manage-events-list.css";
 @import "./styles/user-notifications-list.css";
-
+@import "./styles/alerts-anchor.css";
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")

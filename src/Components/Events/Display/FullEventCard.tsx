@@ -1,14 +1,13 @@
 import Tag from "antd/es/tag"
 import { EventlyType, CIEvent } from "../../../util/interfaces"
-import { Icon } from "../../Common/Icon"
 import { getTag, getType, getTypes } from "./EventPreview"
 import dayjs from "dayjs"
 import React from "react"
 import { utilService } from "../../../util/utilService"
-import SecondaryButton from "../../Common/SecondaryButton"
 import BioModal from "../../Users/BioModal"
 import CIEventNotificationModal from "../../Notifications/CIEventNotificationModal"
-
+import { Icon } from "../../Common/Icon"
+import SecondaryButton from "../../Common/SecondaryButton"
 export default function FullEventCard({
     event: ci_event,
     showPast,
