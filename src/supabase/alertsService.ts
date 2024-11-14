@@ -7,12 +7,11 @@ export const alertsService = {
 
 async function setAlertViewed(alertId: string) {
     try {
-        const { data, error } = await supabase
+        const { error } = await supabase
             .from("alerts")
             .update({ viewed: true })
             .eq("id", alertId)
         if (error) throw error
-        console.log("alert viewed", data)
     } catch (error) {
         console.error(error)
     }

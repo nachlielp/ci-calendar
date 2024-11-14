@@ -2,9 +2,11 @@ import Drawer from "antd/es/drawer"
 import FullEventCard from "./FullEventCard"
 
 import { CIEvent } from "../../../util/interfaces"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Icon } from "../../Common/Icon"
+import { alertsService } from "../../../supabase/alertsService"
+import { useUser } from "../../../context/UserContext"
 
 interface EventDrawerProps {
     event: CIEvent | null
@@ -22,6 +24,19 @@ export default function FullEventCardDrawer({
         return null
     }
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
+
+    const { user } = useUser()
+
+    useEffect(() => {
+        if (isModalOpen && user?.alerts) {
+            const matchingAlert = user.alerts.find(
+                (alert) => alert.ci_event_id === event.id
+            )
+            if (matchingAlert && !matchingAlert.viewed) {
+                alertsService.setAlertViewed(matchingAlert.id)
+            }
+        }
+    }, [isModalOpen, event.id, user?.alerts])
 
     const onClose = () => {
         setIsModalOpen(false)
