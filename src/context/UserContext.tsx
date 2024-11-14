@@ -330,7 +330,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                                   ...prev,
                                   alerts: prev.alerts.map((a) => {
                                       if (a.id === payload.new.id) {
-                                          return payload.new
+                                          return { ...a, ...payload.new }
                                       }
                                       return a
                                   }),

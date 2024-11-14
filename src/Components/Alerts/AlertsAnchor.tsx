@@ -13,8 +13,7 @@ export default function AlertsAnchor() {
 
     useEffect(() => {
         if (user) {
-            setCount(user.alerts.length)
-            console.log(user.alerts)
+            setCount(user.alerts.filter((alert) => !alert.viewed).length)
         }
     }, [user])
 
@@ -37,41 +36,45 @@ export default function AlertsAnchor() {
                     </label>
                     {isOpen && (
                         <article className="alerts-anchor-list">
-                            {user.alerts.map((alert) => {
-                                const eventStartTime = dayjs(alert.start_date)
-                                    .hour(
-                                        dayjs(
-                                            alert.firstSegment.startTime
-                                        ).hour()
+                            {user.alerts
+                                .filter((alert) => !alert.viewed)
+                                .map((alert) => {
+                                    const eventStartTime = dayjs(
+                                        alert.start_date
                                     )
-                                    .minute(
-                                        dayjs(
-                                            alert.firstSegment.startTime
-                                        ).minute()
-                                    )
-                                    .tz("Asia/Jerusalem")
+                                        .hour(
+                                            dayjs(
+                                                alert.firstSegment.startTime
+                                            ).hour()
+                                        )
+                                        .minute(
+                                            dayjs(
+                                                alert.firstSegment.startTime
+                                            ).minute()
+                                        )
+                                        .tz("Asia/Jerusalem")
 
-                                return (
-                                    <div
-                                        key={alert.id}
-                                        className="alert-item"
-                                        onClick={() => onAlertClick(alert)}
-                                    >
-                                        <label className="alert-item-title">
-                                            {alert.title}
-                                        </label>
-                                        <label className="alert-item-description">
-                                            {`תזכורת לאירוע שמתקיים ב ${dayjs(
-                                                alert.start_date
-                                            ).format(
-                                                "DD/MM/YYYY"
-                                            )} בשעה ${eventStartTime.format(
-                                                "HH:mm"
-                                            )} ב${alert.address}`}
-                                        </label>
-                                    </div>
-                                )
-                            })}
+                                    return (
+                                        <div
+                                            key={alert.id}
+                                            className="alert-item"
+                                            onClick={() => onAlertClick(alert)}
+                                        >
+                                            <label className="alert-item-title">
+                                                {alert.title}
+                                            </label>
+                                            <label className="alert-item-description">
+                                                {`תזכורת לאירוע שמתקיים ב ${dayjs(
+                                                    alert.start_date
+                                                ).format(
+                                                    "DD/MM/YYYY"
+                                                )} בשעה ${eventStartTime.format(
+                                                    "HH:mm"
+                                                )} ב${alert.address}`}
+                                            </label>
+                                        </div>
+                                    )
+                                })}
                         </article>
                     )}
                 </>

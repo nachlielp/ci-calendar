@@ -28,7 +28,7 @@ export default function FullEventCardModal({
             const matchingAlert = user.alerts.find(
                 (alert) => alert.ci_event_id === event.id
             )
-            if (matchingAlert) {
+            if (matchingAlert && !matchingAlert.viewed) {
                 alertsService.setAlertViewed(matchingAlert.id)
             }
         }

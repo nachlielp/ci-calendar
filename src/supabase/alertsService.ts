@@ -6,7 +6,6 @@ export const alertsService = {
 }
 
 async function setAlertViewed(alertId: string) {
-    console.log("setAlertViewed", alertId)
     try {
         await supabase.from("alerts").update({ viewed: true }).eq("id", alertId)
     } catch (error) {
