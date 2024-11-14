@@ -8,7 +8,6 @@ import { utilService } from "../../../util/utilService"
 import SecondaryButton from "../../Common/SecondaryButton"
 import BioModal from "../../Users/BioModal"
 import CIEventNotificationModal from "../../Notifications/CIEventNotificationModal"
-// import CIEventNotificationModal from "../Other/CIEventNotificationModal"
 
 export default function FullEventCard({
     event: ci_event,

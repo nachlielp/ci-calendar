@@ -70,6 +70,18 @@ async function getUser(id: string): Promise<DbUser | null> {
             ),
             ci_events:ci_events!left (
                 *
+            ),
+            alerts:alerts!left (
+                id,
+                ci_event_id,
+                user_id,
+                viewed,
+                ci_events!inner (
+                    title,
+                    start_date,
+                    segments,
+                    address
+                )
             )
         `
             )
@@ -80,6 +92,8 @@ async function getUser(id: string): Promise<DbUser | null> {
             .eq("templates.user_id", id)
             .eq("public_bio.user_id", id)
             .eq("ci_events.user_id", id)
+            .eq("alerts.user_id", id)
+            .eq("alerts.viewed", false)
             .single()
 
         if (error) {
@@ -110,7 +124,20 @@ async function getUser(id: string): Promise<DbUser | null> {
                         .isAfter(dayjs())
                 return true
             })
-        return { ...data, notifications } as unknown as DbUser
+
+        const alerts = data?.alerts.map((alert: any) => {
+            const formattedAlert = {
+                ...alert,
+                title: alert.ci_events.title,
+                start_date: alert.ci_events.start_date,
+                firstSegment: alert.ci_events.segments[0],
+                address: alert.ci_events.address.label,
+            }
+            delete formattedAlert.ci_events
+            return formattedAlert
+        })
+
+        return { ...data, notifications, alerts } as unknown as DbUser
     } catch (error) {
         console.error("Error in getUser:", error)
         return null

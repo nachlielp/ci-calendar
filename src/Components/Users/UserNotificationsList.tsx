@@ -5,10 +5,9 @@ import { utilService } from "../../util/utilService"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
-
+import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 dayjs.extend(utc)
 dayjs.extend(timezone)
-import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 
 export default function UserNotificationsList() {
     const { user } = useUser()

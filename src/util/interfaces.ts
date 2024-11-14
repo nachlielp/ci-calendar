@@ -198,8 +198,27 @@ export interface DbUser {
     requests: CIRequest[]
     templates: CITemplate[]
     ci_events: CIEvent[]
+    alerts: CIAlert[]
 }
 
+export interface CIAlert {
+    id: string
+    ci_event_id?: string
+    request_id?: string
+    viewed: boolean
+    title: string
+    start_date: string
+    firstSegment: CIEventSegments
+    address: IAddress
+}
+
+export interface DBCIAlert
+    extends Omit<
+        CIAlert,
+        "ci_event_id" | "title" | "start_date" | "firstSegment" | "address"
+    > {
+    ci_event_id?: string
+}
 export interface UserBio {
     user_id: string
     bio_name: string
