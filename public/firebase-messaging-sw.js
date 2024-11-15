@@ -84,7 +84,7 @@ self.addEventListener("notificationclick", (event) => {
                         .then((navigatedClient) => navigatedClient.focus())
                 }
                 // If no window/tab is open, open a new one
-                return clients.openWindow(urlToOpen)
+                return clients.openWindow(urlToOpen.href)
             })
     )
 })
