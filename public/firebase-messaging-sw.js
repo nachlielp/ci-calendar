@@ -33,6 +33,7 @@ self.addEventListener("push", function (event) {
 // })
 
 self.addEventListener("notificationclick", (event) => {
+    event.preventDefault()
     event.notification.close()
 
     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
