@@ -1,24 +1,14 @@
 import { useEffect } from "react"
-import { useNavigate, useSearchParams } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { utilService } from "../util/utilService"
 
 export const useDefaultFilter = () => {
     const navigate = useNavigate()
-    const [searchParams] = useSearchParams()
+    const location = useLocation()
 
     useEffect(() => {
-        if (searchParams?.get("f")) {
-            const filters = searchParams.get("f")?.split(",")
-            const eventTypes = filters?.filter(
-                (filter) =>
-                    utilService.getFilterItemType(filter) === "eventType"
-            )
-            const districts = filters?.filter(
-                (filter) => utilService.getFilterItemType(filter) === "district"
-            )
-            localStorage.setItem("eventType", JSON.stringify(eventTypes))
-            localStorage.setItem("district", JSON.stringify(districts))
-        } else {
+        // Only run if we're at the root path AND there are no query parameters
+        if (location.pathname === "/" && !location.search) {
             const eventTypes = localStorage.getItem("eventType") || "[]"
             const districts = localStorage.getItem("district") || "[]"
             const defaultFilter = [
@@ -26,11 +16,14 @@ export const useDefaultFilter = () => {
                 ...utilService.removeDuplicates(JSON.parse(districts)),
             ]
 
-            navigate(
-                `/?${defaultFilter
-                    .map((filterItem: any) => `f=${filterItem}`)
-                    .join("&")}`
-            )
+            // Only navigate if we have filters to apply
+            if (defaultFilter.length > 0) {
+                navigate(
+                    `/?${defaultFilter
+                        .map((filterItem: any) => `f=${filterItem}`)
+                        .join("&")}`
+                )
+            }
         }
-    }, [])
+    }, [location.pathname])
 }

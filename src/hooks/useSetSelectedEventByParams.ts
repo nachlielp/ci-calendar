@@ -9,9 +9,6 @@ export const useSetSelectedEventByParams = (events: CIEvent[]) => {
     console.log("eventId", eventId)
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | null>(null)
 
-    const clearSelectedEvent = () => {
-        setSelectedEvent(null)
-    }
     useEffect(() => {
         if (eventId) {
             const event = events.find((event) => event.id === eventId)
@@ -21,9 +18,10 @@ export const useSetSelectedEventByParams = (events: CIEvent[]) => {
                 setSelectedEvent(event)
             }
         } else {
-            setSelectedEvent(null)
+            console.log("eventId is null")
+            // setSelectedEvent(null)
         }
     }, [eventId])
 
-    return { selectedEvent, clearSelectedEvent }
+    return { selectedEvent }
 }

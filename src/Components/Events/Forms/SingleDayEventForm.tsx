@@ -11,7 +11,7 @@ import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { SelectOption, tagOptions } from "../../../util/options"
 import { CIEvent, IAddress, UserType } from "../../../util/interfaces"
-import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
+
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
@@ -25,9 +25,10 @@ import {
     templateService,
 } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
-import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
 import { useCIEvents } from "../../../context/CIEventsContext"
+import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
+import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

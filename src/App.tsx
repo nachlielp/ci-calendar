@@ -76,11 +76,15 @@ export default function App() {
                                 element={<ResetPasswordRequest />}
                             />
                             <Route
-                                path="/"
+                                path="/event/:eventId"
                                 element={<EventsPage events={ci_events} />}
                             />
                             <Route
-                                path="/event/:eventId"
+                                path="/:eventId"
+                                element={<EventsPage events={ci_events} />}
+                            />
+                            <Route
+                                path="/"
                                 element={<EventsPage events={ci_events} />}
                             />
                             {/* <Route

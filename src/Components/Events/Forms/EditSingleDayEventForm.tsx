@@ -15,8 +15,10 @@ import {
     UserType,
     CITemplate,
 } from "../../../util/interfaces"
+
 import Loading from "../../Common/Loading"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
+import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
@@ -27,9 +29,7 @@ import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
-import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import Alert from "antd/es/alert"
-
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
