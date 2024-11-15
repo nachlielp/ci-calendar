@@ -25,11 +25,10 @@ self.addEventListener("push", function (event) {
 self.addEventListener("notificationclick", (event) => {
     event.preventDefault()
 
-    // let distUrl = self.location.origin + "/specific-path"
-    // const apntId = event.notification.data?.apntId
-    // if (apntId) distUrl = self.location.origin + "/other-path/" + apntId
-    const distUrl =
-        "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+    const eventId = event.notification.data?.eventId
+    let distUrl = self.location.origin + "/"
+    if (eventId) distUrl = self.location.origin + `/event/${eventId}`
+
     event.notification.close()
 
     event.waitUntil(
