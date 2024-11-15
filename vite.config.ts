@@ -69,8 +69,6 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
         ],
         navigateFallback: "index.html",
         cleanupOutdatedCaches: true,
-        skipWaiting: true, // Add this
-        clientsClaim: true, // Add this
     },
     // Add notification related strategies
     strategies: "generateSW",
