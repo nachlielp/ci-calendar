@@ -62,12 +62,12 @@ self.addEventListener("push", function (event) {
 // })
 
 self.addEventListener("notificationclick", (event) => {
+    console.log("event", event)
     event.preventDefault()
     event.notification.close()
 
     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
-        .href
-
+    console.log("urlToOpen", urlToOpen)
     event.waitUntil(
         clients
             .matchAll({
