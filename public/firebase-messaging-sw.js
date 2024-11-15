@@ -43,27 +43,8 @@ self.addEventListener("notificationclick", (event) => {
     //             } else event.waitUntil(self.clients.openWindow(distUrl))
     //         })
     // )
-    event.waitUntil(
-        self.clients
-            .matchAll({ type: "window", includeUncontrolled: true })
-            .then(async (clients) => {
-                if (clients.length > 0) {
-                    console.log("clients", clients)
-                    const client = clients[0]
-                    // Wait for navigation to complete before focusing
-                    const navigatedClient = await client.navigate(distUrl)
-                    if (navigatedClient) {
-                        return navigatedClient.focus()
-                    } else {
-                        // If navigation fails, open new window
-                        return self.clients.openWindow(distUrl)
-                    }
-                } else {
-                    console.log("no clients")
-                    return self.clients.openWindow(distUrl)
-                }
-            })
-    )
+    event.notification.close()
+    clients.openWindow("https://youtu.be/PAvHeRGZ_lA")
 })
 
 // self.addEventListener("notificationclick", (event) => {
