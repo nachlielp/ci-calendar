@@ -31,20 +31,18 @@ self.addEventListener("notificationclick", (event) => {
 
     event.notification.close()
 
-    // event.waitUntil(
-    //     self.clients
-    //         .matchAll({ type: "window", includeUncontrolled: true })
-    //         .then((clients) => {
-    //             if (clients.length > 0) {
-    //                 const client = clients[0]
-    //                 client.navigate(distUrl)
-    //                 client.focus()
-    //                 return
-    //             } else event.waitUntil(self.clients.openWindow(distUrl))
-    //         })
-    // )
-    event.notification.close()
-    clients.openWindow(distUrl)
+    event.waitUntil(
+        self.clients
+            .matchAll({ type: "window", includeUncontrolled: true })
+            .then((clients) => {
+                if (clients.length > 0) {
+                    const client = clients[0]
+                    client.navigate(distUrl)
+                    client.focus()
+                    return
+                } else event.waitUntil(self.clients.openWindow(distUrl))
+            })
+    )
 })
 
 // self.addEventListener("notificationclick", (event) => {
