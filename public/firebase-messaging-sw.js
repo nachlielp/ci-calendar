@@ -31,16 +31,37 @@ self.addEventListener("notificationclick", (event) => {
 
     event.notification.close()
 
+    // event.waitUntil(
+    //     self.clients
+    //         .matchAll({ type: "window", includeUncontrolled: true })
+    //         .then((clients) => {
+    //             if (clients.length > 0) {
+    //                 const client = clients[0]
+    //                 client.navigate(distUrl)
+    //                 client.focus()
+    //                 return
+    //             } else event.waitUntil(self.clients.openWindow(distUrl))
+    //         })
+    // )
     event.waitUntil(
         self.clients
             .matchAll({ type: "window", includeUncontrolled: true })
-            .then((clients) => {
+            .then(async (clients) => {
                 if (clients.length > 0) {
+                    console.log("clients", clients)
                     const client = clients[0]
-                    client.navigate(distUrl)
-                    client.focus()
-                    return
-                } else event.waitUntil(self.clients.openWindow(distUrl))
+                    // Wait for navigation to complete before focusing
+                    const navigatedClient = await client.navigate(distUrl)
+                    if (navigatedClient) {
+                        return navigatedClient.focus()
+                    } else {
+                        // If navigation fails, open new window
+                        return self.clients.openWindow(distUrl)
+                    }
+                } else {
+                    console.log("no clients")
+                    return self.clients.openWindow(distUrl)
+                }
             })
     )
 })
