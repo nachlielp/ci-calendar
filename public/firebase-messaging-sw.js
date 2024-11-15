@@ -80,7 +80,7 @@ self.addEventListener("notificationclick", (event) => {
                     const client = windowClients[0]
                     // Navigate to the notification URL
                     return client
-                        .navigate(urlToOpen)
+                        .navigate(urlToOpen.href)
                         .then((navigatedClient) => navigatedClient.focus())
                 }
                 // If no window/tab is open, open a new one
