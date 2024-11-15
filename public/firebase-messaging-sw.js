@@ -62,31 +62,11 @@ self.addEventListener("push", function (event) {
 // })
 
 self.addEventListener("notificationclick", (event) => {
-    console.log("event", event)
     event.preventDefault()
     event.notification.close()
 
     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
-    console.log("urlToOpen", urlToOpen)
-    // event.waitUntil(
-    //     clients
-    //         .matchAll({
-    //             type: "window",
-    //             includeUncontrolled: true,
-    //         })
-    //         .then((windowClients) => {
-    //             // If we have an open window/tab
-    //             if (windowClients.length > 0) {
-    //                 const client = windowClients[0]
-    //                 // Navigate to the notification URL
-    //                 return client
-    //                     .navigate(urlToOpen)
-    //                     .then((navigatedClient) => navigatedClient.focus())
-    //             }
-    //             // If no window/tab is open, open a new one
-    //             return clients.openWindow(urlToOpen)
-    //         })
-    // )
+
     event.waitUntil(
         clients
             .matchAll({
@@ -105,16 +85,25 @@ self.addEventListener("notificationclick", (event) => {
                             return navigatedClient.focus()
                         } else {
                             // If navigation failed, open new window
-                            return clients.openWindow(urlToOpen)
+                            // return clients.openWindow(urlToOpen)
+                            return clients.openWindow(
+                                "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+                            )
                         }
                     } catch (error) {
                         console.error("Navigation failed:", error)
                         // Fallback to opening new window
-                        return clients.openWindow(urlToOpen)
+                        // return clients.openWindow(urlToOpen)
+                        return clients.openWindow(
+                            "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+                        )
                     }
                 }
                 // If no window/tab is open, open a new one
-                return clients.openWindow(urlToOpen)
+                // return clients.openWindow(urlToOpen)
+                return clients.openWindow(
+                    "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+                )
             })
     )
 })
