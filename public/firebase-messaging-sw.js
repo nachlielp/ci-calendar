@@ -44,7 +44,7 @@ self.addEventListener("notificationclick", (event) => {
     //         })
     // )
     event.notification.close()
-    clients.openWindow("https://youtu.be/PAvHeRGZ_lA")
+    clients.openWindow(distUrl)
 })
 
 // self.addEventListener("notificationclick", (event) => {
