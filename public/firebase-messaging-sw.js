@@ -68,23 +68,53 @@ self.addEventListener("notificationclick", (event) => {
 
     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
     console.log("urlToOpen", urlToOpen)
+    // event.waitUntil(
+    //     clients
+    //         .matchAll({
+    //             type: "window",
+    //             includeUncontrolled: true,
+    //         })
+    //         .then((windowClients) => {
+    //             // If we have an open window/tab
+    //             if (windowClients.length > 0) {
+    //                 const client = windowClients[0]
+    //                 // Navigate to the notification URL
+    //                 return client
+    //                     .navigate(urlToOpen)
+    //                     .then((navigatedClient) => navigatedClient.focus())
+    //             }
+    //             // If no window/tab is open, open a new one
+    //             return clients.openWindow(urlToOpen)
+    //         })
+    // )
     event.waitUntil(
         clients
             .matchAll({
                 type: "window",
                 includeUncontrolled: true,
             })
-            .then((windowClients) => {
+            .then(async (windowClients) => {
                 // If we have an open window/tab
                 if (windowClients.length > 0) {
                     const client = windowClients[0]
-                    // Navigate to the notification URL
-                    return client
-                        .navigate(urlToOpen.href)
-                        .then((navigatedClient) => navigatedClient.focus())
+                    try {
+                        // First navigate
+                        const navigatedClient = await client.navigate(urlToOpen)
+                        // Then focus
+                        if (navigatedClient) {
+                            return navigatedClient.focus()
+                        } else {
+                            // If navigation failed, open new window
+                            return clients.openWindow(urlToOpen)
+                        }
+                    } catch (error) {
+                        console.error("Navigation failed:", error)
+                        // Fallback to opening new window
+                        return clients.openWindow(urlToOpen)
+                    }
                 }
                 // If no window/tab is open, open a new one
-                return clients.openWindow(urlToOpen.href)
+                return clients.openWindow(urlToOpen)
             })
     )
 })
