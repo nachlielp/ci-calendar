@@ -2,10 +2,10 @@ import { useUser } from "../../context/UserContext"
 import { UserNotification } from "../../util/interfaces"
 import { notificationOptions, SelectOption } from "../../util/options"
 import { utilService } from "../../util/utilService"
+import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
-import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -22,17 +22,10 @@ export default function UserNotificationsList() {
 
             {user?.notifications
                 .filter((notification: UserNotification) => {
-                    //make sure the event start time did not pass
-                    const eventStartTime = dayjs(notification.start_date)
-                        .hour(dayjs(notification.firstSegment.startTime).hour())
-                        .minute(
-                            dayjs(notification.firstSegment.startTime).minute()
-                        )
-                        .tz("Asia/Jerusalem")
-
-                    const isFutureEvent = eventStartTime.isAfter(now)
-
-                    return isFutureEvent
+                    return utilService.isNotificationStartedByFirstSegment(
+                        notification.start_date,
+                        notification.firstSegment.startTime
+                    )
                 })
                 .sort((a: UserNotification, b: UserNotification) =>
                     dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1

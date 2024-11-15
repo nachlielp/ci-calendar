@@ -5,6 +5,7 @@ import { useRef } from "react"
 import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
+import { utilService } from "../../../util/utilService"
 
 interface IEventsListProps {
     events: CIEvent[]
@@ -19,23 +20,30 @@ export default function EventsList({ events, isEvents }: IEventsListProps) {
     return (
         <div className="events-list-container">
             {!isEvents && emptyEventsList()}
-            {events.map((event) =>
-                event.cancelled ? (
-                    <EventPreview key={event.id} event={event} />
-                ) : (
-                    <div
-                        key={event.id}
-                        ref={(el) => (eventRefs.current[event.id] = el)}
-                    >
-                        <FullEventCardContainer
-                            event={event}
-                            anchorEl={
-                                <EventPreview key={event.id} event={event} />
-                            }
-                        />
-                    </div>
+            {events
+                .filter((event) =>
+                    utilService.isSingleDayEventNotStarted(event)
                 )
-            )}
+                .map((event) =>
+                    event.cancelled ? (
+                        <EventPreview key={event.id} event={event} />
+                    ) : (
+                        <div
+                            key={event.id}
+                            ref={(el) => (eventRefs.current[event.id] = el)}
+                        >
+                            <FullEventCardContainer
+                                event={event}
+                                anchorEl={
+                                    <EventPreview
+                                        key={event.id}
+                                        event={event}
+                                    />
+                                }
+                            />
+                        </div>
+                    )
+                )}
             <div className="events-list-footer"></div>
         </div>
     )

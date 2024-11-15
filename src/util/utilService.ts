@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import { v4 as uuidv4 } from "uuid"
 import { CIEvent, CITemplate, DbUserWithoutJoin, UserType } from "./interfaces"
 import { User } from "@supabase/supabase-js"
@@ -9,6 +8,12 @@ import {
     SelectOption,
 } from "./options"
 import { DBCIEvent } from "../supabase/cieventsService"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc.js"
+import timezone from "dayjs/plugin/timezone.js"
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
 export const utilService = {
     createDbUserFromUser,
     deepCompare,
@@ -36,6 +41,8 @@ export const utilService = {
     notAUserId,
     getUniqueOwnersList,
     removeDuplicates,
+    isSingleDayEventNotStarted,
+    isNotificationStartedByFirstSegment,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -389,4 +396,28 @@ function getUniqueOwnersList(events: CIEvent[]): SelectOption[] {
 
 function removeDuplicates(values: string[]) {
     return Array.from(new Set(values))
+}
+
+function isSingleDayEventNotStarted(event: CIEvent) {
+    if (event.is_multi_day) return true
+    return isEventStartedByFirstSegment(
+        event.start_date,
+        event.segments[0].startTime
+    )
+}
+
+function isEventStartedByFirstSegment(startDate: string, startTime: string) {
+    const now = dayjs().tz("Asia/Jerusalem")
+    const eventStartTime = dayjs(startDate)
+        .hour(dayjs(startTime).hour())
+        .minute(dayjs(startTime).minute())
+        .tz("Asia/Jerusalem")
+    return eventStartTime.isAfter(now)
+}
+
+function isNotificationStartedByFirstSegment(
+    startDate: string,
+    startTime: string
+) {
+    return isEventStartedByFirstSegment(startDate, startTime)
 }
