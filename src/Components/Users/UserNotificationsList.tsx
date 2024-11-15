@@ -12,8 +12,6 @@ dayjs.extend(timezone)
 export default function UserNotificationsList() {
     const { user } = useUser()
 
-    const now = dayjs().tz("Asia/Jerusalem")
-
     return (
         <section className="user-notifications-list">
             <label className="user-notifications-list-title">
