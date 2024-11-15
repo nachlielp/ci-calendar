@@ -32,6 +32,35 @@ self.addEventListener("push", function (event) {
 //     event.notification.close()
 // })
 
+// self.addEventListener("notificationclick", (event) => {
+//     event.preventDefault()
+//     event.notification.close()
+
+//     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
+//     console.log("urlToOpen", urlToOpen)
+//     const promiseChain = clients
+//         .matchAll({
+//             type: "window",
+//             includeUncontrolled: true,
+//         })
+//         .then((windowClients) => {
+//             // Check if there is already a window/tab open with the target URL
+//             let matchingClient = windowClients.find((client) => {
+//                 return client.url === urlToOpen
+//             })
+
+//             // If a matching window is found, focus it
+//             if (matchingClient) {
+//                 return matchingClient.focus()
+//             }
+
+//             // If no matching window is found, open a new one
+//             return clients.openWindow(urlToOpen)
+//         })
+
+//     event.waitUntil(promiseChain)
+// })
+
 self.addEventListener("notificationclick", (event) => {
     event.preventDefault()
     event.notification.close()
@@ -39,29 +68,26 @@ self.addEventListener("notificationclick", (event) => {
     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
         .href
 
-    const promiseChain = clients
-        .matchAll({
-            type: "window",
-            includeUncontrolled: true,
-        })
-        .then((windowClients) => {
-            // Check if there is already a window/tab open with the target URL
-            let matchingClient = windowClients.find((client) => {
-                return client.url === urlToOpen
+    event.waitUntil(
+        clients
+            .matchAll({
+                type: "window",
+                includeUncontrolled: true,
             })
-
-            // If a matching window is found, focus it
-            if (matchingClient) {
-                return matchingClient.focus()
-            }
-
-            // If no matching window is found, open a new one
-            return clients.openWindow(urlToOpen)
-        })
-
-    event.waitUntil(promiseChain)
+            .then((windowClients) => {
+                // If we have an open window/tab
+                if (windowClients.length > 0) {
+                    const client = windowClients[0]
+                    // Navigate to the notification URL
+                    return client
+                        .navigate(urlToOpen)
+                        .then((navigatedClient) => navigatedClient.focus())
+                }
+                // If no window/tab is open, open a new one
+                return clients.openWindow(urlToOpen)
+            })
+    )
 })
-
 //TODO cach images and assets
 const cacheName = "ci-events-v1.5"
 
