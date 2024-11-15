@@ -25,10 +25,12 @@ export default function FullEventCardModal({
 
     useEffect(() => {
         if (isModalOpen && user?.alerts) {
-            const matchingAlert = user.alerts.find(
-                (alert) => alert.ci_event_id === event.id
-            )
-            if (matchingAlert && !matchingAlert.viewed) {
+            const matchingAlert = user.alerts
+                .filter((a) => !a.viewed)
+                .find((alert) => {
+                    return alert.ci_event_id === event.id
+                })
+            if (matchingAlert) {
                 alertsService.setAlertViewed(matchingAlert.id)
             }
         }

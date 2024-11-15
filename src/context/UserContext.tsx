@@ -324,19 +324,35 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                 break
             case "alerts":
                 if (payload.eventType === "UPDATE") {
-                    setUser((prev) =>
-                        prev
-                            ? {
-                                  ...prev,
-                                  alerts: prev.alerts.map((a) => {
-                                      if (a.id === payload.new.id) {
-                                          return { ...a, ...payload.new }
-                                      }
-                                      return a
-                                  }),
-                              }
-                            : null
-                    )
+                    if (payload.new.viewed) {
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      alerts: prev.alerts.filter((a) => {
+                                          if (a.id === payload.new.id) {
+                                              return false
+                                          }
+                                          return a
+                                      }),
+                                  }
+                                : null
+                        )
+                    } else {
+                        setUser((prev) =>
+                            prev
+                                ? {
+                                      ...prev,
+                                      alerts: prev.alerts.map((a) => {
+                                          if (a.id === payload.new.id) {
+                                              return { ...a, ...payload.new }
+                                          }
+                                          return a
+                                      }),
+                                  }
+                                : null
+                        )
+                    }
                 }
                 if (payload.eventType === "INSERT") {
                     const alert = await alertsService.getAlertById(
