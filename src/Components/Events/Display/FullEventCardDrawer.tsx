@@ -34,9 +34,13 @@ export default function FullEventCardDrawer({
                 .find((alert) => {
                     return alert.ci_event_id === event.id
                 })
-            if (matchingAlert) {
-                alertsService.setAlertViewed(matchingAlert.id)
+
+            const setAlertViewed = async () => {
+                if (matchingAlert) {
+                    await alertsService.setAlertViewed(matchingAlert.id)
+                }
             }
+            setAlertViewed()
         }
     }, [isModalOpen, event.id, user?.alerts])
 
