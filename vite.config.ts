@@ -57,21 +57,21 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
             },
         },
     },
-    // workbox: {
-    //     runtimeCaching: [
-    //         {
-    //             urlPattern: ({ url }) => true,
-    //             handler: "NetworkFirst",
-    //             options: {
-    //                 cacheName: "api-cache",
-    //             },
-    //         },
-    //     ],
-    //     navigateFallback: "index.html",
-    //     cleanupOutdatedCaches: true,
-    //     skipWaiting: true, // Add this
-    //     clientsClaim: true, // Add this
-    // },
+    workbox: {
+        runtimeCaching: [
+            {
+                urlPattern: ({ url }) => true,
+                handler: "NetworkFirst",
+                options: {
+                    cacheName: "api-cache",
+                },
+            },
+        ],
+        navigateFallback: "index.html",
+        cleanupOutdatedCaches: true,
+        skipWaiting: true, // Add this
+        clientsClaim: true, // Add this
+    },
     // Add notification related strategies
     strategies: "generateSW",
     includeManifestIcons: true,
