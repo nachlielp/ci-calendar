@@ -27,7 +27,7 @@ export default function FullEventCardDrawer({
     const { user } = useUser()
 
     useEffect(() => {
-        if ((isSelectedEvent || isModalOpen) && user?.alerts) {
+        if (isModalOpen && user?.alerts) {
             const matchingAlert = user.alerts
                 .filter((a) => !a.viewed)
                 .find((alert) => {
