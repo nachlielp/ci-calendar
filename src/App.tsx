@@ -80,7 +80,7 @@ export default function App() {
                                 element={<EventsPage events={ci_events} />}
                             />
                             <Route
-                                path="/:eventId"
+                                path="/event/:eventId"
                                 element={<EventsPage events={ci_events} />}
                             />
                             {/* <Route
