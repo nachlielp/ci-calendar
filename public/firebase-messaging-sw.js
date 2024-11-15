@@ -22,91 +22,76 @@ self.addEventListener("push", function (event) {
     event.waitUntil(self.registration.showNotification(data.title, options))
 })
 
-// self.addEventListener("notificationclick", (event) => {
-//     console.log("notificationData.event: ", event)
-//     const notificationData = event.notification.data
-//     if (notificationData.url) {
-//         clients.openWindow(notificationData.url)
-//     }
+self.addEventListener("notificationclick", (event) => {
+    event.preventDefault()
 
-//     event.notification.close()
-// })
+    // let distUrl = self.location.origin + "/specific-path"
+    // const apntId = event.notification.data?.apntId
+    // if (apntId) distUrl = self.location.origin + "/other-path/" + apntId
+    const distUrl =
+        "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+    event.notification.close()
+
+    event.waitUntil(
+        self.clients
+            .matchAll({ type: "window", includeUncontrolled: true })
+            .then((clients) => {
+                if (clients.length > 0) {
+                    const client = clients[0]
+                    client.navigate(distUrl)
+                    client.focus()
+                    return
+                } else event.waitUntil(self.clients.openWindow(distUrl))
+            })
+    )
+})
 
 // self.addEventListener("notificationclick", (event) => {
 //     event.preventDefault()
 //     event.notification.close()
 
 //     const urlToOpen = new URL(event.notification.data.url, self.location.origin)
-//     console.log("urlToOpen", urlToOpen)
-//     const promiseChain = clients
-//         .matchAll({
-//             type: "window",
-//             includeUncontrolled: true,
-//         })
-//         .then((windowClients) => {
-//             // Check if there is already a window/tab open with the target URL
-//             let matchingClient = windowClients.find((client) => {
-//                 return client.url === urlToOpen
+
+//     event.waitUntil(
+//         clients
+//             .matchAll({
+//                 type: "window",
+//                 includeUncontrolled: true,
 //             })
-
-//             // If a matching window is found, focus it
-//             if (matchingClient) {
-//                 return matchingClient.focus()
-//             }
-
-//             // If no matching window is found, open a new one
-//             return clients.openWindow(urlToOpen)
-//         })
-
-//     event.waitUntil(promiseChain)
+//             .then(async (windowClients) => {
+//                 // If we have an open window/tab
+//                 if (windowClients.length > 0) {
+//                     const client = windowClients[0]
+//                     try {
+//                         // First navigate
+//                         const navigatedClient = await client.navigate(urlToOpen)
+//                         // Then focus
+//                         if (navigatedClient) {
+//                             return navigatedClient.focus()
+//                         } else {
+//                             // If navigation failed, open new window
+//                             // return clients.openWindow(urlToOpen)
+//                             return clients.openWindow(
+//                                 "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+//                             )
+//                         }
+//                     } catch (error) {
+//                         console.error("Navigation failed:", error)
+//                         // Fallback to opening new window
+//                         // return clients.openWindow(urlToOpen)
+//                         return clients.openWindow(
+//                             "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+//                         )
+//                     }
+//                 }
+//                 // If no window/tab is open, open a new one
+//                 // return clients.openWindow(urlToOpen)
+//                 return clients.openWindow(
+//                     "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
+//                 )
+//             })
+//     )
 // })
-
-self.addEventListener("notificationclick", (event) => {
-    event.preventDefault()
-    event.notification.close()
-
-    const urlToOpen = new URL(event.notification.data.url, self.location.origin)
-
-    event.waitUntil(
-        clients
-            .matchAll({
-                type: "window",
-                includeUncontrolled: true,
-            })
-            .then(async (windowClients) => {
-                // If we have an open window/tab
-                if (windowClients.length > 0) {
-                    const client = windowClients[0]
-                    try {
-                        // First navigate
-                        const navigatedClient = await client.navigate(urlToOpen)
-                        // Then focus
-                        if (navigatedClient) {
-                            return navigatedClient.focus()
-                        } else {
-                            // If navigation failed, open new window
-                            // return clients.openWindow(urlToOpen)
-                            return clients.openWindow(
-                                "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
-                            )
-                        }
-                    } catch (error) {
-                        console.error("Navigation failed:", error)
-                        // Fallback to opening new window
-                        // return clients.openWindow(urlToOpen)
-                        return clients.openWindow(
-                            "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
-                        )
-                    }
-                }
-                // If no window/tab is open, open a new one
-                // return clients.openWindow(urlToOpen)
-                return clients.openWindow(
-                    "https://dev-ci-calendar.vercel.app/event/a195afc8-eb84-479d-b82b-b93e65df5a89"
-                )
-            })
-    )
-})
 //TODO cach images and assets
 const cacheName = "ci-events-v1.5"
 
