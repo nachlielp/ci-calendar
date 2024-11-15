@@ -5,7 +5,7 @@ import { visualizer } from "rollup-plugin-visualizer"
 
 //
 const manifestForPlugin: Partial<VitePWAOptions> = {
-    registerType: "autoUpdate",
+    registerType: "prompt",
     includeAssets: ["512.png", "192.png"],
     manifest: {
         name: "CI",
@@ -60,7 +60,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
     workbox: {
         runtimeCaching: [
             {
-                urlPattern: ({ url }) => true,
+                urlPattern: ({ url }) => true, // Match all routes
                 handler: "NetworkFirst",
                 options: {
                     cacheName: "api-cache",
@@ -73,31 +73,17 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
     // Add notification related strategies
     strategies: "generateSW",
     includeManifestIcons: true,
-    devOptions: {
-        enabled: true, // Enable PWA in development
-        type: "module", // Add this
-    },
 }
 
 export default defineConfig({
     base: "/",
-    plugins: [react(), VitePWA(manifestForPlugin), visualizer({ open: true })],
+    plugins: [
+        react(),
+        VitePWA(manifestForPlugin),
+        visualizer({ open: true }), // This plugin helps visualize the size of your bundles
+    ],
+
     server: {
         host: "localhost",
-        headers: {
-            "Service-Worker-Allowed": "/",
-            "Cross-Origin-Embedder-Policy": "require-corp",
-            "Cross-Origin-Opener-Policy": "same-origin",
-        },
-    },
-    build: {
-        rollupOptions: {
-            output: {
-                manualChunks: undefined,
-            },
-        },
-    },
-    optimizeDeps: {
-        exclude: ["firebase/messaging"],
     },
 })
