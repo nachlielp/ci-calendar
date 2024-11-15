@@ -21,7 +21,7 @@ export default function AlertsAnchor() {
 
     const onAlertClick = (alert: CIAlert) => {
         setIsOpen(false)
-        navigate(`/${alert.ci_event_id}`)
+        navigate(`/event/${alert.ci_event_id}`)
     }
 
     return (
