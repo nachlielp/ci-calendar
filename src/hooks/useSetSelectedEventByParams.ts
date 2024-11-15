@@ -19,7 +19,7 @@ export const useSetSelectedEventByParams = (events: CIEvent[]) => {
             }
         } else {
             console.log("eventId is null")
-            // setSelectedEvent(null)
+            setSelectedEvent(null)
         }
     }, [eventId])
 
