@@ -13,11 +13,27 @@ export default function AlertsAnchor() {
 
     useEffect(() => {
         if (user) {
-            setCount(user.alerts.filter((alert) => !alert.viewed).length)
+            const alerts = user.alerts.filter((alert) => !alert.viewed)
+
+            setCount(alerts.length)
+
+            // Add a small delay for iOS PWA
+            setTimeout(() => {
+                if (navigator.setAppBadge) {
+                    console.log("setting badge", alerts.length)
+                    navigator.setAppBadge(alerts.length)
+                }
+            }, 500)
         }
     }, [user?.alerts])
 
-    if (!user) return null
+    // useEffect(() => {
+    //     if (user) {
+    //         setCount(user.alerts.filter((alert) => !alert.viewed).length)
+    //     }
+    // }, [user?.alerts])
+
+    if (!user) return <></>
 
     const onAlertClick = (alert: CIAlert) => {
         setIsOpen(false)
