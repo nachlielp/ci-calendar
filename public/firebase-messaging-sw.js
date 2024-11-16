@@ -11,9 +11,20 @@ const FILES_TO_CACHE = [
 
 self.addEventListener("push", function (event) {
     if (event.data) {
-        const data = event.data.json()
-        console.log("SW: Received push event with data:", data)
-
+        try {
+            data = event.data.json()
+            console.log(
+                "🔧 [ServiceWorker] Received push event with data:",
+                data
+            )
+        } catch (error) {
+            console.error(
+                "🔧 [ServiceWorker] Error parsing push event data:",
+                error
+            )
+            console.log("SW: Event data:", event.data)
+            return // Exit if we can't parse the data
+        }
         const options = {
             body: data.body,
             title: data.title,
