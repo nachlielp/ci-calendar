@@ -12,6 +12,7 @@ export default function AlertsAnchor() {
     const [count, setCount] = useState(0)
 
     useEffect(() => {
+        console.log("user", user)
         if (user) {
             const alerts = user.alerts.filter((alert) => !alert.viewed)
 
@@ -26,12 +27,6 @@ export default function AlertsAnchor() {
             }, 500)
         }
     }, [user?.alerts])
-
-    // useEffect(() => {
-    //     if (user) {
-    //         setCount(user.alerts.filter((alert) => !alert.viewed).length)
-    //     }
-    // }, [user?.alerts])
 
     if (!user) return <></>
 
