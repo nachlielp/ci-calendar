@@ -31,7 +31,7 @@ if ("serviceWorker" in navigator) {
 
                 // Wait for the service worker to be ready
                 await navigator.serviceWorker.ready
-
+                console.log("Service worker ready")
                 // Listen for messages from the service worker
                 navigator.serviceWorker.addEventListener("message", (event) => {
                     console.log("Received message:", event)
