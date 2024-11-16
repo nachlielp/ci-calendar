@@ -23,36 +23,23 @@ if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
             .register("/firebase-messaging-sw.js")
-            .then((registration) => {
+            .then(async (registration) => {
                 console.log(
                     "Service Worker registered with scope:",
                     registration.scope
                 )
 
-                // Check for updates to the service worker
-                registration.onupdatefound = () => {
-                    const installingWorker = registration.installing
+                // Wait for the service worker to be ready
+                await navigator.serviceWorker.ready
 
-                    if (installingWorker) {
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === "installed") {
-                                if (navigator.serviceWorker.controller) {
-                                    // New update available
-                                    console.log(
-                                        "New or updated content is available."
-                                    )
-                                    // Optionally, prompt the user to refresh the page
-                                    // window.location.reload(); - leads to an infinite reload
-                                } else {
-                                    // Content is cached for offline use
-                                    console.log(
-                                        "Content is now available offline!"
-                                    )
-                                }
-                            }
-                        }
+                // Listen for messages from the service worker
+                navigator.serviceWorker.addEventListener("message", (event) => {
+                    if (event.data && event.data.type === "PUSH_NOTIFICATION") {
+                        // Handle the push notification data here
+                        // You can update your app state, refresh data, etc.
+                        console.log("Received push notification:", event.data)
                     }
-                }
+                })
             })
             .catch((error) => {
                 console.error("Service Worker registration failed:", error)
