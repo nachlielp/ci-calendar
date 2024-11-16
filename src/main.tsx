@@ -25,7 +25,7 @@ if ("serviceWorker" in navigator) {
             .register("/firebase-messaging-sw.js")
             .then(async (registration) => {
                 console.log(
-                    "Service Worker registered with scope:",
+                    "_Service Worker registered with scope:",
                     registration.scope
                 )
 
@@ -34,6 +34,7 @@ if ("serviceWorker" in navigator) {
 
                 // Listen for messages from the service worker
                 navigator.serviceWorker.addEventListener("message", (event) => {
+                    console.log("Received message:", event)
                     if (event.data && event.data.type === "PUSH_NOTIFICATION") {
                         // Handle the push notification data here
                         // You can update your app state, refresh data, etc.

@@ -12,7 +12,6 @@ export default function AlertsAnchor() {
     const [count, setCount] = useState(0)
 
     useEffect(() => {
-        console.log("user", user)
         if (user) {
             const alerts = user.alerts.filter((alert) => !alert.viewed)
 
