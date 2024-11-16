@@ -12,6 +12,7 @@ const FILES_TO_CACHE = [
 self.addEventListener("push", function (event) {
     if (event.data) {
         const data = event.data.json()
+        console.log("SW: Received push event with data:", data)
 
         const options = {
             body: data.body,
@@ -25,7 +26,11 @@ self.addEventListener("push", function (event) {
 
         // Notify all clients (browser windows/tabs) about the notification
         self.clients.matchAll().then((clients) => {
+            console.log("SW: Found clients to notify:", clients.length)
+
             clients.forEach((client) => {
+                console.log("SW: Posting message to client")
+
                 client.postMessage({
                     type: "PUSH_NOTIFICATION",
                     payload: data,
