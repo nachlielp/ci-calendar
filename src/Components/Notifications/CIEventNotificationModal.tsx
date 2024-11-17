@@ -103,6 +103,7 @@ export default function CIEventNotificationModal({
                         value={remindInHours?.toString() || "1"}
                         style={{ width: "200px" }}
                         onChange={(value) => setRemindInHours(value)}
+                        disabled={!user?.receive_notifications}
                     />
 
                     {!user.receive_notifications && (
