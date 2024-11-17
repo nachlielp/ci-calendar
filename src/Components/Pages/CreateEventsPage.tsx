@@ -41,6 +41,14 @@ export default function CreateEventsPage() {
                     message="על מנת לתייג את עצמכם בארועים צריך ליצור קודם פרופיל"
                     type="warning"
                     showIcon
+                    style={{ marginBottom: "1rem" }}
+                />
+            )}
+            {user?.templates.length === 0 && (
+                <Alert
+                    message="כדאי ליצור תבניות עבור אירועים חוזרים"
+                    type="warning"
+                    showIcon
                 />
             )}
             <article className="btns-container">
