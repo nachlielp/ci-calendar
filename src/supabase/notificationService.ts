@@ -5,6 +5,7 @@ export const notificationService = {
     createNotification,
     updateNotification,
     getNotificationById,
+    upsertNotification,
 }
 
 async function createNotification(notification: NotificationDB) {
@@ -28,6 +29,21 @@ async function updateNotification(notification: NotificationDB) {
             .from("notifications")
             .update(notification)
             .eq("id", notification.id)
+        if (error) throw error
+        return data
+    } catch (error) {
+        console.error(error)
+    }
+}
+async function upsertNotification(notification: NotificationDB) {
+    try {
+        const { data, error } = await supabase
+            .from("notifications")
+            .upsert(notification, {
+                onConflict: "ci_event_id,user_id",
+            })
+            .select()
+            .single()
         if (error) throw error
         return data
     } catch (error) {

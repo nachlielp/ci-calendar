@@ -57,21 +57,16 @@ export default function CIEventNotificationModal({
             setIsOpen(false)
             return
         }
-        if (currentNotification) {
-            await notificationService.updateNotification({
-                id: currentNotification.id,
+
+        try {
+            await notificationService.upsertNotification({
                 remind_in_hours: remindInHours,
                 ci_event_id: eventId,
                 user_id: user.user_id,
                 is_sent: false,
             })
-        } else if (!user.notifications.find((n) => n.ci_event_id === eventId)) {
-            await notificationService.createNotification({
-                ci_event_id: eventId,
-                user_id: user.user_id,
-                remind_in_hours: remindInHours,
-                is_sent: false,
-            })
+        } catch (error) {
+            console.error(error)
         }
         setIsOpen(false)
     }
