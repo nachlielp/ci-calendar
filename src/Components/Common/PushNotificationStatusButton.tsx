@@ -41,6 +41,9 @@ const PushNotificationStatusButton = () => {
         }
     }, [permissionStatus])
 
+    useEffect(() => {
+        console.log("checked", checked)
+    }, [checked])
     if (!user) return <></>
 
     async function handleChange(checked: boolean) {

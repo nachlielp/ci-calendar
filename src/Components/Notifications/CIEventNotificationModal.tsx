@@ -9,7 +9,7 @@ import Alert from "antd/es/alert/Alert"
 import { notificationOptions } from "../../util/options"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
-    "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור התראה"
+    "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
 
 export default function CIEventNotificationModal({
     eventId,
