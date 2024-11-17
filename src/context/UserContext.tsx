@@ -151,7 +151,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
         switch (table) {
             case "users":
-                console.log("users", payload.new)
                 setUser((prev) => ({ ...prev, ...payload.new }))
                 break
             case "ci_events":
