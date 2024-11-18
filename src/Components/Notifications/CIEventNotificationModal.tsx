@@ -7,6 +7,8 @@ import { useUser } from "../../context/UserContext"
 import { notificationService } from "../../supabase/notificationService"
 import Alert from "antd/es/alert/Alert"
 import { notificationOptions } from "../../util/options"
+import AsyncButton from "../Common/AsyncButton"
+import { utilService } from "../../util/utilService"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
@@ -21,6 +23,7 @@ export default function CIEventNotificationModal({
     if (!user) return null
 
     const [isOpen, setIsOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const [remindInHours, setRemindInHours] = useState<string | null>(null)
 
     useEffect(() => {
@@ -59,6 +62,7 @@ export default function CIEventNotificationModal({
         }
 
         try {
+            setIsSubmitting(true)
             await notificationService.upsertNotification({
                 remind_in_hours: remindInHours,
                 ci_event_id: eventId,
@@ -67,8 +71,10 @@ export default function CIEventNotificationModal({
             })
         } catch (error) {
             console.error(error)
+        } finally {
+            setIsSubmitting(false)
+            setIsOpen(false)
         }
-        setIsOpen(false)
     }
 
     return (
@@ -113,15 +119,13 @@ export default function CIEventNotificationModal({
                         />
                     )}
                     {user.receive_notifications && (
-                        <SecondaryButton
-                            label="אישור"
-                            successLabel="אישור"
-                            icon={"check"}
-                            successIcon={"check"}
+                        <AsyncButton
+                            isSubmitting={isSubmitting}
                             callback={handleOk}
                             disabled={!user?.receive_notifications}
-                            className="notification-modal-button"
-                        />
+                        >
+                            אישור
+                        </AsyncButton>
                     )}
                 </section>
             </Modal>

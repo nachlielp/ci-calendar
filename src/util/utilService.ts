@@ -43,6 +43,7 @@ export const utilService = {
     removeDuplicates,
     isSingleDayEventNotStarted,
     isNotificationStartedByFirstSegment,
+    sleep,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -267,6 +268,7 @@ function getDeviceId() {
 }
 
 function isPWA() {
+    return true
     return (
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true
@@ -420,4 +422,8 @@ function isNotificationStartedByFirstSegment(
     startTime: string
 ) {
     return isEventStartedByFirstSegment(startDate, startTime)
+}
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
 }
