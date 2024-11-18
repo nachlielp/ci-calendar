@@ -3,10 +3,13 @@ const CACHE_NAME = `ci-calendar-cache-${CACHE_VERSION}`
 const FILES_TO_CACHE = [
     // "/",
     // "/index.html",
-    "./assets/img/Background_2.png",
-    "./assets/img/icon-192.png",
-    "./assets/img/icon-512.png",
-    "./assets/img/cat-butt.gif",
+    "/192.png",
+    "/512.png",
+    "/ci-circle-192.png",
+    "/assets/img/Background_2.png",
+    "/assets/img/icon-192.png",
+    "/assets/img/icon-512.png",
+    "/assets/img/cat-butt.gif",
 ]
 self.addEventListener("push", function (event) {
     try {
@@ -64,29 +67,8 @@ self.addEventListener("notificationclick", (event) => {
 
     event.notification.close()
 
-    event.waitUntil(
-        clients.openWindow(distUrl) // The PWA route you want to open
-    )
-
-    // event.waitUntil(
-    //     self.clients
-    //         .matchAll({ type: "window", includeUncontrolled: true })
-    //         .then((clients) => {
-    //             if (clients.length > 0) {
-    //                 const client = clients[0]
-    //                 client.navigate(distUrl)
-    //                 client.focus()
-    //                 return
-    //             } else event.waitUntil(self.clients.openWindow(distUrl))
-    //         })
-    // )
+    event.waitUntil(clients.openWindow(distUrl))
 })
-
-const filesToCache = [
-    "./assets/img/Background_2.png",
-    "./assets/img/icon-192.png",
-    "./assets/img/icon-512.png",
-]
 
 self.addEventListener("install", (e) => {
     console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
@@ -96,7 +78,6 @@ self.addEventListener("install", (e) => {
         (async () => {
             try {
                 const cache = await caches.open(CACHE_NAME)
-                console.log("[ServiceWorker] - Caching app shell")
                 await cache.addAll(FILES_TO_CACHE)
             } catch (error) {
                 console.error("[ServiceWorker] - Cache failed:", error)
@@ -105,6 +86,30 @@ self.addEventListener("install", (e) => {
     )
 })
 
+function isCacheable(req) {
+    const url = new URL(req.url)
+    return !url.pathname.endsWith(".json")
+}
+
+async function cacheFirstWithRefresh(request) {
+    const fetchResponsePromise = fetch(request).then(
+        async (networkResponse) => {
+            if (networkResponse.ok) {
+                const cache = await caches.open(CACHE_NAME)
+                cache.put(request, networkResponse.clone())
+            }
+            return networkResponse
+        }
+    )
+
+    return (await caches.match(request)) || (await fetchResponsePromise)
+}
+
+self.addEventListener("fetch", (event) => {
+    if (isCacheable(event.request)) {
+        event.respondWith(cacheFirstWithRefresh(event.request))
+    }
+})
 //clean up old caches by name
 self.addEventListener("activate", (e) => {
     e.waitUntil(
