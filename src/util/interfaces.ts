@@ -156,6 +156,7 @@ export interface Notification {
     send_at: string
     timezone: string
     is_sent: boolean
+    is_multi_day: boolean
 }
 
 export interface UserNotification
@@ -168,7 +169,13 @@ export interface UserNotification
 export interface NotificationDB
     extends Omit<
         Notification,
-        "id" | "created_at" | "title" | "body" | "send_at" | "timezone"
+        | "id"
+        | "created_at"
+        | "title"
+        | "body"
+        | "send_at"
+        | "timezone"
+        | "is_multi_day"
     > {
     id?: string
 }

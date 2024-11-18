@@ -1,6 +1,6 @@
 import { useUser } from "../../context/UserContext"
 import { UserNotification } from "../../util/interfaces"
-import { notificationOptions, SelectOption } from "../../util/options"
+import { singleDayNotificationOptions, SelectOption } from "../../util/options"
 import { utilService } from "../../util/utilService"
 import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 import dayjs from "dayjs"
@@ -47,7 +47,7 @@ export default function UserNotificationsList() {
                                     {" - "}
                                     <label className="user-notification-remind-in-hours">
                                         {
-                                            notificationOptions.find(
+                                            singleDayNotificationOptions.find(
                                                 (option: SelectOption) =>
                                                     option.value ===
                                                     notification.remind_in_hours
@@ -57,6 +57,7 @@ export default function UserNotificationsList() {
                                 </label>
                                 <CIEventNotificationModal
                                     eventId={notification.ci_event_id}
+                                    isMultiDay={notification.is_multi_day}
                                 />
                             </div>
                         </div>

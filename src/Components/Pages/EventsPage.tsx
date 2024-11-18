@@ -33,8 +33,9 @@ const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
 export default function EventsPage({ events }: IEventsPageProps) {
     const { selectedEvent } = useSetSelectedEventByParams(events)
     const { config } = useCIEvents()
-    console.log("config", config)
+
     const isMobile = useIsMobile()
+
     useDefaultFilter()
 
     const [isListView, setIsListView] = useState<boolean>(true)

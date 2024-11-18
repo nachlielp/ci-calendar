@@ -6,7 +6,10 @@ import Select from "antd/es/select"
 import { useUser } from "../../context/UserContext"
 import { notificationService } from "../../supabase/notificationService"
 import Alert from "antd/es/alert/Alert"
-import { notificationOptions } from "../../util/options"
+import {
+    singleDayNotificationOptions,
+    multiDayNotificationOptions,
+} from "../../util/options"
 import AsyncButton from "../Common/AsyncButton"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
@@ -14,10 +17,12 @@ const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
 
 export default function CIEventNotificationModal({
     eventId,
+    isMultiDay,
 }: {
     eventId: string
+    isMultiDay: boolean
 }) {
-    const { user } = useUser()
+    const { user, updateUserState } = useUser()
 
     if (!user) return null
 
@@ -62,12 +67,23 @@ export default function CIEventNotificationModal({
 
         try {
             setIsSubmitting(true)
-            await notificationService.upsertNotification({
+            const notification = await notificationService.upsertNotification({
                 remind_in_hours: remindInHours,
                 ci_event_id: eventId,
                 user_id: user.user_id,
                 is_sent: false,
             })
+
+            if (notification) {
+                updateUserState({
+                    notifications: [
+                        ...user.notifications.filter(
+                            (n) => n.ci_event_id !== eventId
+                        ),
+                        { ...notification, is_multi_day: isMultiDay },
+                    ],
+                })
+            }
         } catch (error) {
             console.error(error)
         } finally {
@@ -104,7 +120,11 @@ export default function CIEventNotificationModal({
                         </label>
                     </article>
                     <Select
-                        options={notificationOptions}
+                        options={
+                            isMultiDay
+                                ? multiDayNotificationOptions
+                                : singleDayNotificationOptions
+                        }
                         value={remindInHours?.toString() || "1"}
                         style={{ width: "200px" }}
                         onChange={(value) => setRemindInHours(value)}

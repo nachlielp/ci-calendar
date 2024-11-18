@@ -22,7 +22,7 @@ type Props = { children: React.ReactNode }
 export const SessionProvider = ({ children }: Props) => {
     const [session, setSession] = useState<Session | null>(null)
     const [isLoading, setIsLoading] = useState(true)
-    const { updateUser } = useUser()
+    const { updateUserState } = useUser()
 
     useEffect(() => {
         const authStateListener = supabase.auth.onAuthStateChange(
@@ -35,7 +35,7 @@ export const SessionProvider = ({ children }: Props) => {
         return () => {
             authStateListener.data.subscription.unsubscribe()
         }
-    }, [updateUser])
+    }, [updateUserState])
 
     return (
         <SessionContext.Provider value={{ session }}>

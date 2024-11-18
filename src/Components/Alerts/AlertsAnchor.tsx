@@ -20,7 +20,6 @@ export default function AlertsAnchor() {
             // Add a small delay for iOS PWA
             setTimeout(() => {
                 if (navigator.setAppBadge) {
-                    console.log("setting badge", alerts.length)
                     navigator.setAppBadge(alerts.length)
                 }
             }, 500)

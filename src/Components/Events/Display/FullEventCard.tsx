@@ -238,8 +238,11 @@ export default function FullEventCard({
 
             {!showPast && (
                 <article className="event-card-footer">
-                    {utilService.isPWA() && !ci_event.is_multi_day && (
-                        <CIEventNotificationModal eventId={ci_event.id} />
+                    {utilService.isPWA() && (
+                        <CIEventNotificationModal
+                            eventId={ci_event.id}
+                            isMultiDay={ci_event.is_multi_day}
+                        />
                     )}
                     {utilService.isPWA() && (
                         <SecondaryButton

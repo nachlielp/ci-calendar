@@ -10,7 +10,6 @@ import { alertsService } from "../supabase/alertsService"
 
 interface IUserContextType {
     user: DbUser | null
-    updateUser: (updatedUser: Partial<DbUser>) => void
     loading: boolean
     updateUserContext: (updatedUser: Partial<DbUser>) => Promise<void>
     updateUserState: (updatedUser: Partial<DbUser>) => void
@@ -18,7 +17,6 @@ interface IUserContextType {
 
 const UserContext = createContext<IUserContextType>({
     user: null,
-    updateUser: () => {},
     loading: true,
     updateUserContext: async () => {},
     updateUserState: async () => {},
@@ -38,14 +36,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const subscriptionRef = useRef<RealtimeChannel | null>(null)
 
     const { session } = useSession()
-
-    function updateUser(updatedUser: Partial<DbUser>) {
-        if (user) {
-            setUser((prev) => {
-                return { ...prev, ...updatedUser } as DbUser
-            })
-        }
-    }
 
     const updateUserContext = async (updatedUser: Partial<DbUser>) => {
         try {
@@ -374,7 +364,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         <UserContext.Provider
             value={{
                 user,
-                updateUser,
                 loading,
                 updateUserContext,
                 updateUserState,
