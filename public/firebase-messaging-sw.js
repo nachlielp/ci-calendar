@@ -12,8 +12,18 @@ self.addEventListener("push", function (event) {
     try {
         const { data } = event.data.json()
 
+        // Get current badge count from IndexedDB or other storage
+        //anynimous function in waitUntil needs to be async for this
+        // const getBadgeCount = async () => {
+        //   const reg = await self.registration;
+        //   return reg
+        //     .getNotifications()
+        //     .then((notifications) => notifications.length + 1);
+        // };
+
         event.waitUntil(
             (() => {
+                // const count = await getBadgeCount();
                 const options = {
                     body: data.body,
                     title: data.title,
@@ -22,65 +32,17 @@ self.addEventListener("push", function (event) {
                     badge: data.badge,
                 }
 
-                // Set app badge
                 if (navigator.setAppBadge) {
-                    navigator.setAppBadge(data.count)
+                    navigator.setAppBadge(data.badge)
                 }
 
                 return self.registration.showNotification(data.title, options)
             })()
         )
     } catch (error) {
-        console.error(
-            "🔧 [ServiceWorker] Error parsing push event data:",
-            error
-        )
-        console.log("SW: Event data:", event.data)
-        return // Exit if we can't parse the data
-    }
-
-    // Wrap the entire async operation in waitUntil
-})
-self.addEventListener("push", function (event) {
-    if (event.data) {
-        try {
-            data = event.data.json()
-            console.log(
-                "🔧 [ServiceWorker] Received push event with data:",
-                data
-            )
-        } catch (error) {
-            console.error(
-                "🔧 [ServiceWorker] Error parsing push event data:",
-                error
-            )
-            console.log("SW: Event data:", event.data)
-            return // Exit if we can't parse the data
-        }
-        const options = {
-            body: data.body,
-            title: data.title,
-            data: { push_event_url: data.url },
-            icon: "/192.png",
-            badge: data.badge,
-        }
-        // Show the notification
-        event.waitUntil(self.registration.showNotification(data.title, options))
+        console.error("Error in push event: ", error)
     }
 })
-// self.addEventListener("push", function (event) {
-//     const { data } = event.data.json()
-
-//     const options = {
-//         body: data.body,
-//         title: data.title,
-//         data: { push_event_url: data.url },
-//         icon: "/192.png",
-//         badge: "/192.png",
-//     }
-//     console.log("options:1.5 ", options)
-//     event.waitUntil(self.registration.showNotification(data.title, options))
-// })
 
 self.addEventListener("notificationclick", (event) => {
     event.preventDefault()
