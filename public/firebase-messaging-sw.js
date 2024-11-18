@@ -30,7 +30,7 @@ self.addEventListener("push", function (event) {
             title: data.title,
             data: { push_event_url: data.url },
             icon: "/192.png",
-            badge: "/192.png",
+            badge: data.badge,
         }
         // Show the notification
         event.waitUntil(self.registration.showNotification(data.title, options))
