@@ -5,7 +5,7 @@ import PushNotificationStatusButton from "../Common/PushNotificationStatusButton
 
 export default function FiltersAndNotificationsPage() {
     return (
-        <div className="filter-and-notifications-page">
+        <div className="filter-and-notifications-page page">
             <Card className="filter-section">
                 <h3>הרשמה להתראות על ארועים חדשים של מורים וארגונים</h3>
                 <PushNotificationStatusButton />

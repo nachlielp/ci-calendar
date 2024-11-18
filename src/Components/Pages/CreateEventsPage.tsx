@@ -35,7 +35,7 @@ export default function CreateEventsPage() {
     ]
 
     return (
-        <section className="create-events-page">
+        <section className="create-events-page page">
             {isMissingProfile && (
                 <Alert
                     message="על מנת לתייג את עצמכם בארועים צריך ליצור קודם פרופיל"

@@ -35,8 +35,9 @@
 @import "./styles/menu-drawer.css";
 @import "./styles/create-events-page.css";
 @import "./styles/cloudinary-upload.css";
-@import "./styles/elements/buttons.css";
-@import "./styles/elements/title.css";
+@import "./styles/generics/buttons.css";
+@import "./styles/generics/title.css";
+@import "./styles/generics/page.css";
 @import "./styles/menu-buttons.css";
 @import "./styles/manage-templates-table.css";
 @import "./styles/manage-event-actions.css";

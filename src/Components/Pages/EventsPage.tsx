@@ -63,7 +63,7 @@ export default function EventsPage({ events }: IEventsPageProps) {
     }
 
     return (
-        <div className="events-page">
+        <div className="events-page page">
             <header className="header">
                 <AlertsAnchor />
                 <h1 className="title">{config?.app_title || DEFAULT_TITLE}</h1>

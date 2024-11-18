@@ -1,16 +1,6 @@
 .filter-and-notifications-page {
-    height: calc(100vh - 56px);
-    margin: 0 auto;
-    overflow-y: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
-    margin: 16px;
-
     .filter-section {
+        margin-top: 16px;
         .select-filter {
             width: 100%;
             margin-bottom: 1rem;

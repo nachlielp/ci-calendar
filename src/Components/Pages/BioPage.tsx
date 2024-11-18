@@ -10,7 +10,7 @@ export default function BioPage() {
         setEditProfile(false)
     }
     return (
-        <div className="bio-page">
+        <div className="bio-page page">
             <div className="button-container">
                 {editProfile ? (
                     <button
