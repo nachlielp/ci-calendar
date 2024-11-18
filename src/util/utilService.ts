@@ -5,6 +5,7 @@ import {
     DbUserWithoutJoin,
     RawAppConfigRecord,
     UserType,
+    UserNotification,
 } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
@@ -48,7 +49,7 @@ export const utilService = {
     getUniqueOwnersList,
     removeDuplicates,
     isSingleDayEventNotStarted,
-    isNotificationStartedByFirstSegment,
+    isNotificationStarted,
     sleep,
     formatConfig,
 }
@@ -423,12 +424,24 @@ function isEventStartedByFirstSegment(startDate: string, startTime: string) {
         .tz("Asia/Jerusalem")
     return eventStartTime.isAfter(now)
 }
-
-function isNotificationStartedByFirstSegment(
-    startDate: string,
-    startTime: string
-) {
-    return isEventStartedByFirstSegment(startDate, startTime)
+function isEventStartedByDay(startDate: string) {
+    const now = dayjs().tz("Asia/Jerusalem")
+    const eventStartTime = dayjs(startDate)
+        .hour(0)
+        .minute(0)
+        .tz("Asia/Jerusalem")
+    return eventStartTime.isAfter(now)
+}
+function isNotificationStarted(notification: UserNotification) {
+    if (notification.is_multi_day) {
+        return isEventStartedByDay(notification.start_date)
+    } else {
+        if (!notification.firstSegment) return false
+        return isEventStartedByFirstSegment(
+            notification.start_date,
+            notification.firstSegment.startTime
+        )
+    }
 }
 
 function sleep(ms: number) {

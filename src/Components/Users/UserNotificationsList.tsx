@@ -1,6 +1,10 @@
 import { useUser } from "../../context/UserContext"
 import { UserNotification } from "../../util/interfaces"
-import { singleDayNotificationOptions, SelectOption } from "../../util/options"
+import {
+    singleDayNotificationOptions,
+    SelectOption,
+    multiDayNotificationOptions,
+} from "../../util/options"
 import { utilService } from "../../util/utilService"
 import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 import dayjs from "dayjs"
@@ -20,10 +24,7 @@ export default function UserNotificationsList() {
 
             {user?.notifications
                 .filter((notification: UserNotification) => {
-                    return utilService.isNotificationStartedByFirstSegment(
-                        notification.start_date,
-                        notification.firstSegment.startTime
-                    )
+                    return utilService.isNotificationStarted(notification)
                 })
                 .sort((a: UserNotification, b: UserNotification) =>
                     dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
@@ -46,13 +47,17 @@ export default function UserNotificationsList() {
                                     </label>
                                     {" - "}
                                     <label className="user-notification-remind-in-hours">
-                                        {
-                                            singleDayNotificationOptions.find(
-                                                (option: SelectOption) =>
-                                                    option.value ===
-                                                    notification.remind_in_hours
-                                            )?.label
-                                        }
+                                        {notification.is_multi_day
+                                            ? multiDayNotificationOptions.find(
+                                                  (option: SelectOption) =>
+                                                      option.value ===
+                                                      notification.remind_in_hours
+                                              )?.label
+                                            : singleDayNotificationOptions.find(
+                                                  (option: SelectOption) =>
+                                                      option.value ===
+                                                      notification.remind_in_hours
+                                              )?.label}
                                     </label>
                                 </label>
                                 <CIEventNotificationModal
