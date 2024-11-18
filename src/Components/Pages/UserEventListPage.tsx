@@ -67,7 +67,7 @@ export default function UserEventsListPage() {
     const filteredEvents = pastFutureEvents(user.ci_events, showPast)
 
     return (
-        <section className="user-events-list">
+        <section className="user-events-list-page page">
             <header
                 className={`manage-events-header ${
                     isPhone ? "header-phone" : "header-desktop"

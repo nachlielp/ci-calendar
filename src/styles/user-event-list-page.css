@@ -1,20 +1,11 @@
-.user-events-list {
-    max-width: 100%;
-    height: calc(100vh - 56px);
-    margin: 0 auto;
-    overflow-y: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-        display: none;
-    }
-
+.user-events-list-page {
     .manage-events-header {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         gap: 1rem;
+        margin-top: 1rem;
         margin-bottom: 1rem;
         margin-right: 1rem;
         .header-buttons-container {

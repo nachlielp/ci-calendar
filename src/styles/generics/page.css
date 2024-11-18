@@ -14,12 +14,12 @@
     mask-image: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0) 0px,
-        rgba(0, 0, 0, 1) 10px
+        rgba(0, 0, 0, 1) 16px
     );
     -webkit-mask-image: linear-gradient(
         to bottom,
         rgba(0, 0, 0, 0) 0px,
-        rgba(0, 0, 0, 1) 10px
+        rgba(0, 0, 0, 1) 16px
     );
 
     .scroll-to-top {
