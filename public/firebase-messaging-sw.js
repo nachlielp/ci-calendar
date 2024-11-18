@@ -10,7 +10,14 @@ const FILES_TO_CACHE = [
 ]
 self.addEventListener("push", function (event) {
     try {
-        const { data } = event.data.json()
+        let payload
+        try {
+            payload = event.data.json()
+        } catch (e) {
+            payload = {
+                data: { title: "New Notification", body: event.data.text() },
+            }
+        }
 
         // Get current badge count from IndexedDB or other storage
         //anynimous function in waitUntil needs to be async for this
@@ -21,22 +28,26 @@ self.addEventListener("push", function (event) {
         //     .then((notifications) => notifications.length + 1);
         // };
 
+        const data = payload.data || payload
+
+        const options = {
+            body: data.body || "No message content",
+            title: data.title || "New Notification",
+            data: { push_event_url: data.url || "/" },
+            icon: "/192.png",
+            badge: data.badge || 1,
+        }
+
         event.waitUntil(
             (() => {
-                // const count = await getBadgeCount();
-                const options = {
-                    body: data.body,
-                    title: data.title,
-                    data: { push_event_url: data.url },
-                    icon: "/192.png",
-                    badge: data.badge,
-                }
-
                 if (navigator.setAppBadge) {
-                    navigator.setAppBadge(data.badge)
+                    navigator.setAppBadge(options.badge)
                 }
 
-                return self.registration.showNotification(data.title, options)
+                return self.registration.showNotification(
+                    options.title,
+                    options
+                )
             })()
         )
     } catch (error) {
@@ -56,7 +67,7 @@ self.addEventListener("notificationclick", (event) => {
     const page_parms = event.notification.data.push_event_url
 
     event.waitUntil(
-        clients.openWindow(self.location.origin + "/" + page_parms) // The PWA route you want to open
+        clients.openWindow("/" + page_parms) // The PWA route you want to open
     )
 
     // event.waitUntil(
