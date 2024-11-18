@@ -1,5 +1,11 @@
 import { v4 as uuidv4 } from "uuid"
-import { CIEvent, CITemplate, DbUserWithoutJoin, UserType } from "./interfaces"
+import {
+    CIEvent,
+    CITemplate,
+    DbUserWithoutJoin,
+    RawAppConfigRecord,
+    UserType,
+} from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
     districtOptions,
@@ -44,6 +50,7 @@ export const utilService = {
     isSingleDayEventNotStarted,
     isNotificationStartedByFirstSegment,
     sleep,
+    formatConfig,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -426,4 +433,12 @@ function isNotificationStartedByFirstSegment(
 
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function formatConfig(config: RawAppConfigRecord[]) {
+    return {
+        app_title: config.find((c) => c.title === "app_title")?.data || "",
+        app_description:
+            config.find((c) => c.title === "app_description")?.data || "",
+    }
 }

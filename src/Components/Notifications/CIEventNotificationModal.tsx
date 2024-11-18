@@ -8,7 +8,6 @@ import { notificationService } from "../../supabase/notificationService"
 import Alert from "antd/es/alert/Alert"
 import { notificationOptions } from "../../util/options"
 import AsyncButton from "../Common/AsyncButton"
-import { utilService } from "../../util/utilService"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"

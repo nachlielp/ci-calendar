@@ -26,6 +26,20 @@ export interface UserOption {
     label: string
 }
 
+export interface RawAppConfigRecord {
+    id: string
+    title: string
+    created_at: string
+    flag: boolean
+    update_by: string
+    data: string
+}
+
+export interface AppConfig {
+    app_title: string
+    app_description: string
+}
+
 export interface CIEventSegments {
     endTime: string
     type: string

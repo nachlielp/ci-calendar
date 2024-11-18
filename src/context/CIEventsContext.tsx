@@ -1,9 +1,11 @@
 import { createContext, useContext, useRef, useEffect, useState } from "react"
-import { CIEvent } from "../util/interfaces"
+import { AppConfig, CIEvent } from "../util/interfaces"
 import dayjs from "dayjs"
 import { cieventsService, DBCIEvent } from "../supabase/cieventsService"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
+import { configService } from "../supabase/configService"
+import { utilService } from "../util/utilService"
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -12,6 +14,7 @@ const MINUTE_MS = 1000 * 60
 
 interface CIEventsContextType {
     ci_events: CIEvent[]
+    config: AppConfig | null
     loading: boolean
     addEventState: (event: CIEvent) => void
     updateEventState: (eventId: string, event: DBCIEvent) => void
@@ -20,6 +23,7 @@ interface CIEventsContextType {
 
 export const CIEventsContext = createContext<CIEventsContextType>({
     ci_events: [],
+    config: null,
     loading: true,
     addEventState: () => {},
     updateEventState: () => {},
@@ -36,10 +40,21 @@ export const CIEventsProvider = ({
     children: React.ReactNode
 }) => {
     const [ci_events, setCievents] = useState<CIEvent[]>([])
+    const [config, setConfig] = useState<AppConfig | null>(null)
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
 
     useEffect(() => {
+        const fetchConfig = async () => {
+            const config = await configService.getConfig()
+
+            const formattedConfig = utilService.formatConfig(config)
+            console.log("config", formattedConfig)
+            setConfig(formattedConfig)
+        }
+
+        fetchConfig()
+
         let callCount = 0
 
         const getInterval = () => {
@@ -128,6 +143,7 @@ export const CIEventsProvider = ({
         <CIEventsContext.Provider
             value={{
                 ci_events,
+                config,
                 loading,
                 addEventState,
                 updateEventState,

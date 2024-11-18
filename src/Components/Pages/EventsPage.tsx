@@ -21,13 +21,19 @@ import { utilService } from "../../util/utilService"
 import AlertsAnchor from "../Alerts/AlertsAnchor"
 import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
+import { useCIEvents } from "../../context/CIEventsContext"
 
 interface IEventsPageProps {
     events: CIEvent[]
 }
 
+const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
+const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
+
 export default function EventsPage({ events }: IEventsPageProps) {
     const { selectedEvent } = useSetSelectedEventByParams(events)
+    const { config } = useCIEvents()
+    console.log("config", config)
     const isMobile = useIsMobile()
     useDefaultFilter()
 
@@ -59,8 +65,10 @@ export default function EventsPage({ events }: IEventsPageProps) {
         <div className="events-display">
             <header className="header">
                 <AlertsAnchor />
-                <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
-                <p className="subtitle">כל האירועים במקום אחד</p>
+                <h1 className="title">{config?.app_title || DEFAULT_TITLE}</h1>
+                <p className="subtitle">
+                    {config?.app_description || DEFAULT_DESCRIPTION}
+                </p>
                 <main className="menu-container">
                     <MenuButtons
                         onSelectKey={onSelectKey}
