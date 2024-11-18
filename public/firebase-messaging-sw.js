@@ -8,7 +8,39 @@ const FILES_TO_CACHE = [
     "./assets/img/icon-512.png",
     "./assets/img/cat-butt.gif",
 ]
+self.addEventListener("push", function (event) {
+    try {
+        const { data } = event.data.json()
 
+        event.waitUntil(
+            (() => {
+                const options = {
+                    body: data.body,
+                    title: data.title,
+                    data: { push_event_url: data.url },
+                    icon: "/192.png",
+                    badge: data.badge,
+                }
+
+                // Set app badge
+                if (navigator.setAppBadge) {
+                    navigator.setAppBadge(data.count)
+                }
+
+                return self.registration.showNotification(data.title, options)
+            })()
+        )
+    } catch (error) {
+        console.error(
+            "🔧 [ServiceWorker] Error parsing push event data:",
+            error
+        )
+        console.log("SW: Event data:", event.data)
+        return // Exit if we can't parse the data
+    }
+
+    // Wrap the entire async operation in waitUntil
+})
 self.addEventListener("push", function (event) {
     if (event.data) {
         try {
@@ -34,20 +66,6 @@ self.addEventListener("push", function (event) {
         }
         // Show the notification
         event.waitUntil(self.registration.showNotification(data.title, options))
-
-        // Notify all clients (browser windows/tabs) about the notification
-        self.clients.matchAll().then((clients) => {
-            console.log("SW: Found clients to notify:", clients.length)
-
-            clients.forEach((client) => {
-                console.log("SW: Posting message to client")
-
-                client.postMessage({
-                    type: "PUSH_NOTIFICATION",
-                    payload: data,
-                })
-            })
-        })
     }
 })
 // self.addEventListener("push", function (event) {
