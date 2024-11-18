@@ -64,10 +64,8 @@ self.addEventListener("notificationclick", (event) => {
 
     event.notification.close()
 
-    const page_parms = event.notification.data.push_event_url
-
     event.waitUntil(
-        clients.openWindow("/" + page_parms) // The PWA route you want to open
+        clients.openWindow(distUrl) // The PWA route you want to open
     )
 
     // event.waitUntil(
