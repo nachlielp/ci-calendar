@@ -8,7 +8,10 @@ import { PostHogProvider } from "posthog-js/react"
 const options = {
     api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
 }
-posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, options)
+if (import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
+    posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, options)
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
         <Providers>
