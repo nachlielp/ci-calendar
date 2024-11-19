@@ -16,69 +16,69 @@ const FILES_TO_CACHE = [
     "/static/js/vendors~main.chunk.js",
 ]
 
-self.addEventListener("install", (e) => {
-    console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
-    self.skipWaiting()
+// self.addEventListener("install", (e) => {
+//     console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
+//     self.skipWaiting()
 
-    e.waitUntil(
-        (async () => {
-            try {
-                const cache = await caches.open(CACHE_NAME)
-                await cache.addAll(FILES_TO_CACHE)
-            } catch (error) {
-                console.error("[ServiceWorker] - Cache failed:", error)
-            }
-        })()
-    )
-})
+//     e.waitUntil(
+//         (async () => {
+//             try {
+//                 const cache = await caches.open(CACHE_NAME)
+//                 await cache.addAll(FILES_TO_CACHE)
+//             } catch (error) {
+//                 console.error("[ServiceWorker] - Cache failed:", error)
+//             }
+//         })()
+//     )
+// })
 
-self.addEventListener("fetch", (e) => {
-    e.respondWith(
-        (async () => {
-            // Skip caching for API, Firestore, and Supabase requests
-            if (
-                e.request.url.includes("/api/") ||
-                e.request.url.includes("firestore.googleapis.com") ||
-                e.request.url.includes("pjgwpivkvsuernmoeebk.supabase.co")
-            ) {
-                return fetch(e.request)
-            }
+// self.addEventListener("fetch", (e) => {
+//     e.respondWith(
+//         (async () => {
+//             // Skip caching for API, Firestore, and Supabase requests
+//             if (
+//                 e.request.url.includes("/api/") ||
+//                 e.request.url.includes("firestore.googleapis.com") ||
+//                 e.request.url.includes("pjgwpivkvsuernmoeebk.supabase.co")
+//             ) {
+//                 return fetch(e.request)
+//             }
 
-            try {
-                const cache = await caches.open(CACHE_NAME)
-                const cachedResponse = await cache.match(e.request)
-                if (cachedResponse) {
-                    return cachedResponse
-                }
+//             try {
+//                 const cache = await caches.open(CACHE_NAME)
+//                 const cachedResponse = await cache.match(e.request)
+//                 if (cachedResponse) {
+//                     return cachedResponse
+//                 }
 
-                const fetchPromise = fetch(e.request).then(
-                    async (networkResponse) => {
-                        if (
-                            networkResponse.ok &&
-                            e.request.method === "GET" &&
-                            (FILES_TO_CACHE.includes(
-                                new URL(e.request.url).pathname
-                            ) ||
-                                e.request.url.endsWith(".js") ||
-                                e.request.url.endsWith(".css"))
-                        ) {
-                            // Store the new response in the cache
-                            await cache.put(e.request, networkResponse.clone())
-                        }
-                        return networkResponse
-                    }
-                )
+//                 const fetchPromise = fetch(e.request).then(
+//                     async (networkResponse) => {
+//                         if (
+//                             networkResponse.ok &&
+//                             e.request.method === "GET" &&
+//                             (FILES_TO_CACHE.includes(
+//                                 new URL(e.request.url).pathname
+//                             ) ||
+//                                 e.request.url.endsWith(".js") ||
+//                                 e.request.url.endsWith(".css"))
+//                         ) {
+//                             // Store the new response in the cache
+//                             await cache.put(e.request, networkResponse.clone())
+//                         }
+//                         return networkResponse
+//                     }
+//                 )
 
-                // Return cached response immediately if we have it
-                // while updating cache in the background
-                return cachedResponse || fetchPromise
-            } catch (error) {
-                console.error("[ServiceWorker] - Fetch failed:", error)
-                throw error
-            }
-        })()
-    )
-})
+//                 // Return cached response immediately if we have it
+//                 // while updating cache in the background
+//                 return cachedResponse || fetchPromise
+//             } catch (error) {
+//                 console.error("[ServiceWorker] - Fetch failed:", error)
+//                 throw error
+//             }
+//         })()
+//     )
+// })
 
 self.addEventListener("push", function (event) {
     try {
