@@ -49,7 +49,7 @@ export const CIEventsProvider = ({
             const config = await configService.getConfig()
 
             const formattedConfig = utilService.formatConfig(config)
-            console.log("config", formattedConfig)
+
             setConfig(formattedConfig)
         }
 
