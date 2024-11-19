@@ -9,7 +9,7 @@ export default function EventsPageHeader() {
             className="app-content"
             style={{ width: "100%", maxWidth: "500px" }}
         >
-            <div className="events-display">
+            <div className="events-page">
                 <div
                     className="header-skeleton"
                     style={{ height: "56px" }}
