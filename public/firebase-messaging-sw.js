@@ -70,46 +70,22 @@ self.addEventListener("notificationclick", (event) => {
     event.waitUntil(clients.openWindow(distUrl))
 })
 
-self.addEventListener("install", (e) => {
-    console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
-    self.skipWaiting()
+// self.addEventListener("install", (e) => {
+//     console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
+//     self.skipWaiting()
 
-    e.waitUntil(
-        (async () => {
-            try {
-                const cache = await caches.open(CACHE_NAME)
-                await cache.addAll(FILES_TO_CACHE)
-            } catch (error) {
-                console.error("[ServiceWorker] - Cache failed:", error)
-            }
-        })()
-    )
-})
+//     e.waitUntil(
+//         (async () => {
+//             try {
+//                 const cache = await caches.open(CACHE_NAME)
+//                 await cache.addAll(FILES_TO_CACHE)
+//             } catch (error) {
+//                 console.error("[ServiceWorker] - Cache failed:", error)
+//             }
+//         })()
+//     )
+// })
 
-function isCacheable(req) {
-    const url = new URL(req.url)
-    return !url.pathname.endsWith(".json")
-}
-
-async function cacheFirstWithRefresh(request) {
-    const fetchResponsePromise = fetch(request).then(
-        async (networkResponse) => {
-            if (networkResponse.ok) {
-                const cache = await caches.open(CACHE_NAME)
-                cache.put(request, networkResponse.clone())
-            }
-            return networkResponse
-        }
-    )
-
-    return (await caches.match(request)) || (await fetchResponsePromise)
-}
-
-self.addEventListener("fetch", (event) => {
-    if (isCacheable(event.request)) {
-        event.respondWith(cacheFirstWithRefresh(event.request))
-    }
-})
 //clean up old caches by name
 self.addEventListener("activate", (e) => {
     e.waitUntil(
