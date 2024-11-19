@@ -36,21 +36,22 @@ export default function CreateEventsPage() {
 
     return (
         <section className="create-events-page page">
-            {isMissingProfile && (
-                <Alert
-                    message="על מנת לתייג את עצמכם בארועים צריך ליצור קודם פרופיל"
-                    type="warning"
-                    showIcon
-                    style={{ marginBottom: "1rem" }}
-                />
-            )}
-            {user?.templates.length === 0 && (
-                <Alert
-                    message="כדאי ליצור תבניות עבור אירועים חוזרים"
-                    type="warning"
-                    showIcon
-                />
-            )}
+            <article className="alerts-container">
+                {isMissingProfile && (
+                    <Alert
+                        message="על מנת לתייג את עצמכם בארועים צריך ליצור קודם פרופיל"
+                        type="warning"
+                        showIcon
+                    />
+                )}
+                {user?.templates.length === 0 && (
+                    <Alert
+                        message="כדאי ליצור תבניות עבור אירועים חוזרים"
+                        type="warning"
+                        showIcon
+                    />
+                )}
+            </article>
             <article className="btns-container">
                 {buttonsArray.map((button, index) => (
                     <FormContainer

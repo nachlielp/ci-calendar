@@ -3,8 +3,17 @@
     flex-direction: column;
     align-items: center;
 
+    .alerts-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
     .btns-container {
-        margin-top: 70px;
+        margin-top: 1rem;
         width: 350px;
         display: flex;
         flex-direction: row;
