@@ -79,7 +79,15 @@ export default defineConfig({
     base: "/",
     plugins: [
         react(),
-        VitePWA(manifestForPlugin),
+        VitePWA({
+            registerType: "autoUpdate",
+            workbox: {
+                globPatterns: ["**/*.{js,css,html,ico,png,svg,ttf,gif}"],
+                // Skip certain paths
+                navigateFallbackDenylist: [/^\/firestore/, /^\/supabase/],
+            },
+            manifest: manifestForPlugin,
+        }),
         visualizer({ open: true }), // This plugin helps visualize the size of your bundles
     ],
 
