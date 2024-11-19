@@ -1,8 +1,8 @@
-const CACHE_VERSION = "v2" // You can update this to trigger cache refresh
+const CACHE_VERSION = "v2"
 const CACHE_NAME = `ci-calendar-cache-${CACHE_VERSION}`
 const FILES_TO_CACHE = [
-    // "/",
-    // "/index.html",
+    "/",
+    "/index.html",
     "/192.png",
     "/512.png",
     "/ci-circle-192.png",
@@ -10,7 +10,76 @@ const FILES_TO_CACHE = [
     "/assets/img/icon-192.png",
     "/assets/img/icon-512.png",
     "/assets/img/cat-butt.gif",
+    // Add your JS chunks and other static assets
+    "/static/js/main.chunk.js",
+    "/static/js/bundle.js",
+    "/static/js/vendors~main.chunk.js",
 ]
+
+self.addEventListener("install", (e) => {
+    console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
+    self.skipWaiting()
+
+    e.waitUntil(
+        (async () => {
+            try {
+                const cache = await caches.open(CACHE_NAME)
+                await cache.addAll(FILES_TO_CACHE)
+            } catch (error) {
+                console.error("[ServiceWorker] - Cache failed:", error)
+            }
+        })()
+    )
+})
+
+self.addEventListener("fetch", (e) => {
+    e.respondWith(
+        (async () => {
+            // Skip caching for API, Firestore, and Supabase requests
+            if (
+                e.request.url.includes("/api/") ||
+                e.request.url.includes("firestore.googleapis.com") ||
+                e.request.url.includes("pjgwpivkvsuernmoeebk.supabase.co")
+            ) {
+                return fetch(e.request)
+            }
+
+            try {
+                const cache = await caches.open(CACHE_NAME)
+                const cachedResponse = await cache.match(e.request)
+                if (cachedResponse) {
+                    return cachedResponse
+                }
+
+                const fetchPromise = fetch(e.request).then(
+                    async (networkResponse) => {
+                        if (
+                            networkResponse.ok &&
+                            e.request.method === "GET" &&
+                            (FILES_TO_CACHE.includes(
+                                new URL(e.request.url).pathname
+                            ) ||
+                                e.request.url.endsWith(".js") ||
+                                e.request.url.endsWith(".css"))
+                        ) {
+                            // Store the new response in the cache
+                            await cache.put(e.request, networkResponse.clone())
+                        }
+                        return networkResponse
+                    }
+                )
+
+                // Return cached response immediately if we have it
+                // while updating cache in the background
+                return cachedResponse || fetchPromise
+            } catch (error) {
+                console.error("[ServiceWorker] - Fetch failed:", error)
+                throw error
+            }
+        })()
+    )
+})
+
 self.addEventListener("push", function (event) {
     try {
         let payload
@@ -69,22 +138,6 @@ self.addEventListener("notificationclick", (event) => {
 
     event.waitUntil(clients.openWindow(distUrl))
 })
-
-// self.addEventListener("install", (e) => {
-//     console.log("[ServiceWorker] - Installing version:", CACHE_VERSION)
-//     self.skipWaiting()
-
-//     e.waitUntil(
-//         (async () => {
-//             try {
-//                 const cache = await caches.open(CACHE_NAME)
-//                 await cache.addAll(FILES_TO_CACHE)
-//             } catch (error) {
-//                 console.error("[ServiceWorker] - Cache failed:", error)
-//             }
-//         })()
-//     )
-// })
 
 //clean up old caches by name
 self.addEventListener("activate", (e) => {
