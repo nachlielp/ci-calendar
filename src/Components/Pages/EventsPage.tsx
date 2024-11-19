@@ -66,7 +66,6 @@ export default function EventsPage({ events }: IEventsPageProps) {
         <div className="events-page page">
             <header className="header">
                 <AlertsAnchor />
-                <label className="title-container">cache test</label>
                 <h1 className="title">{config?.app_title || DEFAULT_TITLE}</h1>
                 <p className="subtitle">
                     {config?.app_description || DEFAULT_DESCRIPTION}
