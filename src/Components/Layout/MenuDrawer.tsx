@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react"
-import Badge from "antd/es/badge"
+import { useState } from "react"
 import Drawer from "antd/es/drawer"
 import { Icon } from "../Common/Icon"
 import { useNavigate } from "react-router-dom"
@@ -9,20 +8,8 @@ import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
 
 export function MenuDrawer() {
-    const [open, setOpen] = React.useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(false)
     const { user } = useUser()
-    const [isNewResponse, setIsNewResponse] = useState<boolean>(false)
-
-    useEffect(() => {
-        if (user && user?.requests?.length > 0) {
-            setIsNewResponse(
-                user.requests.some(
-                    (request) =>
-                        request.status === "closed" && !request.viewed_response
-                )
-            )
-        }
-    }, [user?.requests])
 
     const isMobile = useIsMobile()
 
@@ -154,9 +141,7 @@ export function MenuDrawer() {
                 className="menu-drawer-btn"
                 aria-label="פתח תפריט"
             >
-                <Badge count={!isNewResponse && 0} size="small">
-                    <Icon icon="menu" className="menu-drawer-icon" />
-                </Badge>
+                <Icon icon="menu" className="menu-drawer-icon" />
             </button>
             <Drawer
                 closable
@@ -173,13 +158,7 @@ export function MenuDrawer() {
                     {mapOfMenu
                         .filter((item) => !item.disabled)
                         .map((item) => (
-                            <MenuItem
-                                key={item.key}
-                                item={item}
-                                isBadge={
-                                    item.key === "request" && isNewResponse
-                                }
-                            />
+                            <MenuItem key={item.key} item={item} />
                         ))}
                 </div>
             </Drawer>
@@ -187,12 +166,10 @@ export function MenuDrawer() {
     )
 }
 
-const MenuItem = ({ item, isBadge }: { item: any; isBadge: boolean }) => {
+const MenuItem = ({ item }: { item: any }) => {
     return (
         <article className="menu-item" onClick={item.onClick}>
-            <Badge count={!isBadge && 0} size="small">
-                <Icon icon={item.icon} />
-            </Badge>
+            <Icon icon={item.icon} />
             <p style={{ fontSize: "24px", margin: "6px 0 10px 0" }}>
                 {item.label}
             </p>
