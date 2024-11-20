@@ -45,6 +45,8 @@ export const CIEventsProvider = ({
     const subscriptionRef = useRef<any>(null)
 
     useEffect(() => {
+        const timestamp = new Date().getTime()
+        console.log("fetching config", timestamp)
         const fetchConfig = async () => {
             const config = await configService.getConfig()
 
@@ -79,6 +81,11 @@ export const CIEventsProvider = ({
                 console.error("Error fetching events:", error)
             } finally {
                 setLoading(false)
+                const timeElapsed = new Date().getTime() - timestamp
+                console.log(
+                    "done fetching events:",
+                    `${timeElapsed}ms (${(timeElapsed / 1000).toFixed(2)}s)`
+                )
             }
         }
 
