@@ -48,21 +48,6 @@ export default function AlertsAnchor() {
                             {user.alerts
                                 .filter((alert) => !alert.viewed)
                                 .map((alert) => {
-                                    const eventStartTime = dayjs(
-                                        alert.start_date
-                                    )
-                                        .hour(
-                                            dayjs(
-                                                alert.firstSegment.startTime
-                                            ).hour()
-                                        )
-                                        .minute(
-                                            dayjs(
-                                                alert.firstSegment.startTime
-                                            ).minute()
-                                        )
-                                        .tz("Asia/Jerusalem")
-
                                     return (
                                         <div
                                             key={alert.id}
@@ -73,13 +58,7 @@ export default function AlertsAnchor() {
                                                 {alert.title}
                                             </label>
                                             <label className="alert-item-description">
-                                                {`תזכורת לאירוע שמתקיים ב ${dayjs(
-                                                    alert.start_date
-                                                ).format(
-                                                    "DD/MM/YYYY"
-                                                )} בשעה ${eventStartTime.format(
-                                                    "HH:mm"
-                                                )} ב${alert.address}`}
+                                                {formatAlertDescription(alert)}
                                             </label>
                                         </div>
                                     )
@@ -90,4 +69,17 @@ export default function AlertsAnchor() {
             )}
         </div>
     )
+}
+
+function formatAlertDescription(alert: CIAlert) {
+    return `תזכורת לאירוע שמתקיים ב ${dayjs(alert.start_date).format(
+        "DD/MM/YYYY"
+    )} בשעה ${eventStartTime(alert).format("HH:mm")} ב${alert.address}`
+}
+
+function eventStartTime(alert: CIAlert) {
+    return dayjs(alert.start_date)
+        .hour(dayjs(alert.firstSegment.startTime).hour())
+        .minute(dayjs(alert.firstSegment.startTime).minute())
+        .tz("Asia/Jerusalem")
 }
