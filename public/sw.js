@@ -3,7 +3,14 @@ const CACHE_NAME = "ci-calendar-casche-v1"
 self.addEventListener("install", (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(["/", "/index.html", "/assets/"])
+            return cache.addAll([
+                "/",
+                "/index.html",
+                "/192.png",
+                "/512.png",
+                "/ci-circle-192.png",
+                "/assets/",
+            ])
         })
     )
 })
