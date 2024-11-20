@@ -145,12 +145,19 @@ export interface PushNotificationToken {
     branch: string
 }
 
+export enum NotificationType {
+    reminder = "reminder",
+    subscription = "subscription",
+    response = "response",
+}
+
 export interface Notification {
     id: string
     created_at: string
     ci_event_id: string
     user_id: string
     remind_in_hours: string
+    type: NotificationType
     title: string
     body: string
     send_at: string
