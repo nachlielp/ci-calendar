@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"
 import dayjs from "dayjs"
-import { CIAlert } from "../../util/interfaces"
+import { CIAlert, NotificationType } from "../../util/interfaces"
 import { useNavigate } from "react-router-dom"
 
 export default function AlertsAnchor() {
@@ -72,7 +72,20 @@ export default function AlertsAnchor() {
 }
 
 function formatAlertDescription(alert: CIAlert) {
-    return `תזכורת לאירוע שמתקיים ב ${dayjs(alert.start_date).format(
+    if (alert.type === NotificationType.response) {
+        return `תגובה לפניית תמיכה שלך נמצאת בדף תמיכה`
+    }
+
+    let label = ""
+    switch (alert.type) {
+        case "reminder":
+            label = "תזכורת לאירוע"
+            break
+        case "subscription":
+            label = "עדכון על לאירוע"
+            break
+    }
+    return `${label} שמתקיים ב ${dayjs(alert.start_date).format(
         "DD/MM/YYYY"
     )} בשעה ${eventStartTime(alert).format("HH:mm")} ב${alert.address}`
 }

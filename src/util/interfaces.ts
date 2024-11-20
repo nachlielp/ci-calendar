@@ -234,6 +234,7 @@ export interface CIAlert {
     ci_event_id?: string
     request_id?: string
     viewed: boolean
+    type: NotificationType
     title: string
     start_date: string
     firstSegment: CIEventSegments
