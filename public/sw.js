@@ -1,16 +1,31 @@
-// const CACHE_VERSION = "v2" // You can update this to trigger cache refresh
-// const CACHE_NAME = `ci-calendar-cache-${CACHE_VERSION}`
-// const FILES_TO_CACHE = [
-//     // "/",
-//     // "/index.html",
-//     "/192.png",
-//     "/512.png",
-//     "/ci-circle-192.png",
-//     "/assets/img/Background_2.png",
-//     "/assets/img/icon-192.png",
-//     "/assets/img/icon-512.png",
-//     "/assets/img/cat-butt.gif",
-// ]
+const CACHE_NAME = "ci-calendar-casche-v1"
+
+self.addEventListener("install", (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(["/", "/index.html", "/assets/"])
+        })
+    )
+})
+
+self.addEventListener("fetch", (event) => {
+    const urlsToNotCache = [
+        "supabase.co",
+        "firebase",
+        "firebaseio.com",
+        "firebasedatabase.app",
+    ]
+    if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
+        event.respondWith(fetch(event.request))
+        return
+    }
+
+    event.respondWith(
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request)
+        })
+    )
+})
 self.addEventListener("push", function (event) {
     try {
         let payload
