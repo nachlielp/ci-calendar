@@ -1,4 +1,4 @@
-const CACHE_NAME = "ci-calendar-casche-v1"
+const CACHE_NAME = "ci-calendar-cache-v1"
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
@@ -109,28 +109,28 @@ self.addEventListener("notificationclick", (event) => {
 // })
 
 //clean up old caches by name
-// self.addEventListener("activate", (e) => {
-//     e.waitUntil(
-//         (async () => {
-//             console.log("[ServiceWorker] - Checking caches")
+self.addEventListener("activate", (e) => {
+    e.waitUntil(
+        (async () => {
+            console.log("[ServiceWorker] - Checking caches")
 
-//             const keyList = await caches.keys()
-//             await Promise.all(
-//                 keyList.map((key) => {
-//                     // Only delete caches that start with 'my-app-cache-' but aren't the current version
-//                     if (
-//                         key.startsWith("ci-calendar-cache-") &&
-//                         key !== CACHE_NAME
-//                     ) {
-//                         console.log("[ServiceWorker] - Removing old cache", key)
-//                         return caches.delete(key)
-//                     }
-//                     return Promise.resolve()
-//                 })
-//             )
-//         })()
-//     )
-// })
+            const keyList = await caches.keys()
+            await Promise.all(
+                keyList.map((key) => {
+                    // Only delete caches that start with 'my-app-cache-' but aren't the current version
+                    if (
+                        key.startsWith("ci-calendar-cache-") &&
+                        key !== CACHE_NAME
+                    ) {
+                        console.log("[ServiceWorker] - Removing old cache", key)
+                        return caches.delete(key)
+                    }
+                    return Promise.resolve()
+                })
+            )
+        })()
+    )
+})
 
 //TODO: for navigation with notification links
 self.addEventListener("load", () => {
