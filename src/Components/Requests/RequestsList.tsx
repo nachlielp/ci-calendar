@@ -1,127 +1,124 @@
-import Badge from "antd/es/badge"
-import Table from "antd/es/table"
-
 import dayjs from "dayjs"
 import {
     CIRequest,
-    RequestStatus,
-    RequestType,
     RequestTypeHebrew,
     RequestStatusHebrew,
 } from "../../util/interfaces"
 import { useState } from "react"
-import { requestsService } from "../../supabase/requestsService"
 import { useUser } from "../../context/UserContext"
-import { TableColumnsType } from "antd/lib"
-
-const columns: TableColumnsType<CIRequest> = [
-    {
-        title: "בקשה",
-        dataIndex: "type",
-        key: "type",
-        render: (text: RequestType, record: CIRequest) => {
-            return (
-                <span>
-                    <Badge
-                        count={!closedAndNotViewedResponse(record) && 0}
-                        size="small"
-                    >
-                        {RequestTypeHebrew[text]}
-                    </Badge>
-                </span>
-            )
-        },
-    },
-    {
-        title: "סטטוס",
-        dataIndex: "status",
-        key: "status",
-        render: (text: RequestStatus) => {
-            return <span>{RequestStatusHebrew[text]}</span>
-        },
-    },
-    {
-        title: "תאריך",
-        dataIndex: "created_at",
-        key: "created_at",
-        render: (text: string) => {
-            return <span>{dayjs(text).format("DD/MM/YY")}</span>
-        },
-    },
-]
 
 export default function RequestsList() {
     const { user } = useUser()
+
     if (!user) {
         throw new Error("user is null, make sure you're within a Provider")
     }
+    const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
+        null
+    )
 
-    const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
-
-    async function handleExpand(expanded: boolean, record: CIRequest) {
-        setExpandedRowKeys(expanded ? [record.request_id] : [])
-        if (record.status === RequestStatus.closed && !record.viewed_response) {
-            await requestsService.markAsViewedResponseByUser(record.request_id)
+    function handleOpenRequest(request: CIRequest) {
+        if (expandedRequestId === request.id) {
+            setExpandedRequestId(null)
+            return
         }
+        setExpandedRequestId(request.id)
     }
 
     return (
         <div className="request-list">
-            <Table
-                dataSource={user.requests}
-                columns={columns}
-                pagination={false}
-                rowKey={(record) => record.request_id}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <section className="request-list-cell-container">
-                            <p className="message-container">
-                                <label className="sub-title">
-                                    בקשה מס׳ : {record.request_id}
+            <div className="requests-container" role="list">
+                {user.requests.map((request) => (
+                    <div
+                        key={request.id}
+                        className="request-item"
+                        role="listitem"
+                    >
+                        <div
+                            className={`request-item ${
+                                expandedRequestId === request.id ? "active" : ""
+                            }`}
+                            onClick={() => handleOpenRequest(request)}
+                        >
+                            <div
+                                className={`request-summary ${
+                                    expandedRequestId === request.id
+                                        ? "active"
+                                        : ""
+                                } ${
+                                    user.requests[user.requests.length - 1]
+                                        .id === request.id
+                                        ? "last-item"
+                                        : ""
+                                }`}
+                            >
+                                <h3 className="request-title">
+                                    {RequestTypeHebrew[request.type]}
+                                </h3>
+                                {" - "}
+                                <h3 className="request-title">
+                                    {request.name}
+                                </h3>
+
+                                <label className="request-status">
+                                    {RequestStatusHebrew[request.status]}
                                 </label>
-                                <span className="message">
-                                    {record.message}
-                                </span>
-                            </p>
-                            {record.responses.length > 0 && (
-                                <p>
-                                    תשובה :
-                                    <span
-                                        style={{
-                                            paddingRight: "10px",
-                                        }}
-                                    >
-                                        {record.responses.map((response) => (
-                                            <article
-                                                key={response.created_at}
-                                                className="request-list-item"
-                                            >
-                                                <label className="sub-title">
-                                                    {response.responder_name} ב{" "}
-                                                    {dayjs(
-                                                        response.created_at
-                                                    ).format(
-                                                        "DD/MM/YYYY HH:mm"
-                                                    )}
-                                                </label>
-                                                <label className="content">
-                                                    {response.response}
-                                                </label>
-                                            </article>
-                                        ))}
-                                    </span>
-                                </p>
+                                <time dateTime={request.created_at}>
+                                    {dayjs(request.created_at).format(
+                                        "DD/MM/YYYY"
+                                    )}
+                                </time>
+                            </div>
+                            {expandedRequestId === request.id && (
+                                <div
+                                    className={`request-details ${
+                                        expandedRequestId === request.id
+                                            ? "active"
+                                            : ""
+                                    } ${
+                                        user.requests[user.requests.length - 1]
+                                            .id === request.id
+                                            ? "last-item"
+                                            : ""
+                                    }`}
+                                >
+                                    <p className="request-details-content">
+                                        <span>בקשה מס׳ : {request.number}</span>
+
+                                        <span>
+                                            {dayjs(request.created_at).format(
+                                                "DD/MM/YYYY HH:mm"
+                                            )}
+                                        </span>
+                                        <label className="request-message">
+                                            {request.message}
+                                        </label>
+                                    </p>
+                                    {request.responses.length > 0 && (
+                                        <article className="request-responses-container">
+                                            <label className="request-responses-title">
+                                                תגובות
+                                            </label>
+                                            <div className="request-responses">
+                                                {request.responses.map(
+                                                    (response, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="request-response"
+                                                        >
+                                                            {response.response}
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        </article>
+                                    )}
+                                </div>
                             )}
-                        </section>
-                    ),
-                    expandedRowKeys: expandedRowKeys,
-                    onExpand: handleExpand,
-                }}
-            />
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     )
-}
-
-function closedAndNotViewedResponse(record: CIRequest) {
-    return record.status === RequestStatus.closed && !record.viewed_response
 }

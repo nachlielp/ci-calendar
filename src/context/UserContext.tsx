@@ -193,7 +193,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
                         ? {
                               ...prev,
                               requests: prev.requests.map((r) => {
-                                  if (r.request_id === payload.old.request_id) {
+                                  if (r.id === payload.old.id) {
                                       return payload.new
                                   }
                                   return r

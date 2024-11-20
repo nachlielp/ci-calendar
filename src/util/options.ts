@@ -1,3 +1,11 @@
+import {
+    RequestStatus,
+    RequestStatusHebrew,
+    RequestStatusOptions,
+    RequestType,
+    RequestTypeHebrew,
+} from "./interfaces"
+
 export interface SelectOption {
     value: string
     label: string
@@ -49,6 +57,16 @@ export const viewOptions: SelectOption[] = [
     { value: "list", label: "list" },
 ]
 
+export const requestStatusOptions: RequestStatusOptions[] = [
+    { value: RequestStatus.open, label: RequestStatusHebrew.open },
+    { value: RequestStatus.closed, label: RequestStatusHebrew.closed },
+]
+export const requestTypeOptions: SelectOption[] = [
+    { value: RequestType.make_profile, label: RequestTypeHebrew.make_profile },
+    { value: RequestType.make_creator, label: RequestTypeHebrew.make_creator },
+    { value: RequestType.make_org, label: RequestTypeHebrew.make_org },
+    { value: RequestType.support, label: RequestTypeHebrew.support },
+]
 export enum ScreenSize {
     mobile = 600,
     tablet = 900,

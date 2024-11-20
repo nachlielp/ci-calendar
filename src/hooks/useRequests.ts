@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react"
 import { requestsService } from "../supabase/requestsService"
-import { CIRequest, RequestStatus, RequestType } from "../util/interfaces"
+import { CIRequest, RequestStatus } from "../util/interfaces"
 import { RealtimeChannel } from "@supabase/supabase-js"
 
+// TODO debounce name
 export interface UseRequestsProps {
-    status?: RequestStatus[] | null
-    type?: RequestType | null
-    name?: string[]
+    status?: RequestStatus | null
+    // types?: RequestType[]
+    name?: string
     email?: string
     page?: number
     pageSize?: number
@@ -14,7 +15,6 @@ export interface UseRequestsProps {
 
 export default function useRequests({
     status,
-    type,
     name,
 }: // email,
 // page,
@@ -25,13 +25,25 @@ UseRequestsProps) {
 
     useEffect(() => {
         const fetchRequests = async () => {
+            console.log("useRequests.fetchRequests.status: ", status)
             const { data, error } = await requestsService.getAllRequests({
                 status,
-                type,
                 name,
-                // email,
-                // page,
-                // pageSize,
+            })
+            if (error) {
+                console.error("useRequests.fetchRequests.error: ", error)
+            }
+
+            setRequests(data || [])
+        }
+
+        fetchRequests()
+    }, [status])
+
+    useEffect(() => {
+        const fetchRequests = async () => {
+            const { data, error } = await requestsService.getAllRequests({
+                status,
             })
             if (error) {
                 console.error("useRequests.fetchRequests.error: ", error)
@@ -77,7 +89,7 @@ UseRequestsProps) {
                 subscriptionRef.current.unsubscribe()
             }
         }
-    }, [status])
+    }, [])
 
     return { requests }
 }

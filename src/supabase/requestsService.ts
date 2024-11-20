@@ -8,13 +8,13 @@ export type CreateRequest = Partial<CIRequest> & {
 }
 
 export type UpdateRequest = Partial<CIRequest> & {
-    request_id: string
+    id: string
     status?: string
     response?: string
 }
 
 export type DeleteRequest = {
-    request_id: string
+    id: string
 }
 
 export const requestsService = {
@@ -41,7 +41,6 @@ async function getUserRequests(userId: string) {
 
 async function getAllRequests({
     status,
-    type,
     name,
 }: // user_name,
 // email,
@@ -54,14 +53,14 @@ UseRequestsProps) {
         .order("created_at", { ascending: false })
 
     if (status) {
-        query = query.in("status", status)
-    }
-    if (type) {
-        query = query.eq("type", type)
+        query = query.eq("status", status)
     }
     if (name) {
         query = query.ilike("name", `%${name}%`)
     }
+    // if (type) {
+    //     query = query.eq("type", type)
+    // }
 
     // if (email) {
     //     query = query.eq("email", email)
@@ -112,7 +111,7 @@ async function updateRequest(request: UpdateRequest) {
     const { data, error } = await supabase
         .from("requests")
         .update(request)
-        .eq("request_id", request.request_id)
+        .eq("id", request.id)
 
     return { data, error }
 }
@@ -121,7 +120,7 @@ async function deleteRequest(requestId: string) {
     const { data, error } = await supabase
         .from("requests")
         .delete()
-        .eq("request_id", requestId)
+        .eq("id", requestId)
 
     return { data, error }
 }
@@ -130,7 +129,7 @@ async function markAsViewedRequestByAdmin(requestId: string, userId: string) {
     const { data, error } = await supabase
         .from("requests")
         .update({ viewed_by: { _fn: "array_append", args: [userId] } })
-        .eq("request_id", requestId)
+        .eq("id", requestId)
         .select()
         .single()
 
@@ -141,7 +140,7 @@ async function markAsViewedResponseByUser(requestId: string) {
     const { data, error } = await supabase
         .from("requests")
         .update({ viewed_response: true })
-        .eq("request_id", requestId)
+        .eq("id", requestId)
         .select()
         .single()
 

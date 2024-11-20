@@ -257,9 +257,8 @@ export interface CIRequestResponse {
     created_at: string
     responder_name: string
 }
-
 export interface CIRequest {
-    request_id: string
+    id: string
     created_at: string
     request_type: string
     user_id: string
@@ -272,6 +271,7 @@ export interface CIRequest {
     name: string
     viewed_response: boolean
     viewed_by: string[]
+    number: number
 }
 
 export enum RequestType {
@@ -291,13 +291,17 @@ export enum RequestTypeHebrew {
 export enum RequestStatus {
     open = "open",
     closed = "closed",
-    pending = "pending",
 }
 export enum RequestStatusHebrew {
     open = "פתוח",
     closed = "סגור",
-    pending = "בטיפול",
 }
+
+export interface RequestStatusOptions {
+    value: RequestStatus
+    label: RequestStatusHebrew
+}
+
 export type PushNotificationPromission = "granted" | "denied" | "default" | null
 
 export interface NotificationPayload {

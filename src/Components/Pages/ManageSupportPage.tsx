@@ -1,132 +1,67 @@
-import type { ColumnsType } from "antd/es/table/interface"
-// import type { ColumnsType } from "antd/es/table/interface"
-import Table, { TablePaginationConfig, TableProps } from "antd/es/table"
-import Input from "antd/es/input"
-import Space from "antd/es/space"
 import {
-    CIRequest,
     RequestType,
     RequestTypeHebrew,
     RequestStatus,
     RequestStatusHebrew,
+    CIRequest,
     UserType,
-    DbUser,
 } from "../../util/interfaces"
 import useRequests from "../../hooks/useRequests"
-import { useState } from "react"
-import { SorterResult } from "antd/es/table/interface"
-// import Highlighter from "react-highlight-words"
+import { useEffect, useState } from "react"
 
 import { requestsService } from "../../supabase/requestsService"
-import { GetProp } from "antd/es/_util/type"
-import { usersService } from "../../supabase/usersService"
-import { useUser } from "../../context/UserContext"
+
 import dayjs from "dayjs"
-import { Icon } from "../Common/Icon"
+
+import DoubleBindedSelect from "../Common/DoubleBindedSelect"
+import { requestTypeOptions } from "../../util/options"
+import Switch from "antd/es/switch"
+import { useUser } from "../../context/UserContext"
+import userRoleService from "../../supabase/userRoleService"
 import AddResponseToSupportReqModal from "../Requests/AddResponseToSupportReqModal"
-
-interface TableParams {
-    pagination?: TablePaginationConfig
-    sortField?: SorterResult<any>["field"]
-    sortOrder?: SorterResult<any>["order"]
-    filters?: Parameters<GetProp<TableProps, "onChange">>[1] & {
-        name?: string[]
-    }
-}
-
-const getColumns = (tableParams: TableParams): ColumnsType<CIRequest> => [
-    {
-        title: "בקשה",
-        dataIndex: "type",
-        key: "type",
-        render: (text: RequestType) => {
-            return <span>{RequestTypeHebrew[text]}</span>
-        },
-        filters: Object.values(RequestType).map((type) => ({
-            text: RequestTypeHebrew[type],
-            value: type,
-        })),
-        filteredValue: tableParams.filters?.type || null,
-        filterMultiple: false,
-    },
-    {
-        title: "סטטוס",
-        dataIndex: "status",
-        key: "status",
-        render: (text: RequestStatus) => {
-            return <span>{RequestStatusHebrew[text]}</span>
-        },
-        filters: Object.values(RequestStatus).map((status) => ({
-            text: RequestStatusHebrew[status],
-            value: status,
-        })),
-        filteredValue: tableParams.filters?.status || null,
-    },
-    {
-        title: "שם",
-        dataIndex: "name",
-        key: "name",
-        render: (text: string) => {
-            return <span>{text}</span>
-        },
-        filterDropdown: filterDropdown,
-        filterIcon: (filtered) => (
-            <Icon
-                icon="search"
-                className={`filter-search-icon ${filtered && "active"}`}
-            />
-        ),
-        filteredValue: tableParams.filters?.name || null,
-    },
-]
 
 export default function ManageSupportPage() {
     const { user } = useUser()
-    const [expandedRowKeys, setExpandedRowKeys] = useState<React.Key[]>([])
-    const [tableParams, setTableParams] = useState<TableParams>({
-        pagination: {
-            current: 1,
-            pageSize: 10,
-        },
-        filters: {
-            status: [RequestStatus.open, RequestStatus.pending],
-            type: null,
-            name: [""],
-        },
-    })
-
+    const [selectedStatus, setSelectedStatus] = useState<RequestStatus>(
+        RequestStatus.open
+    )
+    const [selectedTypes, setSelectedTypes] = useState<RequestType[]>([])
+    const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
+        null
+    )
+    const [filteredRequests, setFilteredRequests] = useState<CIRequest[]>([])
+    const [addResponseModalOpen, setAddResponseModalOpen] =
+        useState<boolean>(false)
     const { requests } = useRequests({
-        status: tableParams.filters?.status as RequestStatus[] | null,
-        type: tableParams.filters?.type as RequestType | null,
-        name: tableParams.filters?.name as string[],
+        status: selectedStatus,
     })
 
-    async function handleExpand(expanded: boolean, record: CIRequest) {
-        setExpandedRowKeys(expanded ? [record.request_id] : [])
+    useEffect(() => {
+        if (selectedTypes.length === 0) {
+            setFilteredRequests(requests)
+            return
+        }
+        const filteredRequests = requests.filter((request) =>
+            selectedTypes.includes(request.type)
+        )
+
+        const sortedRequests = filteredRequests.sort((a, b) => {
+            return dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
+        })
+
+        setFilteredRequests(sortedRequests)
+    }, [requests, selectedTypes])
+
+    function handleStatusChange(checked: boolean) {
+        setSelectedStatus(checked ? RequestStatus.open : RequestStatus.closed)
     }
 
-    const handleTableChange: TableProps<CIRequest>["onChange"] = (
-        pagination,
-        filters,
-        sorter
-    ) => {
-        setTableParams((prevParams) => ({
-            ...prevParams,
-            pagination,
-            filters,
-            sortOrder: Array.isArray(sorter) ? undefined : sorter.order,
-            sortField: Array.isArray(sorter) ? undefined : sorter.field,
-        }))
+    function handleTypesChange(values: string[]) {
+        setSelectedTypes(values as RequestType[])
     }
 
     async function handleAction(action: string, request: CIRequest) {
         switch (action) {
-            case "in_progress":
-                await requestsService.updateRequest({
-                    request_id: request.request_id,
-                    status: RequestStatus.pending,
-                })
-                break
             case "approved":
                 const newUserType =
                     request.type === RequestType.make_profile
@@ -138,19 +73,18 @@ export default function ManageSupportPage() {
                         : null
 
                 if (newUserType) {
-                    const userRes = await usersService.updateUser(
-                        request.user_id,
-                        {
-                            user_type: newUserType,
-                        }
-                    )
-                    if (!userRes) {
-                        console.error(
-                            "ManageSupportPage.handleAction.userRes.error: ",
-                            userRes
-                        )
-                        return
-                    }
+                    await userRoleService.setUserRole({
+                        user_id: request.user_id,
+                        user_type: newUserType,
+                        role_id:
+                            request.type === RequestType.make_profile
+                                ? 4
+                                : request.type === RequestType.make_creator
+                                ? 2
+                                : request.type === RequestType.make_org
+                                ? 3
+                                : 0,
+                    })
                 }
 
                 const newResponseApprovedMessage = [
@@ -172,7 +106,7 @@ export default function ManageSupportPage() {
 
             case "add_response":
                 await requestsService.updateRequest({
-                    request_id: request.request_id,
+                    id: request.id,
                     responses: request.responses,
                     viewed_response: false,
                 })
@@ -188,7 +122,7 @@ export default function ManageSupportPage() {
                     },
                 ]
                 await requestsService.updateRequest({
-                    request_id: request.request_id,
+                    id: request.id,
                     status: RequestStatus.closed,
                     responses: newDeclineResponseMessage,
                     viewed_response: false,
@@ -197,167 +131,180 @@ export default function ManageSupportPage() {
         }
     }
 
-    return (
-        <div style={{ marginTop: "20px" }}>
-            <Table
-                dataSource={requests}
-                columns={getColumns(tableParams)}
-                pagination={false}
-                rowKey={(record) => record.request_id}
-                expandable={{
-                    expandedRowRender: (record) => (
-                        <ManageSupportCell
-                            record={record}
-                            handleAction={handleAction}
-                            user={user}
-                        />
-                    ),
-                    expandedRowKeys: expandedRowKeys,
-                    onExpand: handleExpand,
-                }}
-                onChange={handleTableChange}
-            />
-        </div>
-    )
-}
-
-const ManageSupportCell = ({
-    record,
-    handleAction,
-    user,
-}: {
-    record: CIRequest
-    handleAction: (action: string, request: CIRequest) => void
-    user: DbUser | null
-}) => {
-    return (
-        <section className="manage-support-cell">
-            <p style={{ margin: 0 }}>
-                בקשה מס׳ : {record.request_id}
-                <br />
-                מייל : {record.email}
-                <br />
-                פלאפון : {record.phone}
-                <br />
-                <span className="manage-support-cell-request">
-                    <label className="sub-title">
-                        {dayjs(record.created_at).format("DD/MM/YYYY HH:mm")}
-                    </label>
-                    {record.message}
-                </span>
-            </p>
-            {record.responses.length > 0 && (
-                <p style={{ margin: 0 }}>
-                    <b> תשובה</b>
-                    <span
-                        style={{
-                            paddingRight: "10px",
-                            whiteSpace: "pre-wrap",
-                            wordWrap: "break-word",
-                        }}
-                    >
-                        {record.responses.map((response) => (
-                            <article
-                                key={response.created_at}
-                                className="manage-support-cell-response"
-                            >
-                                <label className="sub-title">
-                                    {response.responder_name} ב{" "}
-                                    {dayjs(response.created_at).format(
-                                        "DD/MM/YYYY HH:mm"
-                                    )}
-                                </label>
-                                <label className="content">
-                                    {response.response}
-                                </label>
-                            </article>
-                        ))}
-                    </span>
-                </p>
-            )}
-            <article
-                className="manage-support-cell-actions"
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                }}
-            >
-                <button
-                    className="secondary-action-btn low-margin"
-                    onClick={() => handleAction("in_progress", record)}
-                >
-                    בטיפול
-                </button>
-                <button
-                    className="secondary-action-btn low-margin"
-                    onClick={() => handleAction("approved", record)}
-                >
-                    אישור וסגירה
-                </button>
-                <AddResponseToSupportReqModal
-                    onSubmit={(response) =>
-                        handleAction("add_response", {
-                            ...record,
-                            responses: [
-                                ...record.responses,
-                                {
-                                    response,
-                                    created_at: new Date().toISOString(),
-                                    responder_name: user?.user_name || "",
-                                },
-                            ],
-                        })
-                    }
-                />
-                <button
-                    className="secondary-action-btn low-margin"
-                    onClick={() => handleAction("close", record)}
-                >
-                    סגירה
-                </button>
-            </article>
-        </section>
-    )
-}
-
-const filterDropdown = ({
-    setSelectedKeys,
-    selectedKeys,
-    confirm,
-    clearFilters,
-}: {
-    setSelectedKeys: (keys: React.Key[]) => void
-    selectedKeys: React.Key[]
-    confirm: () => void
-    clearFilters?: () => void
-}) => {
-    const onClear = () => {
-        clearFilters?.()
-        confirm()
+    function handleOpenRequest(request: CIRequest) {
+        if (expandedRequestId === request.id) {
+            setExpandedRequestId(null)
+            setAddResponseModalOpen(false)
+            return
+        }
+        setExpandedRequestId(request.id)
+        setAddResponseModalOpen(false)
     }
-    return (
-        <div style={{ padding: 8 }}>
-            <Input
-                placeholder={`חיפוש לפי שם`}
-                value={selectedKeys[0]}
-                onChange={(e) =>
-                    setSelectedKeys(e.target.value ? [e.target.value] : [])
-                }
-                onPressEnter={() => confirm()}
-                style={{ marginBottom: 8, display: "block" }}
-            />
-            <Space>
-                <button onClick={() => confirm()} className="general-icon-btn">
-                    <Icon icon="search" className="filter-search-icon-btn" />
-                </button>
 
-                <button onClick={onClear} className="general-icon-btn">
-                    <Icon
-                        icon="search_off"
-                        className="filter-search-icon-btn"
+    return (
+        <section className="manage-support-page">
+            <header className="manage-support-header">
+                <h2 className="manage-support-header-title">ניהול בקשות</h2>
+                <div className="filters-container">
+                    <DoubleBindedSelect
+                        options={requestTypeOptions}
+                        selectedValues={selectedTypes}
+                        onChange={handleTypesChange}
+                        placeholder="סינון לפי סוג הבקשה"
+                        className="filter-select"
                     />
-                </button>
-            </Space>
-        </div>
+                    <Switch
+                        className="filter-switch"
+                        size="default"
+                        onChange={handleStatusChange}
+                        checked={selectedStatus === RequestStatus.open}
+                        checkedChildren={RequestStatusHebrew.open}
+                        unCheckedChildren={RequestStatusHebrew.closed}
+                    />
+                </div>
+            </header>
+            <div className="requests-container" role="list">
+                {filteredRequests.map((request) => (
+                    <div
+                        key={request.id}
+                        className="request-item"
+                        role="listitem"
+                    >
+                        <div
+                            className={`request-item ${
+                                expandedRequestId === request.id ? "active" : ""
+                            }`}
+                            onClick={() => handleOpenRequest(request)}
+                        >
+                            <div
+                                className={`request-summary ${
+                                    expandedRequestId === request.id
+                                        ? "active"
+                                        : ""
+                                } ${
+                                    filteredRequests[
+                                        filteredRequests.length - 1
+                                    ].id === request.id
+                                        ? "last-item"
+                                        : ""
+                                }`}
+                            >
+                                <h3 className="request-title">
+                                    {RequestTypeHebrew[request.type]}
+                                </h3>
+                                {" - "}
+                                <h3 className="request-title">
+                                    {request.name}
+                                </h3>
+
+                                <label className="request-status">
+                                    {RequestStatusHebrew[request.status]}
+                                </label>
+                                <time dateTime={request.created_at}>
+                                    {dayjs(request.created_at).format(
+                                        "DD/MM/YYYY"
+                                    )}
+                                </time>
+                            </div>
+                            {expandedRequestId === request.id && (
+                                <div
+                                    className={`request-details ${
+                                        expandedRequestId === request.id
+                                            ? "active"
+                                            : ""
+                                    } ${
+                                        filteredRequests[
+                                            filteredRequests.length - 1
+                                        ].id === request.id
+                                            ? "last-item"
+                                            : ""
+                                    }`}
+                                >
+                                    <p className="request-details-content">
+                                        <span>בקשה מס׳ : {request.number}</span>
+
+                                        <span>מייל : {request.email}</span>
+
+                                        <span>פלאפון : {request.phone}</span>
+
+                                        <span>
+                                            {dayjs(request.created_at).format(
+                                                "DD/MM/YYYY HH:mm"
+                                            )}
+                                        </span>
+                                        <label className="request-message">
+                                            {request.message}
+                                        </label>
+                                    </p>
+                                    {request.responses.length > 0 && (
+                                        <article className="request-responses-container">
+                                            <label className="request-responses-title">
+                                                תגובות
+                                            </label>
+                                            <div className="request-responses">
+                                                {request.responses.map(
+                                                    (response, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="request-response"
+                                                        >
+                                                            {response.response}
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        </article>
+                                    )}
+                                    <article className="manage-support-actions">
+                                        {request.type !==
+                                            RequestType.support && (
+                                            <button
+                                                className="secondary-action-btn low-margin"
+                                                onClick={() =>
+                                                    handleAction(
+                                                        "approved",
+                                                        request
+                                                    )
+                                                }
+                                            >
+                                                אישור וסגירה
+                                            </button>
+                                        )}
+                                        <AddResponseToSupportReqModal
+                                            isOpen={addResponseModalOpen}
+                                            setIsOpen={setAddResponseModalOpen}
+                                            onSubmit={(response) =>
+                                                handleAction("add_response", {
+                                                    ...request,
+                                                    responses: [
+                                                        ...request.responses,
+                                                        {
+                                                            response,
+                                                            created_at:
+                                                                new Date().toISOString(),
+                                                            responder_name:
+                                                                user?.user_name ||
+                                                                "",
+                                                        },
+                                                    ],
+                                                })
+                                            }
+                                        />
+                                        <button
+                                            className="secondary-action-btn low-margin"
+                                            onClick={() =>
+                                                handleAction("close", request)
+                                            }
+                                        >
+                                            סגירה
+                                        </button>
+                                    </article>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
     )
 }

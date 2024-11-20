@@ -4,36 +4,48 @@ import TextArea from "antd/es/input/TextArea"
 
 export default function AddResponseToSupportReqModal({
     onSubmit,
+    isOpen,
+    setIsOpen,
 }: {
     onSubmit: (response: string) => void
+    isOpen: boolean
+    setIsOpen: (isOpen: boolean) => void
 }) {
-    const [open, setOpen] = useState<boolean>(false)
     const [response, setResponse] = useState<string>("")
 
     const handleSubmit = () => {
         const currentResponse = response
         setResponse("")
         onSubmit(currentResponse)
-        setOpen(false)
+        setIsOpen(false)
+    }
+
+    const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation()
+        e.preventDefault()
+        setIsOpen(true)
     }
 
     return (
         <>
             <button
                 className="secondary-action-btn low-margin"
-                onClick={() => setOpen(true)}
+                onClick={handleOpen}
             >
                 הוספת תשובה
             </button>
             <Modal
-                open={open}
+                open={isOpen}
                 title="הוספת תשובה לבקשת תמיכה"
+                closable={false}
+                maskClosable={false}
                 onOk={handleSubmit}
-                onCancel={() => setOpen(false)}
+                onCancel={() => setIsOpen(false)}
                 okText="שלח"
                 cancelText="ביטול"
             >
                 <TextArea
+                    onClick={(e) => e.stopPropagation()}
                     rows={4}
                     onChange={(e) => setResponse(e.target.value)}
                     placeholder="הכנס תשובה כאן..."
