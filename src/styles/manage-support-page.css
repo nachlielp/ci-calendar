@@ -1,4 +1,5 @@
 .manage-support-page {
+    margin: 0 16px;
     .manage-support-header {
         display: flex;
         flex-direction: column;
