@@ -11,6 +11,7 @@ import {
     multiDayNotificationOptions,
 } from "../../util/options"
 import AsyncButton from "../Common/AsyncButton"
+import { NotificationType } from "../../util/interfaces"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
@@ -72,6 +73,7 @@ export default function CIEventNotificationModal({
                 ci_event_id: eventId,
                 user_id: user.user_id,
                 is_sent: false,
+                type: NotificationType.reminder,
             })
 
             if (notification) {
