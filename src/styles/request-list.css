@@ -1,8 +1,9 @@
 .request-list {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 90%;
     margin: 16px;
+    padding: 16px;
     background-color: #ffffff;
     border-radius: 6px;
     direction: rtl;
