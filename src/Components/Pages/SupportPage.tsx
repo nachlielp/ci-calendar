@@ -1,13 +1,27 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import RequestForm from "../Requests/RequestForm"
 import RequestsList from "../Requests/RequestsList"
 import MenuButtons from "../Common/MenuButtons"
+import { useNavigate, useParams } from "react-router-dom"
 
 export default function SupportPage() {
+    const { requestId } = useParams<{ requestId: string }>()
     const [createRequest, setCreateRequest] = useState<boolean>(false)
+    const [selectedRequestId, setSelectedRequestId] = useState<string | null>(
+        null
+    )
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (requestId) {
+            setCreateRequest(false)
+            setSelectedRequestId(requestId)
+        }
+    }, [requestId])
 
     function onSelectKey(key: string) {
         setCreateRequest(key === "create")
+        navigate("/request")
     }
 
     return (
@@ -33,7 +47,9 @@ export default function SupportPage() {
                 defaultKey="requests"
             />
             {createRequest && <RequestForm />}
-            {!createRequest && <RequestsList />}
+            {!createRequest && (
+                <RequestsList selectedRequestId={selectedRequestId} />
+            )}
         </div>
     )
 }

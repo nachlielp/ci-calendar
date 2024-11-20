@@ -114,6 +114,10 @@ export default function App() {
                                     element={<SupportPage />}
                                 />
                                 <Route
+                                    path="/request/:requestId"
+                                    element={<SupportPage />}
+                                />
+                                <Route
                                     path="/reset-password"
                                     element={<ResetPasswordPage />}
                                 />

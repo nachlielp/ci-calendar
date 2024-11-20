@@ -4,10 +4,14 @@ import {
     RequestTypeHebrew,
     RequestStatusHebrew,
 } from "../../util/interfaces"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"
 
-export default function RequestsList() {
+export default function RequestsList({
+    selectedRequestId,
+}: {
+    selectedRequestId: string | null
+}) {
     const { user } = useUser()
 
     if (!user) {
@@ -16,6 +20,13 @@ export default function RequestsList() {
     const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
         null
     )
+
+    useEffect(() => {
+        if (selectedRequestId) {
+            setExpandedRequestId(selectedRequestId)
+            console.log("expandedRequestId", expandedRequestId)
+        }
+    }, [selectedRequestId])
 
     function handleOpenRequest(request: CIRequest) {
         if (expandedRequestId === request.id) {
