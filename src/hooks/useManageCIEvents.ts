@@ -11,7 +11,7 @@ import { useCIEvents } from "../context/CIEventsContext"
 
 const MINUTE_MS = 1000 * 60
 
-export const useCIManageEvents = (filterBy: FilterOptions = {}) => {
+export const useManageCIEvents = (filterBy: FilterOptions = {}) => {
     const [ci_past_events, setCIPastEvents] = useState<CIEvent[]>([])
     const [ci_future_events, setCIFutureEvents] = useState<CIEvent[]>([])
     const [ci_events_teachers, setCIEventsTeachers] = useState<SelectOption[]>(

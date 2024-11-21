@@ -6,7 +6,7 @@ import dayjs from "dayjs"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 import { useNavigate } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
-import { useCIManageEvents } from "../../hooks/useCIManageEvents"
+import { useManageCIEvents } from "../../hooks/useManageCIEvents"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import Loading from "../Common/Loading"
 import MenuButtons from "../Common/MenuButtons"
@@ -25,7 +25,7 @@ export default function UserEventsListPage() {
     const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
     const { updateEventState, removeEventState: removeEventFromMainStage } =
-        useCIManageEvents({
+        useManageCIEvents({
             user_id: user?.user_id,
         })
 

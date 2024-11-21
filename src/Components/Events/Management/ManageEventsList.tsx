@@ -8,7 +8,7 @@ import { useUser } from "../../../context/UserContext"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import Loading from "../../Common/Loading"
-import { useCIManageEvents } from "../../../hooks/useCIManageEvents"
+import { useManageCIEvents } from "../../../hooks/useManageCIEvents"
 import DoubleBindedSelect from "../../Common/DoubleBindedSelect"
 import { CIEvent } from "../../../util/interfaces"
 import Input from "antd/es/input"
@@ -32,7 +32,7 @@ export default function ManageEventsList() {
         loading,
         updateEventState,
         removeEventState,
-    } = useCIManageEvents({})
+    } = useManageCIEvents({})
 
     const [filteredEvents, setFilteredEvents] = useState<CIEvent[]>([])
 
