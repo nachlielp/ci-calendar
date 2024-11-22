@@ -153,7 +153,7 @@ export default function EditMultiDayEventForm({
             setIsSubmitting(true)
             const updatedTemplate: CITemplate = {
                 type: values["main-event-type"].value,
-                template_id: template.template_id,
+                id: template.id,
                 address: (address || template.address) as IAddress,
                 created_at: template.created_at,
                 updated_at: dayjs().toISOString(),
@@ -179,7 +179,10 @@ export default function EditMultiDayEventForm({
                     ) || [],
             }
             try {
-                await templateService.updateTemplate(updatedTemplate)
+                const newTemplate = await templateService.updateTemplate(
+                    updatedTemplate
+                )
+                store.setTemplate(newTemplate, EventPayloadType.UPDATE)
                 closeForm()
             } catch (error) {
                 console.error(

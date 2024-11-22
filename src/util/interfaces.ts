@@ -95,7 +95,7 @@ export interface CIEvent {
     cancelled: boolean
 }
 export interface CITemplate {
-    template_id: string
+    id: string
     owners: UserOption[]
     name: string
     title: string

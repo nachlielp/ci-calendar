@@ -247,7 +247,7 @@ export default function EditSingleDayEventForm({
         } else if (template) {
             const updatedTemplate: CITemplate = {
                 type: "",
-                template_id: template.template_id,
+                id: template.id,
                 address: (newAddress || address) as IAddress,
                 created_at: template.created_at,
                 updated_at: dayjs().toISOString(),
@@ -273,7 +273,10 @@ export default function EditSingleDayEventForm({
                 updatedTemplate
             )
             try {
-                await templateService.updateTemplate(updatedTemplate)
+                const newTemplate = await templateService.updateTemplate(
+                    updatedTemplate
+                )
+                store.setTemplate(newTemplate, EventPayloadType.UPDATE)
                 closeForm()
             } catch (error) {
                 console.error(

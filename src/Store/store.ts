@@ -164,6 +164,15 @@ class Store {
         return this.userBio
     }
 
+    @computed
+    get getTemplates() {
+        return this.templates
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
+            )
+    }
+
     @action
     setSession(session: Session | null) {
         this.session = session
@@ -412,6 +421,25 @@ class Store {
                 break
             case EventPayloadType.INSERT:
                 this.userBio = bio
+                break
+        }
+    }
+
+    @action
+    setTemplate = (template: CITemplate, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.UPDATE:
+                this.templates = this.templates.map((t) =>
+                    t.id === template.id ? { ...t, ...template } : t
+                )
+                break
+            case EventPayloadType.DELETE:
+                this.templates = this.templates.filter(
+                    (t) => t.id !== template.id
+                )
+                break
+            case EventPayloadType.INSERT:
+                this.templates = [...this.templates, template]
                 break
         }
     }

@@ -67,7 +67,7 @@ export default function SingleDayEventForm({
             user?.templates
                 .filter((template) => !template.is_multi_day)
                 .map((template) => ({
-                    value: template.template_id,
+                    value: template.id,
                     label: template.name,
                 })) || []
         )
@@ -115,13 +115,13 @@ export default function SingleDayEventForm({
     }
 
     const handleTemplateChange = (value: string) => {
-        const template = user?.templates.find((t) => t.template_id === value)
+        const template = user?.templates.find((t) => t.id === value)
         if (template) {
             const { currentFormValues, address } =
                 utilService.singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
-            setSourceTemplateId(template.template_id)
+            setSourceTemplateId(template.id)
         } else {
             setSourceTemplateId(null)
         }
@@ -243,7 +243,11 @@ export default function SingleDayEventForm({
                         ) || [],
                 }
                 // setSubmitted(true)
-                await templateService.createTemplate(template)
+                const newTemplate = await templateService.createTemplate(
+                    template
+                )
+                console.log("newTemplate", newTemplate)
+                store.setTemplate(newTemplate, EventPayloadType.INSERT)
                 clearForm()
                 closeForm()
             }

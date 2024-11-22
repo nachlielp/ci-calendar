@@ -1,15 +1,13 @@
 import ManageTemplatesList from "../Events/Management/ManageTemplatesList"
 import FormContainer from "../Events/Forms/FormContainer"
-import { useCIEvents } from "../../context/CIEventsContext"
 import { Icon } from "../Common/Icon"
-import { useUser } from "../../context/UserContext"
 import Alert from "antd/es/alert"
+import { observer } from "mobx-react-lite"
+import { store } from "../../Store/store"
 
-export default function CreateEventsPage() {
-    const { updateEventState } = useCIEvents()
-    const { user } = useUser()
-
-    const isMissingProfile = !user?.bio?.bio_name || user?.bio?.bio_name === ""
+const CreateEventsPage = () => {
+    const isMissingProfile =
+        !store.getBio.bio_name || store.getBio.bio_name === ""
 
     const buttonsArray = [
         {
@@ -44,7 +42,7 @@ export default function CreateEventsPage() {
                         showIcon
                     />
                 )}
-                {user?.templates.length === 0 && (
+                {store.getTemplates.length === 0 && (
                     <Alert
                         message="כדאי ליצור תבניות עבור אירועים חוזרים"
                         type="warning"
@@ -64,7 +62,6 @@ export default function CreateEventsPage() {
                         }
                         eventType={button.type}
                         isTemplate={button.isTemplate}
-                        updateEventState={updateEventState}
                     />
                 ))}
             </article>
@@ -72,3 +69,5 @@ export default function CreateEventsPage() {
         </section>
     )
 }
+
+export default observer(CreateEventsPage)

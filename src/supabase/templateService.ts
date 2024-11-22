@@ -1,7 +1,7 @@
 import { supabase } from "./client"
 import { CITemplate } from "../util/interfaces"
 
-export type CITemplateWithoutId = Omit<CITemplate, "template_id" | "user_id">
+export type CITemplateWithoutId = Omit<CITemplate, "id" | "user_id">
 
 export const templateService = {
     createTemplate,
@@ -15,7 +15,7 @@ async function getTemplate(templateId: string): Promise<CITemplate> {
         const { data, error } = await supabase
             .from("templates")
             .select("*")
-            .eq("template_id", templateId)
+            .eq("id", templateId)
         if (error) throw error
         return data[0]
     } catch (error) {
@@ -45,10 +45,10 @@ async function deleteTemplate(templateId: string): Promise<string> {
         const { data, error } = await supabase
             .from("templates")
             .delete()
-            .eq("template_id", templateId)
+            .eq("id", templateId)
             .select()
         if (error) throw error
-        return data[0].template_id
+        return data[0].id
     } catch (error) {
         console.error("Error deleting CI template:", error)
         throw error
@@ -60,7 +60,7 @@ async function updateTemplate(template: CITemplate): Promise<CITemplate> {
         const { data, error } = await supabase
             .from("templates")
             .update(template)
-            .eq("template_id", template.template_id)
+            .eq("id", template.id)
             .select()
             .single()
         if (error) throw error
