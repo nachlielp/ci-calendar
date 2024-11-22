@@ -76,6 +76,12 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
 }
 
 export default defineConfig({
+    esbuild: {
+        target: "es2022",
+    },
+    build: {
+        target: "es2022",
+    },
     base: "/",
     plugins: [
         react(),

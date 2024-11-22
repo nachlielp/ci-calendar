@@ -12,7 +12,6 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
 import BackgroundTiles from "./Components/Layout/BackgroundTiles"
-import { useCIEvents } from "./context/CIEventsContext"
 
 import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"
@@ -20,6 +19,9 @@ import { SpeedInsights } from "@vercel/speed-insights/react"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
+import { observer } from "mobx-react-lite"
+import { useCIEvents } from "./hooks/useCIEvents"
+import { rootStore } from "./Store/rootStore"
 
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
@@ -51,14 +53,14 @@ export enum EventAction {
     recycle,
 }
 
-export default function App() {
-    const { ci_events, loading } = useCIEvents()
+const App = () => {
+    const store = rootStore.store
 
     return (
         <div className="app">
             <SpeedInsights />
             <BackgroundTiles />
-            {loading ? (
+            {store.loading ? (
                 <EventsPageSkeleton />
             ) : (
                 <div
@@ -77,15 +79,21 @@ export default function App() {
                             />
                             <Route
                                 path="/event/:eventId"
-                                element={<EventsPage events={ci_events} />}
+                                element={
+                                    <EventsPage events={store.ci_events} />
+                                }
                             />
                             <Route
                                 path="/:eventId"
-                                element={<EventsPage events={ci_events} />}
+                                element={
+                                    <EventsPage events={store.ci_events} />
+                                }
                             />
                             <Route
                                 path="/"
-                                element={<EventsPage events={ci_events} />}
+                                element={
+                                    <EventsPage events={store.ci_events} />
+                                }
                             />
                             {/* <Route
                                 path="/weekly-events"
@@ -212,7 +220,9 @@ export default function App() {
                             </Route>
                             <Route
                                 path="*"
-                                element={<EventsPage events={ci_events} />}
+                                element={
+                                    <EventsPage events={store.ci_events} />
+                                }
                             />
                         </Routes>
                     </Suspense>
@@ -221,3 +231,5 @@ export default function App() {
         </div>
     )
 }
+
+export default observer(App)

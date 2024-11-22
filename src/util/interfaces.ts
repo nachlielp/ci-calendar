@@ -151,7 +151,7 @@ export enum NotificationType {
     response = "response",
 }
 
-export interface Notification {
+export interface CINotification {
     id: string
     created_at: string
     ci_event_id: string
@@ -167,7 +167,7 @@ export interface Notification {
 }
 
 export interface UserNotification
-    extends Omit<Notification, "user_id" | "body" | "send_at" | "timezone"> {
+    extends Omit<CINotification, "user_id" | "body" | "send_at" | "timezone"> {
     title: string
     start_date: string
     firstSegment: CIEventSegments
@@ -175,7 +175,7 @@ export interface UserNotification
 
 export interface NotificationDB
     extends Omit<
-        Notification,
+        CINotification,
         | "id"
         | "created_at"
         | "title"
@@ -185,6 +185,30 @@ export interface NotificationDB
         | "is_multi_day"
     > {
     id?: string
+}
+
+export interface CIUser {
+    user_id: string
+    created_at: string
+    updated_at: string
+    user_type: UserType
+    user_name: string
+    phone: string
+    email: string
+    subscribed_for_updates_at: string
+    allow_tagging: boolean
+    provider: string
+}
+
+export interface CIUserData {
+    user: CIUser
+    userBio: UserBio
+    notifications: CINotification[]
+    requests: CIRequest[]
+    templates: CITemplate[]
+    ci_events: CIEvent[]
+    past_ci_events: CIEvent[]
+    alerts: CIAlert[]
 }
 
 export interface DbUserWithoutJoin

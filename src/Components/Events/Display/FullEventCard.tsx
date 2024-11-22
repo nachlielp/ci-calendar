@@ -8,6 +8,7 @@ import BioModal from "../../Users/BioModal"
 import CIEventNotificationModal from "../../Notifications/CIEventNotificationModal"
 import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
+
 export default function FullEventCard({
     event: ci_event,
     showPast,

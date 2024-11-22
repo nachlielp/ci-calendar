@@ -6,6 +6,7 @@ import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import { configService } from "../supabase/configService"
 import { utilService } from "../util/utilService"
+import { rootStore } from "../Store/rootStore"
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -44,7 +45,13 @@ export const CIEventsProvider = ({
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
 
+    const userStore = rootStore.store
+
     useEffect(() => {
+        if (userStore.ci_events.length > 0) {
+            return
+        }
+
         const fetchConfig = async () => {
             const config = await configService.getConfig()
 

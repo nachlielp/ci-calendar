@@ -5,9 +5,10 @@ import { DbUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import { InstallPWAButton } from "../Common/InstallPWAButton"
 import { LinkButton } from "../Common/LinkButton"
-import { MenuDrawer } from "./MenuDrawer"
+import { observer } from "mobx-react-lite"
+import MenuDrawer from "./MenuDrawer"
 
-export default function AppHeader() {
+const AppHeader = () => {
     const { user } = useUser()
     const isMobile = useIsMobile()
 
@@ -57,7 +58,7 @@ export default function AppHeader() {
 interface IUserInfoProps {
     user: DbUser
 }
-const UserInfo = ({ user }: IUserInfoProps) => {
+const UserInfo = observer(({ user }: IUserInfoProps) => {
     return (
         <div>
             {user && (
@@ -67,4 +68,6 @@ const UserInfo = ({ user }: IUserInfoProps) => {
             )}
         </div>
     )
-}
+})
+
+export default observer(AppHeader)

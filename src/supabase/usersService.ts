@@ -4,6 +4,8 @@ import {
     DbUser,
     UserType,
     DbUserWithoutJoin,
+    CIUser,
+    CIUserData,
 } from "../util/interfaces"
 import dayjs from "dayjs"
 
@@ -20,6 +22,7 @@ export type ManageUserOption = {
 export const usersService = {
     getUsers,
     getUser,
+    getUserData,
     updateUser,
     createUser,
     getTaggableUsers,
@@ -41,6 +44,7 @@ interface UserWithRole {
     }
 }
 
+//TODO remove
 async function getUser(id: string): Promise<DbUser | null> {
     try {
         const { data, error } = await supabase
@@ -145,22 +149,151 @@ async function getUser(id: string): Promise<DbUser | null> {
         return null
     }
 }
+async function getUserData(id: string): Promise<CIUserData | null> {
+    try {
+        const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select(
+                `
+            *,
+            notifications!left (
+                id,
+                ci_event_id,
+                remind_in_hours,
+                is_sent,
+                ci_events!inner (
+                    title,
+                    start_date,
+                    segments,
+                    is_multi_day
+                )
+            ),
+            requests!left (
+                *
+            ),
+            templates!left (
+                *
+            ),
+            bio:public_bio!left (
+                *
+            ),
+            ci_events:ci_events!left (
+                *
+            ),
+            alerts:alerts!left (
+                id,
+                ci_event_id,
+                user_id,
+                viewed,
+                ci_events!inner (
+                    title,
+                    start_date,
+                    segments,
+                    address
+                )
+            )
+        `
+            )
+            .eq("user_id", id)
+            .eq("notifications.user_id", id)
+            .eq("notifications.is_sent", false)
+            .eq("requests.user_id", id)
+            .eq("templates.user_id", id)
+            .eq("public_bio.user_id", id)
+            .eq("ci_events.user_id", id)
+            .lte("ci_events.start_date", dayjs().endOf("day").toISOString())
+            .eq("alerts.user_id", id)
+            .eq("alerts.viewed", false)
+            .single()
+
+        const { data: eventsData, error: eventsError } = await supabase
+            .from("ci_events")
+            .select("*")
+            .gte("start_date", dayjs().startOf("day").toISOString())
+
+        if (userError) throw userError
+        if (eventsError) throw eventsError
+
+        const notifications = userData?.notifications
+            .map((notification: any) => {
+                const title = notification.ci_events.title
+                const start_date = notification.ci_events.start_date
+
+                const formattedNotification = {
+                    ...notification,
+                    title,
+                    start_date,
+                    firstSegment: notification.ci_events.segments[0],
+                    is_multi_day: notification.ci_events.is_multi_day,
+                }
+                delete formattedNotification.ci_events
+                return formattedNotification
+            })
+            .filter((notification: any) => {
+                if (notification.start_date)
+                    return dayjs(notification.start_date)
+                        .endOf("day")
+                        .isAfter(dayjs())
+                return true
+            })
+
+        const alerts = userData.alerts.map((alert: any) => {
+            const formattedAlert = {
+                ...alert,
+                title: alert.ci_events.title,
+                start_date: alert.ci_events.start_date,
+                firstSegment: alert.ci_events.segments[0],
+                address: alert.ci_events.address.label,
+            }
+            delete formattedAlert.ci_events
+            return formattedAlert
+        })
+
+        const templates = userData.templates
+        const requests = userData.requests
+        const past_ci_events = userData.ci_events
+        const userBio = userData.bio
+
+        const user = { ...userData }
+
+        delete user.notifications
+        delete user.alerts
+        delete user.templates
+        delete user.requests
+        delete user.ci_events
+        delete user.bio
+
+        return {
+            user,
+            notifications,
+            alerts,
+            templates,
+            requests,
+            ci_events: eventsData,
+            past_ci_events,
+            userBio,
+        } as unknown as CIUserData
+    } catch (error) {
+        console.error("Error in getUser:", error)
+        return null
+    }
+}
 
 async function updateUser(
     id: string,
     user: Partial<DbUser>
-): Promise<DbUser | null> {
+): Promise<CIUser | null> {
     try {
         const { data, error } = await supabase
             .from("users")
             .update(user)
             .eq("user_id", id)
             .select()
-
+            .single()
         if (error) {
             throw error
         }
-        return data[0] as DbUser
+        return data as CIUser
     } catch (error) {
         console.error("Error in updateUser:", error)
         return null

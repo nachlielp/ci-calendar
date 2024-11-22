@@ -6,8 +6,9 @@ import { useUser } from "../../context/UserContext"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
+import { observer } from "mobx-react-lite"
 
-export function MenuDrawer() {
+const MenuDrawer = () => {
     const [open, setOpen] = useState<boolean>(false)
     const { user } = useUser()
 
@@ -165,6 +166,8 @@ export function MenuDrawer() {
         </>
     )
 }
+
+export default observer(MenuDrawer)
 
 const MenuItem = ({ item }: { item: any }) => {
     return (

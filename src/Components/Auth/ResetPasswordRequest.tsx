@@ -12,6 +12,7 @@ function ResetPasswordRequest() {
     const [message, setMessage] = useState<string>("")
     const [mailSent, setMailSent] = useState<boolean>(false)
     const [messageType, setMessageType] = useState<"info" | "error">()
+
     const onFinish = async () => {
         try {
             setMessage("")

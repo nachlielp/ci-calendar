@@ -6,7 +6,6 @@ import Input from "antd/es/input"
 import { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../supabase/client"
-import { useUser } from "../../context/UserContext"
 import { Icon } from "../Common/Icon"
 
 enum SignupError {
@@ -16,7 +15,6 @@ enum SignupError {
 }
 
 export default function Signup() {
-    const { user } = useUser()
     const nameRef = useRef<InputRef>(null)
     const emailRef = useRef<InputRef>(null)
     const passwordRef = useRef<InputRef>(null)
@@ -24,12 +22,6 @@ export default function Signup() {
     const [error, setError] = useState<SignupError>(SignupError.none)
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
-
-    useEffect(() => {
-        if (user != null) {
-            navigate("/")
-        }
-    }, [user])
 
     const onFinish = async () => {
         if (
