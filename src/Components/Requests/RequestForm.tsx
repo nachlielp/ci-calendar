@@ -2,8 +2,6 @@ import Form, { FormProps } from "antd/es/form"
 import Input from "antd/es/input"
 import Card from "antd/es/card"
 import Select from "antd/es/select"
-
-import { useUser } from "../../context/UserContext"
 import { requestsService } from "../../supabase/requestsService"
 import { EventPayloadType, RequestType } from "../../util/interfaces"
 import { useState } from "react"

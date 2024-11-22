@@ -2,9 +2,10 @@ import Image from "antd/es/image"
 import Typography from "antd/es/typography"
 import { Icon } from "../Common/Icon"
 import { UserBio } from "../../util/interfaces"
+import { observer } from "mobx-react-lite"
 const { Text } = Typography
 
-function BioCard({ teacher }: { teacher: UserBio }) {
+const BioCard = ({ teacher }: { teacher: UserBio }) => {
     return (
         <section className="bio-card" style={{ direction: "rtl" }}>
             <div className="bio-card-content">
@@ -43,4 +44,4 @@ function BioCard({ teacher }: { teacher: UserBio }) {
     )
 }
 
-export default BioCard
+export default observer(BioCard)

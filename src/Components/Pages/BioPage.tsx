@@ -1,14 +1,15 @@
 import { useState } from "react"
-
+import { observer } from "mobx-react-lite"
 import Card from "antd/es/card"
 import BioSelfPreview from "../Users/BioSelfPreview"
 import ProfileForm from "../Users/ProfileForm"
 
-export default function BioPage() {
+const BioPage = () => {
     const [editProfile, setEditProfile] = useState(false)
     const handleSubmitEdit = () => {
         setEditProfile(false)
     }
+
     return (
         <div className="bio-page page">
             <div className="button-container">
@@ -38,3 +39,5 @@ export default function BioPage() {
         </div>
     )
 }
+
+export default observer(BioPage)

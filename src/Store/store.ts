@@ -159,6 +159,11 @@ class Store {
             )
     }
 
+    @computed
+    get getBio() {
+        return this.userBio
+    }
+
     @action
     setSession(session: Session | null) {
         this.session = session
@@ -249,6 +254,9 @@ class Store {
                 break
             case "requests":
                 this.setRequest(payload.new, payload.eventType)
+                break
+            case "public_bio":
+                this.setBio(payload.new, payload.eventType)
                 break
         }
     }
@@ -392,6 +400,18 @@ class Store {
                 this.requests = this.requests.map((r) =>
                     r.id === request.id ? { ...r, ...request } : r
                 )
+                break
+        }
+    }
+
+    @action
+    setBio = (bio: UserBio, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.UPDATE:
+                this.userBio = bio
+                break
+            case EventPayloadType.INSERT:
+                this.userBio = bio
                 break
         }
     }

@@ -477,13 +477,25 @@ async function subscribeToUser(
         .on(
             "postgres_changes",
             {
-                event: "UPDATE",
+                event: "*",
                 schema: "public",
                 table: "requests",
                 filter: `user_id=eq.${userId}`,
             },
             (payload) => {
                 callback({ table: "requests", payload })
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "public_bio",
+                filter: `user_id=eq.${userId}`,
+            },
+            (payload) => {
+                callback({ table: "public_bio", payload })
             }
         )
         .on(
