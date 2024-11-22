@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { ManageUserOption, usersService } from "../supabase/usersService"
 
+//TODO add to view model
 export const useUsers = () => {
     const [users, setUsers] = useState<ManageUserOption[]>([])
     const [loading, setLoading] = useState(true)

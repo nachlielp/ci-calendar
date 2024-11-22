@@ -208,6 +208,7 @@ export interface CIUser {
         teachers: string[]
         orgs: string[]
     }
+    push_notification_tokens: PushNotificationToken[]
 }
 
 export interface CIUserData {

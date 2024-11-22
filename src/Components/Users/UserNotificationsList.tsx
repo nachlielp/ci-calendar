@@ -1,4 +1,3 @@
-import { useUser } from "../../context/UserContext"
 import { UserNotification } from "../../util/interfaces"
 import {
     singleDayNotificationOptions,
@@ -16,15 +15,13 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 const UserNotificationsList = () => {
-    const { user } = useUser()
-
     return (
         <section className="user-notifications-list">
             <label className="user-notifications-list-title">
                 התזכורות שלי
             </label>
 
-            {store.getNotificationList.map((notification: UserNotification) => (
+            {store.getNotifications.map((notification: UserNotification) => (
                 <article key={notification.id} className="user-notification">
                     <div className="user-notification-content">
                         <label className="user-notification-title">
@@ -61,7 +58,7 @@ const UserNotificationsList = () => {
                 </article>
             ))}
 
-            {user?.notifications.length === 0 && (
+            {store.getNotifications.length === 0 && (
                 <div className="user-notifications-list-empty">
                     <label>נראה שאין לכם התראות פעילות</label>
                 </div>

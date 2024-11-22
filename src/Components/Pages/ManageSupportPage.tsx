@@ -16,12 +16,12 @@ import dayjs from "dayjs"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import { requestTypeOptions } from "../../util/options"
 import Switch from "antd/es/switch"
-import { useUser } from "../../context/UserContext"
 import userRoleService from "../../supabase/userRoleService"
 import AddResponseToSupportReqModal from "../Requests/AddResponseToSupportReqModal"
+import { observer } from "mobx-react-lite"
+import { store } from "../../Store/store"
 
-export default function ManageSupportPage() {
-    const { user } = useUser()
+const ManageSupportPage = () => {
     const [selectedStatus, setSelectedStatus] = useState<RequestStatus>(
         RequestStatus.open
     )
@@ -92,7 +92,7 @@ export default function ManageSupportPage() {
                     {
                         response: "הבקשה אושרה",
                         created_at: new Date().toISOString(),
-                        responder_name: user?.user_name || "",
+                        responder_name: store.user.user_name || "",
                     },
                 ]
                 const newRequest: CIRequest = {
@@ -118,7 +118,7 @@ export default function ManageSupportPage() {
                     {
                         response: "הבקשה נסגרה",
                         created_at: new Date().toISOString(),
-                        responder_name: user?.user_name || "",
+                        responder_name: store.user.user_name || "",
                     },
                 ]
                 await requestsService.updateRequest({
@@ -283,7 +283,8 @@ export default function ManageSupportPage() {
                                                             created_at:
                                                                 new Date().toISOString(),
                                                             responder_name:
-                                                                user?.user_name ||
+                                                                store.user
+                                                                    .user_name ||
                                                                 "",
                                                         },
                                                     ],
@@ -308,3 +309,5 @@ export default function ManageSupportPage() {
         </section>
     )
 }
+
+export default observer(ManageSupportPage)

@@ -5,7 +5,6 @@ import {
     RequestStatusHebrew,
 } from "../../util/interfaces"
 import { useEffect, useState } from "react"
-import { useUser } from "../../context/UserContext"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
 
@@ -14,11 +13,6 @@ const RequestsList = ({
 }: {
     selectedRequestId: string | null
 }) => {
-    const { user } = useUser()
-
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
     const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
         null
     )
@@ -59,8 +53,9 @@ const RequestsList = ({
                                         ? "active"
                                         : ""
                                 } ${
-                                    user.requests[user.requests.length - 1]
-                                        .id === request.id
+                                    store.getRequests[
+                                        store.getRequests.length - 1
+                                    ].id === request.id
                                         ? "last-item"
                                         : ""
                                 }`}
@@ -89,8 +84,9 @@ const RequestsList = ({
                                             ? "active"
                                             : ""
                                     } ${
-                                        user.requests[user.requests.length - 1]
-                                            .id === request.id
+                                        store.getRequests[
+                                            store.getRequests.length - 1
+                                        ].id === request.id
                                             ? "last-item"
                                             : ""
                                     }`}

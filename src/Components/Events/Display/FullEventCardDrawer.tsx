@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Icon } from "../../Common/Icon"
 import { alertsService } from "../../../supabase/alertsService"
-import { useUser } from "../../../context/UserContext"
+import { store } from "../../../Store/store"
 
 interface EventDrawerProps {
     event: CIEvent | null
@@ -24,11 +24,10 @@ export default function FullEventCardDrawer({
         return null
     }
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
-    const { user } = useUser()
 
     useEffect(() => {
-        if (isModalOpen && user?.alerts) {
-            const matchingAlert = user.alerts
+        if (isModalOpen && store.getAlerts) {
+            const matchingAlert = store.getAlerts
                 .filter((a) => !a.viewed)
                 .find((alert) => {
                     return alert.ci_event_id === event.id
@@ -41,7 +40,7 @@ export default function FullEventCardDrawer({
             }
             setAlertViewed()
         }
-    }, [isModalOpen, event.id, user?.alerts])
+    }, [isModalOpen, event.id, store.getAlerts])
 
     const onClose = () => {
         setIsModalOpen(false)

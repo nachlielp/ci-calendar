@@ -135,7 +135,7 @@ class Store {
     }
 
     @computed
-    get getNotificationList() {
+    get getNotifications() {
         return this.notifications
             .filter((n) => utilService.isNotificationStarted(n))
             .slice()
@@ -147,7 +147,7 @@ class Store {
     @computed
     get getNotificationByEventId() {
         return (eventId: string) =>
-            this.getNotificationList.find((n) => n.ci_event_id === eventId)
+            this.getNotifications.find((n) => n.ci_event_id === eventId)
     }
 
     @computed
@@ -171,6 +171,11 @@ class Store {
             .sort((a, b) =>
                 dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
             )
+    }
+
+    @computed
+    get getAlerts() {
+        return this.alerts
     }
 
     @action

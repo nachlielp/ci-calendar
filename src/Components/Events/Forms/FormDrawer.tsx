@@ -6,7 +6,6 @@ import EditSingleDayEventForm from "./EditSingleDayEventForm"
 import { EventAction } from "../../../App"
 import EditMultiDayEventForm from "./EditMultiDayEventForm"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
-import { DBCIEvent } from "../../../supabase/cieventsService"
 
 export function FormDrawer({
     anchorEl,

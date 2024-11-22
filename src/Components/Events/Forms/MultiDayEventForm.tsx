@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import Row from "antd/es/row"
@@ -11,12 +10,11 @@ import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
-import { EventPayloadType, IAddress, UserType } from "../../../util/interfaces"
+import { EventPayloadType, IAddress } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 
-import { useUser } from "../../../context/UserContext"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 
 import Alert from "antd/es/alert"
@@ -51,10 +49,8 @@ export default function MultiDayEventForm({
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const navigate = useNavigate()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
 
-    const { user } = useUser()
     const [address, setAddress] = useState<IAddress>()
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
         null
@@ -62,26 +58,14 @@ export default function MultiDayEventForm({
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
 
     useEffect(() => {
-        const newTemplateOptions = user?.templates
+        const newTemplateOptions = store.getTemplates
             .filter((template) => template.is_multi_day)
             .map((template) => ({
                 value: template.id,
                 label: template.name,
             }))
         setTemplateOptions(newTemplateOptions || [])
-    }, [user])
-
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
-
-    if (
-        user.user_type !== UserType.admin &&
-        user.user_type !== UserType.creator &&
-        user.user_type !== UserType.org
-    ) {
-        navigate("/")
-    }
+    }, [store.getTemplates])
 
     const [form] = Form.useForm()
 
@@ -111,7 +95,7 @@ export default function MultiDayEventForm({
     }
 
     const handleTemplateChange = (value: string) => {
-        const template = user?.templates.find((t) => t.id === value)
+        const template = store.getTemplates.find((t) => t.id === value)
         if (template) {
             const { currentFormValues, address } = template.is_multi_day
                 ? utilService.multiDayTemplateToFormValues(template)
@@ -156,13 +140,18 @@ export default function MultiDayEventForm({
                     updated_at: dayjs().toISOString(),
                     title: values["event-title"],
                     description: values["event-description"] || "",
-                    owners: [{ value: user.user_id, label: user.user_name }],
+                    owners: [
+                        {
+                            value: store.user.user_id,
+                            label: store.user.user_name,
+                        },
+                    ],
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     hide: false,
                     segments: [],
                     district: values["district"],
-                    user_id: user.user_id,
+                    user_id: store.user.user_id,
                     source_template_id: sourceTemplateId,
                     is_multi_day: true,
                     multi_day_teachers:
@@ -191,7 +180,12 @@ export default function MultiDayEventForm({
                     name: values["template-name"],
                     title: values["event-title"],
                     description: values["event-description"] || "",
-                    owners: [{ value: user.user_id, label: user.user_name }],
+                    owners: [
+                        {
+                            value: store.user.user_id,
+                            label: store.user.user_name,
+                        },
+                    ],
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     segments: [],

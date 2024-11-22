@@ -4,7 +4,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 import FullEventCard from "../Display/FullEventCard"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { useManageCIEvents } from "../../../hooks/useManageCIEvents"
+import { useEventCreatorOptions } from "../../../hooks/useEventCreatorOptions"
 import DoubleBindedSelect from "../../Common/DoubleBindedSelect"
 import { CIEvent } from "../../../util/interfaces"
 import Input from "antd/es/input"
@@ -19,7 +19,7 @@ const ManageEventsList = () => {
     const [selectedEventTitle, setSelectedEventTitle] = useState<string>("")
     const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
-    const { ci_events_teachers } = useManageCIEvents()
+    const { ci_events_creatores } = useEventCreatorOptions()
 
     const [filteredEvents, setFilteredEvents] = useState<CIEvent[]>([])
 
@@ -50,7 +50,7 @@ const ManageEventsList = () => {
                 <h2 className="manage-events-header-title">ניהול אירועים</h2>
                 <div className="filters-container">
                     <DoubleBindedSelect
-                        options={ci_events_teachers}
+                        options={ci_events_creatores}
                         selectedValues={selectedTeachers}
                         onChange={setSelectedTeachers}
                         placeholder="סינון לפי יוצרים"
@@ -97,7 +97,7 @@ const ManageEventsList = () => {
                                     <label>
                                         <span className="separator">|</span>
                                         {
-                                            ci_events_teachers.find(
+                                            ci_events_creatores.find(
                                                 (t) => t.value === event.user_id
                                             )?.label
                                         }

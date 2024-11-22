@@ -1,20 +1,19 @@
 import { useEffect, useState } from "react"
 
 import { usersService } from "../supabase/usersService"
-import { useUser } from "../context/UserContext"
 import { UserType } from "../util/interfaces"
+import { store } from "../Store/store"
 
+//TODO add to view model
 export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
     const [teachers, setTeachers] = useState<
         { label: string; value: string }[]
     >([])
     const [orgs, setOrgs] = useState<{ label: string; value: string }[]>([])
     const [loading, setLoading] = useState(true)
-    const { user } = useUser()
-    const hasProfile = !!user?.bio?.bio_name && user?.bio?.bio_name !== ""
+    const hasProfile = !!store.getBio.bio_name && store.getBio.bio_name !== ""
 
     useEffect(() => {
-        if (!user) return
         const fetchTeachers = async () => {
             try {
                 const users = await usersService.getTaggableUsers()
@@ -35,19 +34,19 @@ export const useTaggableUsersList = ({ addSelf }: { addSelf: boolean }) => {
                 if (
                     !users
                         .map((teacher) => teacher.user_id)
-                        .includes(user.user_id) &&
+                        .includes(store.getUser.user_id) &&
                     addSelf &&
                     hasProfile
                 ) {
-                    if (user.user_type === UserType.org) {
+                    if (store.getUser.user_type === UserType.org) {
                         orgs.push({
-                            label: `${user.bio.bio_name}`,
-                            value: user.user_id,
+                            label: `${store.getBio.bio_name}`,
+                            value: store.getUser.user_id,
                         })
                     } else {
                         teachers.push({
-                            label: `${user.bio.bio_name}`,
-                            value: user.user_id,
+                            label: `${store.getBio.bio_name}`,
+                            value: store.getUser.user_id,
                         })
                     }
                 }

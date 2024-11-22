@@ -1,5 +1,4 @@
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { DBCIEvent } from "../../../supabase/cieventsService"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
 import { FormDrawer } from "./FormDrawer"
 import FormModal from "./FormModal"

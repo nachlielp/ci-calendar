@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import Alert from "antd/es/alert"
 import Card from "antd/es/card"
 import Form from "antd/es/form"

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { utilService } from "../util/utilService"
-import { useUser } from "../context/UserContext"
 import { getToken } from "firebase/messaging"
 import { usersService } from "../supabase/usersService"
 import { messaging } from "../firebase.messaging"
-import { DbUser, PushNotificationPromission } from "../util/interfaces"
+import { CIUser, PushNotificationPromission } from "../util/interfaces"
+import { store } from "../Store/store"
 
 export default function useMessagingPermission() {
     const [permissionStatus, setPermissionStatus] =
@@ -13,13 +13,11 @@ export default function useMessagingPermission() {
                 null
         )
 
-    const { user } = useUser()
-
     useEffect(() => {
         if (utilService.isPWA()) {
             checkPermissionsAndToken()
         }
-    }, [user, permissionStatus])
+    }, [store.isUser, permissionStatus])
 
     const requestPermission = async () => {
         if (!utilService.isPWA()) {
@@ -32,7 +30,7 @@ export default function useMessagingPermission() {
 
     const checkPermissionsAndToken = async () => {
         try {
-            if (!user) {
+            if (!store.isUser) {
                 console.log("no user")
                 setPermissionStatus(null)
                 return
@@ -46,7 +44,7 @@ export default function useMessagingPermission() {
             setPermissionStatus(permission)
             utilService.setFirstNotificationPermissionRequest(permission)
             if (permission === "granted") {
-                await checkAndUpdateToken(user)
+                await checkAndUpdateToken(store.getUser)
             } else {
                 console.error("Permission not granted for Notification")
             }
@@ -62,7 +60,7 @@ export default function useMessagingPermission() {
     }
 }
 
-async function checkAndUpdateToken(user: DbUser) {
+async function checkAndUpdateToken(user: CIUser) {
     if (!utilService.isPWA()) {
         return
     }

@@ -2,7 +2,7 @@ import React from "react"
 import { Navigate, Outlet } from "react-router-dom"
 import { UserType } from "../../util/interfaces"
 import Loading from "../Common/Loading"
-import { useUser } from "../../context/UserContext"
+import { store } from "../../Store/store"
 
 interface PrivateRoutesProps {
     requiredRoles?: UserType[]
@@ -11,16 +11,14 @@ interface PrivateRoutesProps {
 export const PrivateRoutes: React.FC<PrivateRoutesProps> = ({
     requiredRoles: requiredRoles,
 }) => {
-    const { user, loading } = useUser()
-
-    if (loading) {
+    if (store.isLoading) {
         return <Loading />
     }
 
-    if (!user) {
+    if (!store.getUser) {
         return <Navigate to="/login" />
     }
-    if (requiredRoles && !requiredRoles.includes(user.user_type)) {
+    if (requiredRoles && !requiredRoles.includes(store.getUser.user_type)) {
         return <Navigate to="/" />
     }
 

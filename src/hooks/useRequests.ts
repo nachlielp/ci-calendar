@@ -4,6 +4,7 @@ import { CIRequest, RequestStatus } from "../util/interfaces"
 import { RealtimeChannel } from "@supabase/supabase-js"
 
 // TODO debounce name
+//TODO add to view model
 export interface UseRequestsProps {
     status?: RequestStatus | null
     // types?: RequestType[]
@@ -55,9 +56,16 @@ UseRequestsProps) {
         const subscribeToRequests = async () => {
             console.log("subscribeToRequests on status change")
             const channel = await requestsService.subscribeToAllRequests(
-                async (hasNewResponse) => {
-                    if (hasNewResponse) {
-                        await fetchRequests()
+                async ({ data, eventType }) => {
+                    if (eventType === "UPDATE") {
+                        const newRequests = [
+                            ...requests.filter((r) => r.id !== data.id),
+                            data,
+                        ]
+                        setRequests(newRequests)
+                    }
+                    if (eventType === "INSERT") {
+                        setRequests([...requests, data])
                     }
                 }
             )

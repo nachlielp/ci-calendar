@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react"
-
 import { usersService } from "../supabase/usersService"
-import { useUser } from "../context/UserContext"
 import { UserType } from "../util/interfaces"
 
+//TODO add to view model
 export const usePublicBioList = () => {
     const [teachers, setTeachers] = useState<
         { label: string; value: string }[]
     >([])
     const [orgs, setOrgs] = useState<{ label: string; value: string }[]>([])
     const [loading, setLoading] = useState(true)
-    const { user } = useUser()
 
     useEffect(() => {
-        if (!user) return
         const fetchTeachers = async () => {
             try {
                 const public_bios = await usersService.getPublicBioList()

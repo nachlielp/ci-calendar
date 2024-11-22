@@ -58,29 +58,24 @@ UseRequestsProps) {
     if (name) {
         query = query.ilike("name", `%${name}%`)
     }
-    // if (type) {
-    //     query = query.eq("type", type)
-    // }
-
-    // if (email) {
-    //     query = query.eq("email", email)
-    // }
-    // if (page && pageSize) {
-    //     query = query.range((page - 1) * pageSize, page * pageSize)
-    // }
 
     const { data, error } = await query
     return { data, error }
 }
 
-async function subscribeToAllRequests(callback: (data: CIRequest[]) => void) {
+async function subscribeToAllRequests(
+    callback: (data: { data: CIRequest; eventType: string }) => void
+) {
     const channel = supabase
         .channel("public:requests")
         .on(
             "postgres_changes",
             { event: "*", schema: "public", table: "requests" },
             (payload) => {
-                callback([payload.new as CIRequest])
+                callback({
+                    data: payload.new as CIRequest,
+                    eventType: payload.eventType,
+                })
             }
         )
         .subscribe()

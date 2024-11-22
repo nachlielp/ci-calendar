@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom"
 import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
@@ -12,7 +11,6 @@ import timezone from "dayjs/plugin/timezone"
 import {
     IAddress,
     CIEvent,
-    UserType,
     CITemplate,
     EventPayloadType,
 } from "../../../util/interfaces"
@@ -25,7 +23,6 @@ import AddPricesForm from "./AddPricesForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import EventSegmentsForm from "./EventSegmentsForm"
 import { EventAction } from "../../../App"
-import { useUser } from "../../../context/UserContext"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { templateService } from "../../../supabase/templateService"
@@ -61,10 +58,7 @@ export default function EditSingleDayEventForm({
     template?: CITemplate
     closeForm: () => void
 }) {
-    const navigate = useNavigate()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
-    const { user } = useUser()
-
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
@@ -97,17 +91,6 @@ export default function EditSingleDayEventForm({
 
     const handleEndDateChange = (date: dayjs.Dayjs) => {
         setEndDate(date)
-    }
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
-
-    if (
-        user.user_type !== UserType.admin &&
-        user.user_type !== UserType.creator &&
-        user.user_type !== UserType.org
-    ) {
-        navigate("/")
     }
 
     const handleSubmit = async (values: any) => {
@@ -194,13 +177,18 @@ export default function EditSingleDayEventForm({
                 updated_at: dayjs().toISOString(),
                 title: values["event-title"],
                 description: values["event-description"] || "",
-                owners: [{ value: user.user_id, label: user.user_name }],
+                owners: [
+                    {
+                        value: store.user.user_id,
+                        label: store.user.user_name,
+                    },
+                ],
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 hide: false,
                 segments: segments,
                 district: values["district"],
-                user_id: user.user_id,
+                user_id: store.user.user_id,
                 source_template_id: event.source_template_id,
                 is_multi_day: false,
                 multi_day_teachers: [],
@@ -253,7 +241,9 @@ export default function EditSingleDayEventForm({
                 updated_at: dayjs().toISOString(),
                 title: values["event-title"],
                 description: values["event-description"] || "",
-                owners: [{ value: user.user_id, label: user.user_name }],
+                owners: [
+                    { value: store.user.user_id, label: store.user.user_name },
+                ],
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 segments: segments,
@@ -261,7 +251,7 @@ export default function EditSingleDayEventForm({
                 is_multi_day: false,
                 multi_day_teachers: [],
                 name: values["template-name"],
-                user_id: user.user_id,
+                user_id: store.user.user_id,
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],

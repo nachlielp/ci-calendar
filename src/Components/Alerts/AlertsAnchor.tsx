@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react"
-import { useUser } from "../../context/UserContext"
 import dayjs from "dayjs"
 import { CIAlert, NotificationType } from "../../util/interfaces"
 import { useNavigate } from "react-router-dom"
+import { store } from "../../Store/store"
 
 export default function AlertsAnchor() {
-    const { user } = useUser()
     const navigate = useNavigate()
 
     const [isOpen, setIsOpen] = useState(false)
     const [count, setCount] = useState(0)
 
     useEffect(() => {
-        if (user) {
-            const alerts = user.alerts.filter((alert) => !alert.viewed)
+        if (store.isUser) {
+            const alerts = store.getAlerts.filter((alert) => !alert.viewed)
 
             setCount(alerts.length)
 
@@ -24,9 +23,9 @@ export default function AlertsAnchor() {
                 }
             }, 500)
         }
-    }, [user?.alerts])
+    }, [store.getAlerts])
 
-    if (!user) return <></>
+    if (!store.isUser) return <></>
 
     const onAlertClick = (alert: CIAlert) => {
         setIsOpen(false)
@@ -45,7 +44,7 @@ export default function AlertsAnchor() {
                     </label>
                     {isOpen && (
                         <article className="alerts-anchor-list">
-                            {user.alerts
+                            {store.getAlerts
                                 .filter((alert) => !alert.viewed)
                                 .map((alert) => {
                                     return (

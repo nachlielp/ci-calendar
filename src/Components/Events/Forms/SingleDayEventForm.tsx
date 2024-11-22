@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import Row from "antd/es/row"
@@ -10,7 +9,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { SelectOption, tagOptions } from "../../../util/options"
-import { EventPayloadType, IAddress, UserType } from "../../../util/interfaces"
+import { EventPayloadType, IAddress } from "../../../util/interfaces"
 
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -18,7 +17,6 @@ import AddPricesForm from "./AddPricesForm"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
-import { useUser } from "../../../context/UserContext"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import {
     CITemplateWithoutId,
@@ -54,8 +52,6 @@ export default function SingleDayEventForm({
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const navigate = useNavigate()
-    const { user } = useUser()
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
     const [address, setAddress] = useState<IAddress | undefined>()
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
@@ -64,26 +60,14 @@ export default function SingleDayEventForm({
 
     useEffect(() => {
         setTemplateOptions(
-            user?.templates
+            store.getTemplates
                 .filter((template) => !template.is_multi_day)
                 .map((template) => ({
                     value: template.id,
                     label: template.name,
                 })) || []
         )
-    }, [user])
-
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
-
-    if (
-        user.user_type !== UserType.admin &&
-        user.user_type !== UserType.creator &&
-        user.user_type !== UserType.org
-    ) {
-        navigate("/")
-    }
+    }, [store.getTemplates])
 
     const handleAddressSelect = (place: IGooglePlaceOption | null) => {
         if (!place) {
@@ -115,7 +99,7 @@ export default function SingleDayEventForm({
     }
 
     const handleTemplateChange = (value: string) => {
-        const template = user?.templates.find((t) => t.id === value)
+        const template = store.getTemplates.find((t) => t.id === value)
         if (template) {
             const { currentFormValues, address } =
                 utilService.singleDayTemplateToFormValues(template)
@@ -199,13 +183,18 @@ export default function SingleDayEventForm({
                     updated_at: dayjs().toISOString(),
                     title: values["event-title"],
                     description: values["event-description"] || "",
-                    owners: [{ value: user.user_id, label: user.user_name }],
+                    owners: [
+                        {
+                            value: store.getUser.user_id,
+                            label: store.getUser.user_name,
+                        },
+                    ],
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     hide: false,
                     segments: segmentsArray,
                     district: values["district"],
-                    user_id: user.user_id,
+                    user_id: store.getUser.user_id,
                     source_template_id: sourceTemplateId,
                     is_multi_day: false,
                     multi_day_teachers: null,
@@ -229,7 +218,12 @@ export default function SingleDayEventForm({
                     name: values["template-name"],
                     title: values["event-title"],
                     description: values["event-description"] || "",
-                    owners: [{ value: user.user_id, label: user.user_name }],
+                    owners: [
+                        {
+                            value: store.getUser.user_id,
+                            label: store.getUser.user_name,
+                        },
+                    ],
                     links: values["links"] || [],
                     price: values["prices"] || [],
                     segments: segmentsArray,

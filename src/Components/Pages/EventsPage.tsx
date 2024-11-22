@@ -20,7 +20,6 @@ import { utilService } from "../../util/utilService"
 import AlertsAnchor from "../Alerts/AlertsAnchor"
 import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
-import { useCIEvents } from "../../context/CIEventsContext"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 
@@ -30,7 +29,12 @@ const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
 const EventsPage = () => {
     const events = store.getSortedEvents
     const { selectedEvent } = useSetSelectedEventByParams(events)
-    const { config } = useCIEvents()
+    const { config } = {
+        config: {
+            app_title: DEFAULT_TITLE,
+            app_description: DEFAULT_DESCRIPTION,
+        },
+    }
 
     const isMobile = useIsMobile()
 

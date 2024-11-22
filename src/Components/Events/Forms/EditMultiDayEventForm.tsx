@@ -16,7 +16,6 @@ import MultiDayFormHead from "./MultiDayFormHead.tsx"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList.ts"
 import { EventAction } from "../../../App.tsx"
-import { useUser } from "../../../context/UserContext.tsx"
 import {
     cieventsService,
     DBCIEvent,
@@ -41,10 +40,7 @@ export default function EditMultiDayEventForm({
     closeForm: () => void
 }) {
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
-    const { user } = useUser()
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
+
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
     const [newDates, setNewDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -110,13 +106,18 @@ export default function EditMultiDayEventForm({
                 updated_at: dayjs().toISOString(),
                 title: values["event-title"],
                 description: values["event-description"] || "",
-                owners: [{ value: user.user_id, label: user.user_name }],
+                owners: [
+                    {
+                        value: store.user.user_id,
+                        label: store.user.user_name,
+                    },
+                ],
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 hide: false,
                 segments: [],
                 district: values["district"],
-                user_id: user.user_id,
+                user_id: store.user.user_id,
                 source_template_id: event.source_template_id,
                 is_multi_day: true,
                 multi_day_teachers:
@@ -159,7 +160,12 @@ export default function EditMultiDayEventForm({
                 updated_at: dayjs().toISOString(),
                 title: values["event-title"],
                 description: values["event-description"] || "",
-                owners: [{ value: user.user_id, label: user.user_name }],
+                owners: [
+                    {
+                        value: store.user.user_id,
+                        label: store.user.user_name,
+                    },
+                ],
                 links: values["links"] || [],
                 price: values["prices"] || [],
                 segments: [],
@@ -171,7 +177,7 @@ export default function EditMultiDayEventForm({
                         teachers
                     ) || [],
                 name: values["template-name"],
-                user_id: user.user_id,
+                user_id: store.user.user_id,
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],
