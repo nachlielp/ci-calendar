@@ -1,14 +1,12 @@
 import Modal from "antd/es/modal"
 import { cieventsService } from "../../../supabase/cieventsService"
 import { Icon } from "../../Common/Icon"
+import { store } from "../../../Store/store"
+import { EventPayloadType } from "../../../util/interfaces"
 
 const { confirm } = Modal
 
-const showCancelledConfirm = (
-    eventId: string,
-    cancelled: boolean,
-    updateEventCancelledState: (eventId: string, cancelled: boolean) => void
-) => {
+const showCancelledConfirm = (eventId: string, cancelled: boolean) => {
     confirm({
         title: <div>{cancelled ? "הפעלת אירוע" : "ביטול אירוע"}</div>,
         icon: <Icon icon="warning" />,
@@ -21,9 +19,11 @@ const showCancelledConfirm = (
         okType: "danger",
         cancelText: "חזרה",
         direction: "rtl",
-        onOk() {
-            cieventsService.updateCIEvent(eventId, { cancelled: !cancelled })
-            updateEventCancelledState(eventId, !cancelled)
+        onOk: async () => {
+            const newEvent = await cieventsService.updateCIEvent(eventId, {
+                cancelled: !cancelled,
+            })
+            store.setCIEvent(newEvent, EventPayloadType.UPDATE)
         },
         onCancel() {
             console.log(
@@ -36,24 +36,16 @@ const showCancelledConfirm = (
 interface ICancelledEventProps {
     eventId: string
     cancelled: boolean
-    updateEventCancelledState: (eventId: string, cancelled: boolean) => void
 }
 
 export default function CancelledEventButton({
     eventId,
     cancelled,
-    updateEventCancelledState,
 }: ICancelledEventProps) {
     return (
         <button
             className="action-btn"
-            onClick={() =>
-                showCancelledConfirm(
-                    eventId,
-                    cancelled,
-                    updateEventCancelledState
-                )
-            }
+            onClick={() => showCancelledConfirm(eventId, cancelled)}
             style={{ borderRadius: " 0px", borderLeft: "none" }}
         >
             {cancelled ? <Icon icon="check_circle" /> : <Icon icon="cancel" />}

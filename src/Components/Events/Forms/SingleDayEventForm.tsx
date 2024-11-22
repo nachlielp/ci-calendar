@@ -10,7 +10,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { SelectOption, tagOptions } from "../../../util/options"
-import { CIEvent, IAddress, UserType } from "../../../util/interfaces"
+import { EventPayloadType, IAddress, UserType } from "../../../util/interfaces"
 
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
@@ -26,9 +26,9 @@ import {
 } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import Alert from "antd/es/alert"
-import { useCIEvents } from "../../../context/CIEventsContext"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
+import { store } from "../../../Store/store"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -54,7 +54,6 @@ export default function SingleDayEventForm({
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const { addEventState } = useCIEvents()
     const navigate = useNavigate()
     const { user } = useUser()
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
@@ -218,7 +217,7 @@ export default function SingleDayEventForm({
                     cancelled: false,
                 }
                 const newEvent = await cieventsService.createCIEvent(event)
-                addEventState(newEvent as CIEvent)
+                store.setCIEvent(newEvent, EventPayloadType.INSERT)
                 clearForm()
                 closeForm()
             } else {

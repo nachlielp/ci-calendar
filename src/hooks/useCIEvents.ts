@@ -1,56 +1,21 @@
-import { createContext, useContext, useRef, useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AppConfig, CIEvent } from "../util/interfaces"
-import dayjs from "dayjs"
-import { cieventsService, DBCIEvent } from "../supabase/cieventsService"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
 import { configService } from "../supabase/configService"
 import { utilService } from "../util/utilService"
+import { cieventsService } from "../supabase/cieventsService"
+import dayjs from "dayjs"
 import { store } from "../Store/store"
-// import { rootStore } from "../Store/rootStore"
-
-dayjs.extend(timezone)
-dayjs.extend(utc)
-
 const MINUTE_MS = 1000 * 60
 
-interface CIEventsContextType {
-    ci_events: CIEvent[]
-    config: AppConfig | null
-    loading: boolean
-    addEventState: (event: CIEvent) => void
-    updateEventState: (eventId: string, event: DBCIEvent) => void
-    removeEventState: (eventId: string) => void
-}
-
-export const CIEventsContext = createContext<CIEventsContextType>({
-    ci_events: [],
-    config: null,
-    loading: true,
-    addEventState: () => {},
-    updateEventState: () => {},
-    removeEventState: () => {},
-})
-
 export const useCIEvents = () => {
-    return useContext(CIEventsContext)
-}
-
-export const CIEventsProvider = ({
-    children,
-}: {
-    children: React.ReactNode
-}) => {
     const [ci_events, setCievents] = useState<CIEvent[]>([])
     const [config, setConfig] = useState<AppConfig | null>(null)
     const [loading, setLoading] = useState(true)
     const subscriptionRef = useRef<any>(null)
 
-    // const userStore = rootStore.store
-
     useEffect(() => {
-        return
-        if (store.getEvents.length > 0) {
+        if (store.ci_events.length > 0) {
+            clearInterval(subscriptionRef.current)
             return
         }
 
@@ -73,6 +38,7 @@ export const CIEventsProvider = ({
         }
 
         const fetchEvents = async () => {
+            console.log("fetchEvents")
             try {
                 const fetchedEvents = await cieventsService.getCIEvents({
                     start_date: dayjs()
@@ -128,38 +94,11 @@ export const CIEventsProvider = ({
                 handleVisibilityChange
             )
         }
-    }, [])
+    }, [store.user.user_id])
 
-    function addEventState(event: CIEvent) {
-        setCievents((prev) =>
-            [event, ...prev].sort((a, b) =>
-                dayjs(a.start_date).diff(dayjs(b.start_date))
-            )
-        )
+    return {
+        ci_events: store.ci_events.length > 0 ? store.ci_events : ci_events,
+        config,
+        loading,
     }
-
-    function updateEventState(eventId: string, event: DBCIEvent) {
-        setCievents((prev) =>
-            prev.map((e) => (e.id === eventId ? { ...e, ...event } : e))
-        )
-    }
-
-    function removeEventState(eventId: string) {
-        setCievents((prev) => prev.filter((e) => e.id !== eventId))
-    }
-
-    return (
-        <CIEventsContext.Provider
-            value={{
-                ci_events,
-                config,
-                loading,
-                addEventState,
-                updateEventState,
-                removeEventState,
-            }}
-        >
-            {children}
-        </CIEventsContext.Provider>
-    )
 }

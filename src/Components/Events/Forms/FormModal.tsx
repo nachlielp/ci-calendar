@@ -1,7 +1,6 @@
 import { useState } from "react"
 import Modal from "antd/es/modal"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
-import { DBCIEvent } from "../../../supabase/cieventsService"
 import { EventAction } from "../../../App"
 import SingleDayEventForm from "./SingleDayEventForm"
 import MultiDayEventForm from "./MultiDayEventForm"
@@ -14,14 +13,12 @@ export default function FormModal({
     isTemplate,
     event,
     template,
-    updateEventState,
 }: {
     anchorEl: any
     eventType: string
     isTemplate: boolean
     event?: CIEvent
     template?: CITemplate
-    updateEventState?: (eventId: string, event: DBCIEvent) => void
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -65,7 +62,6 @@ export default function FormModal({
                         event={event}
                         template={template}
                         closeForm={onClose}
-                        updateEventState={updateEventState!}
                     />
                 )}
                 {eventType === "edit-multi-day" && (
@@ -75,7 +71,6 @@ export default function FormModal({
                         event={event}
                         template={template}
                         closeForm={onClose}
-                        updateEventState={updateEventState!}
                     />
                 )}
             </Modal>

@@ -2,8 +2,9 @@ import Card from "antd/es/card"
 import SubscribeToTeachers from "../Users/SubscribeToTeachers"
 import UserNotificationsList from "../Users/UserNotificationsList"
 import PushNotificationStatusButton from "../Common/PushNotificationStatusButton"
+import { observer } from "mobx-react-lite"
 
-export default function FiltersAndNotificationsPage() {
+const FiltersAndNotificationsPage = observer(() => {
     return (
         <div className="filter-and-notifications-page page">
             <Card className="filter-section">
@@ -14,4 +15,6 @@ export default function FiltersAndNotificationsPage() {
             </Card>
         </div>
     )
-}
+})
+
+export default FiltersAndNotificationsPage

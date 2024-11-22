@@ -122,11 +122,15 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
 
 async function getCIEventsCreators(): Promise<SelectOption[]> {
     try {
-        const { data, error } = await supabase.from("ci_events")
-            .select(`creator:users (
+        const { data, error } = await supabase
+            .from("ci_events")
+            .select(
+                `creator:users (
             user_name,
             user_id
-        )`)
+        )`
+            )
+            .gte("start_date", dayjs().startOf("day").toISOString())
 
         if (error) throw error
 
@@ -253,15 +257,18 @@ async function updateMultipleCIEvents(
     }
 }
 
-async function deleteCIEvent(id: string): Promise<void> {
+async function deleteCIEvent(id: string): Promise<string> {
     try {
-        const { error } = await supabase
+        const { data, error } = await supabase
             .from("ci_events")
             .delete()
             .eq("id", id)
+            .select("id")
             .single()
 
         if (error) throw error
+
+        return data.id
     } catch (error) {
         console.error("Error deleting CI event:", error)
         throw error

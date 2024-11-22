@@ -1,47 +1,34 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import dayjs from "dayjs"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 import FullEventCard from "../Display/FullEventCard"
-import { useUser } from "../../../context/UserContext"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import Loading from "../../Common/Loading"
 import { useManageCIEvents } from "../../../hooks/useManageCIEvents"
 import DoubleBindedSelect from "../../Common/DoubleBindedSelect"
 import { CIEvent } from "../../../util/interfaces"
 import Input from "antd/es/input"
+import { store } from "../../../Store/store"
+import { observer } from "mobx-react-lite"
 
 dayjs.extend(isSameOrAfter)
 
-export default function ManageEventsList() {
+const ManageEventsList = () => {
     const isPhone = useIsMobile()
-    const { user } = useUser()
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>([])
     const [selectedEventTitle, setSelectedEventTitle] = useState<string>("")
     const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
-    if (!user) {
-        return <Loading />
-    }
-
-    const {
-        ci_future_events,
-        ci_events_teachers,
-        loading,
-        updateEventState,
-        removeEventState,
-    } = useManageCIEvents({})
+    const { ci_events_teachers } = useManageCIEvents()
 
     const [filteredEvents, setFilteredEvents] = useState<CIEvent[]>([])
 
     useEffect(() => {
         filterEvents()
-    }, [selectedTeachers, selectedEventTitle, ci_future_events])
+    }, [selectedTeachers, selectedEventTitle, store.ci_events])
 
     function filterEvents() {
-        let events = ci_future_events
+        let events = store.getSortedEvents
         if (selectedTeachers.length > 0) {
             events = events.filter((e) => selectedTeachers.includes(e.user_id))
         }
@@ -52,23 +39,7 @@ export default function ManageEventsList() {
         }
         setFilteredEvents(events)
     }
-    function handleHideEventState(eventId: string, hide: boolean) {
-        const event = ci_future_events.find((e) => e.id === eventId)
-        if (event) {
-            updateEventState(event.id, { ...event, hide })
-        }
-    }
 
-    function handleCancelledEventState(eventId: string, cancelled: boolean) {
-        const event = ci_future_events.find((e) => e.id === eventId)
-        if (event) {
-            updateEventState(event.id, { ...event, cancelled })
-        }
-    }
-
-    if (loading) {
-        return <Loading />
-    }
     return (
         <section className="manage-events-list">
             <header
@@ -78,7 +49,6 @@ export default function ManageEventsList() {
             >
                 <h2 className="manage-events-header-title">ניהול אירועים</h2>
                 <div className="filters-container">
-                    {/* TODO - save in local storage for better UX */}
                     <DoubleBindedSelect
                         options={ci_events_teachers}
                         selectedValues={selectedTeachers}
@@ -158,15 +128,7 @@ export default function ManageEventsList() {
                             <div className="event-expanded">
                                 <FullEventCard event={event} />
 
-                                <ManageEventActions
-                                    event={event}
-                                    updateEventState={updateEventState}
-                                    updateEventHideState={handleHideEventState}
-                                    updateEventCancelledState={
-                                        handleCancelledEventState
-                                    }
-                                    removeEventState={removeEventState}
-                                />
+                                <ManageEventActions event={event} />
                             </div>
                         )}
                     </div>
@@ -175,6 +137,8 @@ export default function ManageEventsList() {
         </section>
     )
 }
+
+export default observer(ManageEventsList)
 
 function formatDateRange(startDate: string, endDate: string) {
     const start = dayjs(startDate).format("DD/MM/YYYY")

@@ -4,9 +4,10 @@ import { Icon } from "../Common/Icon"
 import { utilService } from "../../util/utilService"
 import { PushNotificationPromission } from "../../util/interfaces"
 import Switch from "antd/es/switch"
-import { useUser } from "../../context/UserContext"
 import Alert from "antd/es/alert"
 import { usersService } from "../../supabase/usersService"
+import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
 
 const ios_notification_error =
     "ההרשאות לאפליקציה הזו חסומות, ניתן להפעיל אותם בהגדרות => עדכונים => גלילה מטה אל האפליקציה CI, ולחיצה על ״קבלת עדכונים״"
@@ -18,30 +19,35 @@ const browser_notification_error =
     "ניתן להפעיל ולכבות התראות באפליקציה שמותקנת בסלולרי בלבד"
 
 const PushNotificationStatusButton = () => {
-    const { user } = useUser()
     const { requestPermission, permissionStatus } = useMessagingPermission()
 
     const [status, setStatus] = useState<PushNotificationPromission>(
         utilService.getNotificationPermission() as PushNotificationPromission
     )
 
-    const [checked, setChecked] = useState(user?.receive_notifications)
+    const [checked, setChecked] = useState(store.getUserReceiveNotifications)
 
     useEffect(() => {
+        console.log(
+            "store.getUserReceiveNotifications",
+            store.getUserReceiveNotifications
+        )
         if (!utilService.isPWA()) {
+            setChecked(store.getUserReceiveNotifications)
             return
         }
         setStatus(permissionStatus)
-        if (permissionStatus === "granted" && user?.receive_notifications) {
+        if (
+            permissionStatus === "granted" &&
+            store.getUserReceiveNotifications
+        ) {
+            console.log("setting checked to true")
             setChecked(true)
-        } else if (permissionStatus === "denied") {
-            setChecked(false)
-        } else if (permissionStatus === "default") {
+        } else {
+            console.log("setting checked to false")
             setChecked(false)
         }
-    }, [permissionStatus])
-
-    if (!user) return <></>
+    }, [permissionStatus, store.getUserReceiveNotifications])
 
     async function handleChange(checked: boolean) {
         if (!utilService.isPWA()) {
@@ -50,8 +56,8 @@ const PushNotificationStatusButton = () => {
 
         if (checked) {
             requestPermission().then(() => {
-                if (user) {
-                    usersService.updateUser(user.user_id, {
+                if (store.isUser) {
+                    usersService.updateUser(store.getUser.user_id, {
                         receive_notifications: checked,
                     })
                 }
@@ -61,11 +67,10 @@ const PushNotificationStatusButton = () => {
             setChecked(false)
             setStatus("denied")
         } else if (!checked) {
-            if (user) {
-                usersService.updateUser(user.user_id, {
-                    receive_notifications: checked,
-                })
-            }
+            usersService.updateUser(store.getUser.user_id, {
+                receive_notifications: checked,
+            })
+
             setChecked(false)
         }
     }
@@ -87,7 +92,7 @@ const PushNotificationStatusButton = () => {
                         className="notification-switch-icon"
                     />
                 }
-                // disabled={!utilService.isPWA()}
+                disabled={!utilService.isPWA()}
             />
             {utilService.isPWA() && status === "denied" && (
                 <Alert
@@ -111,4 +116,4 @@ const PushNotificationStatusButton = () => {
     )
 }
 
-export default PushNotificationStatusButton
+export default observer(PushNotificationStatusButton)

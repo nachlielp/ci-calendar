@@ -96,36 +96,36 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (loading || !user) return
 
-        const subscribeToUserData = async () => {
-            if (!user) return
-            const channel = usersService.subscribeToUser(
-                user.user_id,
-                handleSubscriptionUpdates
-            )
-            return channel
-        }
+        // const subscribeToUserData = async () => {
+        //     if (!user) return
+        //     const channel = usersService.subscribeToUser(
+        //         user.user_id,
+        //         handleSubscriptionUpdates
+        //     )
+        //     return channel
+        // }
 
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                subscribeToUserData().then((channel) => {
-                    if (channel) {
-                        subscriptionRef.current = channel
-                    }
-                })
-            } else {
-                if (subscriptionRef.current) {
-                    subscriptionRef.current.unsubscribe()
-                }
-            }
-        }
+        // const handleVisibilityChange = () => {
+        //     if (document.visibilityState === "visible") {
+        //         subscribeToUserData().then((channel) => {
+        //             if (channel) {
+        //                 subscriptionRef.current = channel
+        //             }
+        //         })
+        //     } else {
+        //         if (subscriptionRef.current) {
+        //             subscriptionRef.current.unsubscribe()
+        //         }
+        //     }
+        // }
 
-        document.addEventListener("visibilitychange", handleVisibilityChange)
+        // document.addEventListener("visibilitychange", handleVisibilityChange)
 
-        subscribeToUserData().then((channel) => {
-            if (channel) {
-                subscriptionRef.current = channel
-            }
-        })
+        // subscribeToUserData().then((channel) => {
+        //     if (channel) {
+        //         subscriptionRef.current = channel
+        //     }
+        // })
 
         return () => {
             if (subscriptionRef.current) {

@@ -35,6 +35,11 @@ export interface RawAppConfigRecord {
     data: string
 }
 
+export enum EventPayloadType {
+    UPDATE = "UPDATE",
+    DELETE = "DELETE",
+    INSERT = "INSERT",
+}
 export interface AppConfig {
     app_title: string
     app_description: string
@@ -198,12 +203,17 @@ export interface CIUser {
     subscribed_for_updates_at: string
     allow_tagging: boolean
     provider: string
+    receive_notifications: boolean
+    subscriptions: {
+        teachers: string[]
+        orgs: string[]
+    }
 }
 
 export interface CIUserData {
     user: CIUser
     userBio: UserBio
-    notifications: CINotification[]
+    notifications: UserNotification[]
     requests: CIRequest[]
     templates: CITemplate[]
     ci_events: CIEvent[]

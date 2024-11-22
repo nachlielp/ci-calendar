@@ -2,15 +2,14 @@ import { useState } from "react"
 import Drawer from "antd/es/drawer"
 import { Icon } from "../Common/Icon"
 import { useNavigate } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
-
+import { store } from "../../Store/store"
 const MenuDrawer = () => {
     const [open, setOpen] = useState<boolean>(false)
-    const { user } = useUser()
+    const user = store.getUser
 
     const isMobile = useIsMobile()
 

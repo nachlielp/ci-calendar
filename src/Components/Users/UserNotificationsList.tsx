@@ -10,10 +10,12 @@ import CIEventNotificationModal from "../Notifications/CIEventNotificationModal"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
+import { observer } from "mobx-react-lite"
+import { store } from "../../Store/store"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-export default function UserNotificationsList() {
+const UserNotificationsList = () => {
     const { user } = useUser()
 
     return (
@@ -22,52 +24,42 @@ export default function UserNotificationsList() {
                 התזכורות שלי
             </label>
 
-            {user?.notifications
-                .filter((notification: UserNotification) => {
-                    return utilService.isNotificationStarted(notification)
-                })
-                .sort((a: UserNotification, b: UserNotification) =>
-                    dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
-                )
-                .map((notification: UserNotification) => (
-                    <article
-                        key={notification.id}
-                        className="user-notification"
-                    >
-                        <div className="user-notification-content">
-                            <label className="user-notification-title">
-                                {notification.title}
-                            </label>
-                            <div className="notification-actions">
-                                <label className="user-notification-date">
-                                    <label>
-                                        {utilService.formatHebrewDate(
-                                            notification.start_date
-                                        )}
-                                    </label>
-                                    {" - "}
-                                    <label className="user-notification-remind-in-hours">
-                                        {notification.is_multi_day
-                                            ? multiDayNotificationOptions.find(
-                                                  (option: SelectOption) =>
-                                                      option.value ===
-                                                      notification.remind_in_hours
-                                              )?.label
-                                            : singleDayNotificationOptions.find(
-                                                  (option: SelectOption) =>
-                                                      option.value ===
-                                                      notification.remind_in_hours
-                                              )?.label}
-                                    </label>
+            {store.getNotificationList.map((notification: UserNotification) => (
+                <article key={notification.id} className="user-notification">
+                    <div className="user-notification-content">
+                        <label className="user-notification-title">
+                            {notification.title}
+                        </label>
+                        <div className="notification-actions">
+                            <label className="user-notification-date">
+                                <label>
+                                    {utilService.formatHebrewDate(
+                                        notification.start_date
+                                    )}
                                 </label>
-                                <CIEventNotificationModal
-                                    eventId={notification.ci_event_id}
-                                    isMultiDay={notification.is_multi_day}
-                                />
-                            </div>
+                                {" - "}
+                                <label className="user-notification-remind-in-hours">
+                                    {notification.is_multi_day
+                                        ? multiDayNotificationOptions.find(
+                                              (option: SelectOption) =>
+                                                  option.value ===
+                                                  notification.remind_in_hours
+                                          )?.label
+                                        : singleDayNotificationOptions.find(
+                                              (option: SelectOption) =>
+                                                  option.value ===
+                                                  notification.remind_in_hours
+                                          )?.label}
+                                </label>
+                            </label>
+                            <CIEventNotificationModal
+                                eventId={notification.ci_event_id}
+                                isMultiDay={notification.is_multi_day}
+                            />
                         </div>
-                    </article>
-                ))}
+                    </div>
+                </article>
+            ))}
 
             {user?.notifications.length === 0 && (
                 <div className="user-notifications-list-empty">
@@ -77,3 +69,5 @@ export default function UserNotificationsList() {
         </section>
     )
 }
+
+export default observer(UserNotificationsList)

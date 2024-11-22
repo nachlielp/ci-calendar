@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react"
-import { useUser } from "../../context/UserContext"
 import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import Loading from "../Common/Loading"
 import { usePublicBioList } from "../../hooks/usePublicBioList"
 import AsyncButton from "../Common/AsyncButton"
+import { observer } from "mobx-react-lite"
+import { store } from "../../Store/store"
 
-export default function SubscribeToTeachers() {
-    const { user } = useUser()
+const SubscribeToTeachers = () => {
     const { teachers, loading, orgs } = usePublicBioList()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [subscriptionsEqual, setSubscriptionsEqual] = useState(false)
@@ -17,29 +17,29 @@ export default function SubscribeToTeachers() {
     useEffect(() => {
         if (loading) return
         setSelectedTeachers(
-            user?.subscriptions.teachers?.filter((id) =>
+            store.getUser.subscriptions.teachers?.filter((id) =>
                 teachers.some((t) => t.value === id)
             ) || []
         )
         setSelectedOrgs(
-            user?.subscriptions.orgs?.filter((id) =>
+            store.getUser.subscriptions.orgs?.filter((id) =>
                 orgs.some((o) => o.value === id)
             ) || []
         )
-    }, [loading])
+    }, [
+        loading,
+        store.getUser.subscriptions.teachers,
+        store.getUser.subscriptions.orgs,
+    ])
 
     useEffect(() => {
         setSubscriptionsEqual(isSubscriptionsEqual())
     }, [selectedTeachers, selectedOrgs])
 
     async function saveFilters() {
-        if (!user) {
-            throw new Error("user is null, make sure you're within a Provider")
-        }
-
         try {
             setIsSubmitting(true)
-            await usersService.updateUser(user.user_id, {
+            await usersService.updateUser(store.getUserId, {
                 subscriptions: {
                     teachers: [...selectedTeachers],
                     orgs: [...selectedOrgs],
@@ -57,12 +57,8 @@ export default function SubscribeToTeachers() {
     }
 
     function isSubscriptionsEqual() {
-        if (!user) {
-            throw new Error("user is null, make sure you're within a Provider")
-        }
-
-        const currentTeachers = user?.subscriptions.teachers
-        const currentOrgs = user?.subscriptions.orgs
+        const currentTeachers = store.getUser.subscriptions.teachers
+        const currentOrgs = store.getUser.subscriptions.orgs
 
         return (
             JSON.stringify(currentTeachers?.sort()) ===
@@ -108,3 +104,5 @@ export default function SubscribeToTeachers() {
         </div>
     )
 }
+
+export default observer(SubscribeToTeachers)

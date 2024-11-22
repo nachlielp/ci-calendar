@@ -14,19 +14,14 @@ export function FormDrawer({
     isTemplate,
     event,
     template,
-    updateEventState,
 }: {
     anchorEl: any
     eventType: string
     isTemplate: boolean
     event?: CIEvent
     template?: CITemplate
-    updateEventState?: (eventId: string, event: DBCIEvent) => void
 }) {
-    if (
-        !updateEventState &&
-        (eventType === "edit-single-day" || eventType === "edit-multi-day")
-    ) {
+    if (eventType === "edit-single-day" || eventType === "edit-multi-day") {
         throw new Error("updateEventState is required")
     }
 
@@ -63,7 +58,6 @@ export function FormDrawer({
                         event={event}
                         template={template}
                         closeForm={onClose}
-                        updateEventState={updateEventState!}
                     />
                 )}
                 {eventType === "edit-multi-day" && (
@@ -73,7 +67,6 @@ export function FormDrawer({
                         event={event}
                         template={template}
                         closeForm={onClose}
-                        updateEventState={updateEventState!}
                     />
                 )}
             </Drawer>

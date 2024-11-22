@@ -1,59 +1,23 @@
-"use client"
-
 import { useState } from "react"
-import { CIEvent } from "../../util/interfaces"
 import dayjs from "dayjs"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 import { useNavigate } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
-import { useManageCIEvents } from "../../hooks/useManageCIEvents"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import Loading from "../Common/Loading"
 import MenuButtons from "../Common/MenuButtons"
 import FullEventCard from "../Events/Display/FullEventCard"
 import ManageEventActions from "../Events/Management/ManageEventActions"
 import catButtGif from "../../assets/img/cat-butt.gif"
+import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
 
 dayjs.extend(isSameOrAfter)
 
-export default function UserEventsListPage() {
+const UserEventsListPage = () => {
     const navigate = useNavigate()
     const isPhone = useIsMobile()
-    const { user, updateUserState } = useUser()
 
     const [showPast, setShowPast] = useState(false)
     const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
-
-    const { updateEventState, removeEventState: removeEventFromMainStage } =
-        useManageCIEvents({
-            user_id: user?.user_id,
-        })
-
-    if (!user) {
-        return <Loading />
-    }
-
-    function removeEventState(eventId: string) {
-        if (!user) return
-        updateUserState({
-            ci_events: user.ci_events.filter((e) => e.id !== eventId),
-        })
-        removeEventFromMainStage(eventId)
-    }
-
-    function handleHideEventState(eventId: string, hide: boolean) {
-        const event = user?.ci_events.find((e) => e.id === eventId)
-        if (event) {
-            updateEventState(event.id, { ...event, hide })
-        }
-    }
-
-    function handleCancelledEventState(eventId: string, cancelled: boolean) {
-        const event = user?.ci_events.find((e) => e.id === eventId)
-        if (event) {
-            updateEventState(event.id, { ...event, cancelled })
-        }
-    }
 
     function onSelectTimeframe(key: string) {
         setShowPast(key === "past")
@@ -63,8 +27,6 @@ export default function UserEventsListPage() {
         console.log("onGoToCreateEvent")
         navigate("/create-events")
     }
-
-    const filteredEvents = pastFutureEvents(user.ci_events, showPast)
 
     return (
         <section className="user-events-list-page page">
@@ -99,76 +61,80 @@ export default function UserEventsListPage() {
                 </div>
             </header>
             <div className="events-container" role="list">
-                {filteredEvents.map((event) => (
-                    <div key={event.id} className="event-item" role="listitem">
+                {(showPast ? store.getUserPastEvents : store.getUserEvents).map(
+                    (event) => (
                         <div
-                            className={`event-summary ${
-                                expandedEventId === event.id ? "active" : ""
-                            }`}
-                            onClick={() =>
-                                setExpandedEventId(
-                                    expandedEventId === event.id
-                                        ? null
-                                        : event.id
-                                )
-                            }
+                            key={event.id}
+                            className="event-item"
+                            role="listitem"
                         >
-                            <div className="event-details">
-                                <h3 className="event-title">{event.title}</h3>
-                                <div className="event-meta">
-                                    <time dateTime={event.start_date}>
-                                        {formatDateRange(
-                                            event.start_date,
-                                            event.end_date
-                                        )}
-                                    </time>
-                                    {event.hide && (
-                                        <span className="event-status">
-                                            <span className="separator">|</span>
-                                            <span>אירוע מוסתר</span>
-                                        </span>
-                                    )}
-                                    {event.cancelled && (
-                                        <span className="event-status">
-                                            <span className="separator">|</span>
-                                            <span>אירוע מבוטל</span>
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                            <span
-                                className={`chevron-icon ${
+                            <div
+                                className={`event-summary ${
                                     expandedEventId === event.id ? "active" : ""
                                 }`}
+                                onClick={() =>
+                                    setExpandedEventId(
+                                        expandedEventId === event.id
+                                            ? null
+                                            : event.id
+                                    )
+                                }
                             >
-                                &#x2039;
-                            </span>
-                        </div>
-                        {expandedEventId === event.id && (
-                            <div className="event-expanded">
-                                <FullEventCard
-                                    event={event}
-                                    showPast={showPast}
-                                />
-                                {!showPast && (
-                                    <ManageEventActions
-                                        event={event}
-                                        updateEventState={updateEventState}
-                                        updateEventHideState={
-                                            handleHideEventState
-                                        }
-                                        updateEventCancelledState={
-                                            handleCancelledEventState
-                                        }
-                                        removeEventState={removeEventState}
-                                    />
-                                )}
+                                <div className="event-details">
+                                    <h3 className="event-title">
+                                        {event.title}
+                                    </h3>
+                                    <div className="event-meta">
+                                        <time dateTime={event.start_date}>
+                                            {formatDateRange(
+                                                event.start_date,
+                                                event.end_date
+                                            )}
+                                        </time>
+                                        {event.hide && (
+                                            <span className="event-status">
+                                                <span className="separator">
+                                                    |
+                                                </span>
+                                                <span>אירוע מוסתר</span>
+                                            </span>
+                                        )}
+                                        {event.cancelled && (
+                                            <span className="event-status">
+                                                <span className="separator">
+                                                    |
+                                                </span>
+                                                <span>אירוע מבוטל</span>
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                                <span
+                                    className={`chevron-icon ${
+                                        expandedEventId === event.id
+                                            ? "active"
+                                            : ""
+                                    }`}
+                                >
+                                    &#x2039;
+                                </span>
                             </div>
-                        )}
-                    </div>
-                ))}
+                            {expandedEventId === event.id && (
+                                <div className="event-expanded">
+                                    <FullEventCard
+                                        event={event}
+                                        showPast={showPast}
+                                    />
+                                    {!showPast && (
+                                        <ManageEventActions event={event} />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )
+                )}
             </div>
-            {filteredEvents.length === 0 && (
+            {store.getUserEvents.length === 0 && (
                 <div className="no-events-message">
                     <div
                         className="no-events-message-gif"
@@ -185,27 +151,7 @@ export default function UserEventsListPage() {
     )
 }
 
-function pastFutureEvents(events: CIEvent[], showPast: boolean) {
-    const filteredEvents = events.filter((e) =>
-        showPast
-            ? dayjs(e.start_date)
-                  .startOf("day")
-                  .isBefore(dayjs().startOf("day"))
-            : dayjs(e.start_date)
-                  .startOf("day")
-                  .isSameOrAfter(dayjs().startOf("day"))
-    )
-
-    return filteredEvents.sort((a, b) =>
-        showPast
-            ? dayjs(a.start_date).isBefore(dayjs(b.start_date))
-                ? 1
-                : -1
-            : dayjs(a.start_date).isBefore(dayjs(b.start_date))
-            ? -1
-            : 1
-    )
-}
+export default observer(UserEventsListPage)
 
 function formatDateRange(startDate: string, endDate: string) {
     const start = dayjs(startDate).format("DD/MM/YYYY")

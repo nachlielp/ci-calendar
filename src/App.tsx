@@ -20,8 +20,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { observer } from "mobx-react-lite"
-import { useCIEvents } from "./hooks/useCIEvents"
-import { rootStore } from "./Store/rootStore"
+import { store } from "./Store/store"
 
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
@@ -54,13 +53,11 @@ export enum EventAction {
 }
 
 const App = () => {
-    const store = rootStore.store
-
     return (
         <div className="app">
             <SpeedInsights />
             <BackgroundTiles />
-            {store.loading ? (
+            {store.isLoading ? (
                 <EventsPageSkeleton />
             ) : (
                 <div
@@ -79,22 +76,10 @@ const App = () => {
                             />
                             <Route
                                 path="/event/:eventId"
-                                element={
-                                    <EventsPage events={store.ci_events} />
-                                }
+                                element={<EventsPage />}
                             />
-                            <Route
-                                path="/:eventId"
-                                element={
-                                    <EventsPage events={store.ci_events} />
-                                }
-                            />
-                            <Route
-                                path="/"
-                                element={
-                                    <EventsPage events={store.ci_events} />
-                                }
-                            />
+                            <Route path="/:eventId" element={<EventsPage />} />
+                            <Route path="/" element={<EventsPage />} />
                             {/* <Route
                                 path="/weekly-events"
                                 element={<WeeklyEventsPage events={events} />}
@@ -218,12 +203,7 @@ const App = () => {
                                     }
                                 />
                             </Route>
-                            <Route
-                                path="*"
-                                element={
-                                    <EventsPage events={store.ci_events} />
-                                }
-                            />
+                            <Route path="*" element={<EventsPage />} />
                         </Routes>
                     </Suspense>
                 </div>

@@ -3,7 +3,12 @@ import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { CIEvent, IAddress, CITemplate } from "../../../util/interfaces.ts"
+import {
+    CIEvent,
+    IAddress,
+    CITemplate,
+    EventPayloadType,
+} from "../../../util/interfaces.ts"
 import Loading from "../../Common/Loading.tsx"
 import AddLinksForm from "./AddLinksForm.tsx"
 import AddPricesForm from "./AddPricesForm.tsx"
@@ -20,6 +25,7 @@ import { templateService } from "../../../supabase/templateService.ts"
 import { utilService } from "../../../util/utilService.ts"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton.tsx"
 import Alert from "antd/es/alert/Alert"
+import { store } from "../../../Store/store.ts"
 
 export default function EditMultiDayEventForm({
     editType,
@@ -27,14 +33,12 @@ export default function EditMultiDayEventForm({
     event,
     template,
     closeForm,
-    updateEventState,
 }: {
     editType: EventAction
     isTemplate: boolean
     event?: CIEvent
     template?: CITemplate
     closeForm: () => void
-    updateEventState: (eventId: string, event: DBCIEvent) => void
 }) {
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const { user } = useUser()
@@ -132,8 +136,11 @@ export default function EditMultiDayEventForm({
                     await cieventsService.createCIEvent(updatedEvent)
                     closeForm()
                 } else {
-                    await cieventsService.updateCIEvent(event.id, updatedEvent)
-                    updateEventState(event.id, updatedEvent)
+                    const newEvent = await cieventsService.updateCIEvent(
+                        event.id,
+                        updatedEvent
+                    )
+                    store.setCIEvent(newEvent, EventPayloadType.UPDATE)
                     closeForm()
                 }
             } catch (error) {

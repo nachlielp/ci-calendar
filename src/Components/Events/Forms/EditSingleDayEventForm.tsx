@@ -14,6 +14,7 @@ import {
     CIEvent,
     UserType,
     CITemplate,
+    EventPayloadType,
 } from "../../../util/interfaces"
 
 import Loading from "../../Common/Loading"
@@ -30,6 +31,7 @@ import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import Alert from "antd/es/alert"
+import { store } from "../../../Store/store"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -52,14 +54,12 @@ export default function EditSingleDayEventForm({
     event,
     template,
     closeForm,
-    updateEventState,
 }: {
     editType: EventAction
     isTemplate?: boolean
     event?: CIEvent
     template?: CITemplate
     closeForm: () => void
-    updateEventState: (eventId: string, event: DBCIEvent) => void
 }) {
     const navigate = useNavigate()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
@@ -224,11 +224,12 @@ export default function EditSingleDayEventForm({
                     }
                 } else {
                     try {
-                        await cieventsService.updateCIEvent(
+                        const newEvent = await cieventsService.updateCIEvent(
                             eventId,
                             updatedEvent
                         )
-                        updateEventState(eventId, updatedEvent)
+                        console.log("newEvent: ", newEvent)
+                        store.setCIEvent(newEvent, EventPayloadType.UPDATE)
                         closeForm()
                     } catch (error) {
                         console.error(

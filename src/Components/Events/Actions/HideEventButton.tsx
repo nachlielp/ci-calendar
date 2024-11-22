@@ -1,18 +1,20 @@
+import { store } from "../../../Store/store"
 import { cieventsService } from "../../../supabase/cieventsService"
+import { EventPayloadType } from "../../../util/interfaces"
 import { Icon } from "../../Common/Icon"
 
 export default function HideEventButton({
     eventId,
     hide,
-    updateEventHideState,
 }: {
     eventId: string
     hide: boolean
-    updateEventHideState: (eventId: string, hide: boolean) => void
 }) {
     const handleHide = async () => {
-        await cieventsService.updateCIEvent(eventId, { hide: !hide })
-        updateEventHideState(eventId, !hide)
+        const newEvent = await cieventsService.updateCIEvent(eventId, {
+            hide: !hide,
+        })
+        store.setCIEvent(newEvent, EventPayloadType.UPDATE)
     }
     return (
         <button

@@ -1,7 +1,6 @@
 import dayjs, { Dayjs } from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
-import { CIEvent } from "../../util/interfaces"
 import CalendarView from "../Events/Display/CalendarView"
 import EventsList from "../Events/Display/EventsList"
 import { useState } from "react"
@@ -22,15 +21,14 @@ import AlertsAnchor from "../Alerts/AlertsAnchor"
 import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
 import { useCIEvents } from "../../context/CIEventsContext"
-
-interface IEventsPageProps {
-    events: CIEvent[]
-}
+import { observer } from "mobx-react-lite"
+import { store } from "../../Store/store"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
 
-export default function EventsPage({ events }: IEventsPageProps) {
+const EventsPage = () => {
+    const events = store.getSortedEvents
     const { selectedEvent } = useSetSelectedEventByParams(events)
     const { config } = useCIEvents()
 
@@ -133,3 +131,5 @@ export default function EventsPage({ events }: IEventsPageProps) {
         </div>
     )
 }
+
+export default observer(EventsPage)

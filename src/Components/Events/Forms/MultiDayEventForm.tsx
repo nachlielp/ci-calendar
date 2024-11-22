@@ -11,7 +11,7 @@ import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
-import { CIEvent, IAddress, UserType } from "../../../util/interfaces"
+import { EventPayloadType, IAddress, UserType } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
 import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
@@ -20,7 +20,6 @@ import { useUser } from "../../../context/UserContext"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 
 import Alert from "antd/es/alert"
-import { useCIEvents } from "../../../context/CIEventsContext"
 import {
     CITemplateWithoutId,
     templateService,
@@ -30,6 +29,7 @@ import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import AddPricesForm from "./AddPricesForm"
 import MultiDayFormHead from "./MultiDayFormHead"
+import { store } from "../../../Store/store"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -51,7 +51,6 @@ export default function MultiDayEventForm({
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const { addEventState } = useCIEvents()
     const navigate = useNavigate()
     const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
 
@@ -180,7 +179,7 @@ export default function MultiDayEventForm({
                 // console.log("values: ", values)
                 // console.log("event: ", event)
                 const newEvent = await cieventsService.createCIEvent(event)
-                addEventState(newEvent as CIEvent)
+                store.setCIEvent(newEvent, EventPayloadType.INSERT)
                 clearForm()
                 closeForm()
             } else {

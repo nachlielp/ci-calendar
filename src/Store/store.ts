@@ -1,24 +1,27 @@
-import { observable, action, makeAutoObservable } from "mobx"
+import { observable, action, makeAutoObservable, computed } from "mobx"
 import {
     CIAlert,
     CIEvent,
-    CINotification,
     CIRequest,
     CITemplate,
     CIUser,
     CIUserData,
+    EventPayloadType,
     UserBio,
+    UserNotification,
 } from "../util/interfaces"
 import { supabase } from "../supabase/client"
 import { usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
-import { RealtimeChannel } from "@supabase/supabase-js"
+import { RealtimeChannel, Session } from "@supabase/supabase-js"
 import { cieventsService } from "../supabase/cieventsService"
 import dayjs from "dayjs"
+import { notificationService } from "../supabase/notificationService"
 
-export class Store {
+class Store {
+    @observable session: Session | null = null
     @observable user: CIUser = {} as CIUser
-    @observable notifications: CINotification[] = []
+    @observable notifications: UserNotification[] = []
     @observable templates: CITemplate[] = []
     @observable requests: CIRequest[] = []
     @observable userBio: UserBio = {} as UserBio
@@ -26,6 +29,7 @@ export class Store {
     @observable past_ci_events: CIEvent[] = []
     @observable alerts: CIAlert[] = []
     @observable loading: boolean = true
+
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private callCount: number = 0
@@ -33,16 +37,13 @@ export class Store {
     private readonly MINUTE_MS = 1000 * 60
 
     constructor() {
-        makeAutoObservable(this, {
-            user: observable,
-            notifications: observable,
-            templates: observable,
-            requests: observable,
-            userBio: observable,
-            ci_events: observable,
-            past_ci_events: observable,
-            alerts: observable,
-            loading: observable,
+        makeAutoObservable(this)
+        console.log("Store constructor")
+
+        supabase.auth.onAuthStateChange(async (_, session) => {
+            this.cleanup()
+            this.setSession(session)
+            this.init()
         })
     }
 
@@ -52,9 +53,110 @@ export class Store {
         return this.MINUTE_MS * 60
     }
 
+    @computed
+    get isLoading() {
+        return this.loading
+    }
+
+    @computed
+    get getSession() {
+        return this.session
+    }
+
+    @computed
+    get isSession() {
+        return !!this.session
+    }
+
+    @computed
+    get isUser() {
+        return !!this.user?.user_id
+    }
+
+    @computed
+    get getUser() {
+        return this.user
+    }
+
+    @computed
+    get getUserId() {
+        return this.user.user_id
+    }
+
+    @computed
+    get getEvents() {
+        return this.ci_events
+    }
+
+    @computed
+    get getSortedEvents() {
+        return this.ci_events
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
+            )
+    }
+
+    @computed
+    get getUserEvents() {
+        return this.ci_events
+            .filter((e) => e.user_id === this.user.user_id)
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
+            )
+    }
+
+    @computed
+    get getUserPastEvents() {
+        return this.past_ci_events
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1
+            )
+    }
+
+    @computed
+    get getSortedNotifications() {
+        return this.notifications
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? -1 : 1
+            )
+    }
+
+    @computed
+    get getUserReceiveNotifications() {
+        console.log(
+            "getUserReceiveNotifications",
+            this.user.receive_notifications
+        )
+        return this.user.receive_notifications
+    }
+
+    @computed
+    get getNotificationList() {
+        return this.notifications
+            .filter((n) => utilService.isNotificationStarted(n))
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
+            )
+    }
+
+    @computed
+    get getNotificationByEventId() {
+        return (eventId: string) =>
+            this.getNotificationList.find((n) => n.ci_event_id === eventId)
+    }
+
+    @action
+    setSession(session: Session | null) {
+        this.session = session
+    }
+
     @action
     private fetchEvents = async () => {
-        console.log("fetchEvents")
         try {
             const fetchedEvents = await cieventsService.getCIEvents({
                 start_date: dayjs()
@@ -65,11 +167,11 @@ export class Store {
                 sort_direction: "asc",
                 future_events: true,
             })
-            this.ci_events = fetchedEvents
+            this.setCIEvents(fetchedEvents)
         } catch (error) {
             console.error("Error fetching events:", error)
         } finally {
-            this.loading = false
+            this.setLoading(false)
         }
     }
 
@@ -113,20 +215,40 @@ export class Store {
 
     //TODO Handle updates from the user subscription
     @action
-    handleSubscriptionUpdates = (payload: any) => {
-        // Handle different types of updates
-        if (payload.new && payload.eventType === "UPDATE") {
-            // Update specific data based on payload
-            this.setStore(payload.new)
+    handleSubscriptionUpdates = ({
+        table,
+        payload,
+    }: {
+        table: string
+        payload: any
+    }) => {
+        console.log(
+            "handleSubscriptionUpdates table: ",
+            table,
+            "payload: ",
+            payload
+        )
+        switch (table) {
+            case "users":
+                this.setUser(payload.new)
+                break
+            case "ci_events":
+                this.setCIEvent(payload.new, payload.eventType)
+                break
+            case "notifications":
+                this.setNotification(payload.new, payload.eventType)
+                break
         }
     }
 
     private subscribeToUserData = async () => {
         if (!this.user?.user_id) return
+
         const channel = usersService.subscribeToUser(
             this.user.user_id,
             this.handleSubscriptionUpdates
         )
+
         return channel
     }
 
@@ -150,27 +272,11 @@ export class Store {
         }
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
-
-        this.subscribeToUserData().then((channel) => {
-            if (channel) {
-                this.subscriptionRef = channel
-            }
-        })
-
-        return () => {
-            if (this.subscriptionRef) {
-                this.subscriptionRef.unsubscribe()
-                this.subscriptionRef = null
-            }
-            document.removeEventListener(
-                "visibilitychange",
-                handleVisibilityChange
-            )
-        }
+        handleVisibilityChange()
     }
 
     @action
-    setLoading = (loading: boolean) => {
+    setLoading(loading: boolean) {
         this.loading = loading
     }
 
@@ -212,13 +318,69 @@ export class Store {
         this.ci_events = ci_events
     }
 
+    @action
+    setCIEvent = (ci_event: CIEvent, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.UPDATE:
+                this.ci_events = this.ci_events.map((e) =>
+                    e.id === ci_event.id ? { ...e, ...ci_event } : e
+                )
+                break
+            case EventPayloadType.DELETE:
+                this.ci_events = this.ci_events.filter(
+                    (e) => e.id !== ci_event.id
+                )
+                break
+            case EventPayloadType.INSERT:
+                this.ci_events = [...this.ci_events, ci_event]
+                break
+        }
+    }
+
+    @action
+    setNotification = (
+        notification: UserNotification,
+        eventType: EventPayloadType
+    ) => {
+        switch (eventType) {
+            case EventPayloadType.UPDATE:
+                this.notifications = this.notifications.map((n) =>
+                    n.id === notification.id ? { ...n, ...notification } : n
+                )
+                break
+            case EventPayloadType.DELETE:
+                this.notifications = this.notifications.filter(
+                    (n) => n.id !== notification.id
+                )
+                break
+            case EventPayloadType.INSERT:
+                if (this.notifications.find((n) => n.id === notification.id))
+                    return
+                this.fetchNotification(notification.id).then(
+                    (fetchedNotification) => {
+                        if (fetchedNotification) {
+                            this.notifications = [
+                                ...this.notifications,
+                                fetchedNotification,
+                            ]
+                        }
+                    }
+                )
+                break
+        }
+    }
+
+    @action
+    setTemplates = (templates: CITemplate[]) => {
+        this.templates = templates
+    }
+
     async init() {
-        const { data } = await supabase.auth.getUser()
-
-        const { user } = data
-
+        console.log("Store init")
+        this.setLoading(true)
         try {
-            if (!user) {
+            if (!this.isSession) {
+                console.log("Store init no session")
                 // Only fetch and set ci_events, keep other store values empty
                 if (this.pollingRef) clearInterval(this.pollingRef)
                 const ci_events = await cieventsService.getCIEvents()
@@ -235,15 +397,19 @@ export class Store {
                 this.setupPolling()
                 return
             }
-
             if (this.pollingRef) clearInterval(this.pollingRef)
 
-            if (user.id) {
-                const userData = await usersService.getUserData(user.id)
+            if (this.getSession?.user.id) {
+                const userData = await usersService.getUserData(
+                    this.getSession.user.id
+                )
+
                 if (userData) {
                     this.setStore(userData)
                 } else {
-                    const newUser = utilService.createDbUserFromUser(user)
+                    const newUser = utilService.createDbUserFromUser(
+                        this.getSession?.user
+                    )
                     const createdUser = await usersService.createUser(newUser)
                     const ci_events = await cieventsService.getCIEvents()
                     if (createdUser) {
@@ -260,6 +426,7 @@ export class Store {
                         this.setStore(userData)
                     }
                 }
+                this.setLoading(false)
             }
             this.setupSubscription()
         } catch (error) {
@@ -267,6 +434,13 @@ export class Store {
         } finally {
             this.setLoading(false)
         }
+    }
+
+    fetchNotification = async (notificationId: string) => {
+        const notification = await notificationService.getNotificationById(
+            notificationId
+        )
+        return notification
     }
 
     cleanup = () => {
@@ -278,6 +452,8 @@ export class Store {
             clearInterval(this.pollingRef)
             this.pollingRef = null
         }
+        this.setStore({ ci_events: this.ci_events } as CIUserData)
     }
-    // ... rest of your subscription and handler methods
 }
+
+export const store = new Store()

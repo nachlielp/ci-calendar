@@ -1,13 +1,12 @@
 import Modal from "antd/es/modal"
 import { Icon } from "../../Common/Icon"
 import { cieventsService } from "../../../supabase/cieventsService"
+import { CIEvent, EventPayloadType } from "../../../util/interfaces"
+import { store } from "../../../Store/store"
 
 const { confirm } = Modal
 
-const showDeleteConfirm = (
-    eventId: string,
-    removeEventState: (eventId: string) => void
-) => {
+const showDeleteConfirm = (eventId: string) => {
     confirm({
         title: <div className="text-lg text-red-500">מחק ארוע</div>,
         icon: <Icon icon="warning" className="text-red-500 mr-2 ml-2" />,
@@ -16,9 +15,12 @@ const showDeleteConfirm = (
         okType: "danger",
         cancelText: "ביטול",
         direction: "rtl",
-        onOk() {
-            cieventsService.deleteCIEvent(eventId)
-            removeEventState(eventId)
+        onOk: async () => {
+            const deletedEventId = await cieventsService.deleteCIEvent(eventId)
+            store.setCIEvent(
+                { id: deletedEventId } as CIEvent,
+                EventPayloadType.DELETE
+            )
         },
         onCancel() {
             console.log(
@@ -30,17 +32,13 @@ const showDeleteConfirm = (
 
 interface IDeleteEventProps {
     eventId: string
-    removeEventState: (eventId: string) => void
 }
 
-export default function DeleteEventButton({
-    eventId,
-    removeEventState,
-}: IDeleteEventProps) {
+export default function DeleteEventButton({ eventId }: IDeleteEventProps) {
     return (
         <button
             className="action-btn"
-            onClick={() => showDeleteConfirm(eventId, removeEventState)}
+            onClick={() => showDeleteConfirm(eventId)}
             style={{ borderRadius: " 0px", borderLeft: "none" }}
         >
             <Icon icon="deleteIcon" />

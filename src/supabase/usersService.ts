@@ -452,7 +452,9 @@ async function subscribeToUser(
                 event: "*",
                 schema: "public",
                 table: "ci_events",
-                filter: `user_id=eq.${userId}`,
+                filter: `start_date=gte.${dayjs()
+                    .startOf("day")
+                    .toISOString()}`,
             },
 
             (payload) => {

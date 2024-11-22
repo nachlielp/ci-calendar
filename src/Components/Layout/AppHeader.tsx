@@ -1,15 +1,14 @@
 import { useLocation } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import { DbUser } from "../../util/interfaces"
+import { CIUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import { InstallPWAButton } from "../Common/InstallPWAButton"
 import { LinkButton } from "../Common/LinkButton"
 import { observer } from "mobx-react-lite"
 import MenuDrawer from "./MenuDrawer"
+import { store } from "../../Store/store"
 
 const AppHeader = () => {
-    const { user } = useUser()
     const isMobile = useIsMobile()
 
     const location = useLocation()
@@ -18,7 +17,7 @@ const AppHeader = () => {
 
     return (
         <section className="header-container">
-            {!user &&
+            {!store.isUser &&
                 !["/login", "/signup", "/reset-password-request"].includes(
                     currentPath
                 ) && (
@@ -30,7 +29,7 @@ const AppHeader = () => {
                         <Icon icon="account" className="icon-main" />
                     </LinkButton>
                 )}
-            {!user &&
+            {!store.isUser &&
                 ["/login", "/signup", "/reset-password-request"].includes(
                     currentPath
                 ) && (
@@ -43,10 +42,10 @@ const AppHeader = () => {
                     </LinkButton>
                 )}
             {isMobile && location.pathname === "/" && <InstallPWAButton />}
-            {user && (
+            {store.isUser && (
                 <>
                     <div className="header-actions">
-                        <UserInfo user={user} />
+                        <UserInfo user={store.getUser} />
                         <MenuDrawer />
                     </div>
                 </>
@@ -56,12 +55,12 @@ const AppHeader = () => {
 }
 
 interface IUserInfoProps {
-    user: DbUser
+    user: CIUser
 }
 const UserInfo = observer(({ user }: IUserInfoProps) => {
     return (
         <div>
-            {user && (
+            {user.user_id && (
                 <div className={`user-info-container`}>
                     <p className={`user-name`}>{user.user_name}</p>
                 </div>
