@@ -150,6 +150,15 @@ class Store {
             this.getNotificationList.find((n) => n.ci_event_id === eventId)
     }
 
+    @computed
+    get getRequests() {
+        return this.requests
+            .slice()
+            .sort((a, b) =>
+                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
+            )
+    }
+
     @action
     setSession(session: Session | null) {
         this.session = session
@@ -237,6 +246,9 @@ class Store {
                 break
             case "notifications":
                 this.setNotification(payload.new, payload.eventType)
+                break
+            case "requests":
+                this.setRequest(payload.new, payload.eventType)
                 break
         }
     }
@@ -371,8 +383,17 @@ class Store {
     }
 
     @action
-    setTemplates = (templates: CITemplate[]) => {
-        this.templates = templates
+    setRequest = (request: CIRequest, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.INSERT:
+                this.requests = [...this.requests, request]
+                break
+            case EventPayloadType.UPDATE:
+                this.requests = this.requests.map((r) =>
+                    r.id === request.id ? { ...r, ...request } : r
+                )
+                break
+        }
     }
 
     async init() {

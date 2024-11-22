@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
     return (
         <section className="reset-password-page">
             <Card>
-                <h1 className="general-title">איפוס סיסמה</h1>
+                <h1 className="general-title">עדכון סיסמה</h1>
 
                 <Form form={form} onFinish={onFinish}>
                     <label style={{ marginBottom: "0.5rem" }}>

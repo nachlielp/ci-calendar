@@ -6,12 +6,14 @@ import {
 } from "../../util/interfaces"
 import { useEffect, useState } from "react"
 import { useUser } from "../../context/UserContext"
+import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
 
-export default function RequestsList({
+const RequestsList = ({
     selectedRequestId,
 }: {
     selectedRequestId: string | null
-}) {
+}) => {
     const { user } = useUser()
 
     if (!user) {
@@ -39,7 +41,7 @@ export default function RequestsList({
     return (
         <div className="request-list">
             <div className="requests-container" role="list">
-                {user.requests.map((request) => (
+                {store.getRequests.map((request) => (
                     <div
                         key={request.id}
                         className="request-item"
@@ -133,3 +135,5 @@ export default function RequestsList({
         </div>
     )
 }
+
+export default observer(RequestsList)

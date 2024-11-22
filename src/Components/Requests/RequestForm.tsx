@@ -5,10 +5,11 @@ import Select from "antd/es/select"
 
 import { useUser } from "../../context/UserContext"
 import { requestsService } from "../../supabase/requestsService"
-import { RequestType } from "../../util/interfaces"
+import { EventPayloadType, RequestType } from "../../util/interfaces"
 import { useState } from "react"
 import Alert from "antd/es/alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
+import { store } from "../../Store/store"
 
 type RequestFieldType = {
     requestType: RequestType
@@ -28,15 +29,12 @@ const enum RequestResponse {
     error = "קרה שגיאה בשליחת הבקשה",
 }
 export default function RequestForm() {
-    const { user } = useUser()
+    const user = store.getUser
     const [type, setType] = useState<RequestType | null>(null)
     const [isSubmitted, setIsSubmitted] = useState<RequestResponse | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
 
-    if (!user) {
-        throw new Error("user is null, make sure you're within a Provider")
-    }
     const [form] = Form.useForm()
 
     const onFinish: FormProps<RequestFieldType>["onFinish"] = async (
@@ -45,7 +43,7 @@ export default function RequestForm() {
         const requestPayload = {
             type: values.requestType as RequestType,
             message: values.description || "",
-            phone: values.phone || user.phone || "",
+            phone: values.phone || "",
             email: user.email || "",
             name: user.user_name || "",
             responses: [],
@@ -64,6 +62,7 @@ export default function RequestForm() {
             if (data) {
                 setIsSubmitted(RequestResponse.success)
             }
+            store.setRequest(data, EventPayloadType.INSERT)
         } catch (error) {
             console.error("RequestForm.onFinish.error: ", error)
         } finally {
@@ -90,6 +89,7 @@ export default function RequestForm() {
                         initialValues={{
                             user_name: user.user_name,
                             email: user.email,
+                            phone: parseInt(user.phone),
                         }}
                         style={{ minHeight: "130px" }}
                         onFinishFailed={onFinishFailed}
@@ -112,25 +112,22 @@ export default function RequestForm() {
                             />
                         </Form.Item>
 
-                        {(type === RequestType.make_creator ||
-                            type === RequestType.make_profile ||
-                            type === RequestType.make_org) && (
-                            <Form.Item<RequestFieldType>
-                                name="phone"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "נא להזין מספר פלאפון",
-                                    },
-                                    {
-                                        pattern: /^[0-9]+$/,
-                                        message: "נא להזין מספר פלאפון תקין",
-                                    },
-                                ]}
-                            >
-                                <Input placeholder="מספר פלאפון" />
-                            </Form.Item>
-                        )}
+                        <Form.Item<RequestFieldType>
+                            name="phone"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: "נא להזין מספר פלאפון",
+                                },
+                                {
+                                    pattern: /^[0-9]+$/,
+                                    message: "נא להזין מספר פלאפון תקין",
+                                },
+                            ]}
+                        >
+                            <Input placeholder="מספר פלאפון" />
+                        </Form.Item>
+
                         {type && (
                             <>
                                 <Form.Item<RequestFieldType>
