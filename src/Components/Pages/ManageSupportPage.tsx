@@ -5,8 +5,8 @@ import {
     RequestStatusHebrew,
     CIRequest,
     UserType,
+    EventPayloadType,
 } from "../../util/interfaces"
-import useRequests from "../../hooks/useRequests"
 import { useEffect, useState } from "react"
 
 import { requestsService } from "../../supabase/requestsService"
@@ -32,11 +32,14 @@ const ManageSupportPage = () => {
     const [filteredRequests, setFilteredRequests] = useState<CIRequest[]>([])
     const [addResponseModalOpen, setAddResponseModalOpen] =
         useState<boolean>(false)
-    const { requests } = useRequests({
-        status: selectedStatus,
-    })
 
     useEffect(() => {
+        const requests =
+            selectedStatus === RequestStatus.open
+                ? store.getOpenAppRequests
+                : store.getClosedAppRequests
+
+        console.log("requests: ", requests)
         if (selectedTypes.length === 0) {
             setFilteredRequests(requests)
             return
@@ -50,7 +53,7 @@ const ManageSupportPage = () => {
         })
 
         setFilteredRequests(sortedRequests)
-    }, [requests, selectedTypes])
+    }, [store.app_requests, selectedTypes, selectedStatus])
 
     function handleStatusChange(checked: boolean) {
         setSelectedStatus(checked ? RequestStatus.open : RequestStatus.closed)
@@ -101,15 +104,19 @@ const ManageSupportPage = () => {
                     responses: newResponseApprovedMessage,
                     viewed_response: false,
                 }
-                await requestsService.updateRequest(newRequest)
+                const approveRes = await requestsService.updateRequest(
+                    newRequest
+                )
+                store.setAppRequest(approveRes, EventPayloadType.UPDATE)
                 break
 
             case "add_response":
-                await requestsService.updateRequest({
+                const addResponseRes = await requestsService.updateRequest({
                     id: request.id,
                     responses: request.responses,
                     viewed_response: false,
                 })
+                store.setAppRequest(addResponseRes, EventPayloadType.UPDATE)
                 break
 
             case "close":
@@ -121,12 +128,13 @@ const ManageSupportPage = () => {
                         responder_name: store.user.user_name || "",
                     },
                 ]
-                await requestsService.updateRequest({
+                const closeRes = await requestsService.updateRequest({
                     id: request.id,
                     status: RequestStatus.closed,
                     responses: newDeclineResponseMessage,
                     viewed_response: false,
                 })
+                store.setAppRequest(closeRes, EventPayloadType.UPDATE)
                 break
         }
     }

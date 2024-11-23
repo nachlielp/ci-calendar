@@ -322,11 +322,13 @@ async function getPublicBioList(): Promise<UserBio[]> {
 }
 
 async function subscribeToUser(
+    userType: UserType,
     userId: string,
     callback: (payload: any) => void
 ) {
     const channel = supabase
         .channel(`public:users:user_id=eq.${userId}`)
+
         .on(
             "postgres_changes",
             {
@@ -374,7 +376,8 @@ async function subscribeToUser(
                 event: "*",
                 schema: "public",
                 table: "requests",
-                filter: `user_id=eq.${userId}`,
+                filter:
+                    userType === "admin" ? undefined : `user_id=eq.${userId}`,
             },
             (payload) => {
                 callback({ table: "requests", payload })
@@ -417,7 +420,18 @@ async function subscribeToUser(
                 callback({ table: "alerts", payload })
             }
         )
-        .subscribe()
+        .subscribe((status) => {
+            console.log(`Subscription status: ${status}`)
+            if (status === "SUBSCRIBED") {
+                console.log("Successfully subscribed to changes")
+            }
+            if (status === "CLOSED") {
+                console.log("Subscription closed")
+            }
+            if (status === "CHANNEL_ERROR") {
+                console.log("There was an error subscribing to changes")
+            }
+        })
 
     return channel
 }

@@ -187,6 +187,23 @@ class Store {
         return this.alerts
     }
 
+    @computed
+    get getAppRequests() {
+        return this.app_requests
+    }
+
+    @computed
+    get getOpenAppRequests() {
+        return this.app_requests.filter((r) => r.status === RequestStatus.open)
+    }
+
+    @computed
+    get getClosedAppRequests() {
+        return this.app_requests.filter(
+            (r) => r.status === RequestStatus.closed
+        )
+    }
+
     @action
     setSession(session: Session | null) {
         this.session = session
@@ -288,6 +305,7 @@ class Store {
         if (!this.user?.user_id) return
 
         const channel = usersService.subscribeToUser(
+            this.user.user_type,
             this.user.user_id,
             this.handleSubscriptionUpdates
         )
@@ -432,16 +450,30 @@ class Store {
 
     @action
     setRequest = (request: CIRequest, eventType: EventPayloadType) => {
-        switch (eventType) {
-            case EventPayloadType.INSERT:
-                this.requests = [...this.requests, request]
-                break
-            case EventPayloadType.UPDATE:
-                this.requests = this.requests.map((r) =>
-                    r.id === request.id ? { ...r, ...request } : r
-                )
-                break
+        if (this.user.user_type === UserType.admin) {
+            switch (eventType) {
+                case EventPayloadType.INSERT:
+                    this.app_requests = [...this.app_requests, request]
+                    break
+                case EventPayloadType.UPDATE:
+                    this.app_requests = this.app_requests.map((r) =>
+                        r.id === request.id ? { ...r, ...request } : r
+                    )
+                    break
+            }
+        } else {
+            switch (eventType) {
+                case EventPayloadType.INSERT:
+                    this.requests = [...this.requests, request]
+                    break
+                case EventPayloadType.UPDATE:
+                    this.requests = this.requests.map((r) =>
+                        r.id === request.id ? { ...r, ...request } : r
+                    )
+                    break
+            }
         }
+        console.log("requests after update", toJS(this.requests))
     }
 
     @action
@@ -483,6 +515,20 @@ class Store {
     @action
     setAppRequests = (appRequests: CIRequest[]) => {
         this.app_requests = appRequests
+    }
+
+    @action
+    setAppRequest = (appRequest: CIRequest, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.UPDATE:
+                this.app_requests = this.app_requests.map((r) =>
+                    r.id === appRequest.id ? { ...r, ...appRequest } : r
+                )
+                break
+            case EventPayloadType.INSERT:
+                this.app_requests = [...this.app_requests, appRequest]
+                break
+        }
     }
 
     async init() {
@@ -539,10 +585,7 @@ class Store {
 
                 if (userData?.user.user_type === UserType.admin) {
                     this.fetchAppUsers()
-                    this.fetchAppRequests({
-                        status: RequestStatus.open,
-                        name: "",
-                    })
+                    this.fetchAppRequests()
                 }
             }
             this.setupSubscription()
@@ -566,18 +609,9 @@ class Store {
         this.setAppUsers(appUsers)
     }
 
-    //TODO
-    fetchAppRequests = async ({
-        status,
-        name,
-    }: {
-        status: RequestStatus
-        name: string
-    }) => {
-        const appRequests = await requestsService.getAllRequests({
-            status,
-            name,
-        })
+    //TODO pagination and filters
+    fetchAppRequests = async () => {
+        const appRequests = await requestsService.getAllRequests()
         this.setAppRequests(appRequests)
     }
 

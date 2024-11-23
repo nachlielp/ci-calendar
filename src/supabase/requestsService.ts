@@ -1,4 +1,3 @@
-import { UseRequestsProps } from "../hooks/useRequests"
 import { CIRequest, RequestType } from "../util/interfaces"
 import { supabase } from "./client"
 
@@ -39,18 +38,18 @@ async function getUserRequests(userId: string) {
     return { data, error }
 }
 
-async function getAllRequests({ status, name }: UseRequestsProps) {
+async function getAllRequests() {
     let query = supabase
         .from("requests")
         .select("*")
         .order("created_at", { ascending: false })
 
-    if (status) {
-        query = query.eq("status", status)
-    }
-    if (name) {
-        query = query.ilike("name", `%${name}%`)
-    }
+    // if (status) {
+    //     query = query.eq("status", status)
+    // }
+    // if (name) {
+    //     query = query.ilike("name", `%${name}%`)
+    // }
 
     const { data, error } = await query
     if (error) {
@@ -103,8 +102,12 @@ async function updateRequest(request: UpdateRequest) {
         .from("requests")
         .update(request)
         .eq("id", request.id)
-
-    return { data, error }
+        .select()
+        .single()
+    if (error) {
+        throw error
+    }
+    return data
 }
 
 async function deleteRequest(requestId: string) {
