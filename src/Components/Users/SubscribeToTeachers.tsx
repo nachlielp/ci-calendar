@@ -22,6 +22,7 @@ const SubscribeToTeachers = () => {
                 store.getPublicOrgBios.some((o) => o.value === id)
             ) || []
         )
+        console.log("_getAppTaggableTeachers", store.getAppTaggableTeachers)
     }, [store.getUser.subscriptions.teachers, store.getUser.subscriptions.orgs])
 
     useEffect(() => {
