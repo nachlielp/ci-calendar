@@ -1,6 +1,7 @@
-const CACHE_NAME = "ci-calendar-cache-v1732403069503"
+const CACHE_NAME = "ci-calendar-cache-v1732403898503"
 
 self.addEventListener("install", (event) => {
+    console.log("Installing service worker")
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
@@ -33,6 +34,7 @@ self.addEventListener("fetch", (event) => {
         })
     )
 })
+
 self.addEventListener("push", function (event) {
     try {
         let payload
@@ -113,7 +115,6 @@ self.addEventListener("activate", (e) => {
     e.waitUntil(
         (async () => {
             console.log("[ServiceWorker] - Checking caches")
-            console.log("CACHE_NAME", CACHE_NAME)
 
             const keyList = await caches.keys()
             await Promise.all(
