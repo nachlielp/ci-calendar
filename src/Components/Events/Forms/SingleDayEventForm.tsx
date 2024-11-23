@@ -112,13 +112,13 @@ export default function SingleDayEventForm({
             {
                 startTime: baseDate
                     .clone()
-                    .hour(values["event-time"][0].hour())
-                    .minute(values["event-time"][0].minute())
+                    .hour(values["first-segment-start-time"].hour())
+                    .minute(values["first-segment-start-time"].minute())
                     .toISOString(),
                 endTime: baseDate
                     .clone()
-                    .hour(values["event-time"][1].hour())
-                    .minute(values["event-time"][1].minute())
+                    .hour(values["first-segment-end-time"].hour())
+                    .minute(values["first-segment-end-time"].minute())
                     .toISOString(),
                 type: values["event-type"],
                 tags: values["event-tags"] || [],
@@ -140,13 +140,13 @@ export default function SingleDayEventForm({
                     ),
                     startTime: baseDate
                         .clone()
-                        .hour(segment["event-time"][0].hour())
-                        .minute(segment["event-time"][0].minute())
+                        .hour(segment["event-start-time"].hour())
+                        .minute(segment["event-start-time"].minute())
                         .toISOString(),
                     endTime: baseDate
                         .clone()
-                        .hour(segment["event-time"][1].hour())
-                        .minute(segment["event-time"][1].minute())
+                        .hour(segment["event-end-time"].hour())
+                        .minute(segment["event-end-time"].minute())
                         .toISOString(),
                 })
             })

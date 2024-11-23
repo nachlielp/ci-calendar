@@ -11,6 +11,10 @@
   },
   "dependencies": {
     "-": "^0.0.1",
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.8",
+    "@mui/x-date-pickers": "^7.22.3",
     "@supabase/supabase-js": "^2.45.4",
     "@types/react-router-dom": "^5.3.3",
     "@vercel/speed-insights": "^1.0.11",

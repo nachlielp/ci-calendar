@@ -6,6 +6,8 @@ import Col from "antd/es/col"
 import TimePicker from "antd/es/time-picker"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
+import FormInputModal from "./FormInputModal"
+import { FormInputModalType } from "./FormInputModal"
 
 interface EventSegmentsFormProps {
     form: any
@@ -42,7 +44,90 @@ export default function EventSegmentsForm({
                                 </Col>
                             </Row>
 
-                            <Row gutter={10} align="middle">
+                            <Row gutter={0} align="middle">
+                                <Col md={12} xs={12}>
+                                    <FormInputModal
+                                        type={FormInputModalType.time}
+                                        onClose={(value) => {
+                                            form.setFieldsValue({
+                                                segments: {
+                                                    [name]: {
+                                                        "event-start-time":
+                                                            value,
+                                                    },
+                                                },
+                                            })
+                                        }}
+                                        name={`segments.${name}.event-start-time`}
+                                        form={form}
+                                        anchorEl={
+                                            <Form.Item
+                                                name={[
+                                                    name,
+                                                    "event-start-time",
+                                                ]}
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        message: "שדה חובה",
+                                                    },
+                                                ]}
+                                                className="full-width"
+                                            >
+                                                <TimePicker
+                                                    placeholder={"שעת התחלה"}
+                                                    minuteStep={5}
+                                                    format="HH:mm"
+                                                    changeOnScroll
+                                                    needConfirm={false}
+                                                    inputReadOnly
+                                                    open={false}
+                                                />
+                                            </Form.Item>
+                                        }
+                                    />
+                                </Col>
+                                <Col md={12} xs={12}>
+                                    <FormInputModal
+                                        type={FormInputModalType.time}
+                                        onClose={(value) => {
+                                            form.setFieldsValue({
+                                                segments: {
+                                                    [name]: {
+                                                        "event-end-time": value,
+                                                    },
+                                                },
+                                            })
+                                        }}
+                                        name={`segments.${name}.event-end-time`}
+                                        form={form}
+                                        anchorEl={
+                                            <Form.Item
+                                                name={[name, "event-end-time"]}
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        message: "שדה חובה",
+                                                    },
+                                                ]}
+                                                className="full-width"
+                                            >
+                                                <TimePicker
+                                                    placeholder={"שעת סיום"}
+                                                    minuteStep={5}
+                                                    format="HH:mm"
+                                                    changeOnScroll
+                                                    needConfirm={false}
+                                                    inputReadOnly
+                                                    open={false}
+                                                />
+                                            </Form.Item>
+                                        }
+                                    />
+                                </Col>
+                            </Row>
+
+                            {/* <Row gutter={10} align="middle">
                                 <Col md={24} xs={24}>
                                     <Form.Item
                                         name={[name, "event-time"]}
@@ -66,7 +151,7 @@ export default function EventSegmentsForm({
                                         />
                                     </Form.Item>
                                 </Col>
-                            </Row>
+                            </Row> */}
                             <Row gutter={10} align="middle">
                                 <Col md={24} xs={24}>
                                     <Form.Item

@@ -1,4 +1,4 @@
-import Form from "antd/es/form"
+import Form, { FormInstance } from "antd/es/form"
 import Input from "antd/es/input"
 import Select from "antd/es/select"
 import DatePicker from "antd/es/date-picker"
@@ -18,9 +18,10 @@ import {
 } from "../../../util/options"
 
 import { IAddress } from "../../../util/interfaces"
+import FormInputModal, { FormInputModalType } from "./FormInputModal"
 
 interface SingleDayEventFormHeadProps {
-    form: any
+    form: FormInstance
     handleAddressSelect: (place: IGooglePlaceOption) => void
     handleDateChange: (date: dayjs.Dayjs) => void
     handleEndDateChange: (date: dayjs.Dayjs) => void
@@ -41,6 +42,7 @@ export default function SingleDayEventFormHead({
     isTemplate,
     address,
     titleText,
+    form,
 }: SingleDayEventFormHeadProps) {
     return (
         <div className="single-day-event-base-form">
@@ -125,21 +127,76 @@ export default function SingleDayEventFormHead({
                     </Col>
                 </Row>
 
-                <Row gutter={10} align="middle">
-                    <Col md={24} xs={24}>
-                        <Form.Item
-                            name="event-time"
-                            rules={[{ required: true, message: "שדה חובה" }]}
-                            className="full-width"
-                        >
-                            <TimePicker.RangePicker
-                                placeholder={["שעת התחלה", "שעת סיום"]}
-                                format="HH:mm"
-                                minuteStep={5}
-                                changeOnScroll
-                                needConfirm={false}
-                            />
-                        </Form.Item>
+                <Row gutter={0} align="middle">
+                    <Col md={12} xs={12}>
+                        <FormInputModal
+                            type={FormInputModalType.time}
+                            onClose={(value) => {
+                                form.setFieldValue(
+                                    "first-segment-start-time",
+                                    value
+                                )
+                            }}
+                            name="first-segment-start-time"
+                            form={form}
+                            anchorEl={
+                                <Form.Item
+                                    name="first-segment-start-time"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "שדה חובה",
+                                        },
+                                    ]}
+                                    className="full-width"
+                                >
+                                    <TimePicker
+                                        placeholder={"שעת התחלה"}
+                                        minuteStep={5}
+                                        format="HH:mm"
+                                        changeOnScroll
+                                        needConfirm={false}
+                                        inputReadOnly
+                                        open={false}
+                                    />
+                                </Form.Item>
+                            }
+                        />
+                    </Col>
+                    <Col md={12} xs={12}>
+                        <FormInputModal
+                            type={FormInputModalType.time}
+                            onClose={(value) => {
+                                form.setFieldValue(
+                                    "first-segment-end-time",
+                                    value
+                                )
+                            }}
+                            name="first-segment-end-time"
+                            form={form}
+                            anchorEl={
+                                <Form.Item
+                                    name="first-segment-end-time"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: "שדה חובה",
+                                        },
+                                    ]}
+                                    className="full-width"
+                                >
+                                    <TimePicker
+                                        placeholder={"שעת סיום"}
+                                        minuteStep={5}
+                                        format="HH:mm"
+                                        changeOnScroll
+                                        needConfirm={false}
+                                        inputReadOnly
+                                        open={false}
+                                    />
+                                </Form.Item>
+                            }
+                        />
                     </Col>
                 </Row>
                 <Row gutter={10} align="middle">

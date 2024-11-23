@@ -1,0 +1,10 @@
+.time-clock-value {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .full-width {
+        width: 100%;
+    }
+}
