@@ -50,7 +50,6 @@ const PushNotificationStatusButton = () => {
         }
 
         if (checked) {
-            return
             requestPermission().then(() => {
                 if (store.isUser) {
                     usersService.updateUser(store.getUser.user_id, {
