@@ -94,7 +94,10 @@ async function createRequest(request: CreateRequest) {
         .select()
         .single()
 
-    return { data, error }
+    if (error) {
+        throw error
+    }
+    return data
 }
 
 async function updateRequest(request: UpdateRequest) {

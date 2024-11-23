@@ -2,8 +2,7 @@ import Form, { FormProps } from "antd/es/form"
 import Input from "antd/es/input"
 import Card from "antd/es/card"
 import Select from "antd/es/select"
-import { requestsService } from "../../supabase/requestsService"
-import { EventPayloadType, RequestType } from "../../util/interfaces"
+import { CIRequest, RequestStatus, RequestType } from "../../util/interfaces"
 import { useState } from "react"
 import Alert from "antd/es/alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
@@ -38,29 +37,24 @@ export default function RequestForm() {
     const onFinish: FormProps<RequestFieldType>["onFinish"] = async (
         values
     ) => {
-        const requestPayload = {
+        const requestPayload: Omit<CIRequest, "id" | "number"> = {
             type: values.requestType as RequestType,
             message: values.description || "",
             phone: values.phone || "",
             email: user.email || "",
             name: user.user_name || "",
             responses: [],
+            user_id: user.user_id,
+            status: RequestStatus.open,
+            viewed_response: false,
+            viewed_by: [],
+            created_at: new Date().toISOString(),
+            request_type: values.requestType as RequestType,
         }
         try {
             setIsSubmitting(true)
-            const { data, error } = await requestsService.createRequest(
-                requestPayload
-            )
-            if (error) {
-                setIsSubmitted(RequestResponse.error)
-                throw new Error(
-                    `RequestForm.onFinish.error: ${JSON.stringify(error)}`
-                )
-            }
-            if (data) {
-                setIsSubmitted(RequestResponse.success)
-            }
-            store.setRequest(data, EventPayloadType.INSERT)
+            await store.createRequest(requestPayload)
+            setIsSubmitted(RequestResponse.success)
         } catch (error) {
             console.error("RequestForm.onFinish.error: ", error)
         } finally {

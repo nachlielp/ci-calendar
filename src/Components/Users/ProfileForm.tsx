@@ -4,12 +4,11 @@ import Input from "antd/es/input"
 import Card from "antd/es/card"
 import Image from "antd/es/image"
 import Switch from "antd/es/switch"
-import { EventPayloadType, UserBio } from "../../util/interfaces"
+import { UserBio } from "../../util/interfaces"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import CloudinaryUpload from "../Common/CloudinaryUpload"
 import Alert from "antd/es/alert"
 import AsyncButton from "../Common/AsyncButton"
-import { publicBioService } from "../../supabase/publicBioService"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 
@@ -80,12 +79,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
             user_type: store.getUser.user_type,
         }
         try {
-            const updatedUser = await publicBioService.updateTeacherBio(
-                newTeacher
-            )
-            if (updatedUser) {
-                store.setBio(updatedUser, EventPayloadType.UPDATE)
-            }
+            await store.updateBio(newTeacher)
             closeEditProfile()
         } catch (error) {
             console.error("UserForm.onFinish.error: ", error)

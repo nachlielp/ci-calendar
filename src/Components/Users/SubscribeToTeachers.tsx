@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import AsyncButton from "../Common/AsyncButton"
 import { observer } from "mobx-react-lite"
@@ -31,16 +30,12 @@ const SubscribeToTeachers = () => {
     async function saveSubscriptions() {
         try {
             setIsSubmitting(true)
-            const updatedUser = await usersService.updateUser(store.getUserId, {
+            await store.updateUser({
                 subscriptions: {
                     teachers: [...selectedTeachers],
                     orgs: [...selectedOrgs],
                 },
             })
-            if (updatedUser) {
-                store.setUser(updatedUser)
-                setSubscriptionsEqual(true)
-            }
         } catch (error) {
             console.error(
                 "SubscribeToTeachers.debouncedSaveFilters.error: ",

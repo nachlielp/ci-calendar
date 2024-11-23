@@ -1,27 +1,37 @@
 import { observable, action, makeAutoObservable, computed, toJS } from "mobx"
 import {
     CIAlert,
+    CIConfig,
     CIEvent,
     CIRequest,
     CITemplate,
     CIUser,
     CIUserData,
+    DBCIEvent,
     EventPayloadType,
+    ManageUserOption,
+    NotificationDB,
     RequestStatus,
     TaggableUserOptions,
     UserBio,
     UserNotification,
+    UserRole,
     UserType,
 } from "../util/interfaces"
 import { supabase } from "../supabase/client"
-import { ManageUserOption, usersService } from "../supabase/usersService"
+import { usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
 import { RealtimeChannel, Session } from "@supabase/supabase-js"
 import { cieventsService } from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import { notificationService } from "../supabase/notificationService"
-import { requestsService } from "../supabase/requestsService"
+import { requestsService, UpdateRequest } from "../supabase/requestsService"
 import { SelectOption } from "../util/options"
+import { templateService } from "../supabase/templateService"
+import { publicBioService } from "../supabase/publicBioService"
+import { alertsService } from "../supabase/alertsService"
+import { configService } from "../supabase/configService"
+import { userRoleService } from "../supabase/userRoleService"
 
 class Store {
     @observable session: Session | null = null
@@ -32,6 +42,7 @@ class Store {
     @observable bio: UserBio = {} as UserBio
     @observable alerts: CIAlert[] = []
 
+    @observable config: CIConfig = {} as CIConfig
     @observable app_ci_events: CIEvent[] = []
     @observable app_past_ci_events: CIEvent[] = []
     @observable app_public_bios: UserBio[] = []
@@ -50,7 +61,6 @@ class Store {
 
     constructor() {
         makeAutoObservable(this)
-        console.log("Store constructor")
 
         supabase.auth.onAuthStateChange(async (_, session) => {
             this.cleanup()
@@ -59,6 +69,7 @@ class Store {
         })
     }
 
+    //For non-authenticated users, I use polling to avoid useing a subscription channel
     private getPollingInterval = () => {
         if (this.callCount < 5) return this.MINUTE_MS * 2
         if (this.callCount < 10) return this.MINUTE_MS * 5
@@ -68,6 +79,11 @@ class Store {
     @computed
     get isLoading() {
         return this.loading
+    }
+
+    @computed
+    get getConfig() {
+        return this.config
     }
 
     @computed
@@ -387,6 +403,15 @@ class Store {
             case "public_bio":
                 this.setBio(payload.new, payload.eventType)
                 break
+            case "alerts":
+                this.setAlert(payload.new, payload.eventType)
+                break
+            case "templates":
+                this.setTemplate(payload.new, payload.eventType)
+                break
+            case "config":
+                this.setConfig(payload.new, payload.eventType)
+                break
         }
     }
 
@@ -455,6 +480,7 @@ class Store {
                 this.user.user_id,
                 user
             )
+            console.log("updatedUserData", updatedUserData)
             if (updatedUserData) {
                 this.setUser(updatedUserData)
             }
@@ -485,6 +511,31 @@ class Store {
                 this.app_ci_events = [...this.app_ci_events, ci_event]
                 break
         }
+    }
+
+    @action
+    updateCIEvent = async (ci_event: Partial<CIEvent>) => {
+        if (!ci_event.id) return
+        const updatedCIEvent = await cieventsService.updateCIEvent(
+            ci_event.id,
+            ci_event
+        )
+        this.setCIEvent(updatedCIEvent, EventPayloadType.UPDATE)
+    }
+
+    @action
+    deleteCIEvent = async (eventId: string) => {
+        const deletedEventId = await cieventsService.deleteCIEvent(eventId)
+        this.setCIEvent(
+            { id: deletedEventId } as CIEvent,
+            EventPayloadType.DELETE
+        )
+    }
+
+    @action
+    createCIEvent = async (ci_event: Omit<DBCIEvent, "id">) => {
+        const newCIEvent = await cieventsService.createCIEvent(ci_event)
+        this.setCIEvent(newCIEvent, EventPayloadType.INSERT)
     }
 
     @action
@@ -538,6 +589,13 @@ class Store {
     }
 
     @action
+    upsertNotification = async (notification: NotificationDB) => {
+        const updatedNotification =
+            await notificationService.upsertNotification(notification)
+        this.setNotification(updatedNotification, EventPayloadType.UPSERT)
+    }
+
+    @action
     setRequest = (request: CIRequest, eventType: EventPayloadType) => {
         if (this.user.user_type === UserType.admin) {
             switch (eventType) {
@@ -578,6 +636,12 @@ class Store {
     }
 
     @action
+    updateBio = async (bio: UserBio) => {
+        const updatedBio = await publicBioService.updateTeacherBio(bio)
+        this.setBio(updatedBio, EventPayloadType.UPDATE)
+    }
+
+    @action
     setTemplate = (template: CITemplate, eventType: EventPayloadType) => {
         switch (eventType) {
             case EventPayloadType.UPDATE:
@@ -594,6 +658,28 @@ class Store {
                 this.templates = [...this.templates, template]
                 break
         }
+    }
+
+    @action
+    createTemplate = async (template: Omit<CITemplate, "id">) => {
+        const newTemplate = await templateService.createTemplate(template)
+        this.setTemplate(newTemplate, EventPayloadType.INSERT)
+    }
+
+    @action
+    deleteTemplate = async (templateId: string) => {
+        await templateService.deleteTemplate(templateId)
+        this.setTemplate(
+            { id: templateId } as CITemplate,
+            EventPayloadType.DELETE
+        )
+    }
+
+    @action
+    updateTemplate = async (template: Partial<CITemplate> & { id: string }) => {
+        if (!template.id) return
+        const updatedTemplate = await templateService.updateTemplate(template)
+        this.setTemplate(updatedTemplate, EventPayloadType.UPDATE)
     }
 
     @action
@@ -621,6 +707,74 @@ class Store {
     }
 
     @action
+    updateRequest = async (request: UpdateRequest) => {
+        if (!request.id) return
+        const updatedRequest = await requestsService.updateRequest(request)
+        this.setAppRequest(updatedRequest, EventPayloadType.UPDATE)
+    }
+
+    @action
+    createRequest = async (request: Omit<CIRequest, "id" | "number">) => {
+        const newRequest = await requestsService.createRequest(request)
+        this.setAppRequest(newRequest, EventPayloadType.INSERT)
+    }
+
+    @action
+    setAlert = (alert: CIAlert, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.INSERT:
+                this.alerts = [...this.alerts, alert]
+                break
+            case EventPayloadType.UPDATE:
+                this.alerts = this.alerts.map((a) =>
+                    a.id === alert.id ? { ...a, ...alert } : a
+                )
+                break
+        }
+    }
+
+    @action
+    updateAlert = async (alert: Partial<CIAlert>) => {
+        if (!alert.id) return
+        const updatedAlert = await alertsService.updateAlert(alert)
+        this.setAlert(updatedAlert, EventPayloadType.UPDATE)
+    }
+
+    @action
+    viewAlert = async (eventId: string) => {
+        const alert = this.alerts.find((a) => a.ci_event_id === eventId)
+        if (alert && !alert.viewed) {
+            await alertsService.setAlertViewed(alert.id)
+        }
+    }
+
+    @action
+    setConfig = (config: CIConfig, eventType: EventPayloadType) => {
+        switch (eventType) {
+            case EventPayloadType.UPDATE:
+                this.config = config
+                break
+        }
+    }
+
+    @action
+    setUserRole = (userRole: UserRole) => {
+        this.app_users = this.app_users.map((u) =>
+            u.user_id === userRole.user_id ? { ...u, ...userRole } : u
+        )
+    }
+
+    @action
+    updateUserRole = async (userRole: UserRole) => {
+        const updatedUserType = await userRoleService.updateUserRole(userRole)
+        this.setUserRole({
+            user_id: userRole.user_id,
+            user_type: updatedUserType,
+            role_id: userRole.role_id,
+        })
+    }
+
+    @action
     setAppCreators = (appCreators: SelectOption[]) => {
         this.app_creators = appCreators
     }
@@ -639,6 +793,9 @@ class Store {
         console.log("Store init")
         this.setLoading(true)
         try {
+            const config = await configService.getConfig()
+            this.setConfig(config, EventPayloadType.UPDATE)
+
             if (!this.isSession) {
                 console.log("Store init no session")
                 // Only fetch and set ci_events, keep other store values empty
@@ -703,7 +860,8 @@ class Store {
                     this.fetchAppCreators()
                 }
             }
-            this.setupSubscription()
+            //TODO: uncomment
+            // this.setupSubscription()
         } catch (error) {
             console.error("Error fetching user:", error)
         } finally {

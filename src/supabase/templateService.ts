@@ -55,7 +55,9 @@ async function deleteTemplate(templateId: string): Promise<string> {
     }
 }
 
-async function updateTemplate(template: CITemplate): Promise<CITemplate> {
+async function updateTemplate(
+    template: Partial<CITemplate> & { id: string }
+): Promise<CITemplate> {
     try {
         const { data, error } = await supabase
             .from("templates")

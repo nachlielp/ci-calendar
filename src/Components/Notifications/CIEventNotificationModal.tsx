@@ -3,14 +3,13 @@ import SecondaryButton from "../Common/SecondaryButton"
 import { useState, useEffect } from "react"
 import { Icon } from "../Common/Icon"
 import Select from "antd/es/select"
-import { notificationService } from "../../supabase/notificationService"
 import Alert from "antd/es/alert/Alert"
 import {
     singleDayNotificationOptions,
     multiDayNotificationOptions,
 } from "../../util/options"
 import AsyncButton from "../Common/AsyncButton"
-import { EventPayloadType, NotificationType } from "../../util/interfaces"
+import { NotificationType } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 
@@ -50,25 +49,13 @@ const CIEventNotificationModal = ({
 
         try {
             setIsSubmitting(true)
-            const notification = await notificationService.upsertNotification({
+            await store.upsertNotification({
                 remind_in_hours: remindInHours,
                 ci_event_id: eventId,
                 user_id: store.getUserId,
                 is_sent: false,
                 type: NotificationType.reminder,
             })
-
-            if (notification) {
-                const event = store.getCIEventById(eventId)
-                store.setNotification(
-                    {
-                        ...notification,
-                        start_date: event?.start_date,
-                        title: event?.title,
-                    },
-                    EventPayloadType.UPSERT
-                )
-            }
         } catch (error) {
             console.error(error)
         } finally {

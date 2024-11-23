@@ -1,8 +1,10 @@
+import { CIAlert } from "../util/interfaces"
 import { supabase } from "./client"
 
 export const alertsService = {
     setAlertViewed,
     getAlertById,
+    updateAlert,
 }
 
 async function setAlertViewed(alertId: string) {
@@ -38,4 +40,15 @@ async function getAlertById(alertId: string) {
     } catch (error) {
         console.error(error)
     }
+}
+
+async function updateAlert(alert: Partial<CIAlert>): Promise<CIAlert> {
+    const { data, error } = await supabase
+        .from("alerts")
+        .update(alert)
+        .eq("id", alert.id)
+        .select()
+        .single()
+    if (error) throw error
+    return data
 }

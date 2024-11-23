@@ -379,3 +379,26 @@ export interface TaggableUserOptions {
     bio_name: string
     user_type: UserType
 }
+
+export interface CIConfig {
+    app_title: string
+    app_description: string
+}
+export type DBCIEvent = Omit<CIEvent, "users" | "creator">
+
+export interface UserRole {
+    user_id: string
+    role_id: number
+    user_type: UserType
+}
+
+export type ManageUserOption = {
+    user_id: string
+    user_name: string
+    user_type: UserType
+    email: string
+    role: {
+        id: number
+        role: string
+    }
+}

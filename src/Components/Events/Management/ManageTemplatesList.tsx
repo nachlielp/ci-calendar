@@ -1,18 +1,12 @@
 import FormContainer from "../Forms/FormContainer"
-import { templateService } from "../../../supabase/templateService"
 import DeleteTemplateButton from "../Actions/DeleteTemplateButton"
 import { Icon } from "../../Common/Icon"
 import { observer } from "mobx-react-lite"
 import { store } from "../../../Store/store"
-import { CITemplate, EventPayloadType } from "../../../util/interfaces"
 
 const ManageTemplatesList = () => {
     async function handleDeleteTemplate(templateId: string) {
-        await templateService.deleteTemplate(templateId)
-        store.setTemplate(
-            { id: templateId } as CITemplate,
-            EventPayloadType.DELETE
-        )
+        await store.deleteTemplate(templateId)
     }
 
     return (

@@ -12,7 +12,7 @@ import {
     IAddress,
     CIEvent,
     CITemplate,
-    EventPayloadType,
+    DBCIEvent,
 } from "../../../util/interfaces"
 
 import Loading from "../../Common/Loading"
@@ -23,8 +23,6 @@ import AddPricesForm from "./AddPricesForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import EventSegmentsForm from "./EventSegmentsForm"
 import { EventAction } from "../../../App"
-import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
-import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import Alert from "antd/es/alert"
 import { store } from "../../../Store/store"
@@ -152,9 +150,9 @@ export default function EditSingleDayEventForm({
         }
 
         if (event) {
-            const eventId =
-                editType === EventAction.recycle ? uuidv4() : event.id
+            editType === EventAction.recycle ? uuidv4() : event.id
             const updatedEvent: DBCIEvent = {
+                id: event.id,
                 is_notified: event.is_notified,
                 cancelled: event.cancelled,
                 start_date: baseDate
@@ -195,34 +193,11 @@ export default function EditSingleDayEventForm({
                     ) || [],
             }
             try {
-                if (editType === EventAction.recycle) {
-                    try {
-                        await cieventsService.createCIEvent(updatedEvent)
-                        closeForm()
-                    } catch (error) {
-                        console.error(
-                            "EventForm.handleSubmit.createEvent.error: ",
-                            error
-                        )
-                        throw error
-                    }
-                } else {
-                    try {
-                        const newEvent = await cieventsService.updateCIEvent(
-                            eventId,
-                            updatedEvent
-                        )
-                        console.log("newEvent: ", newEvent)
-                        store.setCIEvent(newEvent, EventPayloadType.UPDATE)
-                        closeForm()
-                    } catch (error) {
-                        console.error(
-                            "EventForm.handleSubmit.updateEvent.error: ",
-                            error
-                        )
-                        throw error
-                    }
-                }
+                await store.updateCIEvent({
+                    ...updatedEvent,
+                    id: event.id,
+                })
+                closeForm()
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
             } finally {
@@ -259,10 +234,7 @@ export default function EditSingleDayEventForm({
                 updatedTemplate
             )
             try {
-                const newTemplate = await templateService.updateTemplate(
-                    updatedTemplate
-                )
-                store.setTemplate(newTemplate, EventPayloadType.UPDATE)
+                await store.updateTemplate(updatedTemplate)
                 closeForm()
             } catch (error) {
                 console.error(

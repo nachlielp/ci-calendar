@@ -7,7 +7,7 @@ import {
     CIEvent,
     IAddress,
     CITemplate,
-    EventPayloadType,
+    DBCIEvent,
 } from "../../../util/interfaces.ts"
 import Loading from "../../Common/Loading.tsx"
 import AddLinksForm from "./AddLinksForm.tsx"
@@ -15,11 +15,6 @@ import AddPricesForm from "./AddPricesForm.tsx"
 import MultiDayFormHead from "./MultiDayFormHead.tsx"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
 import { EventAction } from "../../../App.tsx"
-import {
-    cieventsService,
-    DBCIEvent,
-} from "../../../supabase/cieventsService.ts"
-import { templateService } from "../../../supabase/templateService.ts"
 import { utilService } from "../../../util/utilService.ts"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton.tsx"
 import Alert from "antd/es/alert/Alert"
@@ -83,6 +78,7 @@ export default function EditMultiDayEventForm({
             }
 
             const updatedEvent: DBCIEvent = {
+                id: event.id,
                 is_notified: event.is_notified,
                 cancelled: event.cancelled,
                 start_date:
@@ -128,19 +124,9 @@ export default function EditMultiDayEventForm({
                         store.getAppTaggableOrgs
                     ) || [],
             }
-            console.log("updatedEvent: ", updatedEvent)
             try {
-                if (editType === EventAction.recycle) {
-                    await cieventsService.createCIEvent(updatedEvent)
-                    closeForm()
-                } else {
-                    const newEvent = await cieventsService.updateCIEvent(
-                        event.id,
-                        updatedEvent
-                    )
-                    store.setCIEvent(newEvent, EventPayloadType.UPDATE)
-                    closeForm()
-                }
+                await store.updateCIEvent(updatedEvent)
+                closeForm()
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
                 throw error
@@ -182,10 +168,7 @@ export default function EditMultiDayEventForm({
                     ) || [],
             }
             try {
-                const newTemplate = await templateService.updateTemplate(
-                    updatedTemplate
-                )
-                store.setTemplate(newTemplate, EventPayloadType.UPDATE)
+                await store.updateTemplate(updatedTemplate)
                 closeForm()
             } catch (error) {
                 console.error(

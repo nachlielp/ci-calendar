@@ -29,12 +29,6 @@ const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
 const EventsPage = () => {
     const events = store.getSortedEvents
     const { selectedEvent } = useSetSelectedEventByParams(events)
-    const { config } = {
-        config: {
-            app_title: DEFAULT_TITLE,
-            app_description: DEFAULT_DESCRIPTION,
-        },
-    }
 
     const isMobile = useIsMobile()
 
@@ -68,9 +62,11 @@ const EventsPage = () => {
         <div className="events-page">
             <header className="header">
                 <AlertsAnchor />
-                <h1 className="title">{config?.app_title || DEFAULT_TITLE}</h1>
+                <h1 className="title">
+                    {store.getConfig.app_title || DEFAULT_TITLE}
+                </h1>
                 <p className="subtitle">
-                    {config?.app_description || DEFAULT_DESCRIPTION}
+                    {store.getConfig.app_description || DEFAULT_DESCRIPTION}
                 </p>
                 <main className="menu-container">
                     <MenuButtons

@@ -7,19 +7,10 @@ import {
     CIUser,
     CIUserData,
     TaggableUserOptions,
+    ManageUserOption,
 } from "../util/interfaces"
 import dayjs from "dayjs"
 
-export type ManageUserOption = {
-    user_id: string
-    user_name: string
-    user_type: UserType
-    email: string
-    role: {
-        id: number
-        role: string
-    }
-}
 export const usersService = {
     getUsers,
     getUserData,

@@ -1,8 +1,6 @@
 import Modal from "antd/es/modal"
-import { cieventsService } from "../../../supabase/cieventsService"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
-import { EventPayloadType } from "../../../util/interfaces"
 
 const { confirm } = Modal
 
@@ -20,10 +18,10 @@ const showCancelledConfirm = (eventId: string, cancelled: boolean) => {
         cancelText: "חזרה",
         direction: "rtl",
         onOk: async () => {
-            const newEvent = await cieventsService.updateCIEvent(eventId, {
+            await store.updateCIEvent({
+                id: eventId,
                 cancelled: !cancelled,
             })
-            store.setCIEvent(newEvent, EventPayloadType.UPDATE)
         },
         onCancel() {
             console.log(

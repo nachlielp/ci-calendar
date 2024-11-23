@@ -5,18 +5,14 @@ import {
     RequestStatusHebrew,
     CIRequest,
     UserType,
-    EventPayloadType,
 } from "../../util/interfaces"
 import { useEffect, useState } from "react"
-
-import { requestsService } from "../../supabase/requestsService"
 
 import dayjs from "dayjs"
 
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import { requestTypeOptions } from "../../util/options"
 import Switch from "antd/es/switch"
-import userRoleService from "../../supabase/userRoleService"
 import AddResponseToSupportReqModal from "../Requests/AddResponseToSupportReqModal"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
@@ -76,7 +72,7 @@ const ManageSupportPage = () => {
                         : null
 
                 if (newUserType) {
-                    await userRoleService.setUserRole({
+                    await store.updateUserRole({
                         user_id: request.user_id,
                         user_type: newUserType,
                         role_id:
@@ -104,19 +100,15 @@ const ManageSupportPage = () => {
                     responses: newResponseApprovedMessage,
                     viewed_response: false,
                 }
-                const approveRes = await requestsService.updateRequest(
-                    newRequest
-                )
-                store.setAppRequest(approveRes, EventPayloadType.UPDATE)
+                await store.updateRequest(newRequest)
                 break
 
             case "add_response":
-                const addResponseRes = await requestsService.updateRequest({
+                await store.updateRequest({
                     id: request.id,
                     responses: request.responses,
                     viewed_response: false,
                 })
-                store.setAppRequest(addResponseRes, EventPayloadType.UPDATE)
                 break
 
             case "close":
@@ -128,13 +120,12 @@ const ManageSupportPage = () => {
                         responder_name: store.user.user_name || "",
                     },
                 ]
-                const closeRes = await requestsService.updateRequest({
+                await store.updateRequest({
                     id: request.id,
                     status: RequestStatus.closed,
                     responses: newDeclineResponseMessage,
                     viewed_response: false,
                 })
-                store.setAppRequest(closeRes, EventPayloadType.UPDATE)
                 break
         }
     }

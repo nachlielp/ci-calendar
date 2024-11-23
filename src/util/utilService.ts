@@ -6,6 +6,7 @@ import {
     RawAppConfigRecord,
     UserType,
     UserNotification,
+    DBCIEvent,
 } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
@@ -14,7 +15,6 @@ import {
     hebrewMonths,
     SelectOption,
 } from "./options"
-import { DBCIEvent } from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
@@ -286,6 +286,8 @@ function getDeviceId() {
 }
 
 function isPWA() {
+    //TODO: check if this is correct
+    return true
     return (
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true

@@ -10,15 +10,10 @@ import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
-import { EventPayloadType, IAddress } from "../../../util/interfaces"
+import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
-import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import Alert from "antd/es/alert"
-import {
-    CITemplateWithoutId,
-    templateService,
-} from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
@@ -114,7 +109,7 @@ export default function MultiDayEventForm({
                 if (!dates) {
                     throw new Error("dates are null")
                 }
-                const event: DBCIEvent = {
+                const event: Omit<DBCIEvent, "id"> = {
                     is_notified: false,
                     cancelled: false,
                     start_date: dates[0]
@@ -161,14 +156,12 @@ export default function MultiDayEventForm({
                             store.getAppTaggableOrgs
                         ) || [],
                 }
-                // console.log("values: ", values)
-                // console.log("event: ", event)
-                const newEvent = await cieventsService.createCIEvent(event)
-                store.setCIEvent(newEvent, EventPayloadType.INSERT)
+
+                await store.createCIEvent(event)
                 clearForm()
                 closeForm()
             } else {
-                const template: CITemplateWithoutId = {
+                const template: Omit<CITemplate, "id"> = {
                     type: values["main-event-type"],
                     address: address,
                     created_at: dayjs().toISOString(),
@@ -197,12 +190,9 @@ export default function MultiDayEventForm({
                             values["event-orgs"],
                             store.getAppTaggableOrgs
                         ) || [],
+                    user_id: store.user.user_id,
                 }
-                // setSubmitted(true)
-                const newTemplate = await templateService.createTemplate(
-                    template
-                )
-                store.setTemplate(newTemplate, EventPayloadType.INSERT)
+                await store.createTemplate(template)
                 clearForm()
                 closeForm()
             }

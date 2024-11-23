@@ -1,5 +1,5 @@
 import { supabase } from "./client"
-import { CIEvent } from "../util/interfaces"
+import { CIEvent, DBCIEvent } from "../util/interfaces"
 import { utilService } from "../util/utilService"
 import dayjs from "dayjs"
 import { SelectOption } from "../util/options"
@@ -14,8 +14,6 @@ export interface FilterOptions {
     future_events?: boolean
     creator_name?: string
 }
-
-export type DBCIEvent = Omit<CIEvent, "id" | "users" | "creator">
 
 export const cieventsService = {
     getCIEvent,
@@ -156,7 +154,7 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
     }
 }
 
-async function createCIEvent(event: DBCIEvent): Promise<CIEvent> {
+async function createCIEvent(event: Omit<DBCIEvent, "id">): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
             .from("ci_events")
@@ -167,7 +165,7 @@ async function createCIEvent(event: DBCIEvent): Promise<CIEvent> {
         if (error) throw error
 
         const cieventId = data.id
-        const teacherIds = utilService.getCIEventTeachers(event)
+        const teacherIds = utilService.getCIEventTeachers(data)
         const junctionData = teacherIds.map((teacherId) => {
             return {
                 ci_event_id: cieventId,

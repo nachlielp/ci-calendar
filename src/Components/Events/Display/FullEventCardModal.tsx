@@ -3,7 +3,6 @@ import Modal from "antd/es/modal"
 import { CIEvent } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
 import { useNavigate } from "react-router-dom"
-import { alertsService } from "../../../supabase/alertsService"
 import { store } from "../../../Store/store"
 
 interface EventCardProps {
@@ -22,17 +21,10 @@ export default function FullEventCardModal({
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
 
     useEffect(() => {
-        if (isModalOpen && store.getAlerts) {
-            const matchingAlert = store.getAlerts
-                .filter((a) => !a.viewed)
-                .find((alert) => {
-                    return alert.ci_event_id === event.id
-                })
-            if (matchingAlert) {
-                alertsService.setAlertViewed(matchingAlert.id)
-            }
+        if (isModalOpen && store.isUser) {
+            store.viewAlert(event.id)
         }
-    }, [isModalOpen, event.id, store.getAlerts])
+    }, [isModalOpen, event.id, store.isUser])
 
     const showModal = () => {
         setIsModalOpen(true)

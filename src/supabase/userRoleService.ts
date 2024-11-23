@@ -1,19 +1,15 @@
-import { UserType } from "../util/interfaces"
+import { UserRole, UserType } from "../util/interfaces"
 import { supabase } from "./client"
 
-export default {
-    setUserRole,
+export const userRoleService = {
+    updateUserRole,
 }
 
-async function setUserRole({
+async function updateUserRole({
     user_id,
     user_type,
     role_id,
-}: {
-    user_id: string
-    user_type: UserType
-    role_id: number
-}): Promise<UserType> {
+}: UserRole): Promise<UserType> {
     try {
         // Update user_roles table
         const { data: roleData, error: roleError } = await supabase

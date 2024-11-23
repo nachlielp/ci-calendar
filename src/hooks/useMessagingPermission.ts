@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { utilService } from "../util/utilService"
 import { getToken } from "firebase/messaging"
-import { usersService } from "../supabase/usersService"
 import { messaging } from "../firebase.messaging"
 import { CIUser, PushNotificationPromission } from "../util/interfaces"
 import { store } from "../Store/store"
@@ -74,7 +73,8 @@ async function checkAndUpdateToken(user: CIUser) {
     )?.token
 
     if (token && token !== existingToken) {
-        await usersService.updateUser(user.user_id, {
+        store.updateUser({
+            user_id: user.user_id,
             push_notification_tokens: [
                 {
                     device_id: utilService.getDeviceId(),
@@ -84,6 +84,7 @@ async function checkAndUpdateToken(user: CIUser) {
                     branch: import.meta.env.VITE_BRANCH,
                 },
             ],
+            receive_notifications: true,
         })
     }
 }

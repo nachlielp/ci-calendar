@@ -2,11 +2,9 @@ import AutoComplete from "antd/es/auto-complete"
 import Card from "antd/es/card"
 import Input from "antd/es/input"
 import { useEffect, useState } from "react"
-import { UserType } from "../../util/interfaces"
+import { ManageUserOption, UserType } from "../../util/interfaces"
 import { useWindowSize } from "../../hooks/useWindowSize"
-import { ManageUserOption } from "../../supabase/usersService"
 import { SelectProps } from "antd/es/select"
-import userRoleService from "../../supabase/userRoleService"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 
@@ -74,7 +72,7 @@ function ManageUsersPage() {
     const onSetRole = async (user_type: UserType, role_id: number) => {
         if (!selectedUser) return
 
-        await userRoleService.setUserRole({
+        await store.updateUserRole({
             user_id: selectedUser.user_id,
             user_type: user_type,
             role_id: role_id,
