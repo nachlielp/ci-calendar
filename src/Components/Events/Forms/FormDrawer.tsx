@@ -20,10 +20,6 @@ export function FormDrawer({
     event?: CIEvent
     template?: CITemplate
 }) {
-    if (eventType === "edit-single-day" || eventType === "edit-multi-day") {
-        throw new Error("updateEventState is required")
-    }
-
     const [open, setOpen] = useState(false)
 
     const showDrawer = () => {
