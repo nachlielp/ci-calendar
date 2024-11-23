@@ -3,6 +3,7 @@ import SubscribeToTeachers from "../Users/SubscribeToTeachers"
 import UserNotificationsList from "../Users/UserNotificationsList"
 import PushNotificationStatusButton from "../Common/PushNotificationStatusButton"
 import { observer } from "mobx-react-lite"
+import NotificationSwitch from "../Users/NotificationSwitch"
 
 const FiltersAndNotificationsPage = observer(() => {
     return (
@@ -10,6 +11,7 @@ const FiltersAndNotificationsPage = observer(() => {
             <Card className="filter-section">
                 <h3>הרשמה להתראות על ארועים חדשים של מורים וארגונים</h3>
                 <PushNotificationStatusButton />
+                <NotificationSwitch />
                 <SubscribeToTeachers />
                 <UserNotificationsList />
             </Card>

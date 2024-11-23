@@ -31,22 +31,21 @@ export default function useMessagingPermission() {
     const checkPermissionsAndToken = async () => {
         try {
             if (!store.isUser) {
-                console.log("no user")
                 setPermissionStatus(null)
                 return
             }
 
-            if (!utilService.isPWA()) {
-                setPermissionStatus("denied")
-                return
-            }
             const { permission } = Notification
+
             setPermissionStatus(permission)
+
             utilService.setFirstNotificationPermissionRequest(permission)
+
             if (permission === "granted") {
                 await checkAndUpdateToken(store.getUser)
             } else {
-                console.error("Permission not granted for Notification")
+                setPermissionStatus(permission)
+                // console.error("Permission not granted for Notification")
             }
         } catch (error) {
             console.error("Error:", error)

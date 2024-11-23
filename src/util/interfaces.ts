@@ -347,6 +347,12 @@ export interface RequestStatusOptions {
 
 export type PushNotificationPromission = "granted" | "denied" | "default" | null
 
+export enum PromissionStatus {
+    granted = "granted",
+    denied = "denied",
+    default = "default",
+}
+
 export interface NotificationPayload {
     schema: string
     table: string

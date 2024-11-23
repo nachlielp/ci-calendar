@@ -51,6 +51,9 @@
 @import "./styles/manage-events-list.css";
 @import "./styles/user-notifications-list.css";
 @import "./styles/alerts-anchor.css";
+@import "./styles/notification-switch.css";
+@import "./styles/push-notifications-status-button.css";
+
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")

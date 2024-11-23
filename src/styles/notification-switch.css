@@ -1,0 +1,19 @@
+.notification-switch {
+    margin-bottom: 10px;
+    .notification-switch-icon {
+        .injected-svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        &.active {
+            .injected-svg {
+                padding-top: 2px;
+            }
+        }
+    }
+
+    .notification-status-button {
+        color: #9ca3af;
+    }
+}

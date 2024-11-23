@@ -62,23 +62,6 @@
     margin-left: 1.5rem;
 }
 
-.notification-status-container {
-    margin: 12px;
-    margin-right: auto;
-
-    .notification-switch-icon {
-        .injected-svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        &.active {
-            .injected-svg {
-                padding-top: 2px;
-            }
-        }
-    }
-}
 .user-name {
     color: black;
     font-size: 0.875rem;
