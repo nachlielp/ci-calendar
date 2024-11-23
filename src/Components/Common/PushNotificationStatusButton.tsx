@@ -15,6 +15,9 @@ const android_notification_error =
 const browser_notification_error =
     "ניתן לקבל התראות באפליקציה שמותקנת בסלולרי בלבד"
 
+const default_notification_alert =
+    "על מנת לקבל נוטיפיקציות צריך לאשר לאפליקציה לשלוח התראות"
+
 const PushNotificationStatusButton = () => {
     const { requestPermission, permissionStatus } = useMessagingPermission()
 
@@ -51,6 +54,13 @@ const PushNotificationStatusButton = () => {
                 אישור התראות
             </button>
 
+            {status == PromissionStatus.default && (
+                <Alert
+                    message={default_notification_alert}
+                    type="info"
+                    style={{ marginTop: "10px" }}
+                />
+            )}
             {status == PromissionStatus.denied && (
                 <Alert
                     message={
