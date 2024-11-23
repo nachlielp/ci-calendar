@@ -158,6 +158,7 @@ export default function SingleDayEventFormHead({
                                         needConfirm={false}
                                         inputReadOnly
                                         open={false}
+                                        allowClear={false}
                                     />
                                 </Form.Item>
                             }
@@ -193,6 +194,7 @@ export default function SingleDayEventFormHead({
                                         needConfirm={false}
                                         inputReadOnly
                                         open={false}
+                                        allowClear={false}
                                     />
                                 </Form.Item>
                             }

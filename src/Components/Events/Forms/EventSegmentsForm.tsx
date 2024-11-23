@@ -82,6 +82,7 @@ export default function EventSegmentsForm({
                                                     needConfirm={false}
                                                     inputReadOnly
                                                     open={false}
+                                                    allowClear={false}
                                                 />
                                             </Form.Item>
                                         }
@@ -120,6 +121,7 @@ export default function EventSegmentsForm({
                                                     needConfirm={false}
                                                     inputReadOnly
                                                     open={false}
+                                                    allowClear={false}
                                                 />
                                             </Form.Item>
                                         }

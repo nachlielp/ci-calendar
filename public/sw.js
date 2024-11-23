@@ -1,4 +1,4 @@
-const CACHE_NAME = "ci-calendar-cache-v1732403898503"
+const CACHE_NAME = "ci-calendar-cache-v1423423423"
 
 self.addEventListener("install", (event) => {
     console.log("Installing service worker")
