@@ -199,6 +199,10 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
 
                 <hr className="bio-card-hr" />
 
+                <Alert
+                    message="על מנת לאפשר למשמתשים לקבל עדכונים על ארועים חדשים שלכם, צריך שיהיה לכם פרופיל ציבורי"
+                    type="info"
+                />
                 <Form.Item<FieldType>
                     label="הצגת פרופיל"
                     name="show_profile"

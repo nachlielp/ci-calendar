@@ -16,7 +16,6 @@ import AddLinksForm from "./AddLinksForm"
 import AddPricesForm from "./AddPricesForm"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
-import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
 import {
     CITemplateWithoutId,
@@ -46,7 +45,6 @@ export default function SingleDayEventForm({
     isTemplate?: boolean
 }) {
     const [form] = Form.useForm()
-    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const [eventDate, setEventDate] = useState(dayjs())
@@ -131,7 +129,7 @@ export default function SingleDayEventForm({
                 tags: values["event-tags"] || [],
                 teachers: utilService.formatUsersForCIEvent(
                     values["teachers"],
-                    teachers
+                    store.getAppTaggableTeachers
                 ),
             },
         ]
@@ -143,7 +141,7 @@ export default function SingleDayEventForm({
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
                         segment.teachers,
-                        teachers
+                        store.getAppTaggableTeachers
                     ),
                     startTime: baseDate
                         .clone()
@@ -201,7 +199,7 @@ export default function SingleDayEventForm({
                     organisations:
                         utilService.formatUsersForCIEvent(
                             values["event-orgs"],
-                            orgs
+                            store.getAppTaggableOrgs
                         ) || [],
                     cancelled: false,
                 }
@@ -233,7 +231,7 @@ export default function SingleDayEventForm({
                     organisations:
                         utilService.formatUsersForCIEvent(
                             values["event-orgs"],
-                            orgs
+                            store.getAppTaggableOrgs
                         ) || [],
                 }
                 // setSubmitted(true)
@@ -328,12 +326,15 @@ export default function SingleDayEventForm({
                         eventDate={eventDate}
                         endDate={endDate}
                         isEdit={false}
-                        teachers={teachers}
+                        teachers={store.getAppTaggableTeachers}
                         isTemplate={isTemplate}
                         titleText={titleText}
-                        orgs={orgs}
+                        orgs={store.getAppTaggableOrgs}
                     />
-                    <EventSegmentsForm form={form} teachers={teachers} />
+                    <EventSegmentsForm
+                        form={form}
+                        teachers={store.getAppTaggableTeachers}
+                    />
                     <hr className="divider" />
                     <label>
                         <b>קישור</b> (יופיע ככפתור בעמוד האירוע)

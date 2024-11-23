@@ -24,7 +24,6 @@ import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import EventSegmentsForm from "./EventSegmentsForm"
 import { EventAction } from "../../../App"
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
-import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
 import { templateService } from "../../../supabase/templateService"
 import { utilService } from "../../../util/utilService"
 import Alert from "antd/es/alert"
@@ -58,15 +57,12 @@ export default function EditSingleDayEventForm({
     template?: CITemplate
     closeForm: () => void
 }) {
-    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [form] = Form.useForm()
-
-    //TODO move to custom hook
 
     if (!event && !template) return <Loading />
 
@@ -121,7 +117,7 @@ export default function EditSingleDayEventForm({
                 tags: values["event-tags"] || [],
                 teachers: utilService.formatUsersForCIEvent(
                     values["teachers"],
-                    teachers
+                    store.getAppTaggableTeachers
                 ),
             },
         ]
@@ -139,7 +135,7 @@ export default function EditSingleDayEventForm({
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
                         segment.teachers,
-                        teachers
+                        store.getAppTaggableTeachers
                     ),
                     startTime: baseDate
                         .clone()
@@ -195,7 +191,7 @@ export default function EditSingleDayEventForm({
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],
-                        orgs
+                        store.getAppTaggableOrgs
                     ) || [],
             }
             try {
@@ -255,7 +251,7 @@ export default function EditSingleDayEventForm({
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],
-                        orgs
+                        store.getAppTaggableOrgs
                     ) || [],
             }
             console.log(
@@ -321,13 +317,16 @@ export default function EditSingleDayEventForm({
                         eventDate={eventDate}
                         endDate={endDate}
                         isEdit={true}
-                        teachers={teachers}
+                        teachers={store.getAppTaggableTeachers}
                         address={address || ({} as IAddress)}
                         titleText={titleText}
                         isTemplate={isTemplate}
-                        orgs={orgs}
+                        orgs={store.getAppTaggableOrgs}
                     />
-                    <EventSegmentsForm form={form} teachers={teachers} />
+                    <EventSegmentsForm
+                        form={form}
+                        teachers={store.getAppTaggableTeachers}
+                    />
                     <AddLinksForm />
                     <AddPricesForm />
                     {inputErrors && (

@@ -367,3 +367,9 @@ export interface NotificationPayload {
     }
     errors: any | null
 }
+
+export interface TaggableUserOptions {
+    user_id: string
+    bio_name: string
+    user_type: UserType
+}

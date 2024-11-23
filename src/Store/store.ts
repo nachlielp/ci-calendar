@@ -8,6 +8,7 @@ import {
     CIUserData,
     EventPayloadType,
     RequestStatus,
+    TaggableUserOptions,
     UserBio,
     UserNotification,
     UserType,
@@ -20,6 +21,7 @@ import { cieventsService } from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import { notificationService } from "../supabase/notificationService"
 import { requestsService } from "../supabase/requestsService"
+import { SelectOption } from "../util/options"
 
 class Store {
     @observable session: Session | null = null
@@ -27,12 +29,17 @@ class Store {
     @observable notifications: UserNotification[] = []
     @observable templates: CITemplate[] = []
     @observable requests: CIRequest[] = []
-    @observable userBio: UserBio = {} as UserBio
-    @observable ci_events: CIEvent[] = []
-    @observable past_ci_events: CIEvent[] = []
+    @observable bio: UserBio = {} as UserBio
     @observable alerts: CIAlert[] = []
+
+    @observable app_ci_events: CIEvent[] = []
+    @observable app_past_ci_events: CIEvent[] = []
+    @observable app_public_bios: UserBio[] = []
+    @observable app_taggable_teachers: TaggableUserOptions[] = []
     @observable app_users: ManageUserOption[] = []
     @observable app_requests: CIRequest[] = []
+    @observable app_creators: SelectOption[] = []
+
     @observable loading: boolean = true
 
     private subscriptionRef: RealtimeChannel | null = null
@@ -90,12 +97,12 @@ class Store {
 
     @computed
     get getEvents() {
-        return this.ci_events
+        return this.app_ci_events
     }
 
     @computed
     get getSortedEvents() {
-        return this.ci_events
+        return this.app_ci_events
             .slice()
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
@@ -104,7 +111,7 @@ class Store {
 
     @computed
     get getUserEvents() {
-        return this.ci_events
+        return this.app_ci_events
             .filter((e) => e.user_id === this.user.user_id)
             .slice()
             .sort((a, b) =>
@@ -114,7 +121,7 @@ class Store {
 
     @computed
     get getUserPastEvents() {
-        return this.past_ci_events
+        return this.app_past_ci_events
             .slice()
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1
@@ -124,7 +131,7 @@ class Store {
     @computed
     get getCIEventById() {
         return (eventId: string) => {
-            return this.ci_events.find((e) => e.id === eventId)
+            return this.app_ci_events.find((e) => e.id === eventId)
         }
     }
 
@@ -170,7 +177,7 @@ class Store {
 
     @computed
     get getBio() {
-        return this.userBio
+        return this.bio
     }
 
     @computed
@@ -202,6 +209,88 @@ class Store {
         return this.app_requests.filter(
             (r) => r.status === RequestStatus.closed
         )
+    }
+
+    @computed
+    get getAppPublicBios() {
+        return this.app_public_bios
+    }
+
+    @computed
+    get getPublicTeacherBios() {
+        return this.app_public_bios
+            .filter((b) => b.user_type !== UserType.org)
+            .map((b) => ({
+                label: b.bio_name,
+                value: b.user_id,
+            }))
+    }
+
+    @computed
+    get getPublicOrgBios() {
+        return this.app_public_bios
+            .filter((b) => b.user_type === UserType.org)
+            .map((b) => ({
+                label: b.bio_name,
+                value: b.user_id,
+            }))
+    }
+
+    @computed
+    get getAppTaggableTeachers() {
+        const teachers = this.app_taggable_teachers
+            .filter((t) => t.user_type !== UserType.org)
+            .map((t) => ({
+                label: t.bio_name,
+                value: t.user_id,
+            }))
+
+        const selfExists = teachers.some((t) => t.value === this.user.user_id)
+
+        // Add self if not already in list and user is valid
+        if (
+            !selfExists &&
+            this.user?.user_id &&
+            this.user?.user_type !== UserType.org
+        ) {
+            return [
+                {
+                    label: this.bio?.bio_name || this.user.email,
+                    value: this.user.user_id,
+                },
+                ...teachers,
+            ]
+        }
+
+        return teachers
+    }
+
+    @computed
+    get getAppTaggableOrgs() {
+        const orgs = this.app_taggable_teachers
+            .filter((t) => t.user_type === UserType.org)
+            .map((t) => ({
+                label: t.bio_name,
+                value: t.user_id,
+            }))
+
+        const selfExists = orgs.some((o) => o.value === this.user.user_id)
+
+        if (
+            !selfExists &&
+            this.user?.user_id &&
+            this.user?.user_type === UserType.org
+        ) {
+            return [
+                {
+                    label: this.bio?.bio_name || this.user.email,
+                    value: this.user.user_id,
+                },
+                ...orgs,
+            ]
+        }
+
+        return orgs
     }
 
     @action
@@ -347,10 +436,10 @@ class Store {
         this.notifications = userData.notifications
         this.templates = userData.templates
         this.requests = userData.requests
-        this.ci_events = userData.ci_events
-        this.past_ci_events = userData.past_ci_events
+        this.app_ci_events = userData.ci_events
+        this.app_past_ci_events = userData.past_ci_events
         this.alerts = userData.alerts
-        this.userBio = userData.userBio
+        this.bio = userData.userBio
     }
 
     @action
@@ -376,24 +465,24 @@ class Store {
 
     @action
     setCIEvents = (ci_events: CIEvent[]) => {
-        this.ci_events = ci_events
+        this.app_ci_events = ci_events
     }
 
     @action
     setCIEvent = (ci_event: CIEvent, eventType: EventPayloadType) => {
         switch (eventType) {
             case EventPayloadType.UPDATE:
-                this.ci_events = this.ci_events.map((e) =>
+                this.app_ci_events = this.app_ci_events.map((e) =>
                     e.id === ci_event.id ? { ...e, ...ci_event } : e
                 )
                 break
             case EventPayloadType.DELETE:
-                this.ci_events = this.ci_events.filter(
+                this.app_ci_events = this.app_ci_events.filter(
                     (e) => e.id !== ci_event.id
                 )
                 break
             case EventPayloadType.INSERT:
-                this.ci_events = [...this.ci_events, ci_event]
+                this.app_ci_events = [...this.app_ci_events, ci_event]
                 break
         }
     }
@@ -480,10 +569,10 @@ class Store {
     setBio = (bio: UserBio, eventType: EventPayloadType) => {
         switch (eventType) {
             case EventPayloadType.UPDATE:
-                this.userBio = bio
+                this.bio = bio
                 break
             case EventPayloadType.INSERT:
-                this.userBio = bio
+                this.bio = bio
                 break
         }
     }
@@ -529,6 +618,21 @@ class Store {
                 this.app_requests = [...this.app_requests, appRequest]
                 break
         }
+    }
+
+    @action
+    setAppCreators = (appCreators: SelectOption[]) => {
+        this.app_creators = appCreators
+    }
+
+    @action
+    setAppPublicBios = (appPublicBios: UserBio[]) => {
+        this.app_public_bios = appPublicBios
+    }
+
+    @action
+    setAppTaggableTeachers = (appTaggableTeachers: TaggableUserOptions[]) => {
+        this.app_taggable_teachers = appTaggableTeachers
     }
 
     async init() {
@@ -583,9 +687,20 @@ class Store {
                     }
                 }
 
-                if (userData?.user.user_type === UserType.admin) {
+                this.fetchAppPublicBios()
+
+                if (
+                    [UserType.admin, UserType.creator, UserType.org].includes(
+                        this.user.user_type
+                    )
+                ) {
+                    this.fetchAppTaggableTeachers()
+                }
+
+                if (this.user.user_type === UserType.admin) {
                     this.fetchAppUsers()
                     this.fetchAppRequests()
+                    this.fetchAppCreators()
                 }
             }
             this.setupSubscription()
@@ -603,7 +718,6 @@ class Store {
         return notification
     }
 
-    //TODO
     fetchAppUsers = async () => {
         const appUsers = await usersService.getUsers()
         this.setAppUsers(appUsers)
@@ -615,6 +729,21 @@ class Store {
         this.setAppRequests(appRequests)
     }
 
+    fetchAppCreators = async () => {
+        const appCreators = await cieventsService.getCIEventsCreators()
+        this.setAppCreators(appCreators)
+    }
+
+    fetchAppPublicBios = async () => {
+        const appPublicBios = await usersService.getPublicBioList()
+        this.setAppPublicBios(appPublicBios)
+    }
+
+    fetchAppTaggableTeachers = async () => {
+        const appTaggableTeachers = await usersService.getTaggableUsers()
+        this.setAppTaggableTeachers(appTaggableTeachers)
+    }
+
     cleanup = () => {
         if (this.subscriptionRef) {
             this.subscriptionRef.unsubscribe()
@@ -624,7 +753,7 @@ class Store {
             clearInterval(this.pollingRef)
             this.pollingRef = null
         }
-        this.setStore({ ci_events: this.ci_events } as CIUserData)
+        this.setStore({ ci_events: this.app_ci_events } as CIUserData)
     }
 }
 

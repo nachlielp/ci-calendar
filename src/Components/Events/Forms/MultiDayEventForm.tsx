@@ -13,10 +13,7 @@ import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
 import { EventPayloadType, IAddress } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import AddLinksForm from "./AddLinksForm"
-import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList"
-
 import { cieventsService, DBCIEvent } from "../../../supabase/cieventsService"
-
 import Alert from "antd/es/alert"
 import {
     CITemplateWithoutId,
@@ -49,7 +46,6 @@ export default function MultiDayEventForm({
     const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
 
     const [address, setAddress] = useState<IAddress>()
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
@@ -157,12 +153,12 @@ export default function MultiDayEventForm({
                     multi_day_teachers:
                         utilService.formatUsersForCIEvent(
                             values["multi-day-event-teachers"],
-                            teachers
+                            store.getAppTaggableTeachers
                         ) || [],
                     organisations:
                         utilService.formatUsersForCIEvent(
                             values["event-orgs"],
-                            orgs
+                            store.getAppTaggableOrgs
                         ) || [],
                 }
                 // console.log("values: ", values)
@@ -194,12 +190,12 @@ export default function MultiDayEventForm({
                     multi_day_teachers:
                         utilService.formatUsersForCIEvent(
                             values["multi-day-event-teachers"],
-                            teachers
+                            store.getAppTaggableTeachers
                         ) || [],
                     organisations:
                         utilService.formatUsersForCIEvent(
                             values["event-orgs"],
-                            orgs
+                            store.getAppTaggableOrgs
                         ) || [],
                 }
                 // setSubmitted(true)
@@ -286,8 +282,8 @@ export default function MultiDayEventForm({
                         handleDateChange={handleDateChange}
                         isTemplate={isTemplate}
                         address={address}
-                        teachers={teachers}
-                        orgs={orgs}
+                        teachers={store.getAppTaggableTeachers}
+                        orgs={store.getAppTaggableOrgs}
                         titleText="יצירת אירוע - רב יומי"
                     />
                     <hr className="divider" />

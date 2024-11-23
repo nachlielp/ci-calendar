@@ -4,7 +4,6 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
 import FullEventCard from "../Display/FullEventCard"
 import ManageEventActions from "./ManageEventActions"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import { useEventCreatorOptions } from "../../../hooks/useEventCreatorOptions"
 import DoubleBindedSelect from "../../Common/DoubleBindedSelect"
 import { CIEvent } from "../../../util/interfaces"
 import Input from "antd/es/input"
@@ -19,13 +18,11 @@ const ManageEventsList = () => {
     const [selectedEventTitle, setSelectedEventTitle] = useState<string>("")
     const [expandedEventId, setExpandedEventId] = useState<string | null>(null)
 
-    const { ci_events_creatores } = useEventCreatorOptions()
-
     const [filteredEvents, setFilteredEvents] = useState<CIEvent[]>([])
 
     useEffect(() => {
         filterEvents()
-    }, [selectedTeachers, selectedEventTitle, store.ci_events])
+    }, [selectedTeachers, selectedEventTitle, store.app_ci_events])
 
     function filterEvents() {
         let events = store.getSortedEvents
@@ -50,7 +47,7 @@ const ManageEventsList = () => {
                 <h2 className="manage-events-header-title">ניהול אירועים</h2>
                 <div className="filters-container">
                     <DoubleBindedSelect
-                        options={ci_events_creatores}
+                        options={store.app_creators}
                         selectedValues={selectedTeachers}
                         onChange={setSelectedTeachers}
                         placeholder="סינון לפי יוצרים"
@@ -97,7 +94,7 @@ const ManageEventsList = () => {
                                     <label>
                                         <span className="separator">|</span>
                                         {
-                                            ci_events_creatores.find(
+                                            store.app_creators.find(
                                                 (t) => t.value === event.user_id
                                             )?.label
                                         }

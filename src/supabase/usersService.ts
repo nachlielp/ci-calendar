@@ -6,6 +6,7 @@ import {
     DbUserWithoutJoin,
     CIUser,
     CIUserData,
+    TaggableUserOptions,
 } from "../util/interfaces"
 import dayjs from "dayjs"
 
@@ -253,9 +254,7 @@ async function getUsers(): Promise<ManageUserOption[]> {
     }
 }
 
-async function getTaggableUsers(): Promise<
-    { user_id: string; bio_name: string; user_type: UserType }[]
-> {
+async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
     try {
         const { data, error } = await supabase
             .from("public_bio")

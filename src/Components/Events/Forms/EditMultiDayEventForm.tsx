@@ -14,7 +14,6 @@ import AddLinksForm from "./AddLinksForm.tsx"
 import AddPricesForm from "./AddPricesForm.tsx"
 import MultiDayFormHead from "./MultiDayFormHead.tsx"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
-import { useTaggableUsersList } from "../../../hooks/useTaggableUsersList.ts"
 import { EventAction } from "../../../App.tsx"
 import {
     cieventsService,
@@ -39,8 +38,6 @@ export default function EditMultiDayEventForm({
     template?: CITemplate
     closeForm: () => void
 }) {
-    const { teachers, orgs } = useTaggableUsersList({ addSelf: true })
-
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
     const [newDates, setNewDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -123,12 +120,12 @@ export default function EditMultiDayEventForm({
                 multi_day_teachers:
                     utilService.formatUsersForCIEvent(
                         values["multi-day-event-teachers"],
-                        teachers
+                        store.getAppTaggableTeachers
                     ) || [],
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],
-                        orgs
+                        store.getAppTaggableOrgs
                     ) || [],
             }
             console.log("updatedEvent: ", updatedEvent)
@@ -174,14 +171,14 @@ export default function EditMultiDayEventForm({
                 multi_day_teachers:
                     utilService.formatUsersForCIEvent(
                         values["multi-day-event-teachers"],
-                        teachers
+                        store.getAppTaggableTeachers
                     ) || [],
                 name: values["template-name"],
                 user_id: store.user.user_id,
                 organisations:
                     utilService.formatUsersForCIEvent(
                         values["event-orgs"],
-                        orgs
+                        store.getAppTaggableOrgs
                     ) || [],
             }
             try {
@@ -237,8 +234,8 @@ export default function EditMultiDayEventForm({
                         handleDateChange={handleDateChange}
                         address={address || ({} as IAddress)}
                         isTemplate={isTemplate}
-                        teachers={teachers}
-                        orgs={orgs}
+                        teachers={store.getAppTaggableTeachers}
+                        orgs={store.getAppTaggableOrgs}
                         titleText={titleText}
                     />
 

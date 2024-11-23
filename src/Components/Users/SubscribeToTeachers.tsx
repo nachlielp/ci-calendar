@@ -1,51 +1,46 @@
 import { useEffect, useState } from "react"
 import { usersService } from "../../supabase/usersService"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
-import Loading from "../Common/Loading"
-import { usePublicBioList } from "../../hooks/usePublicBioList"
 import AsyncButton from "../Common/AsyncButton"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 
 const SubscribeToTeachers = () => {
-    const { teachers, loading, orgs } = usePublicBioList()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [subscriptionsEqual, setSubscriptionsEqual] = useState(false)
     const [selectedTeachers, setSelectedTeachers] = useState<string[]>([])
     const [selectedOrgs, setSelectedOrgs] = useState<string[]>([])
 
     useEffect(() => {
-        if (loading) return
         setSelectedTeachers(
             store.getUser.subscriptions.teachers?.filter((id) =>
-                teachers.some((t) => t.value === id)
+                store.getPublicTeacherBios.some((t) => t.value === id)
             ) || []
         )
         setSelectedOrgs(
             store.getUser.subscriptions.orgs?.filter((id) =>
-                orgs.some((o) => o.value === id)
+                store.getPublicOrgBios.some((o) => o.value === id)
             ) || []
         )
-    }, [
-        loading,
-        store.getUser.subscriptions.teachers,
-        store.getUser.subscriptions.orgs,
-    ])
+    }, [store.getUser.subscriptions.teachers, store.getUser.subscriptions.orgs])
 
     useEffect(() => {
         setSubscriptionsEqual(isSubscriptionsEqual())
     }, [selectedTeachers, selectedOrgs])
 
-    async function saveFilters() {
+    async function saveSubscriptions() {
         try {
             setIsSubmitting(true)
-            await usersService.updateUser(store.getUserId, {
+            const updatedUser = await usersService.updateUser(store.getUserId, {
                 subscriptions: {
                     teachers: [...selectedTeachers],
                     orgs: [...selectedOrgs],
                 },
             })
-            setSubscriptionsEqual(true)
+            if (updatedUser) {
+                store.setUser(updatedUser)
+                setSubscriptionsEqual(true)
+            }
         } catch (error) {
             console.error(
                 "SubscribeToTeachers.debouncedSaveFilters.error: ",
@@ -68,14 +63,10 @@ const SubscribeToTeachers = () => {
         )
     }
 
-    if (loading) {
-        return <Loading />
-    }
-
     return (
         <div>
             <DoubleBindedSelect
-                options={teachers}
+                options={store.getPublicTeacherBios}
                 selectedValues={selectedTeachers}
                 onChange={(values: string[]) => {
                     const selectedTeachers = values
@@ -85,7 +76,7 @@ const SubscribeToTeachers = () => {
                 className="select-filter"
             />
             <DoubleBindedSelect
-                options={orgs}
+                options={store.getPublicOrgBios}
                 selectedValues={selectedOrgs}
                 onChange={(values: string[]) => {
                     const selectedOrgs = values
@@ -96,7 +87,7 @@ const SubscribeToTeachers = () => {
             />
             <AsyncButton
                 isSubmitting={isSubmitting}
-                callback={saveFilters}
+                callback={saveSubscriptions}
                 disabled={subscriptionsEqual}
             >
                 שמירה
