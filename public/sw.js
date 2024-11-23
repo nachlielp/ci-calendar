@@ -1,4 +1,4 @@
-const CACHE_NAME = "ci-calendar-cache-v7"
+const CACHE_NAME = "ci-calendar-cache-v1732403069503"
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
@@ -113,6 +113,7 @@ self.addEventListener("activate", (e) => {
     e.waitUntil(
         (async () => {
             console.log("[ServiceWorker] - Checking caches")
+            console.log("CACHE_NAME", CACHE_NAME)
 
             const keyList = await caches.keys()
             await Promise.all(
