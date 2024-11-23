@@ -9,9 +9,8 @@ import { utilService } from "../../../util/utilService"
 
 interface IEventsListProps {
     events: CIEvent[]
-    isEvents: boolean
 }
-export default function EventsList({ events, isEvents }: IEventsListProps) {
+export default function EventsList({ events }: IEventsListProps) {
     const { eventId } = useParams<{ eventId: string }>()
     const eventRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
@@ -19,7 +18,7 @@ export default function EventsList({ events, isEvents }: IEventsListProps) {
 
     return (
         <div className="events-list-container">
-            {!isEvents && emptyEventsList()}
+            {!events.length && emptyEventsList()}
             {events
                 .filter((event) =>
                     utilService.isSingleDayEventNotStarted(event)

@@ -36,7 +36,6 @@ async function updateNotification(notification: NotificationDB) {
     }
 }
 async function upsertNotification(notification: NotificationDB) {
-    console.log("notification", notification)
     try {
         const { data, error } = await supabase
             .from("notifications")

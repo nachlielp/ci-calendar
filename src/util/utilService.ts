@@ -49,9 +49,11 @@ export const utilService = {
     getUniqueOwnersList,
     removeDuplicates,
     isSingleDayEventNotStarted,
-    isNotificationStarted,
+    isNotificationNotStarted,
     sleep,
     formatConfig,
+    isEventStarted,
+    formatHebrewDateByStartTime,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -217,7 +219,15 @@ function deepCompareArraysUnordered<T>(arr1: T[], arr2: T[]): boolean {
     const sortedArr2 = [...arr2].sort()
     return sortedArr1.every((value, index) => value === sortedArr2[index])
 }
+
+function formatHebrewDateByStartTime(date: string, startTime: string) {
+    const hebrewDate = dayjs(date)
+        .hour(dayjs(startTime).hour())
+        .minute(dayjs(startTime).minute())
+    return formatHebrewDate(hebrewDate.toISOString())
+}
 function formatHebrewDate(date: string) {
+    if (!date) return " - "
     const hebrewDate = dayjs(date)
     const day = hebrewDate.format("D")
     const month = hebrewDate.format("MM")
@@ -409,7 +419,7 @@ function removeDuplicates(values: string[]) {
 
 function isSingleDayEventNotStarted(event: CIEvent) {
     if (event.is_multi_day) return true
-    return isEventStartedByFirstSegment(
+    return !isEventStartedByFirstSegment(
         event.start_date,
         event.segments[0].startTime
     )
@@ -421,22 +431,31 @@ function isEventStartedByFirstSegment(startDate: string, startTime: string) {
         .hour(dayjs(startTime).hour())
         .minute(dayjs(startTime).minute())
         .tz("Asia/Jerusalem")
-    return eventStartTime.isAfter(now)
+    return eventStartTime.isBefore(now)
 }
+
 function isEventStartedByDay(startDate: string) {
     const now = dayjs().tz("Asia/Jerusalem")
     const eventStartTime = dayjs(startDate)
         .hour(0)
         .minute(0)
         .tz("Asia/Jerusalem")
+    console.log(eventStartTime, now)
     return eventStartTime.isAfter(now)
 }
-function isNotificationStarted(notification: UserNotification) {
+function isEventStarted(event: CIEvent) {
+    if (event.is_multi_day) return isEventStartedByDay(event.start_date)
+    return isEventStartedByFirstSegment(
+        event.start_date,
+        event.segments[0].startTime
+    )
+}
+function isNotificationNotStarted(notification: UserNotification) {
     if (notification.is_multi_day) {
-        return isEventStartedByDay(notification.start_date)
+        return !isEventStartedByDay(notification.start_date)
     } else {
         if (!notification.firstSegment) return false
-        return isEventStartedByFirstSegment(
+        return !isEventStartedByFirstSegment(
             notification.start_date,
             notification.firstSegment.startTime
         )

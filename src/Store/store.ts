@@ -1,4 +1,4 @@
-import { observable, action, makeAutoObservable, computed } from "mobx"
+import { observable, action, makeAutoObservable, computed, toJS } from "mobx"
 import {
     CIAlert,
     CIEvent,
@@ -117,6 +117,13 @@ class Store {
     }
 
     @computed
+    get getCIEventById() {
+        return (eventId: string) => {
+            return this.ci_events.find((e) => e.id === eventId)
+        }
+    }
+
+    @computed
     get getSortedNotifications() {
         return this.notifications
             .slice()
@@ -127,27 +134,24 @@ class Store {
 
     @computed
     get getUserReceiveNotifications() {
-        console.log(
-            "getUserReceiveNotifications",
-            this.user.receive_notifications
-        )
         return this.user.receive_notifications
     }
 
     @computed
     get getNotifications() {
         return this.notifications
-            .filter((n) => utilService.isNotificationStarted(n))
-            .slice()
-            .sort((a, b) =>
-                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
-            )
     }
 
     @computed
     get getNotificationByEventId() {
-        return (eventId: string) =>
-            this.getNotifications.find((n) => n.ci_event_id === eventId)
+        return (eventId: string) => {
+            const notification = this.notifications.find(
+                (n) =>
+                    n.ci_event_id === eventId &&
+                    utilService.isNotificationNotStarted(n)
+            )
+            return notification
+        }
     }
 
     @computed
@@ -390,15 +394,32 @@ class Store {
             case EventPayloadType.INSERT:
                 if (this.notifications.find((n) => n.id === notification.id))
                     return
+
+                this.notifications = [...this.notifications, notification]
+
                 this.fetchNotification(notification.id).then(
                     (fetchedNotification) => {
                         if (fetchedNotification) {
-                            this.notifications = [
-                                ...this.notifications,
-                                fetchedNotification,
-                            ]
+                            this.notifications = this.notifications.map((n) =>
+                                n.id === notification.id
+                                    ? fetchedNotification
+                                    : n
+                            )
                         }
                     }
+                )
+                break
+            case EventPayloadType.UPSERT:
+                if (this.notifications.find((n) => n.id === notification.id)) {
+                    this.notifications = this.notifications.map((n) =>
+                        n.id === notification.id ? { ...n, ...notification } : n
+                    )
+                } else {
+                    this.notifications = [...this.notifications, notification]
+                }
+                console.log(
+                    "notifications after upsert",
+                    toJS(this.notifications)
                 )
                 break
         }

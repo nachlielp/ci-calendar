@@ -17,6 +17,7 @@ import { store } from "../../Store/store"
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
 
+//services both event list and notifications list
 const CIEventNotificationModal = ({
     eventId,
     isMultiDay,
@@ -27,19 +28,16 @@ const CIEventNotificationModal = ({
     const [isOpen, setIsOpen] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [remindInHours, setRemindInHours] = useState<string | null>(null)
-
+    const [isActive, setIsActive] = useState(false)
     useEffect(() => {
-        setRemindInHours(
-            store.getNotificationByEventId(eventId)?.remind_in_hours || "0"
+        const notification = store.getNotifications.find(
+            (n) => n.ci_event_id === eventId
         )
-    }, [store.getNotificationByEventId(eventId)])
-
-    const icon = () => {
-        const notification = store.getNotificationByEventId(eventId)
-        return notification && notification?.remind_in_hours !== "0"
-            ? "notifications_active"
-            : "notifications"
-    }
+        setRemindInHours(notification?.remind_in_hours || "0")
+        setIsActive(
+            notification !== undefined && notification.remind_in_hours !== "0"
+        )
+    }, [store.notifications])
 
     const openModal = () => {
         const notification = store.getNotificationByEventId(eventId)
@@ -61,7 +59,15 @@ const CIEventNotificationModal = ({
             })
 
             if (notification) {
-                store.setNotification(notification, EventPayloadType.UPDATE)
+                const event = store.getCIEventById(eventId)
+                store.setNotification(
+                    {
+                        ...notification,
+                        start_date: event?.start_date,
+                        title: event?.title,
+                    },
+                    EventPayloadType.UPSERT
+                )
             }
         } catch (error) {
             console.error(error)
@@ -76,8 +82,10 @@ const CIEventNotificationModal = ({
             <SecondaryButton
                 label=""
                 successLabel=""
-                icon={icon()}
-                successIcon={icon()}
+                icon={isActive ? "notifications_active" : "notifications"}
+                successIcon={
+                    isActive ? "notifications_active" : "notifications"
+                }
                 callback={openModal}
             />
             <Modal

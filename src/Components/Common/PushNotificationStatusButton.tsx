@@ -28,10 +28,6 @@ const PushNotificationStatusButton = () => {
     const [checked, setChecked] = useState(store.getUserReceiveNotifications)
 
     useEffect(() => {
-        console.log(
-            "store.getUserReceiveNotifications",
-            store.getUserReceiveNotifications
-        )
         if (!utilService.isPWA()) {
             setChecked(store.getUserReceiveNotifications)
             return
@@ -41,7 +37,6 @@ const PushNotificationStatusButton = () => {
             permissionStatus === "granted" &&
             store.getUserReceiveNotifications
         ) {
-            console.log("setting checked to true")
             setChecked(true)
         } else {
             console.log("setting checked to false")
@@ -55,6 +50,7 @@ const PushNotificationStatusButton = () => {
         }
 
         if (checked) {
+            return
             requestPermission().then(() => {
                 if (store.isUser) {
                     usersService.updateUser(store.getUser.user_id, {

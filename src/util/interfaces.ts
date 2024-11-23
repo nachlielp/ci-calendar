@@ -39,6 +39,7 @@ export enum EventPayloadType {
     UPDATE = "UPDATE",
     DELETE = "DELETE",
     INSERT = "INSERT",
+    UPSERT = "UPSERT",
 }
 export interface AppConfig {
     app_title: string

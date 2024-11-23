@@ -46,7 +46,7 @@ const EventsPage = () => {
     const { currentValues: currentFilterValues, removeOption: onRemoveFilter } =
         useParamsFilterHandler()
 
-    const filteredEvents = useEventsFilter({ events, showPast: false })
+    const filteredEvents = useEventsFilter({ events })
 
     const selectedDayEvents = useSelectedDayEvents(filteredEvents, selectedDay)
 
@@ -112,18 +112,10 @@ const EventsPage = () => {
                             events={filteredEvents}
                             onSelect={onSelectDate}
                         />
-                        <EventsList
-                            events={selectedDayEvents}
-                            isEvents={!!selectedDayEvents.length}
-                        />
+                        <EventsList events={selectedDayEvents} />
                     </>
                 )}
-                {isListView && (
-                    <EventsList
-                        events={filteredEvents}
-                        isEvents={!!filteredEvents.length}
-                    />
-                )}
+                {isListView && <EventsList events={filteredEvents} />}
                 {selectedEvent && (
                     <FullEventCardContainer
                         isSelectedEvent={true}

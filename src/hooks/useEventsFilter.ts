@@ -1,21 +1,14 @@
 import { useSearchParams } from "react-router-dom"
 import { CIEvent } from "../util/interfaces"
-import dayjs from "dayjs"
 import { useMemo } from "react"
 import { districtOptions } from "../util/options"
 import { eventOptions } from "../util/options"
 
 interface IUseEventsFilterProps {
     events: CIEvent[]
-    showPast?: boolean
-    uids?: string[]
 }
 
-export const useEventsFilter = ({
-    events,
-    showPast,
-    uids,
-}: IUseEventsFilterProps) => {
+export const useEventsFilter = ({ events }: IUseEventsFilterProps) => {
     const [searchParams] = useSearchParams()
 
     const filteredEvents = useMemo(() => {
@@ -54,13 +47,8 @@ export const useEventsFilter = ({
             return true
         })
 
-        if (showPast) {
-            filtered = filtered.sort((a, b) =>
-                dayjs(b.start_date).diff(dayjs(a.start_date))
-            )
-        }
         return filtered
-    }, [events, showPast, searchParams, uids])
+    }, [events, searchParams])
 
     return filteredEvents
 }

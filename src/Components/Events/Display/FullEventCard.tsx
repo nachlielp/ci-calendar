@@ -9,13 +9,7 @@ import CIEventNotificationModal from "../../Notifications/CIEventNotificationMod
 import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
 
-export default function FullEventCard({
-    event: ci_event,
-    showPast,
-}: {
-    event: CIEvent
-    showPast?: boolean
-}) {
+export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
@@ -237,7 +231,7 @@ export default function FullEventCard({
                 </>
             )}
 
-            {!showPast && (
+            {!utilService.isEventStarted(ci_event) && (
                 <article className="event-card-footer">
                     {utilService.isPWA() && (
                         <CIEventNotificationModal

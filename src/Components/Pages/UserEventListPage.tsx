@@ -121,10 +121,7 @@ const UserEventsListPage = () => {
                             </div>
                             {expandedEventId === event.id && (
                                 <div className="event-expanded">
-                                    <FullEventCard
-                                        event={event}
-                                        showPast={showPast}
-                                    />
+                                    <FullEventCard event={event} />
                                     {!showPast && (
                                         <ManageEventActions event={event} />
                                     )}
