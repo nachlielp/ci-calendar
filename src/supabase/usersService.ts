@@ -21,7 +21,6 @@ export type ManageUserOption = {
 }
 export const usersService = {
     getUsers,
-    getUser,
     getUserData,
     updateUser,
     createUser,
@@ -44,111 +43,6 @@ interface UserWithRole {
     }
 }
 
-//TODO remove
-async function getUser(id: string): Promise<DbUser | null> {
-    try {
-        const { data, error } = await supabase
-            .from("users")
-            .select(
-                `
-            *,
-            notifications!left (
-                id,
-                ci_event_id,
-                remind_in_hours,
-                is_sent,
-                ci_events!inner (
-                    title,
-                    start_date,
-                    segments,
-                    is_multi_day
-                )
-            ),
-            requests!left (
-                *
-            ),
-            templates!left (
-                *
-            ),
-            bio:public_bio!left (
-                *
-            ),
-            ci_events:ci_events!left (
-                *
-            ),
-            alerts:alerts!left (
-                id,
-                ci_event_id,
-                user_id,
-                viewed,
-                ci_events!inner (
-                    title,
-                    start_date,
-                    segments,
-                    address
-                )
-            )
-        `
-            )
-            .eq("user_id", id)
-            .eq("notifications.user_id", id)
-            .eq("notifications.is_sent", false)
-            .eq("requests.user_id", id)
-            .eq("templates.user_id", id)
-            .eq("public_bio.user_id", id)
-            .eq("ci_events.user_id", id)
-            .eq("alerts.user_id", id)
-            .eq("alerts.viewed", false)
-            .single()
-
-        if (error) {
-            if (error.code === "PGRST116") {
-                console.log("No user found with id:", id)
-                return null
-            }
-        }
-
-        const notifications = data?.notifications
-            .map((notification: any) => {
-                const title = notification.ci_events.title
-                const start_date = notification.ci_events.start_date
-
-                const formattedNotification = {
-                    ...notification,
-                    title,
-                    start_date,
-                    firstSegment: notification.ci_events.segments[0],
-                    is_multi_day: notification.ci_events.is_multi_day,
-                }
-                delete formattedNotification.ci_events
-                return formattedNotification
-            })
-            .filter((notification: any) => {
-                if (notification.start_date)
-                    return dayjs(notification.start_date)
-                        .endOf("day")
-                        .isAfter(dayjs())
-                return true
-            })
-
-        const alerts = data?.alerts.map((alert: any) => {
-            const formattedAlert = {
-                ...alert,
-                title: alert.ci_events.title,
-                start_date: alert.ci_events.start_date,
-                firstSegment: alert.ci_events.segments[0],
-                address: alert.ci_events.address.label,
-            }
-            delete formattedAlert.ci_events
-            return formattedAlert
-        })
-
-        return { ...data, notifications, alerts } as unknown as DbUser
-    } catch (error) {
-        console.error("Error in getUser:", error)
-        return null
-    }
-}
 async function getUserData(id: string): Promise<CIUserData | null> {
     try {
         const { data: userData, error: userError } = await supabase

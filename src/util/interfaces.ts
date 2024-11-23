@@ -61,7 +61,6 @@ interface ILink {
     link: string
     title: string
 }
-//TODO preload address and fetch if needed from google api with  id, name, district, lat, lng, address
 export interface IAddress {
     place_id: string
     label: string

@@ -39,14 +39,7 @@ async function getUserRequests(userId: string) {
     return { data, error }
 }
 
-async function getAllRequests({
-    status,
-    name,
-}: // user_name,
-// email,
-// page,
-// pageSize,
-UseRequestsProps) {
+async function getAllRequests({ status, name }: UseRequestsProps) {
     let query = supabase
         .from("requests")
         .select("*")
@@ -60,7 +53,10 @@ UseRequestsProps) {
     }
 
     const { data, error } = await query
-    return { data, error }
+    if (error) {
+        throw error
+    }
+    return data
 }
 
 async function subscribeToAllRequests(

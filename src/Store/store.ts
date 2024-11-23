@@ -7,16 +7,19 @@ import {
     CIUser,
     CIUserData,
     EventPayloadType,
+    RequestStatus,
     UserBio,
     UserNotification,
+    UserType,
 } from "../util/interfaces"
 import { supabase } from "../supabase/client"
-import { usersService } from "../supabase/usersService"
+import { ManageUserOption, usersService } from "../supabase/usersService"
 import { utilService } from "../util/utilService"
 import { RealtimeChannel, Session } from "@supabase/supabase-js"
 import { cieventsService } from "../supabase/cieventsService"
 import dayjs from "dayjs"
 import { notificationService } from "../supabase/notificationService"
+import { requestsService } from "../supabase/requestsService"
 
 class Store {
     @observable session: Session | null = null
@@ -28,6 +31,8 @@ class Store {
     @observable ci_events: CIEvent[] = []
     @observable past_ci_events: CIEvent[] = []
     @observable alerts: CIAlert[] = []
+    @observable app_users: ManageUserOption[] = []
+    @observable app_requests: CIRequest[] = []
     @observable loading: boolean = true
 
     private subscriptionRef: RealtimeChannel | null = null
@@ -470,6 +475,16 @@ class Store {
         }
     }
 
+    @action
+    setAppUsers = (appUsers: ManageUserOption[]) => {
+        this.app_users = appUsers
+    }
+
+    @action
+    setAppRequests = (appRequests: CIRequest[]) => {
+        this.app_requests = appRequests
+    }
+
     async init() {
         console.log("Store init")
         this.setLoading(true)
@@ -521,7 +536,14 @@ class Store {
                         this.setStore(userData)
                     }
                 }
-                this.setLoading(false)
+
+                if (userData?.user.user_type === UserType.admin) {
+                    this.fetchAppUsers()
+                    this.fetchAppRequests({
+                        status: RequestStatus.open,
+                        name: "",
+                    })
+                }
             }
             this.setupSubscription()
         } catch (error) {
@@ -536,6 +558,27 @@ class Store {
             notificationId
         )
         return notification
+    }
+
+    //TODO
+    fetchAppUsers = async () => {
+        const appUsers = await usersService.getUsers()
+        this.setAppUsers(appUsers)
+    }
+
+    //TODO
+    fetchAppRequests = async ({
+        status,
+        name,
+    }: {
+        status: RequestStatus
+        name: string
+    }) => {
+        const appRequests = await requestsService.getAllRequests({
+            status,
+            name,
+        })
+        this.setAppRequests(appRequests)
     }
 
     cleanup = () => {

@@ -3,11 +3,12 @@ import Card from "antd/es/card"
 import Input from "antd/es/input"
 import { useEffect, useState } from "react"
 import { UserType } from "../../util/interfaces"
-import { useUsers } from "../../hooks/useUsers"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import { ManageUserOption } from "../../supabase/usersService"
 import { SelectProps } from "antd/es/select"
 import userRoleService from "../../supabase/userRoleService"
+import { observer } from "mobx-react-lite"
+import { store } from "../../Store/store"
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
@@ -38,23 +39,23 @@ function ManageUsersPage() {
         null
     )
     const [inputValue, setInputValue] = useState<string>("")
-    const { users } = useUsers()
+
     const { width } = useWindowSize()
 
     useEffect(() => {
-        if (users.length > 0) {
+        if (store.app_users.length > 0) {
             setOptions(
-                users.map((user) => ({
+                store.app_users.map((user) => ({
                     value: user.user_id,
                     label: `${user.user_name} - ${user.email}`,
                 }))
             )
         }
-    }, [users])
+    }, [store.app_users])
 
     const handleSearch = (value: string) => {
         setInputValue(value)
-        setOptions(value ? searchResult(value, users) : [])
+        setOptions(value ? searchResult(value, store.app_users) : [])
     }
 
     const handleClear = () => {
@@ -63,7 +64,7 @@ function ManageUsersPage() {
     }
 
     const onSelect = (value: string) => {
-        const user = users.find((user) => user.user_id === value)
+        const user = store.app_users.find((user) => user.user_id === value)
         if (user) {
             setSelectedUser(user)
             setInputValue(user.user_name)
@@ -188,4 +189,4 @@ function ManageUsersPage() {
     )
 }
 
-export default ManageUsersPage
+export default observer(ManageUsersPage)
