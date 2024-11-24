@@ -1,5 +1,5 @@
 import Modal from "antd/es/modal"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import TimeClockValue from "./TimeClockValue"
 import dayjs, { Dayjs } from "dayjs"
 import { FormInstance } from "antd/es/form"
@@ -27,9 +27,14 @@ const FormInputModal = ({
     form,
 }: FormInputModalProps) => {
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState<Dayjs | null>(
-        dayjs(form.getFieldValue(name)) || null
-    )
+    const [value, setValue] = useState<Dayjs | null>(null)
+
+    useEffect(() => {
+        if (open) {
+            const formValue = form.getFieldValue(name)
+            setValue(formValue ? dayjs(formValue) : null)
+        }
+    }, [open, form, name])
 
     const handleClose = () => {
         setOpen(false)
