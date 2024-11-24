@@ -167,7 +167,7 @@ export interface CINotification {
     body: string
     send_at: string
     timezone: string
-    is_sent: boolean
+    sent: boolean
     is_multi_day: boolean
 }
 
@@ -315,6 +315,8 @@ export interface CIRequest {
     viewed_response: boolean
     viewed_by: string[]
     number: number
+    sent: boolean
+    viewed: boolean
 }
 
 export enum RequestType {
@@ -362,7 +364,7 @@ export interface NotificationPayload {
         ci_event_id: string
         created_at: string
         id: string
-        is_sent: boolean
+        sent: boolean
         remind_in_hours: string
         user_id: string
         title?: string

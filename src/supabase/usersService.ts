@@ -46,7 +46,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 id,
                 ci_event_id,
                 remind_in_hours,
-                is_sent,
+                sent,
                 ci_events!inner (
                     title,
                     start_date,
@@ -82,7 +82,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             )
             .eq("user_id", id)
             .eq("notifications.user_id", id)
-            .eq("notifications.is_sent", false)
+            .eq("notifications.sent", false)
             .eq("requests.user_id", id)
             .eq("templates.user_id", id)
             .eq("public_bio.user_id", id)
