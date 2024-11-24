@@ -53,6 +53,7 @@
 @import "./styles/alerts-anchor.css";
 @import "./styles/notification-switch.css";
 @import "./styles/push-notifications-status-button.css";
+@import "./styles/generics/form-inputs.css";
 
 @font-face {
     font-family: "Assistant";

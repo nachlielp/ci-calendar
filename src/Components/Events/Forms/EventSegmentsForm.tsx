@@ -128,32 +128,6 @@ export default function EventSegmentsForm({
                                     />
                                 </Col>
                             </Row>
-
-                            {/* <Row gutter={10} align="middle">
-                                <Col md={24} xs={24}>
-                                    <Form.Item
-                                        name={[name, "event-time"]}
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message: "שדה חובה",
-                                            },
-                                        ]}
-                                        className="full-width"
-                                    >
-                                        <TimePicker.RangePicker
-                                            placeholder={[
-                                                "שעת התחלה",
-                                                "שעת סיום",
-                                            ]}
-                                            minuteStep={5}
-                                            format="HH:mm"
-                                            changeOnScroll
-                                            needConfirm={false}
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row> */}
                             <Row gutter={10} align="middle">
                                 <Col md={24} xs={24}>
                                     <Form.Item
@@ -184,7 +158,7 @@ export default function EventSegmentsForm({
                                     >
                                         <Select
                                             options={tagOptions}
-                                            mode="multiple"
+                                            mode="tags"
                                             placeholder="תגיות"
                                         />
                                     </Form.Item>

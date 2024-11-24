@@ -54,18 +54,31 @@ export default function SingleDayEventFormHead({
                     name="event-title"
                     rules={[{ required: true, message: "שדה חובה" }]}
                 >
-                    <Input placeholder="*כותרת האירוע" />
+                    <Input
+                        placeholder="*כותרת האירוע"
+                        size="large"
+                        className="form-input-large-placeholder"
+                    />
                 </Form.Item>
 
                 <Form.Item name="event-description">
-                    <Input.TextArea rows={6} placeholder="תיאור האירוע" />
+                    <Input.TextArea
+                        rows={6}
+                        placeholder="תיאור האירוע"
+                        className="form-input-large-placeholder"
+                    />
                 </Form.Item>
                 <Form.Item
                     className="form-item"
                     name="district"
                     rules={[{ required: true, message: "שדה חובה" }]}
                 >
-                    <Select options={districtOptions} placeholder="אזור" />
+                    <Select
+                        options={districtOptions}
+                        placeholder="אזור"
+                        className="form-input-large-placeholder"
+                        popupClassName="form-input-large-placeholder"
+                    />
                 </Form.Item>
 
                 <Form.Item
@@ -225,7 +238,7 @@ export default function SingleDayEventFormHead({
                         <Form.Item name="event-tags" className="full-width">
                             <Select
                                 options={tagOptions}
-                                mode="multiple"
+                                mode="tags"
                                 placeholder="תגיות"
                             />
                         </Form.Item>

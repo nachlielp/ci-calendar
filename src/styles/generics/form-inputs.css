@@ -1,0 +1,47 @@
+.form-input-large-placeholder::placeholder {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* For webkit browsers like Chrome/Safari */
+.form-input-large-placeholder::-webkit-input-placeholder {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* For Firefox */
+.form-input-large-placeholder::-moz-placeholder {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.form-input-large-placeholder .ant-select-selection-placeholder {
+    font-size: 20px;
+    font-weight: 700;
+}
+.form-input-large-placeholder .ant-select-selection-item {
+    font-size: 20px;
+    font-weight: 700;
+}
+.form-input-large-placeholder .ant-select-dropdown {
+    font-size: 20px;
+}
+
+.form-input-large-placeholder .ant-select-item {
+    font-size: 20px;
+    padding: 8px 12px; /* Optional: adjust padding for better spacing */
+}
+
+.form-input-large-placeholder .ant-select-item-option-content {
+    font-size: 20px;
+}
+.form-input-large-placeholder .ant-select-selector {
+    display: flex;
+    align-items: center;
+}
+
+.form-input-large-placeholder
+    .ant-select-dropdown
+    .ant-select-item-option-content {
+    font-size: 20px;
+}
