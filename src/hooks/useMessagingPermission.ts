@@ -28,6 +28,7 @@ export default function useMessagingPermission() {
     }
 
     const checkPermissionsAndToken = async () => {
+        console.log("checkPermissionsAndToken")
         try {
             if (!store.isUser) {
                 setPermissionStatus(null)
@@ -59,6 +60,7 @@ export default function useMessagingPermission() {
 }
 
 async function checkAndUpdateToken(user: CIUser) {
+    console.log("checkAndUpdateToken")
     if (!utilService.isPWA()) {
         return
     }
@@ -72,7 +74,7 @@ async function checkAndUpdateToken(user: CIUser) {
         (token) => token.device_id === deviceId
     )?.token
 
-    if (token && token !== existingToken) {
+    if (!existingToken || token !== existingToken) {
         store.updateUser({
             user_id: user.user_id,
             push_notification_tokens: [
