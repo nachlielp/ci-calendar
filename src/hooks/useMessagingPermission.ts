@@ -42,7 +42,13 @@ export default function useMessagingPermission() {
             utilService.setFirstNotificationPermissionRequest(permission)
 
             if (permission === "granted") {
-                await checkAndUpdateToken(store.getUser)
+                try {
+                    await checkAndUpdateToken(store.getUser)
+                } catch (error) {
+                    // Handle FCM token errors gracefully
+                    console.error("FCM token error:", error)
+                    // Continue with the rest of the flow even if token retrieval fails
+                }
             } else {
                 setPermissionStatus(permission)
                 // console.error("Permission not granted for Notification")
@@ -64,29 +70,39 @@ async function checkAndUpdateToken(user: CIUser) {
     if (!utilService.isPWA()) {
         return
     }
-    const token = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
-    })
-
-    const deviceId = utilService.getDeviceId()
-
-    const existingToken = user.push_notification_tokens?.find(
-        (token) => token.device_id === deviceId
-    )?.token
-
-    if (!existingToken || token !== existingToken) {
-        store.updateUser({
-            user_id: user.user_id,
-            push_notification_tokens: [
-                {
-                    device_id: utilService.getDeviceId(),
-                    token,
-                    created_at: new Date().toISOString(),
-                    is_pwa: utilService.isPWA(),
-                    branch: import.meta.env.VITE_BRANCH,
-                },
-            ],
-            receive_notifications: true,
+    try {
+        const token = await getToken(messaging, {
+            vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
         })
+
+        // TODO: remove
+        console.log("token", token)
+
+        const deviceId = utilService.getDeviceId()
+
+        const existingToken = user.push_notification_tokens?.find(
+            (token) => token.device_id === deviceId
+        )?.token
+
+        // TODO: remove
+        console.log("existingToken", existingToken)
+
+        if (!existingToken || token !== existingToken) {
+            store.updateUser({
+                user_id: user.user_id,
+                push_notification_tokens: [
+                    {
+                        device_id: utilService.getDeviceId(),
+                        token,
+                        created_at: new Date().toISOString(),
+                        is_pwa: utilService.isPWA(),
+                        branch: import.meta.env.VITE_BRANCH,
+                    },
+                ],
+                receive_notifications: true,
+            })
+        }
+    } catch (error) {
+        console.error("Error:", error)
     }
 }
