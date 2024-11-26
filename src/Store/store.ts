@@ -343,6 +343,7 @@ class Store {
 
                 const intervalCallback = async () => {
                     await this.fetchEvents()
+                    await this.fetchAppPublicBios()
                     this.callCount++
                     // Clear and set new interval with updated duration
                     if (this.pollingRef) clearInterval(this.pollingRef)
@@ -847,6 +848,7 @@ class Store {
                 // Only fetch and set ci_events, keep other store values empty
                 if (this.pollingRef) clearInterval(this.pollingRef)
                 const ci_events = await cieventsService.getCIEvents()
+                this.fetchAppPublicBios()
                 this.setStore({
                     user: {} as CIUser,
                     notifications: [],
