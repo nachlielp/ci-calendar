@@ -781,7 +781,7 @@ class Store {
     }
 
     @action
-    viewAlert = async (eventId: string) => {
+    viewEventAlert = async (eventId: string) => {
         const alert = this.alerts.find((a) => a.ci_event_id === eventId)
         if (alert && !alert.viewed) {
             const updatedAlert = await alertsService.updateAlert({
@@ -790,6 +790,30 @@ class Store {
             })
             this.setAlert(
                 { ...alert, ...updatedAlert },
+                EventPayloadType.UPDATE
+            )
+        }
+    }
+
+    @action
+    viewRequestAlert = async (requestId: string) => {
+        const alert = this.alerts.find((a) => a.request_id === requestId)
+        const request = this.requests.find((r) => r.id === requestId)
+        if (alert && !alert.viewed && request) {
+            const updatedAlert = await alertsService.updateAlert({
+                id: alert.id,
+                viewed: true,
+            })
+            this.setAlert(
+                { ...alert, ...updatedAlert },
+                EventPayloadType.UPDATE
+            )
+            const updatedRequest = await requestsService.updateRequest({
+                id: requestId,
+                viewed: true,
+            })
+            this.setRequest(
+                { ...request, ...updatedRequest },
                 EventPayloadType.UPDATE
             )
         }
@@ -868,7 +892,6 @@ class Store {
                 const userData = await usersService.getUserData(
                     this.getSession.user.id
                 )
-
                 if (userData) {
                     this.setStore(userData)
                 } else {

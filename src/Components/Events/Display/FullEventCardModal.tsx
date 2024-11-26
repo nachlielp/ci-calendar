@@ -22,7 +22,7 @@ export default function FullEventCardModal({
 
     useEffect(() => {
         if (isModalOpen && store.isUser && event.id) {
-            store.viewAlert(event.id)
+            store.viewEventAlert(event.id)
         }
     }, [isModalOpen])
 

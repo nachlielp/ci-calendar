@@ -17,12 +17,13 @@ const AlertsAnchor = () => {
             const alerts = store.getAlerts
                 .filter((alert) => !alert.viewed)
                 .filter((alert) =>
-                    utilService.validateEventNotification(
-                        alert,
-                        store.getEvents
-                    )
+                    alert.request_id
+                        ? true
+                        : utilService.validateEventNotification(
+                              alert,
+                              store.getEvents
+                          )
                 )
-
             setCount(alerts.length)
 
             // Add a small delay for iOS PWA
@@ -36,9 +37,14 @@ const AlertsAnchor = () => {
 
     if (!store.isUser) return <></>
 
-    const onAlertClick = (alert: CIAlert) => {
+    const onEventClick = (alert: CIAlert) => {
         setIsOpen(false)
         navigate(`/event/${alert.ci_event_id}`)
+    }
+
+    const onRequestClick = (alert: CIAlert) => {
+        setIsOpen(false)
+        navigate(`/request/${alert.request_id}`)
     }
 
     return (
@@ -56,25 +62,26 @@ const AlertsAnchor = () => {
                             {store.getAlerts
                                 .filter((alert) => !alert.viewed)
                                 .filter((alert) =>
-                                    utilService.validateEventNotification(
-                                        alert,
-                                        store.getEvents
-                                    )
+                                    alert.request_id
+                                        ? true
+                                        : utilService.validateEventNotification(
+                                              alert,
+                                              store.getEvents
+                                          )
                                 )
                                 .map((alert) => {
-                                    return (
-                                        <div
+                                    return alert.request_id ? (
+                                        <RequestToast
                                             key={alert.id}
-                                            className="alert-item"
-                                            onClick={() => onAlertClick(alert)}
-                                        >
-                                            <label className="alert-item-title">
-                                                {alert.title}
-                                            </label>
-                                            <label className="alert-item-description">
-                                                {formatAlertDescription(alert)}
-                                            </label>
-                                        </div>
+                                            alert={alert}
+                                            onAlertClick={onRequestClick}
+                                        />
+                                    ) : (
+                                        <EventToast
+                                            key={alert.id}
+                                            alert={alert}
+                                            onAlertClick={onEventClick}
+                                        />
                                     )
                                 })}
                         </article>
@@ -86,6 +93,47 @@ const AlertsAnchor = () => {
 }
 
 export default observer(AlertsAnchor)
+
+const EventToast = ({
+    alert,
+    onAlertClick,
+}: {
+    alert: CIAlert
+    onAlertClick: (alert: CIAlert) => void
+}) => {
+    return (
+        <div
+            key={alert.id}
+            className="alert-item"
+            onClick={() => onAlertClick(alert)}
+        >
+            <label className="alert-item-title">{alert.title}</label>
+            <label className="alert-item-description">
+                {formatAlertDescription(alert)}
+            </label>
+        </div>
+    )
+}
+
+const RequestToast = ({
+    alert,
+    onAlertClick,
+}: {
+    alert: CIAlert
+    onAlertClick: (alert: CIAlert) => void
+}) => {
+    return (
+        <div
+            key={alert.id}
+            className="alert-item"
+            onClick={() => onAlertClick(alert)}
+        >
+            <label className="alert-item-title">
+                תגובה חדשה לפניית תמיכה - ליחצו לפתיחה
+            </label>
+        </div>
+    )
+}
 
 function formatAlertDescription(alert: CIAlert) {
     if (alert.type === NotificationType.response) {

@@ -49,9 +49,9 @@ export default function RequestForm() {
             viewed_response: false,
             viewed_by: [],
             created_at: new Date().toISOString(),
-            request_type: values.requestType as RequestType,
             sent: false,
             viewed: false,
+            to_send: false,
         }
         try {
             setIsSubmitting(true)
@@ -83,7 +83,7 @@ export default function RequestForm() {
                         initialValues={{
                             user_name: user.user_name,
                             email: user.email,
-                            phone: parseInt(user.phone),
+                            phone: user.phone ? parseInt(user.phone) : "",
                         }}
                         style={{ minHeight: "130px" }}
                         onFinishFailed={onFinishFailed}

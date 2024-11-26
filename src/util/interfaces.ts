@@ -303,7 +303,6 @@ export interface CIRequestResponse {
 export interface CIRequest {
     id: string
     created_at: string
-    request_type: string
     user_id: string
     type: RequestType
     status: RequestStatus
@@ -316,6 +315,7 @@ export interface CIRequest {
     viewed_by: string[]
     number: number
     sent: boolean
+    to_send: boolean
     viewed: boolean
 }
 

@@ -69,14 +69,9 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             alerts:alerts!left (
                 id,
                 ci_event_id,
+                request_id,
                 user_id,
-                viewed,
-                ci_events!inner (
-                    title,
-                    start_date,
-                    segments,
-                    address
-                )
+                viewed
             )
         `
             )
@@ -124,12 +119,19 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             })
 
         const alerts = userData.alerts.map((alert: any) => {
-            const formattedAlert = {
+            const event = eventsData.find(
+                (event) => event.id === alert.ci_event_id
+            )
+            const request = userData.requests.find(
+                (request: any) => request.id === alert.request_id
+            )
+            let formattedAlert = {
                 ...alert,
-                title: alert.ci_events.title,
-                start_date: alert.ci_events.start_date,
-                firstSegment: alert.ci_events.segments[0],
-                address: alert.ci_events.address.label,
+                title: event?.title || "",
+                start_date: event?.start_date || "",
+                firstSegment: event?.segments[0] || "",
+                address: event?.address.label || "",
+                type: request?.type || "",
             }
             delete formattedAlert.ci_events
             return formattedAlert
@@ -411,7 +413,6 @@ async function subscribeToUser(
             }
         )
         .subscribe((status) => {
-            console.log(`Subscription status: ${status}`)
             if (status === "SUBSCRIBED") {
                 console.log("Successfully subscribed to changes")
             }

@@ -26,7 +26,7 @@ export default function FullEventCardDrawer({
 
     useEffect(() => {
         if (isModalOpen && store.isUser) {
-            store.viewAlert(event.id)
+            store.viewEventAlert(event.id)
         }
     }, [isModalOpen, event.id, store.isUser])
 
