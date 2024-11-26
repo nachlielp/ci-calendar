@@ -529,6 +529,7 @@ class Store {
                 )
                 break
             case EventPayloadType.INSERT:
+                if (this.app_ci_events.find((e) => e.id === ci_event.id)) return
                 this.app_ci_events = [...this.app_ci_events, ci_event]
                 break
         }
@@ -546,6 +547,10 @@ class Store {
 
     @action
     deleteCIEvent = async (eventId: string) => {
+        await this.updateCIEvent({
+            id: eventId,
+            cancelled: true,
+        })
         const deletedEventId = await cieventsService.deleteCIEvent(eventId)
         this.setCIEvent(
             { id: deletedEventId } as CIEvent,
@@ -621,6 +626,8 @@ class Store {
         if (this.user.user_type === UserType.admin) {
             switch (eventType) {
                 case EventPayloadType.INSERT:
+                    if (this.app_requests.find((r) => r.id === request.id))
+                        return
                     this.app_requests = [...this.app_requests, request]
                     break
                 case EventPayloadType.UPDATE:
@@ -632,6 +639,7 @@ class Store {
         } else {
             switch (eventType) {
                 case EventPayloadType.INSERT:
+                    if (this.requests.find((r) => r.id === request.id)) return
                     this.requests = [...this.requests, request]
                     break
                 case EventPayloadType.UPDATE:
@@ -676,6 +684,7 @@ class Store {
                 )
                 break
             case EventPayloadType.INSERT:
+                if (this.templates.find((t) => t.id === template.id)) return
                 this.templates = [...this.templates, template]
                 break
         }
@@ -722,6 +731,8 @@ class Store {
                 )
                 break
             case EventPayloadType.INSERT:
+                if (this.app_requests.find((r) => r.id === appRequest.id))
+                    return
                 this.app_requests = [...this.app_requests, appRequest]
                 break
         }
