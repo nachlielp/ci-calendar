@@ -43,12 +43,18 @@ async function getAlertById(alertId: string) {
 }
 
 async function updateAlert(alert: Partial<CIAlert>): Promise<CIAlert> {
-    const { data, error } = await supabase
-        .from("alerts")
-        .update(alert)
-        .eq("id", alert.id)
-        .select()
-        .single()
-    if (error) throw error
-    return data
+    try {
+        const { data, error } = await supabase
+            .from("alerts")
+            .update(alert)
+            .eq("id", alert.id)
+            .select()
+            .single()
+        if (error) throw error
+
+        return data
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
 }

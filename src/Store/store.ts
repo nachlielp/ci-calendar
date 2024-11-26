@@ -11,6 +11,7 @@ import {
     EventPayloadType,
     ManageUserOption,
     NotificationDB,
+    NotificationType,
     RequestStatus,
     TaggableUserOptions,
     UserBio,
@@ -404,7 +405,26 @@ class Store {
                 this.setBio(payload.new, payload.eventType)
                 break
             case "alerts":
-                this.setAlert(payload.new, payload.eventType)
+                let alert = payload.new
+                if (
+                    [
+                        NotificationType.reminder,
+                        NotificationType.subscription,
+                    ].includes(payload.new.type)
+                ) {
+                    const event = this.app_ci_events.find(
+                        (e) => e.id === alert.ci_event_id
+                    )
+                    if (!event) {
+                        console.error(`Event not found for alert: ${alert.id}`)
+                        break
+                    }
+                } else {
+                    throw new Error(`Unknown alert type: ${alert.type}`)
+                }
+
+                this.setAlert(alert, payload.eventType)
+
                 break
             case "templates":
                 this.setTemplate(payload.new, payload.eventType)
@@ -744,7 +764,14 @@ class Store {
     viewAlert = async (eventId: string) => {
         const alert = this.alerts.find((a) => a.ci_event_id === eventId)
         if (alert && !alert.viewed) {
-            await alertsService.setAlertViewed(alert.id)
+            const updatedAlert = await alertsService.updateAlert({
+                id: alert.id,
+                viewed: true,
+            })
+            this.setAlert(
+                { ...alert, ...updatedAlert },
+                EventPayloadType.UPDATE
+            )
         }
     }
 
@@ -860,8 +887,7 @@ class Store {
                     this.fetchAppCreators()
                 }
             }
-            //TODO: uncomment
-            // this.setupSubscription()
+            this.setupSubscription()
         } catch (error) {
             console.error("Error fetching user:", error)
         } finally {
