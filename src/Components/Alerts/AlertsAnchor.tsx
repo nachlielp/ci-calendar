@@ -3,8 +3,10 @@ import dayjs from "dayjs"
 import { CIAlert, NotificationType } from "../../util/interfaces"
 import { useNavigate } from "react-router-dom"
 import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
+import { utilService } from "../../util/utilService"
 
-export default function AlertsAnchor() {
+const AlertsAnchor = () => {
     const navigate = useNavigate()
 
     const [isOpen, setIsOpen] = useState(false)
@@ -12,7 +14,14 @@ export default function AlertsAnchor() {
 
     useEffect(() => {
         if (store.isUser) {
-            const alerts = store.getAlerts.filter((alert) => !alert.viewed)
+            const alerts = store.getAlerts
+                .filter((alert) => !alert.viewed)
+                .filter((alert) =>
+                    utilService.validateEventNotification(
+                        alert,
+                        store.getEvents
+                    )
+                )
 
             setCount(alerts.length)
 
@@ -46,6 +55,12 @@ export default function AlertsAnchor() {
                         <article className="alerts-anchor-list">
                             {store.getAlerts
                                 .filter((alert) => !alert.viewed)
+                                .filter((alert) =>
+                                    utilService.validateEventNotification(
+                                        alert,
+                                        store.getEvents
+                                    )
+                                )
                                 .map((alert) => {
                                     return (
                                         <div
@@ -69,6 +84,8 @@ export default function AlertsAnchor() {
         </div>
     )
 }
+
+export default observer(AlertsAnchor)
 
 function formatAlertDescription(alert: CIAlert) {
     if (alert.type === NotificationType.response) {

@@ -743,6 +743,25 @@ class Store {
     setAlert = (alert: CIAlert, eventType: EventPayloadType) => {
         switch (eventType) {
             case EventPayloadType.INSERT:
+                if (
+                    alert.type === NotificationType.subscription ||
+                    alert.type === NotificationType.reminder
+                ) {
+                    const event = this.app_ci_events.find(
+                        (e) => e.id === alert.ci_event_id
+                    )
+                    if (!event) {
+                        console.error(`Event not found for alert: ${alert.id}`)
+                        return
+                    }
+                    alert.title = event.title
+                    alert.start_date = event.start_date
+                    alert.firstSegment = event.segments[0]
+                } else {
+                    throw new Error(
+                        `setAlert - unknown alert type: ${alert.type}`
+                    )
+                }
                 this.alerts = [...this.alerts, alert]
                 break
             case EventPayloadType.UPDATE:
