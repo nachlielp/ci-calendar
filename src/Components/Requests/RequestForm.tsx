@@ -50,6 +50,8 @@ export default function RequestForm() {
             viewed_by: [],
             created_at: new Date().toISOString(),
             request_type: values.requestType as RequestType,
+            sent: false,
+            viewed: false,
         }
         try {
             setIsSubmitting(true)

@@ -1,7 +1,6 @@
-const CACHE_NAME = "ci-calendar-cache-v142232423"
+const CACHE_NAME = "ci-calendar-cache-v1"
 
 self.addEventListener("install", (event) => {
-    console.log("Installing service worker")
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
@@ -34,7 +33,6 @@ self.addEventListener("fetch", (event) => {
         })
     )
 })
-
 self.addEventListener("push", function (event) {
     try {
         let payload

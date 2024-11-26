@@ -53,7 +53,7 @@ const CIEventNotificationModal = ({
                 remind_in_hours: remindInHours,
                 ci_event_id: eventId,
                 user_id: store.getUserId,
-                is_sent: false,
+                sent: false,
                 type: NotificationType.reminder,
             })
         } catch (error) {
