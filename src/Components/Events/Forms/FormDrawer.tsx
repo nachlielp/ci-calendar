@@ -33,7 +33,7 @@ export function FormDrawer({
     return (
         <>
             <div onClick={showDrawer}>{anchorEl}</div>
-            <Drawer onClose={onClose} open={open}>
+            <Drawer onClose={onClose} open={open} bodyStyle={{ padding: 4 }}>
                 {eventType === "create-single-day" && (
                     <SingleDayEventForm
                         closeForm={onClose}
