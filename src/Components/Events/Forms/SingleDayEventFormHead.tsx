@@ -52,7 +52,10 @@ export default function SingleDayEventFormHead({
                     name="event-title"
                     rules={[{ required: true, message: "שדה חובה" }]}
                 >
-                    <Input placeholder="*כותרת האירוע" />
+                    <Input
+                        placeholder="*כותרת האירוע"
+                        style={{ fontSize: "16px" }}
+                    />
                 </Form.Item>
 
                 <Form.Item name="event-description">
