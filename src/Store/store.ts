@@ -584,6 +584,19 @@ class Store {
                 if (this.notifications.find((n) => n.id === notification.id))
                     return
 
+                const event = this.app_ci_events.find(
+                    (e) => e.id === notification.ci_event_id
+                )
+                if (!event) {
+                    console.error(
+                        `Event not found for notification: ${notification.id}`
+                    )
+                    return
+                }
+                notification.title = event.title
+                notification.start_date = event.start_date
+                notification.firstSegment = event.segments[0]
+
                 this.notifications = [...this.notifications, notification]
 
                 this.fetchNotification(notification.id).then(
@@ -618,6 +631,14 @@ class Store {
     upsertNotification = async (notification: NotificationDB) => {
         const updatedNotification =
             await notificationService.upsertNotification(notification)
+        const event = this.app_ci_events.find(
+            (e) => e.id === updatedNotification.ci_event_id
+        )
+        if (event) {
+            updatedNotification.title = event.title
+            updatedNotification.start_date = event.start_date
+            updatedNotification.firstSegment = event.segments[0]
+        }
         this.setNotification(updatedNotification, EventPayloadType.UPSERT)
     }
 
