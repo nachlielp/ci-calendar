@@ -25,7 +25,10 @@ export default function AddLinksForm() {
                                             },
                                         ]}
                                     >
-                                        <Input placeholder="כותרת " />
+                                        <Input
+                                            placeholder="כותרת "
+                                            style={{ fontSize: "16px" }}
+                                        />
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -43,7 +46,10 @@ export default function AddLinksForm() {
                                             { type: "url", warningOnly: true },
                                         ]}
                                     >
-                                        <Input placeholder="קישור" />
+                                        <Input
+                                            placeholder="קישור"
+                                            style={{ fontSize: "16px" }}
+                                        />
                                     </Form.Item>
                                 </Col>
                             </Row>
