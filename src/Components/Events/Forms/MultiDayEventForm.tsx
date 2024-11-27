@@ -226,7 +226,6 @@ export default function MultiDayEventForm({
                                         <Input
                                             placeholder="שם התבנית"
                                             allowClear
-                                            style={{ fontSize: "16px" }}
                                         />
                                     </Form.Item>
                                 </Col>
@@ -253,7 +252,6 @@ export default function MultiDayEventForm({
                                             onChange={handleTemplateChange}
                                             allowClear
                                             placeholder="בחירת תבנית"
-                                            style={{ fontSize: "16px" }}
                                         />
                                     </Form.Item>
                                 </Col>

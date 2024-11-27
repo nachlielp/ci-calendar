@@ -59,22 +59,14 @@ export default function SingleDayEventFormHead({
                 </Form.Item>
 
                 <Form.Item name="event-description">
-                    <Input.TextArea
-                        rows={6}
-                        placeholder="תיאור האירוע"
-                        style={{ fontSize: "16px" }}
-                    />
+                    <Input.TextArea rows={6} placeholder="תיאור האירוע" />
                 </Form.Item>
                 <Form.Item
                     className="form-item"
                     name="district"
                     rules={[{ required: true, message: "שדה חובה" }]}
                 >
-                    <Select
-                        options={districtOptions}
-                        placeholder="אזור"
-                        style={{ fontSize: "16px" }}
-                    />
+                    <Select options={districtOptions} placeholder="אזור" />
                 </Form.Item>
 
                 <Form.Item
@@ -100,7 +92,6 @@ export default function SingleDayEventFormHead({
                             onChange={handleDateChange}
                             allowClear={false}
                             defaultValue={null}
-                            style={{ fontSize: "16px" }}
                         />
                     </Form.Item>
                 )}
@@ -116,7 +107,6 @@ export default function SingleDayEventFormHead({
                                 .indexOf(input.toLowerCase()) >= 0
                         }
                         options={orgs}
-                        style={{ fontSize: "16px" }}
                     />
                 </Form.Item>
             </Card>
@@ -133,7 +123,6 @@ export default function SingleDayEventFormHead({
                             <Select
                                 options={eventOptions}
                                 placeholder="סוג האירוע"
-                                style={{ fontSize: "16px" }}
                             />
                         </Form.Item>
                     </Col>
@@ -152,7 +141,6 @@ export default function SingleDayEventFormHead({
                                 minuteStep={5}
                                 changeOnScroll
                                 needConfirm={false}
-                                style={{ fontSize: "16px" }}
                             />
                         </Form.Item>
                     </Col>
@@ -171,7 +159,6 @@ export default function SingleDayEventFormHead({
                                 }
                                 options={teachers}
                                 allowClear
-                                style={{ fontSize: "16px" }}
                             />
                         </Form.Item>
                     </Col>
@@ -184,7 +171,6 @@ export default function SingleDayEventFormHead({
                                 options={tagOptions}
                                 mode="multiple"
                                 placeholder="תגיות"
-                                style={{ fontSize: "16px" }}
                             />
                         </Form.Item>
                     </Col>

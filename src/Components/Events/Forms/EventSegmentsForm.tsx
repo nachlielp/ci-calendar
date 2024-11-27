@@ -37,7 +37,6 @@ export default function EventSegmentsForm({
                                         <Select
                                             options={eventOptions}
                                             placeholder="סוג האירוע"
-                                            style={{ fontSize: "16px" }}
                                         />
                                     </Form.Item>
                                 </Col>
@@ -64,7 +63,6 @@ export default function EventSegmentsForm({
                                             format="HH:mm"
                                             changeOnScroll
                                             needConfirm={false}
-                                            style={{ fontSize: "16px" }}
                                         />
                                     </Form.Item>
                                 </Col>
@@ -87,7 +85,6 @@ export default function EventSegmentsForm({
                                                     ) >= 0
                                             }
                                             options={teachers}
-                                            style={{ fontSize: "16px" }}
                                         />
                                     </Form.Item>
                                 </Col>
@@ -102,7 +99,6 @@ export default function EventSegmentsForm({
                                             options={tagOptions}
                                             mode="multiple"
                                             placeholder="תגיות"
-                                            style={{ fontSize: "16px" }}
                                         />
                                     </Form.Item>
                                 </Col>

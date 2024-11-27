@@ -278,7 +278,7 @@ export default function EditSingleDayEventForm({
                 >
                     {isTemplate && (
                         <Form.Item name="template-name" label="שם התבנית">
-                            <Input allowClear style={{ fontSize: "16px" }} />
+                            <Input allowClear />
                         </Form.Item>
                     )}
                     <SingleDayEventFormHead
