@@ -3,9 +3,9 @@ import Select from "antd/es/select"
 import Card from "antd/es/card"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
-import TimePicker from "antd/es/time-picker"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
+import FormInputModal from "./TimeInputModal"
 
 interface EventSegmentsFormProps {
     form: any
@@ -42,8 +42,47 @@ export default function EventSegmentsForm({
                                         </Form.Item>
                                     </Col>
                                 </Row>
-
-                                <Row gutter={10} align="middle">
+                                <Row gutter={0} align="middle">
+                                    <Col md={12} xs={12}>
+                                        <FormInputModal
+                                            name={[
+                                                name.toString(),
+                                                "event-start-time",
+                                            ]}
+                                            form={form}
+                                            onClose={(value) => {
+                                                form.setFieldsValue({
+                                                    segments: {
+                                                        [name]: {
+                                                            "event-start-time":
+                                                                value,
+                                                        },
+                                                    },
+                                                })
+                                            }}
+                                        />
+                                    </Col>
+                                    <Col md={12} xs={12}>
+                                        <FormInputModal
+                                            name={[
+                                                name.toString(),
+                                                "event-end-time",
+                                            ]}
+                                            form={form}
+                                            onClose={(value) => {
+                                                form.setFieldsValue({
+                                                    segments: {
+                                                        [name]: {
+                                                            "event-end-time":
+                                                                value,
+                                                        },
+                                                    },
+                                                })
+                                            }}
+                                        />
+                                    </Col>
+                                </Row>
+                                {/* <Row gutter={10} align="middle">
                                     <Col md={24} xs={24}>
                                         <Form.Item
                                             name={[name, "event-time"]}
@@ -67,7 +106,7 @@ export default function EventSegmentsForm({
                                             />
                                         </Form.Item>
                                     </Col>
-                                </Row>
+                                </Row> */}
                                 <Row gutter={10} align="middle">
                                     <Col md={24} xs={24}>
                                         <Form.Item
