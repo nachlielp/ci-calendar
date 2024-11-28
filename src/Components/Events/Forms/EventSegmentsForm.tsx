@@ -45,7 +45,7 @@ export default function EventSegmentsForm({
                                     </Col>
                                 </Row>
                                 <Row gutter={0} align="middle">
-                                    <Col md={12} xs={12}>
+                                    <Col lg={10} md={10} xs={10}>
                                         <TimeInputModal
                                             name={[
                                                 name.toString(),
@@ -65,7 +65,8 @@ export default function EventSegmentsForm({
                                             placeholder="שעת התחלה"
                                         />
                                     </Col>
-                                    <Col md={12} xs={12}>
+                                    <div style={{ marginRight: "1rem" }}></div>
+                                    <Col lg={10} md={10} xs={10}>
                                         <TimeInputModal
                                             name={[
                                                 name.toString(),

@@ -265,8 +265,8 @@ export default function EditSingleDayEventForm({
                 form={form}
                 onFinish={handleSubmit}
                 variant="filled"
-                labelCol={{ span: 6, offset: 0 }}
-                wrapperCol={{ span: 16, offset: 0 }}
+                labelCol={{ span: 24 }} // Labels will take full width
+                wrapperCol={{ span: 24 }}
                 initialValues={currentFormValues}
                 onFinishFailed={onFinishFailed}
             >

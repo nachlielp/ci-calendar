@@ -38,6 +38,7 @@ export default function MultiDayFormHead({
             <Form.Item
                 name="event-title"
                 rules={[{ required: true, message: "שדה חובה" }]}
+                style={{ width: "100%" }}
             >
                 <Input
                     placeholder="כותרת "
@@ -77,14 +78,15 @@ export default function MultiDayFormHead({
             </Form.Item>
             {!isTemplate && (
                 <Row gutter={0} align="middle">
-                    <Col md={12} xs={12}>
+                    <Col lg={10} md={10} xs={10}>
                         <DateInputModal
                             name="event-start-date"
                             form={form}
                             placeholder="תאריך התחלה"
                         />
                     </Col>
-                    <Col md={12} xs={12}>
+                    <div style={{ marginRight: "1rem" }}></div>
+                    <Col lg={10} md={10} xs={10}>
                         <DateInputModal
                             name="event-end-date"
                             form={form}
