@@ -18,7 +18,7 @@ import {
 } from "../../../util/options"
 
 import { IAddress } from "../../../util/interfaces"
-import FormInputModal, { FormInputModalType } from "./FormInputModal"
+import FormInputModal from "./TimeInputModal"
 
 interface SingleDayEventFormHeadProps {
     form: FormInstance
@@ -143,7 +143,6 @@ export default function SingleDayEventFormHead({
                 <Row gutter={0} align="middle">
                     <Col md={12} xs={12}>
                         <FormInputModal
-                            type={FormInputModalType.time}
                             onClose={(value) => {
                                 form.setFieldValue(
                                     "first-segment-start-time",
@@ -152,34 +151,10 @@ export default function SingleDayEventFormHead({
                             }}
                             name="first-segment-start-time"
                             form={form}
-                            anchorEl={
-                                <Form.Item
-                                    name="first-segment-start-time"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: "שדה חובה",
-                                        },
-                                    ]}
-                                    className="full-width"
-                                >
-                                    <TimePicker
-                                        placeholder={"שעת התחלה"}
-                                        minuteStep={5}
-                                        format="HH:mm"
-                                        changeOnScroll
-                                        needConfirm={false}
-                                        inputReadOnly
-                                        open={false}
-                                        allowClear={false}
-                                    />
-                                </Form.Item>
-                            }
                         />
                     </Col>
                     <Col md={12} xs={12}>
                         <FormInputModal
-                            type={FormInputModalType.time}
                             onClose={(value) => {
                                 form.setFieldValue(
                                     "first-segment-end-time",
@@ -188,29 +163,6 @@ export default function SingleDayEventFormHead({
                             }}
                             name="first-segment-end-time"
                             form={form}
-                            anchorEl={
-                                <Form.Item
-                                    name="first-segment-end-time"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: "שדה חובה",
-                                        },
-                                    ]}
-                                    className="full-width"
-                                >
-                                    <TimePicker
-                                        placeholder={"שעת סיום"}
-                                        minuteStep={5}
-                                        format="HH:mm"
-                                        changeOnScroll
-                                        needConfirm={false}
-                                        inputReadOnly
-                                        open={false}
-                                        allowClear={false}
-                                    />
-                                </Form.Item>
-                            }
                         />
                     </Col>
                 </Row>
