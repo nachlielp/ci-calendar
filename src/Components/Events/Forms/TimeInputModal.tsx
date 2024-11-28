@@ -17,12 +17,11 @@ export enum FormInputModalType {
 }
 
 interface FormInputModalProps {
-    onClose: (value: Dayjs | null) => void
     name: string
     form: FormInstance
 }
 
-const FormInputModal = ({ onClose, name, form }: FormInputModalProps) => {
+const FormInputModal = ({ name, form }: FormInputModalProps) => {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<Dayjs | null>(null)
     const [view, setView] = useState<TimeView>("hours")
@@ -36,7 +35,6 @@ const FormInputModal = ({ onClose, name, form }: FormInputModalProps) => {
 
     const handleClose = () => {
         setOpen(false)
-        onClose(value)
         if (value) {
             form.setFieldValue(name, value)
         }

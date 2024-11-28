@@ -5,7 +5,6 @@ import DatePicker from "antd/es/date-picker"
 import Card from "antd/es/card"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
-import TimePicker from "antd/es/time-picker"
 
 import GooglePlacesInput, {
     IGooglePlaceOption,
@@ -143,24 +142,12 @@ export default function SingleDayEventFormHead({
                 <Row gutter={0} align="middle">
                     <Col md={12} xs={12}>
                         <FormInputModal
-                            onClose={(value) => {
-                                form.setFieldValue(
-                                    "first-segment-start-time",
-                                    value
-                                )
-                            }}
                             name="first-segment-start-time"
                             form={form}
                         />
                     </Col>
                     <Col md={12} xs={12}>
                         <FormInputModal
-                            onClose={(value) => {
-                                form.setFieldValue(
-                                    "first-segment-end-time",
-                                    value
-                                )
-                            }}
                             name="first-segment-end-time"
                             form={form}
                         />
