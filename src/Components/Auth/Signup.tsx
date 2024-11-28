@@ -7,6 +7,7 @@ import { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
+import { store } from "../../Store/store"
 
 enum SignupError {
     none = "",
@@ -22,6 +23,10 @@ export default function Signup() {
     const [error, setError] = useState<SignupError>(SignupError.none)
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
+
+    if (store.isUser) {
+        navigate(`/`)
+    }
 
     const onFinish = async () => {
         if (

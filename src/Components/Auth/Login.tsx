@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
 import { LinkButton } from "../Common/LinkButton"
+import { store } from "../../Store/store"
 
 enum LoginError {
     none = "",
@@ -20,6 +21,10 @@ export default function Login() {
     const [error, setError] = useState<LoginError>(LoginError.none)
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
+
+    if (store.isUser) {
+        navigate(`/`)
+    }
 
     const onFinish = async () => {
         try {
