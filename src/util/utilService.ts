@@ -637,8 +637,6 @@ function getDeviceId() {
 }
 
 function isPWA() {
-    //TODO: check if this is correct
-    return true
     return (
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true
