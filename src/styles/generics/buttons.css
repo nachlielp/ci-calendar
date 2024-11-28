@@ -131,6 +131,11 @@
     .loading-spinner {
         animation: spin 1s linear infinite;
     }
+
+    &.large-btn {
+        padding: 9px 24px 10px 24px;
+        font-size: 20px;
+    }
 }
 
 .general-clear-btn {
@@ -142,7 +147,7 @@
     text-align: right;
 
     color: black;
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 5px 16px;
     border: none;
     &:hover {
@@ -153,6 +158,11 @@
     &.loading {
         background-color: rgb(163, 80, 65);
         color: white;
+    }
+
+    &.large-btn {
+        padding: 9px 24px 10px 24px;
+        font-size: 20px;
     }
 }
 
@@ -215,6 +225,11 @@
     }
     .loading-spinner {
         animation: spin 1s linear infinite;
+    }
+
+    &.large-btn {
+        padding: 9px 24px 10px 24px;
+        font-size: 20px;
     }
 }
 

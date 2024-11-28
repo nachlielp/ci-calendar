@@ -1,47 +1,53 @@
-.form-input-large-placeholder::placeholder {
+.form-input-large {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 500;
+}
+.form-input-large::placeholder {
+    font-size: 20px;
+    font-weight: 500;
 }
 
 /* For webkit browsers like Chrome/Safari */
-.form-input-large-placeholder::-webkit-input-placeholder {
+.form-input-large::-webkit-input-placeholder {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 500;
 }
 
 /* For Firefox */
-.form-input-large-placeholder::-moz-placeholder {
+.form-input-large::-moz-placeholder {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 500;
 }
 
-.form-input-large-placeholder .ant-select-selection-placeholder {
+.form-input-large .ant-select-selection-placeholder {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 500;
 }
-.form-input-large-placeholder .ant-select-selection-item {
+.form-input-large .ant-select-selection-item {
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 500;
 }
-.form-input-large-placeholder .ant-select-dropdown {
+.form-input-large .ant-select-dropdown {
     font-size: 20px;
 }
 
-.form-input-large-placeholder .ant-select-item {
+.form-input-large .ant-select-item {
     font-size: 20px;
     padding: 8px 12px; /* Optional: adjust padding for better spacing */
 }
 
-.form-input-large-placeholder .ant-select-item-option-content {
+.form-input-large .ant-select-item-option-content {
     font-size: 20px;
 }
-.form-input-large-placeholder .ant-select-selector {
+.form-input-large .ant-select-selector {
     display: flex;
     align-items: center;
 }
 
-.form-input-large-placeholder
-    .ant-select-dropdown
-    .ant-select-item-option-content {
+.form-input-large .ant-select-dropdown .ant-select-item-option-content {
     font-size: 20px;
+}
+.form-input-large .ant-picker-input {
+    font-size: 20px;
+    font-weight: 500;
 }

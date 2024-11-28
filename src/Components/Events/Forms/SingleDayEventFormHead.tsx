@@ -46,7 +46,7 @@ export default function SingleDayEventFormHead({
         <div className="single-day-event-base-form">
             <Card
                 className="event-card"
-                title={<span className="event-title">{titleText}</span>}
+                title={<span className="segment-title">{titleText}</span>}
             >
                 <Form.Item
                     name="event-title"
@@ -55,7 +55,7 @@ export default function SingleDayEventFormHead({
                     <Input
                         placeholder="*כותרת האירוע"
                         size="large"
-                        className="form-input-large-placeholder"
+                        className="form-input-large"
                     />
                 </Form.Item>
 
@@ -63,7 +63,7 @@ export default function SingleDayEventFormHead({
                     <Input.TextArea
                         rows={6}
                         placeholder="תיאור האירוע"
-                        className="form-input-large-placeholder"
+                        className="form-input-large"
                     />
                 </Form.Item>
                 <Form.Item
@@ -74,8 +74,8 @@ export default function SingleDayEventFormHead({
                     <Select
                         options={districtOptions}
                         placeholder="אזור"
-                        className="form-input-large-placeholder"
-                        popupClassName="form-input-large-placeholder"
+                        className="form-input-large"
+                        popupClassName="form-input-large"
                     />
                 </Form.Item>
 
@@ -101,7 +101,7 @@ export default function SingleDayEventFormHead({
                 <Form.Item name="event-orgs" className="full-width">
                     <Select
                         mode="multiple"
-                        className="full-width"
+                        // className="full-width"
                         placeholder="ארגונים"
                         filterOption={(input, option) =>
                             (option?.label ?? "")
@@ -109,6 +109,8 @@ export default function SingleDayEventFormHead({
                                 .indexOf(input.toLowerCase()) >= 0
                         }
                         options={orgs}
+                        className="form-input-large"
+                        popupClassName="form-input-large"
                     />
                 </Form.Item>
             </Card>
@@ -125,6 +127,8 @@ export default function SingleDayEventFormHead({
                             <Select
                                 options={eventOptions}
                                 placeholder="סוג האירוע"
+                                className="form-input-large"
+                                popupClassName="form-input-large"
                             />
                         </Form.Item>
                     </Col>
@@ -151,7 +155,6 @@ export default function SingleDayEventFormHead({
                         <Form.Item name="teachers" className="full-width">
                             <Select
                                 mode="tags"
-                                className="full-width"
                                 placeholder="מורים - ניתן להוסיף מורים שלא נמצאים ברשימה"
                                 filterOption={(input, option) =>
                                     (option?.label ?? "")
@@ -160,6 +163,8 @@ export default function SingleDayEventFormHead({
                                 }
                                 options={teachers}
                                 allowClear
+                                className="form-input-large"
+                                popupClassName="form-input-large"
                             />
                         </Form.Item>
                     </Col>
@@ -172,6 +177,8 @@ export default function SingleDayEventFormHead({
                                 options={tagOptions}
                                 mode="tags"
                                 placeholder="תגיות"
+                                className="form-input-large"
+                                popupClassName="form-input-large"
                             />
                         </Form.Item>
                     </Col>

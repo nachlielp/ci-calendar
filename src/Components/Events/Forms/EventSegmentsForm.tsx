@@ -38,6 +38,8 @@ export default function EventSegmentsForm({
                                             <Select
                                                 options={eventOptions}
                                                 placeholder="סוג האירוע"
+                                                className="form-input-large"
+                                                popupClassName="form-input-large"
                                             />
                                         </Form.Item>
                                     </Col>
@@ -84,31 +86,7 @@ export default function EventSegmentsForm({
                                         />
                                     </Col>
                                 </Row>
-                                {/* <Row gutter={10} align="middle">
-                                    <Col md={24} xs={24}>
-                                        <Form.Item
-                                            name={[name, "event-time"]}
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "שדה חובה",
-                                                },
-                                            ]}
-                                            className="full-width"
-                                        >
-                                            <TimePicker.RangePicker
-                                                placeholder={[
-                                                    "שעת התחלה",
-                                                    "שעת סיום",
-                                                ]}
-                                                minuteStep={5}
-                                                format="HH:mm"
-                                                changeOnScroll
-                                                needConfirm={false}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row> */}
+
                                 <Row gutter={10} align="middle">
                                     <Col md={24} xs={24}>
                                         <Form.Item
@@ -117,7 +95,6 @@ export default function EventSegmentsForm({
                                         >
                                             <Select
                                                 mode="tags"
-                                                className="full-width"
                                                 placeholder="מורים - ניתן להוסיף מורים שלא נמצאים ברשימה"
                                                 filterOption={(input, option) =>
                                                     (option?.label ?? "")
@@ -127,6 +104,8 @@ export default function EventSegmentsForm({
                                                         ) >= 0
                                                 }
                                                 options={teachers}
+                                                className="form-input-large"
+                                                popupClassName="form-input-large"
                                             />
                                         </Form.Item>
                                     </Col>
@@ -141,6 +120,8 @@ export default function EventSegmentsForm({
                                                 options={tagOptions}
                                                 mode="multiple"
                                                 placeholder="תגיות"
+                                                className="form-input-large"
+                                                popupClassName="form-input-large"
                                             />
                                         </Form.Item>
                                     </Col>

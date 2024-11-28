@@ -1,17 +1,23 @@
 interface AsyncFormSubmitButtonProps {
     isSubmitting: boolean
     children: React.ReactNode
+    size?: "general" | "large"
 }
 
 export default function AsyncFormSubmitButton({
     isSubmitting,
     children,
+    size = "general",
 }: AsyncFormSubmitButtonProps) {
     return (
         <>
             <button
                 type="submit"
-                className="general-action-btn"
+                className={`${
+                    size === "large"
+                        ? "general-action-btn large-btn"
+                        : "general-action-btn"
+                }`}
                 disabled={isSubmitting}
             >
                 {isSubmitting ? (

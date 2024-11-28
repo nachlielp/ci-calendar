@@ -75,6 +75,9 @@ const TimeInputModal = ({
                         inputReadOnly
                         open={false}
                         allowClear={false}
+                        size="large"
+                        className="form-input-large"
+                        popupClassName="form-input-large"
                     />
                 </Form.Item>
             </div>

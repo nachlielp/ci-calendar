@@ -4,6 +4,15 @@
         border-width: 4px;
     }
 
+    .segment-title {
+        font-size: 20px;
+        font-weight: 600;
+    }
+    .segment-description {
+        font-size: 20px;
+        font-weight: 500;
+    }
+
     .event-title {
         display: flex;
         flex-direction: row;

@@ -270,6 +270,8 @@ export default function SingleDayEventForm({
                                         <Input
                                             placeholder="שם התבנית"
                                             allowClear
+                                            size="large"
+                                            className="form-input-large"
                                         />
                                     </Form.Item>
                                 </Col>
@@ -277,7 +279,7 @@ export default function SingleDayEventForm({
                                     <button
                                         type="button"
                                         onClick={() => clearForm()}
-                                        className="general-clear-btn"
+                                        className="general-clear-btn large-btn"
                                     >
                                         ניקוי טופס
                                     </button>
@@ -295,6 +297,9 @@ export default function SingleDayEventForm({
                                             onChange={handleTemplateChange}
                                             allowClear
                                             placeholder="בחירת תבנית"
+                                            size="large"
+                                            className="form-input-large"
+                                            popupClassName="form-input-large"
                                         />
                                     </Form.Item>
                                 </Col>
@@ -302,7 +307,7 @@ export default function SingleDayEventForm({
                                     <button
                                         type="button"
                                         onClick={() => clearForm()}
-                                        className="general-clear-btn"
+                                        className="general-clear-btn large-btn"
                                     >
                                         ניקוי טופס
                                     </button>
@@ -329,14 +334,15 @@ export default function SingleDayEventForm({
                         teachers={store.getAppTaggableTeachers}
                     />
                     <hr className="divider" />
-                    <label>
-                        <b>קישור</b> (יופיע ככפתור בעמוד האירוע)
+                    <label className="segment-title">
+                        קישור{" "}
+                        <span className="segment-description">
+                            (יופיע ככפתור בעמוד האירוע)
+                        </span>
                     </label>
                     <AddLinksForm />
                     <hr className="divider" />
-                    <label>
-                        <b>מחיר</b>
-                    </label>
+                    <label className="segment-title">מחיר</label>
                     <AddPricesForm />
 
                     {inputErrors && (
@@ -355,7 +361,10 @@ export default function SingleDayEventForm({
                             justifyContent: "flex-start",
                         }}
                     >
-                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
+                        <AsyncFormSubmitButton
+                            isSubmitting={isSubmitting}
+                            size="large"
+                        >
                             {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
                         </AsyncFormSubmitButton>
                     </Form.Item>

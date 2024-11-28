@@ -116,6 +116,9 @@ const DateInputModal = ({
                         inputReadOnly
                         defaultValue={null}
                         placeholder={placeholder || ""}
+                        size="large"
+                        className="form-input-large"
+                        popupClassName="form-input-large"
                     />
                 </Form.Item>
             </div>

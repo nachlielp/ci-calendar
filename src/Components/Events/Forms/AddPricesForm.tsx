@@ -27,7 +27,10 @@ export default function AddPricesForm() {
                                                 },
                                             ]}
                                         >
-                                            <Input placeholder="כותרת " />
+                                            <Input
+                                                placeholder="כותרת"
+                                                className="form-input-large"
+                                            />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -48,7 +51,10 @@ export default function AddPricesForm() {
                                                 },
                                             ]}
                                         >
-                                            <InputNumber placeholder="מחיר" />
+                                            <InputNumber
+                                                placeholder="מחיר"
+                                                className="form-input-large"
+                                            />
                                         </Form.Item>
                                     </Col>
                                 </Row>
