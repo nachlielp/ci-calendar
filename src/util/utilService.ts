@@ -63,7 +63,8 @@ function CIEventToFormValues(event: CIEvent) {
         "event-type": segment.type,
         "event-tags": segment.tags,
         teachers: reverseFormatTeachers(segment.teachers),
-        "event-time": [dayjs(segment.startTime), dayjs(segment.endTime)],
+        "event-start-time": dayjs(segment.startTime),
+        "event-end-time": dayjs(segment.endTime),
     }))
     const currentFormValues = {
         created_at: event.created_at,
@@ -81,10 +82,8 @@ function CIEventToFormValues(event: CIEvent) {
         "event-type": event.segments[0]?.type,
         "event-tags": event.segments[0]?.tags,
         teachers: reverseFormatTeachers(event.segments[0]?.teachers),
-        "event-time": [
-            dayjs(event.segments[0]?.startTime),
-            dayjs(event.segments[0]?.endTime),
-        ],
+        "first-segment-start-time": dayjs(event.segments[0]?.startTime),
+        "first-segment-end-time": dayjs(event.segments[0]?.endTime),
         "multi-day-event-teachers": event.multi_day_teachers,
         segments: segments,
         "event-orgs": event.organisations?.map((org) => org.value),

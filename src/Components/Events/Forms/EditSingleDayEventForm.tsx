@@ -1,4 +1,3 @@
-import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import customParseFormat from "dayjs/plugin/customParseFormat"
@@ -103,13 +102,13 @@ export default function EditSingleDayEventForm({
             {
                 startTime: baseDate
                     .clone()
-                    .hour(values["event-time"][0].hour())
-                    .minute(values["event-time"][0].minute())
+                    .hour(values["first-segment-start-time"].hour())
+                    .minute(values["first-segment-start-time"].minute())
                     .toISOString(),
                 endTime: baseDate
                     .clone()
-                    .hour(values["event-time"][1].hour())
-                    .minute(values["event-time"][1].minute())
+                    .hour(values["first-segment-end-time"].hour())
+                    .minute(values["first-segment-end-time"].minute())
                     .toISOString(),
                 type: values["event-type"] || "",
                 tags: values["event-tags"] || [],
@@ -121,12 +120,8 @@ export default function EditSingleDayEventForm({
         ]
         if (values["segments"]) {
             values["segments"].forEach((segment: any) => {
-                const segmentDateString1 = Array.isArray(segment["event-time"])
-                    ? segment["event-time"][0]
-                    : segment["event-time"]
-                const segmentDateString2 = Array.isArray(segment["event-time"])
-                    ? segment["event-time"][1]
-                    : segment["event-time"]
+                const segmentDateString1 = segment["event-start-time"]
+                const segmentDateString2 = segment["event-end-time"]
 
                 segments.push({
                     type: segment["event-type"],
@@ -265,63 +260,65 @@ export default function EditSingleDayEventForm({
 
     return (
         <>
-            <Card className="edit-single-day-event-form">
-                <Form
-                    {...formItemLayout}
-                    form={form}
-                    onFinish={handleSubmit}
-                    variant="filled"
-                    labelCol={{ span: 6, offset: 0 }}
-                    wrapperCol={{ span: 16, offset: 0 }}
-                    initialValues={currentFormValues}
-                    onFinishFailed={onFinishFailed}
-                >
-                    {isTemplate && (
-                        <Form.Item name="template-name" label="שם התבנית">
-                            <Input allowClear />
-                        </Form.Item>
-                    )}
-                    <SingleDayEventFormHead
-                        form={form}
-                        handleAddressSelect={handleAddressSelect}
-                        handleDateChange={handleDateChange}
-                        handleEndDateChange={handleEndDateChange}
-                        eventDate={eventDate}
-                        endDate={endDate}
-                        isEdit={true}
-                        teachers={store.getAppTaggableTeachers}
-                        address={address || ({} as IAddress)}
-                        titleText={titleText}
-                        isTemplate={isTemplate}
-                        orgs={store.getAppTaggableOrgs}
-                    />
-                    <EventSegmentsForm
-                        form={form}
-                        teachers={store.getAppTaggableTeachers}
-                    />
-                    <AddLinksForm />
-                    <AddPricesForm />
-                    {inputErrors && (
-                        <Alert
-                            message="ערכים שגויים, נא לבדוק את הטופס"
-                            type="error"
-                            style={{ margin: "10px 0" }}
-                        />
-                    )}
-                    <Form.Item
-                        wrapperCol={{ span: 24 }}
-                        className="submit-button-container"
-                        style={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                        }}
-                    >
-                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
-                            {submitText}
-                        </AsyncFormSubmitButton>
+            <Form
+                {...formItemLayout}
+                form={form}
+                onFinish={handleSubmit}
+                variant="filled"
+                labelCol={{ span: 6, offset: 0 }}
+                wrapperCol={{ span: 16, offset: 0 }}
+                initialValues={currentFormValues}
+                onFinishFailed={onFinishFailed}
+            >
+                {isTemplate && (
+                    <Form.Item name="template-name" label="שם התבנית">
+                        <Input allowClear />
                     </Form.Item>
-                </Form>
-            </Card>
+                )}
+                <SingleDayEventFormHead
+                    form={form}
+                    handleAddressSelect={handleAddressSelect}
+                    handleDateChange={handleDateChange}
+                    handleEndDateChange={handleEndDateChange}
+                    eventDate={eventDate}
+                    endDate={endDate}
+                    isEdit={true}
+                    teachers={store.getAppTaggableTeachers}
+                    address={address || ({} as IAddress)}
+                    titleText={titleText}
+                    isTemplate={isTemplate}
+                    orgs={store.getAppTaggableOrgs}
+                />
+                <EventSegmentsForm
+                    form={form}
+                    teachers={store.getAppTaggableTeachers}
+                />
+                <AddLinksForm />
+                <AddPricesForm />
+                {inputErrors && (
+                    <Alert
+                        message="ערכים שגויים, נא לבדוק את הטופס"
+                        type="error"
+                        style={{ margin: "10px 0" }}
+                    />
+                )}
+                <Form.Item
+                    wrapperCol={{ span: 24 }}
+                    className="submit-button-container"
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        margin: "20px 0",
+                    }}
+                >
+                    <AsyncFormSubmitButton
+                        isSubmitting={isSubmitting}
+                        size="large"
+                    >
+                        {submitText}
+                    </AsyncFormSubmitButton>
+                </Form.Item>
+            </Form>
             <div className="footer-space"></div>
         </>
     )
