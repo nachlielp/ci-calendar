@@ -11,6 +11,7 @@ import {
     EventPayloadType,
     ManageUserOption,
     NotificationDB,
+    NotificationType,
     RequestStatus,
     TaggableUserOptions,
     UserBio,
@@ -342,6 +343,7 @@ class Store {
 
                 const intervalCallback = async () => {
                     await this.fetchEvents()
+                    await this.fetchAppPublicBios()
                     this.callCount++
                     // Clear and set new interval with updated duration
                     if (this.pollingRef) clearInterval(this.pollingRef)
@@ -404,7 +406,26 @@ class Store {
                 this.setBio(payload.new, payload.eventType)
                 break
             case "alerts":
-                this.setAlert(payload.new, payload.eventType)
+                let alert = payload.new
+                if (
+                    [
+                        NotificationType.reminder,
+                        NotificationType.subscription,
+                    ].includes(payload.new.type)
+                ) {
+                    const event = this.app_ci_events.find(
+                        (e) => e.id === alert.ci_event_id
+                    )
+                    if (!event) {
+                        console.error(`Event not found for alert: ${alert.id}`)
+                        break
+                    }
+                } else {
+                    throw new Error(`Unknown alert type: ${alert.type}`)
+                }
+
+                this.setAlert(alert, payload.eventType)
+
                 break
             case "templates":
                 this.setTemplate(payload.new, payload.eventType)
@@ -508,6 +529,7 @@ class Store {
                 )
                 break
             case EventPayloadType.INSERT:
+                if (this.app_ci_events.find((e) => e.id === ci_event.id)) return
                 this.app_ci_events = [...this.app_ci_events, ci_event]
                 break
         }
@@ -525,6 +547,10 @@ class Store {
 
     @action
     deleteCIEvent = async (eventId: string) => {
+        await this.updateCIEvent({
+            id: eventId,
+            cancelled: true,
+        })
         const deletedEventId = await cieventsService.deleteCIEvent(eventId)
         this.setCIEvent(
             { id: deletedEventId } as CIEvent,
@@ -557,6 +583,19 @@ class Store {
             case EventPayloadType.INSERT:
                 if (this.notifications.find((n) => n.id === notification.id))
                     return
+
+                const event = this.app_ci_events.find(
+                    (e) => e.id === notification.ci_event_id
+                )
+                if (!event) {
+                    console.error(
+                        `Event not found for notification: ${notification.id}`
+                    )
+                    return
+                }
+                notification.title = event.title
+                notification.start_date = event.start_date
+                notification.firstSegment = event.segments[0]
 
                 this.notifications = [...this.notifications, notification]
 
@@ -592,6 +631,14 @@ class Store {
     upsertNotification = async (notification: NotificationDB) => {
         const updatedNotification =
             await notificationService.upsertNotification(notification)
+        const event = this.app_ci_events.find(
+            (e) => e.id === updatedNotification.ci_event_id
+        )
+        if (event) {
+            updatedNotification.title = event.title
+            updatedNotification.start_date = event.start_date
+            updatedNotification.firstSegment = event.segments[0]
+        }
         this.setNotification(updatedNotification, EventPayloadType.UPSERT)
     }
 
@@ -600,6 +647,8 @@ class Store {
         if (this.user.user_type === UserType.admin) {
             switch (eventType) {
                 case EventPayloadType.INSERT:
+                    if (this.app_requests.find((r) => r.id === request.id))
+                        return
                     this.app_requests = [...this.app_requests, request]
                     break
                 case EventPayloadType.UPDATE:
@@ -611,6 +660,7 @@ class Store {
         } else {
             switch (eventType) {
                 case EventPayloadType.INSERT:
+                    if (this.requests.find((r) => r.id === request.id)) return
                     this.requests = [...this.requests, request]
                     break
                 case EventPayloadType.UPDATE:
@@ -655,6 +705,7 @@ class Store {
                 )
                 break
             case EventPayloadType.INSERT:
+                if (this.templates.find((t) => t.id === template.id)) return
                 this.templates = [...this.templates, template]
                 break
         }
@@ -701,6 +752,8 @@ class Store {
                 )
                 break
             case EventPayloadType.INSERT:
+                if (this.app_requests.find((r) => r.id === appRequest.id))
+                    return
                 this.app_requests = [...this.app_requests, appRequest]
                 break
         }
@@ -723,6 +776,25 @@ class Store {
     setAlert = (alert: CIAlert, eventType: EventPayloadType) => {
         switch (eventType) {
             case EventPayloadType.INSERT:
+                if (
+                    alert.type === NotificationType.subscription ||
+                    alert.type === NotificationType.reminder
+                ) {
+                    const event = this.app_ci_events.find(
+                        (e) => e.id === alert.ci_event_id
+                    )
+                    if (!event) {
+                        console.error(`Event not found for alert: ${alert.id}`)
+                        return
+                    }
+                    alert.title = event.title
+                    alert.start_date = event.start_date
+                    alert.firstSegment = event.segments[0]
+                } else {
+                    throw new Error(
+                        `setAlert - unknown alert type: ${alert.type}`
+                    )
+                }
                 this.alerts = [...this.alerts, alert]
                 break
             case EventPayloadType.UPDATE:
@@ -741,10 +813,41 @@ class Store {
     }
 
     @action
-    viewAlert = async (eventId: string) => {
+    viewEventAlert = async (eventId: string) => {
         const alert = this.alerts.find((a) => a.ci_event_id === eventId)
         if (alert && !alert.viewed) {
-            await alertsService.setAlertViewed(alert.id)
+            const updatedAlert = await alertsService.updateAlert({
+                id: alert.id,
+                viewed: true,
+            })
+            this.setAlert(
+                { ...alert, ...updatedAlert },
+                EventPayloadType.UPDATE
+            )
+        }
+    }
+
+    @action
+    viewRequestAlert = async (requestId: string) => {
+        const alert = this.alerts.find((a) => a.request_id === requestId)
+        const request = this.requests.find((r) => r.id === requestId)
+        if (alert && !alert.viewed && request) {
+            const updatedAlert = await alertsService.updateAlert({
+                id: alert.id,
+                viewed: true,
+            })
+            this.setAlert(
+                { ...alert, ...updatedAlert },
+                EventPayloadType.UPDATE
+            )
+            const updatedRequest = await requestsService.updateRequest({
+                id: requestId,
+                viewed: true,
+            })
+            this.setRequest(
+                { ...request, ...updatedRequest },
+                EventPayloadType.UPDATE
+            )
         }
     }
 
@@ -801,6 +904,7 @@ class Store {
                 // Only fetch and set ci_events, keep other store values empty
                 if (this.pollingRef) clearInterval(this.pollingRef)
                 const ci_events = await cieventsService.getCIEvents()
+                this.fetchAppPublicBios()
                 this.setStore({
                     user: {} as CIUser,
                     notifications: [],
@@ -820,7 +924,6 @@ class Store {
                 const userData = await usersService.getUserData(
                     this.getSession.user.id
                 )
-
                 if (userData) {
                     this.setStore(userData)
                 } else {
@@ -860,8 +963,7 @@ class Store {
                     this.fetchAppCreators()
                 }
             }
-            //TODO: uncomment
-            // this.setupSubscription()
+            this.setupSubscription()
         } catch (error) {
             console.error("Error fetching user:", error)
         } finally {

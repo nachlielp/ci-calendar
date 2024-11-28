@@ -21,10 +21,10 @@ export default function FullEventCardModal({
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
 
     useEffect(() => {
-        if (isModalOpen && store.isUser) {
-            store.viewAlert(event.id)
+        if (isModalOpen && store.isUser && event.id) {
+            store.viewEventAlert(event.id)
         }
-    }, [isModalOpen, event.id, store.isUser])
+    }, [isModalOpen])
 
     const showModal = () => {
         setIsModalOpen(true)

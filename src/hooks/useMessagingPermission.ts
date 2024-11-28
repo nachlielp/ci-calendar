@@ -75,17 +75,11 @@ async function checkAndUpdateToken(user: CIUser) {
             vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
         })
 
-        // TODO: remove
-        console.log("token", token)
-
         const deviceId = utilService.getDeviceId()
 
         const existingToken = user.push_notification_tokens?.find(
             (token) => token.device_id === deviceId
         )?.token
-
-        // TODO: remove
-        console.log("existingToken", existingToken)
 
         if (!existingToken || token !== existingToken) {
             store.updateUser({

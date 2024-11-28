@@ -45,7 +45,7 @@ const PushNotificationStatusButton = () => {
         <section
             className={`push-notification-status-button  ${
                 !utilService.isPWA() && "pwa-only"
-            }`}
+            } ${status === PromissionStatus.granted && "granted"}`}
         >
             <button
                 onClick={handleChange}

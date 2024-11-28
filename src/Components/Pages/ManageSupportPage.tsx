@@ -98,7 +98,9 @@ const ManageSupportPage = () => {
                     ...request,
                     status: RequestStatus.closed,
                     responses: newResponseApprovedMessage,
-                    viewed_response: false,
+                    viewed: false,
+                    sent: false,
+                    to_send: true,
                 }
                 await store.updateRequest(newRequest)
                 break
@@ -107,7 +109,9 @@ const ManageSupportPage = () => {
                 await store.updateRequest({
                     id: request.id,
                     responses: request.responses,
-                    viewed_response: false,
+                    viewed: false,
+                    sent: false,
+                    to_send: true,
                 })
                 break
 
@@ -124,7 +128,9 @@ const ManageSupportPage = () => {
                     id: request.id,
                     status: RequestStatus.closed,
                     responses: newDeclineResponseMessage,
-                    viewed_response: false,
+                    viewed: false,
+                    sent: false,
+                    to_send: true,
                 })
                 break
         }

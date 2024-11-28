@@ -8,6 +8,7 @@ import BioModal from "../../Users/BioModal"
 import CIEventNotificationModal from "../../Notifications/CIEventNotificationModal"
 import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
+import { store } from "../../../Store/store"
 
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const segmentLen = ci_event.segments.length
@@ -31,7 +32,7 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                             (orgOption, index, array) => {
                                 const orgId = orgOption.value
 
-                                const org = ci_event.users?.find(
+                                const org = store.getAppPublicBios?.find(
                                     (u) => u.user_id === orgId
                                 )
 
@@ -88,7 +89,7 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                     <Icon icon="person" className="event-icon" />
                     <label className="event-labels">
                         {multiDayTeachersLen.map((teacher, index, array) => {
-                            const isTeacher = ci_event.users?.find(
+                            const isTeacher = store.getAppPublicBios?.find(
                                 (t) => t.user_id === teacher.value
                             )
                             return (
@@ -120,7 +121,7 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                                     {segment.teachers.map(
                                         (teacher, index, array) => {
                                             const isTeacher =
-                                                ci_event.users?.find(
+                                                store.getAppPublicBios?.find(
                                                     (t) =>
                                                         t.user_id ===
                                                         teacher.value

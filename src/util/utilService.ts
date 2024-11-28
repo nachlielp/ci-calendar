@@ -7,6 +7,7 @@ import {
     UserType,
     UserNotification,
     DBCIEvent,
+    CIAlert,
 } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
@@ -54,6 +55,7 @@ export const utilService = {
     formatConfig,
     isEventStarted,
     formatHebrewDateByStartTime,
+    validateEventNotification,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -474,4 +476,12 @@ function formatConfig(config: RawAppConfigRecord[]) {
         app_description:
             config.find((c) => c.title === "app_description")?.data || "",
     }
+}
+
+function validateEventNotification(alert: CIAlert, events: CIEvent[]) {
+    const event = events.find((e) => e.id === alert.ci_event_id)
+    if (!event) {
+        return false
+    }
+    return true
 }
