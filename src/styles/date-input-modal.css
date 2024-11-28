@@ -1,0 +1,33 @@
+.date-input-modal {
+    .calendar-controller {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+
+        .back {
+            transform: rotate(180deg);
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        .next {
+            margin-top: 6px;
+            cursor: pointer;
+        }
+
+        .label {
+            font-size: 16px;
+            font-weight: 600;
+            width: 90px;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+    }
+
+    .ant-picker-cell-selected {
+        background-color: #bc3528;
+        color: #fff;
+    }
+}

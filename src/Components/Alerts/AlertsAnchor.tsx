@@ -1,89 +1,51 @@
-import { useEffect, useState } from "react"
 import dayjs from "dayjs"
 import { CIAlert, NotificationType } from "../../util/interfaces"
 import { useNavigate } from "react-router-dom"
-import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
-import { utilService } from "../../util/utilService"
+import { alertsAnchorViewModal } from "./AlertsAnchorVM"
 
 const AlertsAnchor = () => {
     const navigate = useNavigate()
 
-    const [isOpen, setIsOpen] = useState(false)
-    const [count, setCount] = useState(0)
-
-    useEffect(() => {
-        if (store.isUser) {
-            const alerts = store.getAlerts
-                .filter((alert) => !alert.viewed)
-                .filter((alert) =>
-                    alert.request_id
-                        ? true
-                        : utilService.validateEventNotification(
-                              alert,
-                              store.getEvents
-                          )
-                )
-            setCount(alerts.length)
-
-            // Add a small delay for iOS PWA
-            setTimeout(() => {
-                if (navigator.setAppBadge) {
-                    navigator.setAppBadge(alerts.length)
-                }
-            }, 500)
-        }
-    }, [store.getAlerts])
-
-    if (!store.isUser) return <></>
+    if (!alertsAnchorViewModal.shouldDisplayAlerts) return <></>
 
     const onEventClick = (alert: CIAlert) => {
-        setIsOpen(false)
+        alertsAnchorViewModal.setOpen(false)
         navigate(`/event/${alert.ci_event_id}`)
     }
 
     const onRequestClick = (alert: CIAlert) => {
-        setIsOpen(false)
+        alertsAnchorViewModal.setOpen(false)
         navigate(`/request/${alert.request_id}`)
     }
 
     return (
         <div className="alerts-anchor">
-            {count > 0 && (
+            {alertsAnchorViewModal.alertsCount > 0 && (
                 <>
                     <label
                         className="alerts-anchor-count"
-                        onClick={() => setIsOpen(!isOpen)}
+                        onClick={() => alertsAnchorViewModal.toggleOpen()}
                     >
-                        {count}
+                        {alertsAnchorViewModal.alertsCount}
                     </label>
-                    {isOpen && (
+                    {alertsAnchorViewModal.open && (
                         <article className="alerts-anchor-list">
-                            {store.getAlerts
-                                .filter((alert) => !alert.viewed)
-                                .filter((alert) =>
-                                    alert.request_id
-                                        ? true
-                                        : utilService.validateEventNotification(
-                                              alert,
-                                              store.getEvents
-                                          )
+                            {alertsAnchorViewModal.alerts.map((alert) => {
+                                return alert.request_id ? (
+                                    <RequestToast
+                                        key={alert.id}
+                                        alert={alert}
+                                        onAlertClick={onRequestClick}
+                                    />
+                                ) : (
+                                    <EventToast
+                                        key={alert.id}
+                                        alert={alert}
+                                        onAlertClick={onEventClick}
+                                    />
                                 )
-                                .map((alert) => {
-                                    return alert.request_id ? (
-                                        <RequestToast
-                                            key={alert.id}
-                                            alert={alert}
-                                            onAlertClick={onRequestClick}
-                                        />
-                                    ) : (
-                                        <EventToast
-                                            key={alert.id}
-                                            alert={alert}
-                                            onAlertClick={onEventClick}
-                                        />
-                                    )
-                                })}
+                            })}
                         </article>
                     )}
                 </>
