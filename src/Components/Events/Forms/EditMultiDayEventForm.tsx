@@ -168,8 +168,10 @@ export default function EditMultiDayEventForm({
 
     const onFinishFailed = () => {
         setInputErrors(true)
+        setTimeout(() => {
+            setInputErrors(false)
+        }, 3000)
     }
-
     const submitText = isTemplate
         ? "עדכון תבנית"
         : editType === EventAction.recycle

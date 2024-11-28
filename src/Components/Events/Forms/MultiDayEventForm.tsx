@@ -198,6 +198,9 @@ export default function MultiDayEventForm({
 
     const onFinishFailed = () => {
         setInputErrors(true)
+        setTimeout(() => {
+            setInputErrors(false)
+        }, 3000)
     }
 
     return (
