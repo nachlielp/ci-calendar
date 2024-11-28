@@ -9,14 +9,14 @@ import TimePicker from "antd/es/time-picker"
 
 type TimeView = "hours" | "minutes"
 
-export enum FormInputModalType {
+export enum TimeInputModalType {
     date = "date",
     time = "time",
     timeRange = "timeRange",
     text = "text",
 }
 
-interface FormInputModalProps {
+interface TimeInputModalProps {
     name: string | string[]
     form: FormInstance
     onClose?: (value: Dayjs | null) => void
@@ -24,12 +24,12 @@ interface FormInputModalProps {
 }
 
 //Notice, when name is an array, pass onClose as a function that takes the value and sets the form field value
-const FormInputModal = ({
+const TimeInputModal = ({
     name,
     form,
     onClose,
     placeholder,
-}: FormInputModalProps) => {
+}: TimeInputModalProps) => {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<Dayjs | null>(null)
     const [view, setView] = useState<TimeView>("hours")
@@ -113,4 +113,4 @@ const FormInputModal = ({
     )
 }
 
-export default FormInputModal
+export default TimeInputModal

@@ -5,7 +5,7 @@ import Row from "antd/es/row"
 import Col from "antd/es/col"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
-import FormInputModal from "./TimeInputModal"
+import TimeInputModal from "./TimeInputModal"
 
 interface EventSegmentsFormProps {
     form: any
@@ -44,7 +44,7 @@ export default function EventSegmentsForm({
                                 </Row>
                                 <Row gutter={0} align="middle">
                                     <Col md={12} xs={12}>
-                                        <FormInputModal
+                                        <TimeInputModal
                                             name={[
                                                 name.toString(),
                                                 "event-start-time",
@@ -64,7 +64,7 @@ export default function EventSegmentsForm({
                                         />
                                     </Col>
                                     <Col md={12} xs={12}>
-                                        <FormInputModal
+                                        <TimeInputModal
                                             name={[
                                                 name.toString(),
                                                 "event-end-time",
