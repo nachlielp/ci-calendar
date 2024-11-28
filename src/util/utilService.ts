@@ -8,6 +8,7 @@ import {
     UserNotification,
     DBCIEvent,
     CIAlert,
+    IAddress,
 } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
@@ -19,8 +20,12 @@ import {
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
+import customParseFormat from "dayjs/plugin/customParseFormat"
 dayjs.extend(utc)
 dayjs.extend(timezone)
+dayjs.extend(customParseFormat)
+dayjs.tz.setDefault("Asia/Jerusalem")
+import { store } from "../Store/store"
 
 export const utilService = {
     createDbUserFromUser,
@@ -56,6 +61,10 @@ export const utilService = {
     isEventStarted,
     formatHebrewDateByStartTime,
     validateEventNotification,
+    formatFormValuesToCreateCIEvent,
+    formatFormValuesToCreateCITemplate,
+    formatFormValuesToEditCIEvent,
+    formatFormValuesToEditCITemplate,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -164,6 +173,340 @@ function multiDayTemplateToFormValues(template: CITemplate) {
         )?.label,
     }
     return { currentFormValues, address: template.address }
+}
+
+function formatFormValuesToCreateCIEvent(
+    values: any,
+    address: IAddress,
+    is_multi_day: boolean
+): Omit<DBCIEvent, "id"> {
+    let segments: any[] = []
+    if (!is_multi_day) {
+        segments = [
+            {
+                startTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-start-time"].hour())
+                    .minute(values["first-segment-start-time"].minute())
+                    .toISOString(),
+                endTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-end-time"].hour())
+                    .minute(values["first-segment-end-time"].minute())
+                    .toISOString(),
+                type: values["event-type"] || "",
+                tags: values["event-tags"] || [],
+                teachers: formatUsersForCIEvent(
+                    values["teachers"],
+                    store.getAppTaggableTeachers
+                ),
+            },
+        ]
+
+        if (values["segments"]) {
+            values["segments"].forEach((segment: any) => {
+                const segmentDateString1 = segment["event-start-time"]
+                const segmentDateString2 = segment["event-end-time"]
+
+                segments.push({
+                    type: segment["event-type"],
+                    tags: segment["event-tags"] || [],
+                    teachers: utilService.formatUsersForCIEvent(
+                        segment.teachers,
+                        store.getAppTaggableTeachers
+                    ),
+                    startTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString1.hour())
+                        .minute(segmentDateString1.minute())
+                        .toISOString(),
+                    endTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString2.hour())
+                        .minute(segmentDateString2.minute())
+                        .toISOString(),
+                })
+            })
+        }
+    }
+
+    return {
+        created_at: dayjs().toISOString(),
+        type: values["main-event-type"]?.value || "",
+        hide: false,
+        owners: [],
+        is_multi_day: is_multi_day,
+        user_id: store.user.user_id,
+        source_template_id: values["template-description"],
+        is_notified: false,
+        cancelled: false,
+        start_date: dayjs(values["event-start-date"])
+            .tz("Asia/Jerusalem")
+            .hour(13)
+            .minute(0)
+            .second(0)
+            .format("YYYY-MM-DDTHH:mm:ss"),
+        end_date: is_multi_day
+            ? dayjs(values["event-end-date"])
+                  .tz("Asia/Jerusalem")
+                  .hour(13)
+                  .minute(0)
+                  .second(0)
+                  .format("YYYY-MM-DDTHH:mm:ss")
+            : dayjs(values["event-start-date"])
+                  .tz("Asia/Jerusalem")
+                  .hour(13)
+                  .minute(0)
+                  .second(0)
+                  .format("YYYY-MM-DDTHH:mm:ss"),
+        address: address as IAddress,
+        updated_at: dayjs().toISOString(),
+        title: values["event-title"],
+        description: values["event-description"] || "",
+        links: values["links"] || [],
+        price: values["prices"] || [],
+        district: values["district"],
+        multi_day_teachers:
+            formatUsersForCIEvent(
+                values["multi-day-event-teachers"],
+                store.getAppTaggableTeachers
+            ) || [],
+        organisations:
+            formatUsersForCIEvent(
+                values["event-orgs"],
+                store.getAppTaggableOrgs
+            ) || [],
+        segments: segments,
+    }
+}
+
+function formatFormValuesToEditCIEvent(
+    values: any,
+    address: IAddress,
+    is_multi_day: boolean
+): Partial<DBCIEvent> {
+    let segments: any[] = []
+    if (!is_multi_day) {
+        segments = [
+            {
+                startTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-start-time"].hour())
+                    .minute(values["first-segment-start-time"].minute())
+                    .toISOString(),
+                endTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-end-time"].hour())
+                    .minute(values["first-segment-end-time"].minute())
+                    .toISOString(),
+                type: values["event-type"] || "",
+                tags: values["event-tags"] || [],
+                teachers: formatUsersForCIEvent(
+                    values["teachers"],
+                    store.getAppTaggableTeachers
+                ),
+            },
+        ]
+
+        if (values["segments"]) {
+            values["segments"].forEach((segment: any) => {
+                const segmentDateString1 = segment["event-start-time"]
+                const segmentDateString2 = segment["event-end-time"]
+
+                segments.push({
+                    type: segment["event-type"],
+                    tags: segment["event-tags"] || [],
+                    teachers: utilService.formatUsersForCIEvent(
+                        segment.teachers,
+                        store.getAppTaggableTeachers
+                    ),
+                    startTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString1.hour())
+                        .minute(segmentDateString1.minute())
+                        .toISOString(),
+                    endTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString2.hour())
+                        .minute(segmentDateString2.minute())
+                        .toISOString(),
+                })
+            })
+        }
+    }
+    return {
+        start_date: dayjs(values["event-start-date"])
+            .hour(13)
+            .minute(0)
+            .second(0)
+            .format("YYYY-MM-DDTHH:mm:ss"),
+        end_date: dayjs(values["event-end-date"])
+            .hour(13)
+            .minute(0)
+            .second(0)
+            .format("YYYY-MM-DDTHH:mm:ss"),
+        address: address as IAddress,
+        updated_at: dayjs().toISOString(),
+        title: values["event-title"],
+        description: values["event-description"] || "",
+        links: values["links"] || [],
+        price: values["prices"] || [],
+        district: values["district"],
+        multi_day_teachers:
+            formatUsersForCIEvent(
+                values["multi-day-event-teachers"],
+                store.getAppTaggableTeachers
+            ) || [],
+        organisations:
+            formatUsersForCIEvent(
+                values["event-orgs"],
+                store.getAppTaggableOrgs
+            ) || [],
+        segments: segments,
+    }
+}
+
+function formatFormValuesToCreateCITemplate(
+    values: any,
+    address: IAddress,
+    is_multi_day: boolean
+): Omit<CITemplate, "id"> {
+    let segments: any[] = []
+    if (!is_multi_day) {
+        segments = [
+            {
+                startTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-start-time"].hour())
+                    .minute(values["first-segment-start-time"].minute())
+                    .toISOString(),
+                endTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-end-time"].hour())
+                    .minute(values["first-segment-end-time"].minute())
+                    .toISOString(),
+                type: values["event-type"] || "",
+                tags: values["event-tags"] || [],
+                teachers: formatUsersForCIEvent(
+                    values["teachers"],
+                    store.getAppTaggableTeachers
+                ),
+            },
+        ]
+
+        if (values["segments"]) {
+            values["segments"].forEach((segment: any) => {
+                const segmentDateString1 = segment["event-start-time"]
+                const segmentDateString2 = segment["event-end-time"]
+
+                segments.push({
+                    type: segment["event-type"],
+                    tags: segment["event-tags"] || [],
+                    teachers: utilService.formatUsersForCIEvent(
+                        segment.teachers,
+                        store.getAppTaggableTeachers
+                    ),
+                    startTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString1.hour())
+                        .minute(segmentDateString1.minute())
+                        .toISOString(),
+                    endTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString2.hour())
+                        .minute(segmentDateString2.minute())
+                        .toISOString(),
+                })
+            })
+        }
+    }
+    return {
+        created_at: dayjs().toISOString(),
+        type: values["main-event-type"]?.value || "",
+        owners: [],
+        is_multi_day: is_multi_day,
+        user_id: store.user.user_id,
+        address: address as IAddress,
+        updated_at: dayjs().toISOString(),
+        title: values["event-title"],
+        description: values["event-description"] || "",
+        links: values["links"] || [],
+        price: values["prices"] || [],
+        district: values["district"],
+        multi_day_teachers:
+            formatUsersForCIEvent(
+                values["multi-day-event-teachers"],
+                store.getAppTaggableTeachers
+            ) || [],
+        name: values["template-name"],
+        organisations:
+            formatUsersForCIEvent(
+                values["event-orgs"],
+                store.getAppTaggableOrgs
+            ) || [],
+        segments: segments,
+    }
+}
+function formatFormValuesToEditCITemplate(
+    values: any,
+    address: IAddress,
+    is_multi_day: boolean
+): Partial<CITemplate> {
+    let segments: any[] = []
+    if (!is_multi_day) {
+        segments = [
+            {
+                startTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-start-time"].hour())
+                    .minute(values["first-segment-start-time"].minute())
+                    .toISOString(),
+                endTime: dayjs(values["event-end-date"])
+                    .hour(values["first-segment-end-time"].hour())
+                    .minute(values["first-segment-end-time"].minute())
+                    .toISOString(),
+                type: values["event-type"] || "",
+                tags: values["event-tags"] || [],
+                teachers: formatUsersForCIEvent(
+                    values["teachers"],
+                    store.getAppTaggableTeachers
+                ),
+            },
+        ]
+
+        if (values["segments"]) {
+            values["segments"].forEach((segment: any) => {
+                const segmentDateString1 = segment["event-start-time"]
+                const segmentDateString2 = segment["event-end-time"]
+
+                segments.push({
+                    type: segment["event-type"],
+                    tags: segment["event-tags"] || [],
+                    teachers: utilService.formatUsersForCIEvent(
+                        segment.teachers,
+                        store.getAppTaggableTeachers
+                    ),
+                    startTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString1.hour())
+                        .minute(segmentDateString1.minute())
+                        .toISOString(),
+                    endTime: dayjs(values["event-end-date"])
+                        .hour(segmentDateString2.hour())
+                        .minute(segmentDateString2.minute())
+                        .toISOString(),
+                })
+            })
+        }
+    }
+    return {
+        type: values["main-event-type"]?.value || "",
+        address: address as IAddress,
+        updated_at: dayjs().toISOString(),
+        title: values["event-title"],
+        description: values["event-description"] || "",
+        links: values["links"] || [],
+        price: values["prices"] || [],
+        district: values["district"],
+        multi_day_teachers:
+            formatUsersForCIEvent(
+                values["multi-day-event-teachers"],
+                store.getAppTaggableTeachers
+            ) || [],
+        name: values["template-name"],
+        organisations:
+            formatUsersForCIEvent(
+                values["event-orgs"],
+                store.getAppTaggableOrgs
+            ) || [],
+        segments: segments,
+    }
 }
 
 function createDbUserFromUser(user: User): DbUserWithoutJoin {

@@ -1,7 +1,6 @@
 import { useState } from "react"
 import Modal from "antd/es/modal"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
-import { EventAction } from "../../../App"
 import SingleDayEventForm from "./SingleDayEventForm"
 import MultiDayEventForm from "./MultiDayEventForm"
 import EditSingleDayEventForm from "./EditSingleDayEventForm"
@@ -57,7 +56,6 @@ export default function FormModal({
                 )}
                 {eventType === "edit-single-day" && (
                     <EditSingleDayEventForm
-                        editType={EventAction.edit}
                         isTemplate={isTemplate}
                         event={event}
                         template={template}
@@ -66,7 +64,6 @@ export default function FormModal({
                 )}
                 {eventType === "edit-multi-day" && (
                     <EditMultiDayEventForm
-                        editType={EventAction.edit}
                         isTemplate={isTemplate}
                         event={event}
                         template={template}

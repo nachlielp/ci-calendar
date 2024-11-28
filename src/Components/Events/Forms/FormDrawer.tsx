@@ -3,7 +3,6 @@ import Drawer from "antd/es/drawer"
 import SingleDayEventForm from "./SingleDayEventForm"
 import MultiDayEventForm from "./MultiDayEventForm"
 import EditSingleDayEventForm from "./EditSingleDayEventForm"
-import { EventAction } from "../../../App"
 import EditMultiDayEventForm from "./EditMultiDayEventForm"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
 
@@ -48,7 +47,6 @@ export function FormDrawer({
                 )}
                 {eventType === "edit-single-day" && (
                     <EditSingleDayEventForm
-                        editType={EventAction.edit}
                         isTemplate={isTemplate}
                         event={event}
                         template={template}
@@ -57,7 +55,6 @@ export function FormDrawer({
                 )}
                 {eventType === "edit-multi-day" && (
                     <EditMultiDayEventForm
-                        editType={EventAction.edit}
                         isTemplate={isTemplate}
                         event={event}
                         template={template}

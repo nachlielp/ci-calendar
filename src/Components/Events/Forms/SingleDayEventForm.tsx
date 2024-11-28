@@ -3,24 +3,19 @@ import Input from "antd/es/input"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
 import Select from "antd/es/select"
-
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { SelectOption, tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
-
 import { useEffect, useState } from "react"
-import AddLinksForm from "./AddLinksForm"
-import AddPricesForm from "./AddPricesForm"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { utilService } from "../../../util/utilService"
-import Alert from "antd/es/alert"
-import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import { store } from "../../../Store/store"
+import EventFromFooter from "./EventFromFooter"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -47,9 +42,6 @@ export default function SingleDayEventForm({
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
     const [address, setAddress] = useState<IAddress | undefined>()
-    const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
-        null
-    )
 
     useEffect(() => {
         setTemplateOptions(
@@ -86,8 +78,6 @@ export default function SingleDayEventForm({
 
     const clearForm = () => {
         form.resetFields()
-        // setSubmitted(false)
-        setSourceTemplateId(null)
         handleAddressSelect(null)
     }
 
@@ -98,137 +88,32 @@ export default function SingleDayEventForm({
                 utilService.singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
-            setSourceTemplateId(template.id)
-        } else {
-            setSourceTemplateId(null)
         }
     }
 
     const handleSubmit = async (values: any) => {
-        setIsSubmitting(true)
-        const baseDate = dayjs(values["event-date"]) // Clone the base date for consistent date manipulation
-
-        const segmentsArray = [
-            {
-                startTime: baseDate
-                    .clone()
-                    .hour(values["first-segment-start-time"].hour())
-                    .minute(values["first-segment-start-time"].minute())
-                    .toISOString(),
-                endTime: baseDate
-                    .clone()
-                    .hour(values["first-segment-end-time"].hour())
-                    .minute(values["first-segment-end-time"].minute())
-                    .toISOString(),
-                type: values["event-type"],
-                tags: values["event-tags"] || [],
-                teachers: utilService.formatUsersForCIEvent(
-                    values["teachers"],
-                    store.getAppTaggableTeachers
-                ),
-            },
-        ]
-
-        if (values["segments"]) {
-            values["segments"].forEach((segment: any) => {
-                segmentsArray.push({
-                    type: segment["event-type"],
-                    tags: segment["event-tags"] || [],
-                    teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers,
-                        store.getAppTaggableTeachers
-                    ),
-                    startTime: baseDate
-                        .clone()
-                        .hour(segment["event-start-time"].hour())
-                        .minute(segment["event-start-time"].minute())
-                        .toISOString(),
-                    endTime: baseDate
-                        .clone()
-                        .hour(segment["event-end-time"].hour())
-                        .minute(segment["event-end-time"].minute())
-                        .toISOString(),
-                })
-            })
-        }
-
         if (!address) {
             return
         }
-
+        setIsSubmitting(true)
         try {
             if (!isTemplate) {
-                const event: Omit<DBCIEvent, "id"> = {
-                    is_notified: false,
-                    start_date: eventDate
-                        .hour(13)
-                        .minute(0)
-                        .second(0)
-                        .format("YYYY-MM-DDTHH:mm:ss"),
-                    end_date: eventDate
-                        .hour(13)
-                        .minute(0)
-                        .second(0)
-                        .format("YYYY-MM-DDTHH:mm:ss"),
-                    type: "",
-                    address: address,
-                    created_at: dayjs().toISOString(),
-                    updated_at: dayjs().toISOString(),
-                    title: values["event-title"],
-                    description: values["event-description"] || "",
-                    owners: [
-                        {
-                            value: store.getUser.user_id,
-                            label: store.getUser.user_name,
-                        },
-                    ],
-                    links: values["links"] || [],
-                    price: values["prices"] || [],
-                    hide: false,
-                    segments: segmentsArray,
-                    district: values["district"],
-                    user_id: store.getUser.user_id,
-                    source_template_id: sourceTemplateId,
-                    is_multi_day: false,
-                    multi_day_teachers: null,
-                    organisations:
-                        utilService.formatUsersForCIEvent(
-                            values["event-orgs"],
-                            store.getAppTaggableOrgs
-                        ) || [],
-                    cancelled: false,
-                }
+                const event: Omit<DBCIEvent, "id"> =
+                    utilService.formatFormValuesToCreateCIEvent(
+                        values,
+                        address,
+                        false
+                    )
                 await store.createCIEvent(event)
                 clearForm()
                 closeForm()
             } else {
-                const template: Omit<CITemplate, "id"> = {
-                    type: "",
-                    address: address,
-                    created_at: dayjs().toISOString(),
-                    updated_at: null,
-                    name: values["template-name"],
-                    title: values["event-title"],
-                    description: values["event-description"] || "",
-                    owners: [
-                        {
-                            value: store.getUser.user_id,
-                            label: store.getUser.user_name,
-                        },
-                    ],
-                    links: values["links"] || [],
-                    price: values["prices"] || [],
-                    segments: segmentsArray,
-                    district: values["district"],
-                    is_multi_day: false,
-                    multi_day_teachers: [],
-                    organisations:
-                        utilService.formatUsersForCIEvent(
-                            values["event-orgs"],
-                            store.getAppTaggableOrgs
-                        ) || [],
-                    user_id: store.getUser.user_id,
-                }
+                const template: Omit<CITemplate, "id"> =
+                    utilService.formatFormValuesToCreateCITemplate(
+                        values,
+                        address,
+                        false
+                    )
                 await store.createTemplate(template)
                 clearForm()
                 closeForm()
@@ -333,32 +218,11 @@ export default function SingleDayEventForm({
                         form={form}
                         teachers={store.getAppTaggableTeachers}
                     />
-                    <AddLinksForm />
-                    <AddPricesForm />
-
-                    {inputErrors && (
-                        <Alert
-                            message="ערכים שגויים, נא לבדוק את הטופס"
-                            type="error"
-                            style={{ margin: "10px 0" }}
-                        />
-                    )}
-
-                    <Form.Item
-                        wrapperCol={{ span: 24 }}
-                        className="submit-button-container"
-                        style={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                        }}
-                    >
-                        <AsyncFormSubmitButton
-                            isSubmitting={isSubmitting}
-                            size="large"
-                        >
-                            {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                        </AsyncFormSubmitButton>
-                    </Form.Item>
+                    <EventFromFooter
+                        isSubmitting={isSubmitting}
+                        inputErrors={inputErrors}
+                        submitText={isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                    />
                 </Form>
             </section>
         </div>

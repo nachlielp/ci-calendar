@@ -4,22 +4,17 @@ import Row from "antd/es/row"
 import Col from "antd/es/col"
 import Select from "antd/es/select"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-// import "../../../styles/overrides.css"
-
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
-import AddLinksForm from "./AddLinksForm"
-import Alert from "antd/es/alert"
 import { utilService } from "../../../util/utilService"
-import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
-import AddPricesForm from "./AddPricesForm"
 import MultiDayFormHead from "./MultiDayFormHead"
 import { store } from "../../../Store/store"
+import EventFromFooter from "./EventFromFooter"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -275,32 +270,11 @@ export default function MultiDayEventForm({
                         orgs={store.getAppTaggableOrgs}
                         titleText="יצירת אירוע - רב יומי"
                     />
-
-                    <AddLinksForm />
-                    <AddPricesForm />
-                    {inputErrors && (
-                        <Alert
-                            message="ערכים שגויים, נא לבדוק את הטופס"
-                            type="error"
-                            style={{ margin: "10px 0" }}
-                        />
-                    )}
-
-                    <Form.Item
-                        wrapperCol={{ span: 24 }}
-                        className="submit-button-container"
-                        style={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                        }}
-                    >
-                        <AsyncFormSubmitButton
-                            isSubmitting={isSubmitting}
-                            size="large"
-                        >
-                            {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                        </AsyncFormSubmitButton>
-                    </Form.Item>
+                    <EventFromFooter
+                        isSubmitting={isSubmitting}
+                        inputErrors={inputErrors}
+                        submitText={isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                    />
                 </Form>
             </section>
         </>

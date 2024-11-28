@@ -2,7 +2,6 @@ import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { useState } from "react"
-import dayjs from "dayjs"
 import {
     CIEvent,
     IAddress,
@@ -10,24 +9,18 @@ import {
     DBCIEvent,
 } from "../../../util/interfaces.ts"
 import Loading from "../../Common/Loading.tsx"
-import AddLinksForm from "./AddLinksForm.tsx"
-import AddPricesForm from "./AddPricesForm.tsx"
 import MultiDayFormHead from "./MultiDayFormHead.tsx"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
-import { EventAction } from "../../../App.tsx"
 import { utilService } from "../../../util/utilService.ts"
-import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton.tsx"
-import Alert from "antd/es/alert/Alert"
 import { store } from "../../../Store/store.ts"
+import EventFromFooter from "./EventFromFooter.tsx"
 
 export default function EditMultiDayEventForm({
-    editType,
     isTemplate = false,
     event,
     template,
     closeForm,
 }: {
-    editType: EventAction
     isTemplate: boolean
     event?: CIEvent
     template?: CITemplate
@@ -59,101 +52,38 @@ export default function EditMultiDayEventForm({
     }
 
     const handleSubmit = async (values: any) => {
+        setIsSubmitting(true)
         if (event) {
-            setIsSubmitting(true)
-
-            const updatedEvent: DBCIEvent = {
-                id: event.id,
-                is_notified: event.is_notified,
-                cancelled: event.cancelled,
-                start_date:
-                    dayjs(values["event-start-date"])
-                        .hour(13)
-                        .minute(0)
-                        .second(0)
-                        .format("YYYY-MM-DDTHH:mm:ss") ?? "",
-                end_date:
-                    dayjs(values["event-end-date"])
-                        .hour(13)
-                        .minute(0)
-                        .second(0)
-                        .format("YYYY-MM-DDTHH:mm:ss") ?? "",
-                address: (newAddress || address) as IAddress,
-                type: event.type,
-                created_at: event.created_at,
-                updated_at: dayjs().toISOString(),
-                title: values["event-title"],
-                description: values["event-description"] || "",
-                owners: [
-                    {
-                        value: store.user.user_id,
-                        label: store.user.user_name,
-                    },
-                ],
-                links: values["links"] || [],
-                price: values["prices"] || [],
-                hide: false,
-                segments: [],
-                district: values["district"],
-                user_id: store.user.user_id,
-                source_template_id: event.source_template_id,
-                is_multi_day: true,
-                multi_day_teachers:
-                    utilService.formatUsersForCIEvent(
-                        values["multi-day-event-teachers"],
-                        store.getAppTaggableTeachers
-                    ) || [],
-                organisations:
-                    utilService.formatUsersForCIEvent(
-                        values["event-orgs"],
-                        store.getAppTaggableOrgs
-                    ) || [],
-            }
+            const updatedEvent: Partial<DBCIEvent> =
+                utilService.formatFormValuesToEditCIEvent(
+                    values,
+                    newAddress || (address as IAddress),
+                    event.is_multi_day
+                )
             try {
-                await store.updateCIEvent(updatedEvent)
-                closeForm()
+                await store.updateCIEvent({
+                    ...updatedEvent,
+                    id: event.id,
+                })
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
                 throw error
             } finally {
                 setIsSubmitting(false)
+                closeForm()
             }
         } else if (template) {
-            setIsSubmitting(true)
-            const updatedTemplate: CITemplate = {
-                type: values["main-event-type"].value,
-                id: template.id,
-                address: (address || template.address) as IAddress,
-                created_at: template.created_at,
-                updated_at: dayjs().toISOString(),
-                title: values["event-title"],
-                description: values["event-description"] || "",
-                owners: [
-                    {
-                        value: store.user.user_id,
-                        label: store.user.user_name,
-                    },
-                ],
-                links: values["links"] || [],
-                price: values["prices"] || [],
-                segments: [],
-                district: values["district"],
-                is_multi_day: true,
-                multi_day_teachers:
-                    utilService.formatUsersForCIEvent(
-                        values["multi-day-event-teachers"],
-                        store.getAppTaggableTeachers
-                    ) || [],
-                name: values["template-name"],
-                user_id: store.user.user_id,
-                organisations:
-                    utilService.formatUsersForCIEvent(
-                        values["event-orgs"],
-                        store.getAppTaggableOrgs
-                    ) || [],
-            }
+            const updatedTemplate: Partial<CITemplate> =
+                utilService.formatFormValuesToEditCITemplate(
+                    values,
+                    newAddress || (address as IAddress),
+                    template.is_multi_day
+                )
             try {
-                await store.updateTemplate(updatedTemplate)
+                await store.updateTemplate({
+                    ...updatedTemplate,
+                    id: template.id,
+                })
                 closeForm()
             } catch (error) {
                 console.error(
@@ -167,21 +97,15 @@ export default function EditMultiDayEventForm({
     }
 
     const onFinishFailed = () => {
-        setInputErrors(true)
         setTimeout(() => {
+            setInputErrors(true)
             setInputErrors(false)
         }, 3000)
     }
-    const submitText = isTemplate
-        ? "עדכון תבנית"
-        : editType === EventAction.recycle
-        ? "שיכפול אירוע"
-        : "עדכון אירוע"
+    const submitText = isTemplate ? "עדכון תבנית" : "עדכון אירוע"
 
     const titleText = isTemplate
         ? "עדכון תבנית - רב יומי"
-        : editType === EventAction.recycle
-        ? "שיכפול אירוע - רב יומי"
         : "עדכון אירוע - רב יומי"
 
     return (
@@ -208,28 +132,11 @@ export default function EditMultiDayEventForm({
                         orgs={store.getAppTaggableOrgs}
                         titleText={titleText}
                     />
-
-                    <AddLinksForm />
-                    <AddPricesForm />
-                    {inputErrors && (
-                        <Alert
-                            message="ערכים שגויים, נא לבדוק את הטופס"
-                            type="error"
-                            style={{ margin: "10px 0" }}
-                        />
-                    )}
-                    <Form.Item
-                        wrapperCol={{ span: 24 }}
-                        className="submit-button-container"
-                        style={{
-                            display: "flex",
-                            justifyContent: "flex-start",
-                        }}
-                    >
-                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
-                            {submitText}
-                        </AsyncFormSubmitButton>
-                    </Form.Item>
+                    <EventFromFooter
+                        inputErrors={inputErrors}
+                        isSubmitting={isSubmitting}
+                        submitText={submitText}
+                    />
                 </Form>
             </Card>
         </>
