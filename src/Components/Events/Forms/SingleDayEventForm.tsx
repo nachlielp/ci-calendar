@@ -243,6 +243,9 @@ export default function SingleDayEventForm({
 
     const onFinishFailed = () => {
         setInputErrors(true)
+        setTimeout(() => {
+            setInputErrors(false)
+        }, 3000)
     }
 
     const titleText = isTemplate
