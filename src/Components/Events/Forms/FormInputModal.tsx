@@ -4,6 +4,8 @@ import TimeClockValue from "./TimeClockValue"
 import dayjs, { Dayjs } from "dayjs"
 import { FormInstance } from "antd/es/form"
 
+type TimeView = "hours" | "minutes"
+
 export enum FormInputModalType {
     date = "date",
     time = "time",
@@ -28,6 +30,7 @@ const FormInputModal = ({
 }: FormInputModalProps) => {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<Dayjs | null>(null)
+    const [view, setView] = useState<TimeView>("hours")
 
     useEffect(() => {
         if (open) {
@@ -43,13 +46,21 @@ const FormInputModal = ({
             form.setFieldValue(name, value)
         }
         setValue(null)
+        setView("hours")
     }
+
     return (
         <>
             <div onClick={() => setOpen(true)}>{anchorEl}</div>
             <Modal open={open} onCancel={handleClose} footer={null}>
                 {type === FormInputModalType.time && (
-                    <TimeClockValue value={value} setValue={setValue} />
+                    <TimeClockValue
+                        value={value}
+                        setValue={setValue}
+                        onClose={handleClose}
+                        view={view}
+                        setView={setView}
+                    />
                 )}
 
                 {/* {type === FormInputModalType.date && (

@@ -6,8 +6,6 @@ import Col from "antd/es/col"
 import TimePicker from "antd/es/time-picker"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
-import FormInputModal from "./FormInputModal"
-import { FormInputModalType } from "./FormInputModal"
 
 interface EventSegmentsFormProps {
     form: any

@@ -1,4 +1,3 @@
-import React from "react"
 import { TimeClock } from "@mui/x-date-pickers/TimeClock"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
@@ -9,26 +8,31 @@ type TimeView = "hours" | "minutes"
 export default function TimeClockValue({
     value,
     setValue,
+    view,
+    setView,
 }: {
     value: Dayjs | null
     setValue: (value: Dayjs | null) => void
+    onClose: () => void
+    view: TimeView
+    setView: (view: TimeView) => void
 }) {
-    const [view, setView] = React.useState<TimeView>("hours")
-
     return (
         <section className="time-clock-value">
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <TimeClock
                     className="time-clock-value-clock"
                     value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                    minutesStep={5}
+                    onChange={(newValue) => {
+                        setValue(newValue)
+                    }}
                     view={view}
                     onViewChange={(newView) => setView(newView as TimeView)}
                     views={["hours", "minutes"]}
                     ampmInClock={false}
                     focusedView={view}
                     ampm={false}
+                    minutesStep={5}
                 />
             </LocalizationProvider>
 
