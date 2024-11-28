@@ -20,10 +20,16 @@ interface FormInputModalProps {
     name: string | string[]
     form: FormInstance
     onClose?: (value: Dayjs | null) => void
+    placeholder?: string
 }
 
 //Notice, when name is an array, pass onClose as a function that takes the value and sets the form field value
-const FormInputModal = ({ name, form, onClose }: FormInputModalProps) => {
+const FormInputModal = ({
+    name,
+    form,
+    onClose,
+    placeholder,
+}: FormInputModalProps) => {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<Dayjs | null>(null)
     const [view, setView] = useState<TimeView>("hours")
@@ -61,7 +67,7 @@ const FormInputModal = ({ name, form, onClose }: FormInputModalProps) => {
                     className="full-width"
                 >
                     <TimePicker
-                        placeholder={"שעת התחלה"}
+                        placeholder={placeholder || ""}
                         minuteStep={5}
                         format="HH:mm"
                         changeOnScroll

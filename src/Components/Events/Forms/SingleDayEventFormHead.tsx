@@ -144,12 +144,14 @@ export default function SingleDayEventFormHead({
                         <FormInputModal
                             name="first-segment-start-time"
                             form={form}
+                            placeholder="שעת התחלה"
                         />
                     </Col>
                     <Col md={12} xs={12}>
                         <FormInputModal
                             name="first-segment-end-time"
                             form={form}
+                            placeholder="שעת סיום"
                         />
                     </Col>
                 </Row>

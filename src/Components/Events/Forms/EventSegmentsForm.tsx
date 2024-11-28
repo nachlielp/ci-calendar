@@ -60,6 +60,7 @@ export default function EventSegmentsForm({
                                                     },
                                                 })
                                             }}
+                                            placeholder="שעת התחלה"
                                         />
                                     </Col>
                                     <Col md={12} xs={12}>
@@ -79,6 +80,7 @@ export default function EventSegmentsForm({
                                                     },
                                                 })
                                             }}
+                                            placeholder="שעת סיום"
                                         />
                                     </Col>
                                 </Row>
