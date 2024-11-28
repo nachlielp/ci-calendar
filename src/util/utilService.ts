@@ -792,7 +792,7 @@ function isEventStartedByDay(startDate: string) {
         .minute(0)
         .tz("Asia/Jerusalem")
     console.log(eventStartTime, now)
-    return eventStartTime.isAfter(now)
+    return eventStartTime.isBefore(now)
 }
 function isEventStarted(event: CIEvent) {
     if (event.is_multi_day) return isEventStartedByDay(event.start_date)
