@@ -1,8 +1,8 @@
 import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
-import { useEffect, useState } from "react"
-import dayjs, { Dayjs } from "dayjs"
+import { useState } from "react"
+import dayjs from "dayjs"
 import {
     CIEvent,
     IAddress,
@@ -34,15 +34,8 @@ export default function EditMultiDayEventForm({
     closeForm: () => void
 }) {
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
-    const [newDates, setNewDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-
-    useEffect(() => {
-        if (event) {
-            setNewDates([dayjs(event.start_date), dayjs(event.end_date)])
-        }
-    }, [])
 
     const [form] = Form.useForm()
 
@@ -65,36 +58,28 @@ export default function EditMultiDayEventForm({
         form.setFieldValue("address", selectedAddress)
     }
 
-    const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
-        setNewDates(dates)
-    }
-
     const handleSubmit = async (values: any) => {
         if (event) {
             setIsSubmitting(true)
-            if (!newDates && !values["event-dates"]) {
-                console.error("dates are null")
-                return
-            }
 
             const updatedEvent: DBCIEvent = {
                 id: event.id,
                 is_notified: event.is_notified,
                 cancelled: event.cancelled,
                 start_date:
-                    newDates?.[0]
-                        ?.hour(13)
+                    dayjs(values["event-start-date"])
+                        .hour(13)
                         .minute(0)
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss") ?? "",
                 end_date:
-                    newDates?.[1]
-                        ?.hour(13)
+                    dayjs(values["event-end-date"])
+                        .hour(13)
                         .minute(0)
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss") ?? "",
-                type: values["main-event-type"],
                 address: (newAddress || address) as IAddress,
+                type: event.type,
                 created_at: event.created_at,
                 updated_at: dayjs().toISOString(),
                 title: values["event-title"],
@@ -213,8 +198,8 @@ export default function EditMultiDayEventForm({
                         </Form.Item>
                     )}
                     <MultiDayFormHead
+                        form={form}
                         handleAddressSelect={handleAddressSelect}
-                        handleDateChange={handleDateChange}
                         address={address || ({} as IAddress)}
                         isTemplate={isTemplate}
                         teachers={store.getAppTaggableTeachers}

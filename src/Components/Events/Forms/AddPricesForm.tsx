@@ -9,6 +9,8 @@ import { Icon } from "../../Common/Icon"
 export default function AddPricesForm() {
     return (
         <section className="add-prices-form">
+            <hr className="divider" />
+            <label className="segment-title">מחיר</label>
             <Form.List name="prices">
                 {(fields, { add, remove }) => (
                     <>

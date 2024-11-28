@@ -75,6 +75,7 @@ function CIEventToFormValues(event: CIEvent) {
         address: event.address,
         "event-dates": [dayjs(event.start_date), dayjs(event.end_date)],
         "event-start-date": dayjs(event.start_date),
+        "event-end-date": dayjs(event.end_date),
         "main-event-type": event.type,
         "event-schedule": event.segments.length > 0,
         links: event.links,
@@ -111,15 +112,18 @@ function singleDayTemplateToFormValues(template: CITemplate) {
             dayjs(template.segments[0]?.startTime),
             "Asia/Jerusalem"
         ),
-        "event-time": [
-            dayjs(template.segments[0]?.startTime).tz("Asia/Jerusalem"),
-            dayjs(template.segments[0]?.endTime).tz("Asia/Jerusalem"),
-        ],
+        "first-segment-start-time": dayjs(template.segments[0]?.startTime).tz(
+            "Asia/Jerusalem"
+        ),
+        "first-segment-end-time": dayjs(template.segments[0]?.endTime).tz(
+            "Asia/Jerusalem"
+        ),
         segments: template.segments.slice(1).map((segment) => ({
             "event-type": segment.type,
             "event-tags": segment.tags,
             teachers: reverseFormatTeachers(segment.teachers),
-            "event-time": [dayjs(segment.startTime), dayjs(segment.endTime)],
+            "event-start-time": dayjs(segment.startTime),
+            "event-end-time": dayjs(segment.endTime),
         })),
         links: template.links.map((link) => ({
             title: link.title,
@@ -136,6 +140,9 @@ function singleDayTemplateToFormValues(template: CITemplate) {
 
 function multiDayTemplateToFormValues(template: CITemplate) {
     const currentFormValues = {
+        "event-start-date": template.segments[0]?.startTime,
+        "event-end-date":
+            template.segments[template.segments.length - 1]?.endTime,
         "template-name": template.name,
         "event-title": template.title,
         "event-description": template.description,

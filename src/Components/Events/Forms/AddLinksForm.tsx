@@ -8,6 +8,13 @@ import { Icon } from "../../Common/Icon"
 export default function AddLinksForm() {
     return (
         <section className="add-links-form">
+            <hr className="divider" />
+            <label className="segment-title">
+                קישור{" "}
+                <span className="segment-description">
+                    (יופיע ככפתור בעמוד האירוע)
+                </span>
+            </label>
             <Form.List name="links">
                 {(fields, { add, remove }) => (
                     <>

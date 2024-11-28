@@ -6,7 +6,7 @@ import Select from "antd/es/select"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 // import "../../../styles/overrides.css"
 
-import dayjs, { Dayjs } from "dayjs"
+import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
@@ -38,7 +38,6 @@ export default function MultiDayEventForm({
     closeForm: () => void
     isTemplate: boolean
 }) {
-    const [dates, setDates] = useState<[Dayjs, Dayjs] | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
 
@@ -74,10 +73,6 @@ export default function MultiDayEventForm({
         form.setFieldValue("address", selectedAddress)
     }
 
-    const handleDateChange = (dates: [Dayjs, Dayjs] | null) => {
-        setDates(dates)
-    }
-
     const clearForm = () => {
         form.resetFields()
         // setSubmitted(false)
@@ -106,18 +101,15 @@ export default function MultiDayEventForm({
         setIsSubmitting(true)
         try {
             if (!isTemplate) {
-                if (!dates) {
-                    throw new Error("dates are null")
-                }
                 const event: Omit<DBCIEvent, "id"> = {
                     is_notified: false,
                     cancelled: false,
-                    start_date: dates[0]
+                    start_date: dayjs(values["event-start-date"])
                         .hour(13)
                         .minute(0)
                         .second(0)
                         .format("YYYY-MM-DDTHH:mm:ss"),
-                    end_date: dates[1]
+                    end_date: dayjs(values["event-end-date"])
                         .hour(13)
                         .minute(0)
                         .second(0)
@@ -226,6 +218,8 @@ export default function MultiDayEventForm({
                                         <Input
                                             placeholder="שם התבנית"
                                             allowClear
+                                            size="large"
+                                            className="form-input-large"
                                         />
                                     </Form.Item>
                                 </Col>
@@ -233,7 +227,7 @@ export default function MultiDayEventForm({
                                     <button
                                         type="button"
                                         onClick={() => clearForm()}
-                                        className="general-clear-btn"
+                                        className="general-clear-btn large-btn"
                                     >
                                         ניקוי טופס
                                     </button>
@@ -252,6 +246,8 @@ export default function MultiDayEventForm({
                                             onChange={handleTemplateChange}
                                             allowClear
                                             placeholder="בחירת תבנית"
+                                            size="large"
+                                            className="form-input-large"
                                         />
                                     </Form.Item>
                                 </Col>
@@ -259,7 +255,7 @@ export default function MultiDayEventForm({
                                     <button
                                         type="button"
                                         onClick={() => clearForm()}
-                                        className="general-clear-btn"
+                                        className="general-clear-btn large-btn"
                                     >
                                         ניקוי טופס
                                     </button>
@@ -268,23 +264,16 @@ export default function MultiDayEventForm({
                         </Form.Item>
                     )}
                     <MultiDayFormHead
+                        form={form}
                         handleAddressSelect={handleAddressSelect}
-                        handleDateChange={handleDateChange}
                         isTemplate={isTemplate}
                         address={address}
                         teachers={store.getAppTaggableTeachers}
                         orgs={store.getAppTaggableOrgs}
                         titleText="יצירת אירוע - רב יומי"
                     />
-                    <hr className="divider" />
-                    <label>
-                        <b>קישור</b> (יופיע ככפתור בעמוד האירוע)
-                    </label>
+
                     <AddLinksForm />
-                    <hr className="divider" />
-                    <label>
-                        <b>מחיר</b>
-                    </label>
                     <AddPricesForm />
                     {inputErrors && (
                         <Alert
@@ -302,7 +291,10 @@ export default function MultiDayEventForm({
                             justifyContent: "flex-start",
                         }}
                     >
-                        <AsyncFormSubmitButton isSubmitting={isSubmitting}>
+                        <AsyncFormSubmitButton
+                            isSubmitting={isSubmitting}
+                            size="large"
+                        >
                             {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
                         </AsyncFormSubmitButton>
                     </Form.Item>

@@ -333,16 +333,7 @@ export default function SingleDayEventForm({
                         form={form}
                         teachers={store.getAppTaggableTeachers}
                     />
-                    <hr className="divider" />
-                    <label className="segment-title">
-                        קישור{" "}
-                        <span className="segment-description">
-                            (יופיע ככפתור בעמוד האירוע)
-                        </span>
-                    </label>
                     <AddLinksForm />
-                    <hr className="divider" />
-                    <label className="segment-title">מחיר</label>
                     <AddPricesForm />
 
                     {inputErrors && (

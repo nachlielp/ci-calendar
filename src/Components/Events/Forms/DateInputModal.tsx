@@ -149,7 +149,7 @@ const DateInputModal = ({
                             onSelect={onChange}
                             headerRender={() => <div></div>}
                             disabledDate={(current) =>
-                                current.isBefore(dayjs())
+                                current.isBefore(dayjs().subtract(1, "day"))
                             }
                         />
                     </ConfigProvider>
