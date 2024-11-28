@@ -2,7 +2,6 @@ import { makeAutoObservable, reaction, observable, action } from "mobx"
 import { computed } from "mobx"
 import { store } from "../../Store/store"
 import { utilService } from "../../util/utilService"
-import { CIAlert } from "../../util/interfaces"
 
 class AlertsAnchorVM {
     @observable open = false

@@ -1,7 +1,6 @@
 import Form, { FormInstance } from "antd/es/form"
 import Input from "antd/es/input"
 import Select from "antd/es/select"
-import DatePicker from "antd/es/date-picker"
 import Card from "antd/es/card"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
@@ -18,6 +17,7 @@ import {
 
 import { IAddress } from "../../../util/interfaces"
 import TimeInputModal from "./TimeInputModal"
+import DateInputModal from "./DateInputModal"
 
 interface SingleDayEventFormHeadProps {
     form: FormInstance
@@ -35,7 +35,6 @@ interface SingleDayEventFormHeadProps {
 }
 export default function SingleDayEventFormHead({
     handleAddressSelect,
-    handleDateChange,
     teachers,
     orgs,
     isTemplate,
@@ -92,19 +91,11 @@ export default function SingleDayEventFormHead({
                 </Form.Item>
 
                 {!isTemplate && (
-                    <Form.Item
+                    <DateInputModal
                         name="event-start-date"
-                        rules={[{ required: true, message: "שדה חובה" }]}
-                    >
-                        <DatePicker
-                            format={"DD/MM"}
-                            minDate={dayjs()}
-                            maxDate={dayjs().add(3, "months")}
-                            onChange={handleDateChange}
-                            allowClear={false}
-                            defaultValue={null}
-                        />
-                    </Form.Item>
+                        form={form}
+                        placeholder="תאריך "
+                    />
                 )}
 
                 <Form.Item name="event-orgs" className="full-width">

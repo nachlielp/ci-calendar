@@ -7,14 +7,15 @@
         gap: 1rem;
 
         .back {
-            transform: rotate(180deg);
-            margin-bottom: 6px;
+            margin-top: 6px;
+
             cursor: pointer;
         }
 
         .next {
-            margin-top: 6px;
+            margin-bottom: 6px;
             cursor: pointer;
+            transform: rotate(180deg);
         }
 
         .label {
