@@ -110,7 +110,6 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
 
             return { ...event, users }
         })
-        console.log("eventsWithUsers", eventsWithUsers)
         return eventsWithUsers as CIEvent[]
     } catch (error) {
         console.error("Error fetching CI events:", error)
