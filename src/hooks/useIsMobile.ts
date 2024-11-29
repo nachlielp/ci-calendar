@@ -2,18 +2,25 @@ import { useState, useEffect } from "react"
 import { ScreenSize } from "../util/options"
 
 export const useIsMobile = () => {
-    const [width, setWidth] = useState(window.innerWidth)
-    console.log("useIsMobile.width", width)
-
-    const handleResize = () => {
-        setWidth(window.innerWidth)
-        console.log("useIsMobile.handleResize.width", width)
-    }
+    const [isMobile, setIsMobile] = useState(
+        window.innerWidth < ScreenSize.mobile
+    )
 
     useEffect(() => {
-        window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize)
+        const mediaQuery = window.matchMedia(
+            `(max-width: ${ScreenSize.mobile - 1}px)`
+        )
+
+        setIsMobile(mediaQuery.matches)
+
+        const handleChange = (e: MediaQueryListEvent) => {
+            setIsMobile(e.matches)
+        }
+
+        mediaQuery.addEventListener("change", handleChange)
+
+        return () => mediaQuery.removeEventListener("change", handleChange)
     }, [])
 
-    return width < ScreenSize.mobile
+    return isMobile
 }
