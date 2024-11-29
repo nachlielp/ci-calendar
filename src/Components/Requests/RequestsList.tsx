@@ -40,6 +40,9 @@ const RequestsList = ({
 
     return (
         <div className="request-list">
+            {store.getRequests.length === 0 && (
+                <div className="request-list-empty">🤷🏼‍♂️ אין לכם בקשות</div>
+            )}
             <div className="requests-container" role="list">
                 {store.getRequests.map((request) => (
                     <div

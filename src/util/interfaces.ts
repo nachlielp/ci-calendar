@@ -137,11 +137,6 @@ export interface IMailingList {
     eventTypes: EventlyType[]
 }
 
-export interface DefaultFilter {
-    eventTypes: string[]
-    districts: string[]
-}
-
 export interface PushNotificationToken {
     token: string
     created_at: string
@@ -236,6 +231,7 @@ export interface DbUserWithoutJoin
         | "img"
         | "bio"
         | "ci_events"
+        | "alerts"
     > {}
 
 export interface DbUser {
@@ -250,7 +246,6 @@ export interface DbUser {
     allow_tagging: boolean
     provider: string
     bio: UserBio
-    default_filter: DefaultFilter
     push_notification_tokens: PushNotificationToken[]
     notifications: UserNotification[]
     subscriptions: {

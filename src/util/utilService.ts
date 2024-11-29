@@ -520,17 +520,12 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
         updated_at: new Date().toISOString(),
         subscribed_for_updates_at: new Date().toISOString(),
         provider: user.app_metadata["provider"] || "",
-        default_filter: {
-            districts: [],
-            eventTypes: [],
-        },
         push_notification_tokens: [],
         subscriptions: {
             teachers: [],
             orgs: [],
         },
         receive_notifications: false,
-        alerts: [],
     }
 }
 

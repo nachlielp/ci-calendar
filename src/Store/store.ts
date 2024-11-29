@@ -383,12 +383,12 @@ class Store {
         table: string
         payload: any
     }) => {
-        console.log(
-            "handleSubscriptionUpdates table: ",
-            table,
-            "payload: ",
-            payload
-        )
+        // console.log(
+        //     "handleSubscriptionUpdates table: ",
+        //     table,
+        //     "payload: ",
+        //     payload
+        // )
         switch (table) {
             case "users":
                 this.setUser(payload.new)
@@ -920,48 +920,51 @@ class Store {
             }
             if (this.pollingRef) clearInterval(this.pollingRef)
 
-            if (this.getSession?.user.id) {
-                const userData = await usersService.getUserData(
-                    this.getSession.user.id
+            if (!this.getSession?.user.id) {
+                this.setSession(null)
+                throw new Error("No user id")
+            }
+            const userData = await usersService.getUserData(
+                this.getSession.user.id
+            )
+            if (userData) {
+                this.setStore(userData)
+            } else {
+                const newUser = utilService.createDbUserFromUser(
+                    this.getSession?.user
                 )
-                if (userData) {
-                    this.setStore(userData)
-                } else {
-                    const newUser = utilService.createDbUserFromUser(
-                        this.getSession?.user
-                    )
-                    const createdUser = await usersService.createUser(newUser)
-                    const ci_events = await cieventsService.getCIEvents()
-                    if (createdUser) {
-                        const userData = {
-                            user: createdUser,
-                            ci_events,
-                            requests: [],
-                            templates: [],
-                            notifications: [],
-                            alerts: [],
-                            past_ci_events: [],
-                            userBio: {} as UserBio,
-                        }
-                        this.setStore(userData)
+                const createdUser = await usersService.createUser(newUser)
+                console.log("Store.init.createdUser", createdUser)
+                const ci_events = await cieventsService.getCIEvents()
+                if (createdUser) {
+                    const userData = {
+                        user: createdUser,
+                        ci_events,
+                        requests: [],
+                        templates: [],
+                        notifications: [],
+                        alerts: [],
+                        past_ci_events: [],
+                        userBio: {} as UserBio,
                     }
+                    this.setStore(userData)
                 }
+            }
 
-                this.fetchAppPublicBios()
+            this.fetchAppPublicBios()
 
-                if (
-                    [UserType.admin, UserType.creator, UserType.org].includes(
-                        this.user.user_type
-                    )
-                ) {
-                    this.fetchAppTaggableTeachers()
-                }
+            if (
+                [UserType.admin, UserType.creator, UserType.org].includes(
+                    this.user.user_type
+                )
+            ) {
+                this.fetchAppTaggableTeachers()
+            }
 
-                if (this.user.user_type === UserType.admin) {
-                    this.fetchAppUsers()
-                    this.fetchAppRequests()
-                    this.fetchAppCreators()
-                }
+            if (this.user.user_type === UserType.admin) {
+                this.fetchAppUsers()
+                this.fetchAppRequests()
+                this.fetchAppCreators()
             }
             this.setupSubscription()
         } catch (error) {
