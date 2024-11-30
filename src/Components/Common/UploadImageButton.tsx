@@ -37,13 +37,35 @@ const UploadImageButton = ({
                 croppedAreaPixels,
                 rotation
             )
-            const imageFile = new File(
-                [croppedImage.file],
-                `img-${Date.now()}.png`,
-                {
-                    type: "image/png",
-                }
-            )
+
+            const targetSize = 250 // Fixed size for width and height
+            let quality = 0.8
+
+            // Create a fixed size canvas
+            const canvas = document.createElement("canvas")
+            canvas.width = targetSize
+            canvas.height = targetSize
+
+            const ctx = canvas.getContext("2d")
+            if (!ctx) throw new Error("No 2d context")
+
+            const img = await createImage(croppedImage.url)
+
+            // Draw image at fixed size
+            ctx.drawImage(img, 0, 0, targetSize, targetSize)
+
+            // Convert to blob with compression
+            const blob = await new Promise<Blob>((resolve) => {
+                canvas.toBlob(
+                    (blob) => (blob ? resolve(blob) : null),
+                    "image/jpeg",
+                    quality
+                )
+            })
+
+            const imageFile = new File([blob], `img-${Date.now()}.jpg`, {
+                type: "image/jpeg",
+            })
             return imageFile
         }
     }

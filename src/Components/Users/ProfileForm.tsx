@@ -28,7 +28,10 @@ interface ProfileFormProps {
     closeEditProfile: () => void
 }
 
-//TODO add cropper (react-easy-crop)
+//TODO
+//1 compross before submit
+//2 compress and cache image - supabase storage
+//3 show loading state
 const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     const isMobile = useIsMobile()
 
@@ -47,6 +50,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
 
     const uploadNewImage = async (image: Blob) => {
         const filePath = `${store.getUserId}/${Date.now()}.png`
+        setImageUrl("")
         const data = await storageService.uploadFile(filePath, image)
         const publicUrl = `${
             import.meta.env.VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
