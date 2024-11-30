@@ -146,7 +146,13 @@ const UploadImageButton = ({
                 </label>
             </article>
 
-            <Modal open={open} onCancel={handleCancel} footer={null}>
+            <Modal
+                open={open}
+                onCancel={handleCancel}
+                footer={null}
+                maskClosable={false} // Prevent closing when clicking outside
+                keyboard={false}
+            >
                 <section className="upload-image-button">
                     <div className="cropper-container">
                         {image && (

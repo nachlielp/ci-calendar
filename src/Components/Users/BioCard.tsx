@@ -7,7 +7,7 @@ const { Text } = Typography
 
 const BioCard = ({ teacher }: { teacher: UserBio }) => {
     if (!teacher.bio_name) {
-        return <h2>לא נמצא 1</h2>
+        return <h2>לא נמצא 2</h2>
     }
     return (
         <section className="bio-card" style={{ direction: "rtl" }}>
