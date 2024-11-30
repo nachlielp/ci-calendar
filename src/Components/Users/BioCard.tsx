@@ -6,6 +6,9 @@ import { observer } from "mobx-react-lite"
 const { Text } = Typography
 
 const BioCard = ({ teacher }: { teacher: UserBio }) => {
+    if (!teacher.bio_name) {
+        return <h2>לא נמצא פרופיל</h2>
+    }
     return (
         <section className="bio-card" style={{ direction: "rtl" }}>
             <div className="bio-card-content">
