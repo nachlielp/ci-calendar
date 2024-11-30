@@ -908,20 +908,7 @@ class Store {
             if (!this.isSession) {
                 console.log("Store init no session")
                 // Only fetch and set ci_events, keep other store values empty
-                if (this.pollingRef) clearInterval(this.pollingRef)
-                const ci_events = await cieventsService.getCIEvents()
-                this.fetchAppPublicBios()
-                this.setStore({
-                    user: {} as CIUser,
-                    notifications: [],
-                    templates: [],
-                    requests: [],
-                    ci_events,
-                    past_ci_events: [],
-                    alerts: [],
-                    userBio: {} as UserBio,
-                })
-                this.setupPolling()
+                this.initPolling()
                 return
             }
             if (this.pollingRef) clearInterval(this.pollingRef)
@@ -976,8 +963,30 @@ class Store {
         } catch (error) {
             console.error("Error fetching user:", error)
         } finally {
+            if (!this.user && this.app_ci_events.length === 0) {
+                //issue with user data, init polling
+                console.error("Store.init.noUserData.initPolling")
+                this.initPolling()
+            }
             this.setLoading(false)
         }
+    }
+
+    initPolling = async () => {
+        if (this.pollingRef) clearInterval(this.pollingRef)
+        const ci_events = await cieventsService.getCIEvents()
+        this.fetchAppPublicBios()
+        this.setStore({
+            user: {} as CIUser,
+            notifications: [],
+            templates: [],
+            requests: [],
+            ci_events,
+            past_ci_events: [],
+            alerts: [],
+            userBio: {} as UserBio,
+        })
+        this.setupPolling()
     }
 
     fetchNotification = async (notificationId: string) => {

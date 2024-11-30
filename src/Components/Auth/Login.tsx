@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import Alert from "antd/es/alert"
 import Card from "antd/es/card"
 import Form from "antd/es/form"
@@ -22,9 +22,11 @@ export default function Login() {
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
 
-    if (store.isUser) {
-        navigate(`/`)
-    }
+    useEffect(() => {
+        if (store.isUser) {
+            navigate(`/`)
+        }
+    }, [store.isUser])
 
     const onFinish = async () => {
         try {
