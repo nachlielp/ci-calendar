@@ -79,6 +79,8 @@ const UploadImageButton = ({
     }
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader()
             reader.onload = (e) => {
@@ -134,12 +136,7 @@ const UploadImageButton = ({
                 </label>
             </article>
 
-            <Modal
-                open={open}
-                onCancel={() => setOpen(false)}
-                title="Edit Image"
-                footer={null}
-            >
+            <Modal open={open} onCancel={handleCancel} footer={null}>
                 <section className="upload-image-button">
                     <div className="cropper-container">
                         {image && (

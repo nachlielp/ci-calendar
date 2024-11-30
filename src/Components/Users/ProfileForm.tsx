@@ -48,7 +48,6 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
         originalImageUrl.current = store.getBio.img || ""
     }, [store.getBio])
 
-    //In anddroid uploading the image fails without this
     const uploadNewImage = async (event: any, image: Blob) => {
         event.preventDefault()
         event.stopPropagation()
