@@ -35,7 +35,6 @@ const ManageSupportPage = () => {
                 ? store.getOpenAppRequests
                 : store.getClosedAppRequests
 
-        console.log("requests: ", requests)
         if (selectedTypes.length === 0) {
             setFilteredRequests(requests)
             return
