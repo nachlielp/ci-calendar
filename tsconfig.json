@@ -19,8 +19,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "typeRoots": ["./src/types"],
-        "types": ["react-highlight-words"]
+        "typeRoots": ["./src/types"]
     },
     "include": ["src/**/*", "firebase.service.js", "scripts"],
     "references": [
