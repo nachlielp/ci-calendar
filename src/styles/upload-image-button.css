@@ -1,0 +1,70 @@
+.upload-image-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .upload-button {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #1890ff;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .upload-button:hover {
+        background-color: #40a9ff;
+    }
+
+    .cropper-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        background: #f0f0f0;
+        margin-bottom: 20px;
+    }
+
+    .slider-controls {
+        padding: 16px;
+    }
+
+    .control-group {
+        margin-bottom: 16px;
+    }
+
+    .control-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #666;
+    }
+
+    .control-group input[type="range"] {
+        width: 100%;
+    }
+
+    .modal-button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        margin-left: 8px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .modal-button.cancel {
+        background-color: #f5f5f5;
+        color: #666;
+    }
+
+    .modal-button.save {
+        background-color: #1890ff;
+        color: white;
+    }
+
+    .modal-button:hover {
+        opacity: 0.8;
+    }
+}

@@ -55,6 +55,7 @@
 @import "./styles/push-notifications-status-button.css";
 @import "./styles/generics/form-inputs.css";
 @import "./styles/date-input-modal.css";
+@import "./styles/upload-image-button.css";
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")

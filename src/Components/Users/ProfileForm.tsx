@@ -6,11 +6,12 @@ import Image from "antd/es/image"
 import Switch from "antd/es/switch"
 import { UserBio } from "../../util/interfaces"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import CloudinaryUpload from "../Common/CloudinaryUpload"
 import Alert from "antd/es/alert"
 import AsyncButton from "../Common/AsyncButton"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
+import UploadImageButton from "../Common/UploadImageButton"
+import { storageService } from "../../supabase/storageService"
 
 type FieldType = {
     bio_name: string
@@ -44,8 +45,13 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
         originalImageUrl.current = store.getBio.img || ""
     }, [store.getBio])
 
-    const uploadNewImage = (url: string) => {
-        setImageUrl(url)
+    const uploadNewImage = async (image: Blob) => {
+        const filePath = `${store.getUserId}/${Date.now()}.png`
+        const data = await storageService.uploadFile(filePath, image)
+        const publicUrl = `${
+            import.meta.env.VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
+        }/${data?.path}`
+        setImageUrl(publicUrl)
     }
     const getCurrentFormValues = () => {
         const values = form.getFieldsValue()
@@ -86,10 +92,6 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
         } finally {
             setIsSubmitting(false)
         }
-    }
-
-    const clearImage = () => {
-        setImageUrl("")
     }
 
     return (
@@ -181,14 +183,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                     </div>
                 </Form.Item>
                 <Form.Item<FieldType> name="upload">
-                    <CloudinaryUpload
-                        uploadNewImage={uploadNewImage}
-                        clearImage={clearImage}
-                        onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation() // Prevent form submission
-                        }}
-                    />
+                    <UploadImageButton onImageSave={uploadNewImage} />
                 </Form.Item>
 
                 <hr className="bio-card-hr" />
