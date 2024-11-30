@@ -12,7 +12,7 @@ const defaultCroppedAreaPixels = null
 const UploadImageButton = ({
     onImageSave,
 }: {
-    onImageSave: (image: Blob) => void
+    onImageSave: (event: any, image: Blob) => void
 }) => {
     const [open, setOpen] = useState(false)
     const [image, setImage] = useState<string | null>(defaultImage)
@@ -91,11 +91,13 @@ const UploadImageButton = ({
         }
     }
 
-    const handleSave = async () => {
+    const handleSave = async (event: any) => {
+        event.preventDefault()
+        event.stopPropagation()
         const processedImage = await getProcessedImage()
         if (processedImage) {
             if (onImageSave) {
-                onImageSave(processedImage)
+                onImageSave(event, processedImage)
             } else {
                 // Default handling if no onImageSave prop is provided
                 // You could save it locally, trigger a download, etc.

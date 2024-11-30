@@ -48,7 +48,10 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
         originalImageUrl.current = store.getBio.img || ""
     }, [store.getBio])
 
-    const uploadNewImage = async (image: Blob) => {
+    //In anddroid uploading the image fails without this
+    const uploadNewImage = async (event: any, image: Blob) => {
+        event.preventDefault()
+        event.stopPropagation()
         const filePath = `${store.getUserId}/${Date.now()}.png`
         setImageUrl("")
         const data = await storageService.uploadFile(filePath, image)
