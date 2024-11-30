@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Drawer from "antd/es/drawer"
 import { Icon } from "../Common/Icon"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
@@ -12,6 +12,9 @@ const MenuDrawer = () => {
     const user = store.getUser
 
     const isMobile = useIsMobile()
+
+    const page = useLocation()
+    const firstPage = page.pathname.split("/")[1]
 
     const isAdmin = user?.user_type === UserType.admin
 
@@ -43,7 +46,7 @@ const MenuDrawer = () => {
             onClick: goHome,
         },
         {
-            key: "edit-events",
+            key: "manage-events",
             icon: "calendar",
             label: "הארועים שלי",
             onClick: () => {
@@ -73,7 +76,7 @@ const MenuDrawer = () => {
             disabled: !isAdmin,
         },
         {
-            key: "my-profile",
+            key: "bio",
             icon: "account",
             label: "פרופיל",
             onClick: () => {
@@ -103,7 +106,7 @@ const MenuDrawer = () => {
             disabled: isAdmin,
         },
         {
-            key: "request",
+            key: "manage-support",
             icon: "support_agent",
             label: "ניהול תמיכה",
             onClick: () => {
@@ -158,7 +161,15 @@ const MenuDrawer = () => {
                     {mapOfMenu
                         .filter((item) => !item.disabled)
                         .map((item) => (
-                            <MenuItem key={item.key} item={item} />
+                            <MenuItem
+                                key={item.key}
+                                item={item}
+                                isActive={
+                                    firstPage === item.key ||
+                                    (firstPage === "" &&
+                                        item.key === "all-events")
+                                }
+                            />
                         ))}
                 </div>
             </Drawer>
@@ -168,9 +179,12 @@ const MenuDrawer = () => {
 
 export default observer(MenuDrawer)
 
-const MenuItem = ({ item }: { item: any }) => {
+const MenuItem = ({ item, isActive }: { item: any; isActive: boolean }) => {
     return (
-        <article className="menu-item" onClick={item.onClick}>
+        <article
+            className={`menu-item ${isActive ? "active" : ""}`}
+            onClick={item.onClick}
+        >
             <Icon icon={item.icon} />
             <p style={{ fontSize: "24px", margin: "6px 0 10px 0" }}>
                 {item.label}
