@@ -12,7 +12,7 @@ const defaultCroppedAreaPixels = null
 const UploadImageButton = ({
     onImageSave,
 }: {
-    onImageSave: (event: any, image: Blob) => void
+    onImageSave: (image: Blob) => void
 }) => {
     const [open, setOpen] = useState(false)
     const [image, setImage] = useState<string | null>(defaultImage)
@@ -81,25 +81,35 @@ const UploadImageButton = ({
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault()
         e.stopPropagation()
-        if (e.target.files && e.target.files[0]) {
+
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        try {
             const reader = new FileReader()
-            reader.onload = (e) => {
-                if (e.target?.result) {
-                    setImage(e.target.result as string)
-                    setOpen(true)
+            reader.onload = () => {
+                if (reader.result) {
+                    // Add a small delay before opening the modal
+                    setTimeout(() => {
+                        setImage(reader.result as string)
+                        setOpen(true)
+                    }, 100)
                 }
             }
-            reader.readAsDataURL(e.target.files[0])
+            reader.readAsDataURL(file)
+
+            // Reset the input value to ensure it triggers on selecting the same file again
+            e.target.value = ""
+        } catch (error) {
+            console.error("Error reading file:", error)
         }
     }
 
-    const handleSave = async (event: any) => {
-        event.preventDefault()
-        event.stopPropagation()
+    const handleSave = async () => {
         const processedImage = await getProcessedImage()
         if (processedImage) {
             if (onImageSave) {
-                onImageSave(event, processedImage)
+                onImageSave(processedImage)
             } else {
                 // Default handling if no onImageSave prop is provided
                 // You could save it locally, trigger a download, etc.
