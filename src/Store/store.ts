@@ -420,6 +420,8 @@ class Store {
                         console.error(`Event not found for alert: ${alert.id}`)
                         break
                     }
+                } else if (NotificationType.response === payload.new.type) {
+                    //currently no formatting needed
                 } else {
                     throw new Error(`Unknown alert type: ${alert.type}`)
                 }
@@ -829,25 +831,29 @@ class Store {
 
     @action
     viewRequestAlert = async (requestId: string) => {
-        const alert = this.alerts.find((a) => a.request_id === requestId)
+        //Notice - batch updates are blocked by policy issues for some reason
+        const alerts = this.alerts.filter((a) => a.request_id === requestId)
         const request = this.requests.find((r) => r.id === requestId)
-        if (alert && !alert.viewed && request) {
-            const updatedAlert = await alertsService.updateAlert({
-                id: alert.id,
-                viewed: true,
-            })
-            this.setAlert(
-                { ...alert, ...updatedAlert },
-                EventPayloadType.UPDATE
-            )
-            const updatedRequest = await requestsService.updateRequest({
-                id: requestId,
-                viewed: true,
-            })
-            this.setRequest(
-                { ...request, ...updatedRequest },
-                EventPayloadType.UPDATE
-            )
+
+        for (const alert of alerts) {
+            if (alert && !alert.viewed && request) {
+                const updatedAlert = await alertsService.updateAlert({
+                    id: alert.id,
+                    viewed: true,
+                })
+                this.setAlert(
+                    { ...alert, ...updatedAlert },
+                    EventPayloadType.UPDATE
+                )
+                const updatedRequest = await requestsService.updateRequest({
+                    id: requestId,
+                    viewed: true,
+                })
+                this.setRequest(
+                    { ...request, ...updatedRequest },
+                    EventPayloadType.UPDATE
+                )
+            }
         }
     }
 
