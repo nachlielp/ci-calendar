@@ -72,12 +72,14 @@ async function checkAndUpdateToken(user: CIUser) {
     }
 
     try {
-        console.log("checkAndUpdateToken - try")
-
-        const token = await getToken(messaging, {
-            vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
-        })
-        console.log("checkAndUpdateToken - token")
+        let token = ""
+        try {
+            token = await getToken(messaging, {
+                vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
+            })
+        } catch (error) {
+            console.error("checkAndUpdateToken - error", error)
+        }
 
         const deviceId = utilService.getDeviceId()
         console.log("checkAndUpdateToken - deviceId")
@@ -85,7 +87,7 @@ async function checkAndUpdateToken(user: CIUser) {
             (token) => token.device_id === deviceId
         )?.token
 
-        if (!existingToken || token !== existingToken) {
+        if (token !== "" && (!existingToken || token !== existingToken)) {
             console.log("checkAndUpdateToken - updateUser")
 
             store.updateUser({
