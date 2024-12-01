@@ -57,6 +57,12 @@ const UploadImageButton = ({
     }
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault()
+        e.stopPropagation()
+
+        const file = e.target.files?.[0]
+        if (!file) return
+
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader()
             reader.onload = (e) => {
@@ -67,6 +73,7 @@ const UploadImageButton = ({
             }
             reader.readAsDataURL(e.target.files[0])
         }
+        e.target.value = ""
     }
 
     const handleSave = async () => {
@@ -75,16 +82,10 @@ const UploadImageButton = ({
             if (onImageSave) {
                 onImageSave(processedImage)
             } else {
-                // Default handling if no onImageSave prop is provided
-                // You could save it locally, trigger a download, etc.
-                const imageUrl = URL.createObjectURL(processedImage)
-                const link = document.createElement("a")
-                link.href = imageUrl
-                link.download = processedImage.name
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(imageUrl)
+                console.error(
+                    "UploadImageButton.handleSave.error: ",
+                    "no onImageSave prop"
+                )
             }
         }
         setOpen(false)

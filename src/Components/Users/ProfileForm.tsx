@@ -13,6 +13,7 @@ import { store } from "../../Store/store"
 import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
 import Loading from "../Common/Loading"
+import Spin from "antd/es/spin"
 
 type FieldType = {
     bio_name: string
@@ -39,6 +40,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     const originalImageUrl = useRef<string>(store.getBio.img || "")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
+    const [isUploading, setIsUploading] = useState<boolean>(false)
 
     const [imageUrl, setImageUrl] = useState<string>(store.getBio.img || "")
 
@@ -50,6 +52,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     }, [store.getBio])
 
     const uploadNewImage = async (image: Blob) => {
+        setIsUploading(true)
         try {
             const filePath = `${store.getUserId}/${Date.now()}.png`
             const data = await storageService.uploadFile(filePath, image)
@@ -60,6 +63,8 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
         } catch (error) {
             console.error("ProfileForm.uploadNewImage.error: ", error)
             //TODO show error
+        } finally {
+            setIsUploading(false)
         }
     }
 
@@ -181,28 +186,42 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                 </label>
                 <Form.Item<FieldType> name="img">
                     <div className="img-container">
-                        <Image
-                            alt="profile image"
-                            src={imageUrl}
-                            key={imageUrl}
-                            preview={false}
-                            width={250}
-                            height={250}
-                            className="teacher-form-img"
-                            placeholder={
-                                <section
-                                    style={{
-                                        width: 250,
-                                        height: 250,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                    }}
-                                >
-                                    <Loading />
-                                </section>
-                            }
-                        />
+                        {isUploading ? (
+                            <article
+                                style={{
+                                    width: 250,
+                                    height: 250,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Spin />
+                            </article>
+                        ) : (
+                            <Image
+                                alt="profile image"
+                                src={imageUrl}
+                                key={imageUrl}
+                                preview={false}
+                                width={250}
+                                height={250}
+                                className="teacher-form-img"
+                                placeholder={
+                                    <article
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            width: 250,
+                                            height: 250,
+                                        }}
+                                    >
+                                        <Spin />
+                                    </article>
+                                }
+                            />
+                        )}
                     </div>
                 </Form.Item>
                 <Form.Item<FieldType> name="upload">
