@@ -35,7 +35,7 @@ export default function useMessagingPermission() {
                 return
             }
 
-            const permission = await Notification.requestPermission()
+            const { permission } = Notification
             console.log("permission", permission)
             setPermissionStatus(permission)
 
