@@ -1,4 +1,5 @@
-const CACHE_NAME = "ci-calendar-cache-v14"
+export const CACHE_VERSION = "8"
+export const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 self.addEventListener("install", (event) => {
     event.waitUntil(

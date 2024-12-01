@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 import { utilService } from "../../../util/utilService"
-
+import { CACHE_VERSION } from "../../../../public/firebase-messaging-sw"
 interface IEventsListProps {
     events: CIEvent[]
 }
@@ -44,7 +44,7 @@ export default function EventsList({ events }: IEventsListProps) {
                     )
                 )}
             <div className="events-list-footer">
-                <label>v - 8</label>
+                <label>v - {CACHE_VERSION} </label>
             </div>
         </div>
     )
