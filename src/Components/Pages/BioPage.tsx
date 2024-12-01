@@ -3,9 +3,11 @@ import { observer } from "mobx-react-lite"
 import Card from "antd/es/card"
 import BioSelfPreview from "../Users/BioSelfPreview"
 import ProfileForm from "../Users/ProfileForm"
+import BioCard from "../Users/BioCard"
+import { store } from "../../Store/store"
 
 const BioPage = () => {
-    const [editProfile, setEditProfile] = useState(true)
+    const [editProfile, setEditProfile] = useState(false)
     const handleSubmitEdit = () => {
         setEditProfile(false)
     }
@@ -32,9 +34,7 @@ const BioPage = () => {
             {editProfile ? (
                 <ProfileForm closeEditProfile={handleSubmitEdit} />
             ) : (
-                <Card style={{ marginTop: "1rem" }}>
-                    <BioSelfPreview />
-                </Card>
+                <BioCard teacher={store.getBio} />
             )}
         </div>
     )
