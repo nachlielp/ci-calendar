@@ -44,7 +44,7 @@ export default function EventsList({ events }: IEventsListProps) {
                     )
                 )}
             <div className="events-list-footer">
-                <label>v - 7</label>
+                <label>v - 8</label>
             </div>
         </div>
     )
