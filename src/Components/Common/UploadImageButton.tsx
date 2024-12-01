@@ -142,7 +142,7 @@ const UploadImageButton = ({
                     onChange={handleFileChange}
                     accept="image/*"
                     id="imageInput"
-                    style={{ display: "none" }}
+                    // style={{ display: "none" }}
                 />
                 <label htmlFor="imageInput" className="upload-button">
                     העלאת תמונה
