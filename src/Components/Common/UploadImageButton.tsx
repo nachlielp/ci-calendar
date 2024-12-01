@@ -1,4 +1,4 @@
-// import Modal from "antd/es/modal"
+import Modal from "antd/es/modal"
 import { observer } from "mobx-react-lite"
 import { useCallback, useState } from "react"
 import Cropper from "react-easy-crop"
@@ -113,18 +113,17 @@ const UploadImageButton = ({
         if (processedImage) {
             if (onImageSave) {
                 onImageSave(event, processedImage)
-            } else {
-                // Default handling if no onImageSave prop is provided
-                // You could save it locally, trigger a download, etc.
-                const imageUrl = URL.createObjectURL(processedImage)
-                const link = document.createElement("a")
-                link.href = imageUrl
-                link.download = processedImage.name
-                document.body.appendChild(link)
-                link.click()
-                document.body.removeChild(link)
-                URL.revokeObjectURL(imageUrl)
             }
+            // else {
+            //     const imageUrl = URL.createObjectURL(processedImage)
+            //     const link = document.createElement("a")
+            //     link.href = imageUrl
+            //     link.download = processedImage.name
+            //     document.body.appendChild(link)
+            //     link.click()
+            //     document.body.removeChild(link)
+            //     URL.revokeObjectURL(imageUrl)
+            // }
         }
         setOpen(false)
         resetStates()
@@ -142,71 +141,81 @@ const UploadImageButton = ({
                     onChange={handleFileChange}
                     accept="image/*"
                     id="imageInput"
-                    // style={{ display: "none" }}
+                    style={{ display: "none" }}
                 />
+                {image && (
+                    <img
+                        src={image}
+                        alt="uploaded"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ width: "100px", height: "100px" }}
+                    />
+                )}
                 <label htmlFor="imageInput" className="upload-button">
                     העלאת תמונה
                 </label>
             </article>
 
-            {/* <Modal
+            <Modal
                 open={open}
                 onCancel={handleCancel}
                 footer={null}
                 maskClosable={false} // Prevent closing when clicking outside
                 keyboard={false}
-            > */}
-            <section className="upload-image-button">
-                <div className="cropper-container">
-                    {image && (
-                        <Cropper
-                            image={image}
-                            crop={crop}
-                            zoom={zoom}
-                            rotation={rotation}
-                            aspect={1}
-                            onCropChange={setCrop}
-                            onZoomChange={setZoom}
-                            onRotationChange={setRotation}
-                            onCropComplete={onCropComplete}
-                        />
-                    )}
-                </div>
-
-                <div className="slider-controls">
-                    <div className="control-group">
-                        <div className="control-buttons">
-                            <span>Zoom</span>
-                        </div>
-                        <input
-                            type="range"
-                            value={zoom}
-                            min={1}
-                            max={3}
-                            step={0.1}
-                            onChange={(e) => setZoom(Number(e.target.value))}
-                        />
+            >
+                <section className="upload-image-button">
+                    <div className="cropper-container">
+                        {image && (
+                            <Cropper
+                                image={image}
+                                crop={crop}
+                                zoom={zoom}
+                                rotation={rotation}
+                                aspect={1}
+                                onCropChange={setCrop}
+                                onZoomChange={setZoom}
+                                onRotationChange={setRotation}
+                                onCropComplete={onCropComplete}
+                            />
+                        )}
                     </div>
-                </div>
 
-                <footer>
-                    <button
-                        key="cancel"
-                        onClick={handleCancel}
-                        className="modal-button cancel"
-                    >
-                        ביטול
-                    </button>
-                    <button
-                        key="save"
-                        className="modal-button save"
-                        onClick={handleSave}
-                    >
-                        שמירה
-                    </button>
-                </footer>
-            </section>
-            {/* </Modal> */}
+                    <div className="slider-controls">
+                        <div className="control-group">
+                            <div className="control-buttons">
+                                <span>Zoom</span>
+                            </div>
+                            <input
+                                type="range"
+                                value={zoom}
+                                min={1}
+                                max={3}
+                                step={0.1}
+                                onChange={(e) =>
+                                    setZoom(Number(e.target.value))
+                                }
+                            />
+                        </div>
+                    </div>
+
+                    <footer>
+                        <button
+                            key="cancel"
+                            onClick={handleCancel}
+                            className="modal-button cancel"
+                        >
+                            ביטול
+                        </button>
+                        <button
+                            key="save"
+                            className="modal-button save"
+                            onClick={handleSave}
+                        >
+                            שמירה
+                        </button>
+                    </footer>
+                </section>
+            </Modal>
         </>
     )
 }

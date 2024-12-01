@@ -49,9 +49,10 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     }, [store.getBio])
 
     const uploadNewImage = async (image: Blob) => {
+        console.log("uploadNewImage", image)
         const filePath = `${store.getUserId}/${Date.now()}.png`
-        setImageUrl("")
         const data = await storageService.uploadFile(filePath, image)
+        console.log("data", data)
         const publicUrl = `${
             import.meta.env.VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
         }/${data?.path}`

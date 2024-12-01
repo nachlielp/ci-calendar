@@ -53,30 +53,30 @@ export enum EventAction {
 }
 
 const App = () => {
-    const [image, setImage] = useState<string | null>(null)
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Prevent any form submission or navigation
-        e.preventDefault()
-        e.stopPropagation()
+    // const [image, setImage] = useState<string | null>(null)
+    // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     // Prevent any form submission or navigation
+    //     e.preventDefault()
+    //     e.stopPropagation()
 
-        const file = e.target.files?.[0]
-        if (!file) return
+    //     const file = e.target.files?.[0]
+    //     if (!file) return
 
-        try {
-            const reader = new FileReader()
-            reader.onload = (event) => {
-                if (event.target?.result) {
-                    setImage(event.target.result as string)
-                }
-            }
-            reader.readAsDataURL(file)
+    //     try {
+    //         const reader = new FileReader()
+    //         reader.onload = (event) => {
+    //             if (event.target?.result) {
+    //                 setImage(event.target.result as string)
+    //             }
+    //         }
+    //         reader.readAsDataURL(file)
 
-            // Reset the input value
-            e.target.value = ""
-        } catch (error) {
-            console.error("Error reading file:", error)
-        }
-    }
+    //         // Reset the input value
+    //         e.target.value = ""
+    //     } catch (error) {
+    //         console.error("Error reading file:", error)
+    //     }
+    // }
     return (
         <div className="app">
             <SpeedInsights />
@@ -91,8 +91,8 @@ const App = () => {
                 >
                     <Suspense fallback={<EventsPageSkeleton />}>
                         <AppHeader />
-                        <h1>v - 1</h1>
-                        <div onClick={(e) => e.stopPropagation()}>
+                        <h1>v - 2</h1>
+                        {/* <div onClick={(e) => e.stopPropagation()}>
                             <input
                                 type="file"
                                 onChange={handleFileChange}
@@ -109,7 +109,7 @@ const App = () => {
                                     style={{ width: "100px", height: "100px" }}
                                 />
                             )}
-                        </div>
+                        </div> */}
                         <Routes>
                             <Route path="signup" element={<Signup />} />
                             <Route path="login" element={<Login />} />
