@@ -32,16 +32,7 @@ const BioPage = () => {
             {editProfile ? (
                 <ProfileForm closeEditProfile={handleSubmitEdit} />
             ) : (
-                <section
-                    className="bio-page-card"
-                    style={{
-                        backgroundColor: "#fff",
-                        padding: "1rem",
-                        width: "300px",
-                        borderRadius: "10px",
-                        marginTop: "1rem",
-                    }}
-                >
+                <section className="bio-page-card">
                     <BioCard teacher={store.getBio} />
                 </section>
             )}

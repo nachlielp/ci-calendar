@@ -67,7 +67,6 @@ const App = () => {
                 >
                     <Suspense fallback={<EventsPageSkeleton />}>
                         <AppHeader />
-                        <h1>v - 5</h1>
                         <Routes>
                             <Route path="signup" element={<Signup />} />
                             <Route path="login" element={<Login />} />

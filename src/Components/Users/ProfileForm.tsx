@@ -12,6 +12,7 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
+import Loading from "../Common/Loading"
 
 type FieldType = {
     bio_name: string
@@ -49,14 +50,17 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     }, [store.getBio])
 
     const uploadNewImage = async (image: Blob) => {
-        console.log("uploadNewImage", image)
-        const filePath = `${store.getUserId}/${Date.now()}.png`
-        const data = await storageService.uploadFile(filePath, image)
-        console.log("data", data)
-        const publicUrl = `${
-            import.meta.env.VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
-        }/${data?.path}`
-        setImageUrl(publicUrl)
+        try {
+            const filePath = `${store.getUserId}/${Date.now()}.png`
+            const data = await storageService.uploadFile(filePath, image)
+            const publicUrl = `${
+                import.meta.env.VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
+            }/${data?.path}`
+            setImageUrl(publicUrl)
+        } catch (error) {
+            console.error("ProfileForm.uploadNewImage.error: ", error)
+            //TODO show error
+        }
     }
 
     const getCurrentFormValues = () => {
@@ -178,13 +182,26 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                 <Form.Item<FieldType> name="img">
                     <div className="img-container">
                         <Image
-                            alt="example"
+                            alt="profile image"
                             src={imageUrl}
                             key={imageUrl}
                             preview={false}
                             width={250}
                             height={250}
                             className="teacher-form-img"
+                            placeholder={
+                                <section
+                                    style={{
+                                        width: 250,
+                                        height: 250,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <Loading />
+                                </section>
+                            }
                         />
                     </div>
                 </Form.Item>

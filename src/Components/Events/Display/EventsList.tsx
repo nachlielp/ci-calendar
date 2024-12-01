@@ -43,7 +43,9 @@ export default function EventsList({ events }: IEventsListProps) {
                         </div>
                     )
                 )}
-            <div className="events-list-footer"></div>
+            <div className="events-list-footer">
+                <label>v - 6</label>
+            </div>
         </div>
     )
 }

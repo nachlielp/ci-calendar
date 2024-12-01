@@ -21,4 +21,12 @@
             font-weight: 400;
         }
     }
+
+    .bio-page-card {
+        margin-top: 1rem;
+        background-color: #fff;
+        padding: 1rem;
+        width: 300px;
+        border-radius: 10px;
+    }
 }
