@@ -81,25 +81,7 @@ const App = () => {
         <div className="app">
             <SpeedInsights />
             <BackgroundTiles />
-            <h1>v - 9</h1>
-            <div onClick={(e) => e.stopPropagation()}>
-                <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    id="imageInput"
-                    // Prevent any default form behavior
-                    onClick={(e) => e.stopPropagation()}
-                />
-                {image && (
-                    <img
-                        src={image}
-                        alt="uploaded"
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ width: "100px", height: "100px" }}
-                    />
-                )}
-            </div>
+
             {store.isLoading ? (
                 <EventsPageSkeleton />
             ) : (
@@ -109,6 +91,25 @@ const App = () => {
                 >
                     <Suspense fallback={<EventsPageSkeleton />}>
                         <AppHeader />
+                        <h1>v - 1</h1>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <input
+                                type="file"
+                                onChange={handleFileChange}
+                                accept="image/*"
+                                id="imageInput"
+                                // Prevent any default form behavior
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                            {image && (
+                                <img
+                                    src={image}
+                                    alt="uploaded"
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ width: "100px", height: "100px" }}
+                                />
+                            )}
+                        </div>
                         <Routes>
                             <Route path="signup" element={<Signup />} />
                             <Route path="login" element={<Login />} />

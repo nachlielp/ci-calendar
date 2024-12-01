@@ -64,7 +64,7 @@ class Store {
         makeAutoObservable(this)
 
         supabase.auth.onAuthStateChange(async (_, session) => {
-            this.cleanup()
+            // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
             this.setSession(session)
             this.init()
         })
@@ -900,7 +900,7 @@ class Store {
 
     async init() {
         console.log("Store init")
-        this.setLoading(true)
+
         try {
             const config = await configService.getConfig()
             this.setConfig(config, EventPayloadType.UPDATE)
@@ -913,6 +913,11 @@ class Store {
             }
             if (this.pollingRef) clearInterval(this.pollingRef)
 
+            //Show loader only if the events are not fetched yet
+            if (this.app_ci_events.length === 0) {
+                this.setLoading(true)
+            }
+            //TS for user id
             if (!this.getSession?.user.id) {
                 this.setSession(null)
                 throw new Error("No user id")
@@ -959,6 +964,7 @@ class Store {
                 this.fetchAppRequests()
                 this.fetchAppCreators()
             }
+
             this.setupSubscription()
         } catch (error) {
             console.error("Error fetching user:", error)
@@ -973,6 +979,7 @@ class Store {
     }
 
     initPolling = async () => {
+        this.setLoading(true)
         if (this.pollingRef) clearInterval(this.pollingRef)
         const ci_events = await cieventsService.getCIEvents()
         this.fetchAppPublicBios()
@@ -987,6 +994,7 @@ class Store {
             userBio: {} as UserBio,
         })
         this.setupPolling()
+        this.setLoading(false)
     }
 
     fetchNotification = async (notificationId: string) => {

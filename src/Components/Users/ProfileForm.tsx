@@ -57,6 +57,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
         }/${data?.path}`
         setImageUrl(publicUrl)
     }
+
     const getCurrentFormValues = () => {
         const values = form.getFieldsValue()
         return values
