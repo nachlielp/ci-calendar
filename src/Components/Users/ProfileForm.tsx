@@ -12,7 +12,6 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
-import Loading from "../Common/Loading"
 import Spin from "antd/es/spin"
 
 type FieldType = {
