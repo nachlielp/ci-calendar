@@ -1,7 +1,5 @@
 import { useState } from "react"
 import { observer } from "mobx-react-lite"
-import Card from "antd/es/card"
-import BioSelfPreview from "../Users/BioSelfPreview"
 import ProfileForm from "../Users/ProfileForm"
 import BioCard from "../Users/BioCard"
 import { store } from "../../Store/store"
@@ -34,7 +32,18 @@ const BioPage = () => {
             {editProfile ? (
                 <ProfileForm closeEditProfile={handleSubmitEdit} />
             ) : (
-                <BioCard teacher={store.getBio} />
+                <section
+                    className="bio-page-card"
+                    style={{
+                        backgroundColor: "#fff",
+                        padding: "1rem",
+                        width: "300px",
+                        borderRadius: "10px",
+                        marginTop: "1rem",
+                    }}
+                >
+                    <BioCard teacher={store.getBio} />
+                </section>
             )}
         </div>
     )
