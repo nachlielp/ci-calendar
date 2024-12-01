@@ -7,12 +7,12 @@ import useMessagingPermission from "../../hooks/useMessagingPermission"
 
 const NotificationSwitch = () => {
     const [loading, setLoading] = useState(false)
-    const { requestPermission } = useMessagingPermission()
+    const { checkPermissionsAndToken } = useMessagingPermission()
 
     const handleChange = async (checked: boolean) => {
         setLoading(true)
         if (checked) {
-            requestPermission()
+            checkPermissionsAndToken()
         }
         await store.updateUser({
             receive_notifications: checked,

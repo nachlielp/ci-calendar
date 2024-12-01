@@ -19,7 +19,7 @@ const default_notification_alert =
     "על מנת לקבל נוטיפיקציות צריך לאשר לאפליקציה לשלוח התראות"
 
 const PushNotificationStatusButton = () => {
-    const { requestPermission, permissionStatus } = useMessagingPermission()
+    const { permissionStatus } = useMessagingPermission()
 
     const [status, setStatus] = useState<PromissionStatus>(
         utilService.getNotificationPermission() as PromissionStatus
@@ -32,14 +32,14 @@ const PushNotificationStatusButton = () => {
         setStatus(permissionStatus as PromissionStatus)
     }, [permissionStatus])
 
-    async function handleChange() {
-        if (!utilService.isPWA()) {
-            return
-        }
-        requestPermission().then(() => {
-            setStatus(PromissionStatus.granted)
-        })
-    }
+    // async function handleChange() {
+    //     if (!utilService.isPWA()) {
+    //         return
+    //     }
+    //     requestPermission().then(() => {
+    //         setStatus(PromissionStatus.granted)
+    //     })
+    // }
 
     return (
         <section
@@ -47,12 +47,12 @@ const PushNotificationStatusButton = () => {
                 !utilService.isPWA() && "pwa-only"
             } ${status === PromissionStatus.granted && "granted"}`}
         >
-            <button
+            {/* <button
                 onClick={handleChange}
                 className={`notification-status-button general-action-btn ${status} `}
             >
                 אישור התראות
-            </button>
+            </button> */}
 
             {status == PromissionStatus.default && (
                 <Alert
