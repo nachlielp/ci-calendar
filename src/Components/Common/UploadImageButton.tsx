@@ -3,6 +3,8 @@ import { observer } from "mobx-react-lite"
 import { useCallback, useState } from "react"
 import Cropper from "react-easy-crop"
 
+const MAX_FILE_SIZE = 30 * 1024 // 30KB in bytes
+
 const defaultImage = null
 const defaultCrop = { x: 0, y: 0 }
 const defaultRotation = 0
@@ -30,6 +32,55 @@ const UploadImageButton = ({
         []
     )
 
+    const compressImage = async (file: Blob): Promise<Blob> => {
+        return new Promise((resolve) => {
+            const canvas = document.createElement("canvas")
+            const ctx = canvas.getContext("2d")
+            const img = new Image()
+
+            img.onload = () => {
+                // Start with original dimensions
+                let width = img.width
+                let height = img.height
+                let quality = 0.7 // Starting quality
+
+                // If either dimension is greater than 800, scale down proportionally
+                const MAX_DIMENSION = 800
+                if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+                    const ratio = Math.min(
+                        MAX_DIMENSION / width,
+                        MAX_DIMENSION / height
+                    )
+                    width *= ratio
+                    height *= ratio
+                }
+
+                canvas.width = width
+                canvas.height = height
+                ctx?.drawImage(img, 0, 0, width, height)
+
+                const compress = (q: number) => {
+                    const compressedData = canvas.toDataURL("image/jpeg", q)
+                    // Convert base64 to blob
+                    fetch(compressedData)
+                        .then((res) => res.blob())
+                        .then((blob) => {
+                            if (blob.size > MAX_FILE_SIZE && q > 0.1) {
+                                // If still too large, try with lower quality
+                                compress(q - 0.1)
+                            } else {
+                                resolve(blob)
+                            }
+                        })
+                }
+
+                compress(quality)
+            }
+
+            img.src = URL.createObjectURL(file)
+        })
+    }
+
     const getProcessedImage = async () => {
         if (image && croppedAreaPixels) {
             const croppedImage = await getCroppedImg(
@@ -37,13 +88,18 @@ const UploadImageButton = ({
                 croppedAreaPixels,
                 rotation
             )
+
+            const compressedBlob = await compressImage(croppedImage.file)
+
             const imageFile = new File(
-                [croppedImage.file],
-                `img-${Date.now()}.png`,
+                [compressedBlob],
+                `img-${Date.now()}.jpg`,
                 {
-                    type: "image/png",
+                    type: "image/jpg",
                 }
             )
+            console.log("Compressed file size:", imageFile.size / 1024, "KB")
+
             return imageFile
         }
     }
