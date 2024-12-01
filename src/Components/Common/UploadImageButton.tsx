@@ -12,7 +12,7 @@ const defaultCroppedAreaPixels = null
 const UploadImageButton = ({
     onImageSave,
 }: {
-    onImageSave: (event: any, image: Blob) => void
+    onImageSave: (image: Blob) => void
 }) => {
     const [open, setOpen] = useState(false)
     const [image, setImage] = useState<string | null>(defaultImage)
@@ -22,7 +22,6 @@ const UploadImageButton = ({
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(
         defaultCroppedAreaPixels
     )
-    console.log("open", open)
 
     const onCropComplete = useCallback(
         (_croppedArea: any, croppedAreaPixels: any) => {
@@ -38,35 +37,13 @@ const UploadImageButton = ({
                 croppedAreaPixels,
                 rotation
             )
-
-            const targetSize = 250 // Fixed size for width and height
-            let quality = 0.8
-
-            // Create a fixed size canvas
-            const canvas = document.createElement("canvas")
-            canvas.width = targetSize
-            canvas.height = targetSize
-
-            const ctx = canvas.getContext("2d")
-            if (!ctx) throw new Error("No 2d context")
-
-            const img = await createImage(croppedImage.url)
-
-            // Draw image at fixed size
-            ctx.drawImage(img, 0, 0, targetSize, targetSize)
-
-            // Convert to blob with compression
-            const blob = await new Promise<Blob>((resolve) => {
-                canvas.toBlob(
-                    (blob) => (blob ? resolve(blob) : null),
-                    "image/jpeg",
-                    quality
-                )
-            })
-
-            const imageFile = new File([blob], `img-${Date.now()}.jpg`, {
-                type: "image/jpeg",
-            })
+            const imageFile = new File(
+                [croppedImage.file],
+                `img-${Date.now()}.png`,
+                {
+                    type: "image/png",
+                }
+            )
             return imageFile
         }
     }
@@ -80,50 +57,35 @@ const UploadImageButton = ({
     }
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault()
-        e.stopPropagation()
-
-        const file = e.target.files?.[0]
-        if (!file) return
-
-        try {
+        if (e.target.files && e.target.files[0]) {
             const reader = new FileReader()
-            reader.onload = () => {
-                if (reader.result) {
-                    // Add a small delay before opening the modal
-                    setTimeout(() => {
-                        setImage(reader.result as string)
-                        setOpen(true)
-                    }, 100)
+            reader.onload = (e) => {
+                if (e.target?.result) {
+                    setImage(e.target.result as string)
+                    setOpen(true)
                 }
             }
-            reader.readAsDataURL(file)
-
-            // Reset the input value to ensure it triggers on selecting the same file again
-            e.target.value = ""
-        } catch (error) {
-            console.error("Error reading file:", error)
+            reader.readAsDataURL(e.target.files[0])
         }
     }
 
-    const handleSave = async (event: any) => {
-        event.preventDefault()
-        event.stopPropagation()
+    const handleSave = async () => {
         const processedImage = await getProcessedImage()
         if (processedImage) {
             if (onImageSave) {
-                onImageSave(event, processedImage)
+                onImageSave(processedImage)
+            } else {
+                // Default handling if no onImageSave prop is provided
+                // You could save it locally, trigger a download, etc.
+                const imageUrl = URL.createObjectURL(processedImage)
+                const link = document.createElement("a")
+                link.href = imageUrl
+                link.download = processedImage.name
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(imageUrl)
             }
-            // else {
-            //     const imageUrl = URL.createObjectURL(processedImage)
-            //     const link = document.createElement("a")
-            //     link.href = imageUrl
-            //     link.download = processedImage.name
-            //     document.body.appendChild(link)
-            //     link.click()
-            //     document.body.removeChild(link)
-            //     URL.revokeObjectURL(imageUrl)
-            // }
         }
         setOpen(false)
         resetStates()
@@ -143,14 +105,6 @@ const UploadImageButton = ({
                     id="imageInput"
                     style={{ display: "none" }}
                 />
-                {image && (
-                    <img
-                        src={image}
-                        alt="uploaded"
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ width: "100px", height: "100px" }}
-                    />
-                )}
                 <label htmlFor="imageInput" className="upload-button">
                     העלאת תמונה
                 </label>
@@ -158,10 +112,9 @@ const UploadImageButton = ({
 
             <Modal
                 open={open}
-                onCancel={handleCancel}
+                onCancel={() => setOpen(false)}
+                title="Edit Image"
                 footer={null}
-                maskClosable={false} // Prevent closing when clicking outside
-                keyboard={false}
             >
                 <section className="upload-image-button">
                     <div className="cropper-container">

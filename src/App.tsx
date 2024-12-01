@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from "react"
+import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 
@@ -53,30 +53,6 @@ export enum EventAction {
 }
 
 const App = () => {
-    // const [image, setImage] = useState<string | null>(null)
-    // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     // Prevent any form submission or navigation
-    //     e.preventDefault()
-    //     e.stopPropagation()
-
-    //     const file = e.target.files?.[0]
-    //     if (!file) return
-
-    //     try {
-    //         const reader = new FileReader()
-    //         reader.onload = (event) => {
-    //             if (event.target?.result) {
-    //                 setImage(event.target.result as string)
-    //             }
-    //         }
-    //         reader.readAsDataURL(file)
-
-    //         // Reset the input value
-    //         e.target.value = ""
-    //     } catch (error) {
-    //         console.error("Error reading file:", error)
-    //     }
-    // }
     return (
         <div className="app">
             <SpeedInsights />
@@ -91,25 +67,8 @@ const App = () => {
                 >
                     <Suspense fallback={<EventsPageSkeleton />}>
                         <AppHeader />
-                        <h1>v - 2</h1>
-                        {/* <div onClick={(e) => e.stopPropagation()}>
-                            <input
-                                type="file"
-                                onChange={handleFileChange}
-                                accept="image/*"
-                                id="imageInput"
-                                // Prevent any default form behavior
-                                onClick={(e) => e.stopPropagation()}
-                            />
-                            {image && (
-                                <img
-                                    src={image}
-                                    alt="uploaded"
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{ width: "100px", height: "100px" }}
-                                />
-                            )}
-                        </div> */}
+                        <h1>v - 3</h1>
+
                         <Routes>
                             <Route path="signup" element={<Signup />} />
                             <Route path="login" element={<Login />} />
