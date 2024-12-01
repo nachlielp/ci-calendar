@@ -70,18 +70,24 @@ async function checkAndUpdateToken(user: CIUser) {
     if (!utilService.isPWA()) {
         return
     }
+
     try {
+        console.log("checkAndUpdateToken - try")
+
         const token = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
         })
+        console.log("checkAndUpdateToken - token")
 
         const deviceId = utilService.getDeviceId()
-
+        console.log("checkAndUpdateToken - deviceId")
         const existingToken = user.push_notification_tokens?.find(
             (token) => token.device_id === deviceId
         )?.token
 
         if (!existingToken || token !== existingToken) {
+            console.log("checkAndUpdateToken - updateUser")
+
             store.updateUser({
                 user_id: user.user_id,
                 push_notification_tokens: [
