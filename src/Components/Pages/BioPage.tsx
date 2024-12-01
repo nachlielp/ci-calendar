@@ -5,7 +5,7 @@ import BioSelfPreview from "../Users/BioSelfPreview"
 import ProfileForm from "../Users/ProfileForm"
 
 const BioPage = () => {
-    const [editProfile, setEditProfile] = useState(false)
+    const [editProfile, setEditProfile] = useState(true)
     const handleSubmitEdit = () => {
         setEditProfile(false)
     }
