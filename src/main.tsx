@@ -3,21 +3,21 @@ import App from "./App.tsx"
 import "./index.css"
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router-dom"
-import posthog from "posthog-js"
-import { PostHogProvider } from "posthog-js/react"
-const options = {
-    api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-}
-if (import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
-    posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, options)
-}
+// import posthog from "posthog-js"
+// import { PostHogProvider } from "posthog-js/react"
+// const options = {
+//     api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+// }
+// if (import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
+//     posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, options)
+// }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
         <Providers>
-            <PostHogProvider client={posthog}>
-                <App />
-            </PostHogProvider>
+            {/* <PostHogProvider client={posthog}> */}
+            <App />
+            {/* </PostHogProvider> */}
         </Providers>
     </BrowserRouter>
 )
