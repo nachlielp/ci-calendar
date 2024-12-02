@@ -1,4 +1,11 @@
-import { observable, action, makeAutoObservable, computed, toJS } from "mobx"
+import {
+    observable,
+    action,
+    makeAutoObservable,
+    computed,
+    toJS,
+    reaction,
+} from "mobx"
 import {
     CIAlert,
     CIConfig,
@@ -68,6 +75,19 @@ class Store {
             this.setSession(session)
             this.init()
         })
+
+        reaction(
+            () => this.user.user_type,
+            (userType) => {
+                if (
+                    userType === UserType.org ||
+                    userType === UserType.creator
+                ) {
+                    this.fetchAppPublicBios()
+                    this.fetchAppTaggableTeachers()
+                }
+            }
+        )
     }
 
     //For non-authenticated users, I use polling to avoid useing a subscription channel
