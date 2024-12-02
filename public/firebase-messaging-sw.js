@@ -1,6 +1,6 @@
+const CACHE_VERSION = (15).toString()
+const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 self.addEventListener("install", (event) => {
-    const CACHE_VERSION = (15).toString()
-    const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
@@ -12,6 +12,29 @@ self.addEventListener("install", (event) => {
                 "/assets/",
             ])
         })
+    )
+})
+
+self.addEventListener("activate", (e) => {
+    e.waitUntil(
+        (async () => {
+            console.log("[ServiceWorker] - Checking caches")
+
+            const keyList = await caches.keys()
+            await Promise.all(
+                keyList.map((key) => {
+                    // Only delete caches that start with 'my-app-cache-' but aren't the current version
+                    if (
+                        key.startsWith("ci-calendar-cache-") &&
+                        key !== CACHE_NAME
+                    ) {
+                        console.log("[ServiceWorker] - Removing old cache", key)
+                        return caches.delete(key)
+                    }
+                    return Promise.resolve()
+                })
+            )
+        })()
     )
 })
 
@@ -109,28 +132,6 @@ self.addEventListener("notificationclick", (event) => {
 // })
 
 //clean up old caches by name
-self.addEventListener("activate", (e) => {
-    e.waitUntil(
-        (async () => {
-            console.log("[ServiceWorker] - Checking caches")
-
-            const keyList = await caches.keys()
-            await Promise.all(
-                keyList.map((key) => {
-                    // Only delete caches that start with 'my-app-cache-' but aren't the current version
-                    if (
-                        key.startsWith("ci-calendar-cache-") &&
-                        key !== CACHE_NAME
-                    ) {
-                        console.log("[ServiceWorker] - Removing old cache", key)
-                        return caches.delete(key)
-                    }
-                    return Promise.resolve()
-                })
-            )
-        })()
-    )
-})
 
 //TODO: for navigation with notification links
 self.addEventListener("load", () => {
