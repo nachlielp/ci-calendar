@@ -121,6 +121,7 @@ class Store {
     get getSortedEvents() {
         return this.app_ci_events
             .slice()
+            .filter((e) => !e.hide)
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
             )
