@@ -1,6 +1,5 @@
-const CACHE_NAME = "ci-calendar-cache-v5"
-
 self.addEventListener("install", (event) => {
+    const CACHE_NAME = "ci-calendar-cache-v5"
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
