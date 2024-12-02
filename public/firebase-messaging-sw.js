@@ -1,4 +1,4 @@
-const CACHE_VERSION = (19).toString()
+const CACHE_VERSION = (2).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 self.addEventListener("install", (event) => {
     event.waitUntil(
@@ -45,6 +45,7 @@ self.addEventListener("fetch", (event) => {
         "firebaseio.com",
         "firebasedatabase.app",
         "maps.googleapis.com",
+        "pjgwpivkvsuernmoeebk.supabase.co",
     ]
     if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
         event.respondWith(fetch(event.request))
