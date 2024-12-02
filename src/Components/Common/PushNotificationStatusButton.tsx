@@ -47,12 +47,14 @@ const PushNotificationStatusButton = () => {
                 !utilService.isPWA() && "pwa-only"
             } ${status === PromissionStatus.granted && "granted"}`}
         >
-            <button
-                onClick={handleChange}
-                className={`notification-status-button general-action-btn ${status} `}
-            >
-                אישור התראות
-            </button>
+            {utilService.isPWA() && (
+                <button
+                    onClick={handleChange}
+                    className={`notification-status-button general-action-btn ${status} `}
+                >
+                    אישור התראות
+                </button>
+            )}
 
             {status == PromissionStatus.default && (
                 <Alert
