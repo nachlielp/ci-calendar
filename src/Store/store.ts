@@ -268,11 +268,12 @@ class Store {
         if (
             !selfExists &&
             this.user?.user_id &&
-            this.user?.user_type !== UserType.org
+            this.user?.user_type !== UserType.org &&
+            this.bio?.bio_name
         ) {
             return [
                 {
-                    label: this.bio?.bio_name || this.user.email,
+                    label: this.bio?.bio_name,
                     value: this.user.user_id,
                 },
                 ...teachers,
