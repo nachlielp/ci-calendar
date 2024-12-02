@@ -1,7 +1,6 @@
-export const CACHE_VERSION = (14).toString()
-export const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
-
 self.addEventListener("install", (event) => {
+    const CACHE_VERSION = (15).toString()
+    const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([

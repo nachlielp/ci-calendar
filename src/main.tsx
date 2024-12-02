@@ -25,7 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("/sw.js")
+            .register("/firebase-messaging-sw.js")
             .then(async (registration) => {
                 console.log(
                     "_Service Worker registered with scope:",
