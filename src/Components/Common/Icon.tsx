@@ -53,6 +53,7 @@ import domain from "../../assets/svgs/domain.svg"
 import more_vert from "../../assets/svgs/more_vert.svg"
 import cancel from "../../assets/svgs/cancel.svg"
 import check_circle from "../../assets/svgs/check_circle.svg"
+import verified_user from "../../assets/svgs/verified_user.svg"
 
 export const Icon = ({
     icon,
@@ -121,6 +122,7 @@ export const Icon = ({
         more_vert,
         cancel,
         check_circle,
+        verified_user,
     }
     return (
         <label className="icon-component" onClick={onClick}>

@@ -8,7 +8,10 @@ export type CreateRequest = Partial<CIRequest> & {
 
 export type UpdateRequest = Partial<CIRequest> & {
     id: string
-    status?: string
+    type?: RequestType
+    phone?: string
+    message?: string
+    closed?: boolean
     response?: string
 }
 

@@ -62,9 +62,9 @@ export const requestStatusOptions: RequestStatusOptions[] = [
     { value: RequestStatus.closed, label: RequestStatusHebrew.closed },
 ]
 export const requestTypeOptions: SelectOption[] = [
-    { value: RequestType.make_profile, label: RequestTypeHebrew.make_profile },
-    { value: RequestType.make_creator, label: RequestTypeHebrew.make_creator },
-    { value: RequestType.make_org, label: RequestTypeHebrew.make_org },
+    { value: RequestType.profile, label: RequestTypeHebrew.profile },
+    { value: RequestType.creator, label: RequestTypeHebrew.creator },
+    { value: RequestType.org, label: RequestTypeHebrew.org },
     { value: RequestType.support, label: RequestTypeHebrew.support },
 ]
 export enum ScreenSize {

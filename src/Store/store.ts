@@ -214,6 +214,11 @@ class Store {
     }
 
     @computed
+    get getOpenPositionRequests() {
+        return this.requests.find((r) => !r.closed)
+    }
+
+    @computed
     get getBio() {
         return this.bio
     }
@@ -786,7 +791,9 @@ class Store {
     @action
     updateRequest = async (request: UpdateRequest) => {
         if (!request.id) return
+        console.log("updateRequest", request)
         const updatedRequest = await requestsService.updateRequest(request)
+        console.log("updatedRequest", updatedRequest)
         this.setAppRequest(updatedRequest, EventPayloadType.UPDATE)
     }
 

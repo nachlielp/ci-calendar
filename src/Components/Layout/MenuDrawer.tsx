@@ -97,8 +97,8 @@ const MenuDrawer = () => {
         },
         {
             key: "request",
-            icon: "support_agent",
-            label: "תמיכה",
+            icon: "verified_user",
+            label: "הרשמה כמורה או ארגון",
             onClick: () => {
                 navigate("/request")
                 setOpen(false)

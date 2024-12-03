@@ -3,6 +3,7 @@ interface AsyncButtonProps {
     callback: (args?: any) => void
     children: React.ReactNode
     disabled?: boolean
+    className?: string
 }
 
 export default function AsyncButton({
@@ -10,12 +11,15 @@ export default function AsyncButton({
     callback,
     children,
     disabled,
+    className,
 }: AsyncButtonProps) {
     return (
         <>
             <button
                 onClick={callback}
-                className={`general-action-btn ${disabled ? "disabled" : ""}`}
+                className={`general-action-btn ${
+                    disabled ? "disabled" : ""
+                } ${className}`}
                 disabled={isSubmitting || disabled}
             >
                 {isSubmitting ? (

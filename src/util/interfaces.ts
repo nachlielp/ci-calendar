@@ -128,6 +128,14 @@ export enum UserType {
     user = "user",
 }
 
+export enum UserTypeHebrew {
+    admin = "מנהל",
+    creator = "מורה ויוצר ארועים",
+    profile = "מורה",
+    org = "ארגון",
+    user = "משתמש",
+}
+
 export interface IMailingList {
     createdAt: string
     updatedAt: string
@@ -312,19 +320,20 @@ export interface CIRequest {
     sent: boolean
     to_send: boolean
     viewed: boolean
+    closed: boolean
 }
 
 export enum RequestType {
-    make_profile = "make_profile",
-    make_creator = "make_creator",
-    make_org = "make_org",
+    profile = "profile",
+    creator = "creator",
+    org = "org",
     support = "support",
 }
 
 export enum RequestTypeHebrew {
-    make_profile = "הרשמה כמורה",
-    make_creator = "הרשמה כמורה ויוצר ארועים",
-    make_org = "הרשמה כארגון",
+    profile = "הרשמה כמורה",
+    creator = "הרשמה כמורה ויוצר ארועים",
+    org = "הרשמה כארגון",
     support = "תמיכה",
 }
 

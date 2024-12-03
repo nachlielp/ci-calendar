@@ -2,11 +2,13 @@ import Form, { FormProps } from "antd/es/form"
 import Input from "antd/es/input"
 import Card from "antd/es/card"
 import Select from "antd/es/select"
-import { CIRequest, RequestStatus, RequestType } from "../../util/interfaces"
+import { RequestType } from "../../util/interfaces"
 import { useState } from "react"
 import Alert from "antd/es/alert"
-import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
-import { store } from "../../Store/store"
+
+import { userRequestVM } from "./UserRequestVM"
+import { observer } from "mobx-react-lite"
+import AsyncButton from "../Common/AsyncButton"
 
 type RequestFieldType = {
     requestType: RequestType
@@ -15,52 +17,71 @@ type RequestFieldType = {
 }
 
 const requestOptions = [
-    { label: "הרשמה כמורה", value: "make_profile" },
-    { label: "הרשמה כמורה ויוצר ארועים", value: "make_creator" },
-    { label: "הרשמה כארגון", value: "make_org" },
-    { label: "תמיכה", value: "support" },
+    { label: "הרשמה כמורה", value: RequestType.profile },
+    { label: "הרשמה כמורה ויוצר ארועים", value: RequestType.creator },
+    { label: "הרשמה כארגון", value: RequestType.org },
+    // { label: "תמיכה", value: "support" },
 ]
 
-const enum RequestResponse {
-    success = "הבקשה נשלחה בהצלחה",
-    error = "קרה שגיאה בשליחת הבקשה",
-}
-export default function RequestForm() {
-    const user = store.getUser
-    const [type, setType] = useState<RequestType | null>(null)
-    const [isSubmitted, setIsSubmitted] = useState<RequestResponse | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+const profileDescription = (
+    <label>
+        <b>מורים</b> יכולים ליצור פרופיל ציבורי עם פרטים אישיים ומידע נוסף עבור
+        חברי הקהילה. מורים לא מורשים להוסיף אירועים ללוח אירועים.
+    </label>
+)
+const creatorDescription = (
+    <label>
+        <b>מורים עם הרשאה לפרסום אירועים</b> יכולים ליצור פרופיל ציבורי עם פרטים
+        אישיים ומידע נוסף עבור חברי הקהילה. בנוסף, יש אפשרות להוסיף אירועים ללוח
+        שנה הציבורי.
+    </label>
+)
+const orgDescription = (
+    <label>
+        <b>ארגון</b> יכול ליצור פרופיל ציבורי עם פרטים על הארגון ויכולת לקשר
+        מורים ספציפיים לארגון. כמו כן הארגון יכול ליצור אירועים על שם המורים
+        שמקושרים אליו.
+    </label>
+)
+
+const RequestForm = () => {
     const [inputErrors, setInputErrors] = useState<boolean>(false)
 
     const [form] = Form.useForm()
 
-    const onFinish: FormProps<RequestFieldType>["onFinish"] = async (
-        values
-    ) => {
-        const requestPayload: Omit<CIRequest, "id" | "number"> = {
-            type: values.requestType as RequestType,
-            message: values.description || "",
-            phone: values.phone || "",
-            email: user.email || "",
-            name: user.user_name || "",
-            responses: [],
-            user_id: user.user_id,
-            status: RequestStatus.open,
-            viewed_response: false,
-            viewed_by: [],
-            created_at: new Date().toISOString(),
-            sent: false,
-            viewed: false,
-            to_send: false,
-        }
-        try {
-            setIsSubmitting(true)
-            await store.createRequest(requestPayload)
-            setIsSubmitted(RequestResponse.success)
-        } catch (error) {
-            console.error("RequestForm.onFinish.error: ", error)
-        } finally {
-            setIsSubmitting(false)
+    const filteredRequestOptions = requestOptions.filter(
+        (option) =>
+            String(option.value) !== String(userRequestVM.currentUserType)
+    )
+
+    const onFinish = async () => {
+        const values = form.getFieldsValue()
+        if (!userRequestVM.openPositionRequest) {
+            try {
+                console.log("RequestForm.onFinish.createRequest")
+                await userRequestVM.createRequest({
+                    type: values.requestType as RequestType,
+                    phone: values.phone || "",
+                    message: values.description || "",
+                })
+            } catch (error) {
+                console.error("RequestForm.onFinish.error: ", error)
+            } finally {
+                userRequestVM.closeForm()
+            }
+        } else if (userRequestVM.openPositionRequest) {
+            try {
+                console.log("RequestForm.onFinish.updateRequest")
+                await userRequestVM.updateRequest({
+                    type: values.requestType as RequestType,
+                    phone: values.phone || "",
+                    message: values.description || "",
+                })
+            } catch (error) {
+                console.error("RequestForm.onFinish.error: ", error)
+            } finally {
+                userRequestVM.closeForm()
+            }
         }
     }
 
@@ -71,108 +92,129 @@ export default function RequestForm() {
 
     return (
         <div className="request-form">
-            <Card
-                style={{ width: "300px", marginTop: "1rem" }}
-                id="request-form-card"
-            >
-                {!isSubmitted && (
-                    <Form
-                        form={form}
-                        onFinish={onFinish}
-                        autoComplete="off"
-                        initialValues={{
-                            user_name: user.user_name,
-                            email: user.email,
-                            phone: user.phone ? parseInt(user.phone) : "",
-                        }}
-                        style={{ minHeight: "130px" }}
-                        onFinishFailed={onFinishFailed}
+            <Card className="request-form-card">
+                <Form
+                    form={form}
+                    // onFinish={onFinish}
+                    autoComplete="off"
+                    initialValues={{
+                        phone: userRequestVM.getPhone,
+                        requestType: userRequestVM.getRequestType,
+                        description: userRequestVM.getDescription,
+                    }}
+                    style={{ minHeight: "130px" }}
+                    onFinishFailed={onFinishFailed}
+                >
+                    <Form.Item<RequestFieldType>
+                        name="requestType"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please select a request type",
+                            },
+                        ]}
                     >
-                        <Form.Item<RequestFieldType>
-                            name="requestType"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "Please select a request type",
-                                },
-                            ]}
-                        >
-                            <Select
-                                placeholder="סוג הבקשה"
-                                options={requestOptions}
-                                onChange={(value) =>
-                                    setType(value as RequestType)
-                                }
-                            />
-                        </Form.Item>
+                        <Select
+                            placeholder="סוג הבקשה"
+                            options={filteredRequestOptions}
+                            onChange={(value) =>
+                                userRequestVM.setRequestType(
+                                    value as RequestType
+                                )
+                            }
+                        />
+                    </Form.Item>
 
-                        <Form.Item<RequestFieldType>
-                            name="phone"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: "נא להזין מספר פלאפון",
-                                },
-                                {
-                                    pattern: /^[0-9]+$/,
-                                    message: "נא להזין מספר פלאפון תקין",
-                                },
-                            ]}
-                        >
-                            <Input placeholder="מספר פלאפון" />
-                        </Form.Item>
+                    {(userRequestVM.getRequestType ||
+                        userRequestVM.isEditRequest) && (
+                        <>
+                            {userRequestVM.getRequestType ===
+                                RequestType.org && (
+                                <label>{orgDescription}</label>
+                            )}
+                            {userRequestVM.getRequestType ===
+                                RequestType.creator && (
+                                <label>{creatorDescription}</label>
+                            )}
+                            {userRequestVM.getRequestType ===
+                                RequestType.profile && (
+                                <label>{profileDescription}</label>
+                            )}
 
-                        {type && (
-                            <>
-                                <Form.Item<RequestFieldType>
-                                    name="description"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: "נא להזין תיאור ",
-                                        },
-                                    ]}
-                                >
-                                    <Input.TextArea
-                                        placeholder={
-                                            type === RequestType.support
-                                                ? "תיאור הבקשה"
-                                                : "קצת עליי והערות נוספות"
+                            <Form.Item<RequestFieldType>
+                                name="phone"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "נא להזין מספר פלאפון",
+                                    },
+                                    {
+                                        pattern: /^[0-9]+$/,
+                                        message: "נא להזין מספר פלאפון תקין",
+                                    },
+                                ]}
+                            >
+                                <Input placeholder="מספר פלאפון" />
+                            </Form.Item>
+
+                            <Form.Item<RequestFieldType>
+                                name="description"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "נא להזין תיאור ",
+                                    },
+                                ]}
+                            >
+                                <Input.TextArea
+                                    placeholder={
+                                        userRequestVM.getRequestType ===
+                                        RequestType.support
+                                            ? "תיאור הבקשה"
+                                            : "קצת עליי והערות נוספות"
+                                    }
+                                    rows={6}
+                                />
+                            </Form.Item>
+                            {inputErrors && (
+                                <Alert
+                                    message="ערכים שגויים, נא לבדוק את הטופס"
+                                    type="error"
+                                    style={{ margin: "10px 0" }}
+                                />
+                            )}
+                            <Form.Item wrapperCol={{ span: 24 }}>
+                                <article className="submit-button-container">
+                                    <AsyncButton
+                                        isSubmitting={
+                                            userRequestVM.getIsSubmitting
                                         }
-                                        rows={6}
-                                    />
-                                </Form.Item>
-                                {inputErrors && (
-                                    <Alert
-                                        message="ערכים שגויים, נא לבדוק את הטופס"
-                                        type="error"
-                                        style={{ margin: "10px 0" }}
-                                    />
-                                )}
-                                <Form.Item
-                                    wrapperCol={{ span: 24 }}
-                                    className="submit-button-container"
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "flex-start",
-                                    }}
-                                >
-                                    <AsyncFormSubmitButton
-                                        isSubmitting={isSubmitting}
+                                        className="black-btn"
+                                        callback={onFinish}
                                     >
-                                        הגשה
-                                    </AsyncFormSubmitButton>
-                                </Form.Item>
-                            </>
-                        )}
-                    </Form>
-                )}
-                {isSubmitted && (
-                    <div>
-                        <h2>{isSubmitted}</h2>
-                    </div>
-                )}
+                                        {userRequestVM.isEditRequest
+                                            ? "עדכון"
+                                            : "הגשה"}
+                                    </AsyncButton>
+                                    {userRequestVM.isEditRequest && (
+                                        <AsyncButton
+                                            isSubmitting={
+                                                userRequestVM.getIsSubmitting
+                                            }
+                                            callback={userRequestVM.closeForm}
+                                            className="black-btn"
+                                        >
+                                            ביטול
+                                        </AsyncButton>
+                                    )}
+                                </article>
+                            </Form.Item>
+                        </>
+                    )}
+                </Form>
             </Card>
         </div>
     )
 }
+
+export default observer(RequestForm)

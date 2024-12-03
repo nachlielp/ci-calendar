@@ -56,6 +56,8 @@
 @import "./styles/generics/form-inputs.css";
 @import "./styles/date-input-modal.css";
 @import "./styles/upload-image-button.css";
+@import "./styles/request-form.css";
+@import "./styles/open-request.css";
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")

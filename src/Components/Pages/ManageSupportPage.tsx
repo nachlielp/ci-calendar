@@ -62,11 +62,11 @@ const ManageSupportPage = () => {
         switch (action) {
             case "approved":
                 const newUserType =
-                    request.type === RequestType.make_profile
+                    request.type === RequestType.profile
                         ? UserType.profile
-                        : request.type === RequestType.make_creator
+                        : request.type === RequestType.creator
                         ? UserType.creator
-                        : request.type === RequestType.make_org
+                        : request.type === RequestType.org
                         ? UserType.org
                         : null
 
@@ -75,11 +75,11 @@ const ManageSupportPage = () => {
                         user_id: request.user_id,
                         user_type: newUserType,
                         role_id:
-                            request.type === RequestType.make_profile
+                            request.type === RequestType.profile
                                 ? 4
-                                : request.type === RequestType.make_creator
+                                : request.type === RequestType.creator
                                 ? 2
-                                : request.type === RequestType.make_org
+                                : request.type === RequestType.org
                                 ? 3
                                 : 0,
                     })

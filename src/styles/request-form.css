@@ -1,0 +1,12 @@
+.request-form {
+    .request-form-card {
+        width: 300px !important;
+        min-height: 400px !important;
+
+        .submit-button-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+    }
+}
