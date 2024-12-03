@@ -4,6 +4,8 @@
 
 This app is a work in progress, attempting, together with the [Israeli Contact Improve org](https://www.contactil.org/amutah), to solve the Israeli Contact Improv community's need for a calendar that is easy to use and navigate.
 
+-   [Notifications Server](https://github.com/contactil/ci-calendar-server) is a separate project, and is not included in this repository.
+
 ## Features
 
 ### Users
@@ -13,13 +15,14 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 -   Events can be filtered by region and type (workshop, jame, etc.)
 -   Event previews open to a modal on desktop, and a side page (drawer) on mobile, containing full details, linke to share, and google maps link (maps and share in PWA only)
 -   Users can set notifications for new events of selected Teachers and Organizers (in PWA only)
+-   Users can set alerts for events that are starting soon (in PWA only)
 -   Users can set default filters for event list
 -   Users can submit support tickets and ask to be configerd as teachers or organizers
 
 ### Teachers and Organizers
 
 -   Can add new events to the calendar
--   Can edit and delete events
+-   Can edit and delete their events
 -   Can edit their profile and settings
 -   Can create templates for their events, and use them to create new events
 
@@ -33,6 +36,7 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 
 -   React
 -   TypeScript
+-   MobX
 -   Supabase
 -   Firebase Cloud Messaging
 -   Ant Design
@@ -49,20 +53,17 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 
 ## Environment Variables
 
-VITE_BRANCH
-VITE_FIREBASE_APP_ID
-VITE_FIREBASE_MESSAGING_SENDER_ID
-VITE_FIREBASE_STORAGE_BUCKET
-VITE_FIREBASE_PROJECT_ID
-VITE_FIREBASE_AUTH_DOMAIN
-VITE_FIREBASE_API_KEY
-VITE_VAPID_PUBLIC_FIREBASE_KEY
-VITE_SUPABASE_ANON_KEY
-VITE_SUPABASE_URL
-VITE_GOOGLE_MAPS_API_KEY
-
-VITE_CLOUDINARY_CLOUD_NAME
-VITE_CLOUDINARY_UPLOAD_PRESET
-VITE_CLOUDINARY_API_KEY
-VITE_CLOUDINARY_API_SECRET
-VITE_CLOUDINARY_FOLDER
+-   VITE_BRANCH
+-   VITE_FIREBASE_APP_ID
+-   VITE_FIREBASE_MESSAGING_SENDER_ID
+-   VITE_FIREBASE_STORAGE_BUCKET
+-   VITE_FIREBASE_PROJECT_ID
+-   VITE_FIREBASE_AUTH_DOMAIN
+-   VITE_FIREBASE_API_KEY
+-   VITE_VAPID_PUBLIC_FIREBASE_KEY
+-   VITE_SUPABASE_ANON_KEY
+-   VITE_SUPABASE_URL
+-   VITE_GOOGLE_MAPS_API_KEY
+-   VITE_SUPABASE_STORAGE_BUCKET
+-   VITE_SUPABASE_BIO_STORAGE_PATH
+-   VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
