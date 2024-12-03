@@ -4,6 +4,7 @@
 
 This app is a work in progress, attempting, together with the [Israeli Contact Improve org](https://www.contactil.org/amutah), to solve the Israeli Contact Improv community's need for a calendar that is easy to use and navigate.
 
+-   [App walkthrough video](https://www.youtube.com/watch?v=E3M_769ua3c)
 -   [Notifications Server](https://github.com/contactil/ci-calendar-server) is a separate project, and is not included in this repository.
 
 ## Features
