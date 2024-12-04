@@ -1,4 +1,4 @@
-const CACHE_VERSION = (3).toString()
+const CACHE_VERSION = (4).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 self.addEventListener("install", (event) => {
     event.waitUntil(
