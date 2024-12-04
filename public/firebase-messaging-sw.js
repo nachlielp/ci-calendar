@@ -39,18 +39,18 @@ self.addEventListener("activate", (e) => {
             await Promise.all(clearCaches)
 
             // Additional storage management for Android
-            try {
-                if ("storage" in navigator && "estimate" in navigator.storage) {
-                    const { usage, quota } = await navigator.storage.estimate()
-                    console.log(`Using ${usage} out of ${quota} bytes.`)
+            // try {
+            //     if ("storage" in navigator && "estimate" in navigator.storage) {
+            //         const { usage, quota } = await navigator.storage.estimate()
+            //         console.log(`Using ${usage} out of ${quota} bytes.`)
 
-                    if ("persistent" in navigator.storage) {
-                        await navigator.storage.persist()
-                    }
-                }
-            } catch (error) {
-                console.error("[ServiceWorker] - Storage cleanup error:", error)
-            }
+            //         if ("persistent" in navigator.storage) {
+            //             await navigator.storage.persist()
+            //         }
+            //     }
+            // } catch (error) {
+            //     console.error("[ServiceWorker] - Storage cleanup error:", error)
+            // }
 
             // Return self.clients.claim() to take control of all clients immediately
             return self.clients.claim()
