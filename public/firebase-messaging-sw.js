@@ -1,6 +1,9 @@
 const CACHE_VERSION = (5).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
+
 self.addEventListener("install", (event) => {
+    self.skipWaiting()
+
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
@@ -19,27 +22,38 @@ self.addEventListener("activate", (e) => {
     e.waitUntil(
         (async () => {
             console.log("[ServiceWorker] - Checking caches")
+            await self.clients.claim()
 
             const keyList = await caches.keys()
-            await Promise.all(
-                keyList
-                    .map((key) => {
-                        if (
-                            key.startsWith("ci-calendar-cache-") &&
-                            key !== CACHE_NAME
-                        ) {
-                            console.log(
-                                "[ServiceWorker] - Removing old cache",
-                                key
-                            )
-                            return caches.delete(key)
-                        }
-                    })
-                    .then(() => {
-                        // Take control of all clients immediately
-                        return self.clients.claim()
-                    })
-            )
+
+            const clearCaches = keyList.map((key) => {
+                if (
+                    key.startsWith("ci-calendar-cache-") &&
+                    key !== CACHE_NAME
+                ) {
+                    console.log("[ServiceWorker] - Removing old cache", key)
+                    return caches.delete(key)
+                }
+            })
+
+            await Promise.all(clearCaches)
+
+            // Additional storage management for Android
+            try {
+                if ("storage" in navigator && "estimate" in navigator.storage) {
+                    const { usage, quota } = await navigator.storage.estimate()
+                    console.log(`Using ${usage} out of ${quota} bytes.`)
+
+                    if ("persistent" in navigator.storage) {
+                        await navigator.storage.persist()
+                    }
+                }
+            } catch (error) {
+                console.error("[ServiceWorker] - Storage cleanup error:", error)
+            }
+
+            // Return self.clients.claim() to take control of all clients immediately
+            return self.clients.claim()
         })()
     )
 })
