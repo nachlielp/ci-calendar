@@ -158,6 +158,15 @@ class UserRequestVM {
         this.isEditRequest = false
         this.requestType = null
     }
+
+    @action viewRequestAlert = (requestId: string) => {
+        if (requestId !== this.openPositionRequest?.id) return
+        store.viewRequestAlert(requestId)
+    }
+
+    @action viewRequestAlerts = async () => {
+        await store.viewRequestAlerts()
+    }
 }
 
 export const userRequestVM = new UserRequestVM()

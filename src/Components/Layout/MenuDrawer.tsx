@@ -103,7 +103,7 @@ const MenuDrawer = () => {
                 navigate("/request")
                 setOpen(false)
             },
-            disabled: isAdmin,
+            disabled: isProfile,
         },
         {
             key: "manage-support",

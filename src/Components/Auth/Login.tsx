@@ -116,7 +116,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="general-action-btn "
+                        className="general-action-btn"
                     >
                         כניסה
                     </button>

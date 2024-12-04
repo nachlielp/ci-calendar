@@ -881,6 +881,37 @@ class Store {
             }
         }
     }
+    @action
+    viewRequestAlerts = async () => {
+        //Notice - batch updates are blocked by policy issues for some reason
+        const alerts = this.alerts.filter((a) => !!a.request_id)
+
+        for (const alert of alerts) {
+            if (alert && !alert.viewed) {
+                const updatedAlert = await alertsService.updateAlert({
+                    id: alert.id,
+                    viewed: true,
+                })
+                this.setAlert(
+                    { ...alert, ...updatedAlert },
+                    EventPayloadType.UPDATE
+                )
+                if (!alert.request_id) continue
+                const updatedRequest = await requestsService.updateRequest({
+                    id: alert.request_id,
+                    viewed: true,
+                })
+                const request = this.requests.find(
+                    (r) => r.id === alert.request_id
+                )
+                if (!request) continue
+                this.setRequest(
+                    { ...request, ...updatedRequest },
+                    EventPayloadType.UPDATE
+                )
+            }
+        }
+    }
 
     @action
     setConfig = (config: CIConfig, eventType: EventPayloadType) => {

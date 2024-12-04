@@ -1,8 +1,10 @@
 import dayjs from "dayjs"
-import { CIAlert, NotificationType } from "../../util/interfaces"
+import { CIAlert, NotificationType, UserType } from "../../util/interfaces"
 import { useNavigate } from "react-router-dom"
 import { observer } from "mobx-react-lite"
 import { alertsAnchorViewModal } from "./AlertsAnchorVM"
+import { store } from "../../Store/store"
+import { userRequestVM } from "../Requests/UserRequestVM"
 
 const AlertsAnchor = () => {
     const navigate = useNavigate()
@@ -16,7 +18,13 @@ const AlertsAnchor = () => {
 
     const onRequestClick = (alert: CIAlert) => {
         alertsAnchorViewModal.setOpen(false)
-        navigate(`/request/${alert.request_id}`)
+        if (store.getUser.user_type === UserType.user) {
+            navigate(`/request/${alert.request_id}`)
+            userRequestVM.viewRequestAlerts()
+        } else {
+            navigate(`/bio/request/${alert.request_id}`)
+            userRequestVM.viewRequestAlerts()
+        }
     }
 
     return (

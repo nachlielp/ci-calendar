@@ -3,14 +3,26 @@ import Typography from "antd/es/typography"
 import { Icon } from "../Common/Icon"
 import { UserBio } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
+import { useIsMobile } from "../../hooks/useIsMobile"
 const { Text } = Typography
 
 const BioCard = ({ teacher }: { teacher: UserBio }) => {
+    const isMobile = useIsMobile()
     if (!teacher.bio_name) {
-        return <h2>לא נמצא פרופיל</h2>
+        return (
+            <section className="bio-card">
+                <h2
+                    className={`teacher-form ${
+                        isMobile ? "mobile" : "desktop"
+                    }`}
+                >
+                    לא נמצא פרופיל
+                </h2>
+            </section>
+        )
     }
     return (
-        <section className="bio-card" style={{ direction: "rtl" }}>
+        <section className="bio-card">
             <label className="bio-card-title">{teacher.bio_name}</label>
 
             {teacher?.img && (

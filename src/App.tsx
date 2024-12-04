@@ -138,6 +138,18 @@ const App = () => {
                                         </Suspense>
                                     }
                                 />
+                                <Route
+                                    path="/bio/request/:requestId"
+                                    element={<SupportPage />}
+                                />
+                                <Route
+                                    path="/bio/request"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <SupportPage />
+                                        </Suspense>
+                                    }
+                                />
                             </Route>
 
                             {/* Creator privet routes */}
