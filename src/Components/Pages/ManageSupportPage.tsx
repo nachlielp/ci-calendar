@@ -13,27 +13,26 @@ import dayjs from "dayjs"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import { requestTypeOptions } from "../../util/options"
 import Switch from "antd/es/switch"
-import AddResponseToSupportReqModal from "../Requests/AddResponseToSupportReqModal"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 
 const ManageSupportPage = () => {
-    const [selectedStatus, setSelectedStatus] = useState<RequestStatus>(
-        RequestStatus.open
-    )
+    // const [selectedStatus, setSelectedStatus] = useState<RequestStatus>(
+    //     RequestStatus.open
+    // )
+    const [showOpenRequests, setShowOpenRequests] = useState<boolean>(true)
     const [selectedTypes, setSelectedTypes] = useState<RequestType[]>([])
     const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
         null
     )
     const [filteredRequests, setFilteredRequests] = useState<CIRequest[]>([])
-    const [addResponseModalOpen, setAddResponseModalOpen] =
-        useState<boolean>(false)
+    // const [addResponseModalOpen, setAddResponseModalOpen] =
+    //     useState<boolean>(false)
 
     useEffect(() => {
-        const requests =
-            selectedStatus === RequestStatus.open
-                ? store.getOpenAppRequests
-                : store.getClosedAppRequests
+        const requests = showOpenRequests
+            ? store.getOpenAppRequests
+            : store.getClosedAppRequests
 
         if (selectedTypes.length === 0) {
             setFilteredRequests(requests)
@@ -48,10 +47,10 @@ const ManageSupportPage = () => {
         })
 
         setFilteredRequests(sortedRequests)
-    }, [store.app_requests, selectedTypes, selectedStatus])
+    }, [store.app_requests, selectedTypes, showOpenRequests])
 
     function handleStatusChange(checked: boolean) {
-        setSelectedStatus(checked ? RequestStatus.open : RequestStatus.closed)
+        setShowOpenRequests(checked)
     }
 
     function handleTypesChange(values: string[]) {
@@ -100,6 +99,7 @@ const ManageSupportPage = () => {
                     viewed: false,
                     sent: false,
                     to_send: true,
+                    closed: true,
                 }
                 await store.updateRequest(newRequest)
                 break
@@ -138,11 +138,11 @@ const ManageSupportPage = () => {
     function handleOpenRequest(request: CIRequest) {
         if (expandedRequestId === request.id) {
             setExpandedRequestId(null)
-            setAddResponseModalOpen(false)
+            // setAddResponseModalOpen(false)
             return
         }
         setExpandedRequestId(request.id)
-        setAddResponseModalOpen(false)
+        // setAddResponseModalOpen(false)
     }
 
     return (
@@ -161,9 +161,9 @@ const ManageSupportPage = () => {
                         className="filter-switch"
                         size="default"
                         onChange={handleStatusChange}
-                        checked={selectedStatus === RequestStatus.open}
-                        checkedChildren={RequestStatusHebrew.open}
-                        unCheckedChildren={RequestStatusHebrew.closed}
+                        checked={showOpenRequests}
+                        checkedChildren={"פתוחות"}
+                        unCheckedChildren={"סגורות"}
                     />
                 </div>
             </header>
@@ -202,7 +202,9 @@ const ManageSupportPage = () => {
                                 </h3>
 
                                 <label className="request-status">
-                                    {RequestStatusHebrew[request.status]}
+                                    {request.closed
+                                        ? RequestStatusHebrew.closed
+                                        : RequestStatusHebrew.open}
                                 </label>
                                 <time dateTime={request.created_at}>
                                     {dayjs(request.created_at).format(
@@ -240,7 +242,7 @@ const ManageSupportPage = () => {
                                             {request.message}
                                         </label>
                                     </p>
-                                    {request.responses.length > 0 && (
+                                    {/* {request.responses.length > 0 && (
                                         <article className="request-responses-container">
                                             <label className="request-responses-title">
                                                 תגובות
@@ -258,7 +260,7 @@ const ManageSupportPage = () => {
                                                 )}
                                             </div>
                                         </article>
-                                    )}
+                                    )} */}
                                     <article className="manage-support-actions">
                                         {request.type !==
                                             RequestType.support && (
@@ -271,10 +273,10 @@ const ManageSupportPage = () => {
                                                     )
                                                 }
                                             >
-                                                אישור וסגירה
+                                                אישור
                                             </button>
                                         )}
-                                        <AddResponseToSupportReqModal
+                                        {/* <AddResponseToSupportReqModal
                                             isOpen={addResponseModalOpen}
                                             setIsOpen={setAddResponseModalOpen}
                                             onSubmit={(response) =>
@@ -294,14 +296,14 @@ const ManageSupportPage = () => {
                                                     ],
                                                 })
                                             }
-                                        />
+                                        /> */}
                                         <button
                                             className="secondary-action-btn low-margin"
                                             onClick={() =>
                                                 handleAction("close", request)
                                             }
                                         >
-                                            סגירה
+                                            דחיה
                                         </button>
                                     </article>
                                 </div>

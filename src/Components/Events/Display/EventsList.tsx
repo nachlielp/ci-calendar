@@ -10,7 +10,7 @@ interface IEventsListProps {
     events: CIEvent[]
 }
 
-const CACHE_VERSION = (2).toString()
+const CACHE_VERSION = (3).toString()
 
 export default function EventsList({ events }: IEventsListProps) {
     const { eventId } = useParams<{ eventId: string }>()

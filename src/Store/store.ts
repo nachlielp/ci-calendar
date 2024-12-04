@@ -19,7 +19,6 @@ import {
     ManageUserOption,
     NotificationDB,
     NotificationType,
-    RequestStatus,
     TaggableUserOptions,
     UserBio,
     UserNotification,
@@ -244,14 +243,12 @@ class Store {
 
     @computed
     get getOpenAppRequests() {
-        return this.app_requests.filter((r) => r.status === RequestStatus.open)
+        return this.app_requests.filter((r) => !r.closed)
     }
 
     @computed
     get getClosedAppRequests() {
-        return this.app_requests.filter(
-            (r) => r.status === RequestStatus.closed
-        )
+        return this.app_requests.filter((r) => r.closed)
     }
 
     @computed
