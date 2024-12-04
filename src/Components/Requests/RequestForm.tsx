@@ -125,22 +125,22 @@ const RequestForm = () => {
                         />
                     </Form.Item>
 
-                    {(userRequestVM.getRequestType ||
-                        userRequestVM.isEditRequest) && (
+                    {userRequestVM.getRequestType && (
                         <>
-                            {userRequestVM.getRequestType ===
-                                RequestType.org && (
-                                <label>{orgDescription}</label>
-                            )}
-                            {userRequestVM.getRequestType ===
-                                RequestType.creator && (
-                                <label>{creatorDescription}</label>
-                            )}
-                            {userRequestVM.getRequestType ===
-                                RequestType.profile && (
-                                <label>{profileDescription}</label>
-                            )}
-
+                            <Form.Item>
+                                {userRequestVM.getRequestType ===
+                                    RequestType.org && (
+                                    <label>{orgDescription}</label>
+                                )}
+                                {userRequestVM.getRequestType ===
+                                    RequestType.creator && (
+                                    <label>{creatorDescription}</label>
+                                )}
+                                {userRequestVM.getRequestType ===
+                                    RequestType.profile && (
+                                    <label>{profileDescription}</label>
+                                )}
+                            </Form.Item>
                             <Form.Item<RequestFieldType>
                                 name="phone"
                                 rules={[
@@ -192,7 +192,7 @@ const RequestForm = () => {
                                         className="black-btn"
                                         callback={onFinish}
                                     >
-                                        {userRequestVM.isEditRequest
+                                        {userRequestVM.isOpenPositionRequest
                                             ? "עדכון"
                                             : "הגשה"}
                                     </AsyncButton>

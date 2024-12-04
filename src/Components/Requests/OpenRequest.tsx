@@ -1,16 +1,10 @@
 import { observer } from "mobx-react-lite"
-import { store } from "../../Store/store"
 import Card from "antd/es/card/Card"
 import { UserTypeHebrew } from "../../util/interfaces"
 import { userRequestVM } from "./UserRequestVM"
 
 const OpenRequest = () => {
-    const openPositionRequest = store.getOpenPositionRequests
-    if (!openPositionRequest) return <></>
-
-    const cancelRequest = () => {
-        userRequestVM.closeRequest()
-    }
+    if (!userRequestVM.openPositionRequest) return <></>
 
     return (
         <Card className="open-request">
@@ -22,7 +16,7 @@ const OpenRequest = () => {
                         כ
                         {
                             UserTypeHebrew[
-                                openPositionRequest.type as keyof typeof UserTypeHebrew
+                                userRequestVM.getRequestType as keyof typeof UserTypeHebrew
                             ]
                         }
                     </b>{" "}
@@ -44,7 +38,7 @@ const OpenRequest = () => {
                     עריכת הבקשה
                 </button>
                 <button
-                    onClick={cancelRequest}
+                    onClick={userRequestVM.closeRequest}
                     className="general-action-btn black-btn"
                     type="button"
                 >

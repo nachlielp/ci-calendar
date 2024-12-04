@@ -17,10 +17,6 @@ class UserRequestVM {
         reaction(
             () => store.getOpenPositionRequests,
             () => {
-                console.log(
-                    "store.getOpenPositionRequests",
-                    store.getOpenPositionRequests
-                )
                 this.isEditRequest = false
                 this.openPositionRequest = store.getOpenPositionRequests ?? null
             }
@@ -53,8 +49,12 @@ class UserRequestVM {
         return this.openPositionRequest !== null
     }
 
+    @computed get showUserStatus() {
+        return !this.isOpenPositionRequest && !this.isEditRequest
+    }
+
     @computed get showRequestForm() {
-        return !this.openPositionRequest || this.isEditRequest
+        return this.isEditRequest
     }
 
     @computed get showOpenRequest() {
@@ -72,7 +72,7 @@ class UserRequestVM {
     @action closeRequest = async () => {
         this.isSubmitting = true
         if (!this.openPositionRequest) return
-        store.updateRequest({
+        await store.updateRequest({
             id: this.openPositionRequest.id,
             closed: true,
             responses: [
@@ -87,6 +87,7 @@ class UserRequestVM {
         this.isEditRequest = false
         this.openPositionRequest = null
         this.isSubmitting = false
+        this.requestType = null
     }
 
     @action createRequest = async ({
@@ -120,6 +121,7 @@ class UserRequestVM {
         await store.createRequest(requestPayload)
         this.isEditRequest = false
         this.isSubmitting = false
+        this.requestType = null
     }
 
     @action updateRequest = async ({
@@ -142,6 +144,7 @@ class UserRequestVM {
         await store.updateRequest(reqObj)
         this.isSubmitting = false
         this.isEditRequest = false
+        this.requestType = null
     }
 
     @action setEditingRequest = () => {
@@ -153,6 +156,7 @@ class UserRequestVM {
 
     @action closeForm = () => {
         this.isEditRequest = false
+        this.requestType = null
     }
 }
 

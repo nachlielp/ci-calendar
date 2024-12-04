@@ -2,6 +2,8 @@ import RequestForm from "../Requests/RequestForm"
 import OpenRequest from "../Requests/OpenRequest"
 import { userRequestVM } from "../Requests/UserRequestVM"
 import { observer } from "mobx-react-lite"
+import Card from "antd/lib/card/Card"
+import { UserTypeHebrew } from "../../util/interfaces"
 
 const SupportPage = () => {
     return (
@@ -13,7 +15,34 @@ const SupportPage = () => {
             }}
         >
             <h2>הרשמה כמורה או ארגון</h2>
-            {userRequestVM.showRequestForm ? <RequestForm /> : <OpenRequest />}
+            {userRequestVM.showUserStatus && (
+                <article className="support-page-description">
+                    <Card>
+                        <p dir="rtl">
+                            <label>
+                                אתם רשומים כ
+                                <b>
+                                    {
+                                        UserTypeHebrew[
+                                            userRequestVM.currentUserType
+                                        ]
+                                    }
+                                </b>
+                            </label>
+                            <br />
+                            על מנת לשנות את המעמד שלכם אנא מלאו טופס הרשמה
+                        </p>
+                        <button
+                            className="general-action-btn black-btn"
+                            onClick={() => userRequestVM.setEditingRequest()}
+                        >
+                            הרשמה
+                        </button>
+                    </Card>
+                </article>
+            )}
+            {userRequestVM.showRequestForm && <RequestForm />}
+            {userRequestVM.showOpenRequest && <OpenRequest />}
         </div>
     )
 }

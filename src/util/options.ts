@@ -65,7 +65,7 @@ export const requestTypeOptions: SelectOption[] = [
     { value: RequestType.profile, label: RequestTypeHebrew.profile },
     { value: RequestType.creator, label: RequestTypeHebrew.creator },
     { value: RequestType.org, label: RequestTypeHebrew.org },
-    { value: RequestType.support, label: RequestTypeHebrew.support },
+    // { value: RequestType.support, label: RequestTypeHebrew.support },
 ]
 export enum ScreenSize {
     mobile = 600,

@@ -696,7 +696,6 @@ class Store {
                     break
             }
         }
-        console.log("requests after update", toJS(this.requests))
     }
 
     @action

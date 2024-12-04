@@ -133,7 +133,7 @@ export enum UserTypeHebrew {
     creator = "מורה ויוצר ארועים",
     profile = "מורה",
     org = "ארגון",
-    user = "משתמש",
+    user = "משתמש רגיל",
 }
 
 export interface IMailingList {
