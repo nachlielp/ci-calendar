@@ -22,17 +22,23 @@ self.addEventListener("activate", (e) => {
 
             const keyList = await caches.keys()
             await Promise.all(
-                keyList.map((key) => {
-                    // Only delete caches that start with 'my-app-cache-' but aren't the current version
-                    if (
-                        key.startsWith("ci-calendar-cache-") &&
-                        key !== CACHE_NAME
-                    ) {
-                        console.log("[ServiceWorker] - Removing old cache", key)
-                        return caches.delete(key)
-                    }
-                    return Promise.resolve()
-                })
+                keyList
+                    .map((key) => {
+                        if (
+                            key.startsWith("ci-calendar-cache-") &&
+                            key !== CACHE_NAME
+                        ) {
+                            console.log(
+                                "[ServiceWorker] - Removing old cache",
+                                key
+                            )
+                            return caches.delete(key)
+                        }
+                    })
+                    .then(() => {
+                        // Take control of all clients immediately
+                        return self.clients.claim()
+                    })
             )
         })()
     )
