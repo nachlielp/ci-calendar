@@ -37,7 +37,7 @@ import { SelectOption } from "../util/options"
 import { templateService } from "../supabase/templateService"
 import { publicBioService } from "../supabase/publicBioService"
 import { alertsService } from "../supabase/alertsService"
-import { configService } from "../supabase/configService"
+// import { configService } from "../supabase/configService"
 import { userRoleService } from "../supabase/userRoleService"
 import { CACHE_VERSION } from "../App"
 
