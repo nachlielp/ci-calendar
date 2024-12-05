@@ -67,6 +67,7 @@ export default function ResetPasswordPage() {
                         <Input.Password
                             placeholder="סיסמה חדשה"
                             style={{ marginBottom: "0.5rem" }}
+                            className="form-input-large"
                         />
                     </Form.Item>
                     <Form.Item
@@ -92,6 +93,7 @@ export default function ResetPasswordPage() {
                         <Input.Password
                             placeholder="אימות סיסמה חדשה"
                             style={{ marginBottom: "0.5rem" }}
+                            className="form-input-large"
                         />
                     </Form.Item>
                     {message ? (

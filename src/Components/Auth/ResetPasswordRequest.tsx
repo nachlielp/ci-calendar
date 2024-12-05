@@ -4,6 +4,7 @@ import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
 import { supabase } from "../../supabase/client"
+import { Icon } from "../Common/Icon"
 
 function ResetPasswordRequest() {
     const emailRef = useRef<InputRef>(null)
@@ -44,7 +45,7 @@ function ResetPasswordRequest() {
 
     return (
         <Card id="reset-password-form" className="reset-password-form">
-            <h1 className="general-title">איפוס סיסמה</h1>
+            <h1 className="title">איפוס סיסמה</h1>
 
             <h3 className="login-subtitle">נא להזין את המייל שאיתו נרשמתם:</h3>
             <Form
@@ -62,6 +63,8 @@ function ResetPasswordRequest() {
                         ref={emailRef}
                         required
                         disabled={mailSent}
+                        className="form-input-large"
+                        prefix={<Icon icon="mail" />}
                     />
                 </Form.Item>
                 {message ? (
@@ -76,7 +79,7 @@ function ResetPasswordRequest() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="general-action-btn"
+                            className="general-action-btn black-btn large-btn"
                         >
                             איפוס סיסמה
                         </button>
