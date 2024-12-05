@@ -81,6 +81,7 @@ const SubscribeToTeachers = () => {
                 className="select-filter"
             />
             <AsyncButton
+                className="general-action-btn"
                 isSubmitting={isSubmitting}
                 callback={saveSubscriptions}
                 disabled={subscriptionsEqual}

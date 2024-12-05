@@ -17,9 +17,7 @@ export default function AsyncButton({
         <>
             <button
                 onClick={callback}
-                className={`general-action-btn ${
-                    disabled ? "disabled" : ""
-                } ${className}`}
+                className={` ${disabled ? "disabled" : ""} ${className}`}
                 disabled={isSubmitting || disabled}
             >
                 {isSubmitting ? (

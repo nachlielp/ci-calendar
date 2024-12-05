@@ -50,7 +50,7 @@ class UserRequestVM {
     }
 
     @computed get showUserStatus() {
-        return !this.isOpenPositionRequest && !this.isEditRequest
+        return this.openPositionRequest === null && !this.isEditRequest
     }
 
     @computed get showRequestForm() {

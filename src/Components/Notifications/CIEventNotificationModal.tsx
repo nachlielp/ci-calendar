@@ -111,6 +111,7 @@ const CIEventNotificationModal = ({
                     )}
                     {store.getUserReceiveNotifications && (
                         <AsyncButton
+                            className="general-action-btn"
                             isSubmitting={isSubmitting}
                             callback={handleOk}
                             disabled={!store.getUserReceiveNotifications}

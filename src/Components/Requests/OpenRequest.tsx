@@ -32,14 +32,14 @@ const OpenRequest = () => {
             <article className="submit-button-container">
                 <button
                     onClick={userRequestVM.setEditingRequest}
-                    className="general-action-btn black-btn"
+                    className="text-btn"
                     type="button"
                 >
                     עריכת הבקשה
                 </button>
                 <button
                     onClick={userRequestVM.closeRequest}
-                    className="general-action-btn black-btn"
+                    className="text-btn"
                     type="button"
                 >
                     ביטול הבקשה

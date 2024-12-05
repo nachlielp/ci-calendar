@@ -189,7 +189,7 @@ const RequestForm = () => {
                                         isSubmitting={
                                             userRequestVM.getIsSubmitting
                                         }
-                                        className="black-btn"
+                                        className="general-action-btn black-btn"
                                         callback={onFinish}
                                     >
                                         {userRequestVM.isOpenPositionRequest
@@ -202,7 +202,7 @@ const RequestForm = () => {
                                                 userRequestVM.getIsSubmitting
                                             }
                                             callback={userRequestVM.closeForm}
-                                            className="black-btn"
+                                            className="text-btn"
                                         >
                                             ביטול
                                         </AsyncButton>
