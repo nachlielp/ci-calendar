@@ -2,7 +2,10 @@ import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa"
 import { visualizer } from "rollup-plugin-visualizer"
+import pkg from "./package.json"
 
+const timestamp = new Date().getTime()
+const buildVersion = `${pkg.version}-${timestamp}`
 //
 const manifestForPlugin: Partial<VitePWAOptions> = {
     registerType: "prompt",
@@ -63,7 +66,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
                 urlPattern: ({ url }) => true, // Match all routes
                 handler: "NetworkFirst",
                 options: {
-                    cacheName: "api-cache",
+                    cacheName: `api-cache-${buildVersion}`,
                 },
             },
         ],
