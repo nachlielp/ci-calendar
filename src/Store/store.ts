@@ -39,6 +39,7 @@ import { publicBioService } from "../supabase/publicBioService"
 import { alertsService } from "../supabase/alertsService"
 import { configService } from "../supabase/configService"
 import { userRoleService } from "../supabase/userRoleService"
+import { CACHE_VERSION } from "../App"
 
 class Store {
     @observable session: Session | null = null
@@ -954,6 +955,13 @@ class Store {
         this.app_taggable_teachers = appTaggableTeachers
     }
 
+    @action
+    updateUserAppVersion = async (appVersion: string) => {
+        await usersService.updateUser(this.user.user_id, {
+            version: appVersion,
+        })
+    }
+
     async init() {
         console.log("Store init")
 
@@ -992,7 +1000,7 @@ class Store {
                 const ci_events = await cieventsService.getCIEvents()
                 if (createdUser) {
                     const userData = {
-                        user: createdUser,
+                        user: { ...createdUser, version: CACHE_VERSION },
                         ci_events,
                         requests: [],
                         templates: [],
@@ -1031,6 +1039,9 @@ class Store {
                 this.initPolling()
             }
             this.setLoading(false)
+            if (this.user && this.user.version !== CACHE_VERSION) {
+                this.updateUserAppVersion(CACHE_VERSION)
+            }
         }
     }
 

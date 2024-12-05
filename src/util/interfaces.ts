@@ -212,6 +212,7 @@ export interface CIUser {
         orgs: string[]
     }
     push_notification_tokens: PushNotificationToken[]
+    version: string
 }
 
 export interface CIUserData {
@@ -265,6 +266,7 @@ export interface DbUser {
     templates: CITemplate[]
     ci_events: CIEvent[]
     alerts: CIAlert[]
+    version: string
 }
 
 export interface CIAlert {

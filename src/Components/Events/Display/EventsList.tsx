@@ -6,11 +6,10 @@ import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 import { utilService } from "../../../util/utilService"
+import { CACHE_VERSION } from "../../../App"
 interface IEventsListProps {
     events: CIEvent[]
 }
-
-const CACHE_VERSION = (7.2).toString()
 
 export default function EventsList({ events }: IEventsListProps) {
     const { eventId } = useParams<{ eventId: string }>()
