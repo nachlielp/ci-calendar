@@ -966,8 +966,8 @@ class Store {
         console.log("Store init")
 
         try {
-            const config = await configService.getConfig()
-            this.setConfig(config, EventPayloadType.UPDATE)
+            // const config = await configService.getConfig()
+            // this.setConfig(config, EventPayloadType.UPDATE)
 
             if (!this.isSession) {
                 console.log("Store init no session")
