@@ -26,6 +26,7 @@ dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
 dayjs.tz.setDefault("Asia/Jerusalem")
 import { store } from "../Store/store"
+import { CACHE_VERSION } from "../App"
 
 export const utilService = {
     createDbUserFromUser,
@@ -526,6 +527,7 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
             orgs: [],
         },
         receive_notifications: false,
+        version: CACHE_VERSION,
     }
 }
 
