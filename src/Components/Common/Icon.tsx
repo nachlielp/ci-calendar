@@ -34,7 +34,6 @@ import calendar_add_on from "../../assets/svgs/calendar_add_on.svg"
 import addBox from "../../assets/svgs/add_box.svg"
 import noteStackAdd from "../../assets/svgs/note_stack_add.svg"
 import contentCopy from "../../assets/svgs/content_copy.svg"
-import mail from "../../assets/svgs/mail.svg"
 import support_agent from "../../assets/svgs/support_agent.svg"
 import google_color from "../../assets/svgs/google_color.svg"
 import lock_reset from "../../assets/svgs/lock_reset.svg"
@@ -54,6 +53,8 @@ import more_vert from "../../assets/svgs/more_vert.svg"
 import cancel from "../../assets/svgs/cancel.svg"
 import check_circle from "../../assets/svgs/check_circle.svg"
 import verified_user from "../../assets/svgs/verified_user.svg"
+import mail from "../../assets/svgs/mail.svg"
+import lock from "../../assets/svgs/lock.svg"
 
 export const Icon = ({
     icon,
@@ -123,6 +124,7 @@ export const Icon = ({
         cancel,
         check_circle,
         verified_user,
+        lock,
     }
     return (
         <label className="icon-component" onClick={onClick}>

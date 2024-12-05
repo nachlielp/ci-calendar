@@ -27,7 +27,6 @@ export const LinkButton = ({
                 // shape={shape}
                 onClick={onClick}
                 title={label}
-                style={{ textDecoration: "none" }}
             >
                 {children}
             </button>

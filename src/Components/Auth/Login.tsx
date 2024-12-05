@@ -93,6 +93,9 @@ export default function Login() {
                         required
                         style={{ marginBottom: "8px" }}
                         allowClear
+                        size="large"
+                        prefix={<Icon icon="mail" />}
+                        className="form-input-large login-input"
                     />
 
                     <Input.Password
@@ -100,8 +103,10 @@ export default function Login() {
                         placeholder="סיסמה"
                         ref={passwordRef}
                         required
-                        className="default-font"
+                        className="form-input-large login-input"
                         allowClear
+                        size="large"
+                        prefix={<Icon icon="lock" />}
                     />
                 </Form.Item>
                 {error ? (
@@ -116,7 +121,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="general-action-btn"
+                        className="general-action-btn black-btn large-btn"
                     >
                         כניסה
                     </button>
@@ -124,15 +129,21 @@ export default function Login() {
             </Form>
 
             <div className="link-container">
-                <LinkButton
-                    to="/reset-password-request"
-                    className="login-secondary-btn"
-                >
-                    איפוס סיסמה
-                </LinkButton>
-                <LinkButton to="/signup" className="login-secondary-btn">
-                    הרשמה
-                </LinkButton>
+                <div className="spacer">
+                    פה בפעם הראשונה?
+                    <LinkButton to="/signup" className="text-btn">
+                        הרשמה
+                    </LinkButton>
+                </div>
+                <div className="spacer">
+                    שכחת סיסמה?
+                    <LinkButton
+                        to="/reset-password-request"
+                        className="text-btn"
+                    >
+                        איפוס סיסמה
+                    </LinkButton>
+                </div>
             </div>
         </Card>
     )
