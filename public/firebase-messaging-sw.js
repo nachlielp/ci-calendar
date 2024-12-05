@@ -66,6 +66,10 @@ self.addEventListener("fetch", (event) => {
         "maps.googleapis.com",
         "pjgwpivkvsuernmoeebk.supabase.co",
     ]
+
+    const isSVG = event.request.url.match(/\.svg$/)
+    const isPng = event.request.url.match(/\.png$/)
+
     if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
         event.respondWith(fetch(event.request))
         return
@@ -73,10 +77,25 @@ self.addEventListener("fetch", (event) => {
 
     event.respondWith(
         caches.match(event.request).then((response) => {
-            return response || fetch(event.request)
+            if (response && (isSVG || isPng)) {
+                return response
+            }
+
+            // return response || fetch(event.request)
+            return fetch(event.request).then((fetchResponse) => {
+                // Check if we should cache this response
+                if ((isSVG || isPng) && fetchResponse.status === 200) {
+                    const responseToCache = fetchResponse.clone()
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseToCache)
+                    })
+                }
+                return fetchResponse
+            })
         })
     )
 })
+
 self.addEventListener("push", function (event) {
     try {
         let payload
