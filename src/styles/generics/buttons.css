@@ -54,6 +54,11 @@
         font-weight: 400;
         cursor: pointer;
     }
+
+    .injected-svg {
+        cursor: pointer;
+        margin-top: 0.25rem;
+    }
 }
 
 .plan-btn {
