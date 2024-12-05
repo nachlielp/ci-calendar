@@ -1039,7 +1039,7 @@ class Store {
                 this.initPolling()
             }
             this.setLoading(false)
-            if (this.user && this.user.version !== CACHE_VERSION) {
+            if (this.user.user_id && this.user.version !== CACHE_VERSION) {
                 this.updateUserAppVersion(CACHE_VERSION)
             }
         }
