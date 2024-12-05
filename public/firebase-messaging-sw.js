@@ -1,9 +1,7 @@
-const CACHE_VERSION = (7.3).toString()
+const CACHE_VERSION = (7.4).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 self.addEventListener("install", (event) => {
-    self.skipWaiting()
-
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll([
@@ -16,6 +14,7 @@ self.addEventListener("install", (event) => {
             ])
         })
     )
+    self.skipWaiting()
 })
 
 self.addEventListener("activate", (e) => {
@@ -53,7 +52,7 @@ self.addEventListener("activate", (e) => {
             // }
 
             // Return self.clients.claim() to take control of all clients immediately
-            return self.clients.claim()
+            // return self.clients.claim()
         })()
     )
 })
