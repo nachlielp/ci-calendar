@@ -187,10 +187,10 @@
     line-height: 20.93px;
     text-align: right;
     cursor: pointer;
-    /* padding: 5px 16px; */
+    padding: 5px 8px;
     &:hover {
-        background-color: #e7d1cd;
-        border-radius: 8px;
+        transform: scale(1.25); /* Adjust the scale factor as needed */
+        transition: transform 0.2s;
     }
 }
 

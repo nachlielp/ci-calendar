@@ -80,7 +80,7 @@ export default function Signup() {
 
     return (
         <Card id="signup-form" className="signup-form">
-            <h1 className="general-title">הרשמה</h1>
+            <h1 className="title">הרשמה</h1>
 
             <Form
                 title="הרשמה"
@@ -96,7 +96,8 @@ export default function Signup() {
                         placeholder="שם"
                         ref={nameRef}
                         required
-                        className="signup-input"
+                        className="form-input-large signup-input"
+                        prefix={<Icon icon="person" />}
                     />
                 </Form.Item>
                 <Form.Item style={{ margin: "8px" }}>
@@ -105,7 +106,8 @@ export default function Signup() {
                         placeholder="כתובת מייל"
                         ref={emailRef}
                         required
-                        className="signup-input"
+                        className="form-input-large signup-input"
+                        prefix={<Icon icon="mail" />}
                     />
                 </Form.Item>
                 <Form.Item style={{ margin: "8px" }}>
@@ -114,7 +116,8 @@ export default function Signup() {
                         placeholder="סיסמה"
                         ref={passwordRef}
                         required
-                        className="signup-input"
+                        className="form-input-large signup-input"
+                        prefix={<Icon icon="lock" />}
                     />
                 </Form.Item>
                 <Form.Item style={{ margin: "8px" }}>
@@ -123,7 +126,8 @@ export default function Signup() {
                         placeholder="אימות סיסמה"
                         ref={passwordConfRef}
                         required
-                        className="signup-input"
+                        className="form-input-large signup-input"
+                        prefix={<Icon icon="lock" />}
                     />
                 </Form.Item>
 
@@ -141,17 +145,16 @@ export default function Signup() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="general-action-btn large-btn"
+                        className="general-action-btn black-btn large-btn"
                     >
                         הרשמה
                     </button>
                     <button
                         onClick={onSupabaseGoogleSignIn}
                         disabled={loading}
-                        className="google-button"
+                        className="google-button default-font "
                     >
                         <label className="google-button-label">כניסה עם </label>
-                        &nbsp;
                         <Icon
                             icon="google_color"
                             className="icon-main google-icon"

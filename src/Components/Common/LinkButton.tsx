@@ -22,7 +22,7 @@ export const LinkButton = ({
     return (
         <Link to={to} className="link-btn" style={{ textDecoration: "none" }}>
             <button
-                className={`btn ${className} `} // Add flexbox utilities
+                className={` ${className} `} // Add flexbox utilities
                 disabled={disabled}
                 // shape={shape}
                 onClick={onClick}
