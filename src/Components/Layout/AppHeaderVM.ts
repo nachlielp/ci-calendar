@@ -9,6 +9,7 @@ class AppHeaderVM {
     @observable _isMobile: boolean = false
     @observable _currentPath: string = ""
     @observable _loading: boolean = false
+    @observable _testDate: string = "_X_"
 
     constructor() {
         makeObservable(this)
@@ -17,6 +18,10 @@ class AppHeaderVM {
             () => store.requestNotification,
             (requestNotification) => {
                 const getCurrentPermission = () => Notification.permission
+
+                this._testDate = `requestNotification: ${requestNotification} | isPWA: ${utilService.isPWA()} | permission: ${getCurrentPermission()} | receive_notifications: ${
+                    store.user.receive_notifications
+                } `
 
                 if (
                     requestNotification &&
@@ -28,6 +33,11 @@ class AppHeaderVM {
                 }
             }
         )
+    }
+
+    @computed
+    get testDate() {
+        return this._testDate
     }
 
     @computed
