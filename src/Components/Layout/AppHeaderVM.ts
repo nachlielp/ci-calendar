@@ -80,6 +80,12 @@ class AppHeaderVM {
         return this._showRequestPermissionModal
     }
 
+    @computed
+    get isLoading() {
+        console.log("_loading", this._loading)
+        return this._loading
+    }
+
     @action
     setIsMobile(isMobile: boolean) {
         this._isMobile = isMobile
@@ -88,6 +94,12 @@ class AppHeaderVM {
     @action
     setCurrentPath(path: string) {
         this._currentPath = path
+    }
+
+    @action
+    setLoading() {
+        this._loading = true
+        console.log("setLoading :", this._loading)
     }
 
     @action
@@ -126,6 +138,7 @@ class AppHeaderVM {
         } catch (error) {
             console.error("checkAndUpdateToken - error", error)
         } finally {
+            this._loading = false
             this.setShowRequestPermissionModal(false)
         }
     }
