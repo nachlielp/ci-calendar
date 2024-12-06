@@ -87,7 +87,17 @@ export default defineConfig({
     },
     base: "/",
     plugins: [
-        react(),
+        react({
+            babel: {
+                plugins: [
+                    ["@babel/plugin-proposal-decorators", { legacy: true }],
+                    [
+                        "@babel/plugin-proposal-class-properties",
+                        { loose: true },
+                    ],
+                ],
+            },
+        }),
         VitePWA(manifestForPlugin),
         visualizer({ open: true }), // This plugin helps visualize the size of your bundles
     ],

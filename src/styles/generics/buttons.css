@@ -135,6 +135,13 @@
     &.black-btn:hover {
         background-color: #222222;
     }
+    &.red-btn {
+        background-color: #dd5239;
+    }
+
+    &.red-btn:hover {
+        background-color: #c6280c;
+    }
     @keyframes spin {
         0% {
             transform: rotate(0deg);

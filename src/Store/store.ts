@@ -61,6 +61,8 @@ class Store {
 
     @observable loading: boolean = true
 
+    @observable requestNotification: boolean = false
+
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private callCount: number = 0
@@ -528,7 +530,6 @@ class Store {
                 this.user.user_id,
                 user
             )
-            console.log("updatedUserData", updatedUserData)
             if (updatedUserData) {
                 this.setUser(updatedUserData)
             }
@@ -956,10 +957,17 @@ class Store {
     }
 
     @action
-    updateUserAppVersion = async (appVersion: string) => {
-        await usersService.updateUser(this.user.user_id, {
-            version: appVersion,
-        })
+    updateUserAppVersion = async () => {
+        const payload = {
+            version: CACHE_VERSION,
+            last_signin: dayjs().toISOString(),
+        }
+        await usersService.updateUser(this.user.user_id, payload)
+    }
+
+    @action
+    setRequestNotification = (flag: boolean) => {
+        this.requestNotification = flag
     }
 
     async init() {
@@ -969,7 +977,7 @@ class Store {
             // const config = await configService.getConfig()
             // this.setConfig(config, EventPayloadType.UPDATE)
 
-            if (!this.isSession) {
+            if (!this.getSession?.user?.id) {
                 console.log("Store init no session")
                 // Only fetch and set ci_events, keep other store values empty
                 this.initPolling()
@@ -981,14 +989,11 @@ class Store {
             if (this.app_ci_events.length === 0) {
                 this.setLoading(true)
             }
-            //TS for user id
-            if (!this.getSession?.user.id) {
-                this.setSession(null)
-                throw new Error("No user id")
-            }
+
             const userData = await usersService.getUserData(
                 this.getSession.user.id
             )
+
             if (userData) {
                 this.setStore(userData)
             } else {
@@ -1013,20 +1018,29 @@ class Store {
                 }
             }
 
-            this.fetchAppPublicBios()
+            if (this.user.user_type === UserType.user) {
+                this.fetchAppPublicBios()
+            }
 
             if (
                 [UserType.admin, UserType.creator, UserType.org].includes(
                     this.user.user_type
                 )
             ) {
-                this.fetchAppTaggableTeachers()
+                await Promise.all([
+                    this.fetchAppTaggableTeachers(),
+                    this.fetchAppPublicBios(),
+                ])
             }
 
             if (this.user.user_type === UserType.admin) {
-                this.fetchAppUsers()
-                this.fetchAppRequests()
-                this.fetchAppCreators()
+                await Promise.all([
+                    this.fetchAppTaggableTeachers(),
+                    this.fetchAppPublicBios(),
+                    this.fetchAppUsers(),
+                    this.fetchAppRequests(),
+                    this.fetchAppCreators(),
+                ])
             }
 
             this.setupSubscription()
@@ -1039,9 +1053,13 @@ class Store {
                 this.initPolling()
             }
             this.setLoading(false)
-            if (this.user.user_id && this.user.version !== CACHE_VERSION) {
-                this.updateUserAppVersion(CACHE_VERSION)
+            if (this.user.user_id) {
+                this.updateUserAppVersion()
             }
+        }
+
+        if (this.user.user_id) {
+            this.checkNotifications()
         }
     }
 
@@ -1095,6 +1113,12 @@ class Store {
     fetchAppTaggableTeachers = async () => {
         const appTaggableTeachers = await usersService.getTaggableUsers()
         this.setAppTaggableTeachers(appTaggableTeachers)
+    }
+
+    checkNotifications = async () => {
+        const pwaInstallId = utilService.getPWAInstallId()
+        if (pwaInstallId && pwaInstallId === this.user.pwa_install_id) return
+        this.setRequestNotification(true)
     }
 
     cleanup = () => {

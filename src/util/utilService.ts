@@ -39,7 +39,7 @@ export const utilService = {
     reverseFormatTeachers,
     formatUsersForCIEvent,
     deepCompareArraysUnordered,
-    getDeviceId,
+    getPWAInstallId,
     isPWA,
     isFirstNotificationPermissionRequest,
     setFirstNotificationPermissionRequest,
@@ -526,8 +526,11 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
             teachers: [],
             orgs: [],
         },
-        receive_notifications: false,
+        receive_notifications: true,
         version: CACHE_VERSION,
+        last_signin: dayjs().toISOString(),
+        pwa_install_id: "",
+        fcm_token: "",
     }
 }
 
@@ -624,8 +627,8 @@ function formatUsersForCIEvent(
     return formattedUsers
 }
 
-function getDeviceId() {
-    let deviceId = localStorage.getItem("device_id")
+function getPWAInstallId() {
+    let deviceId = localStorage.getItem("pwa_install_id")
     if (!deviceId) {
         deviceId = uuidv4()
         localStorage.setItem("device_id", deviceId)
@@ -634,6 +637,8 @@ function getDeviceId() {
 }
 
 function isPWA() {
+    //TODO remove
+    return true
     return (
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true

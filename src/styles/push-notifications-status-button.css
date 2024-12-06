@@ -14,10 +14,6 @@
         &.pwa-only {
             display: none;
         }
-
-        &.granted {
-            display: none;
-        }
     }
 
     .notification-switch-icon {

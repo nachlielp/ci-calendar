@@ -103,15 +103,27 @@ const App = () => {
                             >
                                 <Route
                                     path="/filters-and-notifications"
-                                    element={<FiltersAndNotificationsPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <FiltersAndNotificationsPage />
+                                        </Suspense>
+                                    }
                                 />
                                 <Route
                                     path="/request"
-                                    element={<SupportPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <SupportPage />
+                                        </Suspense>
+                                    }
                                 />
                                 <Route
                                     path="/request/:requestId"
-                                    element={<SupportPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <SupportPage />
+                                        </Suspense>
+                                    }
                                 />
                                 <Route
                                     path="/reset-password"
@@ -142,7 +154,11 @@ const App = () => {
                                 />
                                 <Route
                                     path="/bio/request/:requestId"
-                                    element={<SupportPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <SupportPage />
+                                        </Suspense>
+                                    }
                                 />
                                 <Route
                                     path="/bio/request"

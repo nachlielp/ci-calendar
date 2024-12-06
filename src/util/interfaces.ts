@@ -213,6 +213,8 @@ export interface CIUser {
     }
     push_notification_tokens: PushNotificationToken[]
     version: string
+    pwa_install_id: string
+    fcm_token: string
 }
 
 export interface CIUserData {
@@ -247,6 +249,7 @@ export interface DbUser {
     user_id: string
     created_at: string
     updated_at: string
+    last_signin: string
     user_type: UserType
     user_name: string
     phone: string
@@ -267,6 +270,8 @@ export interface DbUser {
     ci_events: CIEvent[]
     alerts: CIAlert[]
     version: string
+    pwa_install_id: string
+    fcm_token: string
 }
 
 export interface CIAlert {
