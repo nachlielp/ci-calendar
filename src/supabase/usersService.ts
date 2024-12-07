@@ -197,6 +197,7 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
             .single()
 
         if (error) {
+            console.error("Error in createUser:", error)
             throw error
         }
         return data as DbUser

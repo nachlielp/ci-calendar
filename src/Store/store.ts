@@ -1000,6 +1000,7 @@ class Store {
                 const newUser = utilService.createDbUserFromUser(
                     this.getSession?.user
                 )
+                console.log("Store.init.newUser", newUser)
                 const createdUser = await usersService.createUser(newUser)
                 console.log("Store.init.createdUser", createdUser)
                 const ci_events = await cieventsService.getCIEvents()

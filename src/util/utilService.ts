@@ -528,9 +528,9 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
         },
         receive_notifications: true,
         version: CACHE_VERSION,
-        last_signin: dayjs().toISOString(),
-        pwa_install_id: "",
-        fcm_token: "",
+        last_signin: new Date().toISOString(),
+        pwa_install_id: null,
+        fcm_token: null,
     }
 }
 
