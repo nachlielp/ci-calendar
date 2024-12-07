@@ -1,16 +1,18 @@
 import Card from "antd/es/card"
 import SubscribeToTeachers from "../Users/SubscribeToTeachers"
 import UserNotificationsList from "../Users/UserNotificationsList"
-import PushNotificationStatusButton from "../Common/PushNotificationStatusButton"
 import { observer } from "mobx-react-lite"
 import NotificationSwitch from "../Users/NotificationSwitch"
+import PermissionsStatusNotice from "../Common/PermissionsStatusNotice"
 
-const FiltersAndNotificationsPage = observer(() => {
+const NotificationsPage = observer(() => {
     return (
-        <div className="filter-and-notifications-page page">
+        <div className="notifications-page page">
             <Card className="filter-section">
-                <h3>הרשמה להתראות על ארועים חדשים של מורים וארגונים</h3>
-                <PushNotificationStatusButton />
+                <label className="notifications-page-title">
+                    הרשמה להתראות על ארועים חדשים של מורים וארגונים
+                </label>
+                <PermissionsStatusNotice />
                 <NotificationSwitch />
                 <SubscribeToTeachers />
                 <UserNotificationsList />
@@ -19,4 +21,4 @@ const FiltersAndNotificationsPage = observer(() => {
     )
 })
 
-export default FiltersAndNotificationsPage
+export default NotificationsPage

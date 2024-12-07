@@ -16,7 +16,7 @@ const BioPage = () => {
         <div className="bio-page page">
             <div className="button-container">
                 <button
-                    className="general-action-btn black-btn"
+                    className="general-action-btn black-btn large-btn"
                     onClick={() => navigate("/bio/request")}
                 >
                     שינוי סוג משתמש
@@ -24,14 +24,14 @@ const BioPage = () => {
 
                 {editProfile ? (
                     <button
-                        className="general-action-btn"
+                        className="general-action-btn large-btn"
                         onClick={() => setEditProfile(false)}
                     >
                         הצגת הפרופיל
                     </button>
                 ) : (
                     <button
-                        className="general-action-btn"
+                        className="general-action-btn large-btn"
                         onClick={() => setEditProfile(true)}
                     >
                         עריכת הפרופיל

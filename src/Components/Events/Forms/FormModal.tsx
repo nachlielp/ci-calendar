@@ -41,6 +41,7 @@ export default function FormModal({
                 onOk={handleOk}
                 onCancel={onClose}
                 footer={null}
+                closable={false}
             >
                 {eventType === "create-single-day" && (
                     <SingleDayEventForm

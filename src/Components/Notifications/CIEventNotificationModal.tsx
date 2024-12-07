@@ -80,6 +80,7 @@ const CIEventNotificationModal = ({
                 onCancel={() => setIsOpen(false)}
                 footer={null}
                 className="set-notification-timeframe-modal"
+                closable={false}
             >
                 <section className="notification-modal-container">
                     <article className="notification-modal-title">
@@ -101,6 +102,9 @@ const CIEventNotificationModal = ({
                         style={{ width: "200px" }}
                         onChange={(value) => setRemindInHours(value)}
                         disabled={!store.getUserReceiveNotifications}
+                        size="large"
+                        className="form-input-large"
+                        popupClassName="form-input-large"
                     />
 
                     {!store.getUserReceiveNotifications && (
@@ -111,7 +115,7 @@ const CIEventNotificationModal = ({
                     )}
                     {store.getUserReceiveNotifications && (
                         <AsyncButton
-                            className="general-action-btn"
+                            className="general-action-btn large-btn"
                             isSubmitting={isSubmitting}
                             callback={handleOk}
                             disabled={!store.getUserReceiveNotifications}

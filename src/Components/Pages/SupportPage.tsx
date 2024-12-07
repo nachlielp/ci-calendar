@@ -7,18 +7,12 @@ import { UserTypeHebrew } from "../../util/interfaces"
 
 const SupportPage = () => {
     return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-            }}
-        >
+        <section className="support-page">
             <h2>הרשמה כמורה או ארגון</h2>
             {userRequestVM.showUserStatus && (
                 <article className="support-page-description">
                     <Card>
-                        <p dir="rtl">
+                        <p dir="rtl" className="text">
                             <label>
                                 אתם רשומים כ
                                 <b>
@@ -33,7 +27,7 @@ const SupportPage = () => {
                             על מנת לשנות את המעמד שלכם אנא מלאו טופס הרשמה
                         </p>
                         <button
-                            className="general-action-btn black-btn"
+                            className="general-action-btn black-btn large-btn"
                             onClick={() => userRequestVM.setEditingRequest()}
                         >
                             הרשמה
@@ -43,7 +37,7 @@ const SupportPage = () => {
             )}
             {userRequestVM.showRequestForm && <RequestForm />}
             {userRequestVM.showOpenRequest && <OpenRequest />}
-        </div>
+        </section>
     )
 }
 

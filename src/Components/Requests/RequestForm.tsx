@@ -95,7 +95,6 @@ const RequestForm = () => {
             <Card className="request-form-card">
                 <Form
                     form={form}
-                    // onFinish={onFinish}
                     autoComplete="off"
                     initialValues={{
                         phone: userRequestVM.getPhone,
@@ -122,6 +121,9 @@ const RequestForm = () => {
                                     value as RequestType
                                 )
                             }
+                            size="large"
+                            className="form-input-large"
+                            popupClassName="form-input-large"
                         />
                     </Form.Item>
 
@@ -130,15 +132,21 @@ const RequestForm = () => {
                             <Form.Item>
                                 {userRequestVM.getRequestType ===
                                     RequestType.org && (
-                                    <label>{orgDescription}</label>
+                                    <label className="text">
+                                        {orgDescription}
+                                    </label>
                                 )}
                                 {userRequestVM.getRequestType ===
                                     RequestType.creator && (
-                                    <label>{creatorDescription}</label>
+                                    <label className="text">
+                                        {creatorDescription}
+                                    </label>
                                 )}
                                 {userRequestVM.getRequestType ===
                                     RequestType.profile && (
-                                    <label>{profileDescription}</label>
+                                    <label className="text">
+                                        {profileDescription}
+                                    </label>
                                 )}
                             </Form.Item>
                             <Form.Item<RequestFieldType>
@@ -154,7 +162,10 @@ const RequestForm = () => {
                                     },
                                 ]}
                             >
-                                <Input placeholder="מספר פלאפון" />
+                                <Input
+                                    placeholder="מספר פלאפון"
+                                    className="form-input-large"
+                                />
                             </Form.Item>
 
                             <Form.Item<RequestFieldType>
@@ -174,13 +185,17 @@ const RequestForm = () => {
                                             : "קצת עליי והערות נוספות"
                                     }
                                     rows={6}
+                                    className="form-input-large"
                                 />
                             </Form.Item>
                             {inputErrors && (
                                 <Alert
                                     message="ערכים שגויים, נא לבדוק את הטופס"
                                     type="error"
-                                    style={{ margin: "10px 0" }}
+                                    style={{
+                                        margin: "10px 0",
+                                        fontSize: "18px",
+                                    }}
                                 />
                             )}
                             <Form.Item wrapperCol={{ span: 24 }}>
@@ -189,7 +204,7 @@ const RequestForm = () => {
                                         isSubmitting={
                                             userRequestVM.getIsSubmitting
                                         }
-                                        className="general-action-btn black-btn"
+                                        className="general-action-btn black-btn large-btn"
                                         callback={onFinish}
                                     >
                                         {userRequestVM.isOpenPositionRequest
@@ -202,7 +217,7 @@ const RequestForm = () => {
                                                 userRequestVM.getIsSubmitting
                                             }
                                             callback={userRequestVM.closeForm}
-                                            className="text-btn"
+                                            className="text-btn large-btn"
                                         >
                                             ביטול
                                         </AsyncButton>

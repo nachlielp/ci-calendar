@@ -29,8 +29,8 @@ const SupportPage = lazy(() => import("./Components/Pages/SupportPage"))
 const ManageSupportPage = lazy(
     () => import("./Components/Pages/ManageSupportPage")
 )
-const FiltersAndNotificationsPage = lazy(
-    () => import("./Components/Pages/FiltersAndNotificationsPage")
+const NotificationsPage = lazy(
+    () => import("./Components/Pages/NotificationsPage")
 )
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const ManageUsersPage = lazy(() => import("./Components/Pages/ManageUsersPage"))
@@ -105,7 +105,7 @@ const App = () => {
                                     path="/filters-and-notifications"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            <FiltersAndNotificationsPage />
+                                            <NotificationsPage />
                                         </Suspense>
                                     }
                                 />

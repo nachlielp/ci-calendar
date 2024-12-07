@@ -9,7 +9,7 @@ const OpenRequest = () => {
     return (
         <Card className="open-request">
             <article>
-                <label>
+                <label className="text">
                     בקשתך להרשמה
                     <b>
                         {" "}

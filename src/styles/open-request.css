@@ -5,6 +5,10 @@
     gap: 10px;
     font-size: 18px;
 
+    .text {
+        font-size: 18px;
+    }
+
     .submit-button-container {
         margin-top: 30px;
         display: flex;

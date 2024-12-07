@@ -58,7 +58,7 @@ const ManageEventsList = () => {
                         onChange={(e) => setSelectedEventTitle(e.target.value)}
                         placeholder="סינון לפי שם האירוע"
                         allowClear
-                        className="filter-input"
+                        className="filter-input form-input-large"
                     />
                 </div>
                 <datalist id="event-titles">

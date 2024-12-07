@@ -1,4 +1,8 @@
-.filter-and-notifications-page {
+.notifications-page {
+    .notifications-page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
     .filter-section {
         margin-top: 16px;
         .select-filter {

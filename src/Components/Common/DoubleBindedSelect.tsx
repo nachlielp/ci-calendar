@@ -26,7 +26,9 @@ const DoubleBindedSelect: React.FC<DoubleBindedSelectProps> = ({
             onChange={onChange}
             allowClear
             placeholder={placeholder}
-            className={className}
+            className={`form-input-large ${className}`}
+            popupClassName={`form-input-large ${className}`}
+            size="large"
         >
             {options.map((option) => (
                 <Option key={option.value} value={option.value}>

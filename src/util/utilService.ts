@@ -637,7 +637,7 @@ function getPWAInstallId() {
 }
 
 function isPWA() {
-    if (import.meta.env.VITE_PWA_TEST) return true
+    // if (import.meta.env.VITE_PWA_TEST) return true
     return (
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true

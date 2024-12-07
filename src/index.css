@@ -29,7 +29,7 @@
 @import "./styles/manage-users.css";
 @import "./styles/teacher-form.css";
 @import "./styles/filter-drawer.css";
-@import "./styles/filter-and-notifications-page.css";
+@import "./styles/notifications-page.css";
 @import "./styles/event-page.css";
 @import "./styles/event-drawer.css";
 @import "./styles/menu-drawer.css";
@@ -59,6 +59,8 @@
 @import "./styles/request-form.css";
 @import "./styles/open-request.css";
 @import "./styles/request-permission-modal.css";
+@import "./styles/support-page.css";
+
 @font-face {
     font-family: "Assistant";
     src: url("./assets/fonts/Assistant-VariableFont_wght.ttf")
