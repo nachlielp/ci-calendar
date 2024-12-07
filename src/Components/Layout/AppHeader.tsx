@@ -26,7 +26,6 @@ const AppHeader = () => {
     return (
         <section className="header-container">
             <RequestPermissionModal />
-            {vm.testDate}
             {vm.showLoginButton && (
                 <LinkButton
                     to="/login"

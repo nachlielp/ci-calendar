@@ -1116,11 +1116,6 @@ class Store {
     checkNotifications = async () => {
         const pwaInstallId = utilService.getPWAInstallId()
 
-        console.log(
-            `checkNotifications: ${pwaInstallId} === ${this.user.pwa_install_id}`
-        )
-        console.log("pwaInstallId", pwaInstallId)
-        console.log("user.pwa_install_id", this.user.pwa_install_id)
         if (pwaInstallId && pwaInstallId === this.user.pwa_install_id) {
             return
         }

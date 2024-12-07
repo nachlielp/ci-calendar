@@ -52,7 +52,7 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = (7.18).toString()
+export const CACHE_VERSION = (7.19).toString()
 
 const App = () => {
     return (
