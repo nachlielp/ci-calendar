@@ -1056,11 +1056,8 @@ class Store {
             this.setLoading(false)
             if (this.user.user_id) {
                 this.updateUserAppVersion()
+                this.checkNotifications()
             }
-        }
-
-        if (this.user.user_id) {
-            this.checkNotifications()
         }
     }
 
@@ -1118,14 +1115,10 @@ class Store {
 
     checkNotifications = async () => {
         const pwaInstallId = utilService.getPWAInstallId()
-        console.log(
-            `__1__checkNotifications: ${pwaInstallId} === ${this.user.pwa_install_id}`
-        )
+
         if (pwaInstallId && pwaInstallId === this.user.pwa_install_id) {
-            console.log("__2__checkNotifications.setRequestNotification")
             return
         }
-        console.log("__3__checkNotifications.setRequestNotification")
         this.setRequestNotification(true)
     }
 

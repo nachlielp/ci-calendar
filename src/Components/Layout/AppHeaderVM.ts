@@ -26,7 +26,7 @@ class AppHeaderVM {
                 if (
                     requestNotification &&
                     utilService.isPWA() &&
-                    getCurrentPermission() === "default" &&
+                    getCurrentPermission() !== "denied" &&
                     store.user.receive_notifications
                 ) {
                     this.setShowRequestPermissionModal(true)
