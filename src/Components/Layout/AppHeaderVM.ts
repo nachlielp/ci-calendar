@@ -132,9 +132,6 @@ class AppHeaderVM {
     @action
     setFCMToken = async () => {
         const pwaInstallId = utilService.getPWAInstallId()
-        if (pwaInstallId && store.user.pwa_install_id === pwaInstallId) {
-            return
-        }
 
         let token = ""
         try {

@@ -631,7 +631,7 @@ function getPWAInstallId() {
     let deviceId = localStorage.getItem("pwa_install_id")
     if (!deviceId) {
         deviceId = uuidv4()
-        localStorage.setItem("device_id", deviceId)
+        localStorage.setItem("pwa_install_id", deviceId)
     }
     return deviceId
 }
