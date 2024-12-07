@@ -85,7 +85,6 @@ class AppHeaderVM {
 
     @computed
     get isLoading() {
-        console.log("_loading", this._loading)
         return this._loading
     }
 

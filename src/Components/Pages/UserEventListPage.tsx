@@ -24,7 +24,6 @@ const UserEventsListPage = () => {
     }
 
     function onGoToCreateEvent() {
-        console.log("onGoToCreateEvent")
         navigate("/create-events")
     }
 

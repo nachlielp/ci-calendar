@@ -83,11 +83,6 @@ const App = () => {
                             />
                             <Route path="/:eventId" element={<EventsPage />} />
                             <Route path="/" element={<EventsPage />} />
-                            {/* <Route
-                                path="/weekly-events"
-                                element={<WeeklyEventsPage events={events} />}
-                            /> */}
-                            {/* User privet routes */}
                             <Route
                                 element={
                                     <PrivateRoutes
