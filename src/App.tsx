@@ -52,8 +52,7 @@ export enum EventAction {
     recycle,
 }
 
-//NOTICE: user.id is form 1.2 and up
-export const CACHE_VERSION = (1.2).toString()
+export const CACHE_VERSION = (1.3).toString()
 
 const App = () => {
     return (

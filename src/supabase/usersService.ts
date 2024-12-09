@@ -17,19 +17,16 @@ export const usersService = {
     updateUser,
     createUser,
     getTaggableUsers,
-    getViewableTeachers,
     getPublicBioList,
     subscribeToUser,
 }
 
-//TODO: remove this once all users are on the right version - 1.2.0
 interface UserWithRole {
-    user_id?: string
     id: string
     user_name: string
     user_type: UserType
     email: string
-    user_role?: {
+    user_role: {
         role: {
             id: number
             role: string
@@ -77,7 +74,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             )
         `
             )
-            .eq("user_id", id)
+            .eq("id", id)
             .eq("notifications.user_id", id)
             .eq("notifications.sent", false)
             .eq("requests.user_id", id)
@@ -89,11 +86,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             .eq("alerts.viewed", false)
             .single()
 
-        //TODO: remove this once all users are on the right version - 1.2.0
-        if (userData.user_id) {
-            userData.id = userData.user_id
-            delete userData.user_id
-        }
+        console.log("userData", userData)
 
         const { data: eventsData, error: eventsError } = await supabase
             .from("ci_events")
@@ -183,7 +176,7 @@ async function updateUser(
         const { data, error } = await supabase
             .from("users")
             .update(user)
-            .eq("user_id", id)
+            .eq("id", id)
             .select()
             .single()
         if (error) {
@@ -219,7 +212,7 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
 async function getUsers(): Promise<ManageUserOption[]> {
     try {
         const { data } = (await supabase.from("users").select(`
-            user_id,
+            id,
             user_name,
             user_type,
             email,
@@ -234,10 +227,6 @@ async function getUsers(): Promise<ManageUserOption[]> {
         if (!data) return []
 
         const users = data.map((user) => {
-            if (user.user_id) {
-                user.id = user.user_id
-                delete user.user_id
-            }
             if (!user.user_role) {
                 const newUser = { ...user, role: null } as Partial<UserWithRole>
                 delete newUser.user_role
@@ -291,23 +280,6 @@ async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
     }
 }
 
-async function getViewableTeachers(teacherIds: string[]): Promise<UserBio[]> {
-    try {
-        const { data, error } = await supabase
-            .from("users")
-            .select(
-                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging,user_type"
-            )
-            .in("user_id", teacherIds)
-            .eq("show_profile", true)
-
-        if (error) throw error
-        return data as UserBio[]
-    } catch (error) {
-        console.error("Error fetching viewable teachers:", error)
-        throw error
-    }
-}
 async function getPublicBioList(): Promise<UserBio[]> {
     try {
         const { data, error } = await supabase

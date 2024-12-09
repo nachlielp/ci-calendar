@@ -1,4 +1,4 @@
-const CACHE_VERSION = (1.2).toString()
+const CACHE_VERSION = (1.3).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 self.addEventListener("install", (event) => {
@@ -173,7 +173,7 @@ self.addEventListener("notificationclick", (event) => {
 
 //clean up old caches by name
 
-//TODO: for navigation with notification links
+//for navigation with notification links
 self.addEventListener("load", () => {
     console.log("Load => nav to page")
     const urlParams = new URLSearchParams(window.location.search)

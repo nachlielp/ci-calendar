@@ -124,7 +124,7 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
             .select(
                 `creator:users (
             user_name,
-            user_id
+            id
         )`
             )
             .gte("start_date", dayjs().startOf("day").toISOString())
@@ -136,11 +136,11 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
         data.forEach((event) => {
             const { creator } = event
             if (creator) {
-                const { user_id, user_name } = creator as unknown as {
-                    user_id: string
+                const { id, user_name } = creator as unknown as {
+                    id: string
                     user_name: string
                 }
-                creators.set(user_id, user_name)
+                creators.set(id, user_name)
             }
         })
         return Array.from(creators.entries()).map(([value, label]) => ({

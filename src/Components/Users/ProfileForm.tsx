@@ -29,10 +29,6 @@ interface ProfileFormProps {
     closeEditProfile: () => void
 }
 
-//TODO
-//1 compross before submit
-//2 compress and cache image - supabase storage
-//3 show loading state
 const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     const isMobile = useIsMobile()
 
