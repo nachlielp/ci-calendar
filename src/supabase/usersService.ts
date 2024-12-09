@@ -22,12 +22,14 @@ export const usersService = {
     subscribeToUser,
 }
 
+//TODO: remove this once all users are on the right version - 1.2.0
 interface UserWithRole {
-    user_id: string
+    user_id?: string
+    id: string
     user_name: string
     user_type: UserType
     email: string
-    user_role: {
+    user_role?: {
         role: {
             id: number
             role: string
@@ -86,6 +88,12 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             .eq("alerts.user_id", id)
             .eq("alerts.viewed", false)
             .single()
+
+        //TODO: remove this once all users are on the right version - 1.2.0
+        if (userData.user_id) {
+            userData.id = userData.user_id
+            delete userData.user_id
+        }
 
         const { data: eventsData, error: eventsError } = await supabase
             .from("ci_events")
@@ -207,6 +215,7 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
     }
 }
 
+//TODO: remove this once all users are on the right version - 1.2.0
 async function getUsers(): Promise<ManageUserOption[]> {
     try {
         const { data } = (await supabase.from("users").select(`
@@ -225,6 +234,10 @@ async function getUsers(): Promise<ManageUserOption[]> {
         if (!data) return []
 
         const users = data.map((user) => {
+            if (user.user_id) {
+                user.id = user.user_id
+                delete user.user_id
+            }
             if (!user.user_role) {
                 const newUser = { ...user, role: null } as Partial<UserWithRole>
                 delete newUser.user_role

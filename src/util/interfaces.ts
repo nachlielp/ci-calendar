@@ -196,7 +196,7 @@ export interface NotificationDB
 }
 
 export interface CIUser {
-    user_id: string
+    id: string
     created_at: string
     updated_at: string
     user_type: UserType
@@ -246,7 +246,7 @@ export interface DbUserWithoutJoin
     > {}
 
 export interface DbUser {
-    user_id: string
+    id: string
     created_at: string
     updated_at: string
     last_signin: string
@@ -406,7 +406,7 @@ export interface UserRole {
 }
 
 export type ManageUserOption = {
-    user_id: string
+    id: string
     user_name: string
     user_type: UserType
     email: string

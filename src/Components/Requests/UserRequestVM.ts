@@ -107,7 +107,7 @@ class UserRequestVM {
             email: store.user.email,
             name: store.user.user_name,
             responses: [],
-            user_id: store.user.user_id,
+            user_id: store.user.id,
             status: RequestStatus.open,
             viewed_response: false,
             viewed_by: [],

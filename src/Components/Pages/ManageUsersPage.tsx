@@ -16,7 +16,7 @@ const searchResult = (query: string, users: ManageUserOption[]) => {
                 user.email.toLowerCase().includes(query.toLowerCase())
         )
         .map((user) => ({
-            value: user.user_id,
+            value: user.id,
             label: (
                 <div
                     style={{ display: "flex", justifyContent: "space-between" }}
@@ -44,7 +44,7 @@ function ManageUsersPage() {
         if (store.app_users.length > 0) {
             setOptions(
                 store.app_users.map((user) => ({
-                    value: user.user_id,
+                    value: user.id,
                     label: `${user.user_name} - ${user.email}`,
                 }))
             )
@@ -62,7 +62,7 @@ function ManageUsersPage() {
     }
 
     const onSelect = (value: string) => {
-        const user = store.app_users.find((user) => user.user_id === value)
+        const user = store.app_users.find((user) => user.id === value)
         if (user) {
             setSelectedUser(user)
             setInputValue(user.user_name)
@@ -73,7 +73,7 @@ function ManageUsersPage() {
         if (!selectedUser) return
 
         await store.updateUserRole({
-            user_id: selectedUser.user_id,
+            user_id: selectedUser.id,
             user_type: user_type,
             role_id: role_id,
         })

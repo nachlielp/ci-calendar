@@ -27,6 +27,7 @@ async function updateUserRole({
         if (roleError) throw roleError
 
         // Update users table
+        //TODO update USER_ID to ID - 1.2.0
         const { error: userError } = await supabase
             .from("users")
             .update({ user_type: user_type })

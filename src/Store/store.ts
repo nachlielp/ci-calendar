@@ -121,7 +121,7 @@ class Store {
 
     @computed
     get isUser() {
-        return !!this.user?.user_id
+        return !!this.user?.id
     }
 
     @computed
@@ -131,7 +131,7 @@ class Store {
 
     @computed
     get getUserId() {
-        return this.user.user_id
+        return this.user.id
     }
 
     @computed
@@ -152,7 +152,7 @@ class Store {
     @computed
     get getUserEvents() {
         return this.app_ci_events
-            .filter((e) => e.user_id === this.user.user_id)
+            .filter((e) => e.user_id === this.user.id)
             .slice()
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
@@ -288,19 +288,19 @@ class Store {
                 value: t.user_id,
             }))
 
-        const selfExists = teachers.some((t) => t.value === this.user.user_id)
+        const selfExists = teachers.some((t) => t.value === this.user.id)
 
         // Add self if not already in list and user is valid
         if (
             !selfExists &&
-            this.user?.user_id &&
+            this.user?.id &&
             this.user?.user_type !== UserType.org &&
             this.bio?.bio_name
         ) {
             return [
                 {
                     label: this.bio?.bio_name,
-                    value: this.user.user_id,
+                    value: this.user.id,
                 },
                 ...teachers,
             ]
@@ -318,17 +318,17 @@ class Store {
                 value: t.user_id,
             }))
 
-        const selfExists = orgs.some((o) => o.value === this.user.user_id)
+        const selfExists = orgs.some((o) => o.value === this.user.id)
 
         if (
             !selfExists &&
-            this.user?.user_id &&
+            this.user?.id &&
             this.user?.user_type === UserType.org
         ) {
             return [
                 {
                     label: this.bio?.bio_name || this.user.email,
-                    value: this.user.user_id,
+                    value: this.user.id,
                 },
                 ...orgs,
             ]
@@ -466,11 +466,11 @@ class Store {
     }
 
     private subscribeToUserData = async () => {
-        if (!this.user?.user_id) return
+        if (!this.user?.id) return
 
         const channel = usersService.subscribeToUser(
             this.user.user_type,
-            this.user.user_id,
+            this.user.id,
             this.handleSubscriptionUpdates
         )
 
@@ -479,7 +479,7 @@ class Store {
 
     @action
     setupSubscription = () => {
-        if (this.loading || !this.user?.user_id) return
+        if (this.loading || !this.user?.id) return
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
@@ -527,7 +527,7 @@ class Store {
     updateUser = async (user: Partial<CIUser>) => {
         try {
             const updatedUserData = await usersService.updateUser(
-                this.user.user_id,
+                this.user.id,
                 user
             )
             if (updatedUserData) {
@@ -927,7 +927,7 @@ class Store {
     @action
     setUserRole = (userRole: UserRole) => {
         this.app_users = this.app_users.map((u) =>
-            u.user_id === userRole.user_id ? { ...u, ...userRole } : u
+            u.id === userRole.user_id ? { ...u, ...userRole } : u
         )
     }
 
@@ -962,7 +962,7 @@ class Store {
             version: CACHE_VERSION,
             last_signin: dayjs().toISOString(),
         }
-        await usersService.updateUser(this.user.user_id, payload)
+        await usersService.updateUser(this.user.id, payload)
     }
 
     @action
@@ -1054,7 +1054,7 @@ class Store {
                 this.initPolling()
             }
             this.setLoading(false)
-            if (this.user.user_id) {
+            if (this.user.id) {
                 this.updateUserAppVersion()
                 this.checkNotifications()
             }

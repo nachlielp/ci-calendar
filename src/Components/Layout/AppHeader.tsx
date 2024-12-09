@@ -63,7 +63,7 @@ interface IUserInfoProps {
 const UserInfo = observer(({ user }: IUserInfoProps) => {
     return (
         <div>
-            {user.user_id && (
+            {user.id && (
                 <div className={`user-info-container`}>
                     <p className={`user-name`}>{user.user_name}</p>
                 </div>

@@ -233,7 +233,7 @@ function formatFormValuesToCreateCIEvent(
         hide: false,
         owners: [],
         is_multi_day: is_multi_day,
-        user_id: store.user.user_id,
+        user_id: store.user.id,
         source_template_id: values["template-description"],
         is_notified: false,
         cancelled: false,
@@ -414,7 +414,7 @@ function formatFormValuesToCreateCITemplate(
         type: values["main-event-type"]?.value || "",
         owners: [],
         is_multi_day: is_multi_day,
-        user_id: store.user.user_id,
+        user_id: store.user.id,
         address: address as IAddress,
         updated_at: dayjs().toISOString(),
         title: values["event-title"],
@@ -512,7 +512,7 @@ function formatFormValuesToEditCITemplate(
 
 function createDbUserFromUser(user: User): DbUserWithoutJoin {
     return {
-        user_id: user.id,
+        id: user.id,
         user_type: UserType.user,
         user_name: user.user_metadata.full_name || "",
         email: user.email || "",

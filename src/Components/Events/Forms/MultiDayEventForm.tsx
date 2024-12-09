@@ -120,7 +120,7 @@ export default function MultiDayEventForm({
                     description: values["event-description"] || "",
                     owners: [
                         {
-                            value: store.user.user_id,
+                            value: store.user.id,
                             label: store.user.user_name,
                         },
                     ],
@@ -129,7 +129,7 @@ export default function MultiDayEventForm({
                     hide: false,
                     segments: [],
                     district: values["district"],
-                    user_id: store.user.user_id,
+                    user_id: store.user.id,
                     source_template_id: sourceTemplateId,
                     is_multi_day: true,
                     multi_day_teachers:
@@ -158,7 +158,7 @@ export default function MultiDayEventForm({
                     description: values["event-description"] || "",
                     owners: [
                         {
-                            value: store.user.user_id,
+                            value: store.user.id,
                             label: store.user.user_name,
                         },
                     ],
@@ -177,7 +177,7 @@ export default function MultiDayEventForm({
                             values["event-orgs"],
                             store.getAppTaggableOrgs
                         ) || [],
-                    user_id: store.user.user_id,
+                    user_id: store.user.id,
                 }
                 await store.createTemplate(template)
                 clearForm()
