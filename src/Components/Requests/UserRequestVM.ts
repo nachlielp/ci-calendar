@@ -118,7 +118,8 @@ class UserRequestVM {
             closed: false,
         }
         this.isSubmitting = true
-        await store.createRequest(requestPayload)
+        const request = await store.createRequest(requestPayload)
+        this.openPositionRequest = request
         this.isEditRequest = false
         this.isSubmitting = false
         this.requestType = null

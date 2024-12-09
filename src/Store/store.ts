@@ -796,9 +796,12 @@ class Store {
     }
 
     @action
-    createRequest = async (request: Omit<CIRequest, "id" | "number">) => {
+    createRequest = async (
+        request: Omit<CIRequest, "id" | "number">
+    ): Promise<CIRequest> => {
         const newRequest = await requestsService.createRequest(request)
         this.setAppRequest(newRequest, EventPayloadType.INSERT)
+        return newRequest
     }
 
     @action
