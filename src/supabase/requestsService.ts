@@ -32,117 +32,156 @@ export const requestsService = {
 }
 
 async function getUserRequests(userId: string) {
-    const { data, error } = await supabase
-        .from("requests")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .select("*")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false })
 
-    return { data, error }
+        return { data, error }
+    } catch (error) {
+        console.error("Error fetching user requests:", error)
+        throw error
+    }
 }
 
 async function getAllRequests() {
-    let query = supabase
-        .from("requests")
-        .select("*")
-        .order("created_at", { ascending: false })
+    try {
+        let query = supabase
+            .from("requests")
+            .select("*")
+            .order("created_at", { ascending: false })
 
-    // if (status) {
-    //     query = query.eq("status", status)
-    // }
-    // if (name) {
-    //     query = query.ilike("name", `%${name}%`)
-    // }
-
-    const { data, error } = await query
-    if (error) {
+        const { data, error } = await query
+        if (error) {
+            throw error
+        }
+        return data
+    } catch (error) {
+        console.error("Error fetching all requests:", error)
         throw error
     }
-    return data
 }
 
 async function subscribeToAllRequests(
     callback: (data: { data: CIRequest; eventType: string }) => void
 ) {
-    const channel = supabase
-        .channel("public:requests")
-        .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "requests" },
-            (payload) => {
-                callback({
-                    data: payload.new as CIRequest,
-                    eventType: payload.eventType,
-                })
-            }
-        )
-        .subscribe()
+    try {
+        const channel = supabase
+            .channel("public:requests")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "requests" },
+                (payload) => {
+                    callback({
+                        data: payload.new as CIRequest,
+                        eventType: payload.eventType,
+                    })
+                }
+            )
+            .subscribe()
 
-    return channel
+        return channel
+    } catch (error) {
+        console.error("Error subscribing to all requests:", error)
+        throw error
+    }
 }
 
 async function getOpenRequestsByType(type: RequestType) {
-    const { data, error } = await supabase
-        .from("requests")
-        .select("*")
-        .eq("type", type)
-        .eq("status", "open")
-    return { data, error }
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .select("*")
+            .eq("type", type)
+            .eq("status", "open")
+
+        return { data, error }
+    } catch (error) {
+        console.error("Error fetching open requests by type:", error)
+        throw error
+    }
 }
 
 async function createRequest(request: CreateRequest) {
-    const { data, error } = await supabase
-        .from("requests")
-        .insert(request)
-        .select()
-        .single()
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .insert(request)
+            .select()
+            .single()
 
-    if (error) {
+        if (error) {
+            throw error
+        }
+        return data
+    } catch (error) {
+        console.error("Error creating request:", error)
         throw error
     }
-    return data
 }
 
 async function updateRequest(request: UpdateRequest) {
-    const { data, error } = await supabase
-        .from("requests")
-        .update(request)
-        .eq("id", request.id)
-        .select()
-        .single()
-    if (error) {
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .update(request)
+            .eq("id", request.id)
+            .select()
+            .single()
+        if (error) {
+            throw error
+        }
+        return data
+    } catch (error) {
+        console.error("Error updating request:", error)
         throw error
     }
-    return data
 }
 
 async function deleteRequest(requestId: string) {
-    const { data, error } = await supabase
-        .from("requests")
-        .delete()
-        .eq("id", requestId)
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .delete()
+            .eq("id", requestId)
 
-    return { data, error }
+        return { data, error }
+    } catch (error) {
+        console.error("Error deleting request:", error)
+        throw error
+    }
 }
 
 async function markAsViewedRequestByAdmin(requestId: string, userId: string) {
-    const { data, error } = await supabase
-        .from("requests")
-        .update({ viewed_by: { _fn: "array_append", args: [userId] } })
-        .eq("id", requestId)
-        .select()
-        .single()
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .update({ viewed_by: { _fn: "array_append", args: [userId] } })
+            .eq("id", requestId)
+            .select()
+            .single()
 
-    return { data, error }
+        return { data, error }
+    } catch (error) {
+        console.error("Error marking request as viewed by admin:", error)
+        throw error
+    }
 }
 
 async function markAsViewedResponseByUser(requestId: string) {
-    const { data, error } = await supabase
-        .from("requests")
-        .update({ viewed_response: true })
-        .eq("id", requestId)
-        .select()
-        .single()
+    try {
+        const { data, error } = await supabase
+            .from("requests")
+            .update({ viewed_response: true })
+            .eq("id", requestId)
+            .select()
+            .single()
 
-    return { data, error }
+        return { data, error }
+    } catch (error) {
+        console.error("Error marking request as viewed by user:", error)
+        throw error
+    }
 }
