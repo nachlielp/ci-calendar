@@ -34,6 +34,7 @@ interface UserWithRole {
     }
 }
 
+//TODO from inner to left join to accommodate response notifications
 async function getUserData(id: string): Promise<CIUserData | null> {
     try {
         const { data: userData, error: userError } = await supabase
@@ -208,7 +209,6 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
     }
 }
 
-//TODO: remove this once all users are on the right version - 1.2.0
 async function getUsers(): Promise<ManageUserOption[]> {
     try {
         const { data } = (await supabase.from("users").select(`
