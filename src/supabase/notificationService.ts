@@ -51,7 +51,6 @@ async function upsertNotification(notification: NotificationDB) {
     }
 }
 
-//TODO from inner to left join to accommodate response notifications
 async function getNotificationById(id: string) {
     try {
         const { data, error } = await supabase

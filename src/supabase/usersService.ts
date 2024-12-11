@@ -34,7 +34,6 @@ interface UserWithRole {
     }
 }
 
-//TODO from inner to left join to accommodate response notifications
 async function getUserData(id: string): Promise<CIUserData | null> {
     try {
         const { data: userData, error: userError } = await supabase
