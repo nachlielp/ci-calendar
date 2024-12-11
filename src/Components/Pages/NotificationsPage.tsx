@@ -8,10 +8,8 @@ import PermissionsStatusNotice from "../Common/PermissionsStatusNotice"
 const NotificationsPage = observer(() => {
     return (
         <div className="notifications-page page">
+            <label className="notifications-page-title">ניהול התראות</label>
             <Card className="filter-section">
-                <label className="notifications-page-title">
-                    הרשמה להתראות על ארועים חדשים של מורים וארגונים
-                </label>
                 <PermissionsStatusNotice />
                 <NotificationSwitch />
                 <SubscribeToTeachers />

@@ -1,7 +1,11 @@
 .notifications-page {
     .notifications-page-title {
+        width: 100%;
         font-size: 1.5rem;
-        font-weight: 600;
+        font-weight: 700;
+        width: 100%;
+        text-align: center;
+        display: block;
     }
     .filter-section {
         margin-top: 16px;
