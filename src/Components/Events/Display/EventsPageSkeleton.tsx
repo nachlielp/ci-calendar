@@ -24,7 +24,7 @@ export default function EventsPageHeader() {
                             flexDirection: "row",
                             alignItems: "center",
                             justifyContent: "space-between",
-                            marginBottom: "16px",
+                            marginBottom: "32px",
                         }}
                     >
                         <MenuButtons
