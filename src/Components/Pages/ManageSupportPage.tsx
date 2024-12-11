@@ -1,12 +1,11 @@
 import {
     RequestType,
     RequestTypeHebrew,
-    RequestStatus,
     RequestStatusHebrew,
     CIRequest,
     UserType,
 } from "../../util/interfaces"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import dayjs from "dayjs"
 
@@ -15,49 +14,84 @@ import { requestTypeOptions } from "../../util/options"
 import Switch from "antd/es/switch"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
+import { action, computed, makeObservable, observable, reaction } from "mobx"
 
-const ManageSupportPage = () => {
-    // const [selectedStatus, setSelectedStatus] = useState<RequestStatus>(
-    //     RequestStatus.open
-    // )
-    const [showOpenRequests, setShowOpenRequests] = useState<boolean>(true)
-    const [selectedTypes, setSelectedTypes] = useState<RequestType[]>([])
-    const [expandedRequestId, setExpandedRequestId] = useState<string | null>(
-        null
-    )
-    const [filteredRequests, setFilteredRequests] = useState<CIRequest[]>([])
-    // const [addResponseModalOpen, setAddResponseModalOpen] =
-    //     useState<boolean>(false)
+class ManageSupportPageVM {
+    @observable showOpenRequests = true
+    @observable selectedTypes: RequestType[] = []
+    @observable expandedRequestId: string | null = null
+    @observable filteredRequests: CIRequest[] = []
 
-    useEffect(() => {
-        const requests = showOpenRequests
-            ? store.getOpenAppRequests
-            : store.getClosedAppRequests
+    constructor() {
+        makeObservable(this)
 
-        if (selectedTypes.length === 0) {
-            setFilteredRequests(requests)
-            return
-        }
-        const filteredRequests = requests.filter((request) =>
-            selectedTypes.includes(request.type)
+        reaction(
+            () => ({
+                showOpen: this.showOpenRequests,
+                types: this.selectedTypes,
+                requests: store.app_requests,
+            }),
+            ({ showOpen, types }) => {
+                const requests = showOpen
+                    ? store.getOpenAppRequests
+                    : store.getClosedAppRequests
+
+                if (types.length === 0) {
+                    this.filteredRequests = requests
+                    return
+                }
+
+                const filteredRequests = requests.filter((request) =>
+                    types.includes(request.type)
+                )
+
+                this.filteredRequests = [...filteredRequests].sort((a, b) => {
+                    return dayjs(a.created_at).isBefore(dayjs(b.created_at))
+                        ? 1
+                        : -1
+                })
+            },
+            { fireImmediately: true }
         )
-
-        const sortedRequests = filteredRequests.sort((a, b) => {
-            return dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
-        })
-
-        setFilteredRequests(sortedRequests)
-    }, [store.app_requests, selectedTypes, showOpenRequests])
-
-    function handleStatusChange(checked: boolean) {
-        setShowOpenRequests(checked)
     }
 
-    function handleTypesChange(values: string[]) {
-        setSelectedTypes(values as RequestType[])
+    @computed
+    get getSelectedTypes() {
+        return this.selectedTypes
     }
 
-    async function handleAction(action: string, request: CIRequest) {
+    @computed
+    get getFilteredRequests() {
+        return this.filteredRequests
+    }
+
+    @computed
+    get getShowOpenRequests() {
+        return this.showOpenRequests
+    }
+
+    @computed
+    get getExpandedRequestId() {
+        return this.expandedRequestId
+    }
+
+    @action
+    setShowOpenRequests = () => {
+        this.showOpenRequests = !this.showOpenRequests
+    }
+
+    @action
+    setSelectedTypes = (types: string[]) => {
+        this.selectedTypes = types as RequestType[]
+    }
+
+    @action
+    setExpandedRequestId = (id: string | null) => {
+        this.expandedRequestId = id
+    }
+
+    @action
+    handleAction = async (action: string, request: CIRequest) => {
         switch (action) {
             case "approved":
                 const newUserType =
@@ -94,7 +128,7 @@ const ManageSupportPage = () => {
                 ]
                 const newRequest: CIRequest = {
                     ...request,
-                    status: RequestStatus.closed,
+                    // status: RequestStatus.closed,
                     responses: newResponseApprovedMessage,
                     viewed: false,
                     sent: false,
@@ -104,15 +138,15 @@ const ManageSupportPage = () => {
                 await store.updateRequest(newRequest)
                 break
 
-            case "add_response":
-                await store.updateRequest({
-                    id: request.id,
-                    responses: request.responses,
-                    viewed: false,
-                    sent: false,
-                    to_send: true,
-                })
-                break
+            // case "add_response":
+            //     await store.updateRequest({
+            //         id: request.id,
+            //         responses: request.responses,
+            //         viewed: false,
+            //         sent: false,
+            //         to_send: true,
+            //     })
+            //     break
 
             case "close":
                 const newDeclineResponseMessage = [
@@ -125,25 +159,29 @@ const ManageSupportPage = () => {
                 ]
                 await store.updateRequest({
                     id: request.id,
-                    status: RequestStatus.closed,
+                    // status: RequestStatus.closed,
                     responses: newDeclineResponseMessage,
                     viewed: false,
                     sent: false,
                     to_send: true,
+                    closed: true,
                 })
                 break
         }
     }
 
-    function handleOpenRequest(request: CIRequest) {
-        if (expandedRequestId === request.id) {
-            setExpandedRequestId(null)
-            // setAddResponseModalOpen(false)
+    @action
+    handleOpenRequest = (request: CIRequest) => {
+        if (this.expandedRequestId === request.id) {
+            this.setExpandedRequestId(null)
             return
         }
-        setExpandedRequestId(request.id)
-        // setAddResponseModalOpen(false)
+        this.setExpandedRequestId(request.id)
     }
+}
+
+const ManageSupportPage = () => {
+    const [vm] = useState(() => new ManageSupportPageVM())
 
     return (
         <section className="manage-support-page">
@@ -152,23 +190,23 @@ const ManageSupportPage = () => {
                 <div className="filters-container">
                     <DoubleBindedSelect
                         options={requestTypeOptions}
-                        selectedValues={selectedTypes}
-                        onChange={handleTypesChange}
+                        selectedValues={vm.getSelectedTypes}
+                        onChange={vm.setSelectedTypes}
                         placeholder="סינון לפי סוג הבקשה"
                         className="filter-select"
                     />
                     <Switch
                         className="filter-switch"
                         size="default"
-                        onChange={handleStatusChange}
-                        checked={showOpenRequests}
+                        onChange={vm.setShowOpenRequests}
+                        checked={vm.getShowOpenRequests}
                         checkedChildren={"פתוחות"}
                         unCheckedChildren={"סגורות"}
                     />
                 </div>
             </header>
             <div className="requests-container" role="list">
-                {filteredRequests.map((request) => (
+                {vm.getFilteredRequests.map((request) => (
                     <div
                         key={request.id}
                         className="request-item"
@@ -176,18 +214,20 @@ const ManageSupportPage = () => {
                     >
                         <div
                             className={`request-item ${
-                                expandedRequestId === request.id ? "active" : ""
+                                vm.getExpandedRequestId === request.id
+                                    ? "active"
+                                    : ""
                             }`}
-                            onClick={() => handleOpenRequest(request)}
+                            onClick={() => vm.handleOpenRequest(request)}
                         >
                             <div
                                 className={`request-summary ${
-                                    expandedRequestId === request.id
+                                    vm.getExpandedRequestId === request.id
                                         ? "active"
                                         : ""
                                 } ${
-                                    filteredRequests[
-                                        filteredRequests.length - 1
+                                    vm.getFilteredRequests[
+                                        vm.getFilteredRequests.length - 1
                                     ].id === request.id
                                         ? "last-item"
                                         : ""
@@ -212,15 +252,15 @@ const ManageSupportPage = () => {
                                     )}
                                 </time>
                             </div>
-                            {expandedRequestId === request.id && (
+                            {vm.getExpandedRequestId === request.id && (
                                 <div
                                     className={`request-details ${
-                                        expandedRequestId === request.id
+                                        vm.getExpandedRequestId === request.id
                                             ? "active"
                                             : ""
                                     } ${
-                                        filteredRequests[
-                                            filteredRequests.length - 1
+                                        vm.getFilteredRequests[
+                                            vm.getFilteredRequests.length - 1
                                         ].id === request.id
                                             ? "last-item"
                                             : ""
@@ -267,7 +307,7 @@ const ManageSupportPage = () => {
                                             <button
                                                 className="secondary-action-btn low-margin"
                                                 onClick={() =>
-                                                    handleAction(
+                                                    vm.handleAction(
                                                         "approved",
                                                         request
                                                     )
@@ -300,7 +340,10 @@ const ManageSupportPage = () => {
                                         <button
                                             className="secondary-action-btn low-margin"
                                             onClick={() =>
-                                                handleAction("close", request)
+                                                vm.handleAction(
+                                                    "close",
+                                                    request
+                                                )
                                             }
                                         >
                                             דחיה

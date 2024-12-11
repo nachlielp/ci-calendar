@@ -30,9 +30,9 @@
         background-color: #ffffff;
         border-radius: 6px;
         direction: rtl;
-        /* .request-item {
-            border-bottom: 1px solid #e0e0e0;
-        } */
+        .request-item {
+            cursor: pointer;
+        }
 
         .request-summary {
             display: flex;
