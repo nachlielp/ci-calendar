@@ -9,9 +9,18 @@ export default function EventsPageSkeleton() {
     const eventTypes = localStorage.getItem("eventType") || "[]"
     const districts = localStorage.getItem("district") || "[]"
     const defaultFilter = [
-        ...utilService.removeDuplicates(JSON.parse(eventTypes)),
-        ...utilService.removeDuplicates(JSON.parse(districts)),
+        ...(JSON.parse(eventTypes).map((t: string) =>
+            utilService.getLabelByValue(t)
+        ) || []),
+        ...(JSON.parse(districts).map((t: string) =>
+            utilService.getLabelByValue(t)
+        ) || []),
     ]
+    console.log(defaultFilter)
+    // const defaultFilter = [
+    //     ...utilService.removeDuplicates(JSON.parse(eventTypes)),
+    //     ...utilService.removeDuplicates(JSON.parse(districts)),
+    // ]
     return (
         <div
             className="app-content"
@@ -76,7 +85,7 @@ export default function EventsPageSkeleton() {
                                 key={eventType}
                                 onClick={() => {}}
                             >
-                                {utilService.getLabelByValue(eventType)}
+                                {eventType}
                                 <Icon icon="close" />
                             </Tag>
                         ))}
