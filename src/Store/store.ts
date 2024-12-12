@@ -41,6 +41,7 @@ import { alertsService } from "../supabase/alertsService"
 import { userRoleService } from "../supabase/userRoleService"
 import { CACHE_VERSION } from "../App"
 
+//TODO store events and load form storage if under 24 hours old
 class Store {
     @observable session: Session | null = null
     @observable user: CIUser = {} as CIUser
