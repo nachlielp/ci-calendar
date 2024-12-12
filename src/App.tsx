@@ -60,6 +60,7 @@ const App = () => {
             <SpeedInsights />
             <BackgroundTiles />
 
+            {/* {store.isLoading ? ( */}
             {store.isLoading ? (
                 <EventsPageSkeleton />
             ) : (
