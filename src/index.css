@@ -1,3 +1,5 @@
+/* TODO Direct imports of CSS files */
+
 @import "./styles/header.css";
 @import "./styles/login.css";
 @import "./styles/signup.css";

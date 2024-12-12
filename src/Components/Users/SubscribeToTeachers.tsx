@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo } from "react"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import AsyncButton from "../Common/AsyncButton"
 import { observer } from "mobx-react-lite"
@@ -72,7 +72,7 @@ class SubscribeToTeachersVM {
 
 const SubscribeToTeachers = () => {
     //TODO ask Juan
-    const [vm] = useState(() => new SubscribeToTeachersVM())
+    const vm = useMemo(() => new SubscribeToTeachersVM(), [])
 
     return (
         <div>
