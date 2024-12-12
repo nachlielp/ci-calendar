@@ -21,14 +21,6 @@ export default function EventsPageSkeleton() {
         ) || []),
     ]
 
-    const iconCloseStyle = {
-        ".injected-svg": {
-            paddingTop: "3px",
-            paddingRight: "4px",
-            width: "16px",
-            height: "16px",
-        },
-    }
     return (
         <div
             className="app-content"
