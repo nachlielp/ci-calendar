@@ -4,6 +4,10 @@ import Skeleton from "antd/es/skeleton"
 import Card from "antd/es/card"
 import { utilService } from "../../../util/utilService"
 import { Tag } from "antd"
+import { ReactSVG } from "react-svg"
+import close from "../../../assets/svgs/close.svg"
+
+// ... imports remain the same ...
 
 export default function EventsPageSkeleton() {
     const eventTypes = localStorage.getItem("eventType") || "[]"
@@ -16,45 +20,85 @@ export default function EventsPageSkeleton() {
             utilService.getLabelByValue(t)
         ) || []),
     ]
-    console.log(defaultFilter)
-    // const defaultFilter = [
-    //     ...utilService.removeDuplicates(JSON.parse(eventTypes)),
-    //     ...utilService.removeDuplicates(JSON.parse(districts)),
-    // ]
+
+    const iconCloseStyle = {
+        ".injected-svg": {
+            paddingTop: "3px",
+            paddingRight: "4px",
+            width: "16px",
+            height: "16px",
+        },
+    }
     return (
         <div
             className="app-content"
             style={{ width: "100%", maxWidth: "500px" }}
         >
-            <div className="events-page">
+            <div
+                style={{
+                    padding: "0 16px",
+                    alignSelf: "center",
+                    position: "relative",
+                    height: "calc(100vh - 56px)",
+                    overflowY: "auto",
+                    color: "#000",
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                    maskImage:
+                        "linear-gradient(to bottom, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 1) 16px)",
+                    WebkitMaskImage:
+                        "linear-gradient(to bottom, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 1) 16px)",
+                }}
+            >
                 <div
                     className="header-skeleton"
                     style={{ height: "56px" }}
                 ></div>
-                <section className="header">
-                    <h1 className="title">קונטקט אימפרוביזציה ישראל</h1>
-                    <p className="subtitle">כל האירועים במקום אחד</p>
+                <section
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: "1.25rem",
+                    }}
+                >
+                    <h1
+                        style={{
+                            fontSize: "1.5rem",
+                            textAlign: "center",
+                            width: "70%",
+                            margin: 0,
+                        }}
+                    >
+                        קונטקט אימפרוביזציה ישראל
+                    </h1>
+                    <p
+                        style={{
+                            fontSize: "1.25rem",
+                            textAlign: "center",
+                            width: "70%",
+                            margin: "0 0 2rem 0",
+                        }}
+                    >
+                        כל האירועים במקום אחד
+                    </p>
                     <main
-                        className="menu-container"
-                        // style={{
-                        //     display: "flex",
-                        //     flexDirection: "row",
-                        //     alignItems: "center",
-                        //     justifyContent: "space-between",
-                        //     marginBottom: "16px",
-                        // }}
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            justifySelf: "center",
+                            gap: "1rem",
+                            width: "100%",
+                        }}
                     >
                         <MenuButtons
                             onSelectKey={() => {}}
                             options={[
-                                {
-                                    key: "list",
-                                    icon: "viewDay",
-                                },
-                                {
-                                    key: "calendar",
-                                    icon: "calendar",
-                                },
+                                { key: "list", icon: "viewDay" },
+                                { key: "calendar", icon: "calendar" },
                             ]}
                             defaultKey="list"
                         />
@@ -65,9 +109,7 @@ export default function EventsPageSkeleton() {
                                     defaultFilter?.length > 0 && "active"
                                 }`}
                                 disabled
-                                style={{
-                                    borderRadius: "6px",
-                                }}
+                                style={{ borderRadius: "6px" }}
                             >
                                 <p className="text">סינון</p>
                                 <Icon
@@ -77,16 +119,43 @@ export default function EventsPageSkeleton() {
                             </button>
                         </div>
                     </main>
-                    <article className="selected-filters">
+                    <article
+                        style={{
+                            width: "90%",
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "end",
+                            gap: "5px",
+                            flexWrap: "wrap",
+                            marginTop: "1rem",
+                        }}
+                    >
                         {defaultFilter?.map((eventType: any) => (
                             <Tag
-                                className="filter-tag"
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    padding: "2px 14px 0 10px",
+                                    borderRadius: "20px",
+                                    fontSize: "0.8rem",
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                }}
                                 color="#913e2f"
                                 key={eventType}
                                 onClick={() => {}}
                             >
                                 {eventType}
-                                <Icon icon="close" />
+                                <ReactSVG
+                                    src={close}
+                                    beforeInjection={(svg) => {
+                                        svg.style.paddingTop = "3px"
+                                        svg.style.paddingRight = "4px"
+                                        svg.style.width = "16px"
+                                        svg.style.height = "16px"
+                                    }}
+                                />
                             </Tag>
                         ))}
                     </article>
