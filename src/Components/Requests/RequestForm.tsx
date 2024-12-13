@@ -38,9 +38,8 @@ const creatorDescription = (
 )
 const orgDescription = (
     <label>
-        <b>ארגון</b> יכול ליצור פרופיל ציבורי עם פרטים על הארגון ויכולת לקשר
-        מורים ספציפיים לארגון. כמו כן הארגון יכול ליצור אירועים על שם המורים
-        שמקושרים אליו.
+        <b>ארגון</b> יכולים ליצור פרופיל ציבורי עם פרטים אישיים ומידע נוסף עבור
+        חברי הקהילה. בנוסף, יש אפשרות להוסיף אירועים ללוח שנה הציבורי.
     </label>
 )
 
@@ -55,6 +54,7 @@ const RequestForm = () => {
     )
 
     const onFinish = async () => {
+        await form.validateFields()
         const values = form.getFieldsValue()
         if (!userRequestVM.openPositionRequest) {
             try {
