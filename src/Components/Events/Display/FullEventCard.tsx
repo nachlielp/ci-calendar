@@ -9,8 +9,10 @@ import CIEventNotificationModal from "../../Notifications/CIEventNotificationMod
 import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
+import { useIsMobile } from "../../../hooks/useIsMobile"
 
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
+    const isMobile = useIsMobile()
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
@@ -234,7 +236,7 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
 
             {!utilService.isEventStarted(ci_event) && (
                 <article className="event-card-footer">
-                    {utilService.isPWA() && (
+                    {isMobile && (
                         <CIEventNotificationModal
                             eventId={ci_event.id}
                             isMultiDay={ci_event.is_multi_day}

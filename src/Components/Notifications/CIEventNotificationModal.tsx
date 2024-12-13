@@ -1,6 +1,6 @@
 import Modal from "antd/es/modal"
 import SecondaryButton from "../Common/SecondaryButton"
-import { useState } from "react"
+import { useMemo } from "react"
 import { Icon } from "../Common/Icon"
 import Select from "antd/es/select"
 import Alert from "antd/es/alert/Alert"
@@ -14,9 +14,12 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { observable, reaction, action, computed } from "mobx"
 import { makeObservable } from "mobx"
+import { utilService } from "../../util/utilService"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
+const NOTIFICATION_MODAL_NOT_INSTALLED =
+    "צריך להתקין את האפליקציה לפני שניתן ליצור ולערוך התראות"
 
 class CIEventNotificationModalVM {
     @observable isOpen = false
@@ -115,8 +118,9 @@ const CIEventNotificationModal = ({
     isMultiDay: boolean
 }) => {
     //TODO ask Juan
-    const [vm] = useState(
-        () => new CIEventNotificationModalVM(eventId, isMultiDay)
+    const vm = useMemo(
+        () => new CIEventNotificationModalVM(eventId, isMultiDay),
+        []
     )
 
     return (
@@ -156,15 +160,25 @@ const CIEventNotificationModal = ({
                         value={vm.getRemindInHours?.toString() || "1"}
                         style={{ width: "200px" }}
                         onChange={(value) => vm.setRemindInHours(value)}
-                        disabled={!store.getUserReceiveNotifications}
+                        disabled={
+                            !store.getUserReceiveNotifications ||
+                            !utilService.isPWA()
+                        }
                         size="large"
                         className="form-input-large"
                         popupClassName="form-input-large"
                     />
 
-                    {!store.getUserReceiveNotifications && (
+                    {utilService.isPWA() &&
+                        !store.getUserReceiveNotifications && (
+                            <Alert
+                                message={NOTIFICATION_MODAL_BUTTON_OFF_ALERT}
+                                type="warning"
+                            />
+                        )}
+                    {!utilService.isPWA() && (
                         <Alert
-                            message={NOTIFICATION_MODAL_BUTTON_OFF_ALERT}
+                            message={NOTIFICATION_MODAL_NOT_INSTALLED}
                             type="warning"
                         />
                     )}
@@ -173,7 +187,10 @@ const CIEventNotificationModal = ({
                             className="general-action-btn large-btn"
                             isSubmitting={vm.getIsSubmitting}
                             callback={vm.upsertNotification}
-                            disabled={!store.getUserReceiveNotifications}
+                            disabled={
+                                !store.getUserReceiveNotifications ||
+                                !utilService.isPWA()
+                            }
                         >
                             אישור
                         </AsyncButton>
