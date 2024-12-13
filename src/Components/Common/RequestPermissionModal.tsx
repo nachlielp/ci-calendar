@@ -38,7 +38,7 @@ const RequestPermissionModal = () => {
                             </button>
                             <button
                                 onClick={vm.setDontReceiveNotifications}
-                                className="general-action-btn large-btn red-btn"
+                                className="text-btn large-btn "
                             >
                                 דחיה
                             </button>

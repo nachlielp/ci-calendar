@@ -38,7 +38,6 @@
     background-color: #efefef;
 
     border-radius: 6px;
-    padding: 9px 24px 10px 24px;
     font-size: 20px;
     padding: 5px 16px;
     border: none;
@@ -50,14 +49,20 @@
     .google-button-label {
         margin-right: 0.5rem;
         margin-left: 0.5rem;
-        font-size: 20px;
-        font-weight: 400;
+        margin-bottom: 2px;
+
+        font-size: 24px;
+        line-height: 29px;
+        font-weight: 500;
+        color: #444444;
         cursor: pointer;
     }
 
     .injected-svg {
         cursor: pointer;
         margin-top: 0.25rem;
+        width: 24px;
+        height: 24px;
     }
 }
 
@@ -87,7 +92,8 @@
     text-align: right;
     cursor: pointer;
     padding: 5px 16px;
-    background-color: #dd5239;
+    /* background-color: #dd5239; */
+    background-color: #444444;
     color: white;
     border-radius: 6px;
     border: none;
@@ -100,7 +106,8 @@
     }
 
     &:hover {
-        background-color: #c6280c;
+        /* background-color: #c6280c; */
+        background-color: #222222;
         color: white;
     }
 
@@ -201,8 +208,13 @@
     cursor: pointer;
     padding: 5px 8px;
     &:hover {
-        transform: scale(1.25); /* Adjust the scale factor as needed */
+        transform: scale(1.05); /* Adjust the scale factor as needed */
         transition: transform 0.2s;
+    }
+
+    &.large-btn {
+        padding: 9px 24px 10px 24px;
+        font-size: 20px;
     }
 }
 
