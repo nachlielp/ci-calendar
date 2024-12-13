@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom"
 
 const BioPage = () => {
     const navigate = useNavigate()
-    const [editProfile, setEditProfile] = useState(false)
+    const [editProfile, setEditProfile] = useState(!store.getBio.bio_name)
     const handleSubmitEdit = () => {
         setEditProfile(false)
     }

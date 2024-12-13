@@ -237,10 +237,10 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                     <Switch
                         checkedChildren="גלוי"
                         unCheckedChildren="מוסתר"
-                        defaultChecked={store.getBio.show_profile}
+                        defaultChecked={store.getBio.show_profile ?? true}
                     />
                 </Form.Item>
-                <Form.Item<FieldType>
+                {/* <Form.Item<FieldType>
                     label="אפשרות לתיוג על ידי מורים אחרים"
                     name="allow_tagging"
                     valuePropName="checked"
@@ -250,7 +250,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                         unCheckedChildren="מוסתר"
                         defaultChecked={store.getBio.allow_tagging}
                     />
-                </Form.Item>
+                </Form.Item> */}
                 {inputErrors && (
                     <Alert
                         message="ערכים שגויים, נא לבדוק את הטופס"
