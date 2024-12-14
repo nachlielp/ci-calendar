@@ -1,4 +1,3 @@
-import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { useState } from "react"
@@ -14,7 +13,7 @@ import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
 import { utilService } from "../../../util/utilService.ts"
 import { store } from "../../../Store/store.ts"
 import EventFromFooter from "./EventFromFooter.tsx"
-
+import "../../../styles/event-form.css"
 export default function EditMultiDayEventForm({
     isTemplate = false,
     event,
@@ -109,36 +108,34 @@ export default function EditMultiDayEventForm({
         : "עדכון אירוע - רב יומי"
 
     return (
-        <>
-            <Card className="edit-multi-day-event-form">
-                <Form
+        <section className="event-form">
+            <Form
+                form={form}
+                variant="filled"
+                onFinish={handleSubmit}
+                initialValues={currentFormValues}
+                onFinishFailed={onFinishFailed}
+            >
+                {isTemplate && (
+                    <Form.Item name="template-name" label="שם התבנית">
+                        <Input allowClear />
+                    </Form.Item>
+                )}
+                <MultiDayFormHead
                     form={form}
-                    variant="filled"
-                    onFinish={handleSubmit}
-                    initialValues={currentFormValues}
-                    onFinishFailed={onFinishFailed}
-                >
-                    {isTemplate && (
-                        <Form.Item name="template-name" label="שם התבנית">
-                            <Input allowClear />
-                        </Form.Item>
-                    )}
-                    <MultiDayFormHead
-                        form={form}
-                        handleAddressSelect={handleAddressSelect}
-                        address={address || ({} as IAddress)}
-                        isTemplate={isTemplate}
-                        teachers={store.getAppTaggableTeachers}
-                        orgs={store.getAppTaggableOrgs}
-                        titleText={titleText}
-                    />
-                    <EventFromFooter
-                        inputErrors={inputErrors}
-                        isSubmitting={isSubmitting}
-                        submitText={submitText}
-                    />
-                </Form>
-            </Card>
-        </>
+                    handleAddressSelect={handleAddressSelect}
+                    address={address || ({} as IAddress)}
+                    isTemplate={isTemplate}
+                    teachers={store.getAppTaggableTeachers}
+                    orgs={store.getAppTaggableOrgs}
+                    titleText={titleText}
+                />
+                <EventFromFooter
+                    inputErrors={inputErrors}
+                    isSubmitting={isSubmitting}
+                    submitText={submitText}
+                />
+            </Form>
+        </section>
     )
 }

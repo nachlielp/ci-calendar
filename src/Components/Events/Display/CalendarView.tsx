@@ -13,6 +13,7 @@ dayjs.locale("he")
 import hb from "antd/locale/he_IL"
 import { useState } from "react"
 import { Icon } from "../../Common/Icon"
+import "../../../styles/calendar-view.css"
 
 interface CalendarViewProps {
     events: CIEvent[]

@@ -5,6 +5,7 @@ import Select from "antd/es/select"
 import { RequestType } from "../../util/interfaces"
 import { useState } from "react"
 import Alert from "antd/es/alert"
+import "../../styles/request-form.css"
 
 import { userRequestVM } from "./UserRequestVM"
 import { observer } from "mobx-react-lite"

@@ -6,7 +6,7 @@ import { utilService } from "../../../util/utilService"
 import { Tag } from "antd"
 import { ReactSVG } from "react-svg"
 import close from "../../../assets/svgs/close.svg"
-
+import "../../../styles/events-page-skeleton.css"
 // ... imports remain the same ...
 
 export default function EventsPageSkeleton() {
@@ -23,7 +23,7 @@ export default function EventsPageSkeleton() {
 
     return (
         <div
-            className="app-content"
+            className="app-content events-page-skeleton"
             style={{ width: "100%", maxWidth: "500px" }}
         >
             <div

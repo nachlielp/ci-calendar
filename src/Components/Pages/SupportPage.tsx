@@ -4,6 +4,7 @@ import { userRequestVM } from "../Requests/UserRequestVM"
 import { observer } from "mobx-react-lite"
 import Card from "antd/lib/card/Card"
 import { UserTypeHebrew } from "../../util/interfaces"
+import "../../styles/support-page.css"
 
 const SupportPage = () => {
     return (

@@ -4,7 +4,7 @@ import SubscribeToTeachers from "../Users/SubscribeToTeachers"
 import { observer } from "mobx-react-lite"
 import NotificationSwitch from "../Users/NotificationSwitch"
 import PermissionsStatusNotice from "../Common/PermissionsStatusNotice"
-
+import "../../styles/notifications-page.css"
 const NotificationsPage = observer(() => {
     return (
         <div className="notifications-page page">

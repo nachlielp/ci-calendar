@@ -1,3 +1,5 @@
+import React from "react"
+import "../../styles/header.css"
 import { CIUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import { InstallPWAButton } from "../Common/InstallPWAButton"
@@ -9,7 +11,6 @@ import { appHeaderVM as vm } from "./AppHeaderVM"
 import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router-dom"
-import React from "react"
 
 const AppHeader = () => {
     const isMobile = useIsMobile()

@@ -4,7 +4,7 @@ import ProfileForm from "../Users/ProfileForm"
 import BioCard from "../Users/BioCard"
 import { store } from "../../Store/store"
 import { useNavigate } from "react-router-dom"
-
+import "../../styles/bio-page.css"
 const BioPage = () => {
     const navigate = useNavigate()
     const [editProfile, setEditProfile] = useState(!store.getBio.bio_name)

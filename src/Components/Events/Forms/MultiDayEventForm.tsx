@@ -15,7 +15,7 @@ import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import MultiDayFormHead from "./MultiDayFormHead"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
-
+import "../../../styles/event-form.css"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -199,84 +199,82 @@ export default function MultiDayEventForm({
     }
 
     return (
-        <>
-            <section className="multi-day-event-form">
-                <Form
+        <section className="event-form">
+            <Form
+                form={form}
+                onFinish={handleSubmit}
+                variant="filled"
+                initialValues={initialValues}
+                onFinishFailed={onFinishFailed}
+            >
+                {isTemplate && (
+                    <Form.Item name="template-name">
+                        <Row gutter={8}>
+                            <Col span={16}>
+                                <Form.Item name="template-name">
+                                    <Input
+                                        placeholder="שם התבנית"
+                                        allowClear
+                                        size="large"
+                                        className="form-input-large"
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <button
+                                    type="button"
+                                    onClick={() => clearForm()}
+                                    className="general-clear-btn large-btn"
+                                >
+                                    ניקוי טופס
+                                </button>
+                            </Col>
+                        </Row>
+                    </Form.Item>
+                )}
+                {!isTemplate && (
+                    <Form.Item>
+                        <Row gutter={8}>
+                            <Col span={16}>
+                                <Form.Item name="template-description">
+                                    <Select
+                                        key={templateOptions.length}
+                                        options={templateOptions}
+                                        onChange={handleTemplateChange}
+                                        allowClear
+                                        placeholder="בחירת תבנית"
+                                        size="large"
+                                        className="form-input-large"
+                                    />
+                                </Form.Item>
+                            </Col>
+                            <Col span={8}>
+                                <button
+                                    type="button"
+                                    onClick={() => clearForm()}
+                                    className="general-clear-btn large-btn"
+                                >
+                                    ניקוי טופס
+                                </button>
+                            </Col>
+                        </Row>
+                    </Form.Item>
+                )}
+                <MultiDayFormHead
                     form={form}
-                    onFinish={handleSubmit}
-                    variant="filled"
-                    initialValues={initialValues}
-                    onFinishFailed={onFinishFailed}
-                >
-                    {isTemplate && (
-                        <Form.Item name="template-name">
-                            <Row gutter={8}>
-                                <Col span={16}>
-                                    <Form.Item name="template-name">
-                                        <Input
-                                            placeholder="שם התבנית"
-                                            allowClear
-                                            size="large"
-                                            className="form-input-large"
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <button
-                                        type="button"
-                                        onClick={() => clearForm()}
-                                        className="general-clear-btn large-btn"
-                                    >
-                                        ניקוי טופס
-                                    </button>
-                                </Col>
-                            </Row>
-                        </Form.Item>
-                    )}
-                    {!isTemplate && (
-                        <Form.Item>
-                            <Row gutter={8}>
-                                <Col span={16}>
-                                    <Form.Item name="template-description">
-                                        <Select
-                                            key={templateOptions.length}
-                                            options={templateOptions}
-                                            onChange={handleTemplateChange}
-                                            allowClear
-                                            placeholder="בחירת תבנית"
-                                            size="large"
-                                            className="form-input-large"
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <button
-                                        type="button"
-                                        onClick={() => clearForm()}
-                                        className="general-clear-btn large-btn"
-                                    >
-                                        ניקוי טופס
-                                    </button>
-                                </Col>
-                            </Row>
-                        </Form.Item>
-                    )}
-                    <MultiDayFormHead
-                        form={form}
-                        handleAddressSelect={handleAddressSelect}
-                        isTemplate={isTemplate}
-                        address={address}
-                        teachers={store.getAppTaggableTeachers}
-                        orgs={store.getAppTaggableOrgs}
-                        titleText="יצירת אירוע - רב יומי"
-                    />
-                    <EventFromFooter
-                        isSubmitting={isSubmitting}
-                        inputErrors={inputErrors}
-                        submitText={isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                    />
-                </Form>
-            </section>
-        </>
+                    handleAddressSelect={handleAddressSelect}
+                    isTemplate={isTemplate}
+                    address={address}
+                    teachers={store.getAppTaggableTeachers}
+                    orgs={store.getAppTaggableOrgs}
+                    titleText="יצירת אירוע - רב יומי"
+                />
+                <EventFromFooter
+                    isSubmitting={isSubmitting}
+                    inputErrors={inputErrors}
+                    submitText={isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                />
+            </Form>
+        </section>
     )
 }

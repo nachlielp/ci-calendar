@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react"
+import "../../styles/login.css"
 import Alert from "antd/es/alert"
 import Card from "antd/es/card"
 import Form from "antd/es/form"

@@ -2,6 +2,7 @@ import Modal from "antd/es/modal"
 import { observer } from "mobx-react-lite"
 import { useCallback, useState } from "react"
 import Cropper from "react-easy-crop"
+import "../../styles/upload-image-button.css"
 
 const MAX_FILE_SIZE = 30 * 1024 // 30KB in bytes
 

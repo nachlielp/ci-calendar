@@ -4,6 +4,7 @@ import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../util/options"
 import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
 import { Icon } from "../Common/Icon"
+import "../../styles/filter-drawer.css"
 
 export default function FilterDrawer() {
     const [modalOpen, setModalOpen] = useState(false)

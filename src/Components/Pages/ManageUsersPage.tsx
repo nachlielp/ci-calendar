@@ -7,6 +7,7 @@ import { useWindowSize } from "../../hooks/useWindowSize"
 import { SelectProps } from "antd/es/select"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
+import "../../styles/manage-users.css"
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users

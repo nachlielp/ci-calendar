@@ -1,5 +1,5 @@
 import { ReactSVG } from "react-svg"
-
+import "../../styles/icon.css"
 import expand from "../../assets/svgs/expand.svg"
 import collapse from "../../assets/svgs/collapse.svg"
 import calendar from "../../assets/svgs/calendar.svg"

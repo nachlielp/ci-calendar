@@ -3,7 +3,7 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { useState } from "react"
 import { Icon } from "../Common/Icon"
-
+import "../../styles/notification-switch.css"
 const NotificationSwitch = () => {
     const [loading, setLoading] = useState(false)
 

@@ -37,20 +37,11 @@ export default function FullEventCardModal({
 
     return (
         <>
-            <div
-                id={event.id}
-                className="modal-card-header"
-                onClick={showModal}
-            >
+            <div id={event.id} onClick={showModal}>
                 {anchorEl}
             </div>
 
-            <Modal
-                open={isModalOpen}
-                onCancel={handleCancel}
-                footer={null}
-                className="single-day-modal-card"
-            >
+            <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
                 <FullEventCard event={event} />
             </Modal>
         </>

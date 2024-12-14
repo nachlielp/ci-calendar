@@ -16,6 +16,7 @@ import { utilService } from "../../../util/utilService"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
+import "../../../styles/event-form.css"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -138,7 +139,7 @@ export default function SingleDayEventForm({
         : "הוספת אירוע חד יומי"
 
     return (
-        <div className="single-day-event-form">
+        <div className="event-form">
             <section className="event-card">
                 <Form
                     form={form}

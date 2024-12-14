@@ -1,3 +1,4 @@
+import "../../../styles/events-list.css"
 import { EventPreview } from "./EventPreview"
 import { CIEvent } from "../../../util/interfaces"
 import Empty from "antd/es/empty"
@@ -18,7 +19,7 @@ export default function EventsList({ events }: IEventsListProps) {
     useScrollToEventById(eventId || "", eventRefs)
 
     return (
-        <div className="events-list-container">
+        <div className="events-list">
             {!events.length && emptyEventsList()}
             {events
                 .filter((event) =>

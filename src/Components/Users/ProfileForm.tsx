@@ -13,7 +13,7 @@ import { store } from "../../Store/store"
 import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
 import Spin from "antd/es/spin"
-
+import "../../styles/profile-form.css"
 type FieldType = {
     bio_name: string
     about: string
@@ -105,7 +105,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     }
 
     return (
-        <Card className={`teacher-form ${isMobile ? "mobile" : "desktop"}`}>
+        <Card className={`profile-form ${isMobile ? "mobile" : "desktop"}`}>
             <Form
                 form={form}
                 autoComplete="off"

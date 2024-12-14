@@ -1,3 +1,4 @@
+import "../../styles/filter-modal.css"
 import { useState } from "react"
 import Modal from "antd/es/modal"
 import Tag from "antd/es/tag"
@@ -5,7 +6,7 @@ import { eventOptions, districtOptions } from "../../util/options"
 import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
 import { Icon } from "../Common/Icon"
 
-export default function FilterModel() {
+export default function FilterModal() {
     const [modalOpen, setModalOpen] = useState(false)
 
     const { currentValues, selectOption, removeOption } =
@@ -14,7 +15,7 @@ export default function FilterModel() {
     const isSelectedFilter = currentValues.length
 
     return (
-        <div className="filter-model-container">
+        <div className="filter-modal">
             <button
                 onClick={() => setModalOpen(true)}
                 className={`anchor-btn ${isSelectedFilter && "active"}`}

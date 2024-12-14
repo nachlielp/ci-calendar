@@ -13,7 +13,9 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 dayjs.extend(utc)
 dayjs.extend(timezone)
+import "../../styles/user-notifications-list.css"
 
+//NOTICE - currently not in use
 const UserNotificationsList = () => {
     return (
         <section className="user-notifications-list">

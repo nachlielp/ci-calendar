@@ -11,7 +11,7 @@ import {
     CITemplate,
     DBCIEvent,
 } from "../../../util/interfaces"
-
+import "../../../styles/event-form.css"
 import Loading from "../../Common/Loading"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
@@ -138,7 +138,7 @@ export default function EditSingleDayEventForm({
         : "עדכון אירוע - חד יומי"
 
     return (
-        <>
+        <section className="event-form">
             <Form
                 {...formItemLayout}
                 form={form}
@@ -179,6 +179,6 @@ export default function EditSingleDayEventForm({
                 />
             </Form>
             <div className="footer-space"></div>
-        </>
+        </section>
     )
 }

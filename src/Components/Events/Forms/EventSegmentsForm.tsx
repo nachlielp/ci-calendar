@@ -6,7 +6,7 @@ import Col from "antd/es/col"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import TimeInputModal from "./TimeInputModal"
-
+import "../../../styles/event-segments-form.css"
 interface EventSegmentsFormProps {
     form: any
     teachers: { label: string; value: string }[]

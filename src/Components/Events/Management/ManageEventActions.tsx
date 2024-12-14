@@ -1,5 +1,5 @@
 import { CIEvent } from "../../../util/interfaces"
-
+import "../../../styles/manage-event-actions.css"
 import HideEventButton from "../Actions/HideEventButton"
 import { Icon } from "../../Common/Icon"
 import FormContainer from "../Forms/FormContainer"

@@ -6,6 +6,7 @@ import { EventlyType, CIEvent } from "../../../util/interfaces"
 import { tagOptions, eventOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
+import "../../../styles/event-preview.css"
 interface EventPreviewProps {
     event: CIEvent
 }

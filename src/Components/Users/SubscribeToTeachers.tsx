@@ -37,16 +37,17 @@ class SubscribeToTeachersVM {
     @computed
     get subscriptionsEqual() {
         return (
-            JSON.stringify([...this.selectedTeachers].sort()) ===
+            JSON.stringify([...this.selectedTeachers]?.sort()) ===
                 JSON.stringify(
-                    [...(store.getUser.subscriptions.teachers || [])].sort()
+                    [...(store.getUser.subscriptions.teachers || [])]?.sort()
                 ) &&
-            JSON.stringify([...this.selectedOrgs].sort()) ===
+            JSON.stringify([...this.selectedOrgs]?.sort()) ===
                 JSON.stringify(
-                    [...(store.getUser.subscriptions.orgs || [])].sort()
+                    [...(store.getUser.subscriptions.orgs || [])]?.sort()
                 )
         )
     }
+
     @action
     saveSubscriptions = async () => {
         this.isSubmitting = true
@@ -71,7 +72,6 @@ class SubscribeToTeachersVM {
 }
 
 const SubscribeToTeachers = () => {
-    //TODO ask Juan
     const vm = useMemo(() => new SubscribeToTeachersVM(), [])
 
     return (

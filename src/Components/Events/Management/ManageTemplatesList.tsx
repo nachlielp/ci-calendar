@@ -3,6 +3,7 @@ import DeleteTemplateButton from "../Actions/DeleteTemplateButton"
 import { Icon } from "../../Common/Icon"
 import { observer } from "mobx-react-lite"
 import { store } from "../../../Store/store"
+import "../../../styles/manage-templates-list.css"
 
 const ManageTemplatesList = () => {
     async function handleDeleteTemplate(templateId: string) {
@@ -10,7 +11,7 @@ const ManageTemplatesList = () => {
     }
 
     return (
-        <section className="manage-templates-table">
+        <section className="manage-templates-list">
             <h2 className="list-title">תבניות</h2>
 
             <section className="templates-list">

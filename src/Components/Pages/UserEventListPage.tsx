@@ -9,6 +9,7 @@ import ManageEventActions from "../Events/Management/ManageEventActions"
 import catButtGif from "../../assets/img/cat-butt.gif"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
+import "../../styles/user-event-list-page.css"
 
 dayjs.extend(isSameOrAfter)
 

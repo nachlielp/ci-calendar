@@ -1,11 +1,12 @@
 import dayjs, { Dayjs } from "dayjs"
+import "../../styles/events-page.css"
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
 import CalendarView from "../Events/Display/CalendarView"
 import EventsList from "../Events/Display/EventsList"
 import { useState } from "react"
 import { useEventsFilter } from "../../hooks/useEventsFilter"
-import FilterModel from "../Filteres/FilterModel"
+import FilterModal from "../Filteres/FilterModal"
 import Tag from "antd/es/tag"
 import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
 import FilterDrawer from "../Filteres/FilterDrawer"
@@ -85,7 +86,7 @@ const EventsPage = () => {
                         ]}
                         defaultKey="list"
                     />
-                    {isMobile ? <FilterDrawer /> : <FilterModel />}
+                    {isMobile ? <FilterDrawer /> : <FilterModal />}
                 </main>
                 <article className="selected-filters">
                     {currentFilterValues?.map((eventType: any) => (

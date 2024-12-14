@@ -1,10 +1,9 @@
 import ManageTemplatesList from "../Events/Management/ManageTemplatesList"
 import FormContainer from "../Events/Forms/FormContainer"
-import { Icon } from "../Common/Icon"
 import Alert from "antd/es/alert"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-
+import "../../styles/create-events-page.css"
 const CreateEventsPage = () => {
     const isMissingProfile =
         !store.getBio.bio_name || store.getBio.bio_name === ""
@@ -55,10 +54,7 @@ const CreateEventsPage = () => {
                     <FormContainer
                         key={index}
                         anchorEl={
-                            <button className="btn">
-                                <Icon icon="addBox" className="icon" />
-                                {button.label}
-                            </button>
+                            <button className="btn">{button.label}</button>
                         }
                         eventType={button.type}
                         isTemplate={button.isTemplate}

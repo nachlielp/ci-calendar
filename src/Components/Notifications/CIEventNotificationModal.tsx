@@ -15,6 +15,7 @@ import { store } from "../../Store/store"
 import { observable, reaction, action, computed } from "mobx"
 import { makeObservable } from "mobx"
 import { utilService } from "../../util/utilService"
+import "../../styles/cievent-notification-modal.css"
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
@@ -117,7 +118,6 @@ const CIEventNotificationModal = ({
     eventId: string
     isMultiDay: boolean
 }) => {
-    //TODO ask Juan
     const vm = useMemo(
         () => new CIEventNotificationModalVM(eventId, isMultiDay),
         []

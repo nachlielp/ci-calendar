@@ -1,0 +1,35 @@
+.events-page-skeleton {
+    .anchor-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 8rem;
+        height: 3rem;
+        background: none;
+        color: #000;
+        border: 1px solid #000 !important;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &.active {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        &:hover {
+            color: #000 !important;
+            border: 1px solid #000 !important;
+            background: none !important;
+        }
+
+        .injected-svg {
+            padding-top: 4px;
+        }
+    }
+
+    .text {
+        font-size: 1.125rem;
+        font-weight: 500;
+        margin-right: 0.4rem;
+        cursor: pointer;
+    }
+}

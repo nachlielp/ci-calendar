@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite"
 import { alertsAnchorViewModal } from "./AlertsAnchorVM"
 import { store } from "../../Store/store"
 import { userRequestVM } from "../Requests/UserRequestVM"
-
+import "../../styles/alerts-anchor.css"
 const AlertsAnchor = () => {
     const navigate = useNavigate()
 

@@ -1,4 +1,6 @@
 import Image from "antd/es/image"
+import "../../styles/bio-card.css"
+import "../../styles/profile-form.css"
 import Typography from "antd/es/typography"
 import { Icon } from "../Common/Icon"
 import { UserBio } from "../../util/interfaces"
@@ -12,7 +14,7 @@ const BioCard = ({ teacher }: { teacher: UserBio }) => {
         return (
             <section className="bio-card">
                 <h2
-                    className={`teacher-form ${
+                    className={`profile-form ${
                         isMobile ? "mobile" : "desktop"
                     }`}
                 >

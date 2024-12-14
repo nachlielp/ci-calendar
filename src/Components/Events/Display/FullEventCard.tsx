@@ -10,6 +10,7 @@ import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
 import { useIsMobile } from "../../../hooks/useIsMobile"
+import "../../../styles/full-event-card.css"
 
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const isMobile = useIsMobile()

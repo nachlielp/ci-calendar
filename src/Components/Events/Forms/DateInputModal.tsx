@@ -13,6 +13,7 @@ import hb from "antd/locale/he_IL"
 import ConfigProvider from "antd/es/config-provider"
 import { Icon } from "../../Common/Icon"
 import DatePicker from "antd/es/date-picker"
+import "../../../styles/date-input-modal.css"
 
 export enum DateInputModalType {
     date = "date",

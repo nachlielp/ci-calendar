@@ -8,7 +8,7 @@ import {
 import { useState } from "react"
 
 import dayjs from "dayjs"
-
+import "../../styles/manage-support-page.css"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import { requestTypeOptions } from "../../util/options"
 import Switch from "antd/es/switch"

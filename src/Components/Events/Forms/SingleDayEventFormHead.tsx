@@ -43,7 +43,7 @@ export default function SingleDayEventFormHead({
     form,
 }: SingleDayEventFormHeadProps) {
     return (
-        <div className="single-day-event-base-form">
+        <div>
             <Card
                 className="event-card"
                 title={<span className="segment-title">{titleText}</span>}

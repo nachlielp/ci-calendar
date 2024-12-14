@@ -2,6 +2,7 @@ import Modal from "antd/es/modal"
 import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import Spin from "antd/es/spin"
 import { observer } from "mobx-react-lite"
+import "../../styles/request-permission-modal.css"
 
 const RequestPermissionModal = () => {
     const requestPermission = async () => {
