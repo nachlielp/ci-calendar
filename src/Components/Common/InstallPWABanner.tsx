@@ -53,7 +53,7 @@ const InstallPWABanner = ({
                             {" "}
                             הודעה{" "}
                         </label>{" "}
-                        כשהמורה המועדפת מעלה אירוע חדש?
+                        כשהמורה המועדף מעלה אירוע חדש?
                     </p>
                 </article>
                 <article className="article-info">
@@ -64,7 +64,7 @@ const InstallPWABanner = ({
                             {" "}
                             תזכורות{" "}
                         </label>{" "}
-                        לג׳אמים האהובים עליכן?
+                        לג׳אמים האהובים עליכם?
                     </p>
                 </article>
                 <p className="install-pwa-modal-p">
@@ -112,7 +112,7 @@ const InstallPWABanner = ({
                             {" "}
                             הודעה{" "}
                         </label>{" "}
-                        כשהמורה המועדפת מעלה אירוע חדש?
+                        כשהמורה המועדף מעלה אירוע חדש?
                     </p>
                 </article>
                 <article className="article-info">
@@ -123,7 +123,7 @@ const InstallPWABanner = ({
                             {" "}
                             תזכורות{" "}
                         </label>{" "}
-                        לג׳אמים האהובים עליכן?
+                        לג׳אמים האהובים עליכם?
                     </p>
                 </article>
                 <p className="install-pwa-modal-p">
