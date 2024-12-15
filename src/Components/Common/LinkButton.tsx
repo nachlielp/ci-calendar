@@ -19,13 +19,18 @@ export const LinkButton = ({
     onClick,
     children,
 }: ILinkButtonProps) => {
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation()
+        if (onClick) {
+            ;() => onClick()
+        }
+    }
     return (
         <Link to={to} className="link-btn" style={{ textDecoration: "none" }}>
             <button
-                className={` ${className} `} // Add flexbox utilities
+                className={` ${className} `}
                 disabled={disabled}
-                // shape={shape}
-                onClick={onClick}
+                onClick={handleClick}
                 title={label}
             >
                 {children}

@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { utilService } from "../../util/utilService"
 import Modal from "antd/es/modal"
 import ios_share from "../../assets/svgs/ios_share.svg"
@@ -6,11 +5,11 @@ import more_vert from "../../assets/svgs/more_vert.svg"
 import add_to_home_screen from "../../assets/svgs/add_to_home_screen.svg"
 import add_box from "../../assets/svgs/add_box.svg"
 import { ReactSVG } from "react-svg"
+import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import "../../styles/install-pwa-button.css"
+import { observer } from "mobx-react-lite"
 
-export function InstallPWAButton() {
-    const [isOpen, setIsOpen] = useState(false)
-
+const InstallPWAModal = ({ children }: { children: React.ReactNode }) => {
     const iosContent = (
         <div className="install-pwa-modal-container">
             <h2 className="install-pwa-modal-title">התקנה באייפון</h2>
@@ -68,17 +67,20 @@ export function InstallPWAButton() {
     )
     return (
         <section className="install-pwa-button">
-            <button
+            {/* <button
                 id="install-button"
                 className="install-pwa-btn"
                 style={{ display: !utilService.isPWA() ? "block" : "none" }}
-                onClick={() => setIsOpen(true)}
+                onClick={() => vm.setShowInstallPWAModal(true)}
             >
                 התקנה
-            </button>
+            </button> */}
+            <div onClick={() => vm.setShowInstallPWAModal(true)}>
+                {children}
+            </div>
             <Modal
-                open={isOpen}
-                onCancel={() => setIsOpen(false)}
+                open={vm.showInstallPWAModal}
+                onCancel={() => vm.setShowInstallPWAModal(false)}
                 footer={null}
             >
                 {utilService.isIos() ? iosContent : androidContent}
@@ -86,3 +88,5 @@ export function InstallPWAButton() {
         </section>
     )
 }
+
+export default observer(InstallPWAModal)
