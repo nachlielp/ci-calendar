@@ -31,6 +31,13 @@ const MenuDrawer = () => {
         user?.user_type === UserType.creator ||
         user?.user_type === UserType.org
 
+    const isUser =
+        user?.user_type === UserType.profile ||
+        user?.user_type === UserType.admin ||
+        user?.user_type === UserType.creator ||
+        user?.user_type === UserType.org ||
+        user?.user_type === UserType.user
+
     const isEmailProvider = user?.provider === "email"
 
     const navigate = useNavigate()
@@ -95,7 +102,7 @@ const MenuDrawer = () => {
                 navigate("/filters-and-notifications")
                 setOpen(false)
             },
-            disabled: false,
+            disabled: !isUser,
         },
         {
             key: "request",
@@ -105,7 +112,7 @@ const MenuDrawer = () => {
                 navigate("/request")
                 setOpen(false)
             },
-            disabled: isProfile,
+            disabled: !isProfile,
         },
         {
             key: "manage-support",
@@ -145,6 +152,7 @@ const MenuDrawer = () => {
                 setOpen(false)
                 navigate("/")
             },
+            disabled: !isUser,
         },
     ]
 

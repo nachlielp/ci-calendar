@@ -54,14 +54,12 @@ const AppHeader = () => {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
-                {vm.showUserInfo && (
-                    <>
-                        <div className="header-actions">
-                            <UserInfo user={store.getUser} />
-                            <MenuDrawer />
-                        </div>
-                    </>
-                )}
+                <>
+                    <div className="header-actions">
+                        {vm.showUserInfo && <UserInfo user={store.getUser} />}
+                        <MenuDrawer />
+                    </div>
+                </>
             </section>
         </section>
     )
