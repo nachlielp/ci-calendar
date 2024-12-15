@@ -45,9 +45,10 @@ export default function EventsList({ events }: IEventsListProps) {
                         </div>
                     )
                 )}
-            <div className="events-list-footer">
-                <label>v - {CACHE_VERSION} </label>
-            </div>
+            <footer className="events-list-footer">
+                <label className="footer-item">עמותת הקונטקט בישראל ©️</label>
+                <label className="footer-item">v - {CACHE_VERSION} </label>
+            </footer>
         </div>
     )
 }
