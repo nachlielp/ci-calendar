@@ -8,6 +8,7 @@ import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 import { utilService } from "../../../util/utilService"
 import { CACHE_VERSION } from "../../../App"
+import PageFooter from "../../Common/PageFooter"
 interface IEventsListProps {
     events: CIEvent[]
 }
@@ -45,10 +46,7 @@ export default function EventsList({ events }: IEventsListProps) {
                         </div>
                     )
                 )}
-            <footer className="events-list-footer">
-                <label className="footer-item">עמותת הקונטקט בישראל ©️</label>
-                <label className="footer-item">v - {CACHE_VERSION} </label>
-            </footer>
+            <PageFooter />
         </div>
     )
 }

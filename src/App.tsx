@@ -21,6 +21,7 @@ import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { observer } from "mobx-react-lite"
 import { store } from "./Store/store"
+import { AboutPage } from "./Components/Pages/AboutPage"
 
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
@@ -53,6 +54,7 @@ export enum EventAction {
 }
 
 export const CACHE_VERSION = (1.33).toString()
+export const EMAIL_SUPPORT = "info@cici.org.il"
 
 const App = () => {
     return (
@@ -84,6 +86,7 @@ const App = () => {
                             />
                             <Route path="/:eventId" element={<EventsPage />} />
                             <Route path="/" element={<EventsPage />} />
+                            <Route path="/about" element={<AboutPage />} />
                             <Route
                                 element={
                                     <PrivateRoutes

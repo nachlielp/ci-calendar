@@ -1,0 +1,11 @@
+.page-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    .footer-item {
+        font-size: 14px;
+        color: #444444;
+    }
+}

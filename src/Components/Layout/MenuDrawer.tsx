@@ -128,6 +128,15 @@ const MenuDrawer = () => {
             disabled: !isEmailProvider,
         },
         {
+            key: "about",
+            icon: "info",
+            label: "אודות",
+            onClick: () => {
+                navigate("/about")
+                setOpen(false)
+            },
+        },
+        {
             key: "logout",
             icon: "logout",
             label: "התנתקות",
