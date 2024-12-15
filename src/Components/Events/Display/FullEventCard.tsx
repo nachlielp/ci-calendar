@@ -11,6 +11,8 @@ import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import "../../../styles/full-event-card.css"
+import InstallPWABanner from "../../Common/InstallPWABanner"
+import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const isMobile = useIsMobile()
@@ -237,7 +239,21 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
 
             {!utilService.isEventStarted(ci_event) && (
                 <article className="event-card-footer">
-                    {isMobile && (
+                    {isMobile && !utilService.isPWA() && (
+                        <InstallPWABanner
+                            anchorElement={
+                                <button
+                                    onClick={() =>
+                                        vm.setShowInstallPWAModal(true)
+                                    }
+                                    className={`secondary-action-btn `}
+                                >
+                                    <Icon icon="notifications" />
+                                </button>
+                            }
+                        />
+                    )}
+                    {utilService.isPWA() && (
                         <CIEventNotificationModal
                             eventId={ci_event.id}
                             isMultiDay={ci_event.is_multi_day}

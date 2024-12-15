@@ -2,7 +2,7 @@ import React from "react"
 import "../../styles/header.css"
 import { CIUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
-import { InstallPWABanner } from "../Common/InstallPWABanner"
+import InstallPWABanner from "../Common/InstallPWABanner"
 import { LinkButton } from "../Common/LinkButton"
 import { observer } from "mobx-react-lite"
 import MenuDrawer from "./MenuDrawer"
@@ -11,6 +11,7 @@ import { appHeaderVM as vm } from "./AppHeaderVM"
 import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router-dom"
+import { utilService } from "../../util/utilService"
 
 const AppHeader = () => {
     const isMobile = useIsMobile()
@@ -26,7 +27,13 @@ const AppHeader = () => {
     }, [location.pathname])
     return (
         <section className="header-container-wapper">
-            <div>{vm.showInstallPWABanner && <InstallPWABanner />}</div>
+            <div>
+                {vm.showInstallPWABanner && (
+                    <InstallPWABanner
+                        anchorElement={<InstallPWABannerAnchor />}
+                    />
+                )}
+            </div>
             <section className="header-container">
                 <RequestPermissionModal />
                 {vm.showLoginButton && (
@@ -76,3 +83,19 @@ const UserInfo = observer(({ user }: IUserInfoProps) => {
 })
 
 export default observer(AppHeader)
+
+const InstallPWABannerAnchor = () => {
+    return (
+        <div className="install-pwa-btn-container">
+            <button
+                id="install-button"
+                className="install-pwa-btn"
+                style={{ display: !utilService.isPWA() ? "block" : "none" }}
+                onClick={() => vm.setShowInstallPWAModal(true)}
+            >
+                לקבלת עדכונים הוסיפו לעמוד הבית
+            </button>
+            <Icon icon="add_alert" className="add-alert-icon" />
+        </div>
+    )
+}

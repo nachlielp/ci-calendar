@@ -9,6 +9,7 @@ class AppHeaderVM {
     @observable _isMobile: boolean = false
     @observable _currentPath: string = ""
     @observable _loading: boolean = false
+    @observable _showInstallPWAModal: boolean = false
 
     constructor() {
         makeObservable(this)
@@ -93,6 +94,11 @@ class AppHeaderVM {
         return this._loading
     }
 
+    @computed
+    get showInstallPWAModal() {
+        return this._showInstallPWAModal
+    }
+
     @action
     setIsMobile(isMobile: boolean) {
         this._isMobile = isMobile
@@ -124,6 +130,12 @@ class AppHeaderVM {
     setReceiveNotifications = () => {
         this._showRequestPermissionModal = false
         store.updateUser({ receive_notifications: true })
+    }
+
+    @action
+    setShowInstallPWAModal = (show: boolean) => {
+        console.log("setShowInstallPWAModal :", show)
+        this._showInstallPWAModal = show
     }
 
     @action
