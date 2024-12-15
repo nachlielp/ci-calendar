@@ -6,7 +6,7 @@ export const publicBioService = {
     deleteTeacherBio,
 }
 
-async function updateTeacherBio(bio: UserBio): Promise<UserBio> {
+async function updateTeacherBio(bio: Partial<UserBio>): Promise<UserBio> {
     try {
         const { data, error } = await supabase
             .from("public_bio")

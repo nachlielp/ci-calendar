@@ -714,7 +714,7 @@ class Store {
     }
 
     @action
-    updateBio = async (bio: UserBio) => {
+    updateBio = async (bio: Partial<UserBio>) => {
         const updatedBio = await publicBioService.updateTeacherBio(bio)
         this.setBio(updatedBio, EventPayloadType.UPDATE)
     }

@@ -7,7 +7,6 @@ import { useParams } from "react-router-dom"
 import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 import { utilService } from "../../../util/utilService"
-import { CACHE_VERSION } from "../../../App"
 import PageFooter from "../../Common/PageFooter"
 interface IEventsListProps {
     events: CIEvent[]

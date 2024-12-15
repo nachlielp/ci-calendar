@@ -287,6 +287,7 @@ async function getPublicBioList(): Promise<UserBio[]> {
                 "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging,user_type"
             )
             .eq("show_profile", true)
+            .not("bio_name", "is", null)
 
         if (error) throw error
 

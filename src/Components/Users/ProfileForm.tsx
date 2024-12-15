@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
-import Card from "antd/es/card"
 import Image from "antd/es/image"
-import Switch from "antd/es/switch"
 import { UserBio } from "../../util/interfaces"
-import { useIsMobile } from "../../hooks/useIsMobile"
 import Alert from "antd/es/alert"
 import AsyncButton from "../Common/AsyncButton"
 import { observer } from "mobx-react-lite"
@@ -30,8 +27,6 @@ interface ProfileFormProps {
 }
 
 const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
-    const isMobile = useIsMobile()
-
     const originalImageUrl = useRef<string>(store.getBio.img || "")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
@@ -75,24 +70,13 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
             return
         }
         setIsSubmitting(true)
-        const {
-            bio_name,
-            about,
-            page_url,
-            page_title,
-            show_profile,
-            allow_tagging,
-        } = values
-        const newTeacher: UserBio = {
+        const { bio_name, about, page_url, page_title } = values
+        const newTeacher: Partial<UserBio> = {
             bio_name: bio_name || "",
             about: about || "",
             img: imageUrl || "",
             page_url: page_url || "",
             page_title: page_title || "",
-            show_profile: Boolean(show_profile),
-            allow_tagging: Boolean(allow_tagging),
-            user_id: store.getUserId,
-            user_type: store.getUser.user_type,
         }
         try {
             await store.updateBio(newTeacher)
@@ -105,7 +89,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
     }
 
     return (
-        <Card className={`profile-form ${isMobile ? "mobile" : "desktop"}`}>
+        <section className="profile-form">
             <Form
                 form={form}
                 autoComplete="off"
@@ -225,11 +209,11 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
 
                 <hr className="bio-card-hr" />
 
-                <Alert
+                {/* <Alert
                     message="על מנת לאפשר למשמתשים לקבל עדכונים על ארועים חדשים שלכם, צריך שיהיה לכם פרופיל ציבורי"
                     type="info"
-                />
-                <Form.Item<FieldType>
+                /> */}
+                {/* <Form.Item<FieldType>
                     label="הצגת פרופיל"
                     name="show_profile"
                     valuePropName="checked"
@@ -239,7 +223,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                         unCheckedChildren="מוסתר"
                         defaultChecked={store.getBio.show_profile ?? true}
                     />
-                </Form.Item>
+                </Form.Item> */}
                 {/* <Form.Item<FieldType>
                     label="אפשרות לתיוג על ידי מורים אחרים"
                     name="allow_tagging"
@@ -266,7 +250,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                     שמירת שינויים
                 </AsyncButton>
             </Form>
-        </Card>
+        </section>
     )
 }
 

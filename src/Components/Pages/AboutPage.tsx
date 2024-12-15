@@ -1,5 +1,5 @@
 import Card from "antd/es/card"
-import { CACHE_VERSION, EMAIL_SUPPORT } from "../../App"
+import { EMAIL_SUPPORT } from "../../App"
 import "../../styles/about-page.css"
 import PageFooter from "../Common/PageFooter"
 
