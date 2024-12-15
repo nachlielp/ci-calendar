@@ -56,7 +56,7 @@ class AppHeaderVM {
 
     @computed
     get showInstallPWABanner() {
-        return this.isMobile && this.currentPath === "/"
+        return this.isMobile && this.currentPath === "/" && !utilService.isPWA()
     }
 
     @computed
