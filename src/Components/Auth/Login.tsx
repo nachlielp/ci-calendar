@@ -65,6 +65,9 @@ export default function Login() {
     return (
         <Card id="login-form" className="login-form">
             <h1 className="login-title">כניסה והזדהות</h1>
+            <h3 className="login-subtitle">
+                על מנת לקבל תזכורות על אירועים יש להירשם:
+            </h3>
             <div>
                 <button
                     onClick={onSupabaseGoogleSignIn}
@@ -86,6 +89,7 @@ export default function Login() {
                 onFinish={onFinish}
             >
                 <h3 className="login-subtitle">כניסה עם סיסמה:</h3>
+
                 <Form.Item>
                     <Input
                         type="email"
