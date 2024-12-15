@@ -55,7 +55,7 @@ import check_circle from "../../assets/svgs/check_circle.svg"
 import verified_user from "../../assets/svgs/verified_user.svg"
 import mail from "../../assets/svgs/mail.svg"
 import lock from "../../assets/svgs/lock.svg"
-
+import ad_units from "../../assets/svgs/ad_units.svg"
 export const Icon = ({
     icon,
     className,
@@ -125,6 +125,7 @@ export const Icon = ({
         check_circle,
         verified_user,
         lock,
+        ad_units,
     }
     return (
         <label className="icon-component" onClick={onClick}>

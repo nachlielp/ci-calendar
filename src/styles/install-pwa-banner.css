@@ -29,8 +29,12 @@
             margin: 0;
 
             &:hover {
-                background-color: #892cb8;
-                color: white;
+                background-color: #af52de;
+                color: fff;
+            }
+            &:active {
+                background-color: #af52de;
+                color: fff;
             }
         }
 
@@ -38,7 +42,7 @@
             margin-left: 10px;
             margin-top: 7px;
             .injected-svg {
-                color: white;
+                color: fff;
             }
         }
     }
@@ -95,5 +99,48 @@
                 margin-left: 5px;
             }
         }
+    }
+    .section-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        display: block;
+
+        .article-info {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 28px;
+
+            .article-icon {
+                margin-left: 10px;
+                .injected-svg {
+                    width: 40px;
+                    height: 40px;
+                    color: #af52de;
+                }
+            }
+
+            .article-item-highlight {
+                color: #af52de;
+                font-weight: 600;
+            }
+        }
+        .install-pwa-modal-p {
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 28px;
+            color: #000000;
+            margin-top: 10px;
+        }
+    }
+    .install-pwa-modal-br {
+        border-bottom: 1px solid #af52de;
+        height: 10px;
+        display: block;
+        margin: 10px 0;
+        width: 100%;
     }
 }

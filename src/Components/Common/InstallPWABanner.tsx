@@ -37,6 +37,37 @@ export function InstallPWABanner() {
                     </label>
                 </li>
             </ol>
+            <div className="install-pwa-modal-br" />
+            <section className="section-info">
+                <article className="article-info">
+                    <Icon
+                        icon="notifications_active"
+                        className="article-icon"
+                    />
+                    <p className="article-item">
+                        רוצים{" "}
+                        <label className="article-item-highlight">
+                            {" "}
+                            הודעה{" "}
+                        </label>{" "}
+                        כשהמורה המועדפת מעלה אירוע חדש?
+                    </p>
+                </article>
+                <article className="article-info">
+                    <Icon icon="ad_units" className="article-icon" />
+                    <p className="article-item">
+                        רוצים{" "}
+                        <label className="article-item-highlight">
+                            {" "}
+                            תזכורות{" "}
+                        </label>{" "}
+                        לג׳אמים האהובים עליכן?
+                    </p>
+                </article>
+                <p className="install-pwa-modal-p">
+                    הוסיפו את האתר לעמוד הבית בטלפון
+                </p>
+            </section>
         </div>
     )
 
@@ -65,6 +96,37 @@ export function InstallPWABanner() {
                     </label>
                 </li>
             </ol>
+            <div className="install-pwa-modal-br" />
+            <section className="section-info">
+                <article className="article-info">
+                    <Icon
+                        icon="notifications_active"
+                        className="article-icon"
+                    />
+                    <p className="article-item">
+                        רוצים{" "}
+                        <label className="article-item-highlight">
+                            {" "}
+                            הודעה{" "}
+                        </label>{" "}
+                        כשהמורה המועדפת מעלה אירוע חדש?
+                    </p>
+                </article>
+                <article className="article-info">
+                    <Icon icon="ad_units" className="article-icon" />
+                    <p className="article-item">
+                        רוצים{" "}
+                        <label className="article-item-highlight">
+                            {" "}
+                            תזכורות{" "}
+                        </label>{" "}
+                        לג׳אמים האהובים עליכן?
+                    </p>
+                </article>
+                <p className="install-pwa-modal-p">
+                    הוסיפו את האתר לעמוד הבית בטלפון
+                </p>
+            </section>
         </div>
     )
     return (
