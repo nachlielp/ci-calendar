@@ -1,4 +1,4 @@
-const CACHE_VERSION = (1.35).toString()
+const CACHE_VERSION = (1.36).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 //TODO cache external libraries and images
