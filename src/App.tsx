@@ -56,7 +56,7 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = (1.33).toString()
+export const CACHE_VERSION = (1.34).toString()
 export const EMAIL_SUPPORT = "info@cici.org.il"
 export const PAYBOX_URL = "https://www.payboxapp.com/"
 

@@ -25,6 +25,7 @@ const AppHeader = () => {
     React.useEffect(() => {
         vm.setCurrentPath(location.pathname)
     }, [location.pathname])
+
     return (
         <section className="header-container-wapper">
             <div>
@@ -50,7 +51,6 @@ const AppHeader = () => {
                         to="/"
                         className="header-btn no-border align-to-content"
                     >
-                        חזרה &nbsp;
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}

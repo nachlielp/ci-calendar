@@ -77,10 +77,11 @@ class AppHeaderVM {
     @computed
     get showBackButton() {
         return (
-            !store.isUser &&
-            ["/login", "/signup", "/reset-password-request"].includes(
-                this.currentPath
-            )
+            (!store.isUser &&
+                ["/login", "/signup", "/reset-password-request"].includes(
+                    this.currentPath
+                )) ||
+            (store.isUser && this.currentPath !== "/")
         )
     }
 
