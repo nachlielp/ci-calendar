@@ -2,15 +2,6 @@ import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 
-const ResetPasswordRequest = lazy(
-    () => import("./Components/Auth/ResetPasswordRequest")
-)
-const ResetPasswordPage = lazy(
-    () => import("./Components/Pages/RestPasswordPage")
-)
-const Login = lazy(() => import("./Components/Auth/Login"))
-const Signup = lazy(() => import("./Components/Auth/Signup"))
-
 import EventsPage from "./Components/Pages/EventsPage"
 import Loading from "./Components/Common/Loading"
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
@@ -25,9 +16,16 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { observer } from "mobx-react-lite"
-// import { store } from "./Store/store"
 import { AboutPage } from "./Components/Pages/AboutPage"
 
+const ResetPasswordRequest = lazy(
+    () => import("./Components/Auth/ResetPasswordRequest")
+)
+const ResetPasswordPage = lazy(
+    () => import("./Components/Pages/RestPasswordPage")
+)
+const Login = lazy(() => import("./Components/Auth/Login"))
+const Signup = lazy(() => import("./Components/Auth/Signup"))
 const CreateEventsPage = lazy(
     () => import("./Components/Pages/CreateEventsPage")
 )
@@ -67,17 +65,12 @@ const App = () => {
             <SpeedInsights />
             <BackgroundTiles />
 
-            {/* {store.isLoading ? ( */}
-            {/* {store.isLoading ? (
-                <EventsPageSkeleton />
-                ) : ( */}
             <div
                 className="app-content"
                 style={{ width: "100%", maxWidth: "500px" }}
             >
                 <Suspense fallback={<EventsPageSkeleton />}>
                     <AppHeader />
-
                     <Routes>
                         <Route
                             path="signup"
@@ -264,7 +257,6 @@ const App = () => {
                     </Routes>
                 </Suspense>
             </div>
-            {/* )} */}
         </div>
     )
 }
