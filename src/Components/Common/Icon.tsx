@@ -56,6 +56,8 @@ import verified_user from "../../assets/svgs/verified_user.svg"
 import mail from "../../assets/svgs/mail.svg"
 import lock from "../../assets/svgs/lock.svg"
 import ad_units from "../../assets/svgs/ad_units.svg"
+import cloud_offline from "../../assets/svgs/cloud_offline.svg"
+
 export const Icon = ({
     icon,
     className,
@@ -126,6 +128,7 @@ export const Icon = ({
         verified_user,
         lock,
         ad_units,
+        cloud_offline,
     }
     return (
         <label className="icon-component" onClick={onClick}>

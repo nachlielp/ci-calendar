@@ -104,9 +104,9 @@ const EventsPage = () => {
                     ))}
                 </article>
             </header>
-            {store.getSortedEvents.length === 0 ? (
-                <EventsListSkeleton />
-            ) : (
+            {store.getOffline && <OfflinePlaceholder />}
+            {store.getIsOnlineNoEvents && <EventsListSkeleton />}
+            {store.getSortedEvents.length > 0 && (
                 <section className="events-display-list">
                     {!isListView && (
                         <>
@@ -152,6 +152,15 @@ const EventsListSkeleton = () => {
             >
                 <Skeleton active />
             </Card>
+        </div>
+    )
+}
+
+const OfflinePlaceholder = () => {
+    return (
+        <div>
+            <p>אין חיבור לרשת</p>
+            <Icon icon="cloud_offline" />
         </div>
     )
 }

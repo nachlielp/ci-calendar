@@ -145,6 +145,16 @@ class Store {
     }
 
     @computed
+    get getOffline() {
+        return !this.isOnline
+    }
+
+    @computed
+    get getIsOnlineNoEvents() {
+        return this.isOnline && this.app_ci_events.length === 0
+    }
+
+    @computed
     get getSortedEvents() {
         return this.app_ci_events
             .slice()
