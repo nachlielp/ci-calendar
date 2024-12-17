@@ -91,9 +91,11 @@ const InstallPWABannerAnchor = () => {
                 style={{ display: !utilService.isPWA() ? "block" : "none" }}
                 onClick={() => vm.setShowInstallPWAModal(true)}
             >
-                לקבלת עדכונים הוסיפו לעמוד הבית
+                <div className="install-pwa-btn-text">
+                    <span>לקבלת עדכונים הוסיפו לעמוד הבית</span>
+                    <Icon icon="add_alert" className="add-alert-icon white" />
+                </div>
             </button>
-            <Icon icon="add_alert" className="add-alert-icon" />
         </div>
     )
 }
