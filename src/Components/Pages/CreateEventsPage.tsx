@@ -12,7 +12,7 @@ const CreateEventsPage = () => {
         {
             type: "create-single-day",
             isTemplate: true,
-            label: "חד יומית - תבנית",
+            label: "תבנית חד יומית",
         },
         {
             type: "create-single-day",
@@ -22,7 +22,7 @@ const CreateEventsPage = () => {
         {
             type: "create-multi-day",
             isTemplate: true,
-            label: "רב יומית - תבנית",
+            label: "תבנית רב יומית",
         },
         {
             type: "create-multi-day",
