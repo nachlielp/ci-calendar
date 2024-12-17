@@ -8,7 +8,6 @@ import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 import { utilService } from "../../../util/utilService"
 import PageFooter from "../../Common/PageFooter"
-import { Icon } from "../../Common/Icon"
 interface IEventsListProps {
     events: CIEvent[]
 }
