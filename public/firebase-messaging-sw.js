@@ -13,6 +13,9 @@ self.addEventListener("install", (event) => {
                 "/512.png",
                 "/ci-circle-192.png",
                 "/assets/",
+                "/index.css", // Add main CSS file
+                "/styles/overrides.css",
+                "/styles/events-page.css",
             ])
         })
     )
@@ -54,6 +57,7 @@ self.addEventListener("fetch", (event) => {
 
     const isSVG = event.request.url.match(/\.svg$/)
     const isPng = event.request.url.match(/\.png$/)
+    const isCSS = event.request.url.match(/\.css$/)
 
     if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
         event.respondWith(fetch(event.request))
@@ -62,21 +66,27 @@ self.addEventListener("fetch", (event) => {
 
     event.respondWith(
         caches.match(event.request).then((response) => {
-            if (response && (isSVG || isPng)) {
+            if (response && (isSVG || isPng || isCSS)) {
                 return response
             }
 
-            // return response || fetch(event.request)
-            return fetch(event.request).then((fetchResponse) => {
-                // Check if we should cache this response
-                if ((isSVG || isPng) && fetchResponse.status === 200) {
-                    const responseToCache = fetchResponse.clone()
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache)
-                    })
-                }
-                return fetchResponse
-            })
+            return fetch(event.request)
+                .then((fetchResponse) => {
+                    if (
+                        (isSVG || isPng || isCSS) &&
+                        fetchResponse.status === 200
+                    ) {
+                        const responseToCache = fetchResponse.clone()
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseToCache)
+                        })
+                    }
+                    return fetchResponse
+                })
+                .catch(() => {
+                    // Return cached response if fetch fails
+                    return response
+                })
         })
     )
 })
