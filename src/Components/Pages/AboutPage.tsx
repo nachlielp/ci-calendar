@@ -1,7 +1,8 @@
 import Card from "antd/es/card"
-import { EMAIL_SUPPORT } from "../../App"
+import { EMAIL_SUPPORT, PAYBOX_URL } from "../../App"
 import "../../styles/about-page.css"
 import PageFooter from "../Common/PageFooter"
+import { Icon } from "../Common/Icon"
 
 export function AboutPage() {
     return (
@@ -13,7 +14,11 @@ export function AboutPage() {
                         לוח אירועי הקונטקט הינו מיזם התנדבותי. עיזרו לנו לכסות
                         הוצאות ולשמור על השרות ללא עלות לטובת הקהילה ❤️
                     </label>
-                    <button className="general-action-btn paybox-btn">
+                    <button
+                        className="general-action-btn paybox-btn"
+                        onClick={() => window.open(PAYBOX_URL, "_blank")}
+                    >
+                        <Icon icon="paybox" />
                         תרומה בפייבוקס
                     </button>
                 </article>
@@ -52,7 +57,11 @@ export function AboutPage() {
                     והחזרת עלויות ראשוניות שהיו קשורות למימוש הפרויקט, כמו תכנות
                     האתר ועיצובו.
                 </article>
-                <button className="general-action-btn paybox-btn">
+                <button
+                    className="general-action-btn paybox-btn"
+                    onClick={() => window.open(PAYBOX_URL, "_blank")}
+                >
+                    <Icon icon="paybox" />
                     תרומה בפייבוקס
                 </button>
                 <hr className="hr" />

@@ -58,6 +58,7 @@ export enum EventAction {
 
 export const CACHE_VERSION = (1.33).toString()
 export const EMAIL_SUPPORT = "info@cici.org.il"
+export const PAYBOX_URL = "https://www.payboxapp.com/"
 
 const App = () => {
     return (

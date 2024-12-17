@@ -42,6 +42,12 @@
 
         .paybox-btn {
             margin-top: 6px;
+            .injected-svg {
+                padding-left: 4px;
+                padding-top: 4px;
+                width: 13px;
+                height: 13px;
+            }
         }
 
         .text-box {
