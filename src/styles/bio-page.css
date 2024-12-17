@@ -37,8 +37,9 @@
     }
 
     .bio-page-footer {
-        margin: 1rem 0;
+        margin: 1rem 0 3rem 0;
         padding: 1rem 0;
+
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -46,7 +47,7 @@
         background-color: #fff;
         border-radius: 10px;
         width: 100%;
-        /* max-width: 300px; */
+        max-width: 330px;
 
         .bio-page-footer-title {
             font-size: 18px;
@@ -57,34 +58,33 @@
             align-self: flex-end;
             margin-right: 1rem;
         }
-    }
+        .bio-page-footer-article {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: start;
+            direction: rtl;
+            width: 90%;
 
-    .bio-page-footer-article {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: start;
-        direction: rtl;
-        width: 90%;
+            .user-type-label {
+                font-size: 18px;
+                font-weight: 700;
+                color: #444;
+                display: block;
+            }
 
-        .user-type-label {
-            font-size: 18px;
-            font-weight: 700;
-            color: #444;
-            display: block;
-        }
-
-        .edit-user-type-btn {
-            background-color: #fff;
-            border: none;
-            outline: none;
-            box-shadow: none;
-            cursor: pointer;
-            .edit-user-type-icon {
-                .injected-svg {
-                    width: 20px;
-                    height: 20px;
-                    color: #007aff;
+            .edit-user-type-btn {
+                background-color: #fff;
+                border: none;
+                outline: none;
+                box-shadow: none;
+                cursor: pointer;
+                .edit-user-type-icon {
+                    .injected-svg {
+                        width: 20px;
+                        height: 20px;
+                        color: #007aff;
+                    }
                 }
             }
         }

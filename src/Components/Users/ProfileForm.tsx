@@ -246,7 +246,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                 <AsyncButton
                     isSubmitting={isSubmitting}
                     callback={handleSubmit}
-                    className="general-action-btn"
+                    className="general-action-btn large-btn"
                 >
                     שמירת שינויים
                 </AsyncButton>
