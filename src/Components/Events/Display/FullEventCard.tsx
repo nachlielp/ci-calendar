@@ -13,9 +13,14 @@ import { useIsMobile } from "../../../hooks/useIsMobile"
 import "../../../styles/full-event-card.css"
 import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
+import { usePrefetchImages } from "../../../hooks/usePrefetchImages"
 
 export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
     const isMobile = useIsMobile()
+    usePrefetchImages({
+        app_public_bios: store.getAppPublicBios || [],
+        ci_event,
+    })
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
