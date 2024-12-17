@@ -104,7 +104,7 @@ const EventsPage = () => {
                     ))}
                 </article>
             </header>
-            {/* {store.getOffline && <OfflinePlaceholder />} */}
+            {store.getOffline && <OfflinePlaceholder />}
             {store.getIsOnlineNoEvents && <EventsListSkeleton />}
             {store.getSortedEvents.length > 0 && (
                 <section className="events-display-list">
@@ -156,11 +156,11 @@ const EventsListSkeleton = () => {
     )
 }
 
-// const OfflinePlaceholder = () => {
-//     return (
-//         <div>
-//             <p>אין חיבור לרשת</p>
-//             <Icon icon="cloud_offline" />
-//         </div>
-//     )
-// }
+const OfflinePlaceholder = () => {
+    return (
+        <div className="offline-placeholder">
+            <h2>אין חיבור לרשת</h2>
+            <Icon icon="cloud_offline" className="offline-icon" />
+        </div>
+    )
+}

@@ -112,4 +112,18 @@
         pointer-events: none;
         z-index: 10;
     } */
+
+    .offline-placeholder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .offline-icon {
+            .injected-svg {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    }
 }
