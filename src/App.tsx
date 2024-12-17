@@ -2,10 +2,15 @@ import { Suspense, lazy } from "react"
 import { Routes, Route } from "react-router-dom"
 import "./styles/overrides.css"
 
-import ResetPasswordRequest from "./Components/Auth/ResetPasswordRequest"
-import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
-import Login from "./Components/Auth/Login"
-import Signup from "./Components/Auth/Signup"
+const ResetPasswordRequest = lazy(
+    () => import("./Components/Auth/ResetPasswordRequest")
+)
+const ResetPasswordPage = lazy(
+    () => import("./Components/Pages/RestPasswordPage")
+)
+const Login = lazy(() => import("./Components/Auth/Login"))
+const Signup = lazy(() => import("./Components/Auth/Signup"))
+
 import EventsPage from "./Components/Pages/EventsPage"
 import Loading from "./Components/Common/Loading"
 import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
@@ -73,12 +78,29 @@ const App = () => {
                     <Suspense fallback={<EventsPageSkeleton />}>
                         <AppHeader />
                         <Routes>
-                            <Route path="signup" element={<Signup />} />
-                            <Route path="login" element={<Login />} />
-
+                            <Route
+                                path="signup"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <Signup />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path="login"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <Login />
+                                    </Suspense>
+                                }
+                            />
                             <Route
                                 path="reset-password-request"
-                                element={<ResetPasswordRequest />}
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <ResetPasswordRequest />
+                                    </Suspense>
+                                }
                             />
                             <Route
                                 path="/event/:eventId"
@@ -126,7 +148,11 @@ const App = () => {
                                 />
                                 <Route
                                     path="/reset-password"
-                                    element={<ResetPasswordPage />}
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <ResetPasswordPage />
+                                        </Suspense>
+                                    }
                                 />
                             </Route>
 
