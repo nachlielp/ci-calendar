@@ -77,6 +77,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
             img: imageUrl || "",
             page_url: page_url || "",
             page_title: page_title || "",
+            user_id: store.getUserId || "",
         }
         try {
             await store.updateBio(newTeacher)
