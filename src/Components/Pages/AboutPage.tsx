@@ -79,7 +79,10 @@ export function AboutPage() {
                 <hr className="hr" />
                 <article className="text-box">
                     <label className="list-item">
-                        ניתן לפנות אלינו במייל: {EMAIL_SUPPORT}
+                        ניתן לפנות אלינו במייל:&nbsp;
+                        <a href={`mailto:${EMAIL_SUPPORT}`} target="_blank">
+                            {EMAIL_SUPPORT}
+                        </a>
                     </label>
                     <br />
                     <label className="list-item">

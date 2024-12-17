@@ -14,4 +14,12 @@
             margin-bottom: 1rem;
         }
     }
+    .support-email {
+        direction: rtl;
+        margin-top: 16px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 }

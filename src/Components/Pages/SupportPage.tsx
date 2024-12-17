@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite"
 import Card from "antd/lib/card/Card"
 import { UserTypeHebrew } from "../../util/interfaces"
 import "../../styles/support-page.css"
+import { EMAIL_SUPPORT } from "../../App"
 
 const SupportPage = () => {
     return (
@@ -38,6 +39,12 @@ const SupportPage = () => {
             )}
             {userRequestVM.showRequestForm && <RequestForm />}
             {userRequestVM.showOpenRequest && <OpenRequest />}
+            <label className="support-email">
+                <label>לתמיכה שאלות או הערות ניתן לפנות אלינו במייל:</label>
+                <a href={`mailto:${EMAIL_SUPPORT}`} target="_blank">
+                    {EMAIL_SUPPORT}
+                </a>
+            </label>
         </section>
     )
 }
