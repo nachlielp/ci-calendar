@@ -38,7 +38,7 @@ const MenuDrawer = () => {
         user?.user_type === UserType.org ||
         user?.user_type === UserType.user
 
-    const isSignedIn = user?.id !== null
+    const isUserOnly = user?.user_type === UserType.user
 
     const isEmailProvider = user?.provider === "email"
 
@@ -114,7 +114,7 @@ const MenuDrawer = () => {
                 navigate("/request")
                 setOpen(false)
             },
-            disabled: isSignedIn && !isProfile,
+            disabled: !isUserOnly,
         },
         {
             key: "manage-support",
