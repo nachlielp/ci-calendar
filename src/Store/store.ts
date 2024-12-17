@@ -61,7 +61,7 @@ class Store {
     @observable app_creators: SelectOption[] = []
 
     @observable loading: boolean = true
-    @observable loading_ci_events: boolean = true
+    @observable isOnline: boolean = navigator.onLine
 
     @observable requestNotification: boolean = false
 
@@ -73,6 +73,9 @@ class Store {
 
     constructor() {
         makeAutoObservable(this)
+
+        window.addEventListener("online", this.handleOnlineStatus)
+        window.addEventListener("offline", this.handleOnlineStatus)
 
         supabase.auth.onAuthStateChange(async (_, session) => {
             // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
@@ -976,6 +979,18 @@ class Store {
         this.requestNotification = flag
     }
 
+    @action
+    private handleOnlineStatus = () => {
+        const wasOffline = !this.isOnline
+        this.isOnline = navigator.onLine
+
+        // If we're coming back online, reinitialize
+        if (wasOffline && this.isOnline) {
+            console.log("Connection restored, reinitializing store")
+            this.init()
+        }
+    }
+
     async init() {
         console.log("Store init")
 
@@ -1137,6 +1152,8 @@ class Store {
             clearInterval(this.pollingRef)
             this.pollingRef = null
         }
+        window.removeEventListener("online", this.handleOnlineStatus)
+        window.removeEventListener("offline", this.handleOnlineStatus)
         this.setStore({ ci_events: this.app_ci_events } as CIUserData)
     }
 }
