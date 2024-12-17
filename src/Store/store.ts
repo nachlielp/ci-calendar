@@ -61,14 +61,15 @@ class Store {
     @observable app_creators: SelectOption[] = []
 
     @observable loading: boolean = true
+    @observable loading_ci_events: boolean = true
 
     @observable requestNotification: boolean = false
 
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
-    private callCount: number = 0
+    // private callCount: number = 0
 
-    private readonly MINUTE_MS = 1000 * 60
+    // private readonly MINUTE_MS = 1000 * 60
 
     constructor() {
         makeAutoObservable(this)
@@ -94,11 +95,11 @@ class Store {
     }
 
     //For non-authenticated users, I use polling to avoid useing a subscription channel
-    private getPollingInterval = () => {
-        if (this.callCount < 5) return this.MINUTE_MS * 2
-        if (this.callCount < 10) return this.MINUTE_MS * 5
-        return this.MINUTE_MS * 60
-    }
+    // private getPollingInterval = () => {
+    //     if (this.callCount < 5) return this.MINUTE_MS * 2
+    //     if (this.callCount < 10) return this.MINUTE_MS * 5
+    //     return this.MINUTE_MS * 60
+    // }
 
     @computed
     get isLoading() {
@@ -366,27 +367,28 @@ class Store {
     private setupPolling = () => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                if (this.pollingRef) clearInterval(this.pollingRef)
+                // if (this.pollingRef) clearInterval(this.pollingRef)
                 this.fetchEvents()
 
-                const intervalCallback = async () => {
-                    await this.fetchEvents()
-                    await this.fetchAppPublicBios()
-                    this.callCount++
-                    // Clear and set new interval with updated duration
-                    if (this.pollingRef) clearInterval(this.pollingRef)
-                    this.pollingRef = setInterval(
-                        intervalCallback,
-                        this.getPollingInterval()
-                    )
-                }
+                //Notice - currently not employing this polling
+                // const intervalCallback = async () => {
+                //     await this.fetchEvents()
+                //     await this.fetchAppPublicBios()
+                //     this.callCount++
+                //     // Clear and set new interval with updated duration
+                //     if (this.pollingRef) clearInterval(this.pollingRef)
+                //     this.pollingRef = setInterval(
+                //         intervalCallback,
+                //         this.getPollingInterval()
+                //     )
+                // }
 
-                this.pollingRef = setInterval(
-                    intervalCallback,
-                    this.getPollingInterval()
-                )
+                // this.pollingRef = setInterval(
+                //     intervalCallback,
+                //     this.getPollingInterval()
+                // )
             } else {
-                if (this.pollingRef) clearInterval(this.pollingRef)
+                // if (this.pollingRef) clearInterval(this.pollingRef)
             }
         }
 

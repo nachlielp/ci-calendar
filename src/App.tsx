@@ -25,7 +25,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { observer } from "mobx-react-lite"
-import { store } from "./Store/store"
+// import { store } from "./Store/store"
 import { AboutPage } from "./Components/Pages/AboutPage"
 
 const CreateEventsPage = lazy(
@@ -68,202 +68,203 @@ const App = () => {
             <BackgroundTiles />
 
             {/* {store.isLoading ? ( */}
-            {store.isLoading ? (
+            {/* {store.isLoading ? (
                 <EventsPageSkeleton />
-            ) : (
-                <div
-                    className="app-content"
-                    style={{ width: "100%", maxWidth: "500px" }}
-                >
-                    <Suspense fallback={<EventsPageSkeleton />}>
-                        <AppHeader />
-                        <Routes>
+                ) : ( */}
+            <div
+                className="app-content"
+                style={{ width: "100%", maxWidth: "500px" }}
+            >
+                <Suspense fallback={<EventsPageSkeleton />}>
+                    <AppHeader />
+
+                    <Routes>
+                        <Route
+                            path="signup"
+                            element={
+                                <Suspense fallback={<Loading />}>
+                                    <Signup />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="login"
+                            element={
+                                <Suspense fallback={<Loading />}>
+                                    <Login />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="reset-password-request"
+                            element={
+                                <Suspense fallback={<Loading />}>
+                                    <ResetPasswordRequest />
+                                </Suspense>
+                            }
+                        />
+                        <Route
+                            path="/event/:eventId"
+                            element={<EventsPage />}
+                        />
+                        <Route path="/:eventId" element={<EventsPage />} />
+                        <Route path="/" element={<EventsPage />} />
+                        <Route path="/about" element={<AboutPage />} />
+                        <Route
+                            element={
+                                <PrivateRoutes
+                                    requiredRoles={[
+                                        UserType.admin,
+                                        UserType.creator,
+                                        UserType.org,
+                                        UserType.user,
+                                        UserType.profile,
+                                    ]}
+                                />
+                            }
+                        >
                             <Route
-                                path="signup"
+                                path="/filters-and-notifications"
                                 element={
                                     <Suspense fallback={<Loading />}>
-                                        <Signup />
+                                        <NotificationsPage />
                                     </Suspense>
                                 }
                             />
                             <Route
-                                path="login"
+                                path="/request"
                                 element={
                                     <Suspense fallback={<Loading />}>
-                                        <Login />
+                                        <SupportPage />
                                     </Suspense>
                                 }
                             />
                             <Route
-                                path="reset-password-request"
+                                path="/request/:requestId"
                                 element={
                                     <Suspense fallback={<Loading />}>
-                                        <ResetPasswordRequest />
+                                        <SupportPage />
                                     </Suspense>
                                 }
                             />
                             <Route
-                                path="/event/:eventId"
-                                element={<EventsPage />}
+                                path="/reset-password"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <ResetPasswordPage />
+                                    </Suspense>
+                                }
                             />
-                            <Route path="/:eventId" element={<EventsPage />} />
-                            <Route path="/" element={<EventsPage />} />
-                            <Route path="/about" element={<AboutPage />} />
-                            <Route
-                                element={
-                                    <PrivateRoutes
-                                        requiredRoles={[
-                                            UserType.admin,
-                                            UserType.creator,
-                                            UserType.org,
-                                            UserType.user,
-                                            UserType.profile,
-                                        ]}
-                                    />
-                                }
-                            >
-                                <Route
-                                    path="/filters-and-notifications"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <NotificationsPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/request"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <SupportPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/request/:requestId"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <SupportPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/reset-password"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <ResetPasswordPage />
-                                        </Suspense>
-                                    }
-                                />
-                            </Route>
+                        </Route>
 
-                            {/* Profile privet routes */}
+                        {/* Profile privet routes */}
+                        <Route
+                            element={
+                                <PrivateRoutes
+                                    requiredRoles={[
+                                        UserType.profile,
+                                        UserType.admin,
+                                        UserType.creator,
+                                        UserType.org,
+                                    ]}
+                                />
+                            }
+                        >
                             <Route
+                                path="/bio"
                                 element={
-                                    <PrivateRoutes
-                                        requiredRoles={[
-                                            UserType.profile,
-                                            UserType.admin,
-                                            UserType.creator,
-                                            UserType.org,
-                                        ]}
-                                    />
+                                    <Suspense fallback={<Loading />}>
+                                        <BioPage />
+                                    </Suspense>
                                 }
-                            >
-                                <Route
-                                    path="/bio"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <BioPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/bio/request/:requestId"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <SupportPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/bio/request"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <SupportPage />
-                                        </Suspense>
-                                    }
-                                />
-                            </Route>
-
-                            {/* Creator privet routes */}
+                            />
                             <Route
+                                path="/bio/request/:requestId"
                                 element={
-                                    <PrivateRoutes
-                                        requiredRoles={[
-                                            UserType.admin,
-                                            UserType.creator,
-                                            UserType.org,
-                                        ]}
-                                    />
+                                    <Suspense fallback={<Loading />}>
+                                        <SupportPage />
+                                    </Suspense>
                                 }
-                            >
-                                <Route
-                                    path="/manage-events"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <UserEventsListPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/create-events"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <CreateEventsPage />
-                                        </Suspense>
-                                    }
-                                />
-                            </Route>
-
-                            {/* Admin privet routes */}
+                            />
                             <Route
+                                path="/bio/request"
                                 element={
-                                    <PrivateRoutes
-                                        requiredRoles={[UserType.admin]}
-                                    />
+                                    <Suspense fallback={<Loading />}>
+                                        <SupportPage />
+                                    </Suspense>
                                 }
-                            >
-                                <Route
-                                    path="/manage-all-events"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <ManageAllEventsPage />
-                                        </Suspense>
-                                    }
-                                />
-                                <Route
-                                    path="/manage-users"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <ManageUsersPage />
-                                        </Suspense>
-                                    }
-                                />
+                            />
+                        </Route>
 
-                                <Route
-                                    path="/manage-support"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <ManageSupportPage />
-                                        </Suspense>
-                                    }
+                        {/* Creator privet routes */}
+                        <Route
+                            element={
+                                <PrivateRoutes
+                                    requiredRoles={[
+                                        UserType.admin,
+                                        UserType.creator,
+                                        UserType.org,
+                                    ]}
                                 />
-                            </Route>
-                            <Route path="*" element={<EventsPage />} />
-                        </Routes>
-                    </Suspense>
-                </div>
-            )}
+                            }
+                        >
+                            <Route
+                                path="/manage-events"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <UserEventsListPage />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path="/create-events"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <CreateEventsPage />
+                                    </Suspense>
+                                }
+                            />
+                        </Route>
+
+                        {/* Admin privet routes */}
+                        <Route
+                            element={
+                                <PrivateRoutes
+                                    requiredRoles={[UserType.admin]}
+                                />
+                            }
+                        >
+                            <Route
+                                path="/manage-all-events"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <ManageAllEventsPage />
+                                    </Suspense>
+                                }
+                            />
+                            <Route
+                                path="/manage-users"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <ManageUsersPage />
+                                    </Suspense>
+                                }
+                            />
+
+                            <Route
+                                path="/manage-support"
+                                element={
+                                    <Suspense fallback={<Loading />}>
+                                        <ManageSupportPage />
+                                    </Suspense>
+                                }
+                            />
+                        </Route>
+                        <Route path="*" element={<EventsPage />} />
+                    </Routes>
+                </Suspense>
+            </div>
+            {/* )} */}
         </div>
     )
 }

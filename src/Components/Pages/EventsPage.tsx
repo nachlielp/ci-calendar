@@ -23,6 +23,8 @@ import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
+import Card from "antd/es/card"
+import Skeleton from "antd/es/skeleton"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
@@ -102,27 +104,54 @@ const EventsPage = () => {
                     ))}
                 </article>
             </header>
-            <section className="events-display-list">
-                {!isListView && (
-                    <>
-                        <CalendarView
-                            events={filteredEvents}
-                            onSelect={onSelectDate}
+            {store.getSortedEvents.length === 0 ? (
+                <EventsListSkeleton />
+            ) : (
+                <section className="events-display-list">
+                    {!isListView && (
+                        <>
+                            <CalendarView
+                                events={filteredEvents}
+                                onSelect={onSelectDate}
+                            />
+                            <EventsList events={selectedDayEvents} />
+                        </>
+                    )}
+                    {isListView && <EventsList events={filteredEvents} />}
+                    {selectedEvent && (
+                        <FullEventCardContainer
+                            isSelectedEvent={true}
+                            event={selectedEvent}
+                            anchorEl={<></>}
                         />
-                        <EventsList events={selectedDayEvents} />
-                    </>
-                )}
-                {isListView && <EventsList events={filteredEvents} />}
-                {selectedEvent && (
-                    <FullEventCardContainer
-                        isSelectedEvent={true}
-                        event={selectedEvent}
-                        anchorEl={<></>}
-                    />
-                )}
-            </section>
+                    )}
+                </section>
+            )}
         </div>
     )
 }
 
 export default observer(EventsPage)
+
+const EventsListSkeleton = () => {
+    return (
+        <div className="events-list">
+            <Card
+                className="single-day-event-card"
+                style={{
+                    width: "100%",
+                    marginBottom: "16px",
+                    marginTop: "16px",
+                }}
+            >
+                <Skeleton active />
+            </Card>
+            <Card
+                className="single-day-event-card"
+                style={{ width: "100%", marginBottom: "16px" }}
+            >
+                <Skeleton active />
+            </Card>
+        </div>
+    )
+}
