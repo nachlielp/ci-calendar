@@ -1,34 +1,56 @@
-import React, { Component, ReactNode } from "react";
-
-interface Props {
-  children: ReactNode;
+import { Icon } from "../Common/Icon"
+import React from "react"
+import { NavigateFunction } from "react-router-dom"
+import "../../styles/error-boundary.css"
+// Update the props interface
+interface ErrorBoundaryProps {
+    children: React.ReactNode
+    fallback?: React.ReactNode
+    navigate: NavigateFunction
 }
 
-interface State {
-  hasError: boolean;
-}
-
-class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(_: Error): State {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("ErrorBoundary caught an error", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h2>Something went wrong.</h2>;
+// The class component (required for error boundary functionality)
+class ErrorBoundaryClass extends React.Component<
+    ErrorBoundaryProps,
+    { hasError: boolean }
+> {
+    constructor(props: ErrorBoundaryProps) {
+        super(props)
+        this.state = { hasError: false }
     }
 
-    return this.props.children;
-  }
+    static getDerivedStateFromError() {
+        return { hasError: true }
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                this.props.fallback || (
+                    <div className="error-container">
+                        <h2> נראה שמשהו השתבש</h2>
+                        <Icon icon="warning" className="warning-icon" />
+                        <button
+                            onClick={() => {
+                                this.props.navigate("/")
+                                window.location.reload()
+                            }}
+                            className="general-action-btn large-btn"
+                        >
+                            חזרה לדף הבית
+                        </button>
+                    </div>
+                )
+            )
+        }
+
+        return this.props.children
+    }
 }
 
-export default ErrorBoundary;
+// Function component wrapper for better DX
+export const ErrorBoundary = (props: ErrorBoundaryProps) => {
+    return <ErrorBoundaryClass {...props} />
+}
+
+export default ErrorBoundary
