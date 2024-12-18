@@ -17,6 +17,8 @@ import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { observer } from "mobx-react-lite"
 import { AboutPage } from "./Components/Pages/AboutPage"
+import { PrivacyPolicyPage } from "./Components/Pages/PrivacyPolicyPage"
+import { TCPage } from "./Components/Pages/TCPage"
 import ErrorBoundary from "./Components/Common/ErrorBoundary"
 
 const ResetPasswordRequest = lazy(
@@ -107,6 +109,14 @@ const App = () => {
                             <Route path="/:eventId" element={<EventsPage />} />
                             <Route path="/" element={<EventsPage />} />
                             <Route path="/about" element={<AboutPage />} />
+                            <Route
+                                path="/privacy-policy"
+                                element={<PrivacyPolicyPage />}
+                            />
+                            <Route
+                                path="/terms-and-conditions"
+                                element={<TCPage />}
+                            />
                             <Route
                                 element={
                                     <PrivateRoutes
