@@ -149,10 +149,17 @@ const MenuDrawer = () => {
             key: "logout",
             icon: "logout",
             label: "התנתקות",
-            onClick: () => {
-                supabase.auth.signOut()
-                setOpen(false)
-                navigate("/")
+            onClick: async () => {
+                try {
+                    await supabase.auth.signOut()
+                } catch (error) {
+                    // Ignore session_not_found error as we want to logout anyway
+                    console.log("Logout error:", error)
+                } finally {
+                    store.clearUser()
+                    setOpen(false)
+                    navigate("/")
+                }
             },
             disabled: !isUser,
         },

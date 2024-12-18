@@ -1164,7 +1164,22 @@ class Store {
         }
         window.removeEventListener("online", this.handleOnlineStatus)
         window.removeEventListener("offline", this.handleOnlineStatus)
-        this.setStore({ ci_events: this.app_ci_events } as CIUserData)
+        this.setStore({
+            ci_events: this.app_ci_events,
+        } as CIUserData)
+    }
+
+    clearUser = () => {
+        this.setStore({
+            ci_events: this.app_ci_events,
+            user: {} as CIUser,
+            notifications: [],
+            templates: [],
+            requests: [],
+            past_ci_events: [],
+            alerts: [],
+            userBio: {} as UserBio,
+        } as CIUserData)
     }
 }
 

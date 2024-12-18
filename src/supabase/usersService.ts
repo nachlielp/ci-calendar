@@ -86,8 +86,6 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             .eq("alerts.viewed", false)
             .single()
 
-        console.log("userData", userData)
-
         const { data: eventsData, error: eventsError } = await supabase
             .from("ci_events")
             .select("*")
