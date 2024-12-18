@@ -15,7 +15,7 @@
         align-items: center;
         justify-content: center;
         color: black;
-        font-size: 0.875rem;
+        font-size: 18px;
         margin-right: 1.5rem;
         margin-right: 0.5rem;
         font-weight: 600;
@@ -67,20 +67,15 @@
     }
 
     .user-name {
-        color: black;
-        font-size: 0.875rem;
-        /* text-sm */
+        color: #000;
+        font-size: 18px;
         font-weight: 600;
-        /* font-semibold */
     }
 
     .user-email {
         color: #9ca3af;
-        /* text-gray-400 */
-        font-size: 0.75rem;
-        /* text-xs */
+        font-size: 18px;
         font-weight: 600;
-        /* font-semibold */
     }
 
     .header-actions {

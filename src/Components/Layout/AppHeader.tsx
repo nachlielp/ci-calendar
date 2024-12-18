@@ -42,7 +42,7 @@ const AppHeader = () => {
                         to="/login"
                         className="header-btn no-border align-to-content"
                     >
-                        התחבר/י &nbsp;
+                        התחבר/י&nbsp;
                         <Icon icon="account" className="icon-main" />
                     </LinkButton>
                 )}

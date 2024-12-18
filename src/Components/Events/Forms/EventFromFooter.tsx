@@ -34,7 +34,7 @@ export default function EventFromFooter({
                     justifyContent: "flex-start",
                 }}
             >
-                <AsyncFormSubmitButton isSubmitting={isSubmitting}>
+                <AsyncFormSubmitButton isSubmitting={isSubmitting} size="large">
                     {submitText}
                 </AsyncFormSubmitButton>
             </Form.Item>

@@ -178,7 +178,6 @@ export default function EditSingleDayEventForm({
                     submitText={submitText}
                 />
             </Form>
-            <div className="footer-space"></div>
         </section>
     )
 }
