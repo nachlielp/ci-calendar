@@ -4,6 +4,9 @@
     position: relative;
 
     height: calc(100vh - 56px);
+    &.install-pwa-banner {
+        height: calc(100vh - 96px);
+    }
     overflow-y: auto;
     color: #000;
     -ms-overflow-style: none;

@@ -25,6 +25,7 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import Card from "antd/es/card"
 import Skeleton from "antd/es/skeleton"
+import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
@@ -62,7 +63,11 @@ const EventsPage = () => {
     }
 
     return (
-        <div className="events-page">
+        <div
+            className={`events-page ${
+                headerVM.showInstallPWABanner ? "install-pwa-banner" : ""
+            }`}
+        >
             <header className="header">
                 <AlertsAnchor />
                 <h1 className="title">
