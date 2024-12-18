@@ -48,9 +48,14 @@ class AppHeaderVM {
     get showLoginButton() {
         return (
             !store.isUser &&
-            !["/login", "/signup", "/reset-password-request"].includes(
-                this.currentPath
-            )
+            ![
+                "/login",
+                "/signup",
+                "/reset-password-request",
+                "/privacy-policy",
+                "/terms-and-conditions",
+                "/about",
+            ].includes(this.currentPath)
         )
     }
 
@@ -78,9 +83,14 @@ class AppHeaderVM {
     get showBackButton() {
         return (
             (!store.isUser &&
-                ["/login", "/signup", "/reset-password-request"].includes(
-                    this.currentPath
-                )) ||
+                [
+                    "/login",
+                    "/signup",
+                    "/reset-password-request",
+                    "/about",
+                    "/privacy-policy",
+                    "/terms-and-conditions",
+                ].includes(this.currentPath)) ||
             (store.isUser && this.currentPath !== "/")
         )
     }
