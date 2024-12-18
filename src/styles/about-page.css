@@ -58,6 +58,10 @@
             line-height: 24px;
             letter-spacing: 0.15px;
             color: #000000;
+            word-wrap: break-word; /* Allows long words to break */
+            overflow-wrap: break-word; /* Modern version of word-wrap */
+            word-break: break-word; /* Breaks words at appropriate points */
+            max-width: 100%;
         }
 
         .hr {

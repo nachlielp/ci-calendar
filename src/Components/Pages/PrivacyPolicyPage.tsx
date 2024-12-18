@@ -102,10 +102,16 @@ export function PrivacyPolicyPage() {
                     שנאספים אוטומטית והנתונים שהוזנו על ידך (כולל כתובת ה-IP
                     שלך) על ידי Google, אחד מנציגיה או ספקי צד שלישי. תנאי
                     השימוש של Google Maps ניתן למצוא בלינק הבא:
-                    https://www.google.de/intl/de/policies/privacy. Google גם
-                    מעבדת את המידע שלך בארה"ב במסגרת Privacy Shield של האיחוד
-                    האירופי וארה"ב:
-                    https://www.privacyshield.gov/EU-US-Framework. <br />
+                    <a href="https://www.google.de/intl/de/policies/privacy">
+                        Google Privacy Policy
+                    </a>
+                    .<br />
+                    Google גם מעבדת את המידע שלך בארה"ב במסגרת Privacy Shield של
+                    האיחוד האירופי וארה"ב:
+                    <a href="https://www.privacyshield.gov/EU-US-Framework">
+                        Privacy Shield
+                    </a>
+                    <br />
                     <br /> 2.3 פרסום אירועים בלוח השנה שלנו <br /> <br /> 2.3.1
                     מטרות וסוגי נתונים <br />
                     מטרת האתר שלנו היא לספק לוח שנה ציבורי לאירועי קונטקט
