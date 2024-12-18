@@ -303,7 +303,7 @@ async function subscribeToUser(
     callback: (payload: any) => void
 ) {
     const channel = supabase
-        .channel(`public:users:user_id=eq.${userId}`)
+        .channel(`public:users:id=eq.${userId}`)
 
         .on(
             "postgres_changes",
@@ -311,7 +311,7 @@ async function subscribeToUser(
                 event: "*",
                 schema: "public",
                 table: "users",
-                filter: `user_id=eq.${userId}`,
+                filter: `id=eq.${userId}`,
             },
 
             (payload) => {
