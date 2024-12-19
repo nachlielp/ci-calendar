@@ -12,9 +12,6 @@ import BackgroundTiles from "./Components/Layout/BackgroundTiles"
 import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
-import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
-import timezone from "dayjs/plugin/timezone"
 import { observer } from "mobx-react-lite"
 import { AboutPage } from "./Components/Pages/AboutPage"
 import { PrivacyPolicyPage } from "./Components/Pages/PrivacyPolicyPage"
@@ -47,7 +44,9 @@ const ManageAllEventsPage = lazy(
 const UserEventsListPage = lazy(
     () => import("./Components/Pages/UserEventListPage")
 )
-
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 

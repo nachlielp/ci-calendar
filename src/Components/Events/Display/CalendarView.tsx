@@ -104,12 +104,15 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 }
 
 function eventsOnDay(day: Dayjs, events: CIEvent[]) {
-    return events.filter((event) =>
-        day.isBetween(
-            dayjs(event.start_date).startOf("day"),
-            dayjs(event.end_date).endOf("day"),
-            null,
-            "[]"
-        )
-    )
+    return events.filter((event) => {
+        if (event.is_multi_day) {
+            return day.isBetween(
+                dayjs(event.start_date).startOf("day"),
+                dayjs(event.end_date).endOf("day"),
+                null,
+                "[]"
+            )
+        }
+        return day.isSame(dayjs(event.start_date), "day")
+    })
 }
