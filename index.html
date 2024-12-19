@@ -4,22 +4,81 @@
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/ci-circle-192.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>CI Israel</title>
-        <!-- <script
-            src="https://upload-widget.cloudinary.com/global/all.js"
-            type="text/javascript"
-        ></script> -->
+        <title>לוח אירועי קונטקט אימפרוביזציה | CI Calendar</title>
+
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta
+            name="title"
+            content="לוח אירועי קונטקט אימפרוביזציה בישראל | CI Calendar"
+        />
+        <meta
+            name="description"
+            content="לוח אירועי קונטקט אימפרוביזציה בישראל - ג'אמים, שיעורים, סדנאות. Contact Improvisation events in Israel."
+        />
+        <meta
+            name="keywords"
+            content="קונטקט אימפרוביזציה, contact improvisation, ג'אם, jam, סדנאות קונטקט, ריקוד, מחול, קונטקט בישראל, CI Israel"
+        />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ci-events.org/" />
+        <meta
+            property="og:title"
+            content="לוח אירועי קונטקט אימפרוביזציה בישראל"
+        />
+        <meta
+            property="og:description"
+            content="לוח אירועי קונטקט אימפרוביזציה בישראל - ג'אמים, סדנאות, פסטיבלים ומפגשי ריקוד"
+        />
+        <meta
+            property="og:image"
+            content="https://ci-events.org/og-image.jpg"
+        />
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://ci-events.org/" />
+        <meta
+            property="twitter:title"
+            content="לוח אירועי קונטקט אימפרוביזציה בישראל"
+        />
+        <meta
+            property="twitter:description"
+            content="לוח אירועי קונטקט אימפרוביזציה בישראל - ג'אמים, סדנאות, פסטיבלים ומפגשי ריקוד"
+        />
+        <meta
+            property="twitter:image"
+            content="https://ci-events.org/og-image.jpg"
+        />
+
+        <!-- PWA -->
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#171717" />
-        <meta name="description" content="CI Calendar" />
+        <link rel="apple-touch-icon" href="/ci-circle-192.png" />
+
+        <!-- Viewport -->
         <meta
             name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+            content="width=device-width, initial-scale=1, maximum-scale=5"
         />
+
+        <!-- Robots -->
+        <meta name="robots" content="index, follow" />
     </head>
 
     <body>
         <div id="root"></div>
         <script type="module" src="/src/main.tsx"></script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "לוח אירועי קונטקט אימפרוביזציה",
+                "url": "https://ci-events.org",
+                "description": "לוח אירועי קונטקט אימפרוביזציה בישראל - ג'אמים, סדנאות, פסטיבלים ומפגשי ריקוד",
+                "inLanguage": ["he", "en"]
+            }
+        </script>
     </body>
 </html>
