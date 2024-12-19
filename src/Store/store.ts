@@ -1005,9 +1005,6 @@ class Store {
         console.log("Store init")
 
         try {
-            // const config = await configService.getConfig()
-            // this.setConfig(config, EventPayloadType.UPDATE)
-
             if (!this.getSession?.user?.id) {
                 console.log("Store init no session")
                 // Only fetch and set ci_events, keep other store values empty
@@ -1031,7 +1028,7 @@ class Store {
                 const newUser = utilService.createDbUserFromUser(
                     this.getSession?.user
                 )
-                console.log("Store.init.newUser", newUser)
+                console.log("Store.init.newUser")
                 const createdUser = await usersService.createUser(newUser)
                 console.log("Store.init.createdUser", createdUser)
                 const ci_events = await cieventsService.getCIEvents()
