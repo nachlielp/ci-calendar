@@ -3,6 +3,7 @@ import App from "./App.tsx"
 import "./index.css"
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router-dom"
+//NOTICE - posthog in not installed
 // import posthog from "posthog-js"
 // import { PostHogProvider } from "posthog-js/react"
 // const options = {

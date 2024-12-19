@@ -10,9 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
-    "@mui/material": "^6.1.8",
     "@mui/x-date-pickers": "^7.22.3",
     "@supabase/supabase-js": "^2.45.4",
     "@types/react-router-dom": "^5.3.3",
@@ -20,10 +17,8 @@
     "antd": "^5.16.1",
     "dayjs": "^1.11.13",
     "firebase": "^10.14.1",
-    "lodash": "^4.17.21",
     "mobx": "^6.13.5",
     "mobx-react-lite": "^4.0.7",
-    "posthog-js": "^1.181.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-easy-crop": "^5.2.0",
