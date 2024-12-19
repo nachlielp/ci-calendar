@@ -1,6 +1,5 @@
 import { useRef, useState } from "react"
 import Alert from "antd/es/alert"
-import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
 import { supabase } from "../../supabase/client"
@@ -45,7 +44,7 @@ function ResetPasswordRequest() {
     }
 
     return (
-        <Card id="reset-password-form" className="reset-password-form">
+        <section className="reset-password-request card">
             <h1 className="title">איפוס סיסמה</h1>
 
             <h3 className="login-subtitle">נא להזין את המייל שאיתו נרשמתם:</h3>
@@ -89,7 +88,7 @@ function ResetPasswordRequest() {
                     <></>
                 )}
             </Form>
-        </Card>
+        </section>
     )
 }
 

@@ -80,8 +80,8 @@ export default function Signup() {
     }
 
     return (
-        <Card id="signup-form" className="signup-form">
-            <h1 className="title">הרשמה</h1>
+        <section id="signup-form" className="signup-form card">
+            <h1 className="signup-title">הרשמה</h1>
 
             <Form
                 title="הרשמה"
@@ -163,6 +163,6 @@ export default function Signup() {
                     </button>
                 </article>
             </Form>
-        </Card>
+        </section>
     )
 }

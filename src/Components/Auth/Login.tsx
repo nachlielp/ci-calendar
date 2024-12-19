@@ -63,7 +63,7 @@ export default function Login() {
     }
 
     return (
-        <Card id="login-form" className="login-form">
+        <section id="login-form" className="login-form card">
             <h1 className="login-title">כניסה והזדהות</h1>
             <h3 className="login-subtitle">
                 על מנת לקבל תזכורות על אירועים יש להירשם:
@@ -150,6 +150,6 @@ export default function Login() {
                     </LinkButton>
                 </div>
             </div>
-        </Card>
+        </section>
     )
 }

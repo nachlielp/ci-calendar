@@ -1,7 +1,7 @@
 .signup-form {
     margin: 1rem auto;
     max-width: 24rem;
-
+    width: 300px;
     .signup-title {
         font-family: Assistant;
         font-size: 30px;
@@ -9,6 +9,9 @@
         line-height: 39.24px;
         text-align: right;
         color: #2c3e50;
+        margin-top: 0;
+        margin-bottom: 8px;
+        padding-right: 6px;
     }
 
     .signup-form-content {

@@ -6,6 +6,7 @@
 @import "./styles/generics/title.css";
 @import "./styles/generics/page.css";
 @import "./styles/generics/form-inputs.css";
+@import "./styles/generics/card.css";
 
 @font-face {
     font-family: "Assistant";
