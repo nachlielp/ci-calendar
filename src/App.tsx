@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react"
+import { Suspense, lazy, useEffect } from "react"
 import { Routes, Route, useNavigate } from "react-router-dom"
 import "./styles/overrides.css"
 
@@ -47,6 +47,7 @@ const UserEventsListPage = lazy(
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
+import { useRemoveAppLoadingScreen } from "./hooks/useRemoveAppLoadingScreen"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -64,6 +65,7 @@ export const PAYBOX_URL = "https://www.payboxapp.com/"
 
 const App = () => {
     const navigate = useNavigate()
+    useRemoveAppLoadingScreen()
     return (
         <div className="app">
             <SpeedInsights />
