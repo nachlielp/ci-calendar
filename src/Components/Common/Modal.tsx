@@ -31,6 +31,9 @@ export const Modal = ({
     const handleClick = (e: React.MouseEvent) => {
         if (!closable) return
         // Check if click was on the backdrop (dialog element itself)
+        if (e.target === dialogRef.current) {
+            onCancel?.()
+        }
         const rect = dialogRef.current?.getBoundingClientRect()
         if (
             rect &&

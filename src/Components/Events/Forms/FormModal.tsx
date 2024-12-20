@@ -1,5 +1,6 @@
 import { useState } from "react"
-import Modal from "antd/es/modal"
+// import Modal from "antd/es/modal"
+import { Modal } from "../../Common/Modal"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
 import SingleDayEventForm from "./SingleDayEventForm"
 import MultiDayEventForm from "./MultiDayEventForm"
@@ -25,10 +26,6 @@ export default function FormModal({
         setIsModalOpen(true)
     }
 
-    const handleOk = () => {
-        setIsModalOpen(false)
-    }
-
     const onClose = () => {
         setIsModalOpen(false)
     }
@@ -38,39 +35,50 @@ export default function FormModal({
             <div onClick={showModal}>{anchorEl}</div>
             <Modal
                 open={isModalOpen}
-                onOk={handleOk}
+                // onOk={handleOk}
                 onCancel={onClose}
-                footer={null}
+                // footer={null}
                 closable={false}
             >
-                {eventType === "create-single-day" && (
-                    <SingleDayEventForm
-                        closeForm={onClose}
-                        isTemplate={isTemplate}
-                    />
-                )}
-                {eventType === "create-multi-day" && (
-                    <MultiDayEventForm
-                        closeForm={onClose}
-                        isTemplate={isTemplate}
-                    />
-                )}
-                {eventType === "edit-single-day" && (
-                    <EditSingleDayEventForm
-                        isTemplate={isTemplate}
-                        event={event}
-                        template={template}
-                        closeForm={onClose}
-                    />
-                )}
-                {eventType === "edit-multi-day" && (
-                    <EditMultiDayEventForm
-                        isTemplate={isTemplate}
-                        event={event}
-                        template={template}
-                        closeForm={onClose}
-                    />
-                )}
+                <button onClick={onClose}>Close</button>
+                <div
+                    className="modal-content"
+                    style={{
+                        width: "500px",
+                        maxHeight: "80vh",
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                    }}
+                >
+                    {eventType === "create-single-day" && (
+                        <SingleDayEventForm
+                            closeForm={onClose}
+                            isTemplate={isTemplate}
+                        />
+                    )}
+                    {eventType === "create-multi-day" && (
+                        <MultiDayEventForm
+                            closeForm={onClose}
+                            isTemplate={isTemplate}
+                        />
+                    )}
+                    {eventType === "edit-single-day" && (
+                        <EditSingleDayEventForm
+                            isTemplate={isTemplate}
+                            event={event}
+                            template={template}
+                            closeForm={onClose}
+                        />
+                    )}
+                    {eventType === "edit-multi-day" && (
+                        <EditMultiDayEventForm
+                            isTemplate={isTemplate}
+                            event={event}
+                            template={template}
+                            closeForm={onClose}
+                        />
+                    )}
+                </div>
             </Modal>
         </>
     )
