@@ -1,5 +1,4 @@
 import utc from "dayjs/plugin/utc"
-import Card from "antd/es/card"
 import ConfigProvider from "antd/es/config-provider"
 import Calendar, { CalendarProps } from "antd/es/calendar"
 import type { Dayjs } from "dayjs"
@@ -86,7 +85,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
                     className="next"
                 />
             </header>
-            <Card className="calendar-view__card">
+            <section className="calendar-view__card card">
                 <ConfigProvider locale={hb} direction="rtl">
                     <Calendar
                         value={value}
@@ -98,7 +97,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
                         headerRender={() => <div></div>}
                     />
                 </ConfigProvider>
-            </Card>
+            </section>
         </section>
     )
 }

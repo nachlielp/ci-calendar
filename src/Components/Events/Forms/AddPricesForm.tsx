@@ -1,6 +1,5 @@
 import Form from "antd/es/form"
 import Input from "antd/es/input"
-import Card from "antd/es/card"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
 import InputNumber from "antd/es/input-number"
@@ -15,7 +14,10 @@ export default function AddPricesForm() {
                 {(fields, { add, remove }) => (
                     <>
                         {fields.map(({ key, name, ...restField }) => (
-                            <Card className="price-card" key={key}>
+                            <section
+                                className="price-card card boardered-card"
+                                key={key}
+                            >
                                 <Row gutter={10} align="middle">
                                     <Col md={24} xs={24}>
                                         <Form.Item
@@ -72,7 +74,7 @@ export default function AddPricesForm() {
                                         </span>
                                     </button>
                                 </div>
-                            </Card>
+                            </section>
                         ))}
                         <div className="add-button-container">
                             <button

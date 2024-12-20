@@ -1,6 +1,5 @@
 import Form, { FormProps } from "antd/es/form"
 import Input from "antd/es/input"
-import Card from "antd/es/card"
 import Select from "antd/es/select"
 import { RequestType } from "../../util/interfaces"
 import { useState } from "react"
@@ -93,7 +92,7 @@ const RequestForm = () => {
 
     return (
         <div className="request-form">
-            <Card className="request-form-card">
+            <section className="request-form-card card">
                 <Form
                     form={form}
                     autoComplete="off"
@@ -230,7 +229,7 @@ const RequestForm = () => {
                         </>
                     )}
                 </Form>
-            </Card>
+            </section>
         </div>
     )
 }

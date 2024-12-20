@@ -10,6 +10,8 @@
         border: 1px solid #000 !important;
         border-radius: 6px;
         cursor: pointer;
+        width: calc(100% - 32px);
+        min-width: 280px;
 
         &.active {
             background: rgba(0, 0, 0, 0.2);
@@ -31,5 +33,23 @@
         font-weight: 500;
         margin-right: 0.4rem;
         cursor: pointer;
+    }
+
+    .skeleton-card {
+        margin-bottom: 16px;
+        margin-top: 16px;
+
+        width: 100%;
+        max-width: calc(100% - 16px); /* Add this to maintain padding */
+        border-radius: 8px; /* Add explicit border radius */
+        overflow: hidden;
+    }
+
+    .skeleton-card-top {
+        margin-bottom: 16px;
+    }
+
+    .skeleton-card-bottom {
+        margin-top: 16px;
     }
 }

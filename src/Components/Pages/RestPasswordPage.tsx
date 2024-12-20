@@ -1,5 +1,4 @@
 import Alert from "antd/es/alert"
-import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { supabase } from "../../supabase/client"
@@ -47,7 +46,7 @@ export default function ResetPasswordPage() {
     }
     return (
         <section className="reset-password-page">
-            <Card>
+            <section className="card">
                 <h1 className="general-title">עדכון סיסמה</h1>
 
                 <Form form={form} onFinish={onFinish}>
@@ -108,7 +107,7 @@ export default function ResetPasswordPage() {
                         שמירה
                     </button>
                 </Form>
-            </Card>
+            </section>
         </section>
     )
 }

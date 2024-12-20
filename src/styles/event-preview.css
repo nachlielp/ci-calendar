@@ -1,8 +1,8 @@
 .event-preview {
     margin-top: 1rem;
-    width: 100%;
-    position: relative;
-
+    width: calc(100% - 32px);
+    min-width: 280px;
+    cursor: pointer;
     &.cancelled {
         opacity: 0.21;
     }
@@ -20,6 +20,8 @@
     }
 
     .event-preview-content {
+        width: 100%;
+        min-width: 280px;
         &.cancelled {
             opacity: 0.3; /* Dim everything except the cancelled label */
         }

@@ -163,7 +163,6 @@ const App = () => {
                                 />
                             </Route>
 
-                            {/* Profile privet routes */}
                             <Route
                                 element={
                                     <PrivateRoutes
@@ -202,7 +201,6 @@ const App = () => {
                                 />
                             </Route>
 
-                            {/* Creator privet routes */}
                             <Route
                                 element={
                                     <PrivateRoutes
@@ -232,7 +230,6 @@ const App = () => {
                                 />
                             </Route>
 
-                            {/* Admin privet routes */}
                             <Route
                                 element={
                                     <PrivateRoutes

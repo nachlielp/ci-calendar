@@ -2,7 +2,6 @@ import RequestForm from "../Requests/RequestForm"
 import OpenRequest from "../Requests/OpenRequest"
 import { userRequestVM } from "../Requests/UserRequestVM"
 import { observer } from "mobx-react-lite"
-import Card from "antd/lib/card/Card"
 import { UserTypeHebrew } from "../../util/interfaces"
 import "../../styles/support-page.css"
 import { EMAIL_SUPPORT } from "../../App"
@@ -13,7 +12,7 @@ const SupportPage = () => {
             <h2>הרשמה כמורה או ארגון</h2>
             {userRequestVM.showUserStatus && (
                 <article className="support-page-description">
-                    <Card>
+                    <section className="card">
                         <p dir="rtl" className="text">
                             <label>
                                 אתם רשומים כ
@@ -34,7 +33,7 @@ const SupportPage = () => {
                         >
                             הרשמה
                         </button>
-                    </Card>
+                    </section>
                 </article>
             )}
             {userRequestVM.showRequestForm && <RequestForm />}

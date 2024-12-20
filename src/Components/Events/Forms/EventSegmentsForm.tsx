@@ -1,6 +1,5 @@
 import Form from "antd/es/form"
 import Select from "antd/es/select"
-import Card from "antd/es/card"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
 import { eventOptions, tagOptions } from "../../../util/options"
@@ -22,7 +21,10 @@ export default function EventSegmentsForm({
                 {(segments, { add, remove }) => (
                     <>
                         {segments.map(({ key, name }) => (
-                            <Card className="segment-card" key={key}>
+                            <section
+                                className="segment-card card boardered-card"
+                                key={key}
+                            >
                                 <Row gutter={10} align="middle">
                                     <Col md={24} xs={24}>
                                         <Form.Item
@@ -139,7 +141,7 @@ export default function EventSegmentsForm({
                                         </span>
                                     </button>
                                 </div>
-                            </Card>
+                            </section>
                         ))}
                         <div className="add-button-container">
                             <button

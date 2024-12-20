@@ -1,7 +1,6 @@
 import Form, { FormInstance } from "antd/es/form"
 import Input from "antd/es/input"
 import Select from "antd/es/select"
-import Card from "antd/es/card"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
 
@@ -44,10 +43,8 @@ export default function SingleDayEventFormHead({
 }: SingleDayEventFormHeadProps) {
     return (
         <div>
-            <Card
-                className="event-card"
-                title={<span className="segment-title">{titleText}</span>}
-            >
+            <section className="event-card card boardered-card">
+                <span className="segment-title">{titleText}</span>
                 <Form.Item
                     name="event-title"
                     rules={[{ required: true, message: "שדה חובה" }]}
@@ -113,10 +110,10 @@ export default function SingleDayEventFormHead({
                         popupClassName="form-input-large"
                     />
                 </Form.Item>
-            </Card>
+            </section>
 
             {/* First Segment */}
-            <Card className="event-card">
+            <section className="event-card card boardered-card">
                 <Row gutter={10} align="middle">
                     <Col md={24} xs={24}>
                         <Form.Item
@@ -184,7 +181,7 @@ export default function SingleDayEventFormHead({
                         </Form.Item>
                     </Col>
                 </Row>
-            </Card>
+            </section>
         </div>
     )
 }

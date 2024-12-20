@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite"
-import Card from "antd/es/card/Card"
 import { UserTypeHebrew } from "../../util/interfaces"
 import { userRequestVM } from "./UserRequestVM"
 import "../../styles/open-request.css"
@@ -8,7 +7,7 @@ const OpenRequest = () => {
     if (!userRequestVM.openPositionRequest) return <></>
 
     return (
-        <Card className="open-request">
+        <section className="open-request card">
             <article>
                 <label className="text">
                     בקשתך להרשמה
@@ -46,7 +45,7 @@ const OpenRequest = () => {
                     ביטול הבקשה
                 </button>
             </article>
-        </Card>
+        </section>
     )
 }
 

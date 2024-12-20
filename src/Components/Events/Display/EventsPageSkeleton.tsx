@@ -1,7 +1,6 @@
 import MenuButtons from "../../Common/MenuButtons"
 import { Icon } from "../../Common/Icon"
 import Skeleton from "antd/es/skeleton"
-import Card from "antd/es/card"
 import { utilService } from "../../../util/utilService"
 import { Tag } from "antd"
 import { ReactSVG } from "react-svg"
@@ -9,7 +8,11 @@ import close from "../../../assets/svgs/close.svg"
 import "../../../styles/events-page-skeleton.css"
 // ... imports remain the same ...
 
-export default function EventsPageSkeleton() {
+export default function EventsPageSkeleton({
+    withHeader = true,
+}: {
+    withHeader?: boolean
+}) {
     const eventTypes = localStorage.getItem("eventType") || "[]"
     const districts = localStorage.getItem("district") || "[]"
     const defaultFilter = [
@@ -44,7 +47,7 @@ export default function EventsPageSkeleton() {
             >
                 <div
                     className="header-skeleton"
-                    style={{ height: "56px" }}
+                    style={{ height: withHeader ? "56px" : "0" }}
                 ></div>
                 <section
                     style={{
@@ -52,121 +55,122 @@ export default function EventsPageSkeleton() {
                         flexDirection: "column",
                         justifyContent: "center",
                         alignItems: "center",
-                        marginTop: "1.25rem",
+                        marginTop: withHeader ? "1.25rem" : "0",
                     }}
                 >
-                    <h1
-                        style={{
-                            fontSize: "1.5rem",
-                            textAlign: "center",
-                            width: "70%",
-                            margin: 0,
-                        }}
-                    >
-                        קונטקט אימפרוביזציה ישראל
-                    </h1>
-                    <p
-                        style={{
-                            fontSize: "1.25rem",
-                            textAlign: "center",
-                            width: "70%",
-                            margin: "0 0 2rem 0",
-                        }}
-                    >
-                        כל האירועים במקום אחד
-                    </p>
-                    <main
-                        style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            justifySelf: "center",
-                            gap: "1rem",
-                            width: "100%",
-                        }}
-                    >
-                        <MenuButtons
-                            onSelectKey={() => {}}
-                            options={[
-                                { key: "list", icon: "viewDay" },
-                                { key: "calendar", icon: "calendar" },
-                            ]}
-                            defaultKey="list"
-                        />
-                        <div className="filter-model-container">
-                            <button
-                                onClick={() => {}}
-                                className={`anchor-btn ${
-                                    defaultFilter?.length > 0 && "active"
-                                }`}
-                                disabled
-                                style={{ borderRadius: "6px" }}
+                    {withHeader && (
+                        <>
+                            <h1
+                                style={{
+                                    fontSize: "1.5rem",
+                                    textAlign: "center",
+                                    width: "70%",
+                                    margin: 0,
+                                }}
                             >
-                                <p className="text">סינון</p>
-                                <Icon
-                                    icon="instantMix"
-                                    className="filter-model-icon"
-                                />
-                            </button>
-                        </div>
-                    </main>
-                    <article
-                        style={{
-                            width: "90%",
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "end",
-                            gap: "5px",
-                            flexWrap: "wrap",
-                            marginTop: "1rem",
-                        }}
-                    >
-                        {defaultFilter?.map((eventType: any) => (
-                            <Tag
+                                קונטקט אימפרוביזציה ישראל
+                            </h1>
+                            <p
+                                style={{
+                                    fontSize: "1.25rem",
+                                    textAlign: "center",
+                                    width: "70%",
+                                    margin: "0 0 2rem 0",
+                                }}
+                            >
+                                כל האירועים במקום אחד
+                            </p>
+                            <main
                                 style={{
                                     display: "flex",
                                     flexDirection: "row",
-                                    padding: "2px 14px 0 10px",
-                                    borderRadius: "20px",
-                                    fontSize: "0.8rem",
-                                    fontWeight: 600,
-                                    cursor: "pointer",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    justifySelf: "center",
+                                    gap: "1rem",
+                                    width: "100%",
                                 }}
-                                color="#913e2f"
-                                key={eventType}
-                                onClick={() => {}}
                             >
-                                {eventType}
-                                <ReactSVG
-                                    src={close}
-                                    beforeInjection={(svg) => {
-                                        svg.style.paddingTop = "3px"
-                                        svg.style.paddingRight = "4px"
-                                        svg.style.width = "16px"
-                                        svg.style.height = "16px"
-                                    }}
+                                <MenuButtons
+                                    onSelectKey={() => {}}
+                                    options={[
+                                        { key: "list", icon: "viewDay" },
+                                        { key: "calendar", icon: "calendar" },
+                                    ]}
+                                    defaultKey="list"
                                 />
-                            </Tag>
-                        ))}
-                    </article>
-                    <Card
-                        className="single-day-event-card"
-                        style={{
-                            width: "100%",
-                            marginBottom: "16px",
-                            marginTop: "16px",
-                        }}
+                                <div className="filter-model-container">
+                                    <button
+                                        onClick={() => {}}
+                                        className={`anchor-btn ${
+                                            defaultFilter?.length > 0 &&
+                                            "active"
+                                        }`}
+                                        disabled
+                                        style={{ borderRadius: "6px" }}
+                                    >
+                                        <p className="text">סינון</p>
+                                        <Icon
+                                            icon="instantMix"
+                                            className="filter-model-icon"
+                                        />
+                                    </button>
+                                </div>
+                            </main>
+                            <article
+                                style={{
+                                    width: "90%",
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    justifyContent: "end",
+                                    gap: "5px",
+                                    flexWrap: "wrap",
+                                    marginTop: "1rem",
+                                }}
+                            >
+                                {defaultFilter?.map((eventType: any) => (
+                                    <Tag
+                                        style={{
+                                            display: "flex",
+                                            flexDirection: "row",
+                                            padding: "2px 14px 0 10px",
+                                            borderRadius: "20px",
+                                            fontSize: "0.8rem",
+                                            fontWeight: 600,
+                                            cursor: "pointer",
+                                        }}
+                                        color="#913e2f"
+                                        key={eventType}
+                                        onClick={() => {}}
+                                    >
+                                        {eventType}
+                                        <ReactSVG
+                                            src={close}
+                                            beforeInjection={(svg) => {
+                                                svg.style.paddingTop = "3px"
+                                                svg.style.paddingRight = "4px"
+                                                svg.style.width = "16px"
+                                                svg.style.height = "16px"
+                                            }}
+                                        />
+                                    </Tag>
+                                ))}
+                            </article>
+                        </>
+                    )}
+                    <section
+                        className="skeleton-card skeleton-card-top card"
+                        style={{ marginBottom: "16px", marginTop: "16px" }}
                     >
                         <Skeleton active />
-                    </Card>
-                    <Card
-                        className="single-day-event-card"
-                        style={{ width: "100%", marginBottom: "16px" }}
+                    </section>
+                    <section
+                        className="skeleton-card skeleton-card-bottom card"
+                        style={{ marginBottom: "16px" }}
                     >
                         <Skeleton active />
-                    </Card>
+                    </section>
                 </section>
             </div>
         </div>

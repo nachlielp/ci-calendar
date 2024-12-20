@@ -23,9 +23,8 @@ import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-import Card from "antd/es/card"
-import Skeleton from "antd/es/skeleton"
 import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
+import EventsPageSkeleton from "../Events/Display/EventsPageSkeleton"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
@@ -109,8 +108,10 @@ const EventsPage = () => {
                     ))}
                 </article>
             </header>
+            {store.getIsOnlineNoEvents && (
+                <EventsPageSkeleton withHeader={false} />
+            )}
             {store.getOffline && <OfflinePlaceholder />}
-            {store.getIsOnlineNoEvents && <EventsListSkeleton />}
             {store.getSortedEvents.length > 0 && (
                 <section className="events-display-list">
                     {!isListView && (
@@ -137,29 +138,6 @@ const EventsPage = () => {
 }
 
 export default observer(EventsPage)
-
-const EventsListSkeleton = () => {
-    return (
-        <div className="events-list">
-            <Card
-                className="single-day-event-card"
-                style={{
-                    width: "100%",
-                    marginBottom: "16px",
-                    marginTop: "16px",
-                }}
-            >
-                <Skeleton active />
-            </Card>
-            <Card
-                className="single-day-event-card"
-                style={{ width: "100%", marginBottom: "16px" }}
-            >
-                <Skeleton active />
-            </Card>
-        </div>
-    )
-}
 
 const OfflinePlaceholder = () => {
     return (

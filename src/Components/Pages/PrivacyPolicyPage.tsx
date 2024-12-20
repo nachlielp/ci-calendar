@@ -1,13 +1,10 @@
-import Card from "antd/es/card"
-// import { EMAIL_SUPPORT, PAYBOX_URL } from "../../App"
 import "../../styles/about-page.css"
 import PageFooter from "../Common/PageFooter"
-// import { Icon } from "../Common/Icon"
 
 export function PrivacyPolicyPage() {
     return (
         <section className="about-page page">
-            <Card className="about-page-card">
+            <section className="about-page-card card">
                 <h1 className="about-page-title">מדיניות הפרטיות</h1>
 
                 <label className="section-title">1. מידע כללי</label>
@@ -207,7 +204,7 @@ export function PrivacyPolicyPage() {
                     <br />
                     ביחס לסוג נתונים זה, יש זכות כללית לבקש מידע ותיקון.
                 </article>
-            </Card>
+            </section>
             <PageFooter />
         </section>
     )

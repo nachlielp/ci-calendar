@@ -1,5 +1,4 @@
 import React from "react"
-import Card from "antd/es/card"
 import Tag from "antd/es/tag"
 import dayjs from "dayjs"
 import { EventlyType, CIEvent } from "../../../util/interfaces"
@@ -7,6 +6,8 @@ import { tagOptions, eventOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
 import "../../../styles/event-preview.css"
+import "../../../styles/generics/card.css"
+
 interface EventPreviewProps {
     event: CIEvent
 }
@@ -51,10 +52,10 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         })
 
         return (
-            <Card
+            <section
                 ref={ref}
-                className={`event-preview `}
-                style={{ width: "100%" }}
+                className={`event-preview card`}
+                style={{ width: "90%", minWidth: "280px" }}
             >
                 {event.cancelled && (
                     <article className="cancelled-event-label">
@@ -155,7 +156,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         ))}
                     </article>
                 </section>
-            </Card>
+            </section>
         )
     }
 )

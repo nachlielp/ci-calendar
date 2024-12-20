@@ -1,11 +1,10 @@
-import Card from "antd/es/card"
 import "../../styles/about-page.css"
 import PageFooter from "../Common/PageFooter"
 
 export function TCPage() {
     return (
         <section className="about-page page">
-            <Card className="about-page-card">
+            <section className="about-page-card card">
                 <h1 className="about-page-title">תנאי השירות והגבלות</h1>
 
                 <label className="section-title">הקדמה</label>
@@ -139,7 +138,7 @@ export function TCPage() {
                         </li>
                     </ul>
                 </article>
-            </Card>
+            </section>
             <PageFooter />
         </section>
     )

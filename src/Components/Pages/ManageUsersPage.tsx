@@ -1,5 +1,4 @@
 import AutoComplete from "antd/es/auto-complete"
-import Card from "antd/es/card"
 import Input from "antd/es/input"
 import { useEffect, useState } from "react"
 import { ManageUserOption, UserType } from "../../util/interfaces"
@@ -150,8 +149,8 @@ function ManageUsersPage() {
 
     return (
         <div className="manage-users">
-            <Card
-                className="manage-users-card"
+            <section
+                className="manage-users-card card"
                 style={{ maxWidth: `${cardWidth}px` }}
                 title="הגדרת משתמשים"
             >
@@ -183,7 +182,7 @@ function ManageUsersPage() {
                     </div>
                 )}
                 <div className="manage-users-actions">{footer}</div>
-            </Card>
+            </section>
         </div>
     )
 }

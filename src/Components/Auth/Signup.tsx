@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import "../../styles/signup.css"
 import Alert from "antd/es/alert"
-import Card from "antd/es/card"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { InputRef } from "antd/es/input"

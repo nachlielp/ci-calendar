@@ -1,7 +1,6 @@
 import Form, { FormInstance } from "antd/es/form"
 import Input from "antd/es/input"
 import Select from "antd/es/select"
-import Card from "antd/es/card"
 import GooglePlacesInput, {
     IGooglePlaceOption,
 } from "../../Common/GooglePlacesInput"
@@ -31,10 +30,8 @@ export default function MultiDayFormHead({
     form,
 }: IMultiDayFormHeadProps) {
     return (
-        <Card
-            className="multi-day-form-head-card"
-            title={<span className="segment-title">{titleText}</span>}
-        >
+        <section className="multi-day-form-head-card card boardered-card">
+            <span className="segment-title">{titleText}</span>
             <Form.Item
                 name="event-title"
                 rules={[{ required: true, message: "שדה חובה" }]}
@@ -136,6 +133,6 @@ export default function MultiDayFormHead({
                     popupClassName="form-input-large"
                 />
             </Form.Item>
-        </Card>
+        </section>
     )
 }
