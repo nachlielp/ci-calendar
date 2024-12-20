@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react"
+import { Suspense, lazy } from "react"
 import { Routes, Route, useNavigate } from "react-router-dom"
 import "./styles/overrides.css"
 
