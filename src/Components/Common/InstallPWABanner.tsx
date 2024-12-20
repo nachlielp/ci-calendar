@@ -1,5 +1,5 @@
 import { utilService } from "../../util/utilService"
-import Modal from "antd/es/modal"
+import { Modal } from "../Common/Modal"
 import ios_share from "../../assets/svgs/ios_share.svg"
 import more_vert from "../../assets/svgs/more_vert.svg"
 import add_to_home_screen from "../../assets/svgs/add_to_home_screen.svg"
@@ -133,12 +133,22 @@ const InstallPWABanner = ({
         </div>
     )
     return (
+        // <section className="install-pwa-banner">
+        //     {anchorElement}
+        //     <Modal
+        //         open={vm.showInstallPWAModal}
+        //         onCancel={() => vm.setShowInstallPWAModal(false)}
+        //         footer={null}
+        //     >
+        //         {utilService.isIos() ? iosContent : androidContent}
+        //     </Modal>
+        // </section>
         <section className="install-pwa-banner">
             {anchorElement}
             <Modal
                 open={vm.showInstallPWAModal}
                 onCancel={() => vm.setShowInstallPWAModal(false)}
-                footer={null}
+                className="install-pwa-modal"
             >
                 {utilService.isIos() ? iosContent : androidContent}
             </Modal>

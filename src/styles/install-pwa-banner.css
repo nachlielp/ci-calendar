@@ -6,6 +6,7 @@
         align-items: center;
         width: 100%;
         background-color: #af52de;
+        direction: rtl;
 
         .install-pwa-btn {
             width: 100%;
@@ -55,6 +56,9 @@
             }
         }
     }
+}
+.install-pwa-modal {
+    direction: rtl;
 }
 .install-pwa-modal-container {
     display: flex;
