@@ -84,6 +84,14 @@ export default defineConfig({
     },
     build: {
         target: "es2022",
+        minify: true,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ["react", "react-dom", "mobx", "antd"],
+                },
+            },
+        },
     },
     base: "/",
     plugins: [

@@ -13,10 +13,10 @@ import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
 import { observer } from "mobx-react-lite"
+import ErrorBoundary from "./Components/Common/ErrorBoundary"
 import { AboutPage } from "./Components/Pages/AboutPage"
 import { PrivacyPolicyPage } from "./Components/Pages/PrivacyPolicyPage"
 import { TCPage } from "./Components/Pages/TCPage"
-import ErrorBoundary from "./Components/Common/ErrorBoundary"
 
 const ResetPasswordRequest = lazy(
     () => import("./Components/Auth/ResetPasswordRequest")

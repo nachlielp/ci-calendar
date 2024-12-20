@@ -58,6 +58,7 @@ self.addEventListener("fetch", (event) => {
     const isSVG = event.request.url.match(/\.svg$/)
     const isPng = event.request.url.match(/\.png$/)
     const isCSS = event.request.url.match(/\.css$/)
+    //TODO add js files
 
     if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
         event.respondWith(fetch(event.request))
