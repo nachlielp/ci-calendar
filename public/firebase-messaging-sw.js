@@ -59,6 +59,7 @@ self.addEventListener("fetch", (event) => {
     const isPng = event.request.url.match(/\.png$/)
     const isCSS = event.request.url.match(/\.css$/)
     const isJS = event.request.url.match(/\.js$/)
+    const isTTF = event.request.url.match(/\.ttf$/)
 
     if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
         event.respondWith(fetch(event.request))
@@ -67,14 +68,14 @@ self.addEventListener("fetch", (event) => {
 
     event.respondWith(
         caches.match(event.request).then((response) => {
-            if (response && (isSVG || isPng || isCSS || isJS)) {
+            if (response && (isSVG || isPng || isCSS || isJS || isTTF)) {
                 return response
             }
 
             return fetch(event.request)
                 .then((fetchResponse) => {
                     if (
-                        (isSVG || isPng || isCSS || isJS) &&
+                        (isSVG || isPng || isCSS || isJS || isTTF) &&
                         fetchResponse.status === 200
                     ) {
                         const responseToCache = fetchResponse.clone()
