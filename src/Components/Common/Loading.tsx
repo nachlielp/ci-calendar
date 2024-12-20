@@ -22,7 +22,7 @@ const Loading = () => {
         const timeoutId = setTimeout(() => {
             setIsStuck(true)
             console.log("Loading timeout reached")
-        }, 10000)
+        }, 30000)
 
         return () => clearTimeout(timeoutId)
     }, [])
