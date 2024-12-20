@@ -58,7 +58,7 @@ self.addEventListener("fetch", (event) => {
     const isSVG = event.request.url.match(/\.svg$/)
     const isPng = event.request.url.match(/\.png$/)
     const isCSS = event.request.url.match(/\.css$/)
-    //TODO add js files
+    const isJS = event.request.url.match(/\.js$/)
 
     if (urlsToNotCache.some((url) => event.request.url.includes(url))) {
         event.respondWith(fetch(event.request))
@@ -67,14 +67,14 @@ self.addEventListener("fetch", (event) => {
 
     event.respondWith(
         caches.match(event.request).then((response) => {
-            if (response && (isSVG || isPng || isCSS)) {
+            if (response && (isSVG || isPng || isCSS || isJS)) {
                 return response
             }
 
             return fetch(event.request)
                 .then((fetchResponse) => {
                     if (
-                        (isSVG || isPng || isCSS) &&
+                        (isSVG || isPng || isCSS || isJS) &&
                         fetchResponse.status === 200
                     ) {
                         const responseToCache = fetchResponse.clone()
