@@ -5,6 +5,7 @@ interface ModalProps {
     open?: boolean
     onCancel?: () => void
     className?: string
+    closable?: boolean
 }
 
 export const Modal = ({
@@ -12,6 +13,7 @@ export const Modal = ({
     open,
     onCancel,
     className = "",
+    closable = true,
 }: ModalProps) => {
     const dialogRef = useRef<HTMLDialogElement>(null)
 
@@ -27,6 +29,7 @@ export const Modal = ({
     }, [open])
 
     const handleClick = (e: React.MouseEvent) => {
+        if (!closable) return
         // Check if click was on the backdrop (dialog element itself)
         const rect = dialogRef.current?.getBoundingClientRect()
         if (

@@ -1,8 +1,6 @@
-import Modal from "antd/es/modal"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
-
-const { confirm } = Modal
+import { confirm } from "../../Common/Confirm"
 
 const showCancelledConfirm = (eventId: string, cancelled: boolean) => {
     confirm({

@@ -1,6 +1,6 @@
 import "../../styles/filter-modal.css"
 import { useState } from "react"
-import Modal from "antd/es/modal"
+import { Modal } from "../Common/Modal"
 import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../util/options"
 import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
@@ -27,9 +27,7 @@ export default function FilterModal() {
             <Modal
                 className="filter-model"
                 open={modalOpen}
-                onOk={() => setModalOpen(false)}
                 onCancel={() => setModalOpen(false)}
-                footer={null}
             >
                 <article className="filter-tags-container">
                     <h3 className="sub-title">סוג אירוע</h3>

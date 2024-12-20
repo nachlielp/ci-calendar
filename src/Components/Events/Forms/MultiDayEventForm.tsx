@@ -7,9 +7,9 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import { eventOptions, SelectOption, tagOptions } from "../../../util/options"
+import { eventOptions, tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { utilService } from "../../../util/utilService"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import MultiDayFormHead from "./MultiDayFormHead"
@@ -40,17 +40,6 @@ export default function MultiDayEventForm({
     const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
         null
     )
-    const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
-
-    useEffect(() => {
-        const newTemplateOptions = store.getTemplates
-            .filter((template) => template.is_multi_day)
-            .map((template) => ({
-                value: template.id,
-                label: template.name,
-            }))
-        setTemplateOptions(newTemplateOptions || [])
-    }, [store.getTemplates])
 
     const [form] = Form.useForm()
 
@@ -238,8 +227,13 @@ export default function MultiDayEventForm({
                             <Col span={16}>
                                 <Form.Item name="template-description">
                                     <Select
-                                        key={templateOptions.length}
-                                        options={templateOptions}
+                                        key={
+                                            store.getMultiDayTemplateOptions
+                                                .length
+                                        }
+                                        options={
+                                            store.getMultiDayTemplateOptions
+                                        }
                                         onChange={handleTemplateChange}
                                         allowClear
                                         placeholder="בחירת תבנית"

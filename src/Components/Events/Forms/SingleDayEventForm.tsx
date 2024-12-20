@@ -7,9 +7,9 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import { SelectOption, tagOptions } from "../../../util/options"
+import { tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { utilService } from "../../../util/utilService"
@@ -41,19 +41,18 @@ export default function SingleDayEventForm({
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const [templateOptions, setTemplateOptions] = useState<SelectOption[]>([])
     const [address, setAddress] = useState<IAddress | undefined>()
 
-    useEffect(() => {
-        setTemplateOptions(
-            store.getTemplates
-                .filter((template) => !template.is_multi_day)
-                .map((template) => ({
-                    value: template.id,
-                    label: template.name,
-                })) || []
-        )
-    }, [store.getTemplates])
+    // useEffect(() => {
+    //     setTemplateOptions(
+    //         store.getTemplates
+    //             .filter((template) => !template.is_multi_day)
+    //             .map((template) => ({
+    //                 value: template.id,
+    //                 label: template.name,
+    //             })) || []
+    //     )
+    // }, [store.getTemplates])
 
     const handleAddressSelect = (place: IGooglePlaceOption | null) => {
         if (!place) {
@@ -179,7 +178,9 @@ export default function SingleDayEventForm({
                                 <Col span={16}>
                                     <Form.Item name="template-description">
                                         <Select
-                                            options={templateOptions}
+                                            options={
+                                                store.getSingleDayTemplateOptions
+                                            }
                                             onChange={handleTemplateChange}
                                             allowClear
                                             placeholder="בחירת תבנית"

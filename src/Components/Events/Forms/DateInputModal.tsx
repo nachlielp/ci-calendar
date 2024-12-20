@@ -1,4 +1,4 @@
-import Modal from "antd/es/modal"
+import { Modal } from "../../Common/Modal"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import Form, { FormInstance } from "antd/es/form"
@@ -123,7 +123,7 @@ const DateInputModal = ({
                     />
                 </Form.Item>
             </div>
-            <Modal open={open} onCancel={handleClose} footer={null}>
+            <Modal open={open} onCancel={handleClose}>
                 <section className="date-input-modal">
                     <header className="calendar-controller">
                         <Icon

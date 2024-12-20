@@ -1,9 +1,8 @@
-import Modal from "antd/es/modal"
 import { observer } from "mobx-react-lite"
 import { useCallback, useState } from "react"
 import Cropper from "react-easy-crop"
 import "../../styles/upload-image-button.css"
-
+import { Modal } from "../Common/Modal"
 const MAX_FILE_SIZE = 30 * 1024 // 30KB in bytes
 
 const defaultImage = null
@@ -168,12 +167,7 @@ const UploadImageButton = ({
                 </label>
             </article>
 
-            <Modal
-                open={open}
-                onCancel={() => setOpen(false)}
-                title="Edit Image"
-                footer={null}
-            >
+            <Modal open={open} onCancel={() => setOpen(false)}>
                 <section className="upload-image-button">
                     <div className="cropper-container">
                         {image && (

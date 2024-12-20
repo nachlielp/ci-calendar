@@ -1,4 +1,4 @@
-import Modal from "antd/es/modal"
+import { Modal } from "../Common/Modal"
 import SecondaryButton from "../Common/SecondaryButton"
 import { useMemo } from "react"
 import { Icon } from "../Common/Icon"
@@ -137,9 +137,7 @@ const CIEventNotificationModal = ({
             <Modal
                 open={vm.getIsOpen}
                 onCancel={() => vm.setIsOpen(false)}
-                footer={null}
                 className="set-notification-timeframe-modal"
-                closable={false}
             >
                 <section className="notification-modal-container">
                     <article className="notification-modal-title">

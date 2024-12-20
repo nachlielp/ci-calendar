@@ -1,7 +1,5 @@
-import Modal from "antd/es/modal"
 import { Icon } from "../../Common/Icon"
-
-const { confirm } = Modal
+import { confirm } from "../../Common/Confirm"
 
 const showDeleteConfirm = (
     templateId: string,

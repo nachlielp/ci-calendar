@@ -250,6 +250,26 @@ class Store {
     }
 
     @computed
+    get getSingleDayTemplateOptions() {
+        return this.templates
+            .filter((t) => !t.is_multi_day)
+            .map((t) => ({
+                value: t.id,
+                label: t.name,
+            }))
+    }
+
+    @computed
+    get getMultiDayTemplateOptions() {
+        return this.templates
+            .filter((t) => t.is_multi_day)
+            .map((t) => ({
+                value: t.id,
+                label: t.name,
+            }))
+    }
+
+    @computed
     get getAlerts() {
         return this.alerts
     }

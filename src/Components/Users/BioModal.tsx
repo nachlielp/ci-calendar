@@ -1,5 +1,5 @@
 import { useState } from "react"
-import Modal from "antd/es/modal"
+import { Modal } from "../Common/Modal"
 import { UserBio } from "../../util/interfaces"
 import BioCard from "./BioCard"
 
@@ -12,10 +12,6 @@ export default function BioModal({ teacher }: BioModalProps) {
 
     const showModal = () => {
         setIsModalOpen(true)
-    }
-
-    const handleOk = () => {
-        setIsModalOpen(false)
     }
 
     const handleCancel = () => {
@@ -39,10 +35,8 @@ export default function BioModal({ teacher }: BioModalProps) {
 
             <Modal
                 open={isModalOpen}
-                onOk={handleOk}
+                // onOk={handleOk}
                 onCancel={handleCancel}
-                footer={null}
-                width={350}
             >
                 <BioCard teacher={teacher} />
             </Modal>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import Modal from "antd/es/modal"
+import { Modal } from "../../Common/Modal"
 import { CIEvent } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
 import { useNavigate } from "react-router-dom"
@@ -41,8 +41,10 @@ export default function FullEventCardModal({
                 {anchorEl}
             </div>
 
-            <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
-                <FullEventCard event={event} />
+            <Modal open={isModalOpen} onCancel={handleCancel}>
+                <div style={{ width: "500px" }}>
+                    <FullEventCard event={event} />
+                </div>
             </Modal>
         </>
     )

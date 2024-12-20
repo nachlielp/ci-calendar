@@ -52,11 +52,7 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         })
 
         return (
-            <section
-                ref={ref}
-                className={`event-preview card`}
-                style={{ width: "90%", minWidth: "280px" }}
-            >
+            <section ref={ref} className={`event-preview card`}>
                 {event.cancelled && (
                     <article className="cancelled-event-label">
                         האירוע בוטל

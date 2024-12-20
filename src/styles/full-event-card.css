@@ -1,8 +1,8 @@
 .full-event-card {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    padding: 16px 0;
+    max-width: 500px;
+    /* padding: 16px 0; */
     gap: 8px;
 
     .event-header {
