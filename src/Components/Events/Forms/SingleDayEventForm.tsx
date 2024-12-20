@@ -2,7 +2,6 @@ import Form from "antd/es/form"
 import Input from "antd/es/input"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
-import Select from "antd/es/select"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
@@ -42,17 +41,6 @@ export default function SingleDayEventForm({
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [address, setAddress] = useState<IAddress | undefined>()
-
-    // useEffect(() => {
-    //     setTemplateOptions(
-    //         store.getTemplates
-    //             .filter((template) => !template.is_multi_day)
-    //             .map((template) => ({
-    //                 value: template.id,
-    //                 label: template.name,
-    //             })) || []
-    //     )
-    // }, [store.getTemplates])
 
     const handleAddressSelect = (place: IGooglePlaceOption | null) => {
         if (!place) {
@@ -177,17 +165,28 @@ export default function SingleDayEventForm({
                             <Row gutter={8}>
                                 <Col span={16}>
                                     <Form.Item name="template-description">
-                                        <Select
-                                            options={
-                                                store.getSingleDayTemplateOptions
-                                            }
-                                            onChange={handleTemplateChange}
-                                            allowClear
-                                            placeholder="בחירת תבנית"
-                                            size="large"
+                                        <select
                                             className="form-input-large"
-                                            popupClassName="form-input-large"
-                                        />
+                                            onChange={(e) =>
+                                                handleTemplateChange(
+                                                    e.target.value
+                                                )
+                                            }
+                                        >
+                                            <option value="">
+                                                בחירת תבנית
+                                            </option>
+                                            {store.getSingleDayTemplateOptions.map(
+                                                (option) => (
+                                                    <option
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </option>
+                                                )
+                                            )}
+                                        </select>
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>
