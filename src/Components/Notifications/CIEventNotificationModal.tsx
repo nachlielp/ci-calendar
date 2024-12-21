@@ -38,7 +38,7 @@ class CIEventNotificationModalVM {
         const notification = store.getNotificationByEventId(this.eventId)
         this.remindInHours = notification?.remind_in_hours || "0"
         this.isActive =
-            notification !== undefined && notification.remind_in_hours !== "0"
+            notification !== undefined && notification?.remind_in_hours !== "0"
 
         reaction(
             () => store.getNotifications,
@@ -49,7 +49,7 @@ class CIEventNotificationModalVM {
                 this.remindInHours = notification?.remind_in_hours || "0"
                 this.isActive =
                     notification !== undefined &&
-                    notification.remind_in_hours !== "0"
+                    notification?.remind_in_hours !== "0"
             }
         )
     }
