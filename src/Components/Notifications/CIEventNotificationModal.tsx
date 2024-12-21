@@ -1,4 +1,5 @@
-import { Modal } from "../Common/Modal"
+// import { Modal } from "../Common/Modal"
+import Modal from "antd/es/modal"
 import SecondaryButton from "../Common/SecondaryButton"
 import { useMemo } from "react"
 import { Icon } from "../Common/Icon"
