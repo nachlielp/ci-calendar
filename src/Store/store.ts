@@ -382,7 +382,9 @@ class Store {
                 sort_direction: "asc",
                 future_events: true,
             })
+
             this.setCIEvents(fetchedEvents)
+            utilService.saveEventsToLocalStorage(fetchedEvents)
         } catch (error) {
             console.error("Error fetching events:", error)
         } finally {
@@ -1024,9 +1026,12 @@ class Store {
 
     @action getOfflineData = () => {
         const events = utilService.getEventsFromLocalStorage()
+        const filteredEvents = events.filter((e) =>
+            dayjs(e.start_date).isAfter(dayjs().subtract(1, "day"))
+        )
         const bios = utilService.getBiosFromLocalStorage()
         this.setAppPublicBios(bios)
-        this.setCIEvents(events)
+        this.setCIEvents(filteredEvents)
     }
 
     async init() {
@@ -1065,14 +1070,11 @@ class Store {
                     )
                     console.log("Store.init.newUser")
                     const createdUser = await usersService.createUser(newUser)
-                    console.log("Store.init.createdUser", createdUser)
-                    const ci_events = await cieventsService.getCIEvents()
-                    utilService.saveEventsToLocalStorage(ci_events)
 
                     if (createdUser) {
                         const userData = {
                             user: { ...createdUser, version: CACHE_VERSION },
-                            ci_events,
+                            ci_events: [],
                             requests: [],
                             templates: [],
                             notifications: [],
@@ -1138,16 +1140,14 @@ class Store {
     initPolling = async () => {
         this.setLoading(true)
         // if (this.pollingRef) clearInterval(this.pollingRef)
-        const ci_events = await cieventsService.getCIEvents()
-        utilService.saveEventsToLocalStorage(ci_events)
-        this.fetchEvents()
-        this.fetchAppPublicBios()
+
+        Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
         this.setStore({
             user: {} as CIUser,
             notifications: [],
             templates: [],
             requests: [],
-            ci_events,
+            ci_events: [],
             past_ci_events: [],
             alerts: [],
             userBio: {} as UserBio,
