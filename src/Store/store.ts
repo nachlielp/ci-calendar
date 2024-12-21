@@ -1226,6 +1226,9 @@ class Store {
             alerts: [],
             userBio: {} as UserBio,
         } as CIUserData)
+
+        sessionStorage.clear()
+        localStorage.removeItem("sb-pjgwpivkvsuernmoeebk-auth-token")
     }
 
     @action
