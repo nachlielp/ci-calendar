@@ -1037,66 +1037,68 @@ class Store {
             return
         }
 
-        // try {
-        //     if (!this.getSession?.user?.id) {
-        //         console.log("Store init no session")
-        //         // Only fetch and set ci_events, keep other store values empty
-        //         this.initPolling()
-        //         return
-        //     }
-        //     if (this.pollingRef) clearInterval(this.pollingRef)
+        try {
+            if (!this.getSession?.user?.id) {
+                console.log("Store init no session")
+                // Only fetch and set ci_events, keep other store values empty
+                this.initPolling()
+                return
+            }
+            if (this.pollingRef) clearInterval(this.pollingRef)
 
-        //     //Show loader only if the events are not fetched yet
-        //     if (this.app_ci_events.length === 0) {
-        //         this.setLoading(true)
-        //     }
+            //Show loader only if the events are not fetched yet
+            if (this.app_ci_events.length === 0) {
+                this.setLoading(true)
+            }
 
-        //     const userData = await usersService.getUserData(
-        //         this.getSession.user.id
-        //     )
+            const userData = await usersService.getUserData(
+                this.getSession.user.id
+            )
 
-        //     if (userData) {
-        //         this.setStore(userData)
-        //     } else {
-        //         const newUser = utilService.createDbUserFromUser(
-        //             this.getSession?.user
-        //         )
-        //         console.log("Store.init.newUser")
-        //         const createdUser = await usersService.createUser(newUser)
-        //         console.log("Store.init.createdUser", createdUser)
-        //         const ci_events = await cieventsService.getCIEvents()
-        //         if (createdUser) {
-        //             const userData = {
-        //                 user: { ...createdUser, version: CACHE_VERSION },
-        //                 ci_events,
-        //                 requests: [],
-        //                 templates: [],
-        //                 notifications: [],
-        //                 alerts: [],
-        //                 past_ci_events: [],
-        //                 userBio: {} as UserBio,
-        //             }
-        //             this.setStore(userData)
-        //         }
-        //     }
+            if (userData) {
+                this.setStore(userData)
+            } else {
+                const newUser = utilService.createDbUserFromUser(
+                    this.getSession?.user
+                )
+                console.log("Store.init.newUser")
+                const createdUser = await usersService.createUser(newUser)
+                console.log("Store.init.createdUser", createdUser)
+                const ci_events = await cieventsService.getCIEvents()
+                utilService.saveEventsToLocalStorage(ci_events)
 
-        //     this.fetchAdditionalData()
+                if (createdUser) {
+                    const userData = {
+                        user: { ...createdUser, version: CACHE_VERSION },
+                        ci_events,
+                        requests: [],
+                        templates: [],
+                        notifications: [],
+                        alerts: [],
+                        past_ci_events: [],
+                        userBio: {} as UserBio,
+                    }
+                    this.setStore(userData)
+                }
+            }
 
-        //     this.setupSubscription()
-        // } catch (error) {
-        //     console.error("Error fetching user:", error)
-        // } finally {
-        //     if (!this.user && this.app_ci_events.length === 0) {
-        //         //issue with user data, init polling
-        //         console.error("Store.init.noUserData.initPolling")
-        //         this.initPolling()
-        //     }
-        //     this.setLoading(false)
-        //     if (this.user.id) {
-        //         this.updateUserAppVersion()
-        //         this.checkNotifications()
-        //     }
-        // }
+            this.fetchAdditionalData()
+
+            this.setupSubscription()
+        } catch (error) {
+            console.error("Error fetching user:", error)
+        } finally {
+            if (!this.user && this.app_ci_events.length === 0) {
+                //issue with user data, init polling
+                console.error("Store.init.noUserData.initPolling")
+                this.initPolling()
+            }
+            this.setLoading(false)
+            if (this.user.id) {
+                this.updateUserAppVersion()
+                this.checkNotifications()
+            }
+        }
     }
 
     @action
@@ -1144,7 +1146,6 @@ class Store {
             userBio: {} as UserBio,
         })
         utilService.saveEventsToLocalStorage(ci_events)
-        utilService.saveBiosToLocalStorage(this.app_public_bios)
         // this.setupPolling()
         this.setLoading(false)
     }
@@ -1175,6 +1176,7 @@ class Store {
     fetchAppPublicBios = async () => {
         const appPublicBios = await usersService.getPublicBioList()
         this.setAppPublicBios(appPublicBios)
+        utilService.saveBiosToLocalStorage(appPublicBios)
     }
 
     fetchAppTaggableTeachers = async () => {
