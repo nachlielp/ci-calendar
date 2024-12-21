@@ -9,6 +9,7 @@ import {
     DBCIEvent,
     CIAlert,
     IAddress,
+    UserBio,
 } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
@@ -66,6 +67,10 @@ export const utilService = {
     formatFormValuesToCreateCITemplate,
     formatFormValuesToEditCIEvent,
     formatFormValuesToEditCITemplate,
+    saveEventsToLocalStorage,
+    getEventsFromLocalStorage,
+    saveBiosToLocalStorage,
+    getBiosFromLocalStorage,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -721,6 +726,24 @@ function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
         eventTypes,
     }
     localStorage.setItem("defaultFilters", JSON.stringify(filters))
+}
+
+function saveEventsToLocalStorage(events: CIEvent[]) {
+    localStorage.setItem("events", JSON.stringify(events))
+}
+
+function getEventsFromLocalStorage() {
+    const events = localStorage.getItem("events")
+    return events ? JSON.parse(events) : []
+}
+
+function saveBiosToLocalStorage(bios: UserBio[]) {
+    localStorage.setItem("bios", JSON.stringify(bios))
+}
+
+function getBiosFromLocalStorage() {
+    const bios = localStorage.getItem("bios")
+    return bios ? JSON.parse(bios) : []
 }
 
 function getCIEventTeachers(cievent: CIEvent | DBCIEvent) {

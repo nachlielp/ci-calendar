@@ -397,45 +397,45 @@ class Store {
         }
     }
 
-    private setupPolling = () => {
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                // if (this.pollingRef) clearInterval(this.pollingRef)
-                this.fetchEvents()
+    // private setupPolling = () => {
+    //     const handleVisibilityChange = () => {
+    //         if (document.visibilityState === "visible") {
+    //             // if (this.pollingRef) clearInterval(this.pollingRef)
+    //             this.fetchEvents()
 
-                //Notice - currently not employing this polling
-                // const intervalCallback = async () => {
-                //     await this.fetchEvents()
-                //     await this.fetchAppPublicBios()
-                //     this.callCount++
-                //     // Clear and set new interval with updated duration
-                //     if (this.pollingRef) clearInterval(this.pollingRef)
-                //     this.pollingRef = setInterval(
-                //         intervalCallback,
-                //         this.getPollingInterval()
-                //     )
-                // }
+    //             Notice - currently not employing this polling
+    //             const intervalCallback = async () => {
+    //                 await this.fetchEvents()
+    //                 await this.fetchAppPublicBios()
+    //                 this.callCount++
+    //                 // Clear and set new interval with updated duration
+    //                 if (this.pollingRef) clearInterval(this.pollingRef)
+    //                 this.pollingRef = setInterval(
+    //                     intervalCallback,
+    //                     this.getPollingInterval()
+    //                 )
+    //             }
 
-                // this.pollingRef = setInterval(
-                //     intervalCallback,
-                //     this.getPollingInterval()
-                // )
-            } else {
-                // if (this.pollingRef) clearInterval(this.pollingRef)
-            }
-        }
+    //             this.pollingRef = setInterval(
+    //                 intervalCallback,
+    //                 this.getPollingInterval()
+    //             )
+    //         } else {
+    //             if (this.pollingRef) clearInterval(this.pollingRef)
+    //         }
+    //     }
 
-        document.addEventListener("visibilitychange", handleVisibilityChange)
-        handleVisibilityChange() // Initial call
+    //     document.addEventListener("visibilitychange", handleVisibilityChange)
+    //     handleVisibilityChange() // Initial call
 
-        return () => {
-            if (this.pollingRef) clearInterval(this.pollingRef)
-            document.removeEventListener(
-                "visibilitychange",
-                handleVisibilityChange
-            )
-        }
-    }
+    //     return () => {
+    //         if (this.pollingRef) clearInterval(this.pollingRef)
+    //         document.removeEventListener(
+    //             "visibilitychange",
+    //             handleVisibilityChange
+    //         )
+    //     }
+    // }
 
     //TODO Handle updates from the user subscription
     @action
@@ -897,7 +897,7 @@ class Store {
 
     @action
     viewRequestAlert = async (requestId: string) => {
-        //Notice - batch updates are blocked by policy issues for some reason
+        //Notice - batch updates are blocked by policy
         const alerts = this.alerts.filter((a) => a.request_id === requestId)
         const request = this.requests.find((r) => r.id === requestId)
 
@@ -924,7 +924,7 @@ class Store {
     }
     @action
     viewRequestAlerts = async () => {
-        //Notice - batch updates are blocked by policy issues for some reason
+        //Notice - batch updates are blocked by policy issues
         const alerts = this.alerts.filter((a) => !!a.request_id)
 
         for (const alert of alerts) {
@@ -1014,105 +1014,124 @@ class Store {
         const wasOffline = !this.isOnline
         this.isOnline = navigator.onLine
 
-        // If we're coming back online, reinitialize
         if (wasOffline && this.isOnline) {
             console.log("Connection restored, reinitializing store")
             this.init()
         }
     }
 
+    @action getOfflineData = () => {
+        const events = utilService.getEventsFromLocalStorage()
+        const bios = utilService.getBiosFromLocalStorage()
+        this.setStore({
+            ci_events: events,
+            userBio: bios,
+        } as CIUserData)
+        console.log("offline events: ", this.app_ci_events)
+    }
+
     async init() {
-        console.log("Store init")
+        this.getOfflineData()
 
-        try {
-            if (!this.getSession?.user?.id) {
-                console.log("Store init no session")
-                // Only fetch and set ci_events, keep other store values empty
-                this.initPolling()
-                return
-            }
-            if (this.pollingRef) clearInterval(this.pollingRef)
+        if (!this.isOnline) {
+            return
+        }
 
-            //Show loader only if the events are not fetched yet
-            if (this.app_ci_events.length === 0) {
-                this.setLoading(true)
-            }
+        // try {
+        //     if (!this.getSession?.user?.id) {
+        //         console.log("Store init no session")
+        //         // Only fetch and set ci_events, keep other store values empty
+        //         this.initPolling()
+        //         return
+        //     }
+        //     if (this.pollingRef) clearInterval(this.pollingRef)
 
-            const userData = await usersService.getUserData(
-                this.getSession.user.id
+        //     //Show loader only if the events are not fetched yet
+        //     if (this.app_ci_events.length === 0) {
+        //         this.setLoading(true)
+        //     }
+
+        //     const userData = await usersService.getUserData(
+        //         this.getSession.user.id
+        //     )
+
+        //     if (userData) {
+        //         this.setStore(userData)
+        //     } else {
+        //         const newUser = utilService.createDbUserFromUser(
+        //             this.getSession?.user
+        //         )
+        //         console.log("Store.init.newUser")
+        //         const createdUser = await usersService.createUser(newUser)
+        //         console.log("Store.init.createdUser", createdUser)
+        //         const ci_events = await cieventsService.getCIEvents()
+        //         if (createdUser) {
+        //             const userData = {
+        //                 user: { ...createdUser, version: CACHE_VERSION },
+        //                 ci_events,
+        //                 requests: [],
+        //                 templates: [],
+        //                 notifications: [],
+        //                 alerts: [],
+        //                 past_ci_events: [],
+        //                 userBio: {} as UserBio,
+        //             }
+        //             this.setStore(userData)
+        //         }
+        //     }
+
+        //     this.fetchAdditionalData()
+
+        //     this.setupSubscription()
+        // } catch (error) {
+        //     console.error("Error fetching user:", error)
+        // } finally {
+        //     if (!this.user && this.app_ci_events.length === 0) {
+        //         //issue with user data, init polling
+        //         console.error("Store.init.noUserData.initPolling")
+        //         this.initPolling()
+        //     }
+        //     this.setLoading(false)
+        //     if (this.user.id) {
+        //         this.updateUserAppVersion()
+        //         this.checkNotifications()
+        //     }
+        // }
+    }
+
+    @action
+    private fetchAdditionalData = async () => {
+        if (this.user.user_type === UserType.user) {
+            this.fetchAppPublicBios()
+        }
+
+        if (
+            [UserType.admin, UserType.creator, UserType.org].includes(
+                this.user.user_type
             )
+        ) {
+            Promise.all([
+                this.fetchAppTaggableTeachers(),
+                this.fetchAppPublicBios(),
+            ])
+        }
 
-            if (userData) {
-                this.setStore(userData)
-            } else {
-                const newUser = utilService.createDbUserFromUser(
-                    this.getSession?.user
-                )
-                console.log("Store.init.newUser")
-                const createdUser = await usersService.createUser(newUser)
-                console.log("Store.init.createdUser", createdUser)
-                const ci_events = await cieventsService.getCIEvents()
-                if (createdUser) {
-                    const userData = {
-                        user: { ...createdUser, version: CACHE_VERSION },
-                        ci_events,
-                        requests: [],
-                        templates: [],
-                        notifications: [],
-                        alerts: [],
-                        past_ci_events: [],
-                        userBio: {} as UserBio,
-                    }
-                    this.setStore(userData)
-                }
-            }
-
-            if (this.user.user_type === UserType.user) {
-                this.fetchAppPublicBios()
-            }
-
-            if (
-                [UserType.admin, UserType.creator, UserType.org].includes(
-                    this.user.user_type
-                )
-            ) {
-                await Promise.all([
-                    this.fetchAppTaggableTeachers(),
-                    this.fetchAppPublicBios(),
-                ])
-            }
-
-            if (this.user.user_type === UserType.admin) {
-                await Promise.all([
-                    this.fetchAppTaggableTeachers(),
-                    this.fetchAppPublicBios(),
-                    this.fetchAppUsers(),
-                    this.fetchAppRequests(),
-                    this.fetchAppCreators(),
-                ])
-            }
-
-            this.setupSubscription()
-        } catch (error) {
-            console.error("Error fetching user:", error)
-        } finally {
-            if (!this.user && this.app_ci_events.length === 0) {
-                //issue with user data, init polling
-                console.error("Store.init.noUserData.initPolling")
-                this.initPolling()
-            }
-            this.setLoading(false)
-            if (this.user.id) {
-                this.updateUserAppVersion()
-                this.checkNotifications()
-            }
+        if (this.user.user_type === UserType.admin) {
+            Promise.all([
+                this.fetchAppTaggableTeachers(),
+                this.fetchAppPublicBios(),
+                this.fetchAppUsers(),
+                this.fetchAppRequests(),
+                this.fetchAppCreators(),
+            ])
         }
     }
 
     initPolling = async () => {
         this.setLoading(true)
-        if (this.pollingRef) clearInterval(this.pollingRef)
+        // if (this.pollingRef) clearInterval(this.pollingRef)
         const ci_events = await cieventsService.getCIEvents()
+        this.fetchEvents()
         this.fetchAppPublicBios()
         this.setStore({
             user: {} as CIUser,
@@ -1124,7 +1143,9 @@ class Store {
             alerts: [],
             userBio: {} as UserBio,
         })
-        this.setupPolling()
+        utilService.saveEventsToLocalStorage(ci_events)
+        utilService.saveBiosToLocalStorage(this.app_public_bios)
+        // this.setupPolling()
         this.setLoading(false)
     }
 
