@@ -25,6 +25,7 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
 import EventsPageSkeleton from "../Events/Display/EventsPageSkeleton"
+import { Spin } from "antd/lib"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
@@ -111,6 +112,12 @@ const EventsPage = () => {
             {store.getIsOnlineNoEvents && (
                 <EventsPageSkeleton withHeader={false} />
             )}
+            {store.isLoading && (
+                <div className="loading-new-events">
+                    <Spin size="large" />
+                </div>
+            )}
+
             {store.getOffline && <OfflinePlaceholder />}
             {store.getSortedEvents.length > 0 && (
                 <section className="events-display-list">

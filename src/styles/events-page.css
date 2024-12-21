@@ -103,19 +103,6 @@
         cursor: pointer;
     }
 
-    /* &::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 64px;
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        pointer-events: none;
-        z-index: 10;
-    } */
-
     .offline-placeholder {
         display: flex;
         flex-direction: column;
@@ -128,5 +115,12 @@
                 height: 100px;
             }
         }
+    }
+
+    .loading-new-events {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 }

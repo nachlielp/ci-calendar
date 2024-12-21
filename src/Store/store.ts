@@ -1058,16 +1058,12 @@ class Store {
             const fetchDataPromise = async () => {
                 if (!this.getSession?.user?.id) {
                     console.log("Store init no session")
-                    // Only fetch and set ci_events, keep other store values empty
+                    // Only fetch and set ci_events and userBio, keep other store values empty
                     this.initPolling()
                     return
                 }
-                // if (this.pollingRef) clearInterval(this.pollingRef)
 
-                //Show loader only if the events are not fetched yet
-                if (this.app_ci_events.length === 0) {
-                    this.setLoading(true)
-                }
+                this.setLoading(true)
 
                 const userData = await usersService.getUserData(
                     this.getSession.user.id
@@ -1155,6 +1151,7 @@ class Store {
         this.setLoading(true)
         // if (this.pollingRef) clearInterval(this.pollingRef)
         const ci_events = await cieventsService.getCIEvents()
+        utilService.saveEventsToLocalStorage(ci_events)
         this.fetchEvents()
         this.fetchAppPublicBios()
         this.setStore({
@@ -1169,7 +1166,6 @@ class Store {
         })
         // this.setupPolling()
         this.setLoading(false)
-        utilService.saveEventsToLocalStorage(ci_events)
     }
 
     fetchNotification = async (notificationId: string) => {
