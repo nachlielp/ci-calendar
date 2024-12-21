@@ -22,8 +22,8 @@ function ResetPasswordRequest() {
             if (!email) {
                 throw new Error("Email is required")
             }
-            const resetPasswordPage = `${window.location.origin}/#/reset-password`
-            console.log("resetPasswordUrl", resetPasswordPage)
+            const baseUrl = window.location.origin
+            const resetPasswordPage = `${baseUrl}/reset-password`
             const { error, data } = await supabase.auth.resetPasswordForEmail(
                 email,
                 { redirectTo: resetPasswordPage }
@@ -75,11 +75,11 @@ function ResetPasswordRequest() {
                 ) : (
                     <></>
                 )}
-                {!mailSent ? (
+                {!mailSent && !loading ? (
                     <Form.Item style={{ marginBottom: "8px" }}>
                         <button
                             type="submit"
-                            disabled={loading || mailSent}
+                            disabled={mailSent}
                             className="general-action-btn black-btn large-btn"
                         >
                             איפוס סיסמה

@@ -8,6 +8,7 @@ import { PrivateRoutes } from "./Components/Auth/PrivateRoutes"
 import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
 import BackgroundTiles from "./Components/Layout/BackgroundTiles"
+import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 
 import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"
@@ -46,7 +47,6 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { useRemoveAppLoadingScreen } from "./hooks/useRemoveAppLoadingScreen"
-import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -58,7 +58,7 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = (1.45).toString()
+export const CACHE_VERSION = (1.46).toString()
 export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://www.payboxapp.com/"
 
