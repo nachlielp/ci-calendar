@@ -25,7 +25,6 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
 import EventsPageSkeleton from "../Events/Display/EventsPageSkeleton"
-import { Spin } from "antd/lib"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
