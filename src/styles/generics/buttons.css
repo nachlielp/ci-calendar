@@ -294,3 +294,22 @@
     font-size: 14px;
     font-weight: 500;
 }
+
+.link-text-btn {
+    background-color: transparent;
+    color: #0000ee;
+    border: none;
+    text-decoration: underline;
+    font-family: Assistant;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20.93px;
+    text-align: right;
+    cursor: pointer;
+    padding: 5px 5px;
+
+    &.large-btn {
+        padding: 9px 24px 10px 24px;
+        font-size: 24px;
+    }
+}
