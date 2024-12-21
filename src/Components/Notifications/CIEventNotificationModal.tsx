@@ -139,6 +139,7 @@ const CIEventNotificationModal = ({
                 open={vm.getIsOpen}
                 onCancel={() => vm.setIsOpen(false)}
                 className="set-notification-timeframe-modal"
+                footer={null}
             >
                 <section className="notification-modal-container">
                     <article className="notification-modal-title">
