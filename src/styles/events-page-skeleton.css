@@ -36,7 +36,6 @@
     }
 
     .skeleton-card {
-        margin-bottom: 16px;
         margin-top: 16px;
 
         width: 100%;
@@ -44,10 +43,10 @@
         border-radius: 8px; /* Add explicit border radius */
         overflow: hidden;
     }
-
+    /* 
     .skeleton-card-top {
         margin-bottom: 16px;
-    }
+    } */
 
     .skeleton-card-bottom {
         margin-top: 16px;
