@@ -201,6 +201,7 @@ class Store {
 
     @computed
     get getUserReceiveNotifications() {
+        if (!this.isOnline) return false
         return this.user.receive_notifications
     }
 
