@@ -21,9 +21,7 @@ import { TCPage } from "./Components/Pages/TCPage"
 const ResetPasswordRequest = lazy(
     () => import("./Components/Auth/ResetPasswordRequest")
 )
-const ResetPasswordPage = lazy(
-    () => import("./Components/Pages/RestPasswordPage")
-)
+
 const Login = lazy(() => import("./Components/Auth/Login"))
 const Signup = lazy(() => import("./Components/Auth/Signup"))
 const CreateEventsPage = lazy(
@@ -48,6 +46,7 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { useRemoveAppLoadingScreen } from "./hooks/useRemoveAppLoadingScreen"
+import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -157,11 +156,7 @@ const App = () => {
                                 />
                                 <Route
                                     path="/reset-password"
-                                    element={
-                                        <Suspense fallback={<Loading />}>
-                                            <ResetPasswordPage />
-                                        </Suspense>
-                                    }
+                                    element={<ResetPasswordPage />}
                                 />
                             </Route>
 
