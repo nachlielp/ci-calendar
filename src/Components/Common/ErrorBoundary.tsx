@@ -2,14 +2,13 @@ import { Icon } from "../Common/Icon"
 import React from "react"
 import { NavigateFunction } from "react-router-dom"
 import "../../styles/error-boundary.css"
-// Update the props interface
+
 interface ErrorBoundaryProps {
     children: React.ReactNode
     fallback?: React.ReactNode
     navigate: NavigateFunction
 }
 
-// The class component (required for error boundary functionality)
 class ErrorBoundaryClass extends React.Component<
     ErrorBoundaryProps,
     { hasError: boolean }
