@@ -213,7 +213,7 @@ class Store {
     @computed
     get getNotificationByEventId() {
         return (eventId: string) => {
-            if (!this.isOnline || !this.user?.id) return undefined
+            if (!this.isOnline || !this.isUser) return undefined
             const notification = this.notifications.find(
                 (n) =>
                     n.ci_event_id === eventId &&
