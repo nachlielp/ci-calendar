@@ -1014,11 +1014,20 @@ class Store {
     @action
     private handleOnlineStatus = () => {
         const wasOffline = !this.isOnline
-        this.isOnline = navigator.onLine
+        const newOnlineStatus = navigator.onLine
 
-        if (wasOffline && this.isOnline) {
-            console.log("Connection restored, reinitializing store")
-            this.init()
+        if (this.isOnline !== newOnlineStatus) {
+            console.log(
+                `Network status changed: ${
+                    newOnlineStatus ? "online" : "offline"
+                }`
+            )
+            this.isOnline = newOnlineStatus
+
+            if (wasOffline && this.isOnline) {
+                console.log("Connection restored, reinitializing store")
+                this.init()
+            }
         }
     }
 
@@ -1029,64 +1038,75 @@ class Store {
             ci_events: events,
             userBio: bios,
         } as CIUserData)
-        console.log("offline events: ", this.app_ci_events)
     }
 
     async init() {
+        console.log("Navigator.onLine", navigator.onLine)
         this.getOfflineData()
 
         if (!this.isOnline) {
+            console.log("App is offline, using cached data")
+            this.setLoading(false)
             return
         }
 
         try {
-            if (!this.getSession?.user?.id) {
-                console.log("Store init no session")
-                // Only fetch and set ci_events, keep other store values empty
-                this.initPolling()
-                return
-            }
-            // if (this.pollingRef) clearInterval(this.pollingRef)
-
-            //Show loader only if the events are not fetched yet
-            if (this.app_ci_events.length === 0) {
-                this.setLoading(true)
-            }
-
-            const userData = await usersService.getUserData(
-                this.getSession.user.id
-            )
-
-            if (userData) {
-                this.setStore(userData)
-            } else {
-                const newUser = utilService.createDbUserFromUser(
-                    this.getSession?.user
-                )
-                console.log("Store.init.newUser")
-                const createdUser = await usersService.createUser(newUser)
-                console.log("Store.init.createdUser", createdUser)
-                const ci_events = await cieventsService.getCIEvents()
-                utilService.saveEventsToLocalStorage(ci_events)
-
-                if (createdUser) {
-                    const userData = {
-                        user: { ...createdUser, version: CACHE_VERSION },
-                        ci_events,
-                        requests: [],
-                        templates: [],
-                        notifications: [],
-                        alerts: [],
-                        past_ci_events: [],
-                        userBio: {} as UserBio,
-                    }
-                    this.setStore(userData)
+            console.log("App is online, fetching fresh data")
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error("Network timeout")), 5000)
+            })
+            const fetchDataPromise = async () => {
+                if (!this.getSession?.user?.id) {
+                    console.log("Store init no session")
+                    // Only fetch and set ci_events, keep other store values empty
+                    this.initPolling()
+                    return
                 }
+                // if (this.pollingRef) clearInterval(this.pollingRef)
+
+                //Show loader only if the events are not fetched yet
+                if (this.app_ci_events.length === 0) {
+                    this.setLoading(true)
+                }
+
+                const userData = await usersService.getUserData(
+                    this.getSession.user.id
+                )
+
+                if (userData) {
+                    this.setStore(userData)
+                } else {
+                    const newUser = utilService.createDbUserFromUser(
+                        this.getSession?.user
+                    )
+                    console.log("Store.init.newUser")
+                    const createdUser = await usersService.createUser(newUser)
+                    console.log("Store.init.createdUser", createdUser)
+                    const ci_events = await cieventsService.getCIEvents()
+                    utilService.saveEventsToLocalStorage(ci_events)
+
+                    if (createdUser) {
+                        const userData = {
+                            user: { ...createdUser, version: CACHE_VERSION },
+                            ci_events,
+                            requests: [],
+                            templates: [],
+                            notifications: [],
+                            alerts: [],
+                            past_ci_events: [],
+                            userBio: {} as UserBio,
+                        }
+                        this.setStore(userData)
+                    }
+                }
+
+                this.fetchAdditionalData()
+
+                this.setupSubscription()
             }
 
-            this.fetchAdditionalData()
-
-            this.setupSubscription()
+            // Race between fetch and timeout
+            await Promise.race([fetchDataPromise(), timeoutPromise])
         } catch (error) {
             console.error("Error fetching user:", error)
         } finally {
@@ -1096,7 +1116,7 @@ class Store {
                 this.initPolling()
             }
             this.setLoading(false)
-            if (this.user.id) {
+            if (this.user.id && this.isOnline) {
                 this.updateUserAppVersion()
                 this.checkNotifications()
             }

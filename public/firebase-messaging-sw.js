@@ -1,4 +1,4 @@
-const CACHE_VERSION = (1.41).toString()
+const CACHE_VERSION = (1.42).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 //TODO cache external libraries and images
@@ -73,8 +73,12 @@ self.addEventListener("fetch", (event) => {
                 return response
             }
 
-            return fetch(event.request)
-                .then((fetchResponse) => {
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error("Network timeout")), 5000)
+            })
+
+            return Promise.race([
+                fetch(event.request).then((fetchResponse) => {
                     if (
                         (isSVG || isPng || isCSS || isJS || isTTF) &&
                         fetchResponse.status === 200
@@ -85,13 +89,42 @@ self.addEventListener("fetch", (event) => {
                         })
                     }
                     return fetchResponse
-                })
-                .catch(() => {
-                    // Return cached response if fetch fails
-                    return response
-                })
+                }),
+                timeoutPromise,
+            ]).catch(() => {
+                // Return cached response if fetch fails or times out
+                return (
+                    response || new Response("Network error", { status: 408 })
+                )
+            })
         })
     )
+
+    // event.respondWith(
+    //     caches.match(event.request).then((response) => {
+    //         if (response && (isSVG || isPng || isCSS || isJS || isTTF)) {
+    //             return response
+    //         }
+
+    //         return fetch(event.request)
+    //             .then((fetchResponse) => {
+    //                 if (
+    //                     (isSVG || isPng || isCSS || isJS || isTTF) &&
+    //                     fetchResponse.status === 200
+    //                 ) {
+    //                     const responseToCache = fetchResponse.clone()
+    //                     caches.open(CACHE_NAME).then((cache) => {
+    //                         cache.put(event.request, responseToCache)
+    //                     })
+    //                 }
+    //                 return fetchResponse
+    //             })
+    //             .catch(() => {
+    //                 // Return cached response if fetch fails
+    //                 return response
+    //             })
+    //     })
+    // )
 })
 
 self.addEventListener("push", function (event) {
