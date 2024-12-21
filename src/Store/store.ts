@@ -8,7 +8,6 @@ import {
 } from "mobx"
 import {
     CIAlert,
-    CIConfig,
     CIEvent,
     CIRequest,
     CITemplate,
@@ -37,7 +36,6 @@ import { SelectOption } from "../util/options"
 import { templateService } from "../supabase/templateService"
 import { publicBioService } from "../supabase/publicBioService"
 import { alertsService } from "../supabase/alertsService"
-// import { configService } from "../supabase/configService"
 import { userRoleService } from "../supabase/userRoleService"
 import { CACHE_VERSION } from "../App"
 
@@ -51,7 +49,6 @@ class Store {
     @observable bio: UserBio = {} as UserBio
     @observable alerts: CIAlert[] = []
 
-    @observable config: CIConfig = {} as CIConfig
     @observable app_ci_events: CIEvent[] = []
     @observable app_past_ci_events: CIEvent[] = []
     @observable app_public_bios: UserBio[] = []
@@ -107,11 +104,6 @@ class Store {
     @computed
     get isLoading() {
         return this.loading
-    }
-
-    @computed
-    get getConfig() {
-        return this.config
     }
 
     @computed
@@ -497,9 +489,9 @@ class Store {
             case "templates":
                 this.setTemplate(payload.new, payload.eventType)
                 break
-            case "config":
-                this.setConfig(payload.new, payload.eventType)
-                break
+            // case "config":
+            //     this.setConfig(payload.new, payload.eventType)
+            //     break
         }
     }
 
@@ -956,14 +948,14 @@ class Store {
         }
     }
 
-    @action
-    setConfig = (config: CIConfig, eventType: EventPayloadType) => {
-        switch (eventType) {
-            case EventPayloadType.UPDATE:
-                this.config = config
-                break
-        }
-    }
+    // @action
+    // setConfig = (config: CIConfig, eventType: EventPayloadType) => {
+    //     switch (eventType) {
+    //         case EventPayloadType.UPDATE:
+    //             this.config = config
+    //             break
+    //     }
+    // }
 
     @action
     setUserRole = (userRole: UserRole) => {
@@ -1236,6 +1228,27 @@ class Store {
             alerts: [],
             userBio: {} as UserBio,
         } as CIUserData)
+    }
+
+    @action
+    clearAppStorage = async (): Promise<void> => {
+        try {
+            localStorage.clear()
+            this.session = null
+            this.user = {} as CIUser
+            this.app_ci_events = []
+            this.app_public_bios = []
+            this.app_users = []
+            this.app_requests = []
+            this.app_creators = []
+            this.app_taggable_teachers = []
+            this.app_past_ci_events = []
+
+            return Promise.resolve()
+        } catch (error) {
+            console.error("Error clearing app storage:", error)
+            return Promise.reject(error)
+        }
     }
 }
 
