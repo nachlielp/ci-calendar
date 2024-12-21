@@ -126,7 +126,7 @@ class Store {
 
     @computed
     get isUser() {
-        return !!this.user?.id
+        return !!this.session && !!this.user?.id
     }
 
     @computed
@@ -213,7 +213,7 @@ class Store {
     @computed
     get getNotificationByEventId() {
         return (eventId: string) => {
-            if (!this.isOnline) return undefined
+            if (!this.isOnline || !this.user?.id) return undefined
             const notification = this.notifications.find(
                 (n) =>
                     n.ci_event_id === eventId &&
