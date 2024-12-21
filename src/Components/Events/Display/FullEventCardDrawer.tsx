@@ -25,10 +25,10 @@ export default function FullEventCardDrawer({
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
 
     useEffect(() => {
-        if (isModalOpen && store.isUser) {
+        if (isModalOpen && store.isUser && store.isOnline) {
             store.viewEventAlert(event.id)
         }
-    }, [isModalOpen, event.id, store.isUser])
+    }, [isModalOpen, event.id, store.isUser, store.isOnline])
 
     const onClose = () => {
         setIsModalOpen(false)

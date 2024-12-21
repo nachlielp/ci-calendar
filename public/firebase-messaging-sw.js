@@ -9,6 +9,7 @@ self.addEventListener("install", (event) => {
             return cache.addAll([
                 "/",
                 "/index.html",
+                "/manifest.json",
                 "/192.png",
                 "/512.png",
                 "/ci-circle-192.png",
