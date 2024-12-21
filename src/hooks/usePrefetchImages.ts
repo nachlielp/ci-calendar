@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { CIEvent, UserBio } from "../util/interfaces"
+import { store } from "../Store/store"
 
 export const usePrefetchImages = ({
     app_public_bios,
@@ -9,6 +10,7 @@ export const usePrefetchImages = ({
     ci_event: CIEvent
 }) => {
     useEffect(() => {
+        if (!store.isOnline) return
         const prefetchImages = () => {
             const imageURLs = [
                 ...ci_event.segments.flatMap((segment) =>
