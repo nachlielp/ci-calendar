@@ -22,17 +22,18 @@ function ResetPasswordRequest() {
             if (!email) {
                 throw new Error("Email is required")
             }
-            const resetPasswordPage = `${window.location.origin}/reset-password`
+            const resetPasswordPage = `${window.location.origin}/#/reset-password`
             console.log("resetPasswordUrl", resetPasswordPage)
             const { error, data } = await supabase.auth.resetPasswordForEmail(
                 email,
                 { redirectTo: resetPasswordPage }
             )
+            console.log("error", error)
             if (error) throw error
             console.log("data", data)
             setMailSent(true)
             setMessage(
-                "במידה והכתובת נמצאת במערכת, הקישור לאיפוס הסיסמה נשלח לכתובת המייל שהזנתם בדקות הקרובות, אנא אתחלו את הסיסמה מתוך החשבון שלכם"
+                "במידה והכתובת נמצאת במערכת, הקישור לאיפוס הסיסמה ישלח לכתובת המייל שהזנתם בדקות הקרובות, אנא אתחלו את הסיסמה מתוך החשבון שלכם"
             )
             setMessageType("info")
         } catch (e) {
@@ -62,7 +63,7 @@ function ResetPasswordRequest() {
                         placeholder="אימייל"
                         ref={emailRef}
                         required
-                        disabled={mailSent}
+                        disabled={loading || mailSent}
                         className="form-input-large"
                         prefix={<Icon icon="mail" />}
                     />
@@ -78,7 +79,7 @@ function ResetPasswordRequest() {
                     <Form.Item style={{ marginBottom: "8px" }}>
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || mailSent}
                             className="general-action-btn black-btn large-btn"
                         >
                             איפוס סיסמה
