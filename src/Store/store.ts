@@ -1044,7 +1044,7 @@ class Store {
                 this.initPolling()
                 return
             }
-            if (this.pollingRef) clearInterval(this.pollingRef)
+            // if (this.pollingRef) clearInterval(this.pollingRef)
 
             //Show loader only if the events are not fetched yet
             if (this.app_ci_events.length === 0) {
@@ -1145,9 +1145,9 @@ class Store {
             alerts: [],
             userBio: {} as UserBio,
         })
-        utilService.saveEventsToLocalStorage(ci_events)
         // this.setupPolling()
         this.setLoading(false)
+        utilService.saveEventsToLocalStorage(ci_events)
     }
 
     fetchNotification = async (notificationId: string) => {

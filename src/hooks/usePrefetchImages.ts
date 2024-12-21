@@ -26,8 +26,19 @@ export const usePrefetchImages = ({
                 imageURLs.forEach((imageUrl) => {
                     if (imageUrl) {
                         console.log("prefetching image", imageUrl)
-                        const img = new Image()
-                        img.src = imageUrl
+                        try {
+                            const img = new Image()
+                            img.onerror = () =>
+                                console.error(
+                                    `Failed to load image: ${imageUrl}`
+                                )
+                            img.src = imageUrl
+                        } catch (error) {
+                            console.error(
+                                `Failed to prefetch image: ${imageUrl}`,
+                                error
+                            )
+                        }
                     }
                 })
             }
