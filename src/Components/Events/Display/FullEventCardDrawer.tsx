@@ -24,6 +24,7 @@ export default function FullEventCardDrawer({
     }
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
 
+    //TODO - handle seen when offline
     useEffect(() => {
         if (isModalOpen && store.isUser && store.isOnline) {
             store.viewEventAlert(event.id)
