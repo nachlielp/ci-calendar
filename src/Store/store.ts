@@ -1034,10 +1034,8 @@ class Store {
     @action getOfflineData = () => {
         const events = utilService.getEventsFromLocalStorage()
         const bios = utilService.getBiosFromLocalStorage()
-        this.setStore({
-            ci_events: events,
-            userBio: bios,
-        } as CIUserData)
+        this.setAppPublicBios(bios)
+        this.setCIEvents(events)
     }
 
     async init() {

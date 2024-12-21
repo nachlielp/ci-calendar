@@ -729,24 +729,44 @@ function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
 }
 
 function saveEventsToLocalStorage(events: CIEvent[]) {
-    localStorage.removeItem("events")
-
-    localStorage.setItem("events", JSON.stringify(events))
+    try {
+        localStorage.removeItem("events")
+        localStorage.setItem("events", JSON.stringify(events))
+        return true
+    } catch (error) {
+        console.error("Error saving events to localStorage:", error)
+    }
 }
 
-function getEventsFromLocalStorage() {
-    const events = localStorage.getItem("events")
-    return events ? JSON.parse(events) : []
+function getEventsFromLocalStorage(): CIEvent[] {
+    try {
+        const events = localStorage.getItem("events")
+        return events ? JSON.parse(events) : []
+    } catch (error) {
+        console.error("Error reading events from localStorage:", error)
+        return []
+    }
 }
 
 function saveBiosToLocalStorage(bios: UserBio[]) {
-    localStorage.removeItem("bios")
-    localStorage.setItem("bios", JSON.stringify(bios))
+    try {
+        localStorage.removeItem("bios")
+        localStorage.setItem("bios", JSON.stringify(bios))
+        return true
+    } catch (error) {
+        console.error("Error saving bios to localStorage:", error)
+        return false
+    }
 }
 
-function getBiosFromLocalStorage() {
-    const bios = localStorage.getItem("bios")
-    return bios ? JSON.parse(bios) : []
+function getBiosFromLocalStorage(): UserBio[] {
+    try {
+        const bios = localStorage.getItem("bios")
+        return bios ? JSON.parse(bios) : []
+    } catch (error) {
+        console.error("Error reading bios from localStorage:", error)
+        return []
+    }
 }
 
 function getCIEventTeachers(cievent: CIEvent | DBCIEvent) {
