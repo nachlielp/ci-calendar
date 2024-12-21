@@ -112,12 +112,6 @@ const EventsPage = () => {
             {store.getIsOnlineNoEvents && (
                 <EventsPageSkeleton withHeader={false} />
             )}
-            {store.isLoading && (
-                <div className="loading-new-events">
-                    <Spin size="large" />
-                </div>
-            )}
-
             {store.getOffline && <OfflinePlaceholder />}
             {store.getSortedEvents.length > 0 && (
                 <section className="events-display-list">

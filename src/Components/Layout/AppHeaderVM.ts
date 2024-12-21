@@ -48,6 +48,7 @@ class AppHeaderVM {
     get showLoginButton() {
         return (
             !store.isUser &&
+            !store.isLoading &&
             ![
                 "/login",
                 "/signup",
@@ -72,6 +73,11 @@ class AppHeaderVM {
     @computed
     get showUserInfo() {
         return store.isUser
+    }
+
+    @computed
+    get showUserLoading() {
+        return store.isLoading
     }
 
     @computed
@@ -103,6 +109,11 @@ class AppHeaderVM {
     @computed
     get isLoading() {
         return this._loading
+    }
+
+    @computed
+    get isAppLoading() {
+        return store.isLoading
     }
 
     @computed

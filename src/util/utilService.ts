@@ -729,6 +729,8 @@ function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
 }
 
 function saveEventsToLocalStorage(events: CIEvent[]) {
+    localStorage.removeItem("events")
+
     localStorage.setItem("events", JSON.stringify(events))
 }
 
@@ -738,6 +740,7 @@ function getEventsFromLocalStorage() {
 }
 
 function saveBiosToLocalStorage(bios: UserBio[]) {
+    localStorage.removeItem("bios")
     localStorage.setItem("bios", JSON.stringify(bios))
 }
 

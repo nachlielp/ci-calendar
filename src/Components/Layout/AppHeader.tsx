@@ -12,6 +12,7 @@ import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router-dom"
 import { utilService } from "../../util/utilService"
+import { Spin } from "antd/lib"
 
 const AppHeader = () => {
     const isMobile = useIsMobile()
@@ -57,6 +58,11 @@ const AppHeader = () => {
                 <>
                     <div className="header-actions">
                         {vm.showUserInfo && <UserInfo user={store.getUser} />}
+                        {vm.showUserLoading && (
+                            <div className="user-loading-container">
+                                <Spin size="small" />
+                            </div>
+                        )}
                         <MenuDrawer />
                     </div>
                 </>
