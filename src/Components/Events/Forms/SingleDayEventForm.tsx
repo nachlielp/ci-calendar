@@ -16,6 +16,7 @@ import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
 import "../../../styles/event-form.css"
+import Select from "antd/es/select"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -165,7 +166,17 @@ export default function SingleDayEventForm({
                             <Row gutter={8}>
                                 <Col span={16}>
                                     <Form.Item name="template-description">
-                                        <select
+                                        <Select
+                                            options={
+                                                store.getSingleDayTemplateOptions
+                                            }
+                                            onChange={handleTemplateChange}
+                                            allowClear
+                                            placeholder="בחירת תבנית"
+                                            size="large"
+                                            popupClassName="form-input-large"
+                                        />
+                                        {/* <select
                                             className="form-input-large"
                                             onChange={(e) =>
                                                 handleTemplateChange(
@@ -186,7 +197,7 @@ export default function SingleDayEventForm({
                                                     </option>
                                                 )
                                             )}
-                                        </select>
+                                        </select> */}
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>

@@ -13,23 +13,23 @@
 }
 
 .modal::backdrop {
-    background: rgba(66, 31, 31, 0.5); /* Semi-transparent black backdrop */
+    background: rgba(66, 31, 31, 0.5);
 }
 
-.modal-content {
-    scrollbar-width: thin; /* For Firefox */
-    scrollbar-color: #888 #f1f1f1; /* For Firefox */
+/* .modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
 }
 
 .modal-content::-webkit-scrollbar {
-    width: 8px; /* Width of the scrollbar */
+    width: 8px; 
 }
 
 .modal-content::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Color of the track */
+    background: #f1f1f1; 
 }
 
 .modal-content::-webkit-scrollbar-thumb {
-    background: #888; /* Color of the scroll thumb */
+    background: #888; 
     border-radius: 4px;
-}
+} */
