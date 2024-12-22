@@ -1112,6 +1112,8 @@ class Store {
                                 userBio: {} as UserBio,
                             }
                             this.setStore(userData)
+                        } else {
+                            this.initPolling()
                         }
                     } catch (error) {
                         console.error("Failed to create user:", error)
