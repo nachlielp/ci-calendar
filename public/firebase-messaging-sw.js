@@ -1,4 +1,4 @@
-const CACHE_VERSION = (1.47).toString()
+const CACHE_VERSION = (1.48).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 //TODO cache external libraries and images
@@ -10,9 +10,9 @@ self.addEventListener("install", (event) => {
                 "/",
                 "/index.html",
                 "/manifest.json",
-                "/192.png",
-                "/512.png",
-                "/ci-circle-192.png",
+                "/ci-logo-192-bg.png",
+                "/ci-logo-512-bg.png",
+                "/ci-logo-192-circle.png",
                 "/assets/",
                 "/index.css", // Add main CSS file
                 "/styles/overrides.css",
@@ -153,7 +153,7 @@ self.addEventListener("push", function (event) {
             body: data.body || "No message content",
             title: data.title || "New Notification",
             data: { push_event_url: data.url || "/" },
-            icon: "/192.png",
+            icon: "/ci-logo-192-bg.png",
             badge: data.badge || 1,
         }
 

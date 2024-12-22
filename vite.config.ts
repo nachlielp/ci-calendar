@@ -9,32 +9,32 @@ const buildVersion = `${pkg.version}-${timestamp}`
 //
 const manifestForPlugin: Partial<VitePWAOptions> = {
     registerType: "prompt",
-    includeAssets: ["512.png", "192.png"],
+    includeAssets: ["ci-logo-512-bg.png", "ci-logo-192-bg.png"],
     manifest: {
         name: "CI",
         short_name: "CI",
         description: "CI Events near you",
         icons: [
             {
-                src: "/192.png",
+                src: "/ci-logo-192-bg.png",
                 sizes: "192x192",
                 type: "image/png",
                 purpose: "monochrome",
             },
             {
-                src: "/192.png",
+                src: "/ci-logo-192-bg.png",
                 sizes: "192x192",
                 type: "image/png",
                 purpose: "monochrome",
             },
             {
-                src: "/512.png",
+                src: "/ci-logo-512-bg.png",
                 sizes: "512x512",
                 type: "image/png",
                 purpose: "any",
             },
             {
-                src: "/192.png",
+                src: "/ci-logo-192-bg.png",
                 sizes: "192x192",
                 type: "image/png",
                 purpose: "maskable",
