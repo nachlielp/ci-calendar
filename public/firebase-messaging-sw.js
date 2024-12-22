@@ -1,7 +1,7 @@
-const CACHE_VERSION = (1.49).toString()
+const CACHE_VERSION = (1.491).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
-//TODO cache external libraries and images
+const TIMEOUT_DURATION = 8000
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
@@ -10,6 +10,7 @@ self.addEventListener("install", (event) => {
                 "/",
                 "/index.html",
                 "/manifest.json",
+                "/site.webmanifest",
                 "/ci-logo-192-bg.png",
                 "/ci-logo-512-bg.png",
                 "/ci-logo-192-circle.png",
