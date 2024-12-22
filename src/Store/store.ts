@@ -1058,7 +1058,7 @@ class Store {
         try {
             console.log("App is online, fetching fresh data")
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error("Network timeout")), 50)
+                setTimeout(() => reject(new Error("Network timeout")), 30000)
             })
             const fetchDataPromise = async () => {
                 if (!this.getSession?.user?.id) {

@@ -48,7 +48,7 @@ class AppHeaderVM {
 
     @computed
     get networkFlag() {
-        return store.getNetworkFlag
+        return store.getNetworkFlag && !store.isLoading && !store.isUser
     }
 
     @computed
