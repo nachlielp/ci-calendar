@@ -1,4 +1,4 @@
-const CACHE_VERSION = (1.48).toString()
+const CACHE_VERSION = (1.49).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 //TODO cache external libraries and images
@@ -47,6 +47,26 @@ self.addEventListener("activate", (e) => {
 })
 
 self.addEventListener("fetch", (event) => {
+    if (event.request.url.endsWith("registerSW.js")) {
+        event.respondWith(
+            new Response(
+                `if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', () => {
+                        navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                            scope: '/'
+                        });
+                    });
+                }`,
+                {
+                    headers: {
+                        "Content-Type": "application/javascript",
+                    },
+                }
+            )
+        )
+        return
+    }
+
     const urlsToNotCache = [
         "supabase.co",
         "firebase",

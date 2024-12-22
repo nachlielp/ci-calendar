@@ -8,7 +8,8 @@ const timestamp = new Date().getTime()
 const buildVersion = `${pkg.version}-${timestamp}`
 //
 const manifestForPlugin: Partial<VitePWAOptions> = {
-    registerType: "prompt",
+    disable: true,
+    registerType: "autoUpdate",
     includeAssets: ["ci-logo-512-bg.png", "ci-logo-192-bg.png"],
     manifest: {
         name: "CI",
