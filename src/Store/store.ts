@@ -1146,6 +1146,7 @@ class Store {
 
     @action
     private fetchAdditionalData = async () => {
+        console.log("fetchAdditionalData.user_type", this.user.user_type)
         if (this.user.user_type === UserType.user) {
             this.fetchAppPublicBios()
         }
