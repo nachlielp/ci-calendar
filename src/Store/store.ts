@@ -1148,6 +1148,9 @@ class Store {
     private fetchAdditionalData = async () => {
         console.log("fetchAdditionalData.user_type", this.user.user_type)
         if (this.user.user_type === UserType.user) {
+            if (this.app_ci_events.length === 0) {
+                this.fetchEvents()
+            }
             this.fetchAppPublicBios()
         }
 
