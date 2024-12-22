@@ -1177,16 +1177,7 @@ class Store {
         // if (this.pollingRef) clearInterval(this.pollingRef)
 
         Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
-        this.setStore({
-            user: {} as CIUser,
-            notifications: [],
-            templates: [],
-            requests: [],
-            ci_events: [],
-            past_ci_events: [],
-            alerts: [],
-            userBio: {} as UserBio,
-        })
+
         // this.setupPolling()
         this.setLoading(false)
     }
