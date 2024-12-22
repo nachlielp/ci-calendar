@@ -1058,7 +1058,7 @@ class Store {
         try {
             console.log("App is online, fetching fresh data")
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error("Network timeout")), 10000)
+                setTimeout(() => reject(new Error("Network timeout")), 50)
             })
             const fetchDataPromise = async () => {
                 if (!this.getSession?.user?.id) {
@@ -1116,6 +1116,7 @@ class Store {
             await Promise.race([fetchDataPromise(), timeoutPromise])
         } catch (error) {
             console.error("Error fetching user:", error)
+            this.setNetworkFlag(true)
         } finally {
             if (!this.user && this.app_ci_events.length === 0) {
                 //issue with user data, init polling
