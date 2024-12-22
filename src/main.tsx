@@ -1,8 +1,12 @@
 import ReactDOM from "react-dom/client"
-import App from "./App.tsx"
+
 import "./index.css"
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router-dom"
+import { lazy, Suspense } from "react"
+import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton.tsx"
+
+const App = lazy(() => import("./App.tsx"))
 //NOTICE - posthog in not installed
 // import posthog from "posthog-js"
 // import { PostHogProvider } from "posthog-js/react"
@@ -15,11 +19,11 @@ import { BrowserRouter } from "react-router-dom"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
-        <Providers>
-            {/* <PostHogProvider client={posthog}> */}
-            <App />
-            {/* </PostHogProvider> */}
-        </Providers>
+        <Suspense fallback={<EventsPageSkeleton />}>
+            <Providers>
+                <App />
+            </Providers>
+        </Suspense>
     </BrowserRouter>
 )
 
