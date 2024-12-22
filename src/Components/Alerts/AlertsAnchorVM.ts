@@ -9,14 +9,17 @@ class AlertsAnchorVM {
     constructor() {
         makeAutoObservable(this)
 
-        reaction(
-            () => store.getAlerts,
-            () => {
-                if (navigator.setAppBadge) {
-                    navigator.setAppBadge(this.alertsCount)
+        setTimeout(() => {
+            reaction(
+                () => store.getAlerts,
+                () => {
+                    if (navigator.setAppBadge) {
+                        navigator.setAppBadge(this.alertsCount)
+                    }
                 }
-            }
-        )
+            ),
+                0
+        })
     }
 
     @computed get alertsCount() {

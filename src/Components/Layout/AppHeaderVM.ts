@@ -14,24 +14,26 @@ class AppHeaderVM {
     constructor() {
         makeObservable(this)
 
-        reaction(
-            () => store.requestNotification,
-            (requestNotification) => {
-                const getCurrentPermission = () => Notification.permission
+        setTimeout(() => {
+            reaction(
+                () => store.requestNotification,
+                (requestNotification) => {
+                    if (
+                        requestNotification &&
+                        utilService.isPWA() &&
+                        store.user.receive_notifications
+                    ) {
+                        const permission = Notification.permission
 
-                if (
-                    requestNotification &&
-                    utilService.isPWA() &&
-                    store.user.receive_notifications
-                ) {
-                    if (getCurrentPermission() === "granted") {
-                        this.setFCMToken()
-                    } else if (getCurrentPermission() !== "denied") {
-                        this.setShowRequestPermissionModal(true)
+                        if (permission === "granted") {
+                            this.setFCMToken()
+                        } else if (permission !== "denied") {
+                            this.setShowRequestPermissionModal(true)
+                        }
                     }
                 }
-            }
-        )
+            )
+        }, 0)
     }
 
     @computed

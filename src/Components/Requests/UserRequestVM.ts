@@ -14,13 +14,17 @@ class UserRequestVM {
     constructor() {
         makeAutoObservable(this)
 
-        reaction(
-            () => store.getOpenPositionRequests,
-            () => {
-                this.isEditRequest = false
-                this.openPositionRequest = store.getOpenPositionRequests ?? null
-            }
-        )
+        setTimeout(() => {
+            reaction(
+                () => store.getOpenPositionRequests,
+                () => {
+                    this.isEditRequest = false
+                    this.openPositionRequest =
+                        store.getOpenPositionRequests ?? null
+                }
+            ),
+                0
+        })
     }
 
     @computed get getRequestType() {
