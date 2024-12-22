@@ -162,7 +162,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         } as unknown as CIUserData
     } catch (error) {
         console.error("Error in getUser:", error)
-        return null
+        throw new Error("NETWORK_ERROR")
     }
 }
 

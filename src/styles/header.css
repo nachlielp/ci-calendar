@@ -81,6 +81,25 @@
     .header-actions {
         margin-left: auto;
         display: flex;
+
+        .network-flag-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 4px;
+
+            .header-error-text {
+                color: #000;
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            .error-icon {
+                color: #000;
+                margin-right: 4px;
+                /* padding-bottom: 6px; */
+            }
+        }
     }
 
     .user-loading-container {

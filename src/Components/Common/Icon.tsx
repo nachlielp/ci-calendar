@@ -58,6 +58,7 @@ import lock from "../../assets/svgs/lock.svg"
 import ad_units from "../../assets/svgs/ad_units.svg"
 import cloud_offline from "../../assets/svgs/cloud_offline.svg"
 import paybox from "../../assets/svgs/paybox.svg"
+import signal_cellular_connected_no_internet_0_bar from "../../assets/svgs/signal_cellular_connected_no_internet_0_bar.svg"
 
 export const Icon = ({
     icon,
@@ -131,6 +132,7 @@ export const Icon = ({
         ad_units,
         cloud_offline,
         paybox,
+        signal_cellular_connected_no_internet_0_bar,
     }
     return (
         <label className="icon-component" onClick={onClick}>

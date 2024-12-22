@@ -58,6 +58,7 @@ class Store {
 
     @observable loading: boolean = true
     @observable isOnline: boolean = navigator.onLine
+    @observable networkFlag: boolean = false
 
     @observable requestNotification: boolean = false
 
@@ -305,6 +306,11 @@ class Store {
                 label: b.bio_name,
                 value: b.user_id,
             }))
+    }
+
+    @computed
+    get getNetworkFlag() {
+        return this.networkFlag
     }
 
     @computed
@@ -1024,6 +1030,11 @@ class Store {
         }
     }
 
+    @action
+    setNetworkFlag = (flag: boolean) => {
+        this.networkFlag = flag
+    }
+
     @action getOfflineData = () => {
         const events = utilService.getEventsFromLocalStorage()
         const filteredEvents = events.filter((e) =>
@@ -1035,6 +1046,7 @@ class Store {
     }
 
     async init() {
+        this.setNetworkFlag(false)
         this.getOfflineData()
 
         if (!this.isOnline) {
@@ -1046,7 +1058,7 @@ class Store {
         try {
             console.log("App is online, fetching fresh data")
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error("Network timeout")), 40000)
+                setTimeout(() => reject(new Error("Network timeout")), 10000)
             })
             const fetchDataPromise = async () => {
                 if (!this.getSession?.user?.id) {
@@ -1058,10 +1070,19 @@ class Store {
 
                 this.setLoading(true)
 
-                const userData = await usersService.getUserData(
-                    this.getSession.user.id
-                )
-
+                const userData = await usersService
+                    .getUserData(this.getSession.user.id)
+                    .catch((error) => {
+                        if (error.message === "NETWORK_ERROR") {
+                            console.error(
+                                "Network error while fetching user data"
+                            )
+                            this.setNetworkFlag(true)
+                            throw error
+                        }
+                        return null
+                    })
+                this.setNetworkFlag(false)
                 if (userData) {
                     this.setStore(userData)
                 } else {

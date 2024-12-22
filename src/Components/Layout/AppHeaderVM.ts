@@ -47,10 +47,16 @@ class AppHeaderVM {
     }
 
     @computed
+    get networkFlag() {
+        return store.getNetworkFlag
+    }
+
+    @computed
     get showLoginButton() {
         return (
             !store.isUser &&
             !store.isLoading &&
+            !this.networkFlag &&
             ![
                 "/login",
                 "/signup",
