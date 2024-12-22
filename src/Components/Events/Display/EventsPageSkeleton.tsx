@@ -6,7 +6,6 @@ import { Tag } from "antd"
 import { ReactSVG } from "react-svg"
 import close from "../../../assets/svgs/close.svg"
 import "../../../styles/events-page-skeleton.css"
-// ... imports remain the same ...
 
 export default function EventsPageSkeleton({
     withHeader = true,
@@ -161,7 +160,7 @@ export default function EventsPageSkeleton({
                     )}
                     <section
                         className="skeleton-card skeleton-card-top card"
-                        style={{ marginBottom: "16px", marginTop: "16px" }}
+                        style={{ marginTop: "16px" }}
                     >
                         <Skeleton active />
                     </section>

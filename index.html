@@ -64,7 +64,15 @@
         />
 
         <!-- Robots -->
-        <meta name="robots" content="index, follow" />
+        <script type="text/javascript">
+            const indexedRoutes = ["/", "/about"]
+            const currentPath = window.location.pathname
+
+            if (!indexedRoutes.includes(currentPath)) {
+                document.querySelector('meta[name="robots"]').content =
+                    "noindex, nofollow"
+            }
+        </script>
     </head>
 
     <body>
