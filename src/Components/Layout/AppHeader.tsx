@@ -57,12 +57,12 @@ const AppHeader = () => {
                 )}
                 <>
                     <div className="header-actions">
-                        {vm.showUserInfo && <UserInfo user={store.getUser} />}
                         {vm.showUserLoading && (
                             <div className="user-loading-container">
                                 <Spin size="small" />
                             </div>
                         )}
+                        {vm.showUserInfo && <UserInfo user={store.getUser} />}
                         <MenuDrawer />
                     </div>
                 </>
