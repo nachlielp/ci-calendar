@@ -1077,7 +1077,7 @@ class Store {
                             console.error(
                                 "Network error while fetching user data"
                             )
-                            throw error // Re-throw to prevent user creation
+                            throw error
                         }
                         if (error.message === "USER_DOES_NOT_EXIST") {
                             return null // Proceed with user creation
@@ -1088,24 +1088,33 @@ class Store {
                 if (userData) {
                     this.setStore(userData)
                 } else {
-                    const newUser = utilService.createDbUserFromUser(
-                        this.getSession?.user
-                    )
-                    console.log("Store.init.newUser")
-                    const createdUser = await usersService.createUser(newUser)
+                    try {
+                        const newUser = utilService.createDbUserFromUser(
+                            this.getSession?.user
+                        )
+                        console.log("Store.init.newUser")
+                        const createdUser = await usersService.createUser(
+                            newUser
+                        )
 
-                    if (createdUser) {
-                        const userData = {
-                            user: { ...createdUser, version: CACHE_VERSION },
-                            ci_events: [],
-                            requests: [],
-                            templates: [],
-                            notifications: [],
-                            alerts: [],
-                            past_ci_events: [],
-                            userBio: {} as UserBio,
+                        if (createdUser) {
+                            const userData = {
+                                user: {
+                                    ...createdUser,
+                                    version: CACHE_VERSION,
+                                },
+                                ci_events: [],
+                                requests: [],
+                                templates: [],
+                                notifications: [],
+                                alerts: [],
+                                past_ci_events: [],
+                                userBio: {} as UserBio,
+                            }
+                            this.setStore(userData)
                         }
-                        this.setStore(userData)
+                    } catch (error) {
+                        console.error("Failed to create user:", error)
                     }
                 }
 
