@@ -88,7 +88,20 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks: {
-                    vendor: ["react", "react-dom", "mobx", "antd"],
+                    // UI Framework chunk
+                    "vendor-ui": ["antd"],
+
+                    // Core React chunk
+                    "vendor-react": ["react", "react-dom"],
+
+                    // State Management chunk
+                    "vendor-state": ["mobx"],
+
+                    // Date handling chunk
+                    "vendor-utils": ["dayjs"],
+
+                    // Data layer chunk
+                    "vendor-data": ["@supabase/supabase-js"],
                 },
             },
         },
