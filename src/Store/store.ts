@@ -1077,12 +1077,14 @@ class Store {
                             console.error(
                                 "Network error while fetching user data"
                             )
-                            this.setNetworkFlag(true)
-                            throw error
+                            throw error // Re-throw to prevent user creation
                         }
-                        return null
+                        if (error.message === "USER_DOES_NOT_EXIST") {
+                            return null // Proceed with user creation
+                        }
+                        throw error // Re-throw unexpected errors
                     })
-                this.setNetworkFlag(false)
+
                 if (userData) {
                     this.setStore(userData)
                 } else {

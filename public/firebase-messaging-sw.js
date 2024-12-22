@@ -1,4 +1,4 @@
-const CACHE_VERSION = (1.496).toString()
+const CACHE_VERSION = (1.497).toString()
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 const TIMEOUT_DURATION = 8000

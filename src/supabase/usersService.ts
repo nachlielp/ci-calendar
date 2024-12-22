@@ -160,8 +160,12 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             past_ci_events,
             userBio,
         } as unknown as CIUserData
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error in getUser:", error)
+        if (error?.code === "PGRST116") {
+            throw new Error("USER_DOES_NOT_EXIST")
+        }
+        // For other database/network errors
         throw new Error("NETWORK_ERROR")
     }
 }
