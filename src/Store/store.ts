@@ -1054,97 +1054,91 @@ class Store {
         this.getOfflineData()
 
         if (!this.isOnline) {
-            console.log("App is offline, using cached data")
-            this.setLoading(false)
             return
         }
 
+        this.setLoading(true)
+
         try {
-            console.log("App is online, fetching fresh data")
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error("Network timeout")), 30000)
-            })
-            const fetchDataPromise = async () => {
-                if (!this.getSession?.user?.id) {
-                    console.log("Store init no session")
-                    // Only fetch and set ci_events and userBio, keep other store values empty
-                    this.initPolling()
-                    return
-                }
-
-                this.setLoading(true)
-
-                const userData = await usersService
-                    .getUserData(this.getSession.user.id)
-                    .catch((error) => {
-                        if (error.message === "NETWORK_ERROR") {
-                            console.error(
-                                "Network error while fetching user data"
-                            )
-                            throw error
-                        }
-                        if (error.message === "USER_DOES_NOT_EXIST") {
-                            return null // Proceed with user creation
-                        }
-                        throw error // Re-throw unexpected errors
-                    })
-
-                if (userData) {
-                    this.setStore(userData)
-                } else {
-                    try {
-                        const newUser = utilService.createDbUserFromUser(
-                            this.getSession?.user
-                        )
-                        console.log("Store.init.newUser")
-                        const createdUser = await usersService.createUser(
-                            newUser
-                        )
-
-                        if (createdUser) {
-                            const userData = {
-                                user: {
-                                    ...createdUser,
-                                    version: CACHE_VERSION,
-                                },
-                                ci_events: [],
-                                requests: [],
-                                templates: [],
-                                notifications: [],
-                                alerts: [],
-                                past_ci_events: [],
-                                userBio: {} as UserBio,
-                            }
-                            this.setStore(userData)
-                        } else {
-                            this.initPolling()
-                        }
-                    } catch (error) {
-                        console.error("Failed to create user:", error)
-                    }
-                }
-
-                this.fetchAdditionalData()
-
-                this.setupSubscription()
-            }
-
-            // Race between fetch and timeout
-            await Promise.race([fetchDataPromise(), timeoutPromise])
+            await Promise.race([
+                this.initializeUserAndData(),
+                this.createTimeout(30000),
+            ])
         } catch (error) {
-            console.error("Error fetching user:", error)
+            console.error("Error in initialization:", error)
             this.setNetworkFlag(true)
         } finally {
-            if (!this.user && this.app_ci_events.length === 0) {
-                //issue with user data, init polling
-                console.error("Store.init.noUserData.initPolling")
-                this.initPolling()
+            this.finalizeInitialization()
+        }
+    }
+
+    private createTimeout(ms: number): Promise<never> {
+        return new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Network timeout")), ms)
+        )
+    }
+
+    private async initializeUserAndData() {
+        if (!this.getSession?.user?.id) {
+            console.log("Store init no session")
+            this.initPolling()
+            return
+        }
+
+        await this.initializeUser()
+        await this.fetchAdditionalData()
+        this.setupSubscription()
+    }
+
+    private async initializeUser() {
+        try {
+            const userData = await this.getUserData()
+            if (userData) {
+                this.setStore(userData)
+                return
             }
-            this.setLoading(false)
-            if (this.user.id && this.isOnline) {
-                this.updateUserAppVersion()
-                this.checkNotifications()
+            this.initPolling()
+            await this.createNewUser()
+        } catch (error) {
+            console.error("Failed to initialize user:", error)
+            this.initPolling()
+        }
+    }
+
+    private async getUserData() {
+        if (!this.getSession?.user?.id) return
+        return await usersService
+            .getUserData(this.getSession.user.id)
+            .catch((error) => {
+                if (error.message === "NETWORK_ERROR") throw error
+                if (error.message === "USER_DOES_NOT_EXIST") return null
+                throw error
+            })
+    }
+
+    private async createNewUser() {
+        if (!this.getSession?.user) return
+        try {
+            const newUser = utilService.createDbUserFromUser(
+                this.getSession.user
+            )
+            const createdUser = await usersService.createUser(newUser)
+
+            if (createdUser) {
+                this.setUser(createdUser)
             }
+        } catch (error) {
+            console.error("Failed to create user:", error)
+            // Continue with fetchAdditionalData even if user creation fails
+        }
+    }
+
+    private finalizeInitialization() {
+        this.setLoading(false)
+
+        if (this.user.id && this.isOnline) {
+            this.updateUserAppVersion()
+            this.checkNotifications()
         }
     }
 
