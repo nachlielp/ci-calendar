@@ -408,7 +408,7 @@ class Store {
     //             // if (this.pollingRef) clearInterval(this.pollingRef)
     //             this.fetchEvents()
 
-    //             Notice - currently not employing this polling
+    //             // Notice - currently not employing this polling
     //             const intervalCallback = async () => {
     //                 await this.fetchEvents()
     //                 await this.fetchAppPublicBios()
@@ -441,6 +441,23 @@ class Store {
     //         )
     //     }
     // }
+    private fetchOnVisibilityChange = () => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
+            }
+        }
+
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+        Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
+
+        return () => {
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            )
+        }
+    }
 
     //TODO Handle updates from the user subscription
     @action
@@ -1175,10 +1192,10 @@ class Store {
     }
 
     initPolling = async () => {
+        console.log("initPolling")
         this.setLoading(true)
         // if (this.pollingRef) clearInterval(this.pollingRef)
-
-        Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
+        this.fetchOnVisibilityChange()
 
         // this.setupPolling()
         this.setLoading(false)
