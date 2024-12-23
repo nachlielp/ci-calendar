@@ -1093,8 +1093,10 @@ class Store {
     private async initializeUser() {
         try {
             const userData = await this.getUserData()
+
             if (userData) {
                 this.setStore(userData)
+                utilService.saveEventsToLocalStorage(userData.ci_events)
                 return
             }
             this.initPolling()
@@ -1146,9 +1148,7 @@ class Store {
     private fetchAdditionalData = async () => {
         console.log("fetchAdditionalData.user_type", this.user.user_type)
         if (this.user.user_type === UserType.user) {
-            if (this.app_ci_events.length === 0) {
-                this.fetchEvents()
-            }
+            this.fetchEvents() //TODO remove
             this.fetchAppPublicBios()
         }
 
