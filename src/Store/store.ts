@@ -74,24 +74,28 @@ class Store {
         window.addEventListener("online", this.handleOnlineStatus)
         window.addEventListener("offline", this.handleOnlineStatus)
 
+        setTimeout(() => {
+            this.getOfflineData()
+        }, 0)
+
         supabase.auth.onAuthStateChange(async (_, session) => {
             // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
             this.setSession(session)
             this.init()
         })
 
-        reaction(
-            () => this.user.user_type,
-            (userType) => {
-                if (
-                    userType === UserType.org ||
-                    userType === UserType.creator
-                ) {
-                    this.fetchAppPublicBios()
-                    this.fetchAppTaggableTeachers()
-                }
-            }
-        )
+        // reaction(
+        //     () => this.user.user_type,
+        //     (userType) => {
+        //         if (
+        //             userType === UserType.org ||
+        //             userType === UserType.creator
+        //         ) {
+        //             this.fetchAppPublicBios()
+        //             this.fetchAppTaggableTeachers()
+        //         }
+        //     }
+        // )
     }
 
     //For non-authenticated users, I use polling to avoid useing a subscription channel
