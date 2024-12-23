@@ -66,6 +66,13 @@ class ManageSupportPageVM {
     }
 
     @computed
+    get getFilteredRequestsLastIndex() {
+        return this.filteredRequests.length
+            ? this.filteredRequests.length - 1
+            : 0
+    }
+
+    @computed
     get getShowOpenRequests() {
         return this.showOpenRequests
     }
@@ -227,7 +234,7 @@ const ManageSupportPage = () => {
                                         : ""
                                 } ${
                                     vm.getFilteredRequests[
-                                        vm.getFilteredRequests.length - 1
+                                        vm.getFilteredRequestsLastIndex
                                     ].id === request.id
                                         ? "last-item"
                                         : ""
@@ -260,7 +267,7 @@ const ManageSupportPage = () => {
                                             : ""
                                     } ${
                                         vm.getFilteredRequests[
-                                            vm.getFilteredRequests.length - 1
+                                            vm.getFilteredRequestsLastIndex
                                         ].id === request.id
                                             ? "last-item"
                                             : ""
