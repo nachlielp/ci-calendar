@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client"
 
 import "./index.css"
 import Providers from "./Providers.tsx"
-import { BrowserRouter } from "react-router-dom"
+import { BrowserRouter } from "react-router"
 // const App = lazy(() => import("./App.tsx"))
 import App from "./App.tsx"
 //NOTICE - posthog in not installed

@@ -1,5 +1,5 @@
 import React from "react"
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router"
 import { UserType } from "../../util/interfaces"
 import Loading from "../Common/Loading"
 import { store } from "../../Store/store"

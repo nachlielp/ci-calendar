@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom"
+import { useSearchParams } from "react-router"
 import { CIEvent } from "../util/interfaces"
 import { useMemo } from "react"
 import { districtOptions } from "../util/options"

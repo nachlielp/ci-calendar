@@ -10,7 +10,7 @@ import { store } from "../../Store/store"
 import { appHeaderVM as vm } from "./AppHeaderVM"
 import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
 import { Spin } from "antd/lib"
 

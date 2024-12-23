@@ -11,7 +11,7 @@ import "../../styles/error-boundary.css"
 // }
 
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { Icon } from "./Icon"
 
 const Loading = () => {

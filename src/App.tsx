@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react"
-import { Routes, Route, useNavigate } from "react-router-dom"
+import { Routes, Route, useNavigate } from "react-router"
 import "./styles/overrides.css"
 
 import EventsPage from "./Components/Pages/EventsPage"
@@ -58,7 +58,7 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = "1.5.6"
+export const CACHE_VERSION = "1.6.0"
 
 export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://www.payboxapp.com/"

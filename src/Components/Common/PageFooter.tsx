@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link } from "react-router"
 import "../../styles/page-footer.css"
 import ClearAppStorageButton from "./ClearAppStorage"
 const PageFooter = () => {

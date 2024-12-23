@@ -1,7 +1,7 @@
 import { useState } from "react"
 import Drawer from "antd/es/drawer"
 import { Icon } from "../Common/Icon"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"

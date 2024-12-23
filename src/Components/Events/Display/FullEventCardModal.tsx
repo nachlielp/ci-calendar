@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { Modal } from "../../Common/Modal"
 import { CIEvent } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { store } from "../../../Store/store"
 
 interface EventCardProps {

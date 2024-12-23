@@ -1,7 +1,7 @@
 //get eventId from url, handle edge cases where event is filtered out
 
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useParams } from "react-router"
 import { CIEvent } from "../util/interfaces"
 
 export const useSetSelectedEventByParams = (events: CIEvent[]) => {

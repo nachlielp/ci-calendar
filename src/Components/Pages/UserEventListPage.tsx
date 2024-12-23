@@ -1,7 +1,7 @@
 import { useState } from "react"
 import dayjs from "dayjs"
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import MenuButtons from "../Common/MenuButtons"
 import FullEventCard from "../Events/Display/FullEventCard"

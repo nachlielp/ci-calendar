@@ -3,7 +3,7 @@ import FullEventCard from "./FullEventCard"
 import "../../../styles/full-event-card-drawer.css"
 import { CIEvent } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 
