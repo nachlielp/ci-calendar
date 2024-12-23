@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa"
@@ -86,6 +87,7 @@ export default defineConfig({
     build: {
         target: "es2022",
         minify: true,
+
         rollupOptions: {
             output: {
                 manualChunks: {
@@ -106,23 +108,25 @@ export default defineConfig({
                 },
             },
         },
+
+        sourcemap: true
     },
     base: "/",
-    plugins: [
-        react({
-            babel: {
-                plugins: [
-                    ["@babel/plugin-proposal-decorators", { legacy: true }],
-                    [
-                        "@babel/plugin-proposal-class-properties",
-                        { loose: true },
-                    ],
+    plugins: [react({
+        babel: {
+            plugins: [
+                ["@babel/plugin-proposal-decorators", { legacy: true }],
+                [
+                    "@babel/plugin-proposal-class-properties",
+                    { loose: true },
                 ],
-            },
-        }),
-        VitePWA(manifestForPlugin),
-        visualizer({ open: true }), // This plugin helps visualize the size of your bundles
-    ],
+            ],
+        },
+    }), VitePWA(manifestForPlugin), // This plugin helps visualize the size of your bundles
+    visualizer({ open: true }), sentryVitePlugin({
+        org: "nachliel",
+        project: "ci-calendar"
+    })],
 
     server: {
         host: "localhost",
