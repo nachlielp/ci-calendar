@@ -215,6 +215,7 @@ export interface CIUser {
     version: string
     pwa_install_id: string | null
     fcm_token: string | null
+    is_internal: boolean
 }
 
 export interface CIUserData {

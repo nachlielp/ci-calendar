@@ -69,13 +69,35 @@
             src="https://www.googletagmanager.com/gtag/js?id=G-MX441RRM7Q"
         ></script>
         <script>
+            // Initialize dataLayer first
             window.dataLayer = window.dataLayer || []
             function gtag() {
                 dataLayer.push(arguments)
             }
-            gtag("js", new Date())
 
-            gtag("config", "G-MX441RRM7Q")
+            // Check if internal user before loading GA
+            const isInternal = localStorage.getItem("isInternal") === "true"
+            console.log("isInternal tagger:", isInternal)
+            if (!isInternal) {
+                // Load GA script dynamically only for non-internal users
+                const gaScript = document.createElement("script")
+                gaScript.async = true
+                gaScript.src =
+                    "https://www.googletagmanager.com/gtag/js?id=G-MX441RRM7Q"
+                document.head.appendChild(gaScript)
+
+                // Initialize GA
+                gtag("js", new Date())
+                gtag("config", "G-MX441RRM7Q")
+            } else {
+                // Mock gtag for internal users
+                window.gtag = function () {
+                    console.log(
+                        "GA Event (disabled for internal user):",
+                        arguments
+                    )
+                }
+            }
         </script>
 
         <!-- Robots -->

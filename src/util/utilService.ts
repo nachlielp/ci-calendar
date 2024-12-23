@@ -71,6 +71,8 @@ export const utilService = {
     getEventsFromLocalStorage,
     saveBiosToLocalStorage,
     getBiosFromLocalStorage,
+    saveIsInternalToLocalStorage,
+    getIsInternalFromLocalStorage,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -766,6 +768,27 @@ function getBiosFromLocalStorage(): UserBio[] {
     } catch (error) {
         console.error("Error reading bios from localStorage:", error)
         return []
+    }
+}
+
+function saveIsInternalToLocalStorage(isInternal: boolean) {
+    try {
+        localStorage.removeItem("isInternal")
+        localStorage.setItem("isInternal", JSON.stringify(isInternal))
+        return true
+    } catch (error) {
+        console.error("Error saving isInternal to localStorage:", error)
+        return false
+    }
+}
+
+function getIsInternalFromLocalStorage(): boolean {
+    try {
+        const isInternal = localStorage.getItem("isInternal")
+        return isInternal ? JSON.parse(isInternal) : false
+    } catch (error) {
+        console.error("Error reading isInternal from localStorage:", error)
+        return false
     }
 }
 

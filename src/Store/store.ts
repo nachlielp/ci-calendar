@@ -1158,6 +1158,7 @@ class Store {
         if (this.user.id && this.isOnline) {
             this.updateUserAppVersion()
             this.checkNotifications()
+            utilService.saveIsInternalToLocalStorage(this.user.is_internal)
         }
     }
 
