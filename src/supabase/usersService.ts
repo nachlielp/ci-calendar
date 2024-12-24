@@ -1,23 +1,20 @@
 import { supabase } from "./client"
 import {
-    UserBio,
     DbUser,
     UserType,
     DbUserWithoutJoin,
     CIUser,
     CIUserData,
-    TaggableUserOptions,
     ManageUserOption,
 } from "../util/interfaces"
 import dayjs from "dayjs"
+import { store } from "../Store/store"
 
 export const usersService = {
     getUsers,
     getUserData,
     updateUser,
     createUser,
-    getTaggableUsers,
-    getPublicBioList,
     subscribeToUser,
 }
 
@@ -80,6 +77,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             .eq("requests.user_id", id)
             .eq("templates.user_id", id)
             .eq("public_bio.user_id", id)
+            .eq("public_bio.allow_tagging", true)
             .eq("ci_events.user_id", id)
             .lte("ci_events.start_date", dayjs().endOf("day").toISOString())
             .eq("alerts.user_id", id)
@@ -91,8 +89,17 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             .select("*")
             .gte("start_date", dayjs().startOf("day").toISOString())
 
-        if (userError) throw userError
-        if (eventsError) throw eventsError
+        if (userError) {
+            // Check specifically for not found error
+            if (userError.code === "PGRST116") {
+                return null
+            }
+            throw new Error(`Database error: ${userError.message}`)
+        }
+        if (eventsError)
+            throw new Error(
+                `Failed to get events data for userId: ${store.getUserId} ERROR: ${eventsError}`
+            )
 
         const notifications = userData?.notifications
             .map((notification: any) => {
@@ -139,7 +146,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         const templates = userData.templates
         const requests = userData.requests
         const past_ci_events = userData.ci_events
-        const userBio = userData.bio
+        const userBio = userData
 
         const user = { ...userData }
 
@@ -162,12 +169,15 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         } as unknown as CIUserData
     } catch (error: any) {
         console.error("Error in getUser:", error)
-        if (error?.code === "PGRST116") {
-            throw new Error("USER_DOES_NOT_EXIST")
+        if (
+            error.message === "NO_USER_ID" ||
+            error.message === "USER_DOES_NOT_EXIST"
+        ) {
+            throw error
         }
-        // For other database/network errors
-        throw new Error("NETWORK_ERROR")
+        throw new Error(`Failed to get user data: ${error.message}`)
     }
+    //TODO hanldle errors in getUserData in a way that reports to snetry and does not break the workflow
 }
 
 async function updateUser(
@@ -182,16 +192,21 @@ async function updateUser(
             .select()
             .single()
         if (error) {
-            throw error
+            throw new Error(
+                `Failed to update user for userId: ${store.getUserId} ERROR: ${error}`
+            )
         }
         return data as CIUser
     } catch (error) {
         console.error("Error in updateUser:", error)
-        return null
+        throw new Error(
+            `Failed to update user for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
 async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
+    console.log("__A_createUser", user)
     try {
         const { data, error } = await supabase
             .from("users")
@@ -200,13 +215,16 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
             .single()
 
         if (error) {
-            console.error("Error in createUser:", error)
-            throw error
+            throw new Error(
+                `_1_Failed to create user for userId: ${store.getUserId} ERROR: ${error}`
+            )
         }
+        console.log("__B_createUser", data)
         return data as DbUser
     } catch (error) {
-        console.error("Error in createUser:", error)
-        return null
+        throw new Error(
+            `_2_Failed to create user for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -246,58 +264,9 @@ async function getUsers(): Promise<ManageUserOption[]> {
 
         return users as ManageUserOption[]
     } catch (error) {
-        console.error("Error in getUsers:", error)
-        return []
-    }
-}
-
-async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
-    try {
-        const { data, error } = await supabase
-            .from("public_bio")
-            .select(
-                `
-                user_id,
-                bio_name,
-                user_type
-            `
-            )
-            .eq("allow_tagging", true)
-
-        if (error) throw error
-
-        const teachers = data.map((teacher) => {
-            return {
-                user_id: teacher.user_id,
-                bio_name: teacher.bio_name,
-                user_type: teacher.user_type,
-            }
-        })
-
-        return teachers
-    } catch (error) {
-        console.error("Error fetching taggable teachers:", error)
-        throw error
-    }
-}
-
-async function getPublicBioList(): Promise<UserBio[]> {
-    try {
-        const { data, error } = await supabase
-            .from("public_bio")
-            .select(
-                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging,user_type"
-            )
-            .eq("show_profile", true)
-            .not("bio_name", "is", null)
-
-        if (error) throw error
-
-        const filteredData = data.filter((user) => user.bio_name !== "")
-        return filteredData as UserBio[]
-    } catch (error) {
-        console.error("Error fetching viewable teachers:", error)
-        throw error
+        throw new Error(
+            `Failed to get users for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 

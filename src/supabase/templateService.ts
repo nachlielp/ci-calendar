@@ -1,3 +1,4 @@
+import { store } from "../Store/store"
 import { supabase } from "./client"
 import { CITemplate } from "../util/interfaces"
 
@@ -16,11 +17,15 @@ async function getTemplate(templateId: string): Promise<CITemplate> {
             .from("templates")
             .select("*")
             .eq("id", templateId)
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data[0]
     } catch (error) {
-        console.error("Error fetching CI template:", error)
-        throw error
+        throw new Error(
+            `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -32,11 +37,15 @@ async function createTemplate(
             .from("templates")
             .insert(template)
             .select()
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to create CI template for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data[0]
     } catch (error) {
-        console.error("Error creating CI template:", error)
-        throw error
+        throw new Error(
+            `Failed to create CI template for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -47,11 +56,15 @@ async function deleteTemplate(templateId: string): Promise<string> {
             .delete()
             .eq("id", templateId)
             .select()
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data[0].id
     } catch (error) {
-        console.error("Error deleting CI template:", error)
-        throw error
+        throw new Error(
+            `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -65,10 +78,14 @@ async function updateTemplate(
             .eq("id", template.id)
             .select()
             .single()
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data
     } catch (error) {
-        console.error("Error updating CI template:", error)
-        throw error
+        throw new Error(
+            `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }

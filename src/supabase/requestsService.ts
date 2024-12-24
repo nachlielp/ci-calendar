@@ -47,7 +47,6 @@ async function getUserRequests(userId: string) {
         }
         return data
     } catch (error) {
-        console.error("Error fetching user requests:", error)
         throw new Error(`getUserRequests failed for userId ${userId}: ${error}`)
     }
 }
@@ -67,7 +66,6 @@ async function getAllRequests() {
         }
         return data
     } catch (error) {
-        console.error("Error fetching all requests:", error)
         throw new Error(
             `getAllRequests failed for userId: ${store.getUserId} ERROR:  ${error}`
         )
@@ -94,7 +92,6 @@ async function subscribeToAllRequests(
 
         return channel
     } catch (error) {
-        console.error("Error subscribing to all requests:", error)
         throw new Error(
             `subscribeToAllRequests failed for userId: ${store.getUserId} ERROR: ${error}`
         )
@@ -116,7 +113,6 @@ async function getOpenRequestsByType(type: RequestType) {
         }
         return data
     } catch (error) {
-        console.error("Error fetching open requests by type:", error)
         throw new Error(
             `getOpenRequestsByType failed for type ${type} for userId: ${store.getUserId} ERROR: ${error}`
         )
@@ -138,7 +134,6 @@ async function createRequest(request: CreateRequest) {
         }
         return data
     } catch (error) {
-        console.error("Error creating request:", error)
         throw new Error(
             `createRequest failed for userId: ${store.getUserId} ERROR: ${error}`
         )
@@ -160,7 +155,6 @@ async function updateRequest(request: UpdateRequest) {
         }
         return data
     } catch (error) {
-        console.error("Error updating request:", error)
         throw new Error(
             `updateRequest failed for userId: ${store.getUserId} ERROR: ${error}`
         )

@@ -1,3 +1,4 @@
+import { store } from "../Store/store"
 import { supabase } from "./client"
 
 export const storageService = {
@@ -11,11 +12,15 @@ async function uploadFile(filePath: string, file: Blob) {
             .from(bucketName)
             .upload(filePath, file)
         if (error) {
-            throw error
+            throw new Error(
+                `Failed to upload file for userId: ${store.getUserId} ERROR: ${error}`
+            )
         } else {
             return data
         }
     } catch (error) {
-        throw error
+        throw new Error(
+            `Failed to upload file for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }

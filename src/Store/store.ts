@@ -3,7 +3,6 @@ import {
     action,
     makeAutoObservable,
     computed,
-    toJS,
     reaction,
 } from "mobx"
 import {
@@ -64,6 +63,8 @@ class Store {
 
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
+    private isInitializing = false
+
     // private callCount: number = 0
 
     // private readonly MINUTE_MS = 1000 * 60
@@ -78,10 +79,16 @@ class Store {
             this.getOfflineData()
         }, 0)
 
-        supabase.auth.onAuthStateChange(async (_, session) => {
+        supabase.auth.onAuthStateChange(async (event, session) => {
             // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
             this.setSession(session)
-            this.init()
+            if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+                if (!this.isInitializing) {
+                    this.init()
+                }
+            } else if (event === "SIGNED_OUT") {
+                this.clearUser()
+            }
         })
 
         reaction(
@@ -468,12 +475,12 @@ class Store {
         table: string
         payload: any
     }) => {
-        // console.log(
-        //     "handleSubscriptionUpdates table: ",
-        //     table,
-        //     "payload: ",
-        //     payload
-        // )
+        console.log(
+            "__handleSubscriptionUpdates table: ",
+            table,
+            "payload: ",
+            payload
+        )
         switch (table) {
             case "users":
                 this.setUser(payload.new)
@@ -555,7 +562,20 @@ class Store {
         }
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
-        handleVisibilityChange()
+        setTimeout(() => {
+            handleVisibilityChange()
+        }, 0)
+
+        return () => {
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            )
+            if (this.subscriptionRef) {
+                this.subscriptionRef.unsubscribe()
+                this.subscriptionRef = null
+            }
+        }
     }
 
     @action
@@ -705,10 +725,7 @@ class Store {
                 } else {
                     this.notifications = [...this.notifications, notification]
                 }
-                console.log(
-                    "notifications after upsert",
-                    toJS(this.notifications)
-                )
+
                 break
         }
     }
@@ -847,9 +864,7 @@ class Store {
     @action
     updateRequest = async (request: UpdateRequest) => {
         if (!request.id) return
-        console.log("updateRequest", request)
         const updatedRequest = await requestsService.updateRequest(request)
-        console.log("updatedRequest", updatedRequest)
         this.setAppRequest(updatedRequest, EventPayloadType.UPDATE)
     }
 
@@ -1037,15 +1052,9 @@ class Store {
         const newOnlineStatus = navigator.onLine
 
         if (this.isOnline !== newOnlineStatus) {
-            console.log(
-                `Network status changed: ${
-                    newOnlineStatus ? "online" : "offline"
-                }`
-            )
             this.isOnline = newOnlineStatus
 
             if (wasOffline && this.isOnline) {
-                console.log("Connection restored, reinitializing store")
                 this.init()
             }
         }
@@ -1097,65 +1106,77 @@ class Store {
 
     private async initializeUserAndData() {
         if (!this.getSession?.user?.id) {
-            console.log("Store init no session")
             this.initPolling()
             return
         }
 
         await this.initializeUser()
         await this.fetchAdditionalData()
-        this.setupSubscription()
     }
 
     private async initializeUser() {
+        if (this.isInitializing) {
+            console.log("Initialization already in progress, skipping...")
+            return
+        }
+        this.isInitializing = true
         try {
-            const userData = await this.getUserData()
+            let userData = await this.getUserData()
 
-            if (userData) {
-                this.setStore(userData)
-                utilService.saveEventsToLocalStorage(userData.ci_events)
+            if (!userData) {
+                await this.createNewUser()
                 return
             }
+
+            this.setStore(userData)
+            utilService.saveEventsToLocalStorage(userData.ci_events)
+        } catch (error: any) {
+            // Handle other errors
             this.initPolling()
-            await this.createNewUser()
-        } catch (error) {
-            console.error("Failed to initialize user:", error)
-            this.initPolling()
+            throw new Error("Error in initializeUser: " + error)
+        } finally {
+            this.isInitializing = false
         }
     }
 
     private async getUserData() {
-        if (!this.getSession?.user?.id) return
-        return await usersService
-            .getUserData(this.getSession.user.id)
-            .catch((error) => {
-                if (error.message === "NETWORK_ERROR") throw error
-                if (error.message === "USER_DOES_NOT_EXIST") return null
-                throw error
-            })
+        const {
+            data: { user },
+        } = await supabase.auth.getUser()
+
+        const userId = user?.id
+
+        if (!userId) {
+            throw new Error("NO_USER_ID")
+        }
+
+        return await usersService.getUserData(userId)
     }
 
     private async createNewUser() {
-        if (!this.getSession?.user) return
+        const {
+            data: { user },
+        } = await supabase.auth.getUser()
+        if (!user) return
         try {
-            const newUser = utilService.createDbUserFromUser(
-                this.getSession.user
-            )
+            const newUser = utilService.createDbUserFromUser(user)
             const createdUser = await usersService.createUser(newUser)
 
             if (createdUser) {
                 this.setUser(createdUser)
+                return createdUser
             }
+            throw new Error("Failed to create user - no user data returned")
         } catch (error) {
-            console.error("Failed to create user:", error)
-            // Continue with fetchAdditionalData even if user creation fails
+            throw new Error(`Error in createNewUser: ${error}`)
         }
     }
 
     private finalizeInitialization() {
         this.setLoading(false)
 
-        if (this.user.id && this.isOnline) {
+        if (this.getSession?.user?.id && this.isOnline) {
+            this.setupSubscription()
             this.updateUserAppVersion()
             this.checkNotifications()
             utilService.saveIsInternalToLocalStorage(this.user.is_internal)
@@ -1225,13 +1246,13 @@ class Store {
     }
 
     fetchAppPublicBios = async () => {
-        const appPublicBios = await usersService.getPublicBioList()
+        const appPublicBios = await publicBioService.getPublicBioList()
         this.setAppPublicBios(appPublicBios)
         utilService.saveBiosToLocalStorage(appPublicBios)
     }
 
     fetchAppTaggableTeachers = async () => {
-        const appTaggableTeachers = await usersService.getTaggableUsers()
+        const appTaggableTeachers = await publicBioService.getTaggableUsers()
         this.setAppTaggableTeachers(appTaggableTeachers)
     }
 
@@ -1273,7 +1294,7 @@ class Store {
         } as CIUserData)
 
         sessionStorage.clear()
-        localStorage.removeItem("sb-pjgwpivkvsuernmoeebk-auth-token")
+        // localStorage.removeItem("sb-pjgwpivkvsuernmoeebk-auth-token")
     }
 
     @action

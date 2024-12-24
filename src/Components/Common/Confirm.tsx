@@ -1,7 +1,7 @@
 import React, { useState } from "react"
-import ReactDOM from "react-dom"
 import { Modal } from "./Modal"
 import "../../styles/confirm.css"
+import { createRoot } from "react-dom/client"
 
 interface ConfirmProps {
     title: React.ReactNode
@@ -76,15 +76,16 @@ export const Confirm = ({
 export const confirm = (config: ConfirmProps) => {
     const container = document.createElement("div")
     document.body.appendChild(container)
+    const root = createRoot(container)
 
     const cleanup = () => {
-        const unmountResult = ReactDOM.unmountComponentAtNode(container)
-        if (unmountResult && container.parentNode) {
+        root.unmount()
+        if (container.parentNode) {
             container.parentNode.removeChild(container)
         }
     }
 
-    ReactDOM.render(
+    root.render(
         <Confirm
             {...config}
             onOk={async () => {
@@ -95,7 +96,6 @@ export const confirm = (config: ConfirmProps) => {
                 config.onCancel?.()
                 cleanup()
             }}
-        />,
-        container
+        />
     )
 }

@@ -1,3 +1,4 @@
+import { store } from "../Store/store"
 import { NotificationDB } from "../util/interfaces"
 import { supabase } from "./client"
 
@@ -16,10 +17,15 @@ async function createNotification(notification: NotificationDB) {
             .select()
             .single()
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to create notification for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data
     } catch (error) {
-        console.error(error)
+        throw new Error(
+            `Failed to create notification for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -29,10 +35,17 @@ async function updateNotification(notification: NotificationDB) {
             .from("notifications")
             .update(notification)
             .eq("id", notification.id)
-        if (error) throw error
+            .select()
+            .single()
+        if (error)
+            throw new Error(
+                `Failed to update notification for notificationId: ${notification.id} for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data
     } catch (error) {
-        console.error(error)
+        throw new Error(
+            `Failed to update notification for notificationId: ${notification.id} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 async function upsertNotification(notification: NotificationDB) {
@@ -44,10 +57,15 @@ async function upsertNotification(notification: NotificationDB) {
             })
             .select()
             .single()
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to upsert notification for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data
     } catch (error) {
-        console.error(error)
+        throw new Error(
+            `Failed to upsert notification for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -59,7 +77,10 @@ async function getNotificationById(id: string) {
             .eq("id", id)
             .single()
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to get notification for notificationId: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            )
 
         const formattedData = {
             ...data,
@@ -70,6 +91,8 @@ async function getNotificationById(id: string) {
         delete formattedData.ci_events
         return formattedData
     } catch (error) {
-        console.error(error)
+        throw new Error(
+            `Failed to get notification for notificationId: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }

@@ -3,7 +3,7 @@ import { CIEvent, DBCIEvent } from "../util/interfaces"
 import { utilService } from "../util/utilService"
 import dayjs from "dayjs"
 import { SelectOption } from "../util/options"
-
+import { store } from "../Store/store"
 export interface FilterOptions {
     start_date?: string
     end_date?: string
@@ -33,11 +33,16 @@ async function getCIEvent(id: string): Promise<CIEvent> {
             .select("*")
             .eq("id", id)
             .single()
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data as CIEvent
     } catch (error) {
         console.error("Error fetching CI event:", error)
-        throw error
+        throw new Error(
+            `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -98,7 +103,10 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         }
 
         const { data, error } = await query
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to get CI events for userId: ${store.getUserId} ERROR: ${error}`
+            )
 
         const eventsWithUsers = data.map((event) => {
             const { ci_events_users_junction } = event
@@ -113,7 +121,9 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         return eventsWithUsers as CIEvent[]
     } catch (error) {
         console.error("Error fetching CI events:", error)
-        throw error
+        throw new Error(
+            `Failed to get CI events for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -129,7 +139,10 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
             )
             .gte("start_date", dayjs().startOf("day").toISOString())
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${error}`
+            )
 
         const creators = new Map<string, string>()
 
@@ -149,7 +162,9 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
         })) as SelectOption[]
     } catch (error) {
         console.error("Error fetching CI events creators:", error)
-        throw error
+        throw new Error(
+            `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -161,7 +176,10 @@ async function createCIEvent(event: Omit<DBCIEvent, "id">): Promise<CIEvent> {
             .select("*")
             .single()
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to create CI event for userId: ${store.getUserId} ERROR: ${error}`
+            )
 
         const cieventId = data.id
         const teacherIds = utilService.getCIEventTeachers(data)
@@ -181,7 +199,9 @@ async function createCIEvent(event: Omit<DBCIEvent, "id">): Promise<CIEvent> {
         return data as CIEvent
     } catch (error) {
         console.error("Error creating CI event:", error)
-        throw error
+        throw new Error(
+            `Failed to create CI event for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -197,7 +217,10 @@ async function updateCIEvent(
             .select("*")
             .single()
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            )
 
         const cieventId = data.id
         const teacherIds = utilService.getCIEventTeachers(data as CIEvent)
@@ -231,7 +254,9 @@ async function updateCIEvent(
         return data as CIEvent
     } catch (error) {
         console.error("Error updating CI event:", error)
-        throw error
+        throw new Error(
+            `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -246,11 +271,16 @@ async function updateMultipleCIEvents(
             .in("id", ids)
             .select("*")
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data as CIEvent[]
     } catch (error) {
         console.error("Error updating multiple CI events:", error)
-        throw error
+        throw new Error(
+            `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -263,12 +293,17 @@ async function deleteCIEvent(id: string): Promise<string> {
             .select("id")
             .single()
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            )
 
         return data.id
     } catch (error) {
         console.error("Error deleting CI event:", error)
-        throw error
+        throw new Error(
+            `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
 
@@ -280,10 +315,15 @@ async function deleteMultipleCIEvents(ids: string[]): Promise<string[]> {
             .in("id", ids)
             .select("id")
 
-        if (error) throw error
+        if (error)
+            throw new Error(
+                `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
+            )
         return data ? data.map((event) => event.id) : []
     } catch (error) {
         console.error("Error deleting multiple CI events:", error)
-        throw error
+        throw new Error(
+            `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }

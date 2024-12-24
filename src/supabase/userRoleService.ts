@@ -1,4 +1,5 @@
 import { UserRole, UserType } from "../util/interfaces"
+import { store } from "../Store/store"
 import { supabase } from "./client"
 
 export const userRoleService = {
@@ -24,7 +25,10 @@ async function updateUserRole({
             .select()
             .single()
 
-        if (roleError) throw roleError
+        if (roleError)
+            throw new Error(
+                `Failed to update user role for userId: ${store.getUserId} ERROR: ${roleError}`
+            )
 
         // Update users table
         const { error: userError } = await supabase
@@ -32,7 +36,10 @@ async function updateUserRole({
             .update({ user_type: user_type })
             .eq("id", user_id)
 
-        if (userError) throw userError
+        if (userError)
+            throw new Error(
+                `Failed to update user for userId: ${store.getUserId} ERROR: ${userError}`
+            )
 
         // Update public_bio table
         const { error: updateError } = await supabase
@@ -44,9 +51,10 @@ async function updateUserRole({
             .select()
             .single()
 
-        if (updateError) {
-            throw updateError
-        }
+        if (updateError)
+            throw new Error(
+                `Failed to update public bio for userId: ${store.getUserId} ERROR: ${updateError}`
+            )
         if (user_type !== UserType.user) {
             // if (updateError) {
             //     const { code } = updateError as PostgrestError
@@ -66,7 +74,8 @@ async function updateUserRole({
 
         return roleData
     } catch (error) {
-        console.error("Failed to update user role:", error)
-        throw new Error("Failed to update user role")
+        throw new Error(
+            `Failed to update user role for userId: ${store.getUserId} ERROR: ${error}`
+        )
     }
 }
