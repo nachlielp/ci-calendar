@@ -164,7 +164,6 @@ class AppHeaderVM {
 
     @action
     setShowInstallPWAModal = (show: boolean) => {
-        console.log("setShowInstallPWAModal :", show)
         this._showInstallPWAModal = show
     }
 
