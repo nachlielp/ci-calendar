@@ -1,9 +1,7 @@
-import ReactDOM from "react-dom/client"
-
+import "./instrument.js"
 import "./index.css"
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router"
-// const App = lazy(() => import("./App.tsx"))
 import App from "./App.tsx"
 //NOTICE - posthog in not installed
 // import posthog from "posthog-js"
@@ -14,8 +12,12 @@ import App from "./App.tsx"
 // if (import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
 //     posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, options)
 // }
+import { createRoot } from "react-dom/client"
+const container = document.getElementById("root")
+if (!container) throw new Error("Root element not found")
+const root = createRoot(container)
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+root.render(
     <BrowserRouter>
         <Providers>
             <App />
