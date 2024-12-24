@@ -13,7 +13,7 @@ import "../../styles/user-event-list-page.css"
 
 dayjs.extend(isSameOrAfter)
 
-const UserEventsListPage = () => {
+const ManageUserEventsPage = () => {
     const navigate = useNavigate()
     const isPhone = useIsMobile()
 
@@ -148,7 +148,7 @@ const UserEventsListPage = () => {
     )
 }
 
-export default observer(UserEventsListPage)
+export default observer(ManageUserEventsPage)
 
 function formatDateRange(startDate: string, endDate: string) {
     const start = dayjs(startDate).format("DD/MM/YYYY")

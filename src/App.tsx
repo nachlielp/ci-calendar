@@ -40,8 +40,8 @@ const ManageUsersPage = lazy(() => import("./Components/Pages/ManageUsersPage"))
 const ManageAllEventsPage = lazy(
     () => import("./Components/Pages/ManageAllEventsPage")
 )
-const UserEventsListPage = lazy(
-    () => import("./Components/Pages/UserEventListPage")
+const ManageUserEventsPage = lazy(
+    () => import("./Components/Pages/ManageUserEventsPage")
 )
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
@@ -215,7 +215,7 @@ const App = () => {
                                     path="/manage-events"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            <UserEventsListPage />
+                                            <ManageUserEventsPage />
                                         </Suspense>
                                     }
                                 />
