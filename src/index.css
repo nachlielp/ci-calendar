@@ -46,8 +46,40 @@ body {
 .background-tile {
     width: 100vw;
     height: 100vw;
-    background-color: #c86767;
-    background-image: url("./assets/img/Background_2.png");
+    background-color: hsla(6, 0%, 100%, 1);
+    background-image: radial-gradient(
+            at 43% 20%,
+            hsla(35, 100%, 88%, 1) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 57% 67%,
+            hsla(357, 100%, 83%, 1) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 34% 79%,
+            hsla(357, 100%, 83%, 1) 0px,
+            transparent 50%
+        ),
+        radial-gradient(at 20% 22%, hsla(36, 100%, 88%, 1) 0px, transparent 50%),
+        radial-gradient(at 100% 35%, hsla(8, 100%, 71%, 1) 0px, transparent 50%),
+        radial-gradient(at 100% 63%, hsla(8, 100%, 71%, 1) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, hsla(8, 100%, 71%, 1) 0px, transparent 50%),
+        radial-gradient(
+            at 100% 100%,
+            hsla(8, 100%, 71%, 1) 0px,
+            transparent 50%
+        ),
+        radial-gradient(
+            at 0% 100%,
+            hsla(333, 100%, 75%, 1) 0px,
+            transparent 50%
+        ),
+        radial-gradient(at 0% 0%, hsla(54, 100%, 75%, 1) 0px, transparent 50%);
+
+    /* background-color: #c86767; */
+    /* background-image: url("./assets/img/Background_2.png"); */
     background-size: cover;
     background-position: center;
     margin-bottom: -1px;
