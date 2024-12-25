@@ -108,6 +108,7 @@
         margin-top: 8px;
 
         .link-button {
+            outline: none;
             display: flex;
             flex-direction: row;
             align-items: center;
