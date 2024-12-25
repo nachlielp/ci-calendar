@@ -6,6 +6,7 @@
     &.cancelled {
         opacity: 0.21;
     }
+    position: relative;
 
     .cancelled-event-label {
         position: absolute;

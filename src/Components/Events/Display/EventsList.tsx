@@ -27,7 +27,12 @@ export default function EventsList({ events }: IEventsListProps) {
                 )
                 .map((event) =>
                     event.cancelled ? (
-                        <EventPreview key={event.id} event={event} />
+                        <div
+                            key={event.id}
+                            ref={(el) => (eventRefs.current[event.id] = el)}
+                        >
+                            <EventPreview key={event.id} event={event} />
+                        </div>
                     ) : (
                         <div
                             key={event.id}
