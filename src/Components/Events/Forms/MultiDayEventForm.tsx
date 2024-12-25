@@ -123,13 +123,11 @@ export default function MultiDayEventForm({
                     is_multi_day: true,
                     multi_day_teachers:
                         utilService.formatUsersForCIEvent(
-                            values["multi-day-event-teachers"],
-                            store.getAppTaggableTeachers
+                            values["multi-day-event-teachers"]
                         ) || [],
                     organisations:
                         utilService.formatUsersForCIEvent(
-                            values["event-orgs"],
-                            store.getAppTaggableOrgs
+                            values["event-orgs"]
                         ) || [],
                 }
 
@@ -158,13 +156,11 @@ export default function MultiDayEventForm({
                     is_multi_day: true,
                     multi_day_teachers:
                         utilService.formatUsersForCIEvent(
-                            values["multi-day-event-teachers"],
-                            store.getAppTaggableTeachers
+                            values["multi-day-event-teachers"]
                         ) || [],
                     organisations:
                         utilService.formatUsersForCIEvent(
-                            values["event-orgs"],
-                            store.getAppTaggableOrgs
+                            values["event-orgs"]
                         ) || [],
                     user_id: store.user.id,
                 }
