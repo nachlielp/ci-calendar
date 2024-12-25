@@ -581,21 +581,47 @@ function hebrewDay(date: string) {
 }
 
 //allows to store teachers that dont exist in the teachers list as {label: teacherName, value: "NON_EXISTENT"+uuid4()}
-function formatUsersForCIEvent(selectedUsers: string[]) {
+function formatUsersForCIEvent(
+    selectedUsers: (string | { label: string; value: string })[]
+): { label: string; value: string }[] {
     store.getAppPublicBios
     if (!selectedUsers) return []
-    const formattedUsers: { label: string; value: string }[] =
-        selectedUsers.map((user) => {
+    const formattedUsers = selectedUsers.map((user) => {
+        if (typeof user === "string") {
             const userObj = store.getAppPublicBios.find(
                 (u) => u.user_id === user
             )
-            if (userObj) {
-                return { label: userObj.bio_name, value: userObj.user_id }
-            } else {
-                return { label: user, value: user }
+            return userObj
+                ? { label: userObj.bio_name, value: userObj.user_id }
+                : { label: user, value: user }
+        } else if (typeof user === "object") {
+            const userObj = store.getAppPublicBios.find(
+                (u) => u.user_id === user.value
+            )
+            return userObj
+                ? { label: userObj.bio_name, value: userObj.user_id }
+                : { label: user.label, value: user.label }
+        }
+        return user
+    })
+
+    const validatedUsers = formattedUsers.filter(
+        (user): user is { label: string; value: string } => {
+            const isValid =
+                user !== null &&
+                typeof user === "object" &&
+                typeof user.label === "string" &&
+                typeof user.value === "string"
+
+            if (!isValid) {
+                console.warn("Invalid user format detected:", user)
             }
-        })
-    return formattedUsers
+
+            return isValid
+        }
+    )
+
+    return validatedUsers
 }
 
 function getPWAInstallId() {
