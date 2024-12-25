@@ -183,18 +183,25 @@ async function createCIEvent(event: Omit<DBCIEvent, "id">): Promise<CIEvent> {
 
         const cieventId = data.id
         const teacherIds = utilService.getCIEventTeachers(data)
-        const junctionData = teacherIds.map((teacherId) => {
-            return {
-                ci_event_id: cieventId,
-                user_id: teacherId,
-            }
-        })
+        const junctionData = teacherIds
+            .filter((teacherId) => {
+                return utilService.isUUID(teacherId)
+            })
+            .map((teacherId) => {
+                return {
+                    ci_event_id: cieventId,
+                    user_id: teacherId,
+                }
+            })
 
         const { error: junctionError } = await supabase
             .from("ci_events_users_junction")
             .insert(junctionData)
 
-        if (junctionError) throw junctionError
+        if (junctionError)
+            throw new Error(
+                `Create new junctionError.message for userId: ${store.getUserId} ERROR: ${junctionError.message}`
+            )
 
         return data as CIEvent
     } catch (error) {
@@ -226,6 +233,9 @@ async function updateCIEvent(
         const teacherIds = utilService.getCIEventTeachers(data as CIEvent)
 
         for (const teacherId of teacherIds) {
+            if (!utilService.isUUID(teacherId)) {
+                continue
+            }
             // Check if the junction already exists
             const { data: existingJunction, error: fetchError } = await supabase
                 .from("ci_events_users_junction")
