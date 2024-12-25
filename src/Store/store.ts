@@ -656,7 +656,6 @@ class Store {
         //DELETE does not emit a payload, so we need to update the event to cancelled and then delete it incase some other user is online
         const ci_event = this.app_ci_events.find((e) => e.id === eventId)
         if (!ci_event) return
-        cieventsService.updateCIEvent(ci_event.id, { cancelled: true })
         const deletedEventId = await cieventsService.deleteCIEvent(eventId)
         this.setCIEvent(
             { id: deletedEventId } as CIEvent,
