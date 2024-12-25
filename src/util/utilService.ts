@@ -73,6 +73,7 @@ export const utilService = {
     getBiosFromLocalStorage,
     saveIsInternalToLocalStorage,
     getIsInternalFromLocalStorage,
+    isUUID,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -232,7 +233,7 @@ function formatFormValuesToCreateCIEvent(
 
     return {
         created_at: dayjs().toISOString(),
-        type: values["main-event-type"]?.value || "",
+        type: values["main-event-type"] || "",
         hide: false,
         owners: [],
         is_multi_day: is_multi_day,
@@ -347,6 +348,7 @@ function formatFormValuesToEditCIEvent(
             formatUsersForCIEvent(values["multi-day-event-teachers"]) || [],
         organisations: formatUsersForCIEvent(values["event-orgs"]) || [],
         segments: segments,
+        type: values["main-event-type"] || "",
     }
 }
 
@@ -398,7 +400,7 @@ function formatFormValuesToCreateCITemplate(
     }
     return {
         created_at: dayjs().toISOString(),
-        type: values["main-event-type"]?.value || "",
+        type: values["main-event-type"] || "",
         owners: [],
         is_multi_day: is_multi_day,
         user_id: store.user.id,
@@ -463,7 +465,7 @@ function formatFormValuesToEditCITemplate(
         }
     }
     return {
-        type: values["main-event-type"]?.value || "",
+        type: values["main-event-type"] || "",
         address: address as IAddress,
         updated_at: dayjs().toISOString(),
         title: values["event-title"],
@@ -590,7 +592,7 @@ function formatUsersForCIEvent(selectedUsers: string[]) {
             if (userObj) {
                 return { label: userObj.bio_name, value: userObj.user_id }
             } else {
-                return { label: user, value: "NON_EXISTENT" + uuidv4() }
+                return { label: user, value: user }
             }
         })
     return formattedUsers
@@ -862,4 +864,10 @@ function validateEventNotification(alert: CIAlert, events: CIEvent[]) {
         return false
     }
     return true
+}
+
+function isUUID(uuid: string) {
+    const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    return uuidPattern.test(uuid)
 }

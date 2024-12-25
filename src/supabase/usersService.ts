@@ -77,13 +77,13 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             .eq("requests.user_id", id)
             .eq("templates.user_id", id)
             .eq("public_bio.user_id", id)
-            .eq("public_bio.allow_tagging", true)
             .eq("ci_events.user_id", id)
             .lte("ci_events.start_date", dayjs().endOf("day").toISOString())
             .eq("alerts.user_id", id)
             .eq("alerts.viewed", false)
             .single()
 
+        console.log("userData", userData)
         const { data: eventsData, error: eventsError } = await supabase
             .from("ci_events")
             .select("*")
@@ -146,7 +146,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         const templates = userData.templates
         const requests = userData.requests
         const past_ci_events = userData.ci_events
-        const userBio = userData
+        const userBio = userData.bio
 
         const user = { ...userData }
 

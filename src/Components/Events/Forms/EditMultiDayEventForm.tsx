@@ -34,9 +34,7 @@ export default function EditMultiDayEventForm({
     const { currentFormValues, address } = event
         ? utilService.CIEventToFormValues(event)
         : template
-        ? template.is_multi_day
-            ? utilService.multiDayTemplateToFormValues(template)
-            : utilService.singleDayTemplateToFormValues(template)
+        ? utilService.multiDayTemplateToFormValues(template)
         : { currentFormValues: {}, address: null }
 
     if (!event && !template) return <Loading />

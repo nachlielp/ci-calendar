@@ -296,6 +296,14 @@ class Store {
 
     @computed
     get getAppPublicBios() {
+        if (
+            this.bio &&
+            !this.app_public_bios.find(
+                (bio) => bio.user_id === this.bio?.user_id
+            )
+        ) {
+            return [...this.app_public_bios, this.bio]
+        }
         return this.app_public_bios
     }
 
@@ -475,12 +483,12 @@ class Store {
         table: string
         payload: any
     }) => {
-        console.log(
-            "__handleSubscriptionUpdates table: ",
-            table,
-            "payload: ",
-            payload
-        )
+        // console.log(
+        //     "__handleSubscriptionUpdates table: ",
+        //     table,
+        //     "payload: ",
+        //     payload
+        // )
         switch (table) {
             case "users":
                 this.setUser(payload.new)
