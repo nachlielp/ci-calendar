@@ -202,10 +202,7 @@ function formatFormValuesToCreateCIEvent(
                     .toISOString(),
                 type: values["event-type"] || "",
                 tags: values["event-tags"] || [],
-                teachers: formatUsersForCIEvent(
-                    values["teachers"],
-                    store.getAppTaggableTeachers
-                ),
+                teachers: formatUsersForCIEvent(values["teachers"]),
             },
         ]
 
@@ -218,8 +215,7 @@ function formatFormValuesToCreateCIEvent(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers,
-                        store.getAppTaggableTeachers
+                        segment.teachers
                     ),
                     startTime: dayjs(values["event-end-date"])
                         .hour(segmentDateString1.hour())
@@ -271,15 +267,8 @@ function formatFormValuesToCreateCIEvent(
         price: values["prices"] || [],
         district: values["district"],
         multi_day_teachers:
-            formatUsersForCIEvent(
-                values["multi-day-event-teachers"],
-                store.getAppTaggableTeachers
-            ) || [],
-        organisations:
-            formatUsersForCIEvent(
-                values["event-orgs"],
-                store.getAppTaggableOrgs
-            ) || [],
+            formatUsersForCIEvent(values["multi-day-event-teachers"]) || [],
+        organisations: formatUsersForCIEvent(values["event-orgs"]) || [],
         segments: segments,
     }
 }
@@ -293,20 +282,17 @@ function formatFormValuesToEditCIEvent(
     if (!is_multi_day) {
         segments = [
             {
-                startTime: dayjs(values["event-end-date"])
+                startTime: dayjs(values["event-start-date"])
                     .hour(values["first-segment-start-time"].hour())
                     .minute(values["first-segment-start-time"].minute())
                     .toISOString(),
-                endTime: dayjs(values["event-end-date"])
+                endTime: dayjs(values["event-start-date"])
                     .hour(values["first-segment-end-time"].hour())
                     .minute(values["first-segment-end-time"].minute())
                     .toISOString(),
                 type: values["event-type"] || "",
                 tags: values["event-tags"] || [],
-                teachers: formatUsersForCIEvent(
-                    values["teachers"],
-                    store.getAppTaggableTeachers
-                ),
+                teachers: formatUsersForCIEvent(values["teachers"]),
             },
         ]
 
@@ -319,14 +305,13 @@ function formatFormValuesToEditCIEvent(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers,
-                        store.getAppTaggableTeachers
+                        segment.teachers
                     ),
-                    startTime: dayjs(values["event-end-date"])
+                    startTime: dayjs(values["event-start-date"])
                         .hour(segmentDateString1.hour())
                         .minute(segmentDateString1.minute())
                         .toISOString(),
-                    endTime: dayjs(values["event-end-date"])
+                    endTime: dayjs(values["event-start-date"])
                         .hour(segmentDateString2.hour())
                         .minute(segmentDateString2.minute())
                         .toISOString(),
@@ -340,11 +325,17 @@ function formatFormValuesToEditCIEvent(
             .minute(0)
             .second(0)
             .format("YYYY-MM-DDTHH:mm:ss"),
-        end_date: dayjs(values["event-end-date"])
-            .hour(13)
-            .minute(0)
-            .second(0)
-            .format("YYYY-MM-DDTHH:mm:ss"),
+        end_date: is_multi_day
+            ? dayjs(values["event-end-date"])
+                  .hour(13)
+                  .minute(0)
+                  .second(0)
+                  .format("YYYY-MM-DDTHH:mm:ss")
+            : dayjs(values["event-start-date"])
+                  .hour(13)
+                  .minute(0)
+                  .second(0)
+                  .format("YYYY-MM-DDTHH:mm:ss"),
         address: address as IAddress,
         updated_at: dayjs().toISOString(),
         title: values["event-title"],
@@ -353,15 +344,8 @@ function formatFormValuesToEditCIEvent(
         price: values["prices"] || [],
         district: values["district"],
         multi_day_teachers:
-            formatUsersForCIEvent(
-                values["multi-day-event-teachers"],
-                store.getAppTaggableTeachers
-            ) || [],
-        organisations:
-            formatUsersForCIEvent(
-                values["event-orgs"],
-                store.getAppTaggableOrgs
-            ) || [],
+            formatUsersForCIEvent(values["multi-day-event-teachers"]) || [],
+        organisations: formatUsersForCIEvent(values["event-orgs"]) || [],
         segments: segments,
     }
 }
@@ -385,10 +369,7 @@ function formatFormValuesToCreateCITemplate(
                     .toISOString(),
                 type: values["event-type"] || "",
                 tags: values["event-tags"] || [],
-                teachers: formatUsersForCIEvent(
-                    values["teachers"],
-                    store.getAppTaggableTeachers
-                ),
+                teachers: formatUsersForCIEvent(values["teachers"]),
             },
         ]
 
@@ -401,8 +382,7 @@ function formatFormValuesToCreateCITemplate(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers,
-                        store.getAppTaggableTeachers
+                        segment.teachers
                     ),
                     startTime: dayjs(values["event-end-date"])
                         .hour(segmentDateString1.hour())
@@ -430,16 +410,9 @@ function formatFormValuesToCreateCITemplate(
         price: values["prices"] || [],
         district: values["district"],
         multi_day_teachers:
-            formatUsersForCIEvent(
-                values["multi-day-event-teachers"],
-                store.getAppTaggableTeachers
-            ) || [],
+            formatUsersForCIEvent(values["multi-day-event-teachers"]) || [],
         name: values["template-name"],
-        organisations:
-            formatUsersForCIEvent(
-                values["event-orgs"],
-                store.getAppTaggableOrgs
-            ) || [],
+        organisations: formatUsersForCIEvent(values["event-orgs"]) || [],
         segments: segments,
     }
 }
@@ -462,10 +435,7 @@ function formatFormValuesToEditCITemplate(
                     .toISOString(),
                 type: values["event-type"] || "",
                 tags: values["event-tags"] || [],
-                teachers: formatUsersForCIEvent(
-                    values["teachers"],
-                    store.getAppTaggableTeachers
-                ),
+                teachers: formatUsersForCIEvent(values["teachers"]),
             },
         ]
 
@@ -478,8 +448,7 @@ function formatFormValuesToEditCITemplate(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers,
-                        store.getAppTaggableTeachers
+                        segment.teachers
                     ),
                     startTime: dayjs(values["event-end-date"])
                         .hour(segmentDateString1.hour())
@@ -503,16 +472,9 @@ function formatFormValuesToEditCITemplate(
         price: values["prices"] || [],
         district: values["district"],
         multi_day_teachers:
-            formatUsersForCIEvent(
-                values["multi-day-event-teachers"],
-                store.getAppTaggableTeachers
-            ) || [],
+            formatUsersForCIEvent(values["multi-day-event-teachers"]) || [],
         name: values["template-name"],
-        organisations:
-            formatUsersForCIEvent(
-                values["event-orgs"],
-                store.getAppTaggableOrgs
-            ) || [],
+        organisations: formatUsersForCIEvent(values["event-orgs"]) || [],
         segments: segments,
     }
 }
@@ -617,16 +579,16 @@ function hebrewDay(date: string) {
 }
 
 //allows to store teachers that dont exist in the teachers list as {label: teacherName, value: "NON_EXISTENT"+uuid4()}
-function formatUsersForCIEvent(
-    selectedUsers: string[],
-    users: { label: string; value: string }[]
-) {
+function formatUsersForCIEvent(selectedUsers: string[]) {
+    store.getAppPublicBios
     if (!selectedUsers) return []
     const formattedUsers: { label: string; value: string }[] =
         selectedUsers.map((user) => {
-            const userObj = users.find((t) => t.value === user)
+            const userObj = store.getAppPublicBios.find(
+                (u) => u.user_id === user
+            )
             if (userObj) {
-                return userObj
+                return { label: userObj.bio_name, value: userObj.user_id }
             } else {
                 return { label: user, value: "NON_EXISTENT" + uuidv4() }
             }
