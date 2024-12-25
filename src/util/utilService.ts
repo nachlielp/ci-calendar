@@ -73,6 +73,7 @@ export const utilService = {
     getBiosFromLocalStorage,
     saveIsInternalToLocalStorage,
     getIsInternalFromLocalStorage,
+    isUUID,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -591,7 +592,7 @@ function formatUsersForCIEvent(selectedUsers: string[]) {
             if (userObj) {
                 return { label: userObj.bio_name, value: userObj.user_id }
             } else {
-                return { label: user, value: "NON_EXISTENT" + uuidv4() }
+                return { label: user, value: user }
             }
         })
     return formattedUsers
@@ -863,4 +864,10 @@ function validateEventNotification(alert: CIAlert, events: CIEvent[]) {
         return false
     }
     return true
+}
+
+function isUUID(uuid: string) {
+    const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    return uuidPattern.test(uuid)
 }
