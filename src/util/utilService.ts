@@ -232,7 +232,7 @@ function formatFormValuesToCreateCIEvent(
 
     return {
         created_at: dayjs().toISOString(),
-        type: values["main-event-type"]?.value || "",
+        type: values["main-event-type"] || "",
         hide: false,
         owners: [],
         is_multi_day: is_multi_day,
@@ -347,6 +347,7 @@ function formatFormValuesToEditCIEvent(
             formatUsersForCIEvent(values["multi-day-event-teachers"]) || [],
         organisations: formatUsersForCIEvent(values["event-orgs"]) || [],
         segments: segments,
+        type: values["main-event-type"] || "",
     }
 }
 
@@ -398,7 +399,7 @@ function formatFormValuesToCreateCITemplate(
     }
     return {
         created_at: dayjs().toISOString(),
-        type: values["main-event-type"]?.value || "",
+        type: values["main-event-type"] || "",
         owners: [],
         is_multi_day: is_multi_day,
         user_id: store.user.id,
@@ -463,7 +464,7 @@ function formatFormValuesToEditCITemplate(
         }
     }
     return {
-        type: values["main-event-type"]?.value || "",
+        type: values["main-event-type"] || "",
         address: address as IAddress,
         updated_at: dayjs().toISOString(),
         title: values["event-title"],
