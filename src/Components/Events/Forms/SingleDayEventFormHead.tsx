@@ -17,6 +17,7 @@ import {
 import { IAddress } from "../../../util/interfaces"
 import TimeInputModal from "./TimeInputModal"
 import DateInputModal from "./DateInputModal"
+import Alert from "antd/es/alert/Alert"
 
 interface SingleDayEventFormHeadProps {
     form: FormInstance
@@ -130,6 +131,23 @@ export default function SingleDayEventFormHead({
                         </Form.Item>
                     </Col>
                 </Row>
+
+                <Form.Item noStyle dependencies={["event-type"]}>
+                    {({ getFieldValue }) => {
+                        const eventType = getFieldValue("event-type")
+                        return eventType === "course" ? (
+                            <Form.Item
+                                name="course-duration"
+                                className="full-width"
+                            >
+                                <Alert
+                                    message="נא לא להזין ללוח קורסים שלא פתוחים להרשמה"
+                                    type="info"
+                                />
+                            </Form.Item>
+                        ) : null
+                    }}
+                </Form.Item>
 
                 <Row gutter={0} align="middle">
                     <Col lg={10} md={10} xs={10}>

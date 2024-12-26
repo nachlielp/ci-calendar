@@ -176,28 +176,6 @@ export default function SingleDayEventForm({
                                             size="large"
                                             popupClassName="form-input-large"
                                         />
-                                        {/* <select
-                                            className="form-input-large"
-                                            onChange={(e) =>
-                                                handleTemplateChange(
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="">
-                                                בחירת תבנית
-                                            </option>
-                                            {store.getSingleDayTemplateOptions.map(
-                                                (option) => (
-                                                    <option
-                                                        key={option.value}
-                                                        value={option.value}
-                                                    >
-                                                        {option.label}
-                                                    </option>
-                                                )
-                                            )}
-                                        </select> */}
                                     </Form.Item>
                                 </Col>
                                 <Col span={8}>
