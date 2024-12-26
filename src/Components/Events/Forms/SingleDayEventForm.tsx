@@ -87,7 +87,7 @@ export default function SingleDayEventForm({
         setIsSubmitting(true)
         try {
             if (!isTemplate) {
-                const event: Omit<DBCIEvent, "id"> =
+                const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
                     utilService.formatFormValuesToCreateCIEvent(
                         values,
                         address,

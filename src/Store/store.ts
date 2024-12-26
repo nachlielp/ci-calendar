@@ -672,7 +672,9 @@ class Store {
     }
 
     @action
-    createCIEvent = async (ci_event: Omit<DBCIEvent, "id">) => {
+    createCIEvent = async (
+        ci_event: Omit<DBCIEvent, "id" | "cancelled_text">
+    ) => {
         const newCIEvent = await cieventsService.createCIEvent(ci_event)
         this.setCIEvent(newCIEvent, EventPayloadType.INSERT)
     }

@@ -93,6 +93,7 @@ export interface CIEvent {
         full_name: string
     }
     cancelled: boolean
+    cancelled_text: string
 }
 export interface CITemplate {
     id: string

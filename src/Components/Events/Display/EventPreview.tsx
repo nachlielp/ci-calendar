@@ -55,7 +55,10 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             <section ref={ref} className={`event-preview card`}>
                 {event.cancelled && (
                     <article className="cancelled-event-label">
-                        האירוע בוטל
+                        <h1 className="cancelled-event-title">האירוע בוטל</h1>
+                        <h2 className="cancelled-event-text">
+                            {event.cancelled_text}
+                        </h2>
                     </article>
                 )}
                 <section

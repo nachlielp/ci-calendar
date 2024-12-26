@@ -85,7 +85,7 @@ export default function MultiDayEventForm({
         setIsSubmitting(true)
         try {
             if (!isTemplate) {
-                const event: Omit<DBCIEvent, "id"> = {
+                const event: Omit<DBCIEvent, "id" | "cancelled_text"> = {
                     is_notified: false,
                     cancelled: false,
                     start_date: dayjs(values["event-start-date"])

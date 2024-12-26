@@ -188,7 +188,7 @@ function formatFormValuesToCreateCIEvent(
     values: any,
     address: IAddress,
     is_multi_day: boolean
-): Omit<DBCIEvent, "id"> {
+): Omit<DBCIEvent, "id" | "cancelled_text"> {
     let segments: any[] = []
     if (!is_multi_day) {
         segments = [

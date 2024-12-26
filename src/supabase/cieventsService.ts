@@ -168,7 +168,9 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
     }
 }
 
-async function createCIEvent(event: Omit<DBCIEvent, "id">): Promise<CIEvent> {
+async function createCIEvent(
+    event: Omit<DBCIEvent, "id" | "cancelled_text">
+): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
             .from("ci_events")
