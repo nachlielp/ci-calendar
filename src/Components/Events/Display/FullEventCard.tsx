@@ -149,7 +149,9 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                                             {isTeacher ? (
                                                 <BioModal teacher={isTeacher} />
                                             ) : (
-                                                teacher.label
+                                                <label className="teacher-name-label">
+                                                    {teacher.label}
+                                                </label>
                                             )}
                                             {index < array.length - 1
                                                 ? ", "
@@ -193,7 +195,9 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
                                                                 }
                                                             />
                                                         ) : (
-                                                            teacher.label
+                                                            <label className="teacher-name-label">
+                                                                {teacher.label}
+                                                            </label>
                                                         )}
                                                         {index <
                                                         array.length - 1

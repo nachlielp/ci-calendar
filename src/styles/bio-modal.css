@@ -1,0 +1,8 @@
+.bio-modal-label {
+    color: blue;
+    text-decoration: underline;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+}

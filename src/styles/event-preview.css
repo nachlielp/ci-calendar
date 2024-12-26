@@ -88,6 +88,7 @@
         }
 
         .event-tags {
+            margin-top: 12px;
             .event-tag {
                 background-color: #e5e5ea;
                 color: #000;

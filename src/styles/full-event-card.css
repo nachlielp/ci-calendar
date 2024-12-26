@@ -32,6 +32,11 @@
         }
     }
 
+    .teacher-name-label {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
     .event-tags {
         display: block;
         width: 100%;
@@ -80,6 +85,7 @@
     }
 
     .event-tags {
+        margin-top: 8px;
         display: flex;
         flex-direction: row;
         justify-content: flex-start;
