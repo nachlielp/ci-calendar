@@ -95,3 +95,19 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+.event-icon.spinning {
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

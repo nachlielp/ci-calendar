@@ -43,10 +43,14 @@ const ManageAllEventsPage = lazy(
 const ManageUserEventsPage = lazy(
     () => import("./Components/Pages/ManageUserEventsPage")
 )
+import "./styles/app-disabled.css"
+
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { useRemoveAppLoadingScreen } from "./hooks/useRemoveAppLoadingScreen"
+import { Icon } from "./Components/Common/Icon"
+
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -58,14 +62,41 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = "1.6.4"
+export const CACHE_VERSION = "1.6.5"
 
 export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://www.payboxapp.com/"
 
+const DisableAppNotice = () => {
+    return (
+        <section className="app-disabled">
+            <span>
+                <Icon icon="settings" className="event-icon spinning" />
+            </span>
+            <h2 className="app-disabled-title">קונטקט אימפרוביזציה ישראל</h2>
+            <h3 className="app-disabled-subtitle">סגור לרגל שיפוצים</h3>
+        </section>
+    )
+}
+const disableApp = import.meta.env.VITE_DISABLE_APP
+
 const App = () => {
     const navigate = useNavigate()
     useRemoveAppLoadingScreen()
+    console.log("disableApp: ", disableApp)
+    if (disableApp === "true") {
+        return (
+            <div className="app">
+                <BackgroundTiles />
+                <div
+                    className="app-content"
+                    style={{ width: "100%", maxWidth: "500px" }}
+                >
+                    <DisableAppNotice />
+                </div>
+            </div>
+        )
+    }
     return (
         <div className="app">
             <SpeedInsights />
