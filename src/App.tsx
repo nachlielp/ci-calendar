@@ -78,6 +78,7 @@ const DisableAppNotice = () => {
         </section>
     )
 }
+
 const disableApp = import.meta.env.VITE_DISABLE_APP
 
 const App = () => {
