@@ -49,7 +49,7 @@ export const districtOptions: SelectOption[] = [
     // { value: "north", label: "צפון" },
     { value: "center", label: "מרכז" },
     { value: "jerusalem", label: "ירושלים" },
-    { value: "עalilee", label: "גליל" },
+    { value: "galilee", label: "גליל" },
     { value: "haifa", label: "חיפה" },
     { value: "carmel", label: "חוף כרמל" },
     { value: "pardes-hana", label: "פרדס חנה" },

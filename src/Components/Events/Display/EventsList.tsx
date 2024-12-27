@@ -8,11 +8,12 @@ import FullEventCardContainer from "./FullEventCardContainer"
 import { useScrollToEventById } from "../../../hooks/useScroolToEventById"
 import { utilService } from "../../../util/utilService"
 import PageFooter from "../../Common/PageFooter"
+import { observer } from "mobx-react-lite"
 interface IEventsListProps {
     events: CIEvent[]
 }
 
-export default function EventsList({ events }: IEventsListProps) {
+const EventsList = ({ events }: IEventsListProps) => {
     const { eventId } = useParams<{ eventId: string }>()
     const eventRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
 
@@ -54,6 +55,8 @@ export default function EventsList({ events }: IEventsListProps) {
         </div>
     )
 }
+
+export default observer(EventsList)
 
 const emptyEventsList = () => {
     return (

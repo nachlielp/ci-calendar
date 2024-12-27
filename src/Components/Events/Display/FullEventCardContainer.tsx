@@ -1,3 +1,4 @@
+import { observer } from "mobx-react-lite"
 import { useIsMobile } from "../../../hooks/useIsMobile"
 import { CIEvent } from "../../../util/interfaces"
 import FullEventCardDrawer from "./FullEventCardDrawer"
@@ -9,11 +10,11 @@ interface FullEventCardContainerProps {
     isSelectedEvent?: boolean
 }
 
-export default function FullEventCardContainer({
+const FullEventCardContainer = ({
     event,
     anchorEl,
     isSelectedEvent = false,
-}: FullEventCardContainerProps) {
+}: FullEventCardContainerProps) => {
     const isMobile = useIsMobile()
     return isMobile ? (
         <FullEventCardDrawer
@@ -29,3 +30,5 @@ export default function FullEventCardContainer({
         />
     )
 }
+
+export default observer(FullEventCardContainer)

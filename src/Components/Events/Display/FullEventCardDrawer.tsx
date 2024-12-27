@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
+import { observer } from "mobx-react-lite"
 
 interface EventDrawerProps {
     event: CIEvent | null
@@ -13,11 +14,11 @@ interface EventDrawerProps {
     isSelectedEvent?: boolean
 }
 
-export default function FullEventCardDrawer({
+const FullEventCardDrawer = ({
     event,
     anchorEl,
     isSelectedEvent = false,
-}: EventDrawerProps) {
+}: EventDrawerProps) => {
     const navigate = useNavigate()
     if (!event) {
         return null
@@ -52,3 +53,5 @@ export default function FullEventCardDrawer({
         </>
     )
 }
+
+export default observer(FullEventCardDrawer)

@@ -4,6 +4,7 @@ import { CIEvent } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
 import { useNavigate } from "react-router"
 import { store } from "../../../Store/store"
+import { observer } from "mobx-react-lite"
 
 interface EventCardProps {
     event: CIEvent
@@ -11,11 +12,11 @@ interface EventCardProps {
     isSelectedEvent?: boolean
 }
 
-export default function FullEventCardModal({
+const FullEventCardModal = ({
     event,
     anchorEl,
     isSelectedEvent = false,
-}: EventCardProps) {
+}: EventCardProps) => {
     const navigate = useNavigate()
 
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
@@ -49,3 +50,5 @@ export default function FullEventCardModal({
         </>
     )
 }
+
+export default observer(FullEventCardModal)

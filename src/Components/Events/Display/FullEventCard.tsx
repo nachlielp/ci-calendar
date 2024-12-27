@@ -13,6 +13,7 @@ import "../../../styles/full-event-card.css"
 import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 import React, { Component } from "react"
+import { observer } from "mobx-react-lite"
 
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
@@ -47,7 +48,7 @@ class EventErrorBoundary extends Component<
     }
 }
 
-export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
+const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
     const isMobile = useIsMobile()
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
@@ -365,3 +366,5 @@ export default function FullEventCard({ event: ci_event }: { event: CIEvent }) {
         </EventErrorBoundary>
     )
 }
+
+export default observer(FullEventCard)
