@@ -234,10 +234,11 @@ async function getUsers(): Promise<ManageUserOption[]> {
             user_name,
             user_type,
             email,
+            phone,
             user_role:user_roles(
                 role:roles(
                 id,
-                    role
+                role
                 )
             )
         `)) as { data: UserWithRole[] }

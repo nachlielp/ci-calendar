@@ -1,12 +1,88 @@
-import AutoComplete from "antd/es/auto-complete"
-import Input from "antd/es/input"
-import { useEffect, useState } from "react"
+import { useMemo } from "react"
 import { ManageUserOption, UserType } from "../../util/interfaces"
 import { useWindowSize } from "../../hooks/useWindowSize"
-import { SelectProps } from "antd/es/select"
+import Select, { SelectProps } from "antd/es/select"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import "../../styles/manage-users.css"
+import { action, computed, makeObservable, observable } from "mobx"
+import { reaction } from "mobx"
+class ManageUsersVM {
+    @observable users: ManageUserOption[] = []
+    @observable selectedUser: ManageUserOption | null = null
+    @observable inputValue: string = ""
+    @observable options: SelectProps<ManageUserOption>["options"] = []
+
+    constructor() {
+        makeObservable(this)
+
+        reaction(
+            () => store.app_users,
+            (users) => {
+                if (users.length > 0) {
+                    this.setOptions(
+                        users.map((user) => ({
+                            value: user.id,
+                            label: `${user.user_name} - ${user.email}`,
+                        }))
+                    )
+                }
+            }
+        )
+    }
+
+    @computed
+    get getSelectedUser() {
+        return this.selectedUser
+    }
+
+    @computed
+    get getInputValue() {
+        return this.inputValue
+    }
+
+    @action
+    setSelectedUser = (value: string) => {
+        const user = store.app_users.find((user) => user.id === value)
+        if (user) {
+            this.selectedUser = user
+            this.setInputValue(user.user_name)
+        }
+    }
+
+    @action
+    setInputValue = (value: string) => {
+        this.inputValue = value
+    }
+
+    @action
+    setOptions = (options: SelectProps<ManageUserOption>["options"]) => {
+        this.options = options
+    }
+
+    @action
+    onSetRole = async (user_type: UserType, role_id: number) => {
+        if (!this.selectedUser) return
+
+        await store.updateUserRole({
+            user_id: this.selectedUser.id,
+            user_type: user_type,
+            role_id: role_id,
+        })
+    }
+
+    @action
+    handleSearch = (value: string) => {
+        this.setInputValue(value)
+        this.setOptions(value ? searchResult(value, store.app_users) : [])
+    }
+
+    @action
+    handleClear = () => {
+        this.setInputValue("")
+        this.selectedUser = null
+    }
+}
 
 const searchResult = (query: string, users: ManageUserOption[]) => {
     return users
@@ -30,72 +106,16 @@ const searchResult = (query: string, users: ManageUserOption[]) => {
 }
 
 function ManageUsersPage() {
-    const [options, setOptions] = useState<
-        SelectProps<ManageUserOption>["options"]
-    >([])
-    const [selectedUser, setSelectedUser] = useState<ManageUserOption | null>(
-        null
-    )
-    const [inputValue, setInputValue] = useState<string>("")
+    const vm = useMemo(() => new ManageUsersVM(), [])
 
     const { width } = useWindowSize()
 
-    useEffect(() => {
-        if (store.app_users.length > 0) {
-            setOptions(
-                store.app_users.map((user) => ({
-                    value: user.id,
-                    label: `${user.user_name} - ${user.email}`,
-                }))
-            )
-        }
-    }, [store.app_users])
-
-    const handleSearch = (value: string) => {
-        setInputValue(value)
-        setOptions(value ? searchResult(value, store.app_users) : [])
-    }
-
-    const handleClear = () => {
-        setInputValue("")
-        setSelectedUser(null)
-    }
-
-    const onSelect = (value: string) => {
-        const user = store.app_users.find((user) => user.id === value)
-        if (user) {
-            setSelectedUser(user)
-            setInputValue(user.user_name)
-        }
-    }
-
-    const onSetRole = async (user_type: UserType, role_id: number) => {
-        if (!selectedUser) return
-
-        await store.updateUserRole({
-            user_id: selectedUser.id,
-            user_type: user_type,
-            role_id: role_id,
-        })
-
-        setSelectedUser((prev) =>
-            prev
-                ? {
-                      ...prev,
-                      role: {
-                          id: role_id,
-                          role: user_type,
-                      },
-                  }
-                : null
-        )
-    }
     const cardWidth = Math.min(width * 0.9, 500)
 
     const makeAdmin = (
         <button
-            disabled={selectedUser?.role?.id === 1}
-            onClick={() => onSetRole(UserType.admin, 1)}
+            disabled={vm.getSelectedUser?.user_type === UserType.admin}
+            onClick={() => vm.onSetRole(UserType.admin, 1)}
             className="user-btn"
             key="admin"
         >
@@ -104,8 +124,8 @@ function ManageUsersPage() {
     )
     const makeCreator = (
         <button
-            disabled={selectedUser?.role?.id === 2}
-            onClick={() => onSetRole(UserType.creator, 2)}
+            disabled={vm.getSelectedUser?.user_type === UserType.creator}
+            onClick={() => vm.onSetRole(UserType.creator, 2)}
             className="user-btn"
             key="creator"
         >
@@ -114,8 +134,8 @@ function ManageUsersPage() {
     )
     const makeOrg = (
         <button
-            disabled={selectedUser?.role?.id === 3}
-            onClick={() => onSetRole(UserType.org, 3)}
+            disabled={vm.getSelectedUser?.user_type === UserType.org}
+            onClick={() => vm.onSetRole(UserType.org, 3)}
             className="user-btn"
             key="org"
         >
@@ -125,8 +145,8 @@ function ManageUsersPage() {
 
     const makeProfile = (
         <button
-            disabled={selectedUser?.role?.id === 4}
-            onClick={() => onSetRole(UserType.profile, 4)}
+            disabled={vm.getSelectedUser?.user_type === UserType.profile}
+            onClick={() => vm.onSetRole(UserType.profile, 4)}
             className="user-btn"
             key="profile"
         >
@@ -135,15 +155,16 @@ function ManageUsersPage() {
     )
     const makeUser = (
         <button
-            disabled={selectedUser?.role?.id === 5 || !selectedUser?.role}
-            onClick={() => onSetRole(UserType.user, 5)}
+            disabled={vm.getSelectedUser?.user_type === UserType.user}
+            onClick={() => vm.onSetRole(UserType.user, 5)}
             className="user-btn"
             key="user"
         >
             משתמש
         </button>
     )
-    const footer = selectedUser
+
+    const footer = vm.getSelectedUser
         ? [makeAdmin, makeOrg, makeCreator, makeProfile, makeUser]
         : []
 
@@ -154,29 +175,27 @@ function ManageUsersPage() {
                 style={{ maxWidth: `${cardWidth}px` }}
                 title="הגדרת משתמשים"
             >
-                <AutoComplete
-                    style={{ width: "100%" }}
-                    options={options}
-                    onSelect={onSelect}
-                    onSearch={handleSearch}
+                <Select
+                    options={vm.options}
+                    onSelect={vm.setSelectedUser}
                     size="large"
-                    value={inputValue}
-                >
-                    <Input.Search
-                        size="large"
-                        placeholder="שם משתמש או כתובת מייל"
-                        enterButton
-                        onClear={handleClear}
-                        allowClear
-                    />
-                </AutoComplete>
-                {selectedUser && (
+                    value={vm.getInputValue}
+                    placeholder="שם משתמש או כתובת מייל"
+                    showSearch
+                    filterOption={(input, option) =>
+                        String(option?.label ?? "")
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
+                    }
+                />
+                {vm.getSelectedUser && (
                     <div>
-                        <p>{selectedUser.user_name}</p>
-                        <p>{selectedUser.email}</p>
+                        <p>{vm.getSelectedUser?.user_name}</p>
+                        <p>{vm.getSelectedUser?.email}</p>
+                        <p>{vm.getSelectedUser?.phone}</p>
                         <p>
-                            {selectedUser.role
-                                ? selectedUser.role.role
+                            {vm.getSelectedUser?.role
+                                ? vm.getSelectedUser?.role.role
                                 : "user"}
                         </p>
                     </div>

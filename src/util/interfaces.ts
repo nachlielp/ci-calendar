@@ -412,6 +412,7 @@ export type ManageUserOption = {
     user_name: string
     user_type: UserType
     email: string
+    phone: string
     role: {
         id: number
         role: string
