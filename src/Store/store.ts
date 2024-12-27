@@ -882,6 +882,9 @@ class Store {
         request: Omit<CIRequest, "id" | "number">
     ): Promise<CIRequest> => {
         const newRequest = await requestsService.createRequest(request)
+        if (!this.user.phone) {
+            this.updateUser({ phone: request.phone })
+        }
         this.setAppRequest(newRequest, EventPayloadType.INSERT)
         return newRequest
     }
