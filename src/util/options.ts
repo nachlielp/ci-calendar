@@ -46,10 +46,14 @@ export const tagOptions: SelectOption[] = [
 ]
 
 export const districtOptions: SelectOption[] = [
-    { value: "north", label: "צפון" },
-    { value: "south", label: "דרום" },
+    // { value: "north", label: "צפון" },
     { value: "center", label: "מרכז" },
     { value: "jerusalem", label: "ירושלים" },
+    { value: "עalilee", label: "גליל" },
+    { value: "haifa", label: "חיפה" },
+    { value: "carmel", label: "חוף כרמל" },
+    { value: "pardes-hana", label: "פרדס חנה" },
+    { value: "south", label: "דרום" },
     // Add more districts as needed
 ]
 
