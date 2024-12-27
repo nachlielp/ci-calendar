@@ -74,6 +74,12 @@ export default function SingleDayEventFormHead({
                         placeholder="אזור"
                         className="form-input-large"
                         popupClassName="form-input-large"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.label ?? "")
+                                .toLowerCase()
+                                .includes(input.toLowerCase())
+                        }
                     />
                 </Form.Item>
 
@@ -127,6 +133,12 @@ export default function SingleDayEventFormHead({
                                 placeholder="סוג האירוע"
                                 className="form-input-large"
                                 popupClassName="form-input-large"
+                                showSearch
+                                filterOption={(input, option) =>
+                                    (option?.label ?? "")
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                }
                             />
                         </Form.Item>
                     </Col>
@@ -195,6 +207,12 @@ export default function SingleDayEventFormHead({
                                 placeholder="תגיות"
                                 className="form-input-large"
                                 popupClassName="form-input-large"
+                                showSearch
+                                filterOption={(input, option) =>
+                                    (option?.label ?? "")
+                                        .toLowerCase()
+                                        .includes(input.toLowerCase())
+                                }
                             />
                         </Form.Item>
                     </Col>

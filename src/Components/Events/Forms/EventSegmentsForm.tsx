@@ -42,6 +42,14 @@ export default function EventSegmentsForm({
                                                 placeholder="סוג האירוע"
                                                 className="form-input-large"
                                                 popupClassName="form-input-large"
+                                                showSearch
+                                                filterOption={(input, option) =>
+                                                    (option?.label ?? "")
+                                                        .toLowerCase()
+                                                        .includes(
+                                                            input.toLowerCase()
+                                                        )
+                                                }
                                             />
                                         </Form.Item>
                                     </Col>
@@ -125,6 +133,14 @@ export default function EventSegmentsForm({
                                                 placeholder="תגיות"
                                                 className="form-input-large"
                                                 popupClassName="form-input-large"
+                                                showSearch
+                                                filterOption={(input, option) =>
+                                                    (option?.label ?? "")
+                                                        .toLowerCase()
+                                                        .includes(
+                                                            input.toLowerCase()
+                                                        )
+                                                }
                                             />
                                         </Form.Item>
                                     </Col>

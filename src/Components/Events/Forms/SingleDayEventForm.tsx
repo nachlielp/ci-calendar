@@ -175,6 +175,14 @@ export default function SingleDayEventForm({
                                             placeholder="בחירת תבנית"
                                             size="large"
                                             popupClassName="form-input-large"
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                (option?.label ?? "")
+                                                    .toLowerCase()
+                                                    .includes(
+                                                        input.toLowerCase()
+                                                    )
+                                            }
                                         />
                                     </Form.Item>
                                 </Col>

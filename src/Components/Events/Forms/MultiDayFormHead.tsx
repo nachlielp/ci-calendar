@@ -61,6 +61,12 @@ export default function MultiDayFormHead({
                     placeholder="אזור"
                     className="form-input-large"
                     popupClassName="form-input-large"
+                    showSearch
+                    filterOption={(input, option) =>
+                        (option?.label ?? "")
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
+                    }
                 />
             </Form.Item>
             <Form.Item
@@ -103,6 +109,12 @@ export default function MultiDayFormHead({
                     placeholder="סוג האירוע"
                     className="form-input-large"
                     popupClassName="form-input-large"
+                    showSearch
+                    filterOption={(input, option) =>
+                        (option?.label ?? "")
+                            .toLowerCase()
+                            .includes(input.toLowerCase())
+                    }
                 />
             </Form.Item>
             <Form.Item name="multi-day-event-teachers" className="full-width">

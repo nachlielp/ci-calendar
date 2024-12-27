@@ -235,6 +235,12 @@ export default function MultiDayEventForm({
                                         placeholder="בחירת תבנית"
                                         size="large"
                                         className="form-input-large"
+                                        showSearch
+                                        filterOption={(input, option) =>
+                                            (option?.label ?? "")
+                                                .toLowerCase()
+                                                .includes(input.toLowerCase())
+                                        }
                                     />
                                 </Form.Item>
                             </Col>
