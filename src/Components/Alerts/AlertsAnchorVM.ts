@@ -1,4 +1,4 @@
-import { makeAutoObservable, reaction, observable, action } from "mobx"
+import { makeAutoObservable, reaction, observable, action, toJS } from "mobx"
 import { computed } from "mobx"
 import { store } from "../../Store/store"
 import { utilService } from "../../util/utilService"
@@ -23,11 +23,12 @@ class AlertsAnchorVM {
     }
 
     @computed get alertsCount() {
-        return this.alerts.length
+        return this.getAlerts.length
     }
 
-    @computed get alerts() {
+    @computed get getAlerts() {
         if (!store.getAlerts) return []
+        console.log("alerts", toJS(store.getAlerts))
         return store.getAlerts
             .filter((alert) => !alert.viewed)
             .filter((alert) =>
@@ -45,6 +46,7 @@ class AlertsAnchorVM {
     }
 
     @action toggleOpen() {
+        console.log("toggleOpen", this.open)
         this.open = !this.open
     }
 

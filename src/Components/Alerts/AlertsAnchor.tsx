@@ -1,5 +1,10 @@
 import dayjs from "dayjs"
-import { CIAlert, NotificationType, UserType } from "../../util/interfaces"
+import {
+    CIAlert,
+    NotificationType,
+    RequestType,
+    UserType,
+} from "../../util/interfaces"
 import { useNavigate } from "react-router"
 import { observer } from "mobx-react-lite"
 import { alertsAnchorViewModal } from "./AlertsAnchorVM"
@@ -45,8 +50,11 @@ const AlertsAnchor = () => {
                     </label>
                     {alertsAnchorViewModal.open && (
                         <article className="alerts-anchor-list">
-                            {alertsAnchorViewModal.alerts.map((alert) => {
-                                if (alert.type === "admin_response") {
+                            {alertsAnchorViewModal.getAlerts.map((alert) => {
+                                if (
+                                    alert.type ===
+                                    NotificationType.admin_response
+                                ) {
                                     return (
                                         <AdminResponseToast
                                             key={alert.id}
@@ -56,7 +64,7 @@ const AlertsAnchor = () => {
                                     )
                                 }
 
-                                if (alert.type === "response") {
+                                if (alert.type === NotificationType.response) {
                                     return (
                                         <RequestToast
                                             key={alert.id}
@@ -67,8 +75,8 @@ const AlertsAnchor = () => {
                                 }
 
                                 if (
-                                    alert.type === "reminder" ||
-                                    alert.type === "subscription"
+                                    alert.type === NotificationType.reminder ||
+                                    alert.type === NotificationType.subscription
                                 ) {
                                     return (
                                         <EventToast

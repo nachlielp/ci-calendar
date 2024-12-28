@@ -138,7 +138,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 start_date: event?.start_date || "",
                 firstSegment: event?.segments[0] || "",
                 address: event?.address.label || "",
-                type: request?.type || alert.type,
+                type: alert.type || request?.type,
             }
             delete formattedAlert.ci_events
             return formattedAlert
