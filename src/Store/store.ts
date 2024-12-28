@@ -917,6 +917,8 @@ class Store {
                     alert.title = event.title
                     alert.start_date = event.start_date
                     alert.firstSegment = event.segments[0]
+                } else if (alert.type === NotificationType.admin_response) {
+                    //No need to set title or start_date for admin response
                 } else {
                     throw new Error(
                         `setAlert - unknown alert type: ${alert.type}`
