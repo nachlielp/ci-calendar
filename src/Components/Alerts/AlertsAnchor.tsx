@@ -1,10 +1,5 @@
 import dayjs from "dayjs"
-import {
-    CIAlert,
-    NotificationType,
-    RequestType,
-    UserType,
-} from "../../util/interfaces"
+import { CIAlert, NotificationType, UserType } from "../../util/interfaces"
 import { useNavigate } from "react-router"
 import { observer } from "mobx-react-lite"
 import { alertsAnchorViewModal } from "./AlertsAnchorVM"
