@@ -1030,13 +1030,39 @@ class Store {
     }
 
     @action
+    updateUserData(
+        user: ManageUserOption,
+        userTypeByRoleId: UserType,
+        userRole: { role_id: number }
+    ) {
+        user.user_type = userTypeByRoleId
+        user.role = {
+            id: userRole.role_id,
+            role: userTypeByRoleId,
+        }
+    }
+
+    @action
     updateUserRole = async (userRole: UserRole) => {
-        const updatedUserType = await userRoleService.updateUserRole(userRole)
+        await userRoleService.updateUserRole(userRole)
+
+        const userTypeByRoleId = utilService.getUserTypeByRoleId(
+            userRole.role_id.toString()
+        )
+
         this.setUserRole({
             user_id: userRole.user_id,
-            user_type: updatedUserType,
+            user_type: userTypeByRoleId,
             role_id: userRole.role_id,
         })
+
+        const user = this.app_users.find((u) => u.id === userRole.user_id)
+        if (!user) return
+        this.updateUserData(user, userTypeByRoleId, userRole)
+
+        this.setAppUsers(
+            this.app_users.map((u) => (u.id === userRole.user_id ? user : u))
+        )
     }
 
     @action

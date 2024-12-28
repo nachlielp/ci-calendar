@@ -74,6 +74,7 @@ export const utilService = {
     saveIsInternalToLocalStorage,
     getIsInternalFromLocalStorage,
     isUUID,
+    getUserTypeByRoleId,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -896,4 +897,20 @@ function isUUID(uuid: string) {
     const uuidPattern =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     return uuidPattern.test(uuid)
+}
+
+function getUserTypeByRoleId(roleId: string) {
+    let type = UserType.user
+    switch (roleId) {
+        case "1":
+            type = UserType.admin
+            break
+        case "2":
+            type = UserType.creator
+            break
+        case "4":
+            type = UserType.profile
+            break
+    }
+    return type
 }

@@ -1,5 +1,9 @@
 import { useMemo } from "react"
-import { ManageUserOption, UserType } from "../../util/interfaces"
+import {
+    ManageUserOption,
+    UserType,
+    UserTypeHebrew,
+} from "../../util/interfaces"
 import { useWindowSize } from "../../hooks/useWindowSize"
 import Select, { SelectProps } from "antd/es/select"
 import { observer } from "mobx-react-lite"
@@ -29,6 +33,15 @@ class ManageUsersVM {
                 }
             }
         )
+
+        reaction(
+            () => this.selectedUser?.user_type,
+            () => {
+                if (this.selectedUser) {
+                    this.setSelectedUser(this.selectedUser.id)
+                }
+            }
+        )
     }
 
     @computed
@@ -37,8 +50,52 @@ class ManageUsersVM {
     }
 
     @computed
+    get getSelectedUserType() {
+        return this.selectedUser?.user_type
+    }
+
+    @computed
     get getInputValue() {
         return this.inputValue
+    }
+
+    @computed
+    get getNumOfUsers() {
+        return store.app_users.length
+    }
+
+    @computed
+    get getNumOfAdmins() {
+        return store.app_users.filter(
+            (user) => user.user_type === UserType.admin
+        ).length
+    }
+
+    @computed
+    get getNumOfCreators() {
+        return store.app_users.filter(
+            (user) => user.user_type === UserType.creator
+        ).length
+    }
+
+    @computed
+    get getNumOfOrgs() {
+        return store.app_users.filter((user) => user.user_type === UserType.org)
+            .length
+    }
+
+    @computed
+    get getNumOfProfiles() {
+        return store.app_users.filter(
+            (user) => user.user_type === UserType.profile
+        ).length
+    }
+
+    @computed
+    get getNumOfTypeUsers() {
+        return store.app_users.filter(
+            (user) => user.user_type === UserType.user
+        ).length
     }
 
     @action
@@ -69,6 +126,8 @@ class ManageUsersVM {
             user_type: user_type,
             role_id: role_id,
         })
+
+        this.setSelectedUser(this.selectedUser.id)
     }
 
     @action
@@ -114,7 +173,7 @@ function ManageUsersPage() {
 
     const makeAdmin = (
         <button
-            disabled={vm.getSelectedUser?.user_type === UserType.admin}
+            disabled={vm.getSelectedUserType === UserType.admin}
             onClick={() => vm.onSetRole(UserType.admin, 1)}
             className="user-btn"
             key="admin"
@@ -124,7 +183,7 @@ function ManageUsersPage() {
     )
     const makeCreator = (
         <button
-            disabled={vm.getSelectedUser?.user_type === UserType.creator}
+            disabled={vm.getSelectedUserType === UserType.creator}
             onClick={() => vm.onSetRole(UserType.creator, 2)}
             className="user-btn"
             key="creator"
@@ -134,7 +193,7 @@ function ManageUsersPage() {
     )
     const makeOrg = (
         <button
-            disabled={vm.getSelectedUser?.user_type === UserType.org}
+            disabled={vm.getSelectedUserType === UserType.org}
             onClick={() => vm.onSetRole(UserType.org, 3)}
             className="user-btn"
             key="org"
@@ -145,7 +204,7 @@ function ManageUsersPage() {
 
     const makeProfile = (
         <button
-            disabled={vm.getSelectedUser?.user_type === UserType.profile}
+            disabled={vm.getSelectedUserType === UserType.profile}
             onClick={() => vm.onSetRole(UserType.profile, 4)}
             className="user-btn"
             key="profile"
@@ -155,7 +214,7 @@ function ManageUsersPage() {
     )
     const makeUser = (
         <button
-            disabled={vm.getSelectedUser?.user_type === UserType.user}
+            disabled={vm.getSelectedUserType === UserType.user}
             onClick={() => vm.onSetRole(UserType.user, 5)}
             className="user-btn"
             key="user"
@@ -194,13 +253,38 @@ function ManageUsersPage() {
                         <p>{vm.getSelectedUser?.email}</p>
                         <p>{vm.getSelectedUser?.phone}</p>
                         <p>
-                            {vm.getSelectedUser?.role
-                                ? vm.getSelectedUser?.role.role
-                                : "user"}
+                            {
+                                UserTypeHebrew[
+                                    vm.getSelectedUser?.role
+                                        ? (vm.getSelectedUser?.role
+                                              .role as UserType)
+                                        : ("user" as UserType)
+                                ]
+                            }
                         </p>
                     </div>
                 )}
                 <div className="manage-users-actions">{footer}</div>
+            </section>
+            <section className="manage-users-stats card">
+                <label className="stats-label">
+                    סהכ חשבונות: {vm.getNumOfUsers}
+                </label>
+                <label className="stats-label">
+                    מנהלים: {vm.getNumOfAdmins}
+                </label>
+                <label className="stats-label">
+                    יוצרים: {vm.getNumOfCreators}
+                </label>
+                <label className="stats-label">
+                    ארגונים: {vm.getNumOfOrgs}
+                </label>
+                <label className="stats-label">
+                    פרופילים: {vm.getNumOfProfiles}
+                </label>
+                <label className="stats-label">
+                    משתמשים: {vm.getNumOfTypeUsers}
+                </label>
             </section>
         </div>
     )
