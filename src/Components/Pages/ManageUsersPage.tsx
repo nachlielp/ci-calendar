@@ -5,7 +5,7 @@ import {
     UserTypeHebrew,
 } from "../../util/interfaces"
 import { useWindowSize } from "../../hooks/useWindowSize"
-import Select, { SelectProps } from "antd/es/select"
+import Select from "antd/es/select"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import "../../styles/manage-users.css"
@@ -15,24 +15,9 @@ class ManageUsersVM {
     @observable users: ManageUserOption[] = []
     @observable selectedUser: ManageUserOption | null = null
     @observable inputValue: string = ""
-    @observable options: SelectProps<ManageUserOption>["options"] = []
 
     constructor() {
         makeObservable(this)
-
-        reaction(
-            () => store.app_users,
-            (users) => {
-                if (users.length > 0) {
-                    this.setOptions(
-                        users.map((user) => ({
-                            value: user.id,
-                            label: `${user.user_name} - ${user.email}`,
-                        }))
-                    )
-                }
-            }
-        )
 
         reaction(
             () => this.selectedUser?.user_type,
@@ -42,6 +27,14 @@ class ManageUsersVM {
                 }
             }
         )
+    }
+
+    @computed
+    get getOptions() {
+        return store.app_users.map((user) => ({
+            value: user.id,
+            label: `${user.user_name} - ${user.email}`,
+        }))
     }
 
     @computed
@@ -113,11 +106,6 @@ class ManageUsersVM {
     }
 
     @action
-    setOptions = (options: SelectProps<ManageUserOption>["options"]) => {
-        this.options = options
-    }
-
-    @action
     onSetRole = async (user_type: UserType, role_id: number) => {
         if (!this.selectedUser) return
 
@@ -133,7 +121,6 @@ class ManageUsersVM {
     @action
     handleSearch = (value: string) => {
         this.setInputValue(value)
-        this.setOptions(value ? searchResult(value, store.app_users) : [])
     }
 
     @action
@@ -141,27 +128,6 @@ class ManageUsersVM {
         this.setInputValue("")
         this.selectedUser = null
     }
-}
-
-const searchResult = (query: string, users: ManageUserOption[]) => {
-    return users
-        .filter(
-            (user) =>
-                user.user_name.toLowerCase().includes(query.toLowerCase()) ||
-                user.email.toLowerCase().includes(query.toLowerCase())
-        )
-        .map((user) => ({
-            value: user.id,
-            label: (
-                <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                    <span>
-                        {user.user_name} - {user.email}
-                    </span>
-                </div>
-            ),
-        }))
 }
 
 function ManageUsersPage() {
@@ -234,8 +200,11 @@ function ManageUsersPage() {
                 style={{ maxWidth: `${cardWidth}px` }}
                 title="הגדרת משתמשים"
             >
+                <label className="manage-users-label">
+                    חיפוש משתמש לפי שם או כתובת מייל:
+                </label>
                 <Select
-                    options={vm.options}
+                    options={vm.getOptions}
                     onSelect={vm.setSelectedUser}
                     size="large"
                     value={vm.getInputValue}
