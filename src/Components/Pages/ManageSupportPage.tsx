@@ -95,6 +95,13 @@ class ManageSupportPageVM {
     @action
     setExpandedRequestId = (id: string | null) => {
         this.expandedRequestId = id
+
+        const alert = store.getAlerts.find(
+            (alert) => alert.request_id === id && !alert.viewed
+        )
+        if (alert) {
+            store.updateAlert({ id: alert.id, viewed: true })
+        }
     }
 
     @action

@@ -158,6 +158,7 @@ export enum NotificationType {
     reminder = "reminder",
     subscription = "subscription",
     response = "response",
+    admin_response = "admin_response",
 }
 
 export interface CINotification {

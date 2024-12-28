@@ -6,6 +6,7 @@ import { alertsAnchorViewModal } from "./AlertsAnchorVM"
 import { store } from "../../Store/store"
 import { userRequestVM } from "../Requests/UserRequestVM"
 import "../../styles/alerts-anchor.css"
+
 const AlertsAnchor = () => {
     const navigate = useNavigate()
 
@@ -27,6 +28,11 @@ const AlertsAnchor = () => {
         }
     }
 
+    const onAdminResponseClick = () => {
+        alertsAnchorViewModal.setOpen(false)
+        navigate(`/manage-support`)
+    }
+
     return (
         <div className="alerts-anchor">
             {alertsAnchorViewModal.alertsCount > 0 && (
@@ -40,19 +46,38 @@ const AlertsAnchor = () => {
                     {alertsAnchorViewModal.open && (
                         <article className="alerts-anchor-list">
                             {alertsAnchorViewModal.alerts.map((alert) => {
-                                return alert.request_id ? (
-                                    <RequestToast
-                                        key={alert.id}
-                                        alert={alert}
-                                        onAlertClick={onRequestClick}
-                                    />
-                                ) : (
-                                    <EventToast
-                                        key={alert.id}
-                                        alert={alert}
-                                        onAlertClick={onEventClick}
-                                    />
-                                )
+                                if (alert.type === "admin_response") {
+                                    return (
+                                        <AdminResponseToast
+                                            key={alert.id}
+                                            alert={alert}
+                                            onAlertClick={onAdminResponseClick}
+                                        />
+                                    )
+                                }
+
+                                if (alert.type === "response") {
+                                    return (
+                                        <RequestToast
+                                            key={alert.id}
+                                            alert={alert}
+                                            onAlertClick={onRequestClick}
+                                        />
+                                    )
+                                }
+
+                                if (
+                                    alert.type === "reminder" ||
+                                    alert.type === "subscription"
+                                ) {
+                                    return (
+                                        <EventToast
+                                            key={alert.id}
+                                            alert={alert}
+                                            onAlertClick={onEventClick}
+                                        />
+                                    )
+                                }
                             })}
                         </article>
                     )}
@@ -105,6 +130,24 @@ const RequestToast = ({
     )
 }
 
+const AdminResponseToast = ({
+    alert,
+    onAlertClick,
+}: {
+    alert: CIAlert
+    onAlertClick: (alert: CIAlert) => void
+}) => {
+    return (
+        <div
+            key={alert.id}
+            className="alert-item"
+            onClick={() => onAlertClick(alert)}
+        >
+            <label className="alert-item-title">{alert.title}</label>
+        </div>
+    )
+}
+
 function formatAlertDescription(alert: CIAlert) {
     if (alert.type === NotificationType.response) {
         return `תגובה לפניית תמיכה שלך נמצאת בדף תמיכה`
@@ -119,14 +162,21 @@ function formatAlertDescription(alert: CIAlert) {
             label = "עדכון על לאירוע"
             break
     }
-    return `${label} שמתקיים ב ${dayjs(alert.start_date).format(
-        "DD/MM/YYYY"
-    )} בשעה ${eventStartTime(alert).format("HH:mm")} ב${alert.address}`
+
+    if (alert.firstSegment) {
+        return `${label}  ${dayjs(alert.start_date).format(
+            "DD/MM/YYYY"
+        )} בשעה ${eventStartTime(alert)?.format("HH:mm")} ב${alert.address}`
+    }
+    return `${label}  ${dayjs(alert.start_date).format("DD/MM/YYYY")} ב${
+        alert.address
+    }`
 }
 
 function eventStartTime(alert: CIAlert) {
-    return dayjs(alert.start_date)
-        .hour(dayjs(alert.firstSegment.startTime).hour())
-        .minute(dayjs(alert.firstSegment.startTime).minute())
-        .tz("Asia/Jerusalem")
+    if (alert.firstSegment)
+        return dayjs(alert.start_date)
+            .hour(dayjs(alert.firstSegment.startTime).hour())
+            .minute(dayjs(alert.firstSegment.startTime).minute())
+            .tz("Asia/Jerusalem")
 }

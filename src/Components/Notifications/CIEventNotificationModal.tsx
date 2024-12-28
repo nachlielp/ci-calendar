@@ -81,7 +81,6 @@ class CIEventNotificationModalVM {
 
     @action
     setIsOpen = (isOpen: boolean) => {
-        console.log("setIsOpen", isOpen)
         this.isOpen = isOpen
     }
 

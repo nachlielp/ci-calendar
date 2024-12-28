@@ -31,12 +31,12 @@ class AlertsAnchorVM {
         return store.getAlerts
             .filter((alert) => !alert.viewed)
             .filter((alert) =>
-                alert.request_id
-                    ? true
-                    : utilService.validateEventNotification(
+                alert.ci_event_id
+                    ? utilService.validateEventNotification(
                           alert,
                           store.getEvents
                       )
+                    : true
             )
     }
 

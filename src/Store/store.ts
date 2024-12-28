@@ -522,6 +522,10 @@ class Store {
                     }
                 } else if (NotificationType.response === payload.new.type) {
                     //currently no formatting needed
+                } else if (
+                    NotificationType.admin_response === payload.new.type
+                ) {
+                    //currently no formatting needed
                 } else {
                     throw new Error(`Unknown alert type: ${alert.type}`)
                 }
@@ -749,8 +753,14 @@ class Store {
         if (event) {
             updatedNotification.title = event.title
             updatedNotification.start_date = event.start_date
-            updatedNotification.firstSegment = event.segments[0]
+            updatedNotification.is_multi_day = event.is_multi_day
+            if (event.segments.length > 0) {
+                updatedNotification.firstSegment = event.segments[0]
+            } else {
+                updatedNotification.firstSegment = null
+            }
         }
+
         this.setNotification(updatedNotification, EventPayloadType.UPSERT)
     }
 
