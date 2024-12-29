@@ -26,6 +26,10 @@
         border: none;
         outline: none;
         box-shadow: none;
+
+        &.mini-hr {
+            width: 30%;
+        }
     }
 
     .teacher-form-img {

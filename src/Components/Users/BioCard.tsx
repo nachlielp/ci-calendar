@@ -38,18 +38,30 @@ const BioCard = ({ teacher }: { teacher: UserBio }) => {
                     className="bio-card-img"
                 />
             )}
-            {teacher.page_url && (
-                <a
-                    className="teacher-page-link"
-                    key={teacher.page_url}
-                    href={teacher.page_url}
-                    target="_blank"
-                >
-                    {teacher.page_title || "דף פרופיל"}
-                    <Icon icon="openInNew" className="event-link-icon" />
-                </a>
-            )}
-
+            <article className="bio-card-links">
+                {teacher.page_url && (
+                    <a
+                        className="teacher-page-link"
+                        key={teacher.page_url}
+                        href={teacher.page_url}
+                        target="_blank"
+                    >
+                        {teacher.page_title || "דף פרופיל"}
+                        <Icon icon="openInNew" className="event-link-icon" />
+                    </a>
+                )}
+                {teacher.page_url_2 && (
+                    <a
+                        className="teacher-page-link"
+                        key={teacher.page_url_2}
+                        href={teacher.page_url_2}
+                        target="_blank"
+                    >
+                        {teacher.page_title_2 || "דף פרופיל"}
+                        <Icon icon="openInNew" className="event-link-icon" />
+                    </a>
+                )}
+            </article>
             <hr className="bio-card-hr" />
             <label className="bio-card-subtitle">
                 אודות {teacher.bio_name}

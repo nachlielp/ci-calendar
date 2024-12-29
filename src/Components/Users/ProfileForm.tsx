@@ -17,6 +17,8 @@ type FieldType = {
     img: string
     page_url?: string
     page_title?: string
+    page_url_2?: string
+    page_title_2?: string
     upload: string
     show_profile: string
     allow_tagging: string
@@ -70,13 +72,22 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
             return
         }
         setIsSubmitting(true)
-        const { bio_name, about, page_url, page_title } = values
+        const {
+            bio_name,
+            about,
+            page_url,
+            page_title,
+            page_url_2,
+            page_title_2,
+        } = values
         const newTeacher: Partial<UserBio> = {
             bio_name: bio_name || "",
             about: about || "",
             img: imageUrl || "",
             page_url: page_url || "",
             page_title: page_title || "",
+            page_url_2: page_url_2 || "",
+            page_title_2: page_title_2 || "",
             user_id: store.getUserId || "",
         }
         try {
@@ -102,6 +113,8 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                     page_title: store.getBio.page_title,
                     show_profile: store.getBio.show_profile,
                     allow_tagging: store.getBio.allow_tagging,
+                    page_url_2: store.getBio.page_url_2,
+                    page_title_2: store.getBio.page_title_2,
                 }}
             >
                 <Form.Item<FieldType>
@@ -129,6 +142,43 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                 </Form.Item>
                 <Form.Item<FieldType>
                     name="page_url"
+                    rules={[
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                // If no URL is entered, it's valid
+                                if (!value) {
+                                    return Promise.resolve()
+                                }
+
+                                // Check if URL has a title when URL is present
+                                if (value && !getFieldValue("page_title")) {
+                                    return Promise.reject(
+                                        new Error("נא להזין כותרת לקישור")
+                                    )
+                                }
+
+                                // Validate URL format - more permissive regex
+                                const urlRegex =
+                                    /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
+                                if (!urlRegex.test(value)) {
+                                    return Promise.reject(
+                                        new Error("נא להזין כתובת אתר תקינה")
+                                    )
+                                }
+
+                                return Promise.resolve()
+                            },
+                        }),
+                    ]}
+                >
+                    <Input placeholder="קישור לדף פרופיל" />
+                </Form.Item>
+                <hr className="bio-card-hr mini-hr" />
+                <Form.Item<FieldType> name="page_title_2">
+                    <Input placeholder="כותרת" />
+                </Form.Item>
+                <Form.Item<FieldType>
+                    name="page_url_2"
                     rules={[
                         ({ getFieldValue }) => ({
                             validator(_, value) {

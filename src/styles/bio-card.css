@@ -23,25 +23,33 @@
         border-radius: 5px;
     }
 
-    .teacher-page-link {
+    .bio-card-links {
+        width: 100%;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        /* margin-left: auto; */
-        margin-top: 1rem;
-        text-decoration: none;
-        color: #000;
-        border: 2px solid #dd5239;
-        border-radius: 5px;
-        padding: 4px 8px;
-        text-align: center;
+        flex-direction: row;
+        /* align-items: space-around; */
+        justify-content: space-around;
+        gap: 4px;
+        .teacher-page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* margin-left: auto; */
+            margin-top: 1rem;
+            text-decoration: none;
+            color: #000;
+            border: 2px solid #dd5239;
+            border-radius: 5px;
+            padding: 4px 8px;
+            text-align: center;
 
-        .event-link-icon {
-            .injected-svg {
-                margin-right: 4px;
-                margin-top: 5px;
-                width: 16px;
-                height: 16px;
+            .event-link-icon {
+                .injected-svg {
+                    margin-right: 4px;
+                    margin-top: 5px;
+                    width: 16px;
+                    height: 16px;
+                }
             }
         }
     }

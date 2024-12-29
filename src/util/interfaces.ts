@@ -301,6 +301,8 @@ export interface UserBio {
     bio_name: string
     page_url: string
     page_title: string
+    page_url_2: string
+    page_title_2: string
     show_profile: boolean
     allow_tagging: boolean
     img: string
