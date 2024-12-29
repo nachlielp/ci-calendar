@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../../Store/store"
 import "../../../styles/manage-templates-list.css"
 
+//TODO move edit to page with save state
 const ManageTemplatesList = () => {
     async function handleDeleteTemplate(templateId: string) {
         await store.deleteTemplate(templateId)
