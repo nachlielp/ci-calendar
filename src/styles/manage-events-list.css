@@ -13,7 +13,7 @@
     align-items: center;
 
     .manage-events-header {
-        width: 90%;
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -30,8 +30,8 @@
             width: 100%;
             display: flex;
             flex-direction: row;
-            justify-content: space-between;
-            gap: 1rem;
+            /* justify-content: space-between; */
+            /* gap: 1rem; */
 
             .create-event-label {
                 font-weight: 400;
@@ -124,7 +124,7 @@
 
     .events-container {
         display: flex;
-        width: 90%;
+        width: 100%;
         flex-direction: column;
         background-color: #ffffff;
         border-radius: 6px;
@@ -242,6 +242,7 @@
             line-height: 21px;
         }
     }
+
     @media (max-width: 768px) {
         .header-phone {
             flex-direction: column;

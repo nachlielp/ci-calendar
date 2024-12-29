@@ -196,7 +196,12 @@ export default function MultiDayEventForm({
                     <Form.Item name="template-name">
                         <Row gutter={8}>
                             <Col span={16}>
-                                <Form.Item name="template-name">
+                                <Form.Item
+                                    name="template-name"
+                                    rules={[
+                                        { required: true, message: "שדה חובה" },
+                                    ]}
+                                >
                                     <Input
                                         placeholder="שם התבנית"
                                         allowClear

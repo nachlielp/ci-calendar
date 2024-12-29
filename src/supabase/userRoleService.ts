@@ -10,7 +10,7 @@ async function updateUserRole({
     user_id,
     user_type,
     role_id,
-}: UserRole): Promise<UserType> {
+}: UserRole): Promise<UserRole> {
     try {
         // Update user_roles table
         const { data: roleData, error: roleError } = await supabase
