@@ -2,7 +2,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile"
 import { CIEvent, CITemplate } from "../../../util/interfaces"
 import { FormDrawer } from "./FormDrawer"
 import FormModal from "./FormModal"
-
+//TODO delete this component
 export default function FormContainer({
     anchorEl,
     eventType,

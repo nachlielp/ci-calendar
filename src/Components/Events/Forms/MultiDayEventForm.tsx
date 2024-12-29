@@ -9,7 +9,7 @@ import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { utilService } from "../../../util/utilService"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import MultiDayFormHead from "./MultiDayFormHead"
@@ -26,6 +26,12 @@ const initialValues = {
     "event-tags": [tagOptions[0].value],
 }
 
+const DRAFT_EVENT_KEY = "multi-day-draft-event"
+const DRAFT_EVENT_ADDRESS_KEY = "multi-day-draft-event-address"
+
+const DRAFT_TEMPLATE_KEY = "multi-day-draft-template"
+const DRAFT_TEMPLATE_ADDRESS_KEY = "multi-day-draft-template-address"
+
 export default function MultiDayEventForm({
     closeForm,
     isTemplate,
@@ -33,6 +39,11 @@ export default function MultiDayEventForm({
     closeForm: () => void
     isTemplate: boolean
 }) {
+    const DRAFT_KEY = isTemplate ? DRAFT_TEMPLATE_KEY : DRAFT_EVENT_KEY
+    const DRAFT_ADDRESS_KEY = isTemplate
+        ? DRAFT_TEMPLATE_ADDRESS_KEY
+        : DRAFT_EVENT_ADDRESS_KEY
+
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
 
@@ -42,6 +53,42 @@ export default function MultiDayEventForm({
     )
 
     const [form] = Form.useForm()
+
+    useEffect(() => {
+        if (isTemplate) {
+        }
+        const addressObj = utilService.getDraftEvent(DRAFT_ADDRESS_KEY)
+        let currentAddress: IAddress | undefined = undefined
+
+        if (addressObj?.address) {
+            currentAddress = addressObj.address
+            setAddress(currentAddress)
+        }
+
+        const currentFormValuesObj = utilService.getDraftEvent(DRAFT_KEY)
+        if (currentFormValuesObj) {
+            const { currentFormValues } =
+                utilService.CIEventDraftToFormValues(currentFormValuesObj)
+            form.setFieldsValue({
+                ...currentFormValues,
+                address: currentAddress,
+            })
+        } else {
+            form.setFieldsValue({
+                ...initialValues,
+                address: currentAddress,
+            })
+        }
+    }, [])
+
+    const onFormValueChange = (_: any, allFields: any) => {
+        const draftEvent = utilService.formatFormValuesToDraftCIEvent(
+            allFields,
+            address,
+            false
+        )
+        utilService.saveDraftEvent(draftEvent, DRAFT_KEY)
+    }
 
     const handleAddressSelect = (place: IGooglePlaceOption | null) => {
         if (!place) {
@@ -54,6 +101,10 @@ export default function MultiDayEventForm({
             place_id: place.value.place_id,
         }
         setAddress(selectedAddress)
+        utilService.saveDraftEvent(
+            { address: selectedAddress },
+            DRAFT_ADDRESS_KEY
+        )
         form.setFieldValue("address", selectedAddress)
     }
 
@@ -62,6 +113,8 @@ export default function MultiDayEventForm({
         // setSubmitted(false)
         setSourceTemplateId(null)
         handleAddressSelect(null)
+        utilService.clearDraftEvent(DRAFT_KEY)
+        utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
     }
 
     const handleTemplateChange = (value: string) => {
@@ -189,8 +242,9 @@ export default function MultiDayEventForm({
                 form={form}
                 onFinish={handleSubmit}
                 variant="filled"
-                initialValues={initialValues}
+                // initialValues={initialValues}
                 onFinishFailed={onFinishFailed}
+                onValuesChange={onFormValueChange}
             >
                 {isTemplate && (
                     <Form.Item name="template-name">

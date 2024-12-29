@@ -17,6 +17,7 @@ import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
 import "../../../styles/event-form.css"
 import Select from "antd/es/select"
+import { memo } from "react"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -34,271 +35,281 @@ const DRAFT_EVENT_ADDRESS_KEY = "single-day-draft-event-address"
 const DRAFT_TEMPLATE_KEY = "single-day-draft-template"
 const DRAFT_TEMPLATE_ADDRESS_KEY = "single-day-draft-template-address"
 
-export default function SingleDayEventForm({
-    closeForm,
-    isTemplate,
-}: {
+interface SingleDayEventFormProps {
     closeForm: () => void
     isTemplate?: boolean
-}) {
-    const DRAFT_KEY = isTemplate ? DRAFT_TEMPLATE_KEY : DRAFT_EVENT_KEY
-    const DRAFT_ADDRESS_KEY = isTemplate
-        ? DRAFT_TEMPLATE_ADDRESS_KEY
-        : DRAFT_EVENT_ADDRESS_KEY
-
-    const [form] = Form.useForm()
-    const [isSubmitting, setIsSubmitting] = useState(false)
-
-    const [eventDate, setEventDate] = useState(dayjs())
-    const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
-    const [inputErrors, setInputErrors] = useState<boolean>(false)
-    const [address, setAddress] = useState<IAddress | undefined>()
-
-    useEffect(() => {
-        if (isTemplate) {
-        }
-        const addressObj = utilService.getDraftEvent(DRAFT_ADDRESS_KEY)
-        let currentAddress: IAddress | undefined = undefined
-
-        if (addressObj?.address) {
-            currentAddress = addressObj.address
-            setAddress(currentAddress)
-        }
-
-        const currentFormValuesObj = utilService.getDraftEvent(DRAFT_KEY)
-        if (currentFormValuesObj) {
-            const { currentFormValues } =
-                utilService.CIEventDraftToFormValues(currentFormValuesObj)
-            form.setFieldsValue({
-                ...currentFormValues,
-                address: currentAddress,
-            })
-        } else {
-            form.setFieldsValue({
-                ...initialValues,
-                address: currentAddress,
-            })
-        }
-    }, [])
-
-    useEffect(() => {
-        onFormValueChange(null, form.getFieldsValue())
-    }, [eventDate, endDate])
-
-    const onFormValueChange = (_: any, allFields: any) => {
-        const updatedFields = {
-            ...allFields,
-            "event-start-date": allFields["event-start-date"] || eventDate,
-            "event-end-date": allFields["event-end-date"] || endDate,
-        }
-
-        const draftEvent = utilService.formatFormValuesToDraftCIEvent(
-            updatedFields,
-            address,
-            false
-        )
-        utilService.saveDraftEvent(draftEvent, DRAFT_KEY)
-    }
-
-    const handleAddressSelect = (place: IGooglePlaceOption | null) => {
-        if (!place) {
-            setAddress(undefined)
-            form.setFieldValue("address", undefined)
-            return
-        }
-        const selectedAddress = {
-            label: place.label,
-            place_id: place.value.place_id,
-        }
-        setAddress(selectedAddress)
-        utilService.saveDraftEvent(
-            { address: selectedAddress },
-            DRAFT_ADDRESS_KEY
-        )
-        form.setFieldValue("address", selectedAddress)
-    }
-
-    const handleDateChange = (date: dayjs.Dayjs) => {
-        setEventDate(date)
-    }
-
-    const handleEndDateChange = (date: dayjs.Dayjs) => {
-        setEndDate(date)
-    }
-
-    const clearForm = () => {
-        form.resetFields()
-        handleAddressSelect(null)
-        utilService.clearDraftEvent(DRAFT_KEY)
-        utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
-    }
-
-    const handleTemplateChange = (value: string) => {
-        const template = store.getTemplates.find((t) => t.id === value)
-        if (template) {
-            const { currentFormValues, address } =
-                utilService.singleDayTemplateToFormValues(template)
-            form.setFieldsValue(currentFormValues)
-            setAddress(address)
-            utilService.saveDraftEvent({ address: address }, DRAFT_ADDRESS_KEY)
-            onFormValueChange(currentFormValues, form.getFieldsValue())
-        }
-    }
-
-    const handleSubmit = async (values: any) => {
-        if (!address) {
-            return
-        }
-        setIsSubmitting(true)
-        try {
-            if (!isTemplate) {
-                const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
-                    utilService.formatFormValuesToCreateCIEvent(
-                        values,
-                        address,
-                        false
-                    )
-                await store.createCIEvent(event)
-                clearForm()
-                closeForm()
-                utilService.clearDraftEvent(DRAFT_KEY)
-                utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
-            } else {
-                const template: Omit<CITemplate, "id"> =
-                    utilService.formatFormValuesToCreateCITemplate(
-                        values,
-                        address,
-                        false
-                    )
-                await store.createTemplate(template)
-                clearForm()
-                closeForm()
-            }
-        } catch (error) {
-            console.error("EventForm.handleSubmit.error: ", error)
-            throw error
-        } finally {
-            setIsSubmitting(false)
-        }
-    }
-
-    const onFinishFailed = () => {
-        setInputErrors(true)
-        setTimeout(() => {
-            setInputErrors(false)
-        }, 3000)
-    }
-
-    const titleText = isTemplate
-        ? "יצירת תבנית חד יומית"
-        : "הוספת אירוע חד יומי"
-
-    return (
-        <div className="event-form">
-            <section className="event-card">
-                <Form
-                    form={form}
-                    onFinish={handleSubmit}
-                    onFinishFailed={onFinishFailed}
-                    variant="filled"
-                    // initialValues={currentFormValues}
-                    onValuesChange={onFormValueChange}
-                >
-                    {isTemplate && (
-                        <Form.Item name="template-name">
-                            <Row gutter={8}>
-                                <Col span={16}>
-                                    <Form.Item
-                                        name="template-name"
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message: "שדה חובה",
-                                            },
-                                        ]}
-                                    >
-                                        <Input
-                                            placeholder="שם התבנית"
-                                            allowClear
-                                            size="large"
-                                            className="form-input-large"
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <button
-                                        type="button"
-                                        onClick={() => clearForm()}
-                                        className="general-clear-btn large-btn"
-                                    >
-                                        ניקוי טופס
-                                    </button>
-                                </Col>
-                            </Row>
-                        </Form.Item>
-                    )}
-                    {!isTemplate && (
-                        <Form.Item>
-                            <Row gutter={8}>
-                                <Col span={16}>
-                                    <Form.Item name="template-description">
-                                        <Select
-                                            options={
-                                                store.getSingleDayTemplateOptions
-                                            }
-                                            onChange={handleTemplateChange}
-                                            allowClear
-                                            placeholder="בחירת תבנית"
-                                            size="large"
-                                            popupClassName="form-input-large"
-                                            showSearch
-                                            filterOption={(input, option) =>
-                                                (option?.label ?? "")
-                                                    .toLowerCase()
-                                                    .includes(
-                                                        input.toLowerCase()
-                                                    )
-                                            }
-                                        />
-                                    </Form.Item>
-                                </Col>
-                                <Col span={8}>
-                                    <button
-                                        type="button"
-                                        onClick={() => clearForm()}
-                                        className="general-clear-btn large-btn"
-                                    >
-                                        ניקוי טופס
-                                    </button>
-                                </Col>
-                            </Row>
-                        </Form.Item>
-                    )}
-                    <SingleDayEventFormHead
-                        form={form}
-                        handleAddressSelect={handleAddressSelect}
-                        address={address}
-                        isEdit={false}
-                        teachers={store.getAppTaggableTeachers}
-                        isTemplate={isTemplate}
-                        titleText={titleText}
-                        orgs={store.getAppTaggableOrgs}
-                        handleDateChange={handleDateChange}
-                        handleEndDateChange={handleEndDateChange}
-                        eventDate={eventDate}
-                        endDate={endDate}
-                    />
-                    <EventSegmentsForm
-                        form={form}
-                        teachers={store.getAppTaggableTeachers}
-                    />
-                    <EventFromFooter
-                        isSubmitting={isSubmitting}
-                        inputErrors={inputErrors}
-                        submitText={isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                    />
-                </Form>
-            </section>
-        </div>
-    )
 }
+
+const SingleDayEventForm = memo(
+    ({ closeForm, isTemplate }: SingleDayEventFormProps) => {
+        const DRAFT_KEY = isTemplate ? DRAFT_TEMPLATE_KEY : DRAFT_EVENT_KEY
+        const DRAFT_ADDRESS_KEY = isTemplate
+            ? DRAFT_TEMPLATE_ADDRESS_KEY
+            : DRAFT_EVENT_ADDRESS_KEY
+
+        const [form] = Form.useForm()
+        const [isSubmitting, setIsSubmitting] = useState(false)
+
+        const [eventDate, setEventDate] = useState(dayjs())
+        const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
+        const [inputErrors, setInputErrors] = useState<boolean>(false)
+        const [address, setAddress] = useState<IAddress | undefined>()
+
+        useEffect(() => {
+            if (isTemplate) {
+            }
+            const addressObj = utilService.getDraftEvent(DRAFT_ADDRESS_KEY)
+            let currentAddress: IAddress | undefined = undefined
+
+            if (addressObj?.address) {
+                currentAddress = addressObj.address
+                setAddress(currentAddress)
+            }
+
+            const currentFormValuesObj = utilService.getDraftEvent(DRAFT_KEY)
+            if (currentFormValuesObj) {
+                const { currentFormValues } =
+                    utilService.CIEventDraftToFormValues(currentFormValuesObj)
+                form.setFieldsValue({
+                    ...currentFormValues,
+                    address: currentAddress,
+                })
+            } else {
+                form.setFieldsValue({
+                    ...initialValues,
+                    address: currentAddress,
+                })
+            }
+        }, [])
+
+        useEffect(() => {
+            onFormValueChange(null, form.getFieldsValue())
+        }, [eventDate, endDate])
+
+        const onFormValueChange = (_: any, allFields: any) => {
+            const updatedFields = {
+                ...allFields,
+                "event-start-date": allFields["event-start-date"] || eventDate,
+                "event-end-date": allFields["event-end-date"] || endDate,
+            }
+
+            const draftEvent = utilService.formatFormValuesToDraftCIEvent(
+                updatedFields,
+                address,
+                false
+            )
+            utilService.saveDraftEvent(draftEvent, DRAFT_KEY)
+        }
+
+        const handleAddressSelect = (place: IGooglePlaceOption | null) => {
+            if (!place) {
+                setAddress(undefined)
+                form.setFieldValue("address", undefined)
+                return
+            }
+            const selectedAddress = {
+                label: place.label,
+                place_id: place.value.place_id,
+            }
+            setAddress(selectedAddress)
+            utilService.saveDraftEvent(
+                { address: selectedAddress },
+                DRAFT_ADDRESS_KEY
+            )
+            form.setFieldValue("address", selectedAddress)
+        }
+
+        const handleDateChange = (date: dayjs.Dayjs) => {
+            setEventDate(date)
+        }
+
+        const handleEndDateChange = (date: dayjs.Dayjs) => {
+            setEndDate(date)
+        }
+
+        const clearForm = () => {
+            form.resetFields()
+            handleAddressSelect(null)
+            utilService.clearDraftEvent(DRAFT_KEY)
+            utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
+        }
+
+        const handleTemplateChange = (value: string) => {
+            const template = store.getTemplates.find((t) => t.id === value)
+            if (template) {
+                const { currentFormValues, address } =
+                    utilService.singleDayTemplateToFormValues(template)
+                form.setFieldsValue(currentFormValues)
+                setAddress(address)
+                utilService.saveDraftEvent(
+                    { address: address },
+                    DRAFT_ADDRESS_KEY
+                )
+                onFormValueChange(currentFormValues, form.getFieldsValue())
+            }
+        }
+
+        const handleSubmit = async (values: any) => {
+            if (!address) {
+                return
+            }
+            setIsSubmitting(true)
+            try {
+                if (!isTemplate) {
+                    const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
+                        utilService.formatFormValuesToCreateCIEvent(
+                            values,
+                            address,
+                            false
+                        )
+                    await store.createCIEvent(event)
+                    clearForm()
+                    closeForm()
+                    utilService.clearDraftEvent(DRAFT_KEY)
+                    utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
+                } else {
+                    const template: Omit<CITemplate, "id"> =
+                        utilService.formatFormValuesToCreateCITemplate(
+                            values,
+                            address,
+                            false
+                        )
+                    await store.createTemplate(template)
+                    clearForm()
+                    closeForm()
+                }
+            } catch (error) {
+                console.error("EventForm.handleSubmit.error: ", error)
+                throw error
+            } finally {
+                setIsSubmitting(false)
+            }
+        }
+
+        const onFinishFailed = () => {
+            setInputErrors(true)
+            setTimeout(() => {
+                setInputErrors(false)
+            }, 3000)
+        }
+
+        const titleText = isTemplate
+            ? "יצירת תבנית חד יומית"
+            : "הוספת אירוע חד יומי"
+
+        return (
+            <div className="event-form">
+                <section className="event-card">
+                    <Form
+                        form={form}
+                        onFinish={handleSubmit}
+                        onFinishFailed={onFinishFailed}
+                        variant="filled"
+                        // initialValues={currentFormValues}
+                        onValuesChange={onFormValueChange}
+                    >
+                        {isTemplate && (
+                            <Form.Item name="template-name">
+                                <Row gutter={8}>
+                                    <Col span={16}>
+                                        <Form.Item
+                                            name="template-name"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: "שדה חובה",
+                                                },
+                                            ]}
+                                        >
+                                            <Input
+                                                placeholder="שם התבנית"
+                                                allowClear
+                                                size="large"
+                                                className="form-input-large"
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={8}>
+                                        <button
+                                            type="button"
+                                            onClick={() => clearForm()}
+                                            className="general-clear-btn large-btn"
+                                        >
+                                            ניקוי טופס
+                                        </button>
+                                    </Col>
+                                </Row>
+                            </Form.Item>
+                        )}
+                        {!isTemplate && (
+                            <Form.Item>
+                                <Row gutter={8}>
+                                    <Col span={16}>
+                                        <Form.Item name="template-description">
+                                            <Select
+                                                options={
+                                                    store.getSingleDayTemplateOptions
+                                                }
+                                                onChange={handleTemplateChange}
+                                                allowClear
+                                                placeholder="בחירת תבנית"
+                                                size="large"
+                                                popupClassName="form-input-large"
+                                                showSearch
+                                                filterOption={(input, option) =>
+                                                    (option?.label ?? "")
+                                                        .toLowerCase()
+                                                        .includes(
+                                                            input.toLowerCase()
+                                                        )
+                                                }
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={8}>
+                                        <button
+                                            type="button"
+                                            onClick={() => clearForm()}
+                                            className="general-clear-btn large-btn"
+                                        >
+                                            ניקוי טופס
+                                        </button>
+                                    </Col>
+                                </Row>
+                            </Form.Item>
+                        )}
+                        <SingleDayEventFormHead
+                            form={form}
+                            handleAddressSelect={handleAddressSelect}
+                            address={address}
+                            isEdit={false}
+                            teachers={store.getAppTaggableTeachers}
+                            isTemplate={isTemplate}
+                            titleText={titleText}
+                            orgs={store.getAppTaggableOrgs}
+                            handleDateChange={handleDateChange}
+                            handleEndDateChange={handleEndDateChange}
+                            eventDate={eventDate}
+                            endDate={endDate}
+                        />
+                        <EventSegmentsForm
+                            form={form}
+                            teachers={store.getAppTaggableTeachers}
+                        />
+                        <EventFromFooter
+                            isSubmitting={isSubmitting}
+                            inputErrors={inputErrors}
+                            submitText={
+                                isTemplate ? "יצירת תבנית" : "יצירת אירוע"
+                            }
+                        />
+                    </Form>
+                </section>
+            </div>
+        )
+    }
+)
+
+SingleDayEventForm.displayName = "SingleDayEventForm"
+
+export default SingleDayEventForm

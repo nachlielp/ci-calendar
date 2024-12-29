@@ -1,10 +1,11 @@
 import ManageTemplatesList from "../Events/Management/ManageTemplatesList"
-import FormContainer from "../Events/Forms/FormContainer"
 import Alert from "antd/es/alert"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import "../../styles/create-events-page.css"
+import { useNavigate } from "react-router"
 const CreateEventsPage = () => {
+    const navigate = useNavigate()
     const isMissingProfile =
         !store.getBio.bio_name || store.getBio.bio_name === ""
 
@@ -13,21 +14,25 @@ const CreateEventsPage = () => {
             type: "create-single-day",
             isTemplate: true,
             label: "תבנית חד יומית",
+            path: "/create-events/single-day?isTemplate=true",
         },
         {
             type: "create-single-day",
             isTemplate: false,
             label: "אירוע חד יומי",
+            path: "/create-events/single-day?isTemplate=false",
         },
         {
             type: "create-multi-day",
             isTemplate: true,
             label: "תבנית רב יומית",
+            path: "/create-events/multi-day?isTemplate=true",
         },
         {
             type: "create-multi-day",
             isTemplate: false,
             label: "אירוע רב יומי",
+            path: "/create-events/multi-day?isTemplate=false",
         },
     ]
 
@@ -50,15 +55,13 @@ const CreateEventsPage = () => {
                 )}
             </article>
             <article className="btns-container">
-                {buttonsArray.map((button, index) => (
-                    <FormContainer
-                        key={index}
-                        anchorEl={
-                            <button className="btn">{button.label}</button>
-                        }
-                        eventType={button.type}
-                        isTemplate={button.isTemplate}
-                    />
+                {buttonsArray.map((button) => (
+                    <button
+                        className="btn"
+                        onClick={() => navigate(button.path)}
+                    >
+                        {button.label}
+                    </button>
                 ))}
             </article>
             <ManageTemplatesList />

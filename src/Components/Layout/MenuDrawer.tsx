@@ -67,6 +67,16 @@ const MenuDrawer = () => {
             disabled: !isCreator,
         },
         {
+            key: "create-events",
+            icon: "calendar_add_on",
+            label: " יצירת ארועים",
+            onClick: () => {
+                navigate("/create-events")
+                setOpen(false)
+            },
+            disabled: !isCreator,
+        },
+        {
             key: "manage-all-events",
             icon: "calendar_add_on",
             label: "ניהול אירועים",

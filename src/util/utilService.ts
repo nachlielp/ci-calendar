@@ -424,7 +424,6 @@ function formatFormValuesToDraftCIEvent(
     address: IAddress | undefined,
     is_multi_day: boolean
 ): Partial<DBCIEvent & { template_name?: string }> {
-    console.log("values: ", values)
     let segments: any[] = []
 
     // Only process segments if we have the required date and time values
@@ -434,7 +433,6 @@ function formatFormValuesToDraftCIEvent(
         values["first-segment-start-time"] &&
         values["first-segment-end-time"]
     ) {
-        console.log("_2_process segments: ", values)
         segments = [
             {
                 startTime: dayjs(values["event-start-date"])

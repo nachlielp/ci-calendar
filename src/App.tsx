@@ -9,6 +9,8 @@ import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
 import BackgroundTiles from "./Components/Layout/BackgroundTiles"
 import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
+import SingleDayFromPage from "./Components/Pages/SingleDayFromPage"
+import MultiDayFormPage from "./Components/Pages/MultiDayFormPage"
 
 import { UserType } from "./util/interfaces"
 import { SpeedInsights } from "@vercel/speed-insights/react"
@@ -62,7 +64,7 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = "1.6.73"
+export const CACHE_VERSION = "1.6.74"
 
 export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://www.payboxapp.com/"
@@ -84,7 +86,6 @@ const disableApp = import.meta.env.VITE_DISABLE_APP
 const App = () => {
     const navigate = useNavigate()
     useRemoveAppLoadingScreen()
-    console.log("disableApp: ", disableApp)
     if (disableApp === "true") {
         return (
             <div className="app">
@@ -155,6 +156,7 @@ const App = () => {
                                 path="/reset-password"
                                 element={<ResetPasswordPage />}
                             />
+
                             <Route
                                 element={
                                     <PrivateRoutes
@@ -256,6 +258,23 @@ const App = () => {
                                     element={
                                         <Suspense fallback={<Loading />}>
                                             <CreateEventsPage />
+                                        </Suspense>
+                                    }
+                                />
+
+                                <Route
+                                    path="/create-events/single-day"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <SingleDayFromPage />
+                                        </Suspense>
+                                    }
+                                />
+                                <Route
+                                    path="/create-events/multi-day"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <MultiDayFormPage />
                                         </Suspense>
                                     }
                                 />
