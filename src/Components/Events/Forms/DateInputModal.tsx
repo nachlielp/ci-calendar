@@ -27,6 +27,7 @@ interface DateInputModalProps {
     form: FormInstance
     onClose?: (value: Dayjs | null) => void
     placeholder?: string
+    handleChange?: (value: Dayjs) => void
 }
 
 //Notice, when name is an array, pass onClose as a function that takes the value and sets the form field value
@@ -35,6 +36,7 @@ const DateInputModal = ({
     form,
     onClose,
     placeholder,
+    handleChange,
 }: DateInputModalProps) => {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState<Dayjs>(dayjs())
@@ -48,12 +50,34 @@ const DateInputModal = ({
 
     const onChange = (newValue: Dayjs) => {
         setValue(newValue)
+        form.setFields([
+            {
+                name: name,
+                value: newValue,
+            },
+        ])
+
+        if (handleChange) {
+            handleChange(newValue)
+        }
+
+        form.setFields([
+            {
+                name: name,
+                value: newValue,
+            },
+        ])
     }
 
     const handleClose = () => {
         setOpen(false)
         if (value) {
-            form.setFieldValue(name, value)
+            form.setFields([
+                {
+                    name: name,
+                    value: value,
+                },
+            ])
         }
 
         if (onClose) {

@@ -31,8 +31,8 @@ const initialValues = {
 const DRAFT_EVENT_KEY = "single-day-draft-event"
 const DRAFT_EVENT_ADDRESS_KEY = "single-day-draft-event-address"
 
-// const DRAFT_TEMPLATE_KEY = "single-day-draft-template"
-// const DRAFT_TEMPLATE_ADDRESS_KEY = "single-day-draft-template-address"
+const DRAFT_TEMPLATE_KEY = "single-day-draft-template"
+const DRAFT_TEMPLATE_ADDRESS_KEY = "single-day-draft-template-address"
 
 export default function SingleDayEventForm({
     closeForm,
@@ -41,6 +41,11 @@ export default function SingleDayEventForm({
     closeForm: () => void
     isTemplate?: boolean
 }) {
+    const DRAFT_KEY = isTemplate ? DRAFT_TEMPLATE_KEY : DRAFT_EVENT_KEY
+    const DRAFT_ADDRESS_KEY = isTemplate
+        ? DRAFT_TEMPLATE_ADDRESS_KEY
+        : DRAFT_EVENT_ADDRESS_KEY
+
     const [form] = Form.useForm()
     const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -50,25 +55,34 @@ export default function SingleDayEventForm({
     const [address, setAddress] = useState<IAddress | undefined>()
 
     useEffect(() => {
-        const { address } = utilService.getDraftEvent(DRAFT_EVENT_ADDRESS_KEY)
-        if (address) {
+        const addressObj = utilService.getDraftEvent(DRAFT_ADDRESS_KEY)
+        if (addressObj?.address) {
+            const { address } = addressObj
             setAddress(address)
+        }
+
+        const currentFormValuesObj = utilService.getDraftEvent(DRAFT_KEY)
+        if (currentFormValuesObj) {
+            const { currentFormValues } =
+                utilService.CIEventDraftToFormValues(currentFormValuesObj)
+            form.setFieldsValue(currentFormValues)
+        } else {
+            form.setFieldsValue(initialValues)
         }
     }, [])
 
-    const { currentFormValues } = utilService.getDraftEvent(DRAFT_EVENT_KEY)
-        ? utilService.CIEventDraftToFormValues(
-              utilService.getDraftEvent(DRAFT_EVENT_KEY)
-          )
-        : { currentFormValues: initialValues }
+    useEffect(() => {
+        onFormValueChange(null, form.getFieldsValue())
+    }, [eventDate, endDate])
 
     const onFormValueChange = (_: any, allFields: any) => {
+        console.log("onFormValueChange triggered:", allFields)
         const draftEvent = utilService.formatFormValuesToDraftCIEvent(
             allFields,
             address,
             false
         )
-        utilService.saveDraftEvent(draftEvent, DRAFT_EVENT_KEY)
+        utilService.saveDraftEvent(draftEvent, DRAFT_KEY)
     }
 
     const handleAddressSelect = (place: IGooglePlaceOption | null) => {
@@ -84,7 +98,7 @@ export default function SingleDayEventForm({
         setAddress(selectedAddress)
         utilService.saveDraftEvent(
             { address: selectedAddress },
-            DRAFT_EVENT_ADDRESS_KEY
+            DRAFT_ADDRESS_KEY
         )
         form.setFieldValue("address", selectedAddress)
     }
@@ -109,10 +123,7 @@ export default function SingleDayEventForm({
                 utilService.singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
-            utilService.saveDraftEvent(
-                { address: address },
-                DRAFT_EVENT_ADDRESS_KEY
-            )
+            utilService.saveDraftEvent({ address: address }, DRAFT_ADDRESS_KEY)
             onFormValueChange(currentFormValues, form.getFieldsValue())
         }
     }
@@ -133,8 +144,8 @@ export default function SingleDayEventForm({
                 await store.createCIEvent(event)
                 clearForm()
                 closeForm()
-                utilService.clearDraftEvent(DRAFT_EVENT_KEY)
-                utilService.clearDraftEvent(DRAFT_EVENT_ADDRESS_KEY)
+                utilService.clearDraftEvent(DRAFT_KEY)
+                utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
             } else {
                 const template: Omit<CITemplate, "id"> =
                     utilService.formatFormValuesToCreateCITemplate(
@@ -173,7 +184,7 @@ export default function SingleDayEventForm({
                     onFinish={handleSubmit}
                     onFinishFailed={onFinishFailed}
                     variant="filled"
-                    initialValues={currentFormValues}
+                    // initialValues={currentFormValues}
                     onValuesChange={onFormValueChange}
                 >
                     {isTemplate && (
@@ -249,16 +260,16 @@ export default function SingleDayEventForm({
                     <SingleDayEventFormHead
                         form={form}
                         handleAddressSelect={handleAddressSelect}
-                        handleDateChange={handleDateChange}
-                        handleEndDateChange={handleEndDateChange}
                         address={address}
-                        eventDate={eventDate}
-                        endDate={endDate}
                         isEdit={false}
                         teachers={store.getAppTaggableTeachers}
                         isTemplate={isTemplate}
                         titleText={titleText}
                         orgs={store.getAppTaggableOrgs}
+                        handleDateChange={handleDateChange}
+                        handleEndDateChange={handleEndDateChange}
+                        eventDate={eventDate}
+                        endDate={endDate}
                     />
                     <EventSegmentsForm
                         form={form}

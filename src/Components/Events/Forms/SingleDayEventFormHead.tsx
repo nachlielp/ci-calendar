@@ -34,13 +34,15 @@ interface SingleDayEventFormHeadProps {
     titleText: string
 }
 export default function SingleDayEventFormHead({
+    form,
     handleAddressSelect,
+    handleDateChange,
+
     teachers,
     orgs,
     isTemplate,
     address,
     titleText,
-    form,
 }: SingleDayEventFormHeadProps) {
     return (
         <div>
@@ -99,6 +101,7 @@ export default function SingleDayEventFormHead({
                         name="event-start-date"
                         form={form}
                         placeholder="תאריך "
+                        handleChange={handleDateChange}
                     />
                 )}
 
