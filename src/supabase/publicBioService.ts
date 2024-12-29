@@ -58,7 +58,7 @@ async function getPublicBioList(): Promise<UserBio[]> {
         const { data, error } = await supabase
             .from("public_bio")
             .select(
-                "id,user_id, bio_name, img, about, page_url, page_title, show_profile, allow_tagging,user_type"
+                "id, user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2, show_profile, allow_tagging, user_type"
             )
             .eq("show_profile", true)
             .not("bio_name", "eq", "")
