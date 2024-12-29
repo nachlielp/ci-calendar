@@ -116,7 +116,9 @@ function CIEventToFormValues(event: CIEvent) {
     return { currentFormValues, address: event.address }
 }
 
-function CIEventDraftToFormValues(event: Partial<CIEvent>) {
+function CIEventDraftToFormValues(
+    event: Partial<CIEvent & { template_name?: string }>
+) {
     // Safely handle segments
     const segments =
         event.segments?.slice(1)?.map((segment) => ({
@@ -133,6 +135,7 @@ function CIEventDraftToFormValues(event: Partial<CIEvent>) {
 
     // Create form values with null checks
     const currentFormValues = {
+        "template-name": event.template_name || "",
         created_at: event.created_at || null,
         updated_at: dayjs().toISOString(),
         "event-title": event.title || "",
@@ -420,7 +423,8 @@ function formatFormValuesToDraftCIEvent(
     values: any,
     address: IAddress | undefined,
     is_multi_day: boolean
-): Partial<DBCIEvent> {
+): Partial<DBCIEvent & { template_name?: string }> {
+    console.log("values: ", values)
     let segments: any[] = []
 
     // Only process segments if we have the required date and time values
@@ -430,6 +434,7 @@ function formatFormValuesToDraftCIEvent(
         values["first-segment-start-time"] &&
         values["first-segment-end-time"]
     ) {
+        console.log("_2_process segments: ", values)
         segments = [
             {
                 startTime: dayjs(values["event-start-date"])
@@ -449,34 +454,87 @@ function formatFormValuesToDraftCIEvent(
         ]
 
         // Only process additional segments if they exist and have required fields
+        // if (values["segments"]?.length > 0) {
+        //     const additionalSegments = values["segments"]
+        //         .filter(
+        //             (segment: any) =>
+        //                 segment["event-start-time"] && segment["event-end-time"]
+        //         )
+        //         .map((segment: any) => ({
+        //             type: segment["event-type"] || "",
+        //             tags: segment["event-tags"] || [],
+        //             teachers: segment.teachers
+        //                 ? utilService.formatUsersForCIEvent(segment.teachers)
+        //                 : [],
+        //             startTime: dayjs(values["event-start-date"])
+        //                 .hour(dayjs(segment["event-start-time"]).hour())
+        //                 .minute(dayjs(segment["event-start-time"]).minute())
+        //                 .toISOString(),
+        //             endTime: dayjs(values["event-start-date"])
+        //                 .hour(dayjs(segment["event-end-time"]).hour())
+        //                 .minute(dayjs(segment["event-end-time"]).minute())
+        //                 .toISOString(),
+        //         }))
+
+        //     segments.push(...additionalSegments)
+        // }
         if (values["segments"]?.length > 0) {
             const additionalSegments = values["segments"]
-                .filter(
-                    (segment: any) =>
-                        segment["event-start-time"] && segment["event-end-time"]
-                )
+                .filter((segment: any) => segment !== undefined)
                 .map((segment: any) => ({
-                    type: segment["event-type"] || "",
-                    tags: segment["event-tags"] || [],
-                    teachers: segment.teachers
-                        ? utilService.formatUsersForCIEvent(segment.teachers)
-                        : [],
-                    startTime: dayjs(values["event-start-date"])
-                        .hour(dayjs(segment["event-start-time"]).hour())
-                        .minute(dayjs(segment["event-start-time"]).minute())
-                        .toISOString(),
-                    endTime: dayjs(values["event-start-date"])
-                        .hour(dayjs(segment["event-end-time"]).hour())
-                        .minute(dayjs(segment["event-end-time"]).minute())
-                        .toISOString(),
+                    type: segment["event-type"],
+                    tags: segment["event-tags"],
+                    teachers: segment.teachers,
+                    startTime: segment["event-start-time"],
+                    endTime: segment["event-end-time"],
                 }))
 
             segments.push(...additionalSegments)
         }
+    } else {
+        segments = [
+            {
+                startTime:
+                    (values["event-start-date"] || dayjs().toISOString()) &&
+                    values["first-segment-start-time"]
+                        ? dayjs(values["event-start-date"])
+                              .hour(
+                                  dayjs(
+                                      values["first-segment-start-time"]
+                                  ).hour()
+                              )
+                              .minute(
+                                  dayjs(
+                                      values["first-segment-start-time"]
+                                  ).minute()
+                              )
+                              .toISOString()
+                        : "",
+                endTime:
+                    (values["event-start-date"] || dayjs().toISOString()) &&
+                    values["first-segment-end-time"]
+                        ? dayjs(values["event-start-date"])
+                              .hour(
+                                  dayjs(values["first-segment-end-time"]).hour()
+                              )
+                              .minute(
+                                  dayjs(
+                                      values["first-segment-end-time"]
+                                  ).minute()
+                              )
+                              .toISOString()
+                        : "",
+                type: values["event-type"] || "",
+                tags: values["event-tags"] || [],
+                teachers: values["teachers"]
+                    ? formatUsersForCIEvent(values["teachers"])
+                    : [],
+            },
+        ]
     }
 
     // Construct the base event object with optional fields
-    const draftEvent: Partial<DBCIEvent> = {
+    const draftEvent: Partial<DBCIEvent & { template_name?: string }> = {
         updated_at: dayjs().toISOString(),
     }
 
@@ -521,6 +579,9 @@ function formatFormValuesToDraftCIEvent(
         draftEvent.segments = segments
     }
 
+    if (values["template-name"]) {
+        draftEvent.template_name = values["template-name"]
+    }
     return draftEvent
 }
 

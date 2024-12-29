@@ -55,19 +55,29 @@ export default function SingleDayEventForm({
     const [address, setAddress] = useState<IAddress | undefined>()
 
     useEffect(() => {
+        if (isTemplate) {
+        }
         const addressObj = utilService.getDraftEvent(DRAFT_ADDRESS_KEY)
+        let currentAddress: IAddress | undefined = undefined
+
         if (addressObj?.address) {
-            const { address } = addressObj
-            setAddress(address)
+            currentAddress = addressObj.address
+            setAddress(currentAddress)
         }
 
         const currentFormValuesObj = utilService.getDraftEvent(DRAFT_KEY)
         if (currentFormValuesObj) {
             const { currentFormValues } =
                 utilService.CIEventDraftToFormValues(currentFormValuesObj)
-            form.setFieldsValue(currentFormValues)
+            form.setFieldsValue({
+                ...currentFormValues,
+                address: currentAddress,
+            })
         } else {
-            form.setFieldsValue(initialValues)
+            form.setFieldsValue({
+                ...initialValues,
+                address: currentAddress,
+            })
         }
     }, [])
 
@@ -76,9 +86,14 @@ export default function SingleDayEventForm({
     }, [eventDate, endDate])
 
     const onFormValueChange = (_: any, allFields: any) => {
-        console.log("onFormValueChange triggered:", allFields)
+        const updatedFields = {
+            ...allFields,
+            "event-start-date": allFields["event-start-date"] || eventDate,
+            "event-end-date": allFields["event-end-date"] || endDate,
+        }
+
         const draftEvent = utilService.formatFormValuesToDraftCIEvent(
-            allFields,
+            updatedFields,
             address,
             false
         )
@@ -114,6 +129,8 @@ export default function SingleDayEventForm({
     const clearForm = () => {
         form.resetFields()
         handleAddressSelect(null)
+        utilService.clearDraftEvent(DRAFT_KEY)
+        utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
     }
 
     const handleTemplateChange = (value: string) => {
