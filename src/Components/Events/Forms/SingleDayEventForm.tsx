@@ -8,7 +8,7 @@ import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import EventSegmentsForm from "./EventSegmentsForm"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"
 import { utilService } from "../../../util/utilService"
@@ -28,6 +28,12 @@ const initialValues = {
     "event-tags": [tagOptions[0].value],
 }
 
+const DRAFT_EVENT_KEY = "single-day-draft-event"
+const DRAFT_EVENT_ADDRESS_KEY = "single-day-draft-event-address"
+
+// const DRAFT_TEMPLATE_KEY = "single-day-draft-template"
+// const DRAFT_TEMPLATE_ADDRESS_KEY = "single-day-draft-template-address"
+
 export default function SingleDayEventForm({
     closeForm,
     isTemplate,
@@ -43,6 +49,28 @@ export default function SingleDayEventForm({
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [address, setAddress] = useState<IAddress | undefined>()
 
+    useEffect(() => {
+        const { address } = utilService.getDraftEvent(DRAFT_EVENT_ADDRESS_KEY)
+        if (address) {
+            setAddress(address)
+        }
+    }, [])
+
+    const { currentFormValues } = utilService.getDraftEvent(DRAFT_EVENT_KEY)
+        ? utilService.CIEventDraftToFormValues(
+              utilService.getDraftEvent(DRAFT_EVENT_KEY)
+          )
+        : { currentFormValues: initialValues }
+
+    const onFormValueChange = (_: any, allFields: any) => {
+        const draftEvent = utilService.formatFormValuesToDraftCIEvent(
+            allFields,
+            address,
+            false
+        )
+        utilService.saveDraftEvent(draftEvent, DRAFT_EVENT_KEY)
+    }
+
     const handleAddressSelect = (place: IGooglePlaceOption | null) => {
         if (!place) {
             setAddress(undefined)
@@ -54,6 +82,10 @@ export default function SingleDayEventForm({
             place_id: place.value.place_id,
         }
         setAddress(selectedAddress)
+        utilService.saveDraftEvent(
+            { address: selectedAddress },
+            DRAFT_EVENT_ADDRESS_KEY
+        )
         form.setFieldValue("address", selectedAddress)
     }
 
@@ -77,6 +109,11 @@ export default function SingleDayEventForm({
                 utilService.singleDayTemplateToFormValues(template)
             form.setFieldsValue(currentFormValues)
             setAddress(address)
+            utilService.saveDraftEvent(
+                { address: address },
+                DRAFT_EVENT_ADDRESS_KEY
+            )
+            onFormValueChange(currentFormValues, form.getFieldsValue())
         }
     }
 
@@ -96,6 +133,8 @@ export default function SingleDayEventForm({
                 await store.createCIEvent(event)
                 clearForm()
                 closeForm()
+                utilService.clearDraftEvent(DRAFT_EVENT_KEY)
+                utilService.clearDraftEvent(DRAFT_EVENT_ADDRESS_KEY)
             } else {
                 const template: Omit<CITemplate, "id"> =
                     utilService.formatFormValuesToCreateCITemplate(
@@ -134,7 +173,8 @@ export default function SingleDayEventForm({
                     onFinish={handleSubmit}
                     onFinishFailed={onFinishFailed}
                     variant="filled"
-                    initialValues={initialValues}
+                    initialValues={currentFormValues}
+                    onValuesChange={onFormValueChange}
                 >
                     {isTemplate && (
                         <Form.Item name="template-name">

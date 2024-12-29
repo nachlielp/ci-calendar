@@ -75,6 +75,11 @@ export const utilService = {
     getIsInternalFromLocalStorage,
     isUUID,
     getUserTypeByRoleId,
+    formatFormValuesToDraftCIEvent,
+    saveDraftEvent,
+    getDraftEvent,
+    clearDraftEvent,
+    CIEventDraftToFormValues,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -96,7 +101,7 @@ function CIEventToFormValues(event: CIEvent) {
         "event-start-date": dayjs(event.start_date),
         "event-end-date": dayjs(event.end_date),
         "main-event-type": event.type,
-        "event-schedule": event.segments.length > 0,
+        "event-schedule": event.segments ? event.segments.length > 0 : false,
         links: event.links,
         prices: event.price,
         "event-type": event.segments[0]?.type,
@@ -109,6 +114,64 @@ function CIEventToFormValues(event: CIEvent) {
         "event-orgs": event.organisations?.map((org) => org.value),
     }
     return { currentFormValues, address: event.address }
+}
+
+function CIEventDraftToFormValues(event: Partial<CIEvent>) {
+    // Safely handle segments
+    const segments =
+        event.segments?.slice(1)?.map((segment) => ({
+            "event-type": segment.type || "",
+            "event-tags": segment.tags || [],
+            teachers: segment.teachers
+                ? reverseFormatTeachers(segment.teachers)
+                : [],
+            "event-start-time": segment.startTime
+                ? dayjs(segment.startTime)
+                : null,
+            "event-end-time": segment.endTime ? dayjs(segment.endTime) : null,
+        })) || []
+
+    // Create form values with null checks
+    const currentFormValues = {
+        created_at: event.created_at || null,
+        updated_at: dayjs().toISOString(),
+        "event-title": event.title || "",
+        "event-description": event.description || "",
+        district: event.district || null,
+        address: event.address || null,
+        "event-dates": [
+            event.start_date ? dayjs(event.start_date) : null,
+            event.end_date ? dayjs(event.end_date) : null,
+        ],
+        "event-start-date": event.start_date ? dayjs(event.start_date) : null,
+        "event-end-date": event.end_date ? dayjs(event.end_date) : null,
+        "main-event-type": event.type || "",
+        "event-schedule": event.segments ? event.segments.length > 0 : false,
+        links: event.links || [],
+        prices: event.price || [],
+
+        // Handle first segment data safely
+        "event-type": event.segments?.[0]?.type || "",
+        "event-tags": event.segments?.[0]?.tags || [],
+        teachers: event.segments?.[0]?.teachers
+            ? reverseFormatTeachers(event.segments[0].teachers)
+            : [],
+        "first-segment-start-time": event.segments?.[0]?.startTime
+            ? dayjs(event.segments[0].startTime)
+            : null,
+        "first-segment-end-time": event.segments?.[0]?.endTime
+            ? dayjs(event.segments[0].endTime)
+            : null,
+
+        "multi-day-event-teachers": event.multi_day_teachers || [],
+        segments: segments,
+        "event-orgs": event.organisations?.map((org) => org.value) || [],
+    }
+
+    return {
+        currentFormValues,
+        address: event.address || null,
+    }
 }
 
 function reverseFormatTeachers(teachers: { label: string; value: string }[]) {
@@ -351,6 +414,114 @@ function formatFormValuesToEditCIEvent(
         segments: segments,
         type: values["main-event-type"] || "",
     }
+}
+
+function formatFormValuesToDraftCIEvent(
+    values: any,
+    address: IAddress | undefined,
+    is_multi_day: boolean
+): Partial<DBCIEvent> {
+    let segments: any[] = []
+
+    // Only process segments if we have the required date and time values
+    if (
+        !is_multi_day &&
+        values["event-start-date"] &&
+        values["first-segment-start-time"] &&
+        values["first-segment-end-time"]
+    ) {
+        segments = [
+            {
+                startTime: dayjs(values["event-start-date"])
+                    .hour(dayjs(values["first-segment-start-time"]).hour())
+                    .minute(dayjs(values["first-segment-start-time"]).minute())
+                    .toISOString(),
+                endTime: dayjs(values["event-start-date"])
+                    .hour(dayjs(values["first-segment-end-time"]).hour())
+                    .minute(dayjs(values["first-segment-end-time"]).minute())
+                    .toISOString(),
+                type: values["event-type"] || "",
+                tags: values["event-tags"] || [],
+                teachers: values["teachers"]
+                    ? formatUsersForCIEvent(values["teachers"])
+                    : [],
+            },
+        ]
+
+        // Only process additional segments if they exist and have required fields
+        if (values["segments"]?.length > 0) {
+            const additionalSegments = values["segments"]
+                .filter(
+                    (segment: any) =>
+                        segment["event-start-time"] && segment["event-end-time"]
+                )
+                .map((segment: any) => ({
+                    type: segment["event-type"] || "",
+                    tags: segment["event-tags"] || [],
+                    teachers: segment.teachers
+                        ? utilService.formatUsersForCIEvent(segment.teachers)
+                        : [],
+                    startTime: dayjs(values["event-start-date"])
+                        .hour(dayjs(segment["event-start-time"]).hour())
+                        .minute(dayjs(segment["event-start-time"]).minute())
+                        .toISOString(),
+                    endTime: dayjs(values["event-start-date"])
+                        .hour(dayjs(segment["event-end-time"]).hour())
+                        .minute(dayjs(segment["event-end-time"]).minute())
+                        .toISOString(),
+                }))
+
+            segments.push(...additionalSegments)
+        }
+    }
+
+    // Construct the base event object with optional fields
+    const draftEvent: Partial<DBCIEvent> = {
+        updated_at: dayjs().toISOString(),
+    }
+
+    // Only add fields if they have values
+    if (values["event-start-date"]) {
+        draftEvent.start_date = dayjs(values["event-start-date"])
+            .hour(13)
+            .minute(0)
+            .second(0)
+            .format("YYYY-MM-DDTHH:mm:ss")
+
+        draftEvent.end_date =
+            is_multi_day && values["event-end-date"]
+                ? dayjs(values["event-end-date"])
+                      .hour(13)
+                      .minute(0)
+                      .second(0)
+                      .format("YYYY-MM-DDTHH:mm:ss")
+                : draftEvent.start_date
+    }
+
+    if (address) draftEvent.address = address
+    if (values["event-title"]) draftEvent.title = values["event-title"]
+    if (values["event-description"])
+        draftEvent.description = values["event-description"]
+    if (values["links"]) draftEvent.links = values["links"]
+    if (values["prices"]) draftEvent.price = values["prices"]
+    if (values["district"]) draftEvent.district = values["district"]
+    if (values["main-event-type"]) draftEvent.type = values["main-event-type"]
+
+    if (values["multi-day-event-teachers"]) {
+        draftEvent.multi_day_teachers = formatUsersForCIEvent(
+            values["multi-day-event-teachers"]
+        )
+    }
+
+    if (values["event-orgs"]) {
+        draftEvent.organisations = formatUsersForCIEvent(values["event-orgs"])
+    }
+
+    if (segments.length > 0) {
+        draftEvent.segments = segments
+    }
+
+    return draftEvent
 }
 
 function formatFormValuesToCreateCITemplate(
@@ -913,4 +1084,17 @@ function getUserTypeByRoleId(roleId: string) {
             break
     }
     return type
+}
+
+function saveDraftEvent(draftEvent: Partial<DBCIEvent>, key: string) {
+    localStorage.setItem(key, JSON.stringify(draftEvent))
+}
+
+function getDraftEvent(key: string) {
+    const draftEvent = localStorage.getItem(key)
+    return draftEvent ? JSON.parse(draftEvent) : null
+}
+
+function clearDraftEvent(key: string) {
+    localStorage.removeItem(key)
 }
