@@ -25,6 +25,8 @@ export default function Login() {
     useEffect(() => {
         if (store.isUser) {
             navigate(`/`)
+        } else {
+            store.clearUser()
         }
     }, [store.isUser])
 

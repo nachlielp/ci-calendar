@@ -27,6 +27,8 @@ export default function Signup() {
     useEffect(() => {
         if (store.isUser) {
             navigate(`/`)
+        } else {
+            store.clearUser()
         }
     }, [store.isUser])
 

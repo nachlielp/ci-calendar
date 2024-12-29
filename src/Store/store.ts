@@ -1334,17 +1334,17 @@ class Store {
     clearUser = () => {
         this.setStore({
             ci_events: this.app_ci_events,
+            past_ci_events: this.app_past_ci_events,
             user: {} as CIUser,
             notifications: [],
             templates: [],
             requests: [],
-            past_ci_events: [],
             alerts: [],
             userBio: {} as UserBio,
         } as CIUserData)
 
         sessionStorage.clear()
-        // localStorage.removeItem("sb-pjgwpivkvsuernmoeebk-auth-token")
+        localStorage.removeItem(import.meta.env.VITE_AUTH_KEY_NAME)
     }
 
     @action
