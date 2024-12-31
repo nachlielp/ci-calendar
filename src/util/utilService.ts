@@ -256,6 +256,9 @@ function formatFormValuesToCreateCIEvent(
     address: IAddress,
     is_multi_day: boolean
 ): Omit<DBCIEvent, "id" | "cancelled_text"> {
+    if (import.meta.env.VITE_HIDE_EVENTS_FLAG) {
+        console.error("__HIDE EVENTS ON CREATION")
+    }
     let segments: any[] = []
     if (!is_multi_day) {
         segments = [
@@ -301,7 +304,7 @@ function formatFormValuesToCreateCIEvent(
     return {
         created_at: dayjs().toISOString(),
         type: values["main-event-type"] || "",
-        hide: false,
+        hide: import.meta.env.VITE_HIDE_EVENTS_FLAG ? true : false,
         owners: [],
         is_multi_day: is_multi_day,
         user_id: store.user.id,
