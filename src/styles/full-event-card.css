@@ -175,6 +175,33 @@
         }
     }
 
+    @media screen and (min-width: 768px) {
+        .event-description {
+            max-height: 200px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            scrollbar-gutter: stable; /* Prevents layout shift when scrollbar appears */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+
+            /* scrollbar-width: thin; Firefox */
+
+            /* For Webkit browsers (Chrome, Safari) */
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 4px;
+                min-height: 40px;
+            }
+            &::-webkit-scrollbar-thumb:hover {
+                background: #555;
+            }
+        }
+    }
+
     .event-card-footer {
         display: flex;
         flex-direction: row;
