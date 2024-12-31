@@ -16,6 +16,7 @@ import MultiDayFormHead from "./MultiDayFormHead"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
 import "../../../styles/event-form.css"
+import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -324,11 +325,22 @@ export default function MultiDayEventForm({
                     orgs={store.getAppTaggableOrgs}
                     titleText="יצירת אירוע - רב יומי"
                 />
-                <EventFromFooter
-                    isSubmitting={isSubmitting}
-                    inputErrors={inputErrors}
-                    submitText={isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
-                />
+                <EventFromFooter inputErrors={inputErrors} />
+                <Form.Item
+                    wrapperCol={{ span: 24 }}
+                    className="submit-button-container"
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                    }}
+                >
+                    <AsyncFormSubmitButton
+                        isSubmitting={isSubmitting}
+                        size="large"
+                    >
+                        {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                    </AsyncFormSubmitButton>
+                </Form.Item>
             </Form>
         </section>
     )

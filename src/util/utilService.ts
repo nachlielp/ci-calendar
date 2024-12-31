@@ -18,13 +18,15 @@ import {
     hebrewMonths,
     SelectOption,
 } from "./options"
-import dayjs from "dayjs"
+import dayjs, { Dayjs } from "dayjs"
 import utc from "dayjs/plugin/utc.js"
 import timezone from "dayjs/plugin/timezone.js"
 import customParseFormat from "dayjs/plugin/customParseFormat"
+import weekOfYear from "dayjs/plugin/weekOfYear"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
+dayjs.extend(weekOfYear)
 dayjs.tz.setDefault("Asia/Jerusalem")
 import { store } from "../Store/store"
 import { CACHE_VERSION } from "../App"
@@ -80,6 +82,8 @@ export const utilService = {
     getDraftEvent,
     clearDraftEvent,
     CIEventDraftToFormValues,
+    calculateRecurringEventDates,
+    duplicateEvent,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -1159,4 +1163,66 @@ function getDraftEvent(key: string) {
 
 function clearDraftEvent(key: string) {
     localStorage.removeItem(key)
+}
+
+function calculateRecurringEventDates(
+    startDate: dayjs.Dayjs,
+    recurringEndData: dayjs.Dayjs,
+    recurringOption: string
+) {
+    const recurringDates = []
+
+    if (recurringOption === "weekly") {
+        for (let i = 0; i < 52; i++) {
+            const date = startDate.add(i, "week")
+            if (date.isAfter(recurringEndData)) break
+            recurringDates.push(date)
+        }
+    } else if (recurringOption === "bi-weekly") {
+        for (let i = 0; i < 52; i++) {
+            const date = startDate.add(i * 2, "week")
+            if (date.isAfter(recurringEndData)) break
+            recurringDates.push(date)
+        }
+    } else if (recurringOption === "monthly") {
+        for (let i = 0; i < 12; i++) {
+            const date = startDate.add(i, "month")
+            if (date.isAfter(recurringEndData)) break
+            recurringDates.push(date)
+        }
+    } else if (recurringOption === "monthly-pattern") {
+        const weekOfMonth = Math.ceil(startDate.date() / 7) // Get which week of the month (1-5)
+        const dayOfWeek = startDate.day() // Get day of week (0-6)
+
+        for (let i = 0; i < 12; i++) {
+            let targetDate = startDate.clone().add(i, "months")
+
+            let firstDayOfMonth = targetDate.clone().startOf("month")
+
+            let dayOffset = (dayOfWeek - firstDayOfMonth.day() + 7) % 7
+            let firstTargetDay = firstDayOfMonth.clone().add(dayOffset, "days")
+
+            let finalDate = firstTargetDay.clone().add(weekOfMonth - 1, "weeks")
+
+            if (finalDate.isAfter(recurringEndData)) break
+            recurringDates.push(finalDate)
+        }
+    }
+    return recurringDates
+}
+
+function duplicateEvent(
+    date: Dayjs,
+    event: Omit<DBCIEvent, "id" | "cancelled_text">
+): Omit<DBCIEvent, "id" | "cancelled_text"> {
+    const eventLength = dayjs(event.start_date).diff(
+        dayjs(event.end_date),
+        "day"
+    )
+
+    return {
+        ...event,
+        start_date: date.format("YYYY/MM/DD"),
+        end_date: date.add(eventLength, "day").format("YYYY/MM/DD"),
+    }
 }

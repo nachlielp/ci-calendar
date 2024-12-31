@@ -18,6 +18,9 @@ import EventFromFooter from "./EventFromFooter"
 import "../../../styles/event-form.css"
 import Select from "antd/es/select"
 import { memo } from "react"
+import { v4 as uuidv4 } from "uuid"
+import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
+import RecurringEventSection from "./RecurringEventSection"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -54,6 +57,11 @@ const SingleDayEventForm = memo(
         const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
         const [inputErrors, setInputErrors] = useState<boolean>(false)
         const [address, setAddress] = useState<IAddress | undefined>()
+        const [recurringOption, setRecurringOption] = useState<string | null>(
+            null
+        )
+        const [recurringEndDate, setRecurringEndDate] =
+            useState<dayjs.Dayjs | null>(null)
 
         useEffect(() => {
             if (isTemplate) {
@@ -127,6 +135,14 @@ const SingleDayEventForm = memo(
             setEndDate(date)
         }
 
+        const handleRecurringOptionChange = (value: string) => {
+            setRecurringOption(value)
+        }
+
+        const handleRecurringEndDateChange = (date: dayjs.Dayjs) => {
+            setRecurringEndDate(date)
+        }
+
         const clearForm = () => {
             form.resetFields()
             handleAddressSelect(null)
@@ -150,19 +166,64 @@ const SingleDayEventForm = memo(
         }
 
         const handleSubmit = async (values: any) => {
+            console.log("handleSubmit", values)
             if (!address) {
                 return
             }
             setIsSubmitting(true)
             try {
                 if (!isTemplate) {
-                    const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
-                        utilService.formatFormValuesToCreateCIEvent(
-                            values,
-                            address,
-                            false
-                        )
-                    await store.createCIEvent(event)
+                    if (!values["recurring-event"]) {
+                        const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
+                            utilService.formatFormValuesToCreateCIEvent(
+                                values,
+                                address,
+                                false
+                            )
+                        await store.createCIEvent(event)
+                    } else {
+                        const recurring_ref_key = uuidv4()
+                        const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
+                            utilService.formatFormValuesToCreateCIEvent(
+                                values,
+                                address,
+                                true
+                            )
+
+                        if (
+                            eventDate &&
+                            values["recurring-event-end-date"] &&
+                            values["recurring-event-option"]
+                        ) {
+                            const startDate = eventDate
+                            const recurringEndDate = dayjs(
+                                values["recurring-event-end-date"]
+                            )
+                            const recurringOption =
+                                values["recurring-event-option"]
+                            const recurringEventStartDates =
+                                utilService.calculateRecurringEventDates(
+                                    startDate,
+                                    recurringEndDate,
+                                    recurringOption
+                                )
+                            const recurringEvents =
+                                recurringEventStartDates.map((date) => {
+                                    return utilService.duplicateEvent(
+                                        date,
+                                        event
+                                    )
+                                })
+                            Promise.all(
+                                recurringEvents.map((event) =>
+                                    store.createCIEvent({
+                                        ...event,
+                                        recurring_ref_key,
+                                    })
+                                )
+                            )
+                        }
+                    }
                     clearForm()
                     closeForm()
                     utilService.clearDraftEvent(DRAFT_KEY)
@@ -296,13 +357,38 @@ const SingleDayEventForm = memo(
                             form={form}
                             teachers={store.getAppTaggableTeachers}
                         />
-                        <EventFromFooter
-                            isSubmitting={isSubmitting}
-                            inputErrors={inputErrors}
-                            submitText={
-                                isTemplate ? "יצירת תבנית" : "יצירת אירוע"
-                            }
-                        />
+                        <EventFromFooter inputErrors={inputErrors} />
+                        {!isTemplate && (
+                            <RecurringEventSection
+                                startDate={eventDate}
+                                endDate={endDate}
+                                form={form}
+                                recurringOption={recurringOption}
+                                recurringEndDate={recurringEndDate}
+                                handleRecurringOptionChange={
+                                    handleRecurringOptionChange
+                                }
+                                handleRecurringEndDateChange={
+                                    handleRecurringEndDateChange
+                                }
+                            />
+                        )}
+
+                        <Form.Item
+                            wrapperCol={{ span: 24 }}
+                            className="submit-button-container"
+                            style={{
+                                display: "flex",
+                                justifyContent: "flex-start",
+                            }}
+                        >
+                            <AsyncFormSubmitButton
+                                isSubmitting={isSubmitting}
+                                size="large"
+                            >
+                                {isTemplate ? "יצירת תבנית" : "יצירת אירוע"}
+                            </AsyncFormSubmitButton>
+                        </Form.Item>
                     </Form>
                 </section>
             </div>

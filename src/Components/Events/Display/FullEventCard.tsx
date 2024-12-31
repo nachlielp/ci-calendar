@@ -266,7 +266,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <hr className="hr" />
                         <h3 className="section-title">פרטים נוספים</h3>
                         <article className="event-description">
-                            <label className="event-label">
+                            <label className="event-label ">
                                 {ci_event.description}
                             </label>
                         </article>

@@ -92,3 +92,10 @@ export const multiDayNotificationOptions: SelectOption[] = [
     { label: "יומיים לפני הארוע", value: "48" },
     { label: "שבוע לפני הארוע", value: "168" },
 ]
+
+export const recurringOptions: SelectOption[] = [
+    { label: "שבועי", value: "weekly" },
+    { label: "דו שבועי", value: "bi-weekly" },
+    { label: "חודשי", value: "monthly" },
+    { label: "חודשי - יום בשבוע", value: "monthly-pattern" },
+]

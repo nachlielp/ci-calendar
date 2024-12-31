@@ -168,6 +168,7 @@
         overflow-wrap: break-word;
         margin-left: 24px;
         font-size: 18px;
+        white-space: pre-wrap;
 
         .event-label {
             margin-bottom: 8px;

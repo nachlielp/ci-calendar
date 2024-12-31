@@ -14,6 +14,7 @@ import { utilService } from "../../../util/utilService.ts"
 import { store } from "../../../Store/store.ts"
 import EventFromFooter from "./EventFromFooter.tsx"
 import "../../../styles/event-form.css"
+import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton.tsx"
 export default function EditMultiDayEventForm({
     isTemplate = false,
     event,
@@ -99,7 +100,6 @@ export default function EditMultiDayEventForm({
             setInputErrors(false)
         }, 3000)
     }
-    const submitText = isTemplate ? "עדכון תבנית" : "עדכון אירוע"
 
     const titleText = isTemplate
         ? "עדכון תבנית - רב יומי"
@@ -128,11 +128,23 @@ export default function EditMultiDayEventForm({
                     orgs={store.getAppTaggableOrgs}
                     titleText={titleText}
                 />
-                <EventFromFooter
-                    inputErrors={inputErrors}
-                    isSubmitting={isSubmitting}
-                    submitText={submitText}
-                />
+                <EventFromFooter inputErrors={inputErrors} />
+
+                <Form.Item
+                    wrapperCol={{ span: 24 }}
+                    className="submit-button-container"
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                    }}
+                >
+                    <AsyncFormSubmitButton
+                        isSubmitting={isSubmitting}
+                        size="large"
+                    >
+                        {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
+                    </AsyncFormSubmitButton>
+                </Form.Item>
             </Form>
         </section>
     )

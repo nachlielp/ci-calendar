@@ -19,6 +19,7 @@ import EventSegmentsForm from "./EventSegmentsForm"
 import { utilService } from "../../../util/utilService"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
+import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -131,8 +132,6 @@ export default function EditSingleDayEventForm({
         }, 3000)
     }
 
-    const submitText = isTemplate ? "עדכון תבנית" : "עדכון אירוע"
-
     const titleText = isTemplate
         ? "עדכון תבנית - חד יומי"
         : "עדכון אירוע - חד יומי"
@@ -172,11 +171,22 @@ export default function EditSingleDayEventForm({
                     form={form}
                     teachers={store.getAppTaggableTeachers}
                 />
-                <EventFromFooter
-                    inputErrors={inputErrors}
-                    isSubmitting={isSubmitting}
-                    submitText={submitText}
-                />
+                <EventFromFooter inputErrors={inputErrors} />
+                <Form.Item
+                    wrapperCol={{ span: 24 }}
+                    className="submit-button-container"
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                    }}
+                >
+                    <AsyncFormSubmitButton
+                        isSubmitting={isSubmitting}
+                        size="large"
+                    >
+                        {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
+                    </AsyncFormSubmitButton>
+                </Form.Item>
             </Form>
         </section>
     )

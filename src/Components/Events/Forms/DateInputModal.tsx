@@ -14,6 +14,7 @@ import ConfigProvider from "antd/es/config-provider"
 import { Icon } from "../../Common/Icon"
 import DatePicker from "antd/es/date-picker"
 import "../../../styles/date-input-modal.css"
+import { DATE_LIMIT } from "../../../App"
 
 export enum DateInputModalType {
     date = "date",
@@ -115,8 +116,8 @@ const DateInputModal = ({
 
     const nextMonth = () => {
         const newValue = value.add(1, "month")
-        const threeMonthsAhead = dayjs().add(3, "months").endOf("month")
-        if (newValue.isBefore(threeMonthsAhead)) {
+        // const threeMonthsAhead = dayjs().add(3, "months").endOf("month")
+        if (newValue.isBefore(DATE_LIMIT)) {
             setValue(newValue)
         }
     }

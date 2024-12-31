@@ -1,0 +1,20 @@
+.recurring-event-section {
+    .recurring-container {
+        width: 100%;
+        .recurring-event-option {
+            width: 100%;
+            .recurring-select {
+                width: 100%;
+            }
+
+            .full-width {
+                width: 100%;
+            }
+        }
+    }
+
+    .recurring-event-date {
+        font-size: 18px;
+        font-weight: 600;
+    }
+}

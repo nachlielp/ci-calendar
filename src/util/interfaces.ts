@@ -94,6 +94,7 @@ export interface CIEvent {
     }
     cancelled: boolean
     cancelled_text: string
+    recurring_ref_key?: string
 }
 export interface CITemplate {
     id: string
