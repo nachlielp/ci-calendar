@@ -59,6 +59,7 @@ const CreateEventsPage = () => {
                     <button
                         className="btn"
                         onClick={() => navigate(button.path)}
+                        key={button.path}
                     >
                         {button.label}
                     </button>
