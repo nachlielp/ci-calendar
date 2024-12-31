@@ -211,7 +211,8 @@ const SingleDayEventForm = memo(
                                 recurringEventStartDates.map((date) => {
                                     return utilService.duplicateEvent(
                                         date,
-                                        event
+                                        event,
+                                        false
                                     )
                                 })
                             Promise.all(

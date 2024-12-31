@@ -1213,7 +1213,8 @@ function calculateRecurringEventDates(
 
 function duplicateEvent(
     date: Dayjs,
-    event: Omit<DBCIEvent, "id" | "cancelled_text">
+    event: Omit<DBCIEvent, "id" | "cancelled_text">,
+    isMultiDayEvent: boolean
 ): Omit<DBCIEvent, "id" | "cancelled_text"> {
     const eventLength = dayjs(event.start_date).diff(
         dayjs(event.end_date),
@@ -1223,6 +1224,8 @@ function duplicateEvent(
     return {
         ...event,
         start_date: date.format("YYYY/MM/DD"),
-        end_date: date.add(eventLength, "day").format("YYYY/MM/DD"),
+        end_date: isMultiDayEvent
+            ? date.add(eventLength, "day").format("YYYY/MM/DD")
+            : date.format("YYYY/MM/DD"),
     }
 }
