@@ -2,7 +2,8 @@ import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import Spin from "antd/es/spin"
 import { observer } from "mobx-react-lite"
 import "../../styles/request-permission-modal.css"
-import { Modal } from "../Common/Modal"
+import Modal from "antd/es/modal"
+// import { Modal } from "../Common/Modal"
 const RequestPermissionModal = () => {
     const requestPermission = async () => {
         vm.setLoading()
@@ -12,7 +13,11 @@ const RequestPermissionModal = () => {
         }
     }
     return (
-        <Modal open={vm.showRequestPermissionModal} closable={false}>
+        <Modal
+            open={vm.showRequestPermissionModal}
+            closable={false}
+            footer={null}
+        >
             <section className="request-permission-modal">
                 <label className="title">אישור קבלת התראות</label>
                 <label className="description">

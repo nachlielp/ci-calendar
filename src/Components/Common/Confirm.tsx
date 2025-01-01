@@ -1,7 +1,8 @@
 import React, { useState } from "react"
-import { Modal } from "./Modal"
+// import { Modal } from "./Modal"
 import "../../styles/confirm.css"
 import { createRoot } from "react-dom/client"
+import Modal from "antd/es/modal"
 
 interface ConfirmProps {
     title: React.ReactNode
@@ -45,7 +46,7 @@ export const Confirm = ({
     }
 
     return (
-        <Modal open={isOpen} onCancel={handleCancel}>
+        <Modal open={isOpen} onCancel={handleCancel} footer={null}>
             <div className={`confirm-container ${direction}`}>
                 <div className="confirm-header">
                     {icon && <span className="confirm-icon">{icon}</span>}

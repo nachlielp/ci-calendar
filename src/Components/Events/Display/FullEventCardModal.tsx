@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import { Modal } from "../../Common/Modal"
+// import { Modal } from "../../Common/Modal"
 import { CIEvent } from "../../../util/interfaces"
 import FullEventCard from "./FullEventCard"
 import { useNavigate } from "react-router"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
+import Modal from "antd/es/modal/Modal"
 
 interface EventCardProps {
     event: CIEvent
@@ -42,7 +43,7 @@ const FullEventCardModal = ({
                 {anchorEl}
             </div>
 
-            <Modal open={isModalOpen} onCancel={handleCancel}>
+            <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
                 <div style={{ width: "500px" }}>
                     <FullEventCard event={event} />
                 </div>

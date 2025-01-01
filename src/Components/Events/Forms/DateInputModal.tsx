@@ -1,4 +1,4 @@
-import { Modal } from "../../Common/Modal"
+// import { Modal } from "../../Common/Modal"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import Form, { FormInstance } from "antd/es/form"
@@ -15,6 +15,7 @@ import { Icon } from "../../Common/Icon"
 import DatePicker from "antd/es/date-picker"
 import "../../../styles/date-input-modal.css"
 import { DATE_LIMIT } from "../../../App"
+import Modal from "antd/es/modal"
 
 export enum DateInputModalType {
     date = "date",
@@ -148,7 +149,7 @@ const DateInputModal = ({
                     />
                 </Form.Item>
             </div>
-            <Modal open={open} onCancel={handleClose}>
+            <Modal open={open} onCancel={handleClose} footer={null}>
                 <section className="date-input-modal">
                     <header className="calendar-controller">
                         <Icon
