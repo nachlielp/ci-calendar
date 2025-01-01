@@ -52,7 +52,7 @@ const showCancelledConfirm = (eventId: string, cancelled: boolean) => {
                 )}
             </div>
         ),
-        okText: cancelled ? "הפעלה" : "ביטול",
+        okText: cancelled ? "הפעלה" : "ביטול אירוע",
         okType: "danger",
         cancelText: "חזרה",
         direction: "rtl",

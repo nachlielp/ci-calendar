@@ -1,4 +1,5 @@
-import { Modal } from "../../Common/Modal"
+// import { Modal } from "../../Common/Modal"
+import Modal from "antd/es/modal"
 import { useEffect, useState } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import Form, { FormInstance } from "antd/es/form"
@@ -6,6 +7,7 @@ import { TimeClock } from "@mui/x-date-pickers/TimeClock"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import TimePicker from "antd/es/time-picker"
+import "../../../styles/time-clock-value.css"
 
 type TimeView = "hours" | "minutes"
 
@@ -81,7 +83,7 @@ const TimeInputModal = ({
                     />
                 </Form.Item>
             </div>
-            <Modal open={open} onCancel={handleClose}>
+            <Modal open={open} onCancel={handleClose} footer={null}>
                 <section className="time-clock-value">
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <TimeClock
@@ -102,14 +104,22 @@ const TimeInputModal = ({
                         />
                     </LocalizationProvider>
 
-                    <button
-                        className="general-clear-btn "
-                        onClick={() =>
-                            setView(view === "hours" ? "minutes" : "hours")
-                        }
-                    >
-                        {view === "minutes" ? "שעות" : "דקות"}
-                    </button>
+                    <section className="time-clock-value-buttons">
+                        <button
+                            className="general-action-btn btn"
+                            onClick={() => handleClose()}
+                        >
+                            אישור
+                        </button>
+                        <button
+                            className="general-clear-btn btn"
+                            onClick={() =>
+                                setView(view === "hours" ? "minutes" : "hours")
+                            }
+                        >
+                            {view === "minutes" ? "שעות" : "דקות"}
+                        </button>
+                    </section>
                 </section>
             </Modal>
         </>
