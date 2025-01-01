@@ -187,7 +187,7 @@ const SingleDayEventForm = memo(
                             utilService.formatFormValuesToCreateCIEvent(
                                 values,
                                 address,
-                                true
+                                false
                             )
 
                         if (
