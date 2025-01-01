@@ -2,6 +2,7 @@ import { makeAutoObservable, reaction, observable, action } from "mobx"
 import { computed } from "mobx"
 import { store } from "../../Store/store"
 import { utilService } from "../../util/utilService"
+import { NotificationType } from "../../util/interfaces"
 
 class AlertsAnchorVM {
     @observable open = false
@@ -13,6 +14,7 @@ class AlertsAnchorVM {
             reaction(
                 () => store.getAlerts,
                 () => {
+                    this.cleanup()
                     if (navigator.setAppBadge) {
                         navigator.setAppBadge(this.alertsCount)
                     }
@@ -45,12 +47,39 @@ class AlertsAnchorVM {
     }
 
     @action toggleOpen() {
-        console.log("toggleOpen", this.open)
         this.open = !this.open
     }
 
     @action setOpen(open: boolean) {
         this.open = open
+    }
+
+    @action cleanup() {
+        const openAdminRequestIds = store.getRequests
+            .filter((r) => !r.viewed)
+            .map((r) => r.id)
+        const futureEventIds = store.getEvents.map((e) => e.id)
+
+        const alertIdsToClose = []
+
+        for (let a of this.getAlerts) {
+            if (
+                a.type === NotificationType.admin_response &&
+                !openAdminRequestIds.includes(a.id)
+            ) {
+                alertIdsToClose.push(a.id)
+            } else if (
+                (a.type === NotificationType.reminder ||
+                    a.type === NotificationType.subscription) &&
+                ((a.ci_event_id && !futureEventIds.includes(a.ci_event_id)) ||
+                    !a.ci_event_id)
+            ) {
+                alertIdsToClose.push(a.id)
+            }
+        }
+        Promise.all(
+            alertIdsToClose.map((id) => store.updateAlert({ id, viewed: true }))
+        )
     }
 }
 
