@@ -236,7 +236,7 @@ class Store {
     }
 
     @computed
-    get getOpenPositionRequests() {
+    get getOpenPositionRequest() {
         return this.requests.find((r) => !r.closed)
     }
 

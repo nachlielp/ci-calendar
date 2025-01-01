@@ -16,11 +16,11 @@ class UserRequestVM {
 
         setTimeout(() => {
             reaction(
-                () => store.getOpenPositionRequests,
+                () => store.getOpenPositionRequest,
                 () => {
                     this.isEditRequest = false
                     this.openPositionRequest =
-                        store.getOpenPositionRequests ?? null
+                        store.getOpenPositionRequest ?? null
                 }
             ),
                 0
