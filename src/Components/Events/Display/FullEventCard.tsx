@@ -14,6 +14,7 @@ import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 import React, { Component } from "react"
 import { observer } from "mobx-react-lite"
+import { shortHebrewDays } from "../../../util/options"
 
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
@@ -98,29 +99,47 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <>
                             <Icon icon="calendar" className="event-icon" />
                             <label className="event-label">
+                                {
+                                    shortHebrewDays[
+                                        dayjs(ci_event.start_date).day()
+                                    ]
+                                }
+                                {", "}
                                 {utilService.formatHebrewDate(
                                     ci_event.start_date
                                 )}
                             </label>
                             <Icon icon="schedule" className="event-icon" />
                             <label className="event-label">
-                                {dayjs(ci_event.segments[0].startTime).format(
-                                    "HH:mm"
-                                )}
-                                &nbsp;-&nbsp;
                                 {dayjs(
                                     ci_event.segments[segmentLen - 1].endTime
                                 ).format("HH:mm")}
+                                &nbsp;-&nbsp;
+                                {dayjs(ci_event.segments[0].startTime).format(
+                                    "HH:mm"
+                                )}
                             </label>
                         </>
                     ) : (
                         <>
                             <Icon icon="calendar" className="event-icon" />
                             <label className="event-label">
+                                {
+                                    shortHebrewDays[
+                                        dayjs(ci_event.start_date).day()
+                                    ]
+                                }
+                                {", "}
                                 {utilService.formatHebrewDate(
                                     ci_event.start_date
-                                )}{" "}
-                                -{" "}
+                                )}
+                                {" - "}
+                                {
+                                    shortHebrewDays[
+                                        dayjs(ci_event.end_date).day()
+                                    ]
+                                }
+                                {", "}
                                 {utilService.formatHebrewDate(
                                     ci_event.end_date
                                 )}

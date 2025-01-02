@@ -43,8 +43,8 @@ export default function EditSingleDayEventForm({
     closeForm,
 }: {
     isTemplate?: boolean
-    event: CIEvent | null
-    template: CITemplate | null
+    event: CIEvent | undefined
+    template: CITemplate | undefined
     closeForm: () => void
 }) {
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)

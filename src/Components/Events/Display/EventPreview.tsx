@@ -2,7 +2,11 @@ import React from "react"
 import Tag from "antd/es/tag"
 import dayjs from "dayjs"
 import { EventlyType, CIEvent } from "../../../util/interfaces"
-import { tagOptions, eventOptions } from "../../../util/options"
+import {
+    tagOptions,
+    eventOptions,
+    shortHebrewDays,
+} from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
 import "../../../styles/event-preview.css"
@@ -82,30 +86,48 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                             <>
                                 <Icon icon="calendar" className="event-icon" />
                                 <label className="event-label">
+                                    {
+                                        shortHebrewDays[
+                                            dayjs(event.start_date).day()
+                                        ]
+                                    }
+                                    {", "}
                                     {utilService.formatHebrewDate(
                                         event.start_date
                                     )}
                                 </label>
                                 <Icon icon="schedule" className="event-icon" />
                                 <label className="event-label">
-                                    {dayjs(event.segments[0].startTime).format(
-                                        "HH:mm"
-                                    )}
-                                    &nbsp;-&nbsp;
                                     {dayjs(
                                         event.segments[segmentsLength - 1]
                                             .endTime
                                     ).format("HH:mm")}
+                                    &nbsp;-&nbsp;
+                                    {dayjs(event.segments[0].startTime).format(
+                                        "HH:mm"
+                                    )}
                                 </label>
                             </>
                         ) : (
                             <>
                                 <Icon icon="calendar" className="event-icon" />
                                 <label className="event-label">
+                                    {
+                                        shortHebrewDays[
+                                            dayjs(event.start_date).day()
+                                        ]
+                                    }
+                                    {", "}
                                     {utilService.formatHebrewDate(
                                         event.start_date
-                                    )}{" "}
-                                    -{" "}
+                                    )}
+                                    {" - "}
+                                    {
+                                        shortHebrewDays[
+                                            dayjs(event.end_date).day()
+                                        ]
+                                    }
+                                    {", "}
                                     {utilService.formatHebrewDate(
                                         event.end_date
                                     )}
