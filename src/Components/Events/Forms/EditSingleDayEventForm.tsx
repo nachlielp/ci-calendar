@@ -20,6 +20,8 @@ import { utilService } from "../../../util/utilService"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
+import { toJS } from "mobx"
+import UpdateRecurringEventInstances from "./UpdateRecurringEventInstances"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -90,11 +92,19 @@ export default function EditSingleDayEventForm({
                     event.is_multi_day
                 )
             try {
-                await store.updateCIEvent({
-                    ...updatedEvent,
-                    id: event.id,
-                })
-                closeForm()
+                console.log("__update all recurrance: ", values)
+                if (values["update-recurring-events"]) {
+                    // await store.updateCIEvent({
+                    //     ...updatedEvent,
+                    //     id: event.id,
+                    // })
+                } else {
+                    // await store.updateCIEvent({
+                    //     ...updatedEvent,
+                    //     id: event.id,
+                    // })
+                }
+                // closeForm()
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
             } finally {
@@ -172,6 +182,7 @@ export default function EditSingleDayEventForm({
                     teachers={store.getAppTaggableTeachers}
                 />
                 <EventFromFooter inputErrors={inputErrors} />
+                <UpdateRecurringEventInstances eventId={event?.id} />
                 <Form.Item
                     wrapperCol={{ span: 24 }}
                     className="submit-button-container"

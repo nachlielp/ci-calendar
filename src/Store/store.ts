@@ -275,6 +275,18 @@ class Store {
     }
 
     @computed
+    get getFutureRecurringEvents() {
+        return (eventId: string) => {
+            const event = this.getCIEventById(eventId)
+            if (!event?.recurring_ref_key) return []
+            return this.app_ci_events.filter(
+                (e) =>
+                    dayjs(e.start_date).isAfter(dayjs(event.start_date)) &&
+                    e.recurring_ref_key === event.recurring_ref_key
+            )
+        }
+    }
+    @computed
     get getAlerts() {
         return this.alerts
     }
