@@ -14,6 +14,7 @@ import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 import React, { Component } from "react"
 import { observer } from "mobx-react-lite"
+import { shortHebrewDays } from "../../../util/options"
 
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
@@ -98,6 +99,12 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <>
                             <Icon icon="calendar" className="event-icon" />
                             <label className="event-label">
+                                {
+                                    shortHebrewDays[
+                                        dayjs(ci_event.start_date).day()
+                                    ]
+                                }
+                                {", "}
                                 {utilService.formatHebrewDate(
                                     ci_event.start_date
                                 )}
@@ -117,10 +124,22 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <>
                             <Icon icon="calendar" className="event-icon" />
                             <label className="event-label">
+                                {
+                                    shortHebrewDays[
+                                        dayjs(ci_event.start_date).day()
+                                    ]
+                                }
+                                {", "}
                                 {utilService.formatHebrewDate(
                                     ci_event.start_date
-                                )}{" "}
-                                -{" "}
+                                )}
+                                {" - "}
+                                {
+                                    shortHebrewDays[
+                                        dayjs(ci_event.end_date).day()
+                                    ]
+                                }
+                                {", "}
                                 {utilService.formatHebrewDate(
                                     ci_event.end_date
                                 )}
@@ -169,9 +188,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                     ci_event.segments.map((segment, index) => (
                         <div className="sub-event" key={index}>
                             <span>
-                                {dayjs(segment.endTime).format("HH:mm")}
+                                {dayjs(segment.startTime).format("HH:mm")}
                                 &nbsp;-&nbsp;
-                                {dayjs(segment.startTime).format("HH:mm")}&nbsp;
+                                {dayjs(segment.endTime).format("HH:mm")}
+                                &nbsp;
                                 {getType(segment.type as EventlyType)}
                                 {segment.teachers.length > 0 && (
                                     <span>

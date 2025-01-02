@@ -36,6 +36,16 @@ export const hebrewMonths: SelectOption[] = [
     { value: "12", label: "דצמבר" },
 ]
 
+export const shortHebrewDays = {
+    0: "ראשון",
+    1: "שני",
+    2: "שלישי",
+    3: "רביעי",
+    4: "חמישי",
+    5: "שישי",
+    6: "שבת",
+}
+
 export const tagOptions: SelectOption[] = [
     { value: "everyone", label: "פתוח לכולם" },
     { value: "beginner", label: "מתחילים" },

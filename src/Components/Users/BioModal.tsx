@@ -1,8 +1,9 @@
 import { useState } from "react"
-import { Modal } from "../Common/Modal"
+// import { Modal } from "../Common/Modal"
 import { UserBio } from "../../util/interfaces"
 import BioCard from "./BioCard"
 import "../../styles/bio-modal.css"
+import Modal from "antd/es/modal"
 interface BioModalProps {
     teacher: UserBio
 }
@@ -36,7 +37,10 @@ export default function BioModal({ teacher }: BioModalProps) {
             <Modal
                 open={isModalOpen}
                 // onOk={handleOk}
+                width={350}
+                style={{ width: "300px" }}
                 onCancel={handleCancel}
+                footer={null}
             >
                 <BioCard teacher={teacher} />
             </Modal>

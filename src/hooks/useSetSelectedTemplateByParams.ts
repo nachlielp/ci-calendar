@@ -5,11 +5,12 @@ import { useParams } from "react-router"
 import { CITemplate } from "../util/interfaces"
 import { store } from "../Store/store"
 
+//TODO undefined to null
 export const useSetSelectedTemplateByParams = () => {
     const { templateId } = useParams<{ templateId: string }>()
-    const [selectedTemplate, setSelectedTemplate] = useState<CITemplate | null>(
-        null
-    )
+    const [selectedTemplate, setSelectedTemplate] = useState<
+        CITemplate | undefined
+    >(undefined)
 
     useEffect(() => {
         if (templateId) {
@@ -17,11 +18,11 @@ export const useSetSelectedTemplateByParams = () => {
                 (template) => template.id === templateId
             )
             if (template) {
-                setSelectedTemplate(null)
+                setSelectedTemplate(undefined)
                 setSelectedTemplate(template)
             }
         } else {
-            setSelectedTemplate(null)
+            setSelectedTemplate(undefined)
         }
     }, [templateId])
 
