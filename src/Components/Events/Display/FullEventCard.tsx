@@ -111,13 +111,13 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                             </label>
                             <Icon icon="schedule" className="event-icon" />
                             <label className="event-label">
-                                {dayjs(
-                                    ci_event.segments[segmentLen - 1].endTime
-                                ).format("HH:mm")}
-                                &nbsp;-&nbsp;
                                 {dayjs(ci_event.segments[0].startTime).format(
                                     "HH:mm"
                                 )}
+                                &nbsp;-&nbsp;
+                                {dayjs(
+                                    ci_event.segments[segmentLen - 1].endTime
+                                ).format("HH:mm")}
                             </label>
                         </>
                     ) : (
@@ -188,9 +188,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                     ci_event.segments.map((segment, index) => (
                         <div className="sub-event" key={index}>
                             <span>
-                                {dayjs(segment.endTime).format("HH:mm")}
+                                {dayjs(segment.startTime).format("HH:mm")}
                                 &nbsp;-&nbsp;
-                                {dayjs(segment.startTime).format("HH:mm")}&nbsp;
+                                {dayjs(segment.endTime).format("HH:mm")}
+                                &nbsp;
                                 {getType(segment.type as EventlyType)}
                                 {segment.teachers.length > 0 && (
                                     <span>

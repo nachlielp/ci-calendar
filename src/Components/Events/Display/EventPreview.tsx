@@ -98,14 +98,14 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                 </label>
                                 <Icon icon="schedule" className="event-icon" />
                                 <label className="event-label">
+                                    {dayjs(event.segments[0].startTime).format(
+                                        "HH:mm"
+                                    )}
+                                    &nbsp;-&nbsp;
                                     {dayjs(
                                         event.segments[segmentsLength - 1]
                                             .endTime
                                     ).format("HH:mm")}
-                                    &nbsp;-&nbsp;
-                                    {dayjs(event.segments[0].startTime).format(
-                                        "HH:mm"
-                                    )}
                                 </label>
                             </>
                         ) : (
