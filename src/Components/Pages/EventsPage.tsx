@@ -31,7 +31,7 @@ const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
 
 const EventsPage = () => {
     const events = store.getSortedEvents
-    const { selectedEvent } = useSetSelectedEventByParams(events)
+    const { selectedEvent } = useSetSelectedEventByParams()
 
     const isMobile = useIsMobile()
 

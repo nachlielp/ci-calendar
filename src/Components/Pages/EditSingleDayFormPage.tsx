@@ -1,14 +1,19 @@
 import { useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router"
-import SingleDayEventForm from "../Events/Forms/SingleDayEventForm"
 import "../../styles/single-day-form-page.css"
+import EditSingleDayEventForm from "../Events/Forms/EditSingleDayEventForm"
+import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByParams"
+import { useSetSelectedTemplateByParams } from "../../hooks/useSetSelectedTemplateByParams"
 
-const EVENT_TYPE_LABEL = "אירוע חד יומי"
-const TEMPLATE_TYPE_LABEL = "תבנית חד יומית"
+const EVENT_TYPE_LABEL = "עריכת אירוע חד יומי"
+const TEMPLATE_TYPE_LABEL = "עריכת תבנית חד יומית"
 
 const SingleDayFromPage = () => {
     const navigate = useNavigate()
     const { search } = useLocation()
+
+    const { selectedEvent: event } = useSetSelectedEventByParams()
+    const { selectedTemplate: template } = useSetSelectedTemplateByParams()
 
     // Memoize the isTemplate value
     const isTemplate = useMemo(() => {
@@ -17,7 +22,7 @@ const SingleDayFromPage = () => {
     }, [search])
 
     const closeForm = useCallback(() => {
-        navigate("/create-events")
+        navigate("/manage-events")
     }, [navigate])
 
     return (
@@ -27,12 +32,14 @@ const SingleDayFromPage = () => {
                     {isTemplate ? TEMPLATE_TYPE_LABEL : EVENT_TYPE_LABEL}
                 </label>
                 <button onClick={closeForm} className="general-action-btn">
-                    חזרה ליצירת אירועים
+                    חזרה לאירועים שלי
                 </button>
             </header>
             <div className="form-container">
-                <SingleDayEventForm
+                <EditSingleDayEventForm
                     closeForm={closeForm}
+                    event={event}
+                    template={template}
                     isTemplate={isTemplate}
                 />
             </div>

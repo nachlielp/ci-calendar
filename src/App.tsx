@@ -9,7 +9,7 @@ import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
 import BackgroundTiles from "./Components/Layout/BackgroundTiles"
 import ResetPasswordPage from "./Components/Pages/RestPasswordPage"
-import SingleDayFromPage from "./Components/Pages/SingleDayFromPage"
+import SingleDayFormPage from "./Components/Pages/SingleDayFormPage"
 import MultiDayFormPage from "./Components/Pages/MultiDayFormPage"
 
 import { UserType } from "./util/interfaces"
@@ -36,6 +36,12 @@ const ManageSupportPage = lazy(
 )
 const NotificationsPage = lazy(
     () => import("./Components/Pages/NotificationsPage")
+)
+const EditSingleDayFormPage = lazy(
+    () => import("./Components/Pages/EditSingleDayFormPage")
+)
+const EditMultiDayFormPage = lazy(
+    () => import("./Components/Pages/EditMultiDayFormPage")
 )
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const ManageUsersPage = lazy(() => import("./Components/Pages/ManageUsersPage"))
@@ -267,7 +273,15 @@ const App = () => {
                                     path="/create-events/single-day"
                                     element={
                                         <Suspense fallback={<Loading />}>
-                                            <SingleDayFromPage />
+                                            <SingleDayFormPage />
+                                        </Suspense>
+                                    }
+                                />
+                                <Route
+                                    path="/manage-events/edit-single-day/:eventId"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <EditSingleDayFormPage />
                                         </Suspense>
                                     }
                                 />
@@ -276,6 +290,14 @@ const App = () => {
                                     element={
                                         <Suspense fallback={<Loading />}>
                                             <MultiDayFormPage />
+                                        </Suspense>
+                                    }
+                                />
+                                <Route
+                                    path="/manage-events/edit-multi-day/:eventId"
+                                    element={
+                                        <Suspense fallback={<Loading />}>
+                                            <EditMultiDayFormPage />
                                         </Suspense>
                                     }
                                 />

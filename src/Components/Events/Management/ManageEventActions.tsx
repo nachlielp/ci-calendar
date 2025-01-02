@@ -5,8 +5,11 @@ import { Icon } from "../../Common/Icon"
 import FormContainer from "../Forms/FormContainer"
 import CancelledEventButton from "../Actions/CancelleEventButton"
 import DeleteEventButton from "../Actions/DeleteEventButton"
+import { useNavigate } from "react-router"
 
 export default function ManageEventActions({ event }: { event: CIEvent }) {
+    const navigate = useNavigate()
+
     const buttonsArray = [
         {
             eventType: event.is_multi_day
@@ -14,6 +17,9 @@ export default function ManageEventActions({ event }: { event: CIEvent }) {
                 : "edit-single-day",
             icon: "edit",
             className: "edit-btn",
+            path: event.is_multi_day
+                ? `/manage-events/edit-multi-day/${event.id}`
+                : `/manage-events/edit-single-day/${event.id}`,
         },
     ]
 
@@ -23,7 +29,10 @@ export default function ManageEventActions({ event }: { event: CIEvent }) {
                 <FormContainer
                     key={index}
                     anchorEl={
-                        <button className={`action-btn ${button.className}`}>
+                        <button
+                            className={`action-btn ${button.className}`}
+                            onClick={() => navigate(button.path)}
+                        >
                             <Icon icon={button.icon} className="icon" />
                         </button>
                     }

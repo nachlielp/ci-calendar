@@ -22,8 +22,8 @@ export default function EditMultiDayEventForm({
     closeForm,
 }: {
     isTemplate: boolean
-    event?: CIEvent
-    template?: CITemplate
+    event: CIEvent | null
+    template: CITemplate | null
     closeForm: () => void
 }) {
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
