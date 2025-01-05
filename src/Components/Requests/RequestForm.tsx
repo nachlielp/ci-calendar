@@ -17,8 +17,8 @@ type RequestFieldType = {
 }
 
 const requestOptions = [
-    { label: "הרשמה כמורה", value: RequestType.profile },
     { label: "הרשמה כמורה ויוצר ארועים", value: RequestType.creator },
+    { label: "הרשמה כמורה - פרופיל בלבד  ", value: RequestType.profile },
     { label: "הרשמה כארגון", value: RequestType.org },
     // { label: "תמיכה", value: "support" },
 ]
