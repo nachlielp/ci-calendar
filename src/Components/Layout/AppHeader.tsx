@@ -111,7 +111,7 @@ const InstallPWABannerAnchor = () => {
             >
                 <div className="install-pwa-btn-text">
                     <span>לקבלת עדכונים הוסיפו לעמוד הבית</span>
-                    <Icon icon="add_alert" className="add-alert-icon white" />
+                    <Icon icon="touch_app" className="add-alert-icon white" />
                 </div>
             </button>
         </div>
