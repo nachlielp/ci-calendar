@@ -3,13 +3,14 @@ import Form from "antd/lib/form"
 import dayjs from "dayjs"
 import { observer } from "mobx-react-lite"
 import { store } from "../../../Store/store"
-import { useState } from "react"
+import { editSingleDayEventViewModal as vm } from "./EditSingleDayEventVM"
+
 import "../../../styles/update-recurring-event-instance.css"
 
 const UpdateRecurringEventInstances = ({ eventId }: { eventId?: string }) => {
-    const [updateRecurring, setUpdateRecurring] = useState<boolean>(false)
-    if (!eventId) return
     const events = store.getFutureRecurringEvents(eventId)
+
+    if (!eventId) return
     return (
         <section className="update-recurring-event-instance">
             <hr className="divider" />
@@ -32,8 +33,10 @@ const UpdateRecurringEventInstances = ({ eventId }: { eventId?: string }) => {
                             marginTop: "10px",
                             transform: "scale(1.5)",
                         }}
-                        value={updateRecurring}
-                        onChange={(e) => setUpdateRecurring(e.target.checked)}
+                        value={vm.getUpdateRecurring}
+                        onChange={(e) =>
+                            vm.setUpdateRecurring(e.target.checked)
+                        }
                     />
                     <label className="segment-title">
                         האם לעדכן את כל האירועים העתידיים?{" "}
@@ -44,17 +47,38 @@ const UpdateRecurringEventInstances = ({ eventId }: { eventId?: string }) => {
                 </div>
             </Form.Item>
             <div className="recurring-event-date-list">
-                {updateRecurring &&
+                {vm.updateRecurring &&
                     events.map((event) => (
-                        <div key={event.id} className="recurring-event-date">
-                            יום {dayjs(event.start_date).format("dddd")} -{" "}
-                            {dayjs(event.start_date).format("DD/MM/YYYY")}
-                            {event.is_multi_day &&
-                                `  יום ${dayjs(event.end_date).format(
-                                    "dddd"
-                                )} - ${dayjs(event.end_date).format(
-                                    "DD/MM/YYYY"
-                                )}`}
+                        <div
+                            key={event.id}
+                            className="recurring-event-date"
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                            }}
+                        >
+                            <Checkbox
+                                checked={vm.getSelectedEventsIds.includes(
+                                    event.id
+                                )}
+                                onChange={() =>
+                                    vm.updateSelectedEvent(event.id)
+                                }
+                                style={{
+                                    transform: "scale(1.5)",
+                                }}
+                            />
+                            <span>
+                                יום {dayjs(event.start_date).format("dddd")} -{" "}
+                                {dayjs(event.start_date).format("DD/MM/YYYY")}
+                                {event.is_multi_day &&
+                                    `  יום ${dayjs(event.end_date).format(
+                                        "dddd"
+                                    )} - ${dayjs(event.end_date).format(
+                                        "DD/MM/YYYY"
+                                    )}`}
+                            </span>
                         </div>
                     ))}
             </div>

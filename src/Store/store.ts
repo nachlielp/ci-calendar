@@ -276,7 +276,8 @@ class Store {
 
     @computed
     get getFutureRecurringEvents() {
-        return (eventId: string) => {
+        return (eventId?: string) => {
+            if (!eventId) return []
             const event = this.getCIEventById(eventId)
             if (!event?.recurring_ref_key) return []
             return this.app_ci_events.filter(

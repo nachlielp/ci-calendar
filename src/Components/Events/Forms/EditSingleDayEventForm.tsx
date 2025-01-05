@@ -1,7 +1,6 @@
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { useState } from "react"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
@@ -20,8 +19,10 @@ import { utilService } from "../../../util/utilService"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
-import { toJS } from "mobx"
 import UpdateRecurringEventInstances from "./UpdateRecurringEventInstances"
+import { editSingleDayEventViewModal as vm } from "./EditSingleDayEventVM"
+import { useEffect } from "react"
+
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -49,12 +50,16 @@ export default function EditSingleDayEventForm({
     template: CITemplate | undefined
     closeForm: () => void
 }) {
-    const [newAddress, setNewAddress] = useState<IAddress | null>(null)
-    const [eventDate, setEventDate] = useState(dayjs())
-    const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [form] = Form.useForm()
+
+    useEffect(() => {
+        if (event?.id) {
+            vm.setSelectedEventId(event.id)
+        }
+        return () => {
+            vm.setSelectedEventId(null)
+        }
+    }, [event?.id])
 
     if (!event && !template) return <Loading />
 
@@ -69,52 +74,45 @@ export default function EditSingleDayEventForm({
             label: place.label,
             place_id: place.value.place_id,
         }
-        setNewAddress(selectedAddress)
+        vm.setAddress(selectedAddress)
         form.setFieldValue("address", selectedAddress)
     }
 
-    const handleDateChange = (date: dayjs.Dayjs) => {
-        setEventDate(date)
-    }
-
-    const handleEndDateChange = (date: dayjs.Dayjs) => {
-        setEndDate(date)
-    }
-
     const handleSubmit = async (values: any) => {
-        setIsSubmitting(true)
+        vm.setIsSubmitting(true)
 
         if (event) {
             const updatedEvent: Partial<DBCIEvent> =
                 utilService.formatFormValuesToEditCIEvent(
                     values,
-                    newAddress || (address as IAddress),
+                    vm.getAddress || (address as IAddress),
                     event.is_multi_day
                 )
             try {
+                //TODO
                 console.log("__update all recurrance: ", values)
                 if (values["update-recurring-events"]) {
-                    // await store.updateCIEvent({
-                    //     ...updatedEvent,
-                    //     id: event.id,
-                    // })
+                    await store.updateCIEvent({
+                        ...updatedEvent,
+                        id: event.id,
+                    })
                 } else {
-                    // await store.updateCIEvent({
-                    //     ...updatedEvent,
-                    //     id: event.id,
-                    // })
+                    await store.updateCIEvent({
+                        ...updatedEvent,
+                        id: event.id,
+                    })
                 }
                 // closeForm()
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
             } finally {
-                setIsSubmitting(false)
+                vm.setIsSubmitting(false)
             }
         } else if (template) {
             const updatedTemplate =
                 utilService.formatFormValuesToEditCITemplate(
                     values,
-                    newAddress || (address as IAddress),
+                    vm.getAddress || (address as IAddress),
                     template.is_multi_day
                 )
 
@@ -130,16 +128,16 @@ export default function EditSingleDayEventForm({
                     error
                 )
             } finally {
-                setIsSubmitting(false)
+                vm.setIsSubmitting(false)
             }
         }
     }
 
     const onFinishFailed = () => {
-        setInputErrors(true)
+        vm.setIsInputError(true)
         setTimeout(() => {
-            setInputErrors(false)
-        }, 3000)
+            vm.setIsInputError(false)
+        }, 4000)
     }
 
     const titleText = isTemplate
@@ -166,10 +164,10 @@ export default function EditSingleDayEventForm({
                 <SingleDayEventFormHead
                     form={form}
                     handleAddressSelect={handleAddressSelect}
-                    handleDateChange={handleDateChange}
-                    handleEndDateChange={handleEndDateChange}
-                    eventDate={eventDate}
-                    endDate={endDate}
+                    handleDateChange={vm.setStartDate}
+                    handleEndDateChange={vm.setEndDate}
+                    eventDate={vm.getStartDate}
+                    endDate={vm.getEndDate}
                     isEdit={true}
                     teachers={store.getAppTaggableTeachers}
                     address={address || ({} as IAddress)}
@@ -181,7 +179,7 @@ export default function EditSingleDayEventForm({
                     form={form}
                     teachers={store.getAppTaggableTeachers}
                 />
-                <EventFromFooter inputErrors={inputErrors} />
+                <EventFromFooter inputErrors={vm.getIsInputError} />
                 <UpdateRecurringEventInstances eventId={event?.id} />
                 <Form.Item
                     wrapperCol={{ span: 24 }}
@@ -192,7 +190,7 @@ export default function EditSingleDayEventForm({
                     }}
                 >
                     <AsyncFormSubmitButton
-                        isSubmitting={isSubmitting}
+                        isSubmitting={vm.getIsSubmitting}
                         size="large"
                     >
                         {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
