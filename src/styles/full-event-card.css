@@ -160,6 +160,7 @@
     }
 
     .event-description {
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -179,16 +180,15 @@
     @media screen and (min-width: 768px) {
         .event-description {
             max-height: 200px;
-            overflow-y: scroll;
+            overflow-y: auto;
             overflow-x: hidden;
-            scrollbar-gutter: stable; /* Prevents layout shift when scrollbar appears */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on touch devices */
+            padding: 4px 0; /* Add padding for the fade effect */
 
-            /* scrollbar-width: thin; Firefox */
-
-            /* For Webkit browsers (Chrome, Safari) */
-            scrollbar-width: none;
-
+            /* Show regular scrollbar instead of hiding it */
+            scrollbar-width: thin;
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
             &::-webkit-scrollbar-track {
                 background: #f1f1f1;
             }
@@ -202,7 +202,6 @@
             }
         }
     }
-
     .event-card-footer {
         display: flex;
         flex-direction: row;
