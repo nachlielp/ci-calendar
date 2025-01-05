@@ -1,5 +1,5 @@
 import { utilService } from "../../util/utilService"
-import { Modal } from "../Common/Modal"
+// import { Modal } from "../Common/Modal"
 import ios_share from "../../assets/svgs/ios_share.svg"
 import more_vert from "../../assets/svgs/more_vert.svg"
 import add_to_home_screen from "../../assets/svgs/add_to_home_screen.svg"
@@ -9,6 +9,7 @@ import "../../styles/install-pwa-banner.css"
 import { Icon } from "./Icon"
 import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import { observer } from "mobx-react-lite"
+import Modal from "antd/es/modal"
 
 const InstallPWABanner = ({
     anchorElement,
@@ -149,6 +150,7 @@ const InstallPWABanner = ({
                 open={vm.showInstallPWAModal}
                 onCancel={() => vm.setShowInstallPWAModal(false)}
                 className="install-pwa-modal"
+                footer={null}
             >
                 {utilService.isIos() ? iosContent : androidContent}
             </Modal>
