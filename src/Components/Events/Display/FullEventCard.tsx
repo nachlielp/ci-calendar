@@ -319,6 +319,15 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
 
                 {!utilService.isEventStarted(ci_event) && (
                     <article className="event-card-footer">
+                        <SecondaryButton
+                            label=""
+                            successLabel=""
+                            icon={"calendar"}
+                            successIcon={"calendar"}
+                            callback={() => {
+                                utilService.addToGoogleCalendar(ci_event)
+                            }}
+                        />
                         {isMobile && !utilService.isPWA() && (
                             <InstallPWABanner
                                 anchorElement={

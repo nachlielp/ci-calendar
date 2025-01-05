@@ -84,6 +84,7 @@ export const utilService = {
     CIEventDraftToFormValues,
     calculateRecurringEventDates,
     duplicateEvent,
+    addToGoogleCalendar,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -1228,4 +1229,30 @@ function duplicateEvent(
             ? date.add(eventLength, "day").format("YYYY/MM/DD")
             : date.format("YYYY/MM/DD"),
     }
+}
+
+function addToGoogleCalendar(event: CIEvent) {
+    let startTime: string
+    let endTime: string
+
+    if (event.is_multi_day) {
+        // For multi-day events, use full days
+        startTime = dayjs(event.start_date).format("YYYYMMDD")
+        // For all-day events in Google Calendar, the end date needs to be the day after
+        endTime = dayjs(event.end_date).add(1, "day").format("YYYYMMDD")
+    } else {
+        // For single-day events, use segment times with specific format required by Google Calendar
+        startTime = dayjs(event.segments[0].startTime).format("YYYYMMDDTHHmmss")
+        endTime = dayjs(
+            event.segments[event.segments.length - 1].endTime
+        ).format("YYYYMMDDTHHmmss")
+    }
+
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+        event.title
+    )}&dates=${startTime}/${endTime}&details=${encodeURIComponent(
+        event.description || ""
+    )}&location=${encodeURIComponent(event.address.label || "")}`
+
+    window.open(url, "_blank")
 }
