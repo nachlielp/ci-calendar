@@ -1,5 +1,5 @@
 import { supabase } from "./client"
-import { TaggableUserOptions, UserBio } from "../util/interfaces"
+import { TaggableUserOptions, UserBio, UserType } from "../util/interfaces"
 import { store } from "../Store/store"
 
 export const publicBioService = {
@@ -61,6 +61,7 @@ async function getPublicBioList(): Promise<UserBio[]> {
                 "id, user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2, show_profile, allow_tagging, user_type"
             )
             .eq("show_profile", true)
+            .not("user_type", "eq", UserType.admin)
             .not("bio_name", "eq", "")
 
         if (error)
