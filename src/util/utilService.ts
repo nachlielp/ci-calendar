@@ -911,7 +911,7 @@ function isIos() {
 }
 
 function handleShareEvent(eventId: string, eventTitle: string) {
-    const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
+    const shareUrl = `${window.location.origin}/event/${eventId}` // Construct the URL
 
     if (navigator.share) {
         navigator
@@ -929,7 +929,7 @@ function handleShareEvent(eventId: string, eventTitle: string) {
 }
 
 function copyURLToClipboard(eventId: string, info: () => void) {
-    const shareUrl = `${window.location.origin}/${eventId}` // Construct the URL
+    const shareUrl = `${window.location.origin}/event/${eventId}` // Construct the URL
     navigator.clipboard.writeText(shareUrl)
     info()
 }
