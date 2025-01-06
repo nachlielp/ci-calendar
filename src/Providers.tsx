@@ -1,5 +1,6 @@
 import React from "react"
 import { ConfigProvider } from "antd"
+import { PHProvider } from "./Providers/PHProvider"
 
 interface ProvidersProps {
     children: React.ReactNode
@@ -18,7 +19,7 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
                 },
             }}
         >
-            {children}
+            <PHProvider>{children}</PHProvider>
         </ConfigProvider>
     )
 }
