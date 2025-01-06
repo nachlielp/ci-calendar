@@ -73,7 +73,7 @@ export enum EventAction {
 export const CACHE_VERSION = "1.6.76"
 
 export const EMAIL_SUPPORT = "info@ci-events.org"
-export const PAYBOX_URL = "https://www.payboxapp.com"
+export const PAYBOX_URL = "https://payboxapp.page.link/32yzdN1D1gix4AR37"
 export const DATE_LIMIT = dayjs().add(1, "year").toDate()
 
 const DisableAppNotice = () => {
