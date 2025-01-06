@@ -11,6 +11,9 @@ import { store } from "../../Store/store"
 import "../../styles/manage-users.css"
 import { action, computed, makeObservable, observable } from "mobx"
 import { reaction } from "mobx"
+import message from "antd/es/message"
+import { Icon } from "../Common/Icon"
+
 class ManageUsersVM {
     @observable users: ManageUserOption[] = []
     @observable selectedUser: ManageUserOption | null = null
@@ -220,7 +223,26 @@ function ManageUsersPage() {
                     <div>
                         <p>{vm.getSelectedUser?.user_name}</p>
                         <p>{vm.getSelectedUser?.email}</p>
-                        <p>{vm.getSelectedUser?.phone}</p>
+                        <p
+                            onClick={async () => {
+                                await navigator.clipboard.writeText(
+                                    vm.getSelectedUser?.phone || ""
+                                )
+                                // If you're using antd, you can use their message component
+                                message.success(
+                                    "Phone number copied to clipboard"
+                                )
+                            }}
+                            style={{
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                            title="Click to copy"
+                        >
+                            {vm.getSelectedUser?.phone}
+                            <Icon icon="contentCopy" className="copy-icon" />
+                        </p>
                         <p>
                             {
                                 UserTypeHebrew[

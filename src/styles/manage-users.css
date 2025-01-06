@@ -36,6 +36,16 @@
         padding: 16px !important;
         margin-top: 30px;
         min-height: 350px;
+
+        .copy-icon {
+            margin-left: 0.5rem;
+            margin-top: 0.2rem;
+            cursor: pointer;
+            .injected-svg {
+                width: 16px;
+                height: 16px;
+            }
+        }
     }
 
     .manage-users-actions {

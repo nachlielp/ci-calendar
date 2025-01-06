@@ -15,6 +15,8 @@ import Switch from "antd/es/switch"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { action, computed, makeObservable, observable, reaction } from "mobx"
+import message from "antd/es/message"
+import { Icon } from "../Common/Icon"
 
 class ManageSupportPageVM {
     @observable showOpenRequests = true
@@ -284,7 +286,30 @@ const ManageSupportPage = () => {
                                         <span>בקשה מס׳ : {request.number}</span>
 
                                         <span>מייל : {request.email}</span>
-
+                                        <span
+                                            onClick={async (e) => {
+                                                e.stopPropagation()
+                                                await navigator.clipboard.writeText(
+                                                    request.phone || ""
+                                                )
+                                                // If you're using antd, you can use their message component
+                                                message.success(
+                                                    "Phone number copied to clipboard"
+                                                )
+                                            }}
+                                            style={{
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                alignItems: "center",
+                                            }}
+                                            title="Click to copy"
+                                        >
+                                            {request.phone}
+                                            <Icon
+                                                icon="contentCopy"
+                                                className="copy-icon"
+                                            />
+                                        </span>
                                         <span>פלאפון : {request.phone}</span>
 
                                         <span>
