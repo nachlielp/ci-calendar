@@ -304,13 +304,12 @@ const ManageSupportPage = () => {
                                             }}
                                             title="Click to copy"
                                         >
-                                            {request.phone}
+                                            פלאפון :{request.phone}
                                             <Icon
                                                 icon="contentCopy"
                                                 className="copy-icon"
                                             />
                                         </span>
-                                        <span>פלאפון : {request.phone}</span>
 
                                         <span>
                                             {dayjs(request.created_at).format(
