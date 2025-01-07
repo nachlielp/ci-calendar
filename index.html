@@ -77,7 +77,10 @@
 
             // Check if internal user before loading GA
 
-            const isProd = window.location.hostname === "ci-events"
+            const isProd =
+                window.location.hostname === "ci-events.org" ||
+                window.location.hostname === "www.ci-events.org"
+            console.log("Environment:", isProd ? "production" : "development")
 
             const disableTracking =
                 localStorage.getItem("isInternal") === "true" || !isProd
