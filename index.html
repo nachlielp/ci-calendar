@@ -76,24 +76,30 @@
             }
 
             // Check if internal user before loading GA
-            const isInternal = localStorage.getItem("isInternal") === "true" ||
-            import.meta.env.VITE_BRANCH !== "prod"
+            const isInternal =
+                localStorage.getItem("isInternal") === "true" ||
+                window.ENV_VITE_BRANCH !== "prod"
+
             console.log("isInternal tagger:", isInternal)
 
             if (!isInternal) {
                 // Load GA script dynamically only for non-internal users
                 const gaScript = document.createElement("script")
                 gaScript.async = true
-                gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GOOGLE_ANALYTICS_ID}`
+                gaScript.src =
+                    "https://www.googletagmanager.com/gtag/js?id=G-MX441RRM7Q"
                 document.head.appendChild(gaScript)
 
                 // Initialize GA
                 gtag("js", new Date())
-                gtag("config", import.meta.env.VITE_GOOGLE_ANALYTICS_ID)
+                gtag("config", "G-MX441RRM7Q")
             } else {
                 // Mock gtag for internal users
                 window.gtag = function () {
-                    console.log("GA Event (disabled for internal user):", arguments)
+                    console.log(
+                        "GA Event (disabled for internal user):",
+                        arguments
+                    )
                 }
             }
         </script>
