@@ -76,13 +76,17 @@
             }
 
             // Check if internal user before loading GA
-            const isInternal =
-                localStorage.getItem("isInternal") === "true" ||
-                window.ENV_VITE_BRANCH !== "prod"
 
-            console.log("isInternal tagger:", isInternal)
+            const isProd = window.location.hostname === "ci-events.org"
 
-            if (!isInternal) {
+            const disableTracking =
+                localStorage.getItem("isInternal") === "true" || !isProd
+
+            console.log("isProd:", isProd)
+
+            console.log("disableTracking:", disableTracking)
+
+            if (!disableTracking) {
                 // Load GA script dynamically only for non-internal users
                 const gaScript = document.createElement("script")
                 gaScript.async = true
