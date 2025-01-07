@@ -4,6 +4,11 @@ import { useEffect } from "react"
 
 export function PHProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
+        const isInternal = localStorage.getItem("isInternal") === "true"
+        if (isInternal) {
+            return
+        }
+
         const getUserId = () => {
             const persistedId = posthog.get_distinct_id()
             if (persistedId && !persistedId.startsWith("user-")) {
