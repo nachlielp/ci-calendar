@@ -33,12 +33,16 @@ const FullEventCardDrawer = ({
     }, [isModalOpen, event.id, store.isUser, store.isOnline])
 
     const onOpen = () => {
-        navigate(`/event/${event.id}`)
+        const currentSearch = window.location.search
+        navigate(`/event/${event.id}${currentSearch}`)
     }
+
     const onClose = () => {
         setIsModalOpen(false)
-        navigate("/")
+        const currentSearch = window.location.search
+        navigate(`/${currentSearch}`)
     }
+
     return (
         <>
             <div onClick={onOpen}>{anchorEl}</div>

@@ -28,24 +28,26 @@ const FullEventCardModal = ({
         }
     }, [isModalOpen])
 
-    const showModal = () => {
-        navigate(`/event/${event.id}`)
+    const onOpen = () => {
+        const currentSearch = window.location.search
+        navigate(`/event/${event.id}${currentSearch}`)
     }
 
-    const handleCancel = () => {
+    const onClose = () => {
         setIsModalOpen(false)
-        navigate("/")
+        const currentSearch = window.location.search
+        navigate(`/${currentSearch}`)
     }
 
     return (
         <>
-            <div id={event.id} onClick={showModal}>
+            <div id={event.id} onClick={onOpen}>
                 {anchorEl}
             </div>
 
             <Modal
                 open={isModalOpen}
-                onCancel={handleCancel}
+                onCancel={onClose}
                 footer={null}
                 style={{
                     top: "20px", // Set specific top margin
