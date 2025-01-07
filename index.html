@@ -82,10 +82,6 @@
             const disableTracking =
                 localStorage.getItem("isInternal") === "true" || !isProd
 
-            console.log("isProd:", isProd)
-
-            console.log("disableTracking:", disableTracking)
-
             if (!disableTracking) {
                 // Load GA script dynamically only for non-internal users
                 const gaScript = document.createElement("script")
