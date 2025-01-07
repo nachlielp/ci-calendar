@@ -1,27 +1,55 @@
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { useEffect } from "react"
-import { useLocation } from "react-router"
 
 export function PHProvider({ children }: { children: React.ReactNode }) {
-    const location = useLocation()
-
     useEffect(() => {
-        // Initialize PostHog with capture_pageview: false since we'll handle it manually
-        posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, {
-            api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-            capture_pageview: false,
-        })
-    }, [])
+        const getUserId = () => {
+            const persistedId = posthog.get_distinct_id()
+            if (persistedId && !persistedId.startsWith("user-")) {
+                return persistedId
+            }
 
-    // Track pageviews on location change
-    useEffect(() => {
-        if (posthog) {
-            posthog.capture("$pageview", {
-                $current_url: window.location.href,
-            })
+            const storedId = localStorage.getItem("custom_user_id")
+            if (storedId) {
+                return storedId
+            }
+
+            const newId = `user_${Date.now()}_${Math.random()
+                .toString(36)
+                .substring(2, 11)}`
+            localStorage.setItem("custom_user_id", newId)
+            return newId
         }
-    }, [location])
+
+        const phKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY
+        const phHost =
+            import.meta.env.VITE_PUBLIC_POSTHOG_HOST ||
+            "https://app.posthog.com"
+
+        posthog.reset()
+
+        try {
+            posthog.init(phKey, {
+                api_host: phHost,
+                autocapture: true,
+                capture_pageview: true,
+                capture_pageleave: true,
+                persistence: "localStorage",
+                persistence_name: "ph_custom_persistence",
+                loaded: () => {
+                    const userId = getUserId()
+                    posthog.identify(userId)
+                },
+            })
+        } catch (error) {
+            console.error("PostHog initialization error:", error)
+        }
+
+        return () => {
+            posthog.reset()
+        }
+    }, [])
 
     return <PostHogProvider client={posthog}>{children}</PostHogProvider>
 }

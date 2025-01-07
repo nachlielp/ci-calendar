@@ -1,10 +1,11 @@
 import React from "react"
 import { ConfigProvider } from "antd"
-import { PHProvider } from "./Providers/PHProvider"
 
 interface ProvidersProps {
     children: React.ReactNode
 }
+
+import { PHProvider } from "./Providers/PHProvider"
 
 const Providers: React.FC<ProvidersProps> = ({ children }) => {
     return (
@@ -19,7 +20,7 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
                 },
             }}
         >
-            <PHProvider>{children}</PHProvider>
+            <PHProvider> {children}</PHProvider>
         </ConfigProvider>
     )
 }

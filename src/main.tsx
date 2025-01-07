@@ -3,15 +3,6 @@ import "./index.css"
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router"
 import App from "./App.tsx"
-//NOTICE - posthog in not installed
-// import posthog from "posthog-js"
-// import { PostHogProvider } from "posthog-js/react"
-// const options = {
-//     api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-// }
-// if (import.meta.env.VITE_PUBLIC_POSTHOG_KEY) {
-//     posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_KEY, options)
-// }
 
 import { createRoot } from "react-dom/client"
 const container = document.getElementById("root")
