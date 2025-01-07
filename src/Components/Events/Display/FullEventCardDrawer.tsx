@@ -33,8 +33,15 @@ const FullEventCardDrawer = ({
     }, [isModalOpen, event.id, store.isUser, store.isOnline])
 
     const onOpen = () => {
+        const currentPath = window.location.pathname
         const currentSearch = window.location.search
-        navigate(`/event/${event.id}${currentSearch}`)
+
+        // Only navigate if we're not already on this event's page
+        if (!currentPath.includes(`/event/${event.id}`)) {
+            navigate(`/event/${event.id}${currentSearch}`)
+        } else {
+            setIsModalOpen(true)
+        }
     }
 
     const onClose = () => {
