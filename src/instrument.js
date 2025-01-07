@@ -10,8 +10,6 @@ import {
 Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
     integrations: [
-        // See docs for support of different versions of variation of react router
-        // https://docs.sentry.io/platforms/javascript/guides/react/configuration/integrations/react-router/
         Sentry.reactRouterV6BrowserTracingIntegration({
             useEffect,
             useLocation,
@@ -29,8 +27,10 @@ Sentry.init({
     tracesSampleRate: 1.0,
 
     // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
-    tracePropagationTargets: [/^\//, /^https:\/\/yourserver\.io\/api/],
-
+    tracePropagationTargets: [
+        /^\//, // Local routes
+        /^https:\/\/ci-events\.org/, // All requests to ci-events.org
+    ],
     // Capture Replay for 10% of all sessions,
     // plus for 100% of sessions with an error
     // Learn more at
