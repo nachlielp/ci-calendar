@@ -1,11 +1,13 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 export const useScrollToEventById = (
     eventId: string,
     eventRefs: React.RefObject<{ [key: string]: HTMLDivElement | null }>
 ) => {
+    const isFirstRender = useRef(true)
+
     useEffect(() => {
-        if (eventId && eventRefs.current) {
+        if (eventId && eventRefs.current && isFirstRender.current) {
             if (eventRefs.current[eventId]) {
                 eventRefs.current[eventId]?.scrollIntoView({
                     behavior: "smooth",
@@ -13,5 +15,6 @@ export const useScrollToEventById = (
                 })
             }
         }
+        isFirstRender.current = false
     }, [eventId])
 }

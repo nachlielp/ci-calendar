@@ -35,8 +35,8 @@ const FullEventCardModal = ({
 
     const onClose = () => {
         setIsModalOpen(false)
-        const currentSearch = window.location.search
-        navigate(`/${currentSearch}`)
+        // const currentSearch = window.location.search
+        // navigate(`/${currentSearch}`)
     }
 
     return (
