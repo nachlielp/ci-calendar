@@ -5,7 +5,7 @@ import { Icon } from "../Common/Icon"
 
 export function AboutPage() {
     return (
-        <section className="about-page page">
+        <section className="about-page ">
             <section className="about-page-card card">
                 <h1 className="about-page-title">אודות הפרוייקט</h1>
                 <article className="info-box">

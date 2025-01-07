@@ -37,7 +37,7 @@ const CreateEventsPage = () => {
     ]
 
     return (
-        <section className="create-events-page page">
+        <section className="create-events-page ">
             <article className="alerts-container">
                 {isMissingProfile && (
                     <Alert

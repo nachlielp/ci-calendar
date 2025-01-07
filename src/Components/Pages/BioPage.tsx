@@ -26,7 +26,7 @@ const BioPage = () => {
     }
 
     return (
-        <div className="bio-page page">
+        <div className="bio-page">
             <h1> הפרופיל שלי</h1>
 
             <div className={`bio-page-container `}>

@@ -29,7 +29,7 @@ const ManageUserEventsPage = () => {
     }
 
     return (
-        <section className="user-events-list-page page">
+        <section className="user-events-list-page">
             <header
                 className={`manage-events-header ${
                     isPhone ? "header-phone" : "header-desktop"
