@@ -35,7 +35,7 @@ export default function ManageEventActions({ event }: { event: CIEvent }) {
                 eventId={event.id}
                 cancelled={event.cancelled}
             />
-            <HideEventButton eventId={event.id} hide={event.hide} />
+            <HideEventButton event={event} />
         </section>
     )
 }

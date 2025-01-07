@@ -28,6 +28,7 @@ export default function DeleteEventButton({ event }: IDeleteEventProps) {
         ])
         setOpen(false)
     }
+
     function onSelectEventIds(eventIds: string[]) {
         setSelectedEventIds(eventIds)
     }
