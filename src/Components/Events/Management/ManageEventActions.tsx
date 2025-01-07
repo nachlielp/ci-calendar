@@ -25,11 +25,12 @@ export default function ManageEventActions({ event }: { event: CIEvent }) {
                 <button
                     className={`action-btn ${button.className}`}
                     onClick={() => navigate(button.path)}
+                    key={button.icon}
                 >
                     <Icon icon={button.icon} className="icon" />
                 </button>
             ))}
-            <DeleteEventButton eventId={event.id} />
+            <DeleteEventButton event={event} />
             <CancelledEventButton
                 eventId={event.id}
                 cancelled={event.cancelled}
