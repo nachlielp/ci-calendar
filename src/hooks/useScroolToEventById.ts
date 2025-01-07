@@ -9,7 +9,7 @@ export const useScrollToEventById = (
             if (eventRefs.current[eventId]) {
                 eventRefs.current[eventId]?.scrollIntoView({
                     behavior: "smooth",
-                    block: "end",
+                    block: "center",
                 })
             }
         }

@@ -29,7 +29,7 @@ const FullEventCardModal = ({
     }, [isModalOpen])
 
     const showModal = () => {
-        setIsModalOpen(true)
+        navigate(`/event/${event.id}`)
     }
 
     const handleCancel = () => {
@@ -43,7 +43,14 @@ const FullEventCardModal = ({
                 {anchorEl}
             </div>
 
-            <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
+            <Modal
+                open={isModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+                style={{
+                    top: "20px", // Set specific top margin
+                }}
+            >
                 <div style={{ width: "500px" }}>
                     <FullEventCard event={event} />
                 </div>

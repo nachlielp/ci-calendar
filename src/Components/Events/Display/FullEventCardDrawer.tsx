@@ -32,13 +32,16 @@ const FullEventCardDrawer = ({
         }
     }, [isModalOpen, event.id, store.isUser, store.isOnline])
 
+    const onOpen = () => {
+        navigate(`/event/${event.id}`)
+    }
     const onClose = () => {
         setIsModalOpen(false)
         navigate("/")
     }
     return (
         <>
-            <div onClick={() => setIsModalOpen(true)}>{anchorEl}</div>
+            <div onClick={onOpen}>{anchorEl}</div>
 
             <Drawer
                 className="full-event-card-drawer"
