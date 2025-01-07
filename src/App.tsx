@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react"
+import { Suspense, lazy, useState } from "react"
 import { Routes, Route, useNavigate } from "react-router"
 import "./styles/overrides.css"
 
@@ -91,8 +91,14 @@ const DisableAppNotice = () => {
 const disableApp = import.meta.env.VITE_DISABLE_APP
 
 const App = () => {
+    const [isDev] = useState(
+        localStorage.getItem("isInternal") === "true" ||
+            import.meta.env.VITE_BRANCH !== "prod"
+    )
+
     const navigate = useNavigate()
     useRemoveAppLoadingScreen()
+
     if (disableApp === "true") {
         return (
             <div className="app">
@@ -108,7 +114,7 @@ const App = () => {
     }
     return (
         <div className="app">
-            <SpeedInsights />
+            {!isDev && <SpeedInsights />}
             <BackgroundTiles />
 
             <div
