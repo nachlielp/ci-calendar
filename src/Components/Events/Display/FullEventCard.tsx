@@ -55,7 +55,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
         await navigator.clipboard.writeText(
-            `${window.location.origin}/event/${ci_event.id}`
+            `${window.location.origin}/event/${ci_event.short_id}`
         )
     }
 
@@ -375,7 +375,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 }
                                 callback={() =>
                                     utilService.handleShareEvent(
-                                        ci_event.id,
+                                        ci_event.short_id,
                                         ci_event.title
                                     )
                                 }

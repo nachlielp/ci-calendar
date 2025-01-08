@@ -37,8 +37,8 @@ const FullEventCardDrawer = ({
         const currentSearch = window.location.search
 
         // Only navigate if we're not already on this event's page
-        if (!currentPath.includes(`/event/${event.id}`)) {
-            navigate(`/event/${event.id}${currentSearch}`)
+        if (!currentPath.includes(`/event/${event.short_id}`)) {
+            navigate(`/event/${event.short_id}${currentSearch}`)
         } else {
             setIsModalOpen(true)
         }

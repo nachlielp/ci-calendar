@@ -174,21 +174,25 @@ const SingleDayEventForm = memo(
             try {
                 if (!isTemplate) {
                     if (!values["recurring-event"]) {
-                        const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
-                            utilService.formatFormValuesToCreateCIEvent(
-                                values,
-                                address,
-                                false
-                            )
+                        const event: Omit<
+                            DBCIEvent,
+                            "id" | "cancelled_text" | "short_id"
+                        > = utilService.formatFormValuesToCreateCIEvent(
+                            values,
+                            address,
+                            false
+                        )
                         await store.createCIEvent(event)
                     } else {
                         const recurring_ref_key = uuidv4()
-                        const event: Omit<DBCIEvent, "id" | "cancelled_text"> =
-                            utilService.formatFormValuesToCreateCIEvent(
-                                values,
-                                address,
-                                false
-                            )
+                        const event: Omit<
+                            DBCIEvent,
+                            "id" | "cancelled_text" | "short_id"
+                        > = utilService.formatFormValuesToCreateCIEvent(
+                            values,
+                            address,
+                            false
+                        )
 
                         if (
                             eventDate &&

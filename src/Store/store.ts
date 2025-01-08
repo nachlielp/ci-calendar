@@ -189,7 +189,21 @@ class Store {
     @computed
     get getCIEventById() {
         return (eventId: string) => {
-            return this.app_ci_events.find((e) => e.id === eventId)
+            return this.app_ci_events.find(
+                (e) => e.id === eventId || e.short_id === eventId
+            )
+        }
+    }
+
+    @computed
+    get getFutureRecurringEventsByRefKey() {
+        return (event: CIEvent) => {
+            return this.app_ci_events.filter(
+                (e) =>
+                    e.recurring_ref_key &&
+                    e.recurring_ref_key === event.recurring_ref_key &&
+                    dayjs(e.start_date).isAfter(dayjs(event.start_date))
+            )
         }
     }
 
@@ -677,7 +691,7 @@ class Store {
 
     @action
     createCIEvent = async (
-        ci_event: Omit<DBCIEvent, "id" | "cancelled_text">
+        ci_event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">
     ) => {
         const newCIEvent = await cieventsService.createCIEvent(ci_event)
         this.setCIEvent(newCIEvent, EventPayloadType.INSERT)
