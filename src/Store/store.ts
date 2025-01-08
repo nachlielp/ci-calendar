@@ -206,6 +206,19 @@ class Store {
             )
         }
     }
+    @computed
+    get getIsFutureRecurringEvent() {
+        return (event: CIEvent) => {
+            return (
+                this.app_ci_events.filter(
+                    (e) =>
+                        e.recurring_ref_key &&
+                        e.recurring_ref_key === event.recurring_ref_key &&
+                        dayjs(e.start_date).isAfter(dayjs(event.start_date))
+                ).length > 0
+            )
+        }
+    }
 
     @computed
     get getSortedNotifications() {
