@@ -124,7 +124,9 @@ const UploadImageButton = ({
             const reader = new FileReader()
             reader.onload = (e) => {
                 if (e.target?.result) {
-                    setImage(e.target.result as string)
+                    const imageUrl = e.target.result as string
+                    console.log("handleFileChange.imageUrl", imageUrl)
+                    setImage(imageUrl)
                     setOpen(true)
                 }
             }
