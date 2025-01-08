@@ -117,6 +117,7 @@ const UploadImageButton = ({
         e.stopPropagation()
 
         const file = e.target.files?.[0]
+        console.log("handleFileChange.file", file)
         if (!file) return
 
         if (e.target.files && e.target.files[0]) {
