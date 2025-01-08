@@ -67,6 +67,7 @@ export interface IAddress {
 }
 export interface CIEvent {
     id: string
+    short_id: string
     users: UserBio[]
     owners: UserOption[]
     title: string

@@ -260,7 +260,7 @@ function formatFormValuesToCreateCIEvent(
     values: any,
     address: IAddress,
     is_multi_day: boolean
-): Omit<DBCIEvent, "id" | "cancelled_text"> {
+): Omit<DBCIEvent, "id" | "cancelled_text" | "short_id"> {
     if (import.meta.env.VITE_HIDE_EVENTS_FLAG) {
         console.error("__HIDE EVENTS ON CREATION")
     }
@@ -873,7 +873,7 @@ function getPWAInstallId() {
 }
 
 function isPWA() {
-    // if (import.meta.env.VITE_PWA_TEST) return true
+    if (import.meta.env.VITE_PWA_TEST) return true
     return (
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true
@@ -1214,9 +1214,9 @@ function calculateRecurringEventDates(
 
 function duplicateEvent(
     date: Dayjs,
-    event: Omit<DBCIEvent, "id" | "cancelled_text">,
+    event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">,
     isMultiDayEvent: boolean
-): Omit<DBCIEvent, "id" | "cancelled_text"> {
+): Omit<DBCIEvent, "id" | "cancelled_text" | "short_id"> {
     const eventLength = dayjs(event.start_date).diff(
         dayjs(event.end_date),
         "day"

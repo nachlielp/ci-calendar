@@ -189,7 +189,9 @@ class Store {
     @computed
     get getCIEventById() {
         return (eventId: string) => {
-            return this.app_ci_events.find((e) => e.id === eventId)
+            return this.app_ci_events.find(
+                (e) => e.id === eventId || e.short_id === eventId
+            )
         }
     }
 
@@ -689,7 +691,7 @@ class Store {
 
     @action
     createCIEvent = async (
-        ci_event: Omit<DBCIEvent, "id" | "cancelled_text">
+        ci_event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">
     ) => {
         const newCIEvent = await cieventsService.createCIEvent(ci_event)
         this.setCIEvent(newCIEvent, EventPayloadType.INSERT)

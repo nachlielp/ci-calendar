@@ -169,7 +169,7 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
 }
 
 async function createCIEvent(
-    event: Omit<DBCIEvent, "id" | "cancelled_text">
+    event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">
 ): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
