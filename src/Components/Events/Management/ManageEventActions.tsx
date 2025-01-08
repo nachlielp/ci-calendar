@@ -9,27 +9,23 @@ import { useNavigate } from "react-router"
 export default function ManageEventActions({ event }: { event: CIEvent }) {
     const navigate = useNavigate()
 
-    const buttonsArray = [
-        {
-            icon: "edit",
-            className: "edit-btn",
-            path: event.is_multi_day
-                ? `/manage-events/edit-multi-day/${event.id}`
-                : `/manage-events/edit-single-day/${event.id}`,
-        },
-    ]
+    const btn = {
+        icon: "edit",
+        className: "edit-btn",
+        path: event.is_multi_day
+            ? `/manage-events/edit-multi-day/${event.id}`
+            : `/manage-events/edit-single-day/${event.id}`,
+    }
 
     return (
         <section className="manage-event-actions">
-            {buttonsArray.map((button) => (
-                <button
-                    className={`action-btn ${button.className}`}
-                    onClick={() => navigate(button.path)}
-                    key={button.icon}
-                >
-                    <Icon icon={button.icon} className="icon" />
-                </button>
-            ))}
+            <button
+                className={`action-btn ${btn.className}`}
+                onClick={() => navigate(btn.path)}
+                key={btn.icon}
+            >
+                <Icon icon={btn.icon} className="icon" />
+            </button>
             <DeleteEventButton event={event} />
             <CancelledEventButton
                 eventId={event.id}

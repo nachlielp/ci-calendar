@@ -6,7 +6,7 @@ import dayjs from "dayjs"
 import { useState } from "react"
 import { CIEvent } from "../../../util/interfaces"
 import { CheckboxChangeEvent } from "antd/es/checkbox"
-import "../../../styles/delete-event-modal.css"
+import "../../../styles/batch-action-event-modal.css"
 
 export default function HideEventButton({ event }: { event: CIEvent }) {
     const [open, setOpen] = useState(false)
@@ -66,7 +66,7 @@ export default function HideEventButton({ event }: { event: CIEvent }) {
                 cancelText="ביטול"
                 okType="danger"
             >
-                <div className="delete-event-modal">
+                <div className="batch-action-event-modal">
                     <div>
                         האם אתם בטוחים שאתם רוצים{" "}
                         {event.hide ? "להציג" : "להסתיר"} את הארוע?

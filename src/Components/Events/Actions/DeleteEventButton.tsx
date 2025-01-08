@@ -5,7 +5,7 @@ import type { CheckboxChangeEvent } from "antd/es/checkbox"
 import { CIEvent } from "../../../util/interfaces"
 import dayjs from "dayjs"
 import { useState } from "react"
-import "../../../styles/delete-event-modal.css"
+import "../../../styles/batch-action-event-modal.css"
 
 interface IDeleteEventProps {
     event: CIEvent
