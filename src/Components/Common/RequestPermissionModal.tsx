@@ -3,7 +3,6 @@ import Spin from "antd/es/spin"
 import { observer } from "mobx-react-lite"
 import "../../styles/request-permission-modal.css"
 import Modal from "antd/es/modal"
-// import { Modal } from "../Common/Modal"
 const RequestPermissionModal = () => {
     const requestPermission = async () => {
         vm.setLoading()

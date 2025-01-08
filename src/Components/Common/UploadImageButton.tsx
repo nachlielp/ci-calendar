@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite"
 import { useCallback, useEffect, useState, useRef } from "react"
 import Cropper from "react-easy-crop"
 import "../../styles/upload-image-button.css"
-import { Modal } from "../Common/Modal"
+import Modal from "antd/es/modal"
 const MAX_FILE_SIZE = 30 * 1024 // 30KB in bytes
 
 const defaultImage = null
@@ -292,6 +292,7 @@ const UploadImageButton = observer(
                         console.log("Modal cancel triggered")
                         safeSetState(setOpen, false)
                     }}
+                    footer={null}
                 >
                     <section className="upload-image-button">
                         <div className="cropper-container">
