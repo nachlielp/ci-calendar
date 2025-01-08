@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Cropper from "react-easy-crop"
 import "../../styles/upload-image-button.css"
 import { Modal } from "../Common/Modal"
@@ -24,6 +24,14 @@ const UploadImageButton = ({
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(
         defaultCroppedAreaPixels
     )
+
+    useEffect(() => {
+        console.log("Image state changed:", image)
+    }, [image])
+
+    useEffect(() => {
+        console.log("Modal open state changed:", open)
+    }, [open])
 
     const onCropComplete = useCallback(
         (_croppedArea: any, croppedAreaPixels: any) => {
@@ -170,7 +178,13 @@ const UploadImageButton = ({
                 </label>
             </article>
 
-            <Modal open={open} onCancel={() => setOpen(false)}>
+            <Modal
+                open={open}
+                onCancel={() => {
+                    console.log("Modal cancel triggered")
+                    setOpen(false)
+                }}
+            >
                 <section className="upload-image-button">
                     <div className="cropper-container">
                         {image && (
