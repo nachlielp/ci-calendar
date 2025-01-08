@@ -126,20 +126,40 @@ const UploadImageButton = ({
 
         const file = e.target.files?.[0]
         console.log("handleFileChange.file", file)
-        if (!file) return
-
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                if (e.target?.result) {
-                    const imageUrl = e.target.result as string
-                    console.log("handleFileChange.imageUrl", imageUrl)
-                    setImage(imageUrl)
-                    setOpen(true)
-                }
-            }
-            reader.readAsDataURL(e.target.files[0])
+        if (!file) {
+            console.error("No file selected")
+            return
         }
+
+        try {
+            const reader = new FileReader()
+            reader.addEventListener("loadend", function () {
+                console.log("FileReader loadend event triggered")
+                if (this.result) {
+                    const imageUrl = this.result as string
+                    console.log("Image loaded, length:", imageUrl.length)
+
+                    // First set the image
+                    setImage(imageUrl)
+                    // Then open the modal in a separate tick
+                    requestAnimationFrame(() => {
+                        setOpen(true)
+                    })
+                } else {
+                    console.error("FileReader result is null")
+                }
+            })
+
+            reader.addEventListener("error", (error) => {
+                console.error("FileReader error:", error)
+            })
+
+            console.log("Starting to read file...")
+            reader.readAsDataURL(file)
+        } catch (error) {
+            console.error("Error in handleFileChange:", error)
+        }
+
         e.target.value = ""
     }
 
