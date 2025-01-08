@@ -70,7 +70,7 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = "1.6.77"
+export const CACHE_VERSION = "1.6.78"
 
 export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://payboxapp.page.link/32yzdN1D1gix4AR37"
