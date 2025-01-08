@@ -459,31 +459,6 @@ function formatFormValuesToDraftCIEvent(
             },
         ]
 
-        // Only process additional segments if they exist and have required fields
-        // if (values["segments"]?.length > 0) {
-        //     const additionalSegments = values["segments"]
-        //         .filter(
-        //             (segment: any) =>
-        //                 segment["event-start-time"] && segment["event-end-time"]
-        //         )
-        //         .map((segment: any) => ({
-        //             type: segment["event-type"] || "",
-        //             tags: segment["event-tags"] || [],
-        //             teachers: segment.teachers
-        //                 ? utilService.formatUsersForCIEvent(segment.teachers)
-        //                 : [],
-        //             startTime: dayjs(values["event-start-date"])
-        //                 .hour(dayjs(segment["event-start-time"]).hour())
-        //                 .minute(dayjs(segment["event-start-time"]).minute())
-        //                 .toISOString(),
-        //             endTime: dayjs(values["event-start-date"])
-        //                 .hour(dayjs(segment["event-end-time"]).hour())
-        //                 .minute(dayjs(segment["event-end-time"]).minute())
-        //                 .toISOString(),
-        //         }))
-
-        //     segments.push(...additionalSegments)
-        // }
         if (values["segments"]?.length > 0) {
             const additionalSegments = values["segments"]
                 .filter((segment: any) => segment !== undefined)

@@ -13,7 +13,9 @@ async function uploadFile(filePath: string, file: Blob) {
             .upload(filePath, file)
         if (error) {
             throw new Error(
-                `Failed to upload file for userId: ${store.getUserId} ERROR: ${error}`
+                `Failed to upload file for userId: ${
+                    store.getUserId
+                } ERROR: ${JSON.stringify(error)}`
             )
         } else {
             return data

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import Image from "antd/es/image"
@@ -11,6 +11,9 @@ import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
 import Spin from "antd/es/spin"
 import "../../styles/profile-form.css"
+import { utilService } from "../../util/utilService"
+
+const DRAFT_KEY = "profile-form"
 type FieldType = {
     bio_name: string
     about: string
@@ -29,7 +32,6 @@ interface ProfileFormProps {
 }
 
 const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
-    const originalImageUrl = useRef<string>(store.getBio.img || "")
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [inputErrors, setInputErrors] = useState<boolean>(false)
     const [isUploading, setIsUploading] = useState<boolean>(false)
@@ -40,8 +42,24 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
 
     useEffect(() => {
         setImageUrl(store.getBio.img || "")
-        originalImageUrl.current = store.getBio.img || ""
+
+        const currentFormValuesObj = utilService.getDraftEvent(DRAFT_KEY)
+        if (currentFormValuesObj) {
+            form.setFieldsValue({
+                ...currentFormValuesObj,
+            })
+            const draftImageUrl = currentFormValuesObj?.img || ""
+            setImageUrl(draftImageUrl)
+        }
     }, [store.getBio])
+
+    const onFormValueChange = (_: any, allFields: any) => {
+        const draftProfile = {
+            ...allFields,
+            img: imageUrl,
+        }
+        utilService.saveDraftEvent(draftProfile, DRAFT_KEY)
+    }
 
     const uploadNewImage = async (image: Blob) => {
         setIsUploading(true)
@@ -52,6 +70,12 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                 import.meta.env.VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
             }/${data?.path}`
             setImageUrl(publicUrl)
+
+            const draftProfile = {
+                ...form.getFieldsValue(),
+                img: publicUrl,
+            }
+            utilService.saveDraftEvent(draftProfile, DRAFT_KEY)
         } catch (error) {
             console.error("ProfileForm.uploadNewImage.error: ", error)
             //TODO show error
@@ -97,6 +121,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
             console.error("UserForm.onFinish.error: ", error)
         } finally {
             setIsSubmitting(false)
+            utilService.clearDraftEvent(DRAFT_KEY)
         }
     }
 
@@ -116,6 +141,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                     page_url_2: store.getBio.page_url_2,
                     page_title_2: store.getBio.page_title_2,
                 }}
+                onValuesChange={onFormValueChange}
             >
                 <Form.Item<FieldType>
                     name="bio_name"
