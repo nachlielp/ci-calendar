@@ -61,11 +61,7 @@ export default function EditRecurringEventButton({
 
     return (
         <>
-            <button
-                className="action-btn"
-                onClick={handleOpen}
-                style={{ borderRadius: "0px", borderLeft: "none" }}
-            >
+            <button className="general-action-btn" onClick={handleOpen}>
                 עדכון אירוע
             </button>
             <Modal
@@ -85,7 +81,7 @@ export default function EditRecurringEventButton({
                         }`}
                     </div>
                     <Alert
-                        message="עדכון ארועים נוספים יעדכן את כל התוכן של האירוע למעט התאריך!"
+                        message="עדכון ארועים נוספים יעדכן את כל התוכן של האירוע למעט התאריך, ביטול והסתרה!"
                         type="warning"
                     />
                     {futureEvents.length > 0 && (

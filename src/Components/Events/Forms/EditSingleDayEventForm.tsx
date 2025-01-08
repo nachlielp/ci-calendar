@@ -145,14 +145,23 @@ export default function EditSingleDayEventForm({
                 event.is_multi_day
             )
         try {
-            if (!eventIds.includes(event.id)) {
-                setEventIds([...eventIds, event.id])
-            }
+            const eventIdsToUpdate = new Set(eventIds)
+            eventIdsToUpdate.add(event.id)
 
             await Promise.allSettled([
-                ...eventIds.map((eventId) => {
-                    const { start_date, end_date, ...eventUpdates } =
-                        updatedEvent
+                ...[...eventIdsToUpdate].map((eventId) => {
+                    const {
+                        start_date,
+                        end_date,
+                        short_id,
+                        cancelled,
+                        cancelled_text,
+                        is_notified,
+                        created_at,
+                        hide,
+                        id,
+                        ...eventUpdates
+                    } = updatedEvent
                     return store.updateCIEvent({
                         ...eventUpdates,
                         id: eventId,
