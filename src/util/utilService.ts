@@ -1200,6 +1200,9 @@ function duplicateEvent(
     return {
         ...event,
         start_date: date.format("YYYY/MM/DD"),
+        is_notified:
+            date.format("YYYY/MM/DD") !==
+            dayjs(event.start_date).format("YYYY/MM/DD"),
         end_date: isMultiDayEvent
             ? date.add(eventLength, "day").format("YYYY/MM/DD")
             : date.format("YYYY/MM/DD"),
