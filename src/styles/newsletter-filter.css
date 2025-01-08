@@ -1,0 +1,39 @@
+.newsletter-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .add-button,
+    .remove-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        background-color: #fff;
+        border: 1px solid #000;
+        border-radius: 5px;
+        padding-top: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        font-size: 16px;
+        font-weight: 500;
+        color: #000;
+
+        .add-button-label,
+        .remove-button-label {
+            margin-bottom: 6px;
+            margin-right: 6px;
+        }
+    }
+
+    .add-button {
+        margin-top: 1rem;
+    }
+
+    .general-action-btn {
+        margin-top: 1rem;
+    }
+}

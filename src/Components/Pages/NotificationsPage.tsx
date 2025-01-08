@@ -5,7 +5,9 @@ import NotificationSwitch from "../Users/NotificationSwitch"
 import PermissionsStatusNotice from "../Common/PermissionsStatusNotice"
 import "../../styles/notifications-page.css"
 import { EMAIL_SUPPORT } from "../../App"
+import NewsletterFilter from "../Users/NewsletterFilter"
 const NotificationsPage = observer(() => {
+    const branch = import.meta.env.VITE_BRANCH
     return (
         <div className="notifications-page page">
             <label className="notifications-page-title">ניהול התראות</label>
@@ -13,6 +15,8 @@ const NotificationsPage = observer(() => {
                 <PermissionsStatusNotice />
                 <NotificationSwitch />
                 <SubscribeToTeachers />
+
+                {branch !== "prod" && <NewsletterFilter />}
                 {/* <UserNotificationsList /> */}
             </section>
             <label className="support-email">
