@@ -26,11 +26,21 @@ const UploadImageButton = ({
     )
 
     useEffect(() => {
-        console.log("Image state changed:", image)
+        console.log(
+            "Image state changed:",
+            image?.slice(0, 50),
+            "... length:",
+            image?.length
+        )
     }, [image])
 
     useEffect(() => {
-        console.log("Modal open state changed:", open)
+        console.log(
+            "Modal open state changed:",
+            open,
+            "at:",
+            new Date().toISOString()
+        )
     }, [open])
 
     const onCropComplete = useCallback(
@@ -141,10 +151,16 @@ const UploadImageButton = ({
 
                     // First set the image
                     setImage(imageUrl)
-                    // Then open the modal in a separate tick
-                    requestAnimationFrame(() => {
+                    console.log(
+                        "Image state update attempted with URL length:",
+                        imageUrl.length
+                    )
+
+                    // Force a delay before opening modal
+                    setTimeout(() => {
+                        console.log("Attempting to open modal...")
                         setOpen(true)
-                    })
+                    }, 100)
                 } else {
                     console.error("FileReader result is null")
                 }
