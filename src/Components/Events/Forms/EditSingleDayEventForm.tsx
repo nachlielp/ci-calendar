@@ -20,6 +20,7 @@ import { utilService } from "../../../util/utilService"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
+import EditRecurringEventButton from "../Actions/EditRecurringEventDialog"
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(customParseFormat)
@@ -48,6 +49,7 @@ export default function EditSingleDayEventForm({
     closeForm: () => void
 }) {
     const [newAddress, setNewAddress] = useState<IAddress | null>(null)
+    const [eventIds, setEventIds] = useState<string[]>([])
     const [eventDate, setEventDate] = useState(dayjs())
     const [endDate, setEndDate] = useState<dayjs.Dayjs | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -77,6 +79,10 @@ export default function EditSingleDayEventForm({
 
     const handleEndDateChange = (date: dayjs.Dayjs) => {
         setEndDate(date)
+    }
+
+    const handleEventIdsChange = (eventIds: string[]) => {
+        setEventIds(eventIds)
     }
 
     const handleSubmit = async (values: any) => {
@@ -125,6 +131,42 @@ export default function EditSingleDayEventForm({
         }
     }
 
+    const handleBatchSubmit = async (
+        values: any,
+        event: CIEvent,
+        eventIds: string[]
+    ) => {
+        setIsSubmitting(true)
+        console.log("handleBatchSubmit")
+        const updatedEvent: Partial<DBCIEvent> =
+            utilService.formatFormValuesToEditCIEvent(
+                values,
+                newAddress || (address as IAddress),
+                event.is_multi_day
+            )
+        try {
+            if (!eventIds.includes(event.id)) {
+                setEventIds([...eventIds, event.id])
+            }
+
+            await Promise.allSettled([
+                ...eventIds.map((eventId) => {
+                    const { start_date, end_date, ...eventUpdates } =
+                        updatedEvent
+                    return store.updateCIEvent({
+                        ...eventUpdates,
+                        id: eventId,
+                    })
+                }),
+            ])
+            closeForm()
+        } catch (error) {
+            console.error("EventForm.handleSubmit.error: ", error)
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
     const onFinishFailed = () => {
         setInputErrors(true)
         setTimeout(() => {
@@ -141,7 +183,12 @@ export default function EditSingleDayEventForm({
             <Form
                 {...formItemLayout}
                 form={form}
-                onFinish={handleSubmit}
+                onFinish={(values) => {
+                    if (event && store.getIsFutureRecurringEvent(event)) {
+                        return handleBatchSubmit(values, event, eventIds)
+                    }
+                    return handleSubmit(values)
+                }}
                 variant="filled"
                 labelCol={{ span: 24 }}
                 wrapperCol={{ span: 24 }}
@@ -180,12 +227,20 @@ export default function EditSingleDayEventForm({
                         justifyContent: "flex-start",
                     }}
                 >
-                    <AsyncFormSubmitButton
-                        isSubmitting={isSubmitting}
-                        size="large"
-                    >
-                        {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
-                    </AsyncFormSubmitButton>
+                    {event && store.getIsFutureRecurringEvent(event) ? (
+                        <EditRecurringEventButton
+                            event={event}
+                            isSubmitting={isSubmitting}
+                            handleEventIdsChange={handleEventIdsChange}
+                        />
+                    ) : (
+                        <AsyncFormSubmitButton
+                            isSubmitting={isSubmitting}
+                            size="large"
+                        >
+                            {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
+                        </AsyncFormSubmitButton>
+                    )}
                 </Form.Item>
             </Form>
         </section>
