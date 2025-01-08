@@ -11,6 +11,50 @@ const defaultRotation = 0
 const defaultZoom = 1
 const defaultCroppedAreaPixels = null
 
+const STORAGE_KEY = "upload-image-temp"
+const MAX_STORAGE_TIME = 1000 * 60 * 5 // 5 minutes
+
+// Add these helper functions
+const saveToStorage = (imageData: string) => {
+    try {
+        const storageItem = {
+            timestamp: Date.now(),
+            imageData,
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(storageItem))
+    } catch (error) {
+        console.error("Error saving to storage:", error)
+    }
+}
+
+const getFromStorage = (): string | null => {
+    try {
+        const item = localStorage.getItem(STORAGE_KEY)
+        if (!item) return null
+
+        const { timestamp, imageData } = JSON.parse(item)
+
+        // Check if the stored data is still valid (less than MAX_STORAGE_TIME old)
+        if (Date.now() - timestamp > MAX_STORAGE_TIME) {
+            localStorage.removeItem(STORAGE_KEY)
+            return null
+        }
+
+        return imageData
+    } catch (error) {
+        console.error("Error reading from storage:", error)
+        return null
+    }
+}
+
+const clearStorage = () => {
+    try {
+        localStorage.removeItem(STORAGE_KEY)
+    } catch (error) {
+        console.error("Error clearing storage:", error)
+    }
+}
+
 const UploadImageButton = observer(
     ({ onImageSave }: { onImageSave: (image: Blob) => void }) => {
         const [open, setOpen] = useState(false)
@@ -24,6 +68,12 @@ const UploadImageButton = observer(
         const mounted = useRef(true)
 
         useEffect(() => {
+            const storedImage = getFromStorage()
+            if (storedImage) {
+                safeSetState(setImage, storedImage)
+                safeSetState(setOpen, true)
+            }
+
             return () => {
                 mounted.current = false
             }
@@ -161,10 +211,11 @@ const UploadImageButton = observer(
                 const reader = new FileReader()
                 reader.addEventListener("loadend", function () {
                     console.log("FileReader loadend event triggered")
+
                     if (this.result) {
                         const imageUrl = this.result as string
                         console.log("Image loaded, length:", imageUrl.length)
-
+                        saveToStorage(imageUrl)
                         // Use a Promise to ensure state updates are sequential
                         Promise.resolve()
                             .then(() => {
@@ -212,9 +263,11 @@ const UploadImageButton = observer(
             }
             setOpen(false)
             resetStates()
+            clearStorage()
         }
 
         const handleCancel = () => {
+            clearStorage()
             setOpen(false)
             resetStates()
         }
