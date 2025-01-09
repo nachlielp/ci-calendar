@@ -2,11 +2,11 @@
 
 /* @import "./styles/loading.css"; */
 
-@import "./styles/generics/buttons.scss";
-@import "./styles/generics/title.scss";
-@import "./styles/generics/page.scss";
-@import "./styles/generics/form-inputs.scss";
-@import "./styles/generics/card.scss";
+@use "./styles/generics/buttons" as *;
+@use "./styles/generics/title" as *;
+@use "./styles/generics/page" as *;
+@use "./styles/generics/form-inputs" as *;
+@use "./styles/generics/card" as *;
 
 @font-face {
     font-family: "Assistant";
