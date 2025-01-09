@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import "../../styles/newsletter-filter.css"
+import '../../styles/newsletter-filter.scss'
 import Form from "antd/es/form"
 import Select from "antd/es/select"
 import { eventOptions } from "../../util/options"
@@ -7,7 +7,7 @@ import { districtOptions } from "../../util/options"
 import { Icon } from "../Common/Icon"
 import Alert from "antd/es/alert/Alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
-import { newsletterFilterVM as vm } from "./NewsletterFilterVM"
+// import { newsletterFilterVM as vm } from "./NewsletterFilterVM"
 
 const NewsletterFilter = () => {
     return (
@@ -90,8 +90,9 @@ const NewsletterFilter = () => {
                         )}
                     </Form.List>
                     <AsyncFormSubmitButton
-                        className="general-action-btn large-btn btn "
-                        isSubmitting={vm.isSubmitting}
+                        className="general-action-btn large-btn"
+                        isSubmitting={false}
+                        // isSubmitting={vm.isSubmitting}
                         // callback={vm.saveSubscriptions}
                         // disabled={vm.subscriptionsEqual}
                     >

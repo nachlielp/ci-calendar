@@ -2,7 +2,7 @@ import ManageTemplatesList from "../Events/Management/ManageTemplatesList"
 import Alert from "antd/es/alert"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-import "../../styles/create-events-page.css"
+import '../../styles/create-events-page.scss'
 import { useNavigate } from "react-router"
 const CreateEventsPage = () => {
     const navigate = useNavigate()

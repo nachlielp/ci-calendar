@@ -6,7 +6,7 @@ import dayjs from "dayjs"
 import { useState } from "react"
 import { CIEvent } from "../../../util/interfaces"
 import { CheckboxChangeEvent } from "antd/es/checkbox"
-import "../../../styles/batch-action-event-modal.css"
+import '../../../styles/batch-action-event-modal.scss'
 
 export default function HideEventButton({ event }: { event: CIEvent }) {
     const [open, setOpen] = useState(false)

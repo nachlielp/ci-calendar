@@ -4,7 +4,7 @@ import type { CheckboxChangeEvent } from "antd/es/checkbox"
 import { CIEvent } from "../../../util/interfaces"
 import dayjs from "dayjs"
 import { useState } from "react"
-import "../../../styles/batch-action-event-modal.css"
+import '../../../styles/batch-action-event-modal.scss'
 import Alert from "antd/es/alert/Alert"
 
 interface IEditRecurringEventProps {

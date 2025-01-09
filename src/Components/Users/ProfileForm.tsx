@@ -10,7 +10,7 @@ import { store } from "../../Store/store"
 import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
 import Spin from "antd/es/spin"
-import "../../styles/profile-form.css"
+import '../../styles/profile-form.scss'
 import { utilService } from "../../util/utilService"
 
 const DRAFT_KEY = "profile-form"

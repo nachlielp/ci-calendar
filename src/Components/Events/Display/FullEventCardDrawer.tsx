@@ -1,6 +1,6 @@
 import Drawer from "antd/es/drawer"
 import FullEventCard from "./FullEventCard"
-import "../../../styles/full-event-card-drawer.css"
+import '../../../styles/full-event-card-drawer.scss'
 import { CIEvent } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"

@@ -3,7 +3,7 @@ import Col from "antd/es/col"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { Icon } from "../../Common/Icon"
-import "../../../styles/add-links-form.css"
+import '../../../styles/add-links-form.scss'
 
 export default function AddLinksForm() {
     return (

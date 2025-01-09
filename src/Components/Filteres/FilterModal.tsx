@@ -1,4 +1,4 @@
-import "../../styles/filter-modal.css"
+import '../../styles/filter-modal.scss'
 import { useState } from "react"
 import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../util/options"

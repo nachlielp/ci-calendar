@@ -1,7 +1,7 @@
 import { Icon } from "../Common/Icon"
 import React from "react"
 import { NavigateFunction } from "react-router"
-import "../../styles/error-boundary.css"
+import '../../styles/error-boundary.scss'
 
 interface ErrorBoundaryProps {
     children: React.ReactNode

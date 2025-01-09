@@ -1,6 +1,6 @@
 import Spin from "antd/es/spin"
-import "../../styles/loading.css"
-import "../../styles/error-boundary.css"
+import '../../styles/loading.scss'
+import '../../styles/error-boundary.scss'
 
 // export default function Loading() {
 //     return (

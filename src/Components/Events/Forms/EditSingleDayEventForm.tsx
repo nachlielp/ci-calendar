@@ -11,7 +11,7 @@ import {
     CITemplate,
     DBCIEvent,
 } from "../../../util/interfaces"
-import "../../../styles/event-form.css"
+import '../../../styles/event-form.scss'
 import Loading from "../../Common/Loading"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import SingleDayEventFormHead from "./SingleDayEventFormHead"

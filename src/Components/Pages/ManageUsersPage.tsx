@@ -8,7 +8,7 @@ import { useWindowSize } from "../../hooks/useWindowSize"
 import Select from "antd/es/select"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-import "../../styles/manage-users.css"
+import '../../styles/manage-users.scss'
 import { action, computed, makeObservable, observable } from "mobx"
 import { reaction } from "mobx"
 import message from "antd/es/message"

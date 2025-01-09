@@ -9,8 +9,8 @@ import {
 } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
-import "../../../styles/event-preview.css"
-import "../../../styles/generics/card.css"
+import '../../../styles/event-preview.scss'
+import '../../../styles/generics/card.scss'
 
 interface EventPreviewProps {
     event: CIEvent

@@ -1,5 +1,5 @@
 import { EMAIL_SUPPORT, PAYBOX_URL } from "../../App"
-import "../../styles/about-page.css"
+import '../../styles/about-page.scss'
 import PageFooter from "../Common/PageFooter"
 import { Icon } from "../Common/Icon"
 

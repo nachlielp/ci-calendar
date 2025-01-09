@@ -3,7 +3,7 @@ import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { supabase } from "../../supabase/client"
 import { useState } from "react"
-import "../../styles/reset-password-page.css"
+import '../../styles/reset-password-page.scss'
 
 export default function ResetPasswordPage() {
     const [form] = Form.useForm()

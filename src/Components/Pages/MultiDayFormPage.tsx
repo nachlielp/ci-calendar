@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router"
 import MultiDayEventForm from "../Events/Forms/MultiDayEventForm"
-import "../../styles/single-day-form-page.css"
+import '../../styles/single-day-form-page.scss'
 import { Alert } from "antd"
 
 const EVENT_TYPE_LABEL = "אירוע רב יומי"

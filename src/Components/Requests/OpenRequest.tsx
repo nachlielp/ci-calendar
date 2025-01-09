@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import { UserTypeHebrew } from "../../util/interfaces"
 import { userRequestVM } from "./UserRequestVM"
-import "../../styles/open-request.css"
+import '../../styles/open-request.scss'
 
 const OpenRequest = () => {
     if (!userRequestVM.openPositionRequest) return <></>

@@ -3,7 +3,7 @@ import SubscribeToTeachers from "../Users/SubscribeToTeachers"
 import { observer } from "mobx-react-lite"
 import NotificationSwitch from "../Users/NotificationSwitch"
 import PermissionsStatusNotice from "../Common/PermissionsStatusNotice"
-import "../../styles/notifications-page.css"
+import '../../styles/notifications-page.scss'
 import { EMAIL_SUPPORT } from "../../App"
 import NewsletterFilter from "../Users/NewsletterFilter"
 const NotificationsPage = observer(() => {

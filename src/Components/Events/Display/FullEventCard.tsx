@@ -9,7 +9,7 @@ import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import "../../../styles/full-event-card.css"
+import '../../../styles/full-event-card.scss'
 import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 import React, { Component } from "react"
@@ -383,8 +383,8 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         )}
                         {!utilService.isPWA() && (
                             <SecondaryButton
-                                label="העתקת קישור"
-                                successLabel="קישור הועתק"
+                                label="קישור"
+                                successLabel="הועתק"
                                 icon="contentCopy"
                                 successIcon="check"
                                 callback={handleCopy}

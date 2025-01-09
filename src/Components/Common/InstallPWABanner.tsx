@@ -5,7 +5,7 @@ import more_vert from "../../assets/svgs/more_vert.svg"
 import add_to_home_screen from "../../assets/svgs/add_to_home_screen.svg"
 import add_box from "../../assets/svgs/add_box.svg"
 import { ReactSVG } from "react-svg"
-import "../../styles/install-pwa-banner.css"
+import '../../styles/install-pwa-banner.scss'
 import { Icon } from "./Icon"
 import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import { observer } from "mobx-react-lite"

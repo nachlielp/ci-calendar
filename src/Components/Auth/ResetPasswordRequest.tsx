@@ -4,7 +4,7 @@ import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
-import "../../styles/reset-password-request.css"
+import '../../styles/reset-password-request.scss'
 
 function ResetPasswordRequest() {
     const emailRef = useRef<InputRef>(null)

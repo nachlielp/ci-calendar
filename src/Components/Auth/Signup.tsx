@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import "../../styles/signup.css"
+import '../../styles/signup.scss'
 import Alert from "antd/es/alert"
 import Form from "antd/es/form"
 import Input from "antd/es/input"

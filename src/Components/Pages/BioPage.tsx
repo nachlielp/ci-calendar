@@ -4,7 +4,7 @@ import ProfileForm from "../Users/ProfileForm"
 import BioCard from "../Users/BioCard"
 import { store } from "../../Store/store"
 import { useNavigate } from "react-router"
-import "../../styles/bio-page.css"
+import '../../styles/bio-page.scss'
 import { UserTypeHebrew } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import Switch from "antd/es/switch"

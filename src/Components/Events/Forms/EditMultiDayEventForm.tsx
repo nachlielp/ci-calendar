@@ -13,7 +13,7 @@ import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
 import { utilService } from "../../../util/utilService.ts"
 import { store } from "../../../Store/store.ts"
 import EventFromFooter from "./EventFromFooter.tsx"
-import "../../../styles/event-form.css"
+import '../../../styles/event-form.scss'
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton.tsx"
 export default function EditMultiDayEventForm({
     isTemplate = false,

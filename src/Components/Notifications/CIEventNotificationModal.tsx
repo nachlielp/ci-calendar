@@ -16,7 +16,7 @@ import { store } from "../../Store/store"
 import { observable, reaction, action, computed } from "mobx"
 import { makeObservable } from "mobx"
 import { utilService } from "../../util/utilService"
-import "../../styles/cievent-notification-modal.css"
+import '../../styles/cievent-notification-modal.scss'
 
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"

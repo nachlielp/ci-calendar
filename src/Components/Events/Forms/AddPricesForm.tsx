@@ -4,7 +4,7 @@ import Row from "antd/es/row"
 import Col from "antd/es/col"
 import InputNumber from "antd/es/input-number"
 import { Icon } from "../../Common/Icon"
-import "../../../styles/add-prices-form.css"
+import '../../../styles/add-prices-form.scss'
 export default function AddPricesForm() {
     return (
         <section className="add-prices-form">

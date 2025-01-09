@@ -3,7 +3,7 @@ import OpenRequest from "../Requests/OpenRequest"
 import { userRequestVM } from "../Requests/UserRequestVM"
 import { observer } from "mobx-react-lite"
 import { UserTypeHebrew } from "../../util/interfaces"
-import "../../styles/support-page.css"
+import '../../styles/support-page.scss'
 import { EMAIL_SUPPORT } from "../../App"
 
 const SupportPage = () => {

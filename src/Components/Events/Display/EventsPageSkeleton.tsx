@@ -5,7 +5,7 @@ import { utilService } from "../../../util/utilService"
 import { Tag } from "antd"
 import { ReactSVG } from "react-svg"
 import close from "../../../assets/svgs/close.svg"
-import "../../../styles/events-page-skeleton.css"
+import '../../../styles/events-page-skeleton.scss'
 
 export default function EventsPageSkeleton({
     withHeader = true,

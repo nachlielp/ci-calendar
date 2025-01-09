@@ -15,7 +15,7 @@ import { utilService } from "../../../util/utilService"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
-import "../../../styles/event-form.css"
+import '../../../styles/event-form.scss'
 import Select from "antd/es/select"
 import { memo } from "react"
 import { v4 as uuidv4 } from "uuid"

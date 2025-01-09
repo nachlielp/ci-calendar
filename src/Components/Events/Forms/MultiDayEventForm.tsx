@@ -15,7 +15,7 @@ import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import MultiDayFormHead from "./MultiDayFormHead"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
-import "../../../styles/event-form.css"
+import '../../../styles/event-form.scss'
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 dayjs.extend(utc)
 dayjs.extend(timezone)

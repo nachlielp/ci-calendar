@@ -7,7 +7,7 @@ import {
 import { useEffect, useState } from "react"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
-import "../../styles/request-list.css"
+import '../../styles/request-list.scss'
 //NOTICE - currently not in use, only show a single user type request
 const RequestsList = ({
     selectedRequestId,

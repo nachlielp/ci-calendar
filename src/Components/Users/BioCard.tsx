@@ -1,6 +1,6 @@
 import Image from "antd/es/image"
-import "../../styles/bio-card.css"
-import "../../styles/profile-form.css"
+import '../../styles/bio-card.scss'
+import '../../styles/profile-form.scss'
 import Typography from "antd/es/typography"
 import { Icon } from "../Common/Icon"
 import { UserBio } from "../../util/interfaces"

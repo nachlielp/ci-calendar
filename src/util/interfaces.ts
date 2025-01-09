@@ -199,6 +199,11 @@ export interface NotificationDB
     id?: string
 }
 
+export interface NewsletterFilter {
+    districts: District[]
+    eventTypes: EventlyType[]
+}
+
 export interface CIUser {
     id: string
     created_at: string
@@ -220,6 +225,7 @@ export interface CIUser {
     pwa_install_id: string | null
     fcm_token: string | null
     is_internal: boolean
+    newsletter_filter: NewsletterFilter[]
 }
 
 export interface CIUserData {

@@ -9,7 +9,7 @@ import { CIEvent } from "../../../util/interfaces"
 import Input from "antd/es/input"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
-import "../../../styles/manage-events-list.css"
+import '../../../styles/manage-events-list.scss'
 
 dayjs.extend(isSameOrAfter)
 

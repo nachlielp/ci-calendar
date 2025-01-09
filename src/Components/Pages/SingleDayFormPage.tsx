@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router"
 import SingleDayEventForm from "../Events/Forms/SingleDayEventForm"
-import "../../styles/single-day-form-page.css"
+import '../../styles/single-day-form-page.scss'
 
 const EVENT_TYPE_LABEL = "אירוע חד יומי"
 const TEMPLATE_TYPE_LABEL = "תבנית חד יומית"

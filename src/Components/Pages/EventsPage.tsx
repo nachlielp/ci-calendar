@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from "dayjs"
-import "../../styles/events-page.css"
+import '../../styles/events-page.scss'
 import isBetween from "dayjs/plugin/isBetween"
 dayjs.extend(isBetween)
 import CalendarView from "../Events/Display/CalendarView"

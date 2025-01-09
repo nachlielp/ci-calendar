@@ -1,4 +1,4 @@
-import "../../../styles/events-list.css"
+import '../../../styles/events-list.scss'
 import { EventPreview } from "./EventPreview"
 import { CIEvent } from "../../../util/interfaces"
 import Empty from "antd/es/empty"

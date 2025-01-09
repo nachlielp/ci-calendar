@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "convert-to-scss": "node scripts/convertToScss.js",
+    "update-imports": "node scripts/updateImports.js"
   },
   "dependencies": {
     "@mui/x-date-pickers": "^7.22.3",

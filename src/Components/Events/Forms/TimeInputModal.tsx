@@ -7,7 +7,7 @@ import { TimeClock } from "@mui/x-date-pickers/TimeClock"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import TimePicker from "antd/es/time-picker"
-import "../../../styles/time-clock-value.css"
+import '../../../styles/time-clock-value.scss'
 
 type TimeView = "hours" | "minutes"
 

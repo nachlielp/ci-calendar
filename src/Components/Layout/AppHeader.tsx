@@ -1,5 +1,5 @@
 import React from "react"
-import "../../styles/header.css"
+import '../../styles/header.scss'
 import { CIUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import InstallPWABanner from "../Common/InstallPWABanner"

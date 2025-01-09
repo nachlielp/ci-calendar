@@ -1,6 +1,6 @@
 import { Suspense, lazy, useState } from "react"
 import { Routes, Route, useNavigate } from "react-router"
-import "./styles/overrides.css"
+import './styles/overrides.scss'
 
 import EventsPage from "./Components/Pages/EventsPage"
 import Loading from "./Components/Common/Loading"
@@ -51,7 +51,7 @@ const ManageAllEventsPage = lazy(
 const ManageUserEventsPage = lazy(
     () => import("./Components/Pages/ManageUserEventsPage")
 )
-import "./styles/app-disabled.css"
+import './styles/app-disabled.scss'
 
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"

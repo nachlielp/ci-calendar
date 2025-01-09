@@ -1,5 +1,5 @@
 import "./instrument.js"
-import "./index.css"
+import './index.scss'
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router"
 import App from "./App.tsx"

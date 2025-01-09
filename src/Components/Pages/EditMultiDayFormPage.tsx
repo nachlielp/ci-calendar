@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router"
-import "../../styles/single-day-form-page.css"
+import '../../styles/single-day-form-page.scss'
 import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByParams"
 import { useSetSelectedTemplateByParams } from "../../hooks/useSetSelectedTemplateByParams"
 import EditMultiDayEventForm from "../Events/Forms/EditMultiDayEventForm"

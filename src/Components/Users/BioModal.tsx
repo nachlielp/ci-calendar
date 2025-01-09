@@ -2,7 +2,7 @@ import { useState } from "react"
 // import { Modal } from "../Common/Modal"
 import { UserBio } from "../../util/interfaces"
 import BioCard from "./BioCard"
-import "../../styles/bio-modal.css"
+import '../../styles/bio-modal.scss'
 import Modal from "antd/es/modal"
 interface BioModalProps {
     teacher: UserBio

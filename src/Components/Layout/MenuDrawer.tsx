@@ -7,7 +7,7 @@ import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-import "../../styles/menu-drawer.css"
+import '../../styles/menu-drawer.scss'
 
 const MenuDrawer = () => {
     const [open, setOpen] = useState<boolean>(false)

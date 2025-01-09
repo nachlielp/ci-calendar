@@ -1,6 +1,6 @@
 import Form from "antd/es/form"
 import { useState } from "react"
-import "../../../styles/recurring-event-section.css"
+import '../../../styles/recurring-event-section.scss'
 import Checkbox from "antd/es/checkbox/Checkbox"
 import { Dayjs } from "dayjs"
 import { Col, FormInstance, Row, Select } from "antd/lib"

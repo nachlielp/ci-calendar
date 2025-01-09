@@ -1,5 +1,5 @@
 import { CIEvent } from "../../../util/interfaces"
-import "../../../styles/manage-event-actions.css"
+import '../../../styles/manage-event-actions.scss'
 import HideEventButton from "../Actions/HideEventButton"
 import { Icon } from "../../Common/Icon"
 import CancelledEventButton from "../Actions/CancelleEventButton"

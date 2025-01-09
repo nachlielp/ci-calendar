@@ -3,7 +3,7 @@ import DeleteTemplateButton from "../Actions/DeleteTemplateButton"
 import { Icon } from "../../Common/Icon"
 import { observer } from "mobx-react-lite"
 import { store } from "../../../Store/store"
-import "../../../styles/manage-templates-list.css"
+import '../../../styles/manage-templates-list.scss'
 
 //TODO move edit to page with save state
 const ManageTemplatesList = () => {
