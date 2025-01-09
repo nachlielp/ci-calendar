@@ -7,6 +7,8 @@
         <title>לוח אירועי קונטקט אימפרוביזציה | CI Calendar</title>
 
         <link rel="manifest" href="/site.webmanifest" />
+        <meta name="robots" content="index, follow" />
+
         <meta
             name="title"
             content="לוח אירועי קונטקט אימפרוביזציה בישראל | CI Calendar"
@@ -111,10 +113,10 @@
         <script type="text/javascript">
             const indexedRoutes = ["/", "/about"]
             const currentPath = window.location.pathname
+            const robotsTag = document.querySelector('meta[name="robots"]')
 
-            if (!indexedRoutes.includes(currentPath)) {
-                document.querySelector('meta[name="robots"]').content =
-                    "noindex, nofollow"
+            if (robotsTag && !indexedRoutes.includes(currentPath)) {
+                robotsTag.content = "noindex, nofollow"
             }
         </script>
     </head>
