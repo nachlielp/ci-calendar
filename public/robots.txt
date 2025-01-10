@@ -1,5 +1,16 @@
 User-agent: *
+# Only allow indexing if the host is ci-events.org
 Allow: /$
 Allow: /about$
 Disallow: /*
+
+# Add host-specific rules
+Host: ci-events.org
+
+# Add sitemap only for production
 Sitemap: https://ci-events.org/sitemap.xml
+
+# Block all other hosts/environments
+User-agent: *
+Host: *
+Disallow: /
