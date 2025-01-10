@@ -61,6 +61,8 @@ class Store {
 
     @observable requestNotification: boolean = false
 
+    @observable private currentSessionId: string | null = null
+
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private isInitializing = false
@@ -81,14 +83,22 @@ class Store {
             this.getOfflineData()
         }, 0)
 
+        //TODO: make sure that if returns after more than 5 minutes, it will reload the page
         supabase.auth.onAuthStateChange(async (event, session) => {
+            console.log("onAuthStateChange", event, session)
             // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
+            if (session?.access_token === this.currentSessionId) {
+                return
+            }
+
             this.setSession(session)
             if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
                 if (!this.isInitializing) {
+                    this.currentSessionId = session?.access_token || null
                     this.init()
                 }
             } else if (event === "SIGNED_OUT") {
+                this.currentSessionId = null
                 this.clearUser()
             }
         })
@@ -1358,6 +1368,7 @@ class Store {
     }
 
     cleanup = () => {
+        this.currentSessionId = null
         if (this.subscriptionRef) {
             this.subscriptionRef.unsubscribe()
             this.subscriptionRef = null
@@ -1384,6 +1395,7 @@ class Store {
             alerts: [],
             userBio: {} as UserBio,
         } as CIUserData)
+        this.currentSessionId = null
 
         sessionStorage.clear()
         localStorage.removeItem(import.meta.env.VITE_AUTH_KEY_NAME)
@@ -1391,6 +1403,7 @@ class Store {
 
     @action
     clearAppStorage = async (): Promise<void> => {
+        this.currentSessionId = null
         try {
             localStorage.clear()
             this.session = null
