@@ -6,6 +6,7 @@ export function PHProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const isInternal = localStorage.getItem("isInternal") === "true"
         if (isInternal) {
+            console.log("Internal user, not initializing PostHog")
             return
         }
 

@@ -1,12 +1,13 @@
 import Drawer from "antd/es/drawer"
 import FullEventCard from "./FullEventCard"
-import '../../../styles/full-event-card-drawer.scss'
+import "../../../styles/full-event-card-drawer.scss"
 import { CIEvent } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
+import posthog from "posthog-js"
 
 interface EventDrawerProps {
     event: CIEvent | null
@@ -33,6 +34,14 @@ const FullEventCardDrawer = ({
     }, [isModalOpen, event.id, store.isUser, store.isOnline])
 
     const onOpen = () => {
+        posthog.capture("event_preview_clicked", {
+            event_id: event.id,
+            event_short_id: event.short_id,
+            event_title: event.title,
+            source_page: window.location.pathname,
+            view_type: "drawer",
+        })
+
         const currentPath = window.location.pathname
         const currentSearch = window.location.search
 
