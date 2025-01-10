@@ -64,6 +64,8 @@ class Store {
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private isInitializing = false
+    private inactivityTimeout: NodeJS.Timeout | null = null
+    private readonly INACTIVITY_DELAY = 5 * 60 * 1000
 
     // private callCount: number = 0
 
@@ -587,16 +589,26 @@ class Store {
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
+                if (this.inactivityTimeout) {
+                    clearTimeout(this.inactivityTimeout)
+                    this.inactivityTimeout = null
+                }
+                if (this.subscriptionRef) {
+                    return
+                }
+
                 this.subscribeToUserData().then((channel) => {
                     if (channel) {
                         this.subscriptionRef = channel
                     }
                 })
             } else {
-                if (this.subscriptionRef) {
-                    this.subscriptionRef.unsubscribe()
-                    this.subscriptionRef = null
-                }
+                this.inactivityTimeout = setTimeout(() => {
+                    if (this.subscriptionRef) {
+                        this.subscriptionRef.unsubscribe()
+                        this.subscriptionRef = null
+                    }
+                }, this.INACTIVITY_DELAY)
             }
         }
 
@@ -610,6 +622,9 @@ class Store {
                 "visibilitychange",
                 handleVisibilityChange
             )
+            if (this.inactivityTimeout) {
+                clearTimeout(this.inactivityTimeout)
+            }
             if (this.subscriptionRef) {
                 this.subscriptionRef.unsubscribe()
                 this.subscriptionRef = null
