@@ -15,12 +15,12 @@ import { utilService } from "../../../util/utilService"
 import { IGooglePlaceOption } from "../../Common/GooglePlacesInput"
 import { store } from "../../../Store/store"
 import EventFromFooter from "./EventFromFooter"
-import '../../../styles/event-form.scss'
+import "../../../styles/event-form.scss"
 import Select from "antd/es/select"
-import { memo } from "react"
 import { v4 as uuidv4 } from "uuid"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton"
 import RecurringEventSection from "./RecurringEventSection"
+import { observer } from "mobx-react-lite"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -43,7 +43,7 @@ interface SingleDayEventFormProps {
     isTemplate?: boolean
 }
 
-const SingleDayEventForm = memo(
+const SingleDayEventForm = observer(
     ({ closeForm, isTemplate }: SingleDayEventFormProps) => {
         const DRAFT_KEY = isTemplate ? DRAFT_TEMPLATE_KEY : DRAFT_EVENT_KEY
         const DRAFT_ADDRESS_KEY = isTemplate
@@ -64,7 +64,25 @@ const SingleDayEventForm = memo(
             useState<dayjs.Dayjs | null>(null)
 
         useEffect(() => {
+            console.log(
+                "store.getAppTaggableTeachers",
+                store.getAppTaggableTeachers
+            )
+        }, [store.getAppTaggableTeachers])
+
+        useEffect(() => {
             if (isTemplate) {
+                const currentFormValuesObj =
+                    utilService.getDraftEvent(DRAFT_KEY)
+                if (currentFormValuesObj) {
+                    const { currentFormValues } =
+                        utilService.CIEventDraftToFormValues(
+                            currentFormValuesObj
+                        )
+                    form.setFieldsValue({
+                        ...currentFormValues,
+                    })
+                }
             }
             const addressObj = utilService.getDraftEvent(DRAFT_ADDRESS_KEY)
             let currentAddress: IAddress | undefined = undefined
@@ -229,10 +247,6 @@ const SingleDayEventForm = memo(
                             )
                         }
                     }
-                    clearForm()
-                    closeForm()
-                    utilService.clearDraftEvent(DRAFT_KEY)
-                    utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
                 } else {
                     const template: Omit<CITemplate, "id"> =
                         utilService.formatFormValuesToCreateCITemplate(
@@ -241,9 +255,11 @@ const SingleDayEventForm = memo(
                             false
                         )
                     await store.createTemplate(template)
-                    clearForm()
-                    closeForm()
                 }
+                clearForm()
+                closeForm()
+                utilService.clearDraftEvent(DRAFT_KEY)
+                utilService.clearDraftEvent(DRAFT_ADDRESS_KEY)
             } catch (error) {
                 console.error("EventForm.handleSubmit.error: ", error)
                 throw error
