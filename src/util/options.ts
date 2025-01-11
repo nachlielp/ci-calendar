@@ -19,6 +19,7 @@ export const eventOptions: SelectOption[] = [
     { value: "conference", label: "כנס" },
     { value: "warmup", label: "חימום" },
     { value: "course", label: "קורס" },
+    { value: "score", label: "סקור" },
 ]
 
 export const hebrewMonths: SelectOption[] = [
