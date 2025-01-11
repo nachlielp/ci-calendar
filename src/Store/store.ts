@@ -17,6 +17,7 @@ import {
     ManageUserOption,
     NotificationDB,
     NotificationType,
+    SupabaseSessionEvent,
     TaggableUserOptions,
     UserBio,
     UserNotification,
@@ -37,6 +38,7 @@ import { publicBioService } from "../supabase/publicBioService"
 import { alertsService } from "../supabase/alertsService"
 import { userRoleService } from "../supabase/userRoleService"
 import { CACHE_VERSION } from "../App"
+import { AuthChangeEvent } from "@supabase/supabase-js"
 
 class Store {
     @observable session: Session | null = null
@@ -63,15 +65,14 @@ class Store {
 
     @observable private currentSessionId: string | null = null
 
+    @observable private lastActivityTimestamp: number = Date.now()
+
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private isInitializing = false
     private inactivityTimeout: NodeJS.Timeout | null = null
     private readonly INACTIVITY_DELAY = 5 * 60 * 1000
-
-    // private callCount: number = 0
-
-    // private readonly MINUTE_MS = 1000 * 60
+    private readonly ACTIVITY_TIMEOUT = 5 * 60 * 1000
 
     constructor() {
         makeAutoObservable(this)
@@ -83,25 +84,60 @@ class Store {
             this.getOfflineData()
         }, 0)
 
-        //TODO: make sure that if returns after more than 5 minutes, it will reload the page
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            console.log("onAuthStateChange", event, session)
-            // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
-            if (session?.access_token === this.currentSessionId) {
-                return
-            }
+        supabase.auth.onAuthStateChange(
+            async (event: AuthChangeEvent, session: Session | null) => {
+                console.log("onAuthStateChange", event, session)
+                // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
 
-            this.setSession(session)
-            if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
-                if (!this.isInitializing) {
-                    this.currentSessionId = session?.access_token || null
-                    this.init()
+                const timeSinceLastActivity =
+                    Date.now() - this.lastActivityTimestamp
+                const needsReinitialization =
+                    timeSinceLastActivity > this.ACTIVITY_TIMEOUT
+
+                if (
+                    session?.access_token === this.currentSessionId &&
+                    !needsReinitialization
+                ) {
+                    return
                 }
-            } else if (event === "SIGNED_OUT") {
-                this.currentSessionId = null
-                this.clearUser()
+
+                this.setSession(session)
+
+                switch (event) {
+                    case SupabaseSessionEvent.signedIn:
+                    case SupabaseSessionEvent.initialSession:
+                        if (!this.isInitializing) {
+                            this.currentSessionId =
+                                session?.access_token || null
+                            this.lastActivityTimestamp = Date.now()
+                            this.init()
+                        }
+                        break
+
+                    case SupabaseSessionEvent.signedOut:
+                        this.currentSessionId = null
+                        this.lastActivityTimestamp = Date.now()
+                        this.clearUser()
+                        break
+
+                    case SupabaseSessionEvent.tokenRefreshed:
+                        this.currentSessionId = session?.access_token || null
+                        this.lastActivityTimestamp = Date.now()
+                        break
+
+                    case SupabaseSessionEvent.userUpdated:
+                        if (session) {
+                            this.setUser(session.user)
+                            this.lastActivityTimestamp = Date.now()
+                        }
+                        break
+
+                    case SupabaseSessionEvent.passwordRecovery:
+                        this.lastActivityTimestamp = Date.now()
+                        break
+                }
             }
-        })
+        )
 
         reaction(
             () => this.user.user_type,
@@ -599,6 +635,7 @@ class Store {
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
+                this.lastActivityTimestamp = Date.now()
                 if (this.inactivityTimeout) {
                     clearTimeout(this.inactivityTimeout)
                     this.inactivityTimeout = null
@@ -1150,6 +1187,7 @@ class Store {
 
     @action
     private handleOnlineStatus = () => {
+        console.log("handleOnlineStatus")
         const wasOffline = !this.isOnline
         const newOnlineStatus = navigator.onLine
 

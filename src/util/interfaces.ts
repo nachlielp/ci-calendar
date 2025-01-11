@@ -429,3 +429,14 @@ export type ManageUserOption = {
         role: string
     }
 }
+
+export enum SupabaseSessionEvent {
+    signedIn = "SIGNED_IN",
+    signedOut = "SIGNED_OUT",
+    initialSession = "INITIAL_SESSION",
+    sessionChange = "SESSION_CHANGE",
+    tokenRefreshed = "TOKEN_REFRESHED",
+    userUpdated = "USER_UPDATED",
+    userDeleted = "USER_DELETED",
+    passwordRecovery = "PASSWORD_RECOVERY",
+}
