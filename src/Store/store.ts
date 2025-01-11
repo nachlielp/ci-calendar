@@ -86,7 +86,6 @@ class Store {
 
         supabase.auth.onAuthStateChange(
             async (event: AuthChangeEvent, session: Session | null) => {
-                console.log("onAuthStateChange", event, session)
                 // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
 
                 const timeSinceLastActivity =

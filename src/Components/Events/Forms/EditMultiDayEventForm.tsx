@@ -13,139 +13,145 @@ import { IGooglePlaceOption } from "../../Common/GooglePlacesInput.tsx"
 import { utilService } from "../../../util/utilService.ts"
 import { store } from "../../../Store/store.ts"
 import EventFromFooter from "./EventFromFooter.tsx"
-import '../../../styles/event-form.scss'
+import "../../../styles/event-form.scss"
 import AsyncFormSubmitButton from "../../Common/AsyncFormSubmitButton.tsx"
-export default function EditMultiDayEventForm({
-    isTemplate = false,
-    event,
-    template,
-    closeForm,
-}: {
-    isTemplate: boolean
-    event: CIEvent | undefined
-    template: CITemplate | undefined
-    closeForm: () => void
-}) {
-    const [newAddress, setNewAddress] = useState<IAddress | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [inputErrors, setInputErrors] = useState<boolean>(false)
+import { observer } from "mobx-react-lite"
 
-    const [form] = Form.useForm()
+const EditMultiDayEventForm = observer(
+    ({
+        isTemplate = false,
+        event,
+        template,
+        closeForm,
+    }: {
+        isTemplate: boolean
+        event: CIEvent | undefined
+        template: CITemplate | undefined
+        closeForm: () => void
+    }) => {
+        const [newAddress, setNewAddress] = useState<IAddress | null>(null)
+        const [isSubmitting, setIsSubmitting] = useState(false)
+        const [inputErrors, setInputErrors] = useState<boolean>(false)
 
-    const { currentFormValues, address } = event
-        ? utilService.CIEventToFormValues(event)
-        : template
-        ? utilService.multiDayTemplateToFormValues(template)
-        : { currentFormValues: {}, address: null }
+        const [form] = Form.useForm()
 
-    if (!event && !template) return <Loading />
+        const { currentFormValues, address } = event
+            ? utilService.CIEventToFormValues(event)
+            : template
+            ? utilService.multiDayTemplateToFormValues(template)
+            : { currentFormValues: {}, address: null }
 
-    const handleAddressSelect = (place: IGooglePlaceOption) => {
-        const selectedAddress = {
-            label: place.label,
-            place_id: place.value.place_id,
-        }
-        setNewAddress(selectedAddress)
-        form.setFieldValue("address", selectedAddress)
-    }
+        if (!event && !template) return <Loading />
 
-    const handleSubmit = async (values: any) => {
-        setIsSubmitting(true)
-        if (event) {
-            const updatedEvent: Partial<DBCIEvent> =
-                utilService.formatFormValuesToEditCIEvent(
-                    values,
-                    newAddress || (address as IAddress),
-                    event.is_multi_day
-                )
-            try {
-                await store.updateCIEvent({
-                    ...updatedEvent,
-                    id: event.id,
-                })
-            } catch (error) {
-                console.error("EventForm.handleSubmit.error: ", error)
-                throw error
-            } finally {
-                setIsSubmitting(false)
-                closeForm()
+        const handleAddressSelect = (place: IGooglePlaceOption) => {
+            const selectedAddress = {
+                label: place.label,
+                place_id: place.value.place_id,
             }
-        } else if (template) {
-            const updatedTemplate: Partial<CITemplate> =
-                utilService.formatFormValuesToEditCITemplate(
-                    values,
-                    newAddress || (address as IAddress),
-                    template.is_multi_day
-                )
-            try {
-                await store.updateTemplate({
-                    ...updatedTemplate,
-                    id: template.id,
-                })
-                closeForm()
-            } catch (error) {
-                console.error(
-                    "EventForm.handleSubmit.updateTemplate.error: ",
-                    error
-                )
-            } finally {
-                setIsSubmitting(false)
+            setNewAddress(selectedAddress)
+            form.setFieldValue("address", selectedAddress)
+        }
+
+        const handleSubmit = async (values: any) => {
+            setIsSubmitting(true)
+            if (event) {
+                const updatedEvent: Partial<DBCIEvent> =
+                    utilService.formatFormValuesToEditCIEvent(
+                        values,
+                        newAddress || (address as IAddress),
+                        event.is_multi_day
+                    )
+                try {
+                    await store.updateCIEvent({
+                        ...updatedEvent,
+                        id: event.id,
+                    })
+                } catch (error) {
+                    console.error("EventForm.handleSubmit.error: ", error)
+                    throw error
+                } finally {
+                    setIsSubmitting(false)
+                    closeForm()
+                }
+            } else if (template) {
+                const updatedTemplate: Partial<CITemplate> =
+                    utilService.formatFormValuesToEditCITemplate(
+                        values,
+                        newAddress || (address as IAddress),
+                        template.is_multi_day
+                    )
+                try {
+                    await store.updateTemplate({
+                        ...updatedTemplate,
+                        id: template.id,
+                    })
+                    closeForm()
+                } catch (error) {
+                    console.error(
+                        "EventForm.handleSubmit.updateTemplate.error: ",
+                        error
+                    )
+                } finally {
+                    setIsSubmitting(false)
+                }
             }
         }
-    }
 
-    const onFinishFailed = () => {
-        setTimeout(() => {
-            setInputErrors(true)
-            setInputErrors(false)
-        }, 3000)
-    }
+        const onFinishFailed = () => {
+            setTimeout(() => {
+                setInputErrors(true)
+                setInputErrors(false)
+            }, 3000)
+        }
 
-    const titleText = isTemplate
-        ? "עדכון תבנית - רב יומי"
-        : "עדכון אירוע - רב יומי"
+        const titleText = isTemplate
+            ? "עדכון תבנית - רב יומי"
+            : "עדכון אירוע - רב יומי"
 
-    return (
-        <section className="event-form">
-            <Form
-                form={form}
-                variant="filled"
-                onFinish={handleSubmit}
-                initialValues={currentFormValues}
-                onFinishFailed={onFinishFailed}
-            >
-                {isTemplate && (
-                    <Form.Item name="template-name" label="שם התבנית">
-                        <Input allowClear />
-                    </Form.Item>
-                )}
-                <MultiDayFormHead
+        return (
+            <section className="event-form">
+                <Form
                     form={form}
-                    handleAddressSelect={handleAddressSelect}
-                    address={address || ({} as IAddress)}
-                    isTemplate={isTemplate}
-                    teachers={store.getAppTaggableTeachers}
-                    orgs={store.getAppTaggableOrgs}
-                    titleText={titleText}
-                />
-                <EventFromFooter inputErrors={inputErrors} />
-
-                <Form.Item
-                    wrapperCol={{ span: 24 }}
-                    className="submit-button-container"
-                    style={{
-                        display: "flex",
-                        justifyContent: "flex-start",
-                    }}
+                    variant="filled"
+                    onFinish={handleSubmit}
+                    initialValues={currentFormValues}
+                    onFinishFailed={onFinishFailed}
                 >
-                    <AsyncFormSubmitButton
-                        isSubmitting={isSubmitting}
-                        size="large"
+                    {isTemplate && (
+                        <Form.Item name="template-name" label="שם התבנית">
+                            <Input allowClear />
+                        </Form.Item>
+                    )}
+                    <MultiDayFormHead
+                        form={form}
+                        handleAddressSelect={handleAddressSelect}
+                        address={address || ({} as IAddress)}
+                        isTemplate={isTemplate}
+                        teachers={store.getAppTaggableTeachers}
+                        orgs={store.getAppTaggableOrgs}
+                        titleText={titleText}
+                    />
+                    <EventFromFooter inputErrors={inputErrors} />
+
+                    <Form.Item
+                        wrapperCol={{ span: 24 }}
+                        className="submit-button-container"
+                        style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                        }}
                     >
-                        {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
-                    </AsyncFormSubmitButton>
-                </Form.Item>
-            </Form>
-        </section>
-    )
-}
+                        <AsyncFormSubmitButton
+                            isSubmitting={isSubmitting}
+                            size="large"
+                        >
+                            {isTemplate ? "עדכון תבנית" : "עדכון אירוע"}
+                        </AsyncFormSubmitButton>
+                    </Form.Item>
+                </Form>
+            </section>
+        )
+    }
+)
+
+export default EditMultiDayEventForm
