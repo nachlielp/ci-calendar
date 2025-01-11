@@ -1226,10 +1226,13 @@ function addToGoogleCalendar(event: CIEvent) {
         ).format("YYYYMMDDTHHmmss")
     }
 
+    const eventLink = `www.ci-events.org/${event.short_id}`
+    const description = `${eventLink}\n\n${event.description || ""}`
+
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
         event.title
     )}&dates=${startTime}/${endTime}&details=${encodeURIComponent(
-        event.description || ""
+        description
     )}&location=${encodeURIComponent(event.address.label || "")}`
 
     window.open(url, "_blank")
