@@ -209,6 +209,15 @@ class Store {
         return this.app_ci_events
             .slice()
             .filter((e) => !e.hide)
+            .filter(
+                (e) =>
+                    dayjs(e.start_date)
+                        .startOf("day")
+                        .isAfter(dayjs().startOf("day")) ||
+                    dayjs(e.start_date)
+                        .startOf("day")
+                        .isSame(dayjs().startOf("day"))
+            )
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
             )

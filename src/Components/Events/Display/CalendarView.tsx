@@ -12,7 +12,7 @@ dayjs.locale("he")
 import hb from "antd/locale/he_IL"
 import { useState } from "react"
 import { Icon } from "../../Common/Icon"
-import '../../../styles/calendar-view.scss'
+import "../../../styles/calendar-view.scss"
 
 interface CalendarViewProps {
     events: CIEvent[]
@@ -39,7 +39,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
             >
                 <span>{current.date()}</span>
                 <div className="event-dots">
-                    {Array.from({ length: Math.min(eventCount, 5) }).map(
+                    {Array.from({ length: Math.min(eventCount, 4) }).map(
                         (_, index) => (
                             <span key={index} className="event-dot"></span>
                         )
