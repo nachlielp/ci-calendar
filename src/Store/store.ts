@@ -539,7 +539,7 @@ class Store {
     //         )
     //     }
     // }
-    private fetchOnVisibilityChange = () => {
+    private fetchOnVisibilityChange = async () => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
                 Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
@@ -1228,10 +1228,9 @@ class Store {
         this.getOfflineData()
 
         if (!this.isOnline) {
+            this.setLoading(false)
             return
         }
-
-        this.setLoading(true)
 
         try {
             await Promise.race([
@@ -1258,6 +1257,7 @@ class Store {
             return
         }
 
+        this.setLoading(true)
         await this.initializeUser()
         await this.fetchAdditionalData()
     }
@@ -1265,6 +1265,7 @@ class Store {
     private async initializeUser() {
         if (this.isInitializing) {
             console.log("Initialization already in progress, skipping...")
+            this.setLoading(false)
             return
         }
         this.isInitializing = true
@@ -1273,6 +1274,7 @@ class Store {
 
             if (!userData) {
                 await this.createNewUser()
+                this.setLoading(false)
                 return
             }
 
@@ -1281,6 +1283,7 @@ class Store {
         } catch (error: any) {
             // Handle other errors
             this.initPolling()
+            this.setLoading(false)
             throw new Error("Error in initializeUser: " + error)
         } finally {
             this.isInitializing = false
@@ -1333,41 +1336,49 @@ class Store {
 
     @action
     private fetchAdditionalData = async () => {
-        if (this.user.user_type === UserType.user) {
-            this.fetchEvents() //TODO remove
-            this.fetchAppPublicBios()
-        }
+        try {
+            if (this.user.user_type === UserType.user) {
+                await this.fetchAppPublicBios()
+            }
 
-        if (
-            [UserType.admin, UserType.creator, UserType.org].includes(
-                this.user.user_type
-            )
-        ) {
-            Promise.all([
-                this.fetchAppTaggableTeachers(),
-                this.fetchAppPublicBios(),
-            ])
-        }
+            if (
+                [UserType.admin, UserType.creator, UserType.org].includes(
+                    this.user.user_type
+                )
+            ) {
+                await Promise.allSettled([
+                    this.fetchAppTaggableTeachers(),
+                    this.fetchAppPublicBios(),
+                ])
+            }
 
-        if (this.user.user_type === UserType.admin) {
-            Promise.all([
-                this.fetchAppTaggableTeachers(),
-                this.fetchAppPublicBios(),
-                this.fetchAppUsers(),
-                this.fetchAppRequests(),
-                this.fetchAppCreators(),
-            ])
+            if (this.user.user_type === UserType.admin) {
+                await Promise.allSettled([
+                    this.fetchAppTaggableTeachers(),
+                    this.fetchAppPublicBios(),
+                    this.fetchAppUsers(),
+                    this.fetchAppRequests(),
+                    this.fetchAppCreators(),
+                ])
+            }
+        } catch (error) {
+            console.error("Fetch timeout:", error)
+        } finally {
+            this.setLoading(false)
         }
     }
 
     initPolling = async () => {
         console.log("initPolling")
-        this.setLoading(true)
-        // if (this.pollingRef) clearInterval(this.pollingRef)
-        this.fetchOnVisibilityChange()
-
-        // this.setupPolling()
-        this.setLoading(false)
+        try {
+            this.setLoading(true)
+            // if (this.pollingRef) clearInterval(this.pollingRef)
+            await this.fetchOnVisibilityChange()
+        } catch (error) {
+            console.error("Error in initPolling:", error)
+        } finally {
+            this.setLoading(false)
+        }
     }
 
     fetchNotification = async (notificationId: string) => {
