@@ -22,6 +22,7 @@ export const useSetSelectedEventByParams = () => {
             const event = store.getCIEventById(eventId)
             if (event) {
                 posthog.capture("event_viewed", {
+                    event_start_date: event.start_date,
                     event_id: event.id,
                     event_short_id: event.short_id,
                     event_title: event.title,
