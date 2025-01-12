@@ -1253,7 +1253,7 @@ class Store {
 
     private async initializeUserAndData() {
         if (!this.getSession?.user?.id) {
-            this.initPolling()
+            await this.initPolling()
             return
         }
 
@@ -1372,7 +1372,6 @@ class Store {
         console.log("initPolling")
         try {
             this.setLoading(true)
-            // if (this.pollingRef) clearInterval(this.pollingRef)
             await this.fetchOnVisibilityChange()
         } catch (error) {
             console.error("Error in initPolling:", error)

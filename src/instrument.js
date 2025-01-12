@@ -7,34 +7,53 @@ import {
     useNavigationType,
 } from "react-router"
 
-Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN,
-    integrations: [
-        Sentry.reactRouterV6BrowserTracingIntegration({
-            useEffect,
-            useLocation,
-            useNavigationType,
-            createRoutesFromChildren,
-            matchRoutes,
-        }),
-        Sentry.replayIntegration(),
-    ],
+// Immediately invoke Sentry initialization
+const initSentry = () => {
+    const dsn = import.meta.env.VITE_SENTRY_DSN
 
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for tracing.
-    // Learn more at
-    // https://docs.sentry.io/platforms/javascript/configuration/options/#traces-sample-rate
-    tracesSampleRate: 1.0,
+    if (!dsn) {
+        console.warn("No Sentry DSN found. Sentry will not be initialized.")
+        return
+    }
 
-    // Set `tracePropagationTargets` to control for which URLs trace propagation should be enabled
-    tracePropagationTargets: [
-        /^\//, // Local routes
-        /^https:\/\/ci-events\.org/, // All requests to ci-events.org
-    ],
-    // Capture Replay for 10% of all sessions,
-    // plus for 100% of sessions with an error
-    // Learn more at
-    // https://docs.sentry.io/platforms/javascript/session-replay/configuration/#general-integration-configuration
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
+    Sentry.init({
+        dsn,
+        enabled: true,
+        environment: import.meta.env.MODE,
+        integrations: [
+            Sentry.reactRouterV6BrowserTracingIntegration({
+                useEffect,
+                useLocation,
+                useNavigationType,
+                createRoutesFromChildren,
+                matchRoutes,
+            }),
+            Sentry.replayIntegration(),
+        ],
+        beforeSend(event) {
+            if (process.env.NODE_ENV === "development") {
+                console.log(
+                    "Test error sent to Sentry. Check your Sentry dashboard."
+                )
+            }
+            return event
+        },
+        debug: false,
+        tracesSampleRate: 1.0,
+        allowUrls: [window.location.origin, /^https:\/\/ci-events\.org/],
+        tracePropagationTargets: [
+            window.location.origin,
+            /^https:\/\/ci-events\.org/,
+        ],
+        replaysSessionSampleRate: 0.1,
+        replaysOnErrorSampleRate: 1.0,
+    })
+}
+
+// Initialize immediately
+initSentry()
+
+// Add global error handler
+window.addEventListener("unhandledrejection", (event) => {
+    Sentry.captureException(event.reason)
 })
