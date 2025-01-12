@@ -39,8 +39,8 @@ export function PHProvider({ children }: { children: React.ReactNode }) {
             posthog.init(phKey, {
                 api_host: phHost,
                 autocapture: true,
-                capture_pageview: true,
-                capture_pageleave: true,
+                capture_pageview: false,
+                capture_pageleave: false,
                 persistence: "localStorage",
                 persistence_name: "ph_custom_persistence",
                 loaded: () => {

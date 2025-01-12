@@ -58,6 +58,7 @@ import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { useRemoveAppLoadingScreen } from "./hooks/useRemoveAppLoadingScreen"
 import { Icon } from "./Components/Common/Icon"
+import PostHogPageView from "./Components/Common/PHPageView"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -116,7 +117,7 @@ const App = () => {
         <div className="app">
             {!isDev && <SpeedInsights />}
             <BackgroundTiles />
-
+            <PostHogPageView />
             <div
                 className="app-content"
                 style={{ width: "100%", maxWidth: "500px" }}
