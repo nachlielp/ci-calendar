@@ -8,7 +8,7 @@ import {
 import { useState } from "react"
 
 import dayjs from "dayjs"
-import '../../styles/manage-support-page.scss'
+import "../../styles/manage-support-page.scss"
 import DoubleBindedSelect from "../Common/DoubleBindedSelect"
 import { requestTypeOptions } from "../../util/options"
 import Switch from "antd/es/switch"
@@ -392,6 +392,18 @@ const ManageSupportPage = () => {
                         </div>
                     </div>
                 ))}
+            </div>
+            <div className="test-error-container">
+                <button
+                    className="secondary-action-btn"
+                    onClick={() => {
+                        throw new Error(
+                            "Test error thrown from ManageSupportPage"
+                        )
+                    }}
+                >
+                    Throw Test Error
+                </button>
             </div>
         </section>
     )
