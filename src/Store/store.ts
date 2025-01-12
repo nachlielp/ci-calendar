@@ -1225,6 +1225,7 @@ class Store {
     }
 
     async init() {
+        console.log("init")
         this.setNetworkFlag(false)
         this.getOfflineData()
 
@@ -1243,6 +1244,7 @@ class Store {
             this.setNetworkFlag(true)
         } finally {
             this.finalizeInitialization()
+            console.log("finalizeInitialization")
         }
     }
 
@@ -1253,6 +1255,7 @@ class Store {
     }
 
     private async initializeUserAndData() {
+        console.log("initializeUserAndData")
         if (!this.getSession?.user?.id) {
             await this.initPolling()
             return
@@ -1264,6 +1267,7 @@ class Store {
     }
 
     private async initializeUser() {
+        console.log("initializeUser")
         if (this.isInitializing) {
             console.log("Initialization already in progress, skipping...")
             this.setLoading(false)
@@ -1292,6 +1296,7 @@ class Store {
     }
 
     private async getUserData() {
+        console.log("getUserData")
         const {
             data: { user },
         } = await supabase.auth.getUser()
@@ -1306,6 +1311,7 @@ class Store {
     }
 
     private async createNewUser() {
+        console.log("createNewUser")
         const {
             data: { user },
         } = await supabase.auth.getUser()
@@ -1325,6 +1331,7 @@ class Store {
     }
 
     private finalizeInitialization() {
+        console.log("finalizeInitialization")
         this.setLoading(false)
 
         if (this.getSession?.user?.id && this.isOnline) {
@@ -1337,6 +1344,7 @@ class Store {
 
     @action
     private fetchAdditionalData = async () => {
+        console.log("fetchAdditionalData")
         try {
             if (this.user.user_type === UserType.user) {
                 await this.fetchAppPublicBios()
