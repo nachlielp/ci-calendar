@@ -42,15 +42,23 @@ const initSentry = () => {
                 }
                 return event
             },
-            debug: false,
-            tracesSampleRate: 1.0,
-            allowUrls: [window.location.origin, /^https:\/\/ci-events\.org/],
+            debug: import.meta.env.MODE === "development",
+            tracesSampleRate: import.meta.env.MODE === "production" ? 0.2 : 1.0,
+            allowUrls: [
+                window.location.origin,
+                "https://ci-events.org",
+                "https://www.ci-events.org",
+            ],
             tracePropagationTargets: [
                 window.location.origin,
-                /^https:\/\/ci-events\.org/,
+                "https://ci-events.org",
+                "https://www.ci-events.org",
             ],
-            replaysSessionSampleRate: 0.1,
-            replaysOnErrorSampleRate: 1.0,
+            // Reduce sampling rates in production to prevent timeouts
+            replaysSessionSampleRate:
+                import.meta.env.MODE === "production" ? 0.05 : 0.1,
+            replaysOnErrorSampleRate:
+                import.meta.env.MODE === "production" ? 0.5 : 1.0,
         })
     } catch (error) {
         console.error("Failed to initialize Sentry:", error)
