@@ -12,6 +12,7 @@
     "update-imports": "node scripts/updateImports.js"
   },
   "dependencies": {
+    "@emotion/react": "^11.5.0",
     "@mui/x-date-pickers": "^7.22.3",
     "@sentry/react": "^8.47.0",
     "@sentry/tracing": "^7.114.0",
@@ -20,6 +21,7 @@
     "@vercel/speed-insights": "^1.0.11",
     "antd": "^5.16.1",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
     "firebase": "^10.14.1",
     "mobx": "^6.13.5",
     "mobx-react-lite": "^4.0.7",
@@ -52,5 +54,10 @@
     "sass": "^1.83.1",
     "typescript": "^5.4.5",
     "vite": "^5.2.0"
+  },
+  "overrides": {
+    "react-google-places-autocomplete": {
+      "@emotion/react": "^11.5.0"
+    }
   }
 }
