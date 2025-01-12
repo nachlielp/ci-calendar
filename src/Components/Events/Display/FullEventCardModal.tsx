@@ -6,7 +6,6 @@ import { useNavigate } from "react-router"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
 import Modal from "antd/es/modal/Modal"
-import posthog from "posthog-js"
 
 interface EventCardProps {
     event: CIEvent
@@ -30,15 +29,6 @@ const FullEventCardModal = ({
     }, [isModalOpen])
 
     const onOpen = () => {
-        posthog.capture("event_preview_clicked", {
-            event_id: event.id,
-            event_short_id: event.short_id,
-            event_title: event.title,
-            event_owner: event.user_id,
-            source_page: window.location.pathname,
-            view_type: "modal",
-        })
-
         const currentPath = window.location.pathname
         const currentSearch = window.location.search
 
