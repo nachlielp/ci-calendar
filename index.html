@@ -7,9 +7,8 @@
         <title>לוח אירועי קונטקט אימפרוביזציה | CI Calendar</title>
 
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://ci-events.org/" />
-
+        <meta name="robots" content="index, follow" />
         <meta
             name="title"
             content="לוח אירועי קונטקט אימפרוביזציה בישראל | CI Calendar"
@@ -110,20 +109,18 @@
             }
         </script>
 
-        <!-- Robots -->
+        <!-- Single robots control script -->
         <script type="text/javascript">
             const prodDomain = "ci-events.org"
             const currentDomain = window.location.hostname
-            const indexedRoutes = ["/", "/about"]
-            const currentPath = window.location.pathname
-            const robotsTag = document.querySelector('meta[name="robots"]')
-
-            // Only allow indexing on production domain and specific routes
-            if (robotsTag) {
-                if (
-                    currentDomain !== prodDomain ||
-                    !indexedRoutes.includes(currentPath)
-                ) {
+            console.log("currentDomain: ", currentDomain)
+            // Only modify robots tag if NOT on production domain
+            if (
+                currentDomain !== prodDomain &&
+                currentDomain !== `www.${prodDomain}`
+            ) {
+                const robotsTag = document.querySelector('meta[name="robots"]')
+                if (robotsTag) {
                     robotsTag.content = "noindex, nofollow"
                 }
             }
@@ -135,15 +132,6 @@
             if (canonicalTag && currentDomain !== prodDomain) {
                 // Always point canonical to production domain
                 canonicalTag.href = `https://${prodDomain}${window.location.pathname}`
-            }
-        </script>
-
-        <!-- For staging domain -->
-        <script type="text/javascript">
-            if (window.location.hostname !== "ci-events.org") {
-                document.write(
-                    '<meta name="robots" content="noindex, nofollow" />'
-                )
             }
         </script>
     </head>
