@@ -115,7 +115,10 @@
             const currentDomain = window.location.hostname
             console.log("currentDomain: ", currentDomain)
             // Only modify robots tag if NOT on production domain
-            if (currentDomain !== prodDomain) {
+            if (
+                currentDomain !== prodDomain &&
+                currentDomain !== `www.${prodDomain}`
+            ) {
                 const robotsTag = document.querySelector('meta[name="robots"]')
                 if (robotsTag) {
                     robotsTag.content = "noindex, nofollow"
