@@ -4,6 +4,7 @@ import {
     makeAutoObservable,
     computed,
     reaction,
+    toJS,
 } from "mobx"
 import {
     CIAlert,
@@ -120,11 +121,36 @@ class Store {
                             "this.isInitializing: ",
                             this.isInitializing
                         )
-                        if (!this.isInitializing) {
+
+                        const isValidToken =
+                            session?.access_token &&
+                            session.access_token !== this.session?.access_token
+
+                        const isValidUser =
+                            session?.user?.id &&
+                            this.user?.id &&
+                            session.user.id === this.user.id
+
+                        console.log("isValidToken: ", isValidToken)
+                        console.log("isValidUser: ", isValidUser)
+                        if (!isValidToken || !isValidUser) {
                             this.currentSessionId =
                                 session?.access_token || null
                             this.lastActivityTimestamp = Date.now()
                             this.init()
+                        } else {
+                            console.log(
+                                "Skipping initialization - invalid token/user or already initializing"
+                            )
+                            console.log(
+                                "this.isInitializing: ",
+                                this.isInitializing
+                            )
+                            console.log(
+                                "this.currentSessionId: ",
+                                this.currentSessionId
+                            )
+                            console.log("this.user: ", toJS(this.user))
                         }
                         break
 
