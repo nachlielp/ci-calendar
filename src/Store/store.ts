@@ -94,10 +94,17 @@ class Store {
                 const needsReinitialization =
                     timeSinceLastActivity > this.ACTIVITY_TIMEOUT
 
+                if (needsReinitialization) {
+                    this.isInitializing = false
+                }
+
                 if (
                     session?.access_token === this.currentSessionId &&
                     !needsReinitialization
                 ) {
+                    console.log(
+                        "current sessions && !needsReinitialization. ending init "
+                    )
                     return
                 }
 
@@ -106,6 +113,10 @@ class Store {
                 switch (event) {
                     case SupabaseSessionEvent.signedIn:
                     case SupabaseSessionEvent.initialSession:
+                        console.log(
+                            "this.isInitializing: ",
+                            this.isInitializing
+                        )
                         if (!this.isInitializing) {
                             this.currentSessionId =
                                 session?.access_token || null
