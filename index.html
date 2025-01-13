@@ -112,12 +112,38 @@
 
         <!-- Robots -->
         <script type="text/javascript">
+            const prodDomain = "ci-events.org"
+            const currentDomain = window.location.hostname
             const indexedRoutes = ["/", "/about"]
             const currentPath = window.location.pathname
             const robotsTag = document.querySelector('meta[name="robots"]')
 
-            if (robotsTag && !indexedRoutes.includes(currentPath)) {
-                robotsTag.content = "noindex, nofollow"
+            // Only allow indexing on production domain and specific routes
+            if (robotsTag) {
+                if (
+                    currentDomain !== prodDomain ||
+                    !indexedRoutes.includes(currentPath)
+                ) {
+                    robotsTag.content = "noindex, nofollow"
+                }
+            }
+        </script>
+
+        <!-- Canonical URL -->
+        <script type="text/javascript">
+            const canonicalTag = document.querySelector('link[rel="canonical"]')
+            if (canonicalTag && currentDomain !== prodDomain) {
+                // Always point canonical to production domain
+                canonicalTag.href = `https://${prodDomain}${window.location.pathname}`
+            }
+        </script>
+
+        <!-- For staging domain -->
+        <script type="text/javascript">
+            if (window.location.hostname !== "ci-events.org") {
+                document.write(
+                    '<meta name="robots" content="noindex, nofollow" />'
+                )
             }
         </script>
     </head>
