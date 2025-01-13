@@ -110,20 +110,18 @@
             }
         </script>
 
-        <!-- Robots -->
+        <!-- Single robots control script -->
         <script type="text/javascript">
             const prodDomain = "ci-events.org"
             const currentDomain = window.location.hostname
-            const indexedRoutes = ["/", "/about"]
-            const currentPath = window.location.pathname
 
             // Only modify robots tag if NOT on production domain
             if (currentDomain !== prodDomain) {
-                document.write(
-                    '<meta name="robots" content="noindex, nofollow" />'
-                )
+                const robotsTag = document.querySelector('meta[name="robots"]')
+                if (robotsTag) {
+                    robotsTag.content = "noindex, nofollow"
+                }
             }
-            // On production domain, we keep the default "index, follow"
         </script>
 
         <!-- Canonical URL -->
