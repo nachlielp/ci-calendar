@@ -4,7 +4,6 @@ import {
     makeAutoObservable,
     computed,
     reaction,
-    toJS,
 } from "mobx"
 import {
     CIAlert,
@@ -66,7 +65,7 @@ class Store {
 
     @observable private currentSessionId: string | null = null
 
-    @observable private lastActivityTimestamp: number = Date.now()
+    @observable private lastActivityTimestamp: number = 0
 
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
@@ -146,11 +145,6 @@ class Store {
                                 "this.isInitializing: ",
                                 this.isInitializing
                             )
-                            console.log(
-                                "this.currentSessionId: ",
-                                this.currentSessionId
-                            )
-                            console.log("this.user: ", toJS(this.user))
                         }
                         break
 
