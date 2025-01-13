@@ -96,23 +96,26 @@ class Store {
 
                 if (needsReinitialization) {
                     this.isInitializing = false
+                    this.currentSessionId = null
                 }
+
+                this.setSession(session)
 
                 if (
                     session?.access_token === this.currentSessionId &&
                     !needsReinitialization
                 ) {
                     console.log(
-                        "current sessions && !needsReinitialization. ending init "
+                        "Skipping initialization - same session and recently active"
                     )
+
                     return
                 }
-
-                this.setSession(session)
 
                 switch (event) {
                     case SupabaseSessionEvent.signedIn:
                     case SupabaseSessionEvent.initialSession:
+                    case SupabaseSessionEvent.tokenRefreshed:
                         console.log(
                             "this.isInitializing: ",
                             this.isInitializing
@@ -129,11 +132,6 @@ class Store {
                         this.currentSessionId = null
                         this.lastActivityTimestamp = Date.now()
                         this.clearUser()
-                        break
-
-                    case SupabaseSessionEvent.tokenRefreshed:
-                        this.currentSessionId = session?.access_token || null
-                        this.lastActivityTimestamp = Date.now()
                         break
 
                     case SupabaseSessionEvent.userUpdated:
@@ -487,7 +485,12 @@ class Store {
 
     @action
     setSession(session: Session | null) {
+        const previousSession = this.session
         this.session = session
+
+        if (previousSession?.access_token !== session?.access_token) {
+            this.isInitializing = false
+        }
     }
 
     @action
