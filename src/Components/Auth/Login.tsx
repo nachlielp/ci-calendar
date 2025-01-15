@@ -1,13 +1,13 @@
-import { useState, useRef, useEffect } from "react"
-import '../../styles/login.scss'
+import { useState, useRef } from "react"
+import "../../styles/login.scss"
 import Alert from "antd/es/alert"
 import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
-import { useNavigate } from "react-router"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
 import { LinkButton } from "../Common/LinkButton"
-import { store } from "../../Store/store"
+import { useClearUser } from "../../hooks/useClearUser"
+import { useNavigate } from "react-router"
 
 enum LoginError {
     none = "",
@@ -22,13 +22,7 @@ export default function Login() {
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (store.isUser) {
-            navigate(`/`)
-        } else {
-            store.clearUser()
-        }
-    }, [store.isUser])
+    useClearUser()
 
     const onFinish = async () => {
         try {
@@ -44,12 +38,14 @@ export default function Login() {
                 password,
             })
             if (error) throw error
+
             navigate(`/`)
         } catch (e) {
             setError(LoginError.default)
             console.error(`Login Error:`, e)
+        } finally {
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     const onSupabaseGoogleSignIn = async () => {

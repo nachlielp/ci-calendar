@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
-import '../../styles/signup.scss'
+import { useRef, useState } from "react"
+import "../../styles/signup.scss"
 import Alert from "antd/es/alert"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
@@ -7,7 +7,7 @@ import { InputRef } from "antd/es/input"
 import { useNavigate } from "react-router"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
-import { store } from "../../Store/store"
+import { useClearUser } from "../../hooks/useClearUser"
 
 enum SignupError {
     none = "",
@@ -24,13 +24,7 @@ export default function Signup() {
     const [loading, setLoading] = useState<boolean>(false)
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (store.isUser) {
-            navigate(`/`)
-        } else {
-            store.clearUser()
-        }
-    }, [store.isUser])
+    useClearUser()
 
     const onFinish = async () => {
         if (
