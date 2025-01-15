@@ -95,11 +95,7 @@ const UserInfo = observer(({ user }: IUserInfoProps) => {
 const ErrorInfo = () => {
     return (
         <div className="network-flag-container">
-            <Icon
-                icon="signal_cellular_connected_no_internet_0_bar"
-                className="icon-main error-icon"
-            />
-            <p className={`header-error-text`}>בעיות תקשרות</p>
+            <p className={`header-error-text`}>שגיעת התחברות</p>
         </div>
     )
 }
