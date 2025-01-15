@@ -113,4 +113,14 @@
         padding-top: 15px;
         height: 100%;
     }
+
+    .offline-icon {
+        color: #000;
+        margin-right: 4px;
+        // margin-bottom: 2px;
+        .injected-svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
 }

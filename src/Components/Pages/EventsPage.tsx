@@ -107,7 +107,7 @@ const EventsPage = () => {
             {store.getIsOnlineNoEvents && (
                 <EventsPageSkeleton withHeader={false} />
             )}
-            {store.getOffline && <OfflinePlaceholder />}
+
             {store.getSortedEvents.length > 0 && (
                 <section className="events-display-list">
                     {!isListView && (
@@ -134,12 +134,3 @@ const EventsPage = () => {
 }
 
 export default observer(EventsPage)
-
-const OfflinePlaceholder = () => {
-    return (
-        <div className="offline-placeholder">
-            <h2>אין חיבור לרשת</h2>
-            <Icon icon="cloud_offline" className="offline-icon" />
-        </div>
-    )
-}

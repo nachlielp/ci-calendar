@@ -1,5 +1,5 @@
 import React from "react"
-import '../../styles/header.scss'
+import "../../styles/header.scss"
 import { CIUser } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import InstallPWABanner from "../Common/InstallPWABanner"
@@ -57,6 +57,12 @@ const AppHeader = () => {
                 )}
                 <>
                     <div className="header-actions">
+                        {store.getOffline && (
+                            <Icon
+                                icon="cloud_offline"
+                                className="offline-icon"
+                            />
+                        )}
                         {vm.networkFlag && <ErrorInfo />}
                         {vm.showUserLoading && (
                             <div className="user-loading-container">
