@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite"
-import '../../styles/newsletter-filter.scss'
+import "../../styles/newsletter-filter.scss"
 import Form from "antd/es/form"
 import Select from "antd/es/select"
 import { eventOptions } from "../../util/options"
@@ -7,7 +7,7 @@ import { districtOptions } from "../../util/options"
 import { Icon } from "../Common/Icon"
 import Alert from "antd/es/alert/Alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
-// import { newsletterFilterVM as vm } from "./NewsletterFilterVM"
+import { newsletterFilterVM as vm } from "./NewsletterFilterVM"
 
 const NewsletterFilter = () => {
     return (
@@ -15,7 +15,7 @@ const NewsletterFilter = () => {
             <hr className="divider" />
             <h3 className="title"> ניוזלטר וואצאפ</h3>
             <Alert
-                message="ניתן לבנות עדכון שבועי בהתאמה אישית, לדוגמה ג׳אמים ושיעורים במרכז, וסדנאות וריטרטים במרכז ובירושלים. העדכון ישלח ביום חמישי בבוקר עם עדכון לסופש הקרוב ולשבוע הבא. איזורים או אירועים ריק - כול האזורים וכול האירועים."
+                message="ניתן לבנות עדכון שבועי בהתאמה אישית, לדוגמה ג׳אמים ושיעורים במרכז, וסדנאות וריטרטים בכל הארץ. העדכון ישלח ביום חמישי בבוקר עם עדכון לסופש הקרוב ולשבוע הבא."
                 type="info"
             />
             <div className="filter-container">
@@ -32,9 +32,21 @@ const NewsletterFilter = () => {
                                             {...restField}
                                             className="filter-form-item"
                                             name={[name, "district"]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: "אנא בחרו אזור",
+                                                },
+                                            ]}
                                         >
                                             <Select
-                                                options={districtOptions}
+                                                options={[
+                                                    {
+                                                        value: "all",
+                                                        label: "כול הארץ",
+                                                    },
+                                                    ...districtOptions,
+                                                ]}
                                                 placeholder="איזורים"
                                                 size="large"
                                                 className="form-input-large"
@@ -47,10 +59,22 @@ const NewsletterFilter = () => {
                                             {...restField}
                                             className="filter-form-item"
                                             name={[name, "event-type"]}
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: "אנא בחרו ארוע",
+                                                },
+                                            ]}
                                         >
                                             <Select
-                                                options={eventOptions}
-                                                placeholder="ארועים"
+                                                options={[
+                                                    {
+                                                        value: "all",
+                                                        label: "כול סוגי הארועים",
+                                                    },
+                                                    ...eventOptions,
+                                                ]}
+                                                placeholder="סוגי ארועים"
                                                 size="large"
                                                 className="form-input-large"
                                                 popupClassName="form-input-large"
@@ -66,7 +90,7 @@ const NewsletterFilter = () => {
                                             >
                                                 <Icon icon="doNotDisturb" />
                                                 <span className="remove-button-label">
-                                                    הסרת פילטר
+                                                    הסרת התראה
                                                 </span>
                                             </button>
                                         </div>
@@ -82,7 +106,7 @@ const NewsletterFilter = () => {
                                             className="add-icon"
                                         />
                                         <span className="add-button-label">
-                                            הוספת פילטר
+                                            הוספת התראה
                                         </span>
                                     </button>
                                 </div>
