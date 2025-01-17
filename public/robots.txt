@@ -2,6 +2,7 @@ User-agent: *
 # Only allow indexing if the host is www.ci-events.org
 Allow: /$
 Allow: /about$
+Allow: /sitemap.xml
 Disallow: /*
 
 # Add host-specific rules
