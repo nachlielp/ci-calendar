@@ -5,13 +5,10 @@ Allow: /about$
 Allow: /sitemap.xml
 Disallow: /*
 
-# Add host-specific rules
-Host: www.ci-events.org
-
 # Add sitemap only for production
 Sitemap: https://www.ci-events.org/sitemap.xml
 
-# Block all other hosts/environments
-User-agent: *
-Host: *
-Disallow: /
+# Add host-specific rules
+Host: www.ci-events.org
+
+
