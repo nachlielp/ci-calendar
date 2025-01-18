@@ -6,20 +6,24 @@ import { useNavigate } from "react-router"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
 import Modal from "antd/es/modal/Modal"
-import EventPreview from "./EventPreview"
+import { useSetSelectedEventByParams } from "../../../hooks/useSetSelectedEventByParams"
 
 interface EventCardProps {
     event: CIEvent
     isSelectedEvent?: boolean
+    anchorEl?: React.ReactNode
 }
 
 const FullEventCardModal = ({
     event,
     isSelectedEvent = false,
+    anchorEl,
 }: EventCardProps) => {
     const navigate = useNavigate()
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
     const [isClicked, setIsClicked] = useState(false)
+
+    const { clearSelectedEvent } = useSetSelectedEventByParams()
 
     useEffect(() => {
         if (isModalOpen && store.isUser && event.id) {
@@ -52,6 +56,7 @@ const FullEventCardModal = ({
 
     const onClose = () => {
         setIsModalOpen(false)
+        clearSelectedEvent()
         // const currentSearch = window.location.search
         // navigate(`/${currentSearch}`)
     }
@@ -59,11 +64,7 @@ const FullEventCardModal = ({
     return (
         <>
             <div id={event.id} onClick={onOpen}>
-                <EventPreview
-                    key={event.id}
-                    event={event}
-                    isClicked={isClicked}
-                />
+                {anchorEl}
             </div>
 
             <Modal

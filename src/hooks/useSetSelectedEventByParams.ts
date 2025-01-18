@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useParams, useLocation } from "react-router"
 import { CIEvent } from "../util/interfaces"
 import { store } from "../Store/store"
-
 //TODO undefined to null
 export const useSetSelectedEventByParams = () => {
     const { eventId } = useParams<{ eventId: string }>()
@@ -27,5 +26,9 @@ export const useSetSelectedEventByParams = () => {
         }
     }, [eventId, location.pathname, store.isLoading])
 
-    return { selectedEvent }
+    const clearSelectedEvent = () => {
+        setSelectedEvent(undefined)
+    }
+
+    return { selectedEvent, clearSelectedEvent }
 }

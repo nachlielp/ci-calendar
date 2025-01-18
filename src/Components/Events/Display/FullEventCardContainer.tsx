@@ -7,17 +7,27 @@ import FullEventCardModal from "./FullEventCardModal"
 interface FullEventCardContainerProps {
     event: CIEvent
     isSelectedEvent?: boolean
+    anchorEl?: React.ReactNode
 }
 
 const FullEventCardContainer = ({
     event,
     isSelectedEvent = false,
+    anchorEl,
 }: FullEventCardContainerProps) => {
     const isMobile = useIsMobile()
     return isMobile ? (
-        <FullEventCardDrawer event={event} isSelectedEvent={isSelectedEvent} />
+        <FullEventCardDrawer
+            event={event}
+            isSelectedEvent={isSelectedEvent}
+            anchorEl={anchorEl}
+        />
     ) : (
-        <FullEventCardModal event={event} isSelectedEvent={isSelectedEvent} />
+        <FullEventCardModal
+            event={event}
+            isSelectedEvent={isSelectedEvent}
+            anchorEl={anchorEl}
+        />
     )
 }
 
