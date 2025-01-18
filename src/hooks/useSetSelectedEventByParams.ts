@@ -17,15 +17,15 @@ export const useSetSelectedEventByParams = () => {
     useEffect(() => {
         setSelectedEvent(undefined)
 
-        if (eventId) {
+        if (eventId && !store.isLoading) {
             const event = store.getCIEventById(eventId)
             if (event) {
                 setTimeout(() => {
                     setSelectedEvent(event)
-                }, 100)
+                }, 0)
             }
         }
-    }, [eventId, location.pathname])
+    }, [eventId, location.pathname, store.isLoading])
 
     return { selectedEvent }
 }

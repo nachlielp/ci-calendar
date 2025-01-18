@@ -8,7 +8,7 @@
     }
     position: relative;
 
-    .cancelled-event-label {
+    .cancelled-event-cover {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -18,6 +18,13 @@
         font-weight: 600;
         text-align: center;
         width: 100%;
+        background-color: rgba(
+            255,
+            255,
+            255,
+            0.8
+        ); // Added white semi-transparent background
+        padding: 1rem 0;
         .cancelled-event-title {
             font-size: 50px;
             font-weight: 600;
@@ -29,6 +36,23 @@
             margin-bottom: 4rem;
             padding: 0 1rem;
         }
+    }
+    .loading-event-cover {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        font-size: 50px;
+        font-weight: 600;
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     .event-preview-content {

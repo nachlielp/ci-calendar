@@ -86,7 +86,6 @@ class Store {
 
         supabase.auth.onAuthStateChange(
             async (event: AuthChangeEvent, session: Session | null) => {
-                console.log("__authStateChange: ", event)
                 // this.cleanup() // Notice issue with file upload on android - reload app and clears image state
 
                 const timeSinceLastActivity =
@@ -116,11 +115,6 @@ class Store {
                     case SupabaseSessionEvent.signedIn:
                     case SupabaseSessionEvent.initialSession:
                     case SupabaseSessionEvent.tokenRefreshed:
-                        console.log(
-                            "this.isInitializing: ",
-                            this.isInitializing
-                        )
-
                         const isValidToken =
                             session?.access_token &&
                             session.access_token !== this.session?.access_token
@@ -130,8 +124,6 @@ class Store {
                             this.user?.id &&
                             session.user.id === this.user.id
 
-                        console.log("isValidToken: ", isValidToken)
-                        console.log("isValidUser: ", isValidUser)
                         if (!isValidToken || !isValidUser) {
                             this.currentSessionId =
                                 session?.access_token || null
@@ -139,11 +131,7 @@ class Store {
                             this.init()
                         } else {
                             console.log(
-                                "Skipping initialization - invalid token/user or already initializing"
-                            )
-                            console.log(
-                                "this.isInitializing: ",
-                                this.isInitializing
+                                "Skipping initialization - token/user are already initialized"
                             )
                         }
                         break
@@ -530,8 +518,6 @@ class Store {
             utilService.saveEventsToLocalStorage(fetchedEvents)
         } catch (error) {
             console.error("Error fetching events:", error)
-        } finally {
-            this.setLoading(false)
         }
     }
 
@@ -577,12 +563,13 @@ class Store {
     private fetchOnVisibilityChange = async () => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
+                //TODO - do i need to handle loading here for returning for new /event/id?
                 Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
             }
         }
 
         document.addEventListener("visibilitychange", handleVisibilityChange)
-        Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
+        await Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
 
         return () => {
             document.removeEventListener(
@@ -1278,7 +1265,6 @@ class Store {
             this.setNetworkFlag(true)
         } finally {
             this.finalizeInitialization()
-            console.log("finalizeInitialization")
         }
     }
 
@@ -1447,9 +1433,13 @@ class Store {
     }
 
     fetchAppPublicBios = async () => {
-        const appPublicBios = await publicBioService.getPublicBioList()
-        this.setAppPublicBios(appPublicBios)
-        utilService.saveBiosToLocalStorage(appPublicBios)
+        try {
+            const appPublicBios = await publicBioService.getPublicBioList()
+            this.setAppPublicBios(appPublicBios)
+            utilService.saveBiosToLocalStorage(appPublicBios)
+        } catch (error) {
+            throw new Error("Error in fetchAppPublicBios: " + error)
+        }
     }
 
     fetchAppTaggableTeachers = async () => {

@@ -7,16 +7,15 @@ import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
+import EventPreview from "./EventPreview"
 
 interface EventDrawerProps {
     event: CIEvent | null
-    anchorEl: any | null
     isSelectedEvent?: boolean
 }
 
 const FullEventCardDrawer = ({
     event,
-    anchorEl,
     isSelectedEvent = false,
 }: EventDrawerProps) => {
     const navigate = useNavigate()
@@ -24,6 +23,13 @@ const FullEventCardDrawer = ({
         return null
     }
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
+    const [isClicked, setIsClicked] = useState(false)
+
+    useEffect(() => {
+        if (isClicked) {
+            setIsClicked(false)
+        }
+    }, [store.isLoading])
 
     //TODO - handle seen when offline
     useEffect(() => {
@@ -33,6 +39,10 @@ const FullEventCardDrawer = ({
     }, [isModalOpen, event.id, store.isUser, store.isOnline])
 
     const onOpen = () => {
+        if (store.isLoading) {
+            setIsClicked(true)
+            return
+        }
         const currentPath = window.location.pathname
         const currentSearch = window.location.search
 
@@ -52,7 +62,13 @@ const FullEventCardDrawer = ({
 
     return (
         <>
-            <div onClick={onOpen}>{anchorEl}</div>
+            <div onClick={onOpen}>
+                <EventPreview
+                    key={event.id}
+                    event={event}
+                    isClicked={isClicked}
+                />
+            </div>
 
             <Drawer
                 className="full-event-card-drawer"
