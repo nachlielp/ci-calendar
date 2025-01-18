@@ -7,7 +7,6 @@ import { districtOptions } from "../../util/options"
 import { Icon } from "../Common/Icon"
 import Alert from "antd/es/alert/Alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
-import { newsletterFilterVM as vm } from "./NewsletterFilterVM"
 
 const NewsletterFilter = () => {
     return (
