@@ -9,15 +9,19 @@ import {
 } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
-import '../../../styles/event-preview.scss'
-import '../../../styles/generics/card.scss'
+import "../../../styles/event-preview.scss"
+import "../../../styles/generics/card.scss"
+import { Spin } from "antd"
+import { store } from "../../../Store/store"
+import { observer } from "mobx-react-lite"
 
 interface EventPreviewProps {
     event: CIEvent
+    isClicked: boolean
 }
 
-export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
-    ({ event }, ref) => {
+const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
+    ({ event, isClicked }, ref) => {
         const segmentsLength = Object.values(event.segments).length
 
         const singleDayTeacherNames = Array.from(
@@ -58,11 +62,16 @@ export const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
         return (
             <section ref={ref} className={`event-preview card`}>
                 {event.cancelled && (
-                    <article className="cancelled-event-label">
+                    <article className="cancelled-event-cover">
                         <h1 className="cancelled-event-title">האירוע בוטל</h1>
                         <h2 className="cancelled-event-text">
                             {event.cancelled_text}
                         </h2>
+                    </article>
+                )}
+                {isClicked && store.isLoading && (
+                    <article className="loading-event-cover">
+                        <Spin size="large" />
                     </article>
                 )}
                 <section
@@ -212,3 +221,5 @@ export const getEventTeachersIds = (event: CIEvent) => {
         .map((teacher) => teacher.value)
         .filter((teacher) => utilService.notAUserId(teacher))
 }
+
+export default observer(EventPreview)

@@ -1,5 +1,5 @@
 import "../../../styles/events-list.scss"
-import { EventPreview } from "./EventPreview"
+import EventPreview from "./EventPreview"
 import { CIEvent } from "../../../util/interfaces"
 import Empty from "antd/es/empty"
 import { useRef } from "react"
@@ -27,19 +27,18 @@ const EventsList = ({ events }: IEventsListProps) => {
                         key={event.id}
                         ref={(el) => (eventRefs.current[event.id] = el)}
                     >
-                        <EventPreview key={event.id} event={event} />
+                        <EventPreview
+                            key={event.id}
+                            event={event}
+                            isClicked={false}
+                        />
                     </div>
                 ) : (
                     <div
                         key={event.id}
                         ref={(el) => (eventRefs.current[event.id] = el)}
                     >
-                        <FullEventCardContainer
-                            event={event}
-                            anchorEl={
-                                <EventPreview key={event.id} event={event} />
-                            }
-                        />
+                        <FullEventCardContainer event={event} />
                     </div>
                 )
             )}
