@@ -7,18 +7,21 @@ import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
-import EventPreview from "./EventPreview"
+import { useSetSelectedEventByParams } from "../../../hooks/useSetSelectedEventByParams"
 
 interface EventDrawerProps {
     event: CIEvent | null
     isSelectedEvent?: boolean
+    anchorEl?: React.ReactNode
 }
 
 const FullEventCardDrawer = ({
     event,
     isSelectedEvent = false,
+    anchorEl,
 }: EventDrawerProps) => {
     const navigate = useNavigate()
+    const { clearSelectedEvent } = useSetSelectedEventByParams()
     if (!event) {
         return null
     }
@@ -56,20 +59,12 @@ const FullEventCardDrawer = ({
 
     const onClose = () => {
         setIsModalOpen(false)
-        // const currentSearch = window.location.search
-        // navigate(`/${currentSearch}`)
+        clearSelectedEvent()
     }
 
     return (
         <>
-            <div onClick={onOpen}>
-                <EventPreview
-                    key={event.id}
-                    event={event}
-                    isClicked={isClicked}
-                />
-            </div>
-
+            <div onClick={onOpen}>{anchorEl}</div>
             <Drawer
                 className="full-event-card-drawer"
                 onClose={onClose}

@@ -38,7 +38,12 @@ const EventsList = ({ events }: IEventsListProps) => {
                         key={event.id}
                         ref={(el) => (eventRefs.current[event.id] = el)}
                     >
-                        <FullEventCardContainer event={event} />
+                        <FullEventCardContainer
+                            event={event}
+                            anchorEl={
+                                <EventPreview event={event} isClicked={false} />
+                            }
+                        />
                     </div>
                 )
             )}

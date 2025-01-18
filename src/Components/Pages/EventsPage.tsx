@@ -124,6 +124,7 @@ const EventsPage = () => {
                         <FullEventCardContainer
                             isSelectedEvent={true}
                             event={selectedEvent}
+                            anchorEl={<></>}
                         />
                     )}
                 </section>
