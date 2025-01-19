@@ -24,16 +24,19 @@ const initSentry = () => {
             dsn,
             enabled: true,
             environment: import.meta.env.MODE,
-            integrations: [
-                Sentry.reactRouterV7BrowserTracingIntegration({
-                    useEffect: React.useEffect,
-                    useLocation,
-                    useNavigationType,
-                    createRoutesFromChildren,
-                    matchRoutes,
-                }),
-                Sentry.replayIntegration(),
-            ],
+            integrations:
+                import.meta.env.MODE === "production"
+                    ? [
+                          Sentry.reactRouterV7BrowserTracingIntegration({
+                              useEffect: React.useEffect,
+                              useLocation,
+                              useNavigationType,
+                              createRoutesFromChildren,
+                              matchRoutes,
+                          }),
+                          Sentry.replayIntegration(),
+                      ]
+                    : [], // No performance monitoring integrations in development
             beforeSend(event) {
                 if (process.env.NODE_ENV === "development") {
                     console.log(
@@ -42,7 +45,7 @@ const initSentry = () => {
                 }
                 return event
             },
-            debug: import.meta.env.MODE === "development",
+            debug: false,
             tracesSampleRate: import.meta.env.MODE === "production" ? 0.2 : 1.0,
             allowUrls: [
                 window.location.origin,

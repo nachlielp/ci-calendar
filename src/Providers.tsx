@@ -24,7 +24,6 @@ const Providers: React.FC<ProvidersProps> = ({ children }) => {
             }}
         >
             <PHProvider>
-                {" "}
                 {React.Children.map(children, (child) => {
                     if (React.isValidElement(child) && child.type === Routes) {
                         return (
