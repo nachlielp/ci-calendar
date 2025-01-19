@@ -7,7 +7,6 @@ import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
-import { useSetSelectedEventByParams } from "../../../hooks/useSetSelectedEventByParams"
 
 interface EventDrawerProps {
     event: CIEvent | null
@@ -21,7 +20,6 @@ const FullEventCardDrawer = ({
     anchorEl,
 }: EventDrawerProps) => {
     const navigate = useNavigate()
-    const { clearSelectedEvent } = useSetSelectedEventByParams()
     if (!event) {
         return null
     }
@@ -59,7 +57,6 @@ const FullEventCardDrawer = ({
 
     const onClose = () => {
         setIsModalOpen(false)
-        clearSelectedEvent()
     }
 
     return (
