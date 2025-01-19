@@ -122,6 +122,7 @@ const EventsPage = () => {
                     {isListView && <EventsList events={filteredEvents} />}
                     {selectedEvent && (
                         <FullEventCardContainer
+                            key={selectedEvent.id}
                             isSelectedEvent={true}
                             event={selectedEvent}
                             anchorEl={<></>}
