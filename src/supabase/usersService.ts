@@ -74,7 +74,6 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 .eq("templates.user_id", id)
                 .eq("public_bio.user_id", id)
                 .eq("ci_events.user_id", id)
-                .lte("ci_events.start_date", dayjs().endOf("day").toISOString())
                 .eq("alerts.user_id", id)
                 .eq("alerts.viewed", false)
                 .single(),
@@ -149,7 +148,16 @@ async function getUserData(id: string): Promise<CIUserData | null> {
 
         const templates = userData.templates
         const requests = userData.requests
-        const past_ci_events = userData.ci_events
+        const past_ci_events = userData.ci_events.filter((event: any) =>
+            dayjs(event.start_date)
+                .startOf("day")
+                .isBefore(dayjs().startOf("day"))
+        )
+        const future_ci_events = userData.ci_events.filter((event: any) =>
+            dayjs(event.start_date)
+                .startOf("day")
+                .isAfter(dayjs().startOf("day"))
+        )
         const userBio = userData.bio
 
         const user = { ...userData }
@@ -169,6 +177,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             requests,
             ci_events: eventsData,
             past_ci_events,
+            future_ci_events,
             userBio,
         } as unknown as CIUserData
     } catch (error: any) {

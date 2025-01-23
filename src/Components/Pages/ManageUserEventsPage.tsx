@@ -9,7 +9,7 @@ import ManageEventActions from "../Events/Management/ManageEventActions"
 import catButtGif from "../../assets/img/cat-butt.gif"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
-import '../../styles/user-event-list-page.scss'
+import "../../styles/user-event-list-page.scss"
 
 dayjs.extend(isSameOrAfter)
 
@@ -61,77 +61,66 @@ const ManageUserEventsPage = () => {
                 </div>
             </header>
             <div className="events-container" role="list">
-                {(showPast ? store.getUserPastEvents : store.getUserEvents).map(
-                    (event) => (
+                {(showPast
+                    ? store.getUserPastEvents
+                    : store.getUserFutureEvents
+                ).map((event) => (
+                    <div key={event.id} className="event-item" role="listitem">
                         <div
-                            key={event.id}
-                            className="event-item"
-                            role="listitem"
+                            className={`event-summary ${
+                                expandedEventId === event.id ? "active" : ""
+                            }`}
+                            onClick={() =>
+                                setExpandedEventId(
+                                    expandedEventId === event.id
+                                        ? null
+                                        : event.id
+                                )
+                            }
                         >
-                            <div
-                                className={`event-summary ${
-                                    expandedEventId === event.id ? "active" : ""
-                                }`}
-                                onClick={() =>
-                                    setExpandedEventId(
-                                        expandedEventId === event.id
-                                            ? null
-                                            : event.id
-                                    )
-                                }
-                            >
-                                <div className="event-details">
-                                    <h3 className="event-title">
-                                        {event.title}
-                                    </h3>
-                                    <div className="event-meta">
-                                        <time dateTime={event.start_date}>
-                                            {formatDateRange(
-                                                event.start_date,
-                                                event.end_date
-                                            )}
-                                        </time>
-                                        {event.hide && (
-                                            <span className="event-status">
-                                                <span className="separator">
-                                                    |
-                                                </span>
-                                                <span>אירוע מוסתר</span>
-                                            </span>
+                            <div className="event-details">
+                                <h3 className="event-title">{event.title}</h3>
+                                <div className="event-meta">
+                                    <time dateTime={event.start_date}>
+                                        {formatDateRange(
+                                            event.start_date,
+                                            event.end_date
                                         )}
-                                        {event.cancelled && (
-                                            <span className="event-status">
-                                                <span className="separator">
-                                                    |
-                                                </span>
-                                                <span>אירוע מבוטל</span>
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <span
-                                    className={`chevron-icon ${
-                                        expandedEventId === event.id
-                                            ? "active"
-                                            : ""
-                                    }`}
-                                >
-                                    &#x2039;
-                                </span>
-                            </div>
-                            {expandedEventId === event.id && (
-                                <div className="event-expanded">
-                                    <FullEventCard event={event} />
-                                    {!showPast && (
-                                        <ManageEventActions event={event} />
+                                    </time>
+                                    {event.hide && (
+                                        <span className="event-status">
+                                            <span className="separator">|</span>
+                                            <span>אירוע מוסתר</span>
+                                        </span>
+                                    )}
+                                    {event.cancelled && (
+                                        <span className="event-status">
+                                            <span className="separator">|</span>
+                                            <span>אירוע מבוטל</span>
+                                        </span>
                                     )}
                                 </div>
-                            )}
+                            </div>
+                            <span
+                                className={`chevron-icon ${
+                                    expandedEventId === event.id ? "active" : ""
+                                }`}
+                            >
+                                &#x2039;
+                            </span>
                         </div>
-                    )
-                )}
+                        {expandedEventId === event.id && (
+                            <div className="event-expanded">
+                                <FullEventCard event={event} />
+                                {!showPast && (
+                                    <ManageEventActions event={event} />
+                                )}
+                            </div>
+                        )}
+                    </div>
+                ))}
             </div>
-            {store.getUserEvents.length === 0 && (
+            {store.getUserFutureEvents.length === 0 && (
                 <div className="no-events-message">
                     <div
                         className="no-events-message-gif"

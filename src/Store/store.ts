@@ -49,8 +49,9 @@ class Store {
     @observable bio: UserBio = {} as UserBio
     @observable alerts: CIAlert[] = []
 
+    @observable user_past_ci_events: CIEvent[] = []
+    @observable user_future_ci_events: CIEvent[] = []
     @observable app_ci_events: CIEvent[] = []
-    @observable app_past_ci_events: CIEvent[] = []
     @observable app_public_bios: UserBio[] = []
     @observable app_taggable_teachers: TaggableUserOptions[] = []
     @observable app_users: ManageUserOption[] = []
@@ -224,7 +225,14 @@ class Store {
 
     @computed
     get getSortedEvents() {
-        return this.app_ci_events
+        const events = new Map()
+        this.app_ci_events.forEach((e) => {
+            events.set(e.id, e)
+        })
+        this.user_future_ci_events.forEach((e) => {
+            events.set(e.id, e)
+        })
+        return Array.from(events.values())
             .slice()
             .filter((e) => !e.hide)
             .filter(
@@ -242,9 +250,8 @@ class Store {
     }
 
     @computed
-    get getUserEvents() {
-        return this.app_ci_events
-            .filter((e) => e.user_id === this.user.id)
+    get getUserFutureEvents() {
+        return this.user_future_ci_events
             .slice()
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
@@ -253,7 +260,7 @@ class Store {
 
     @computed
     get getUserPastEvents() {
-        return this.app_past_ci_events
+        return this.user_past_ci_events
             .slice()
             .sort((a, b) =>
                 dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1
@@ -263,9 +270,15 @@ class Store {
     @computed
     get getCIEventById() {
         return (eventId: string) => {
-            return this.app_ci_events.find(
+            let event = this.app_ci_events.find(
                 (e) => e.id === eventId || e.short_id === eventId
             )
+            if (!event) {
+                event = this.user_future_ci_events.find(
+                    (e) => e.id === eventId || e.short_id === eventId
+                )
+            }
+            return event
         }
     }
 
@@ -736,7 +749,8 @@ class Store {
         this.templates = userData.templates
         this.requests = userData.requests
         this.app_ci_events = userData.ci_events
-        this.app_past_ci_events = userData.past_ci_events
+        this.user_past_ci_events = userData.past_ci_events
+        this.user_future_ci_events = userData.future_ci_events
         this.alerts = userData.alerts
         this.bio = userData.userBio
     }
@@ -768,21 +782,43 @@ class Store {
     }
 
     @action
+    setUserFutureCIEvents = (ci_events: CIEvent[]) => {
+        this.user_future_ci_events = ci_events
+    }
+
+    @action
+    setUserPastCIEvents = (ci_events: CIEvent[]) => {
+        this.user_past_ci_events = ci_events
+    }
+
+    @action
     setCIEvent = (ci_event: CIEvent, eventType: EventPayloadType) => {
         switch (eventType) {
             case EventPayloadType.UPDATE:
                 this.app_ci_events = this.app_ci_events.map((e) =>
                     e.id === ci_event.id ? { ...e, ...ci_event } : e
                 )
+                this.user_future_ci_events = this.user_future_ci_events.map(
+                    (e) => (e.id === ci_event.id ? { ...e, ...ci_event } : e)
+                )
+
                 break
             case EventPayloadType.DELETE:
                 this.app_ci_events = this.app_ci_events.filter(
                     (e) => e.id !== ci_event.id
                 )
+                this.user_future_ci_events = this.user_future_ci_events.filter(
+                    (e) => e.id !== ci_event.id
+                )
+
                 break
             case EventPayloadType.INSERT:
                 if (this.app_ci_events.find((e) => e.id === ci_event.id)) return
                 this.app_ci_events = [...this.app_ci_events, ci_event]
+                this.user_future_ci_events = [
+                    ...this.user_future_ci_events,
+                    ci_event,
+                ]
                 break
         }
     }
@@ -800,7 +836,9 @@ class Store {
     @action
     deleteCIEvent = async (eventId: string) => {
         //DELETE does not emit a payload, so we need to update the event to cancelled and then delete it incase some other user is online
-        const ci_event = this.app_ci_events.find((e) => e.id === eventId)
+        const ci_event = this.user_future_ci_events.find(
+            (e) => e.id === eventId
+        )
         if (!ci_event) return
         const deletedEventId = await cieventsService.deleteCIEvent(eventId)
         this.setCIEvent(
@@ -1490,7 +1528,8 @@ class Store {
     clearUser = () => {
         this.setStore({
             ci_events: this.app_ci_events,
-            past_ci_events: this.app_past_ci_events,
+            past_ci_events: this.user_past_ci_events,
+            future_ci_events: this.user_future_ci_events,
             user: {} as CIUser,
             notifications: [],
             templates: [],
@@ -1517,7 +1556,7 @@ class Store {
             this.app_requests = []
             this.app_creators = []
             this.app_taggable_teachers = []
-            this.app_past_ci_events = []
+            this.user_past_ci_events = []
 
             return Promise.resolve()
         } catch (error) {
