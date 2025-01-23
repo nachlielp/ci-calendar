@@ -10,7 +10,7 @@ import { store } from "../../Store/store"
 import UploadImageButton from "../Common/UploadImageButton"
 import { storageService } from "../../supabase/storageService"
 import Spin from "antd/es/spin"
-import '../../styles/profile-form.scss'
+import "../../styles/profile-form.scss"
 import { utilService } from "../../util/utilService"
 
 const DRAFT_KEY = "profile-form"
@@ -163,7 +163,29 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                 <label className="bio-card-subtitle">
                     <b>קישור</b> (יופיע ככפתור בעמוד הפרופיל)
                 </label>
-                <Form.Item<FieldType> name="page_title">
+                <Form.Item<FieldType>
+                    name="page_title"
+                    validateTrigger={["onChange", "onBlur"]}
+                    rules={[
+                        {
+                            max: 30,
+                            message: "כותרת יכולה להכיל עד 30 תווים",
+                        },
+                        {
+                            validator: (_, value) => {
+                                if (!value) return Promise.resolve()
+                                const urlRegex =
+                                    /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
+                                if (urlRegex.test(value)) {
+                                    return Promise.reject(
+                                        "כותרת לא יכולה להיות קישור"
+                                    )
+                                }
+                                return Promise.resolve()
+                            },
+                        },
+                    ]}
+                >
                     <Input placeholder="כותרת" />
                 </Form.Item>
                 <Form.Item<FieldType>
@@ -200,7 +222,29 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                     <Input placeholder="קישור לדף פרופיל" />
                 </Form.Item>
                 <hr className="bio-card-hr mini-hr" />
-                <Form.Item<FieldType> name="page_title_2">
+                <Form.Item<FieldType>
+                    name="page_title_2"
+                    validateTrigger={["onChange", "onBlur"]}
+                    rules={[
+                        {
+                            max: 30,
+                            message: "כותרת יכולה להכיל עד 30 תווים",
+                        },
+                        {
+                            validator: (_, value) => {
+                                if (!value) return Promise.resolve()
+                                const urlRegex =
+                                    /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
+                                if (urlRegex.test(value)) {
+                                    return Promise.reject(
+                                        "כותרת לא יכולה להיות קישור"
+                                    )
+                                }
+                                return Promise.resolve()
+                            },
+                        },
+                    ]}
+                >
                     <Input placeholder="כותרת" />
                 </Form.Item>
                 <Form.Item<FieldType>

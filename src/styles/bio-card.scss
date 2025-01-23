@@ -27,6 +27,7 @@
         width: 100%;
         display: flex;
         flex-direction: row;
+        flex-wrap: wrap;
         /* align-items: space-around; */
         justify-content: space-around;
         gap: 4px;
