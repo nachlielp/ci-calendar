@@ -66,13 +66,13 @@ class Store {
     @observable private currentSessionId: string | null = null
 
     @observable private lastActivityTimestamp: number = 0
+    @observable private lastFetchTimestamp: number = 0
 
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private isInitializing = false
     private inactivityTimeout: NodeJS.Timeout | null = null
     private readonly INACTIVITY_DELAY = 5 * 60 * 1000
-    private readonly ACTIVITY_TIMEOUT = 5 * 60 * 1000
 
     constructor() {
         makeAutoObservable(this)
@@ -91,7 +91,7 @@ class Store {
                 const timeSinceLastActivity =
                     Date.now() - this.lastActivityTimestamp
                 const needsReinitialization =
-                    timeSinceLastActivity > this.ACTIVITY_TIMEOUT
+                    timeSinceLastActivity > this.INACTIVITY_DELAY
 
                 if (needsReinitialization) {
                     this.isInitializing = false
@@ -505,9 +505,13 @@ class Store {
     private fetchEvents = async () => {
         try {
             const fetchedEvents = await cieventsService.getCIEvents({
-                start_date: dayjs()
+                from_start_date: dayjs()
                     .tz("Asia/Jerusalem")
                     .add(3, "hours")
+                    .toISOString(),
+                to_start_date: dayjs()
+                    .tz("Asia/Jerusalem")
+                    .add(30, "day")
                     .toISOString(),
                 sort_by: "start_date",
                 sort_direction: "asc",
@@ -563,13 +567,24 @@ class Store {
     private fetchOnVisibilityChange = async () => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
-                //TODO - do i need to handle loading here for returning for new /event/id?
-                Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
+                const timeSinceLastFetch = Date.now() - this.lastFetchTimestamp
+                if (timeSinceLastFetch >= this.INACTIVITY_DELAY) {
+                    Promise.all([
+                        this.fetchEvents(),
+                        this.fetchAppPublicBios(),
+                    ]).then(() => {
+                        this.lastFetchTimestamp = Date.now()
+                    })
+                }
             }
         }
 
+        document.removeEventListener("visibilitychange", handleVisibilityChange)
         document.addEventListener("visibilitychange", handleVisibilityChange)
+
+        // Initial fetch
         await Promise.all([this.fetchEvents(), this.fetchAppPublicBios()])
+        this.lastFetchTimestamp = Date.now()
 
         return () => {
             document.removeEventListener(
@@ -1280,7 +1295,6 @@ class Store {
             await this.initPolling()
             return
         }
-
         this.setLoading(true)
         await this.initializeUser()
         await this.fetchAdditionalData()

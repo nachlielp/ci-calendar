@@ -5,7 +5,8 @@ import dayjs from "dayjs"
 import { SelectOption } from "../util/options"
 import { store } from "../Store/store"
 export interface FilterOptions {
-    start_date?: string
+    from_start_date?: string
+    to_start_date?: string
     end_date?: string
     user_id?: string
     sort_by?: string
@@ -72,16 +73,24 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             .eq("ci_events_users_junction.public_bio.show_profile", true) // Updated filter path
 
         // Apply filters
-        if (filterBy?.start_date) {
-            query = filterBy.future_events
-                ? query.gte(
-                      "start_date",
-                      dayjs(filterBy.start_date).format("YYYY-MM-DD")
-                  )
-                : query.lte(
-                      "start_date",
-                      dayjs(filterBy.start_date).format("YYYY-MM-DD")
-                  )
+        if (filterBy?.from_start_date) {
+            if (filterBy.future_events) {
+                query = query.gte(
+                    "start_date",
+                    dayjs(filterBy.from_start_date).format("YYYY-MM-DD")
+                )
+                if (filterBy.to_start_date) {
+                    query = query.lte(
+                        "start_date",
+                        dayjs(filterBy.to_start_date).format("YYYY-MM-DD")
+                    )
+                }
+            } else {
+                query = query.lte(
+                    "start_date",
+                    dayjs(filterBy.from_start_date).format("YYYY-MM-DD")
+                )
+            }
         }
         if (filterBy?.end_date) {
             query = filterBy.future_events
