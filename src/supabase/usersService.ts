@@ -33,62 +33,65 @@ interface UserWithRole {
 
 async function getUserData(id: string): Promise<CIUserData | null> {
     try {
-        const { data: userData, error: userError } = await supabase
-            .from("users")
-            .select(
+        const [userResponse, eventsResponse] = await Promise.all([
+            // First query - user data
+            supabase
+                .from("users")
+                .select(
+                    `
+                    *,
+                    notifications!left (
+                        id,
+                        ci_event_id,
+                        remind_in_hours,
+                        sent,
+                        ci_events!inner (
+                            title,
+                            start_date,
+                            segments,
+                            is_multi_day
+                        )
+                    ),
+                    requests!left (*),
+                    templates!left (*),
+                    bio:public_bio!left (*),
+                    ci_events:ci_events!left (*),
+                    alerts:alerts!left (
+                        id,
+                        ci_event_id,
+                        request_id,
+                        user_id,
+                        viewed,
+                        type,
+                        title
+                    )
                 `
-            *,
-            notifications!left (
-                id,
-                ci_event_id,
-                remind_in_hours,
-                sent,
-                ci_events!inner (
-                    title,
-                    start_date,
-                    segments,
-                    is_multi_day
                 )
-            ),
-            requests!left (
-                *
-            ),
-            templates!left (
-                *
-            ),
-            bio:public_bio!left (
-                *
-            ),
-            ci_events:ci_events!left (
-                *
-            ),
-            alerts:alerts!left (
-                id,
-                ci_event_id,
-                request_id,
-                user_id,
-                viewed,
-                type,
-                title
-            )
-        `
-            )
-            .eq("id", id)
-            .eq("notifications.user_id", id)
-            .eq("notifications.sent", false)
-            .eq("requests.user_id", id)
-            .eq("templates.user_id", id)
-            .eq("public_bio.user_id", id)
-            .eq("ci_events.user_id", id)
-            .lte("ci_events.start_date", dayjs().endOf("day").toISOString())
-            .eq("alerts.user_id", id)
-            .eq("alerts.viewed", false)
-            .single()
+                .eq("id", id)
+                .eq("notifications.user_id", id)
+                .eq("notifications.sent", false)
+                .eq("requests.user_id", id)
+                .eq("templates.user_id", id)
+                .eq("public_bio.user_id", id)
+                .eq("ci_events.user_id", id)
+                .lte("ci_events.start_date", dayjs().endOf("day").toISOString())
+                .eq("alerts.user_id", id)
+                .eq("alerts.viewed", false)
+                .single(),
 
-        const { data: eventsData, error: eventsError } = await supabase
-            .from("ci_events")
-            .select("*")
-            .gte("start_date", dayjs().startOf("day").toISOString())
+            // Second query - events data
+            supabase
+                .from("ci_events")
+                .select("*")
+                .gte("start_date", dayjs().startOf("day").toISOString())
+                .lte(
+                    "start_date",
+                    dayjs().endOf("day").add(30, "day").toISOString()
+                ),
+        ])
+
+        const { data: userData, error: userError } = userResponse
+        const { data: eventsData, error: eventsError } = eventsResponse
 
         if (userError) {
             // Check specifically for not found error
