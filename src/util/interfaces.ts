@@ -236,6 +236,7 @@ export interface CIUserData {
     templates: CITemplate[]
     ci_events: CIEvent[]
     past_ci_events: CIEvent[]
+    future_ci_events: CIEvent[]
     alerts: CIAlert[]
 }
 
