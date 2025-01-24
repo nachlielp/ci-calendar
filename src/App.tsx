@@ -77,18 +77,6 @@ export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://payboxapp.page.link/32yzdN1D1gix4AR37"
 export const DATE_LIMIT = dayjs().add(1, "year").toDate()
 
-const DisableAppNotice = () => {
-    return (
-        <section className="app-disabled">
-            <span>
-                <Icon icon="settings" className="event-icon spinning" />
-            </span>
-            <h2 className="app-disabled-title">קונטקט אימפרוביזציה ישראל</h2>
-            <h3 className="app-disabled-subtitle">סגור לרגל שיפוצים</h3>
-        </section>
-    )
-}
-
 const disableApp = import.meta.env.VITE_DISABLE_APP
 
 const App = () => {
@@ -101,18 +89,9 @@ const App = () => {
     useRemoveAppLoadingScreen()
 
     if (disableApp === "true") {
-        return (
-            <div className="app">
-                <BackgroundTiles />
-                <div
-                    className="app-content"
-                    style={{ width: "100%", maxWidth: "500px" }}
-                >
-                    <DisableAppNotice />
-                </div>
-            </div>
-        )
+        return <DisableAppNotice />
     }
+
     return (
         <div className="app">
             {!isDev && <SpeedInsights />}
@@ -353,3 +332,25 @@ const App = () => {
 }
 
 export default observer(App)
+
+const DisableAppNotice = () => {
+    return (
+        <div className="app">
+            <BackgroundTiles />
+            <div
+                className="app-content"
+                style={{ width: "100%", maxWidth: "500px" }}
+            >
+                <section className="app-disabled">
+                    <span>
+                        <Icon icon="settings" className="event-icon spinning" />
+                    </span>
+                    <h2 className="app-disabled-title">
+                        קונטקט אימפרוביזציה ישראל
+                    </h2>
+                    <h3 className="app-disabled-subtitle">סגור לרגל שיפוצים</h3>
+                </section>
+            </div>
+        </div>
+    )
+}
