@@ -1308,24 +1308,32 @@ class Store {
             return
         }
 
+        this.setLoading(true)
         try {
-            await Promise.race([
-                this.initializeUserAndData(),
-                this.createTimeout(30000),
-            ])
+            this.initializeUserAndData()
+            // await Promise.race([
+            //     this.createTimeout(30000),
+            // ])
         } catch (error) {
+            //TODO: clear user data and signout
             console.error("Error in initialization:", error)
             this.setNetworkFlag(true)
         } finally {
-            this.finalizeInitialization()
+            this.setLoading(false)
+            if (this.getSession?.user?.id && this.isOnline) {
+                this.setupSubscription()
+                this.updateUserAppVersion()
+                this.checkNotifications()
+                utilService.saveIsInternalToLocalStorage(this.user.is_internal)
+            }
         }
     }
 
-    private createTimeout(ms: number): Promise<never> {
-        return new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Network timeout")), ms)
-        )
-    }
+    // private createTimeout(ms: number): Promise<never> {
+    //     return new Promise((_, reject) =>
+    //         setTimeout(() => reject(new Error("Network timeout")), ms)
+    //     )
+    // }
 
     private async initializeUserAndData() {
         console.log("initializeUserAndData")
@@ -1333,7 +1341,7 @@ class Store {
             await this.initPolling()
             return
         }
-        this.setLoading(true)
+
         await this.initializeUser()
         await this.fetchAdditionalData()
     }
@@ -1342,7 +1350,7 @@ class Store {
         console.log("initializeUser")
         if (this.isInitializing) {
             console.log("Initialization already in progress, skipping...")
-            this.setLoading(false)
+
             return
         }
         this.isInitializing = true
@@ -1351,7 +1359,6 @@ class Store {
 
             if (!userData) {
                 await this.createNewUser()
-                this.setLoading(false)
                 return
             }
 
@@ -1360,7 +1367,6 @@ class Store {
         } catch (error: any) {
             // Handle other errors
             this.initPolling()
-            this.setLoading(false)
             throw new Error("Error in initializeUser: " + error)
         } finally {
             this.isInitializing = false
@@ -1402,18 +1408,6 @@ class Store {
         }
     }
 
-    private finalizeInitialization() {
-        console.log("finalizeInitialization")
-        this.setLoading(false)
-
-        if (this.getSession?.user?.id && this.isOnline) {
-            this.setupSubscription()
-            this.updateUserAppVersion()
-            this.checkNotifications()
-            utilService.saveIsInternalToLocalStorage(this.user.is_internal)
-        }
-    }
-
     @action
     private fetchAdditionalData = async () => {
         console.log("fetchAdditionalData")
@@ -1444,20 +1438,18 @@ class Store {
             }
         } catch (error) {
             console.error("Fetch timeout:", error)
-        } finally {
-            this.setLoading(false)
         }
     }
 
     initPolling = async () => {
         console.log("initPolling")
         try {
-            this.setLoading(true)
+            // this.setLoading(true)
             await this.fetchOnVisibilityChange()
         } catch (error) {
             console.error("Error in initPolling:", error)
         } finally {
-            this.setLoading(false)
+            // this.setLoading(false)
         }
     }
 
