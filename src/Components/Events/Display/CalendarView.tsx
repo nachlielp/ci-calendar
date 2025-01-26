@@ -56,7 +56,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 
     const prevMonth = () => {
         const newValue = value.subtract(1, "month")
-        const oneMonthAgo = dayjs().subtract(1, "month").startOf("month")
+        const oneMonthAgo = dayjs().startOf("month")
         if (newValue.isAfter(oneMonthAgo)) {
             setValue(newValue)
         }
@@ -64,7 +64,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 
     const nextMonth = () => {
         const newValue = value.add(1, "month")
-        const threeMonthsAhead = dayjs().add(3, "months").endOf("month")
+        const threeMonthsAhead = dayjs().add(1, "months").endOf("month")
         if (newValue.isBefore(threeMonthsAhead)) {
             setValue(newValue)
         }
