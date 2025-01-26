@@ -101,7 +101,11 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         }
         if (eventsError)
             throw new Error(
-                `Failed to get events data for userId: ${store.getUserId} ERROR: ${eventsError}`
+                `Failed to get events data for userId: ${id} ERROR: ${JSON.stringify(
+                    eventsError,
+                    null,
+                    2
+                )}`
             )
 
         const notifications = userData?.notifications
@@ -188,7 +192,11 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         ) {
             throw error
         }
-        throw new Error(`Failed to get user data: ${error.message}`)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
+        throw new Error(`Failed to get user data: ${errorMessage}`)
     }
     //TODO hanldle errors in getUserData in a way that reports to snetry and does not break the workflow
 }
@@ -205,15 +213,22 @@ async function updateUser(
             .select()
             .single()
         if (error) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : JSON.stringify(error, null, 2)
             throw new Error(
-                `Failed to update user for userId: ${store.getUserId} ERROR: ${error}`
+                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`
             )
         }
         return data as CIUser
-    } catch (error) {
-        console.error("Error in updateUser:", error)
+    } catch (error: any) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update user for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -228,15 +243,23 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
             .single()
 
         if (error) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : JSON.stringify(error, null, 2)
             throw new Error(
-                `_1_Failed to create user for userId: ${store.getUserId} ERROR: ${error}`
+                `_1_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`
             )
         }
         console.log("__B_createUser", data)
         return data as DbUser
-    } catch (error) {
+    } catch (error: any) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `_2_Failed to create user for userId: ${store.getUserId} ERROR: ${error}`
+            `_2_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -277,9 +300,13 @@ async function getUsers(): Promise<ManageUserOption[]> {
         })
 
         return users as ManageUserOption[]
-    } catch (error) {
+    } catch (error: any) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get users for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get users for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

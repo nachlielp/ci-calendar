@@ -84,7 +84,7 @@ export const requestTypeOptions: SelectOption[] = [
     // { value: RequestType.support, label: RequestTypeHebrew.support },
 ]
 export enum ScreenSize {
-    mobile = 600,
+    mobile = 500,
     tablet = 900,
     desktop = 1200,
 }

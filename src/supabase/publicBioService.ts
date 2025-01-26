@@ -14,21 +14,21 @@ async function updateTeacherBio(bio: Partial<UserBio>): Promise<UserBio> {
         const { data, error } = await supabase
             .from("public_bio")
             .upsert(bio, {
-                onConflict: "user_id", // Specify the unique constraint
-                ignoreDuplicates: false, // Update if exists
+                onConflict: "user_id",
+                ignoreDuplicates: false,
             })
             .select()
             .single()
 
-        if (error)
-            throw new Error(
-                `Failed to update teacher bio for userId: ${store.getUserId} ERROR: ${error}`
-            )
-
+        if (error) throw error
         return data
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update teacher bio for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -40,14 +40,14 @@ async function deleteTeacherBio(userId: string): Promise<void> {
             .delete()
             .eq("user_id", userId)
 
-        if (error) {
-            throw new Error(
-                `Failed to delete teacher bio for userId: ${store.getUserId} ERROR: ${error}`
-            )
-        }
+        if (error) throw error
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete teacher bio for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to delete teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -64,15 +64,17 @@ async function getPublicBioList(): Promise<UserBio[]> {
             .not("user_type", "eq", UserType.admin)
             .not("bio_name", "eq", "")
 
-        if (error)
-            throw new Error(
-                `Failed to get public bio list for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
+
         const filteredData = data.filter((user) => user.bio_name !== "")
         return filteredData as UserBio[]
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get public bio list for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get public bio list for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -91,22 +93,22 @@ async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
             )
             .eq("allow_tagging", true)
             .not("bio_name", "eq", "")
-        if (error)
-            throw new Error(
-                `Failed to get taggable teachers for userId: ${store.getUserId} ERROR: ${error}`
-            )
 
-        const teachers = data.map((teacher) => {
-            return {
-                user_id: teacher.user_id,
-                bio_name: teacher.bio_name,
-                user_type: teacher.user_type,
-            }
-        })
+        if (error) throw error
+
+        const teachers = data.map((teacher) => ({
+            user_id: teacher.user_id,
+            bio_name: teacher.bio_name,
+            user_type: teacher.user_type,
+        }))
         return teachers
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get taggable teachers for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get taggable teachers for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

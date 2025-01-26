@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router"
 import MultiDayEventForm from "../Events/Forms/MultiDayEventForm"
-import '../../styles/single-day-form-page.scss'
+import "../../styles/single-day-form-page.scss"
 import { Alert } from "antd"
 
 const EVENT_TYPE_LABEL = "אירוע רב יומי"
@@ -35,6 +35,7 @@ const MultiDayFormPage = () => {
             <Alert
                 message="אירוע רב יומי הוא אירוע רציף שנמשך מספר ימים"
                 type="info"
+                style={{ fontSize: "1.2rem", fontWeight: "bold" }}
             />
             <div className="form-container">
                 <MultiDayEventForm

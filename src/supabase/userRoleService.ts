@@ -25,10 +25,15 @@ async function updateUserRole({
             .select()
             .single()
 
-        if (roleError)
+        if (roleError) {
+            const errorMessage =
+                roleError instanceof Error
+                    ? roleError.message
+                    : JSON.stringify(roleError, null, 2)
             throw new Error(
-                `Failed to update user role for userId: ${store.getUserId} ERROR: ${roleError}`
+                `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`
             )
+        }
 
         // Update users table
         const { error: userError } = await supabase
@@ -36,10 +41,15 @@ async function updateUserRole({
             .update({ user_type: user_type })
             .eq("id", user_id)
 
-        if (userError)
+        if (userError) {
+            const errorMessage =
+                userError instanceof Error
+                    ? userError.message
+                    : JSON.stringify(userError, null, 2)
             throw new Error(
-                `Failed to update user for userId: ${store.getUserId} ERROR: ${userError}`
+                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`
             )
+        }
 
         // Update public_bio table
         const { error: updateError } = await supabase
@@ -51,10 +61,15 @@ async function updateUserRole({
             .select()
             .single()
 
-        if (updateError)
+        if (updateError) {
+            const errorMessage =
+                updateError instanceof Error
+                    ? updateError.message
+                    : JSON.stringify(updateError, null, 2)
             throw new Error(
-                `Failed to update public bio for userId: ${store.getUserId} ERROR: ${updateError}`
+                `Failed to update public bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
             )
+        }
         if (user_type !== UserType.user) {
             // if (updateError) {
             //     const { code } = updateError as PostgrestError
@@ -73,9 +88,13 @@ async function updateUserRole({
         }
 
         return roleData
-    } catch (error) {
+    } catch (error: any) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update user role for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

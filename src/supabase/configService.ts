@@ -9,10 +9,7 @@ export const configService = {
 async function getConfig(): Promise<CIConfig> {
     try {
         const { data, error } = await supabase.from("config").select("*")
-        if (error)
-            throw new Error(
-                `Failed to get config for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
 
         const config = {
             app_title: data.find((c) => c.title === "app_title")?.data,
@@ -21,9 +18,12 @@ async function getConfig(): Promise<CIConfig> {
         }
         return config
     } catch (error) {
-        console.error("Error fetching config:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get config for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get config for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

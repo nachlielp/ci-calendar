@@ -101,7 +101,7 @@ const EditMultiDayEventForm = observer(
             setTimeout(() => {
                 setInputErrors(true)
                 setInputErrors(false)
-            }, 3000)
+            }, 5000)
         }
 
         const titleText = isTemplate

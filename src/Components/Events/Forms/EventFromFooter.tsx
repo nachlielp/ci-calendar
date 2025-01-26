@@ -4,9 +4,13 @@ import AddPricesForm from "./AddPricesForm"
 
 interface EventFromFooterProps {
     inputErrors: boolean
+    message?: string | null
 }
 
-export default function EventFromFooter({ inputErrors }: EventFromFooterProps) {
+export default function EventFromFooter({
+    inputErrors,
+    message = null,
+}: EventFromFooterProps) {
     return (
         <section>
             <AddLinksForm />
@@ -14,7 +18,7 @@ export default function EventFromFooter({ inputErrors }: EventFromFooterProps) {
 
             {inputErrors && (
                 <Alert
-                    message="ערכים שגויים, נא לבדוק את הטופס"
+                    message={message || "ערכים שגויים, נא לבדוק את הטופס"}
                     type="error"
                     style={{ margin: "10px 0" }}
                 />

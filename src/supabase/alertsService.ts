@@ -14,13 +14,14 @@ async function setAlertViewed(alertId: string) {
             .update({ viewed: true })
             .eq("id", alertId)
         if (error) throw error
-        throw new Error(
-            `Failed to set alert viewed for alertId: ${alertId} for userId: ${store.getUserId}`
-        )
+        return alertId
     } catch (error) {
-        console.error(error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to set alert viewed for alertId: ${alertId} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to set alert viewed for alertId: ${alertId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -33,15 +34,15 @@ async function updateAlert(alert: Partial<CIAlert>): Promise<CIAlert> {
             .eq("id", alert.id)
             .select()
             .single()
-        if (error)
-            throw new Error(
-                `Failed to update alert for alertId: ${alert.id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data
     } catch (error) {
-        console.error(error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update alert for alertId: ${alert.id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update alert for alertId: ${alert.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
