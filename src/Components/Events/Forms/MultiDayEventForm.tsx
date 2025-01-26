@@ -34,6 +34,8 @@ const DRAFT_EVENT_ADDRESS_KEY = "multi-day-draft-event-address"
 const DRAFT_TEMPLATE_KEY = "multi-day-draft-template"
 const DRAFT_TEMPLATE_ADDRESS_KEY = "multi-day-draft-template-address"
 
+const ERROR_MESSAGE_TOO_LONG = "אירוע לא יכול להמשך מעל ל-14 ימים"
+
 const MultiDayEventForm = observer(
     ({
         closeForm,
@@ -49,6 +51,7 @@ const MultiDayEventForm = observer(
 
         const [isSubmitting, setIsSubmitting] = useState(false)
         const [inputErrors, setInputErrors] = useState<boolean>(false)
+        const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
         const [address, setAddress] = useState<IAddress>()
         const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
@@ -146,8 +149,23 @@ const MultiDayEventForm = observer(
 
         const handleSubmit = async (values: any) => {
             if (!address) {
+                setErrorMessage("שדה חובה")
                 return
             }
+
+            if (
+                dayjs(values["event-end-date"]).diff(
+                    dayjs(values["event-start-date"]),
+                    "days"
+                ) > 14
+            ) {
+                setErrorMessage(ERROR_MESSAGE_TOO_LONG)
+                setTimeout(() => {
+                    onFinishFailed(), 0
+                })
+                return
+            }
+
             setIsSubmitting(true)
             try {
                 if (!isTemplate) {
@@ -250,7 +268,8 @@ const MultiDayEventForm = observer(
             setInputErrors(true)
             setTimeout(() => {
                 setInputErrors(false)
-            }, 3000)
+                setErrorMessage(null)
+            }, 5000)
         }
 
         return (
@@ -346,7 +365,10 @@ const MultiDayEventForm = observer(
                         orgs={store.getAppTaggableOrgs}
                         titleText="יצירת אירוע - רב יומי"
                     />
-                    <EventFromFooter inputErrors={inputErrors} />
+                    <EventFromFooter
+                        inputErrors={inputErrors}
+                        message={errorMessage}
+                    />
                     <Form.Item
                         wrapperCol={{ span: 24 }}
                         className="submit-button-container"
