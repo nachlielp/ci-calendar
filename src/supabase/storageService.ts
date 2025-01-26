@@ -11,18 +11,16 @@ async function uploadFile(filePath: string, file: Blob) {
         const { data, error } = await supabase.storage
             .from(bucketName)
             .upload(filePath, file)
-        if (error) {
-            throw new Error(
-                `Failed to upload file for userId: ${
-                    store.getUserId
-                } ERROR: ${JSON.stringify(error)}`
-            )
-        } else {
-            return data
-        }
+
+        if (error) throw error
+        return data
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to upload file for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to upload file to path: ${filePath} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

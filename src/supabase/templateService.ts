@@ -17,14 +17,16 @@ async function getTemplate(templateId: string): Promise<CITemplate> {
             .from("templates")
             .select("*")
             .eq("id", templateId)
-        if (error)
-            throw new Error(
-                `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+
+        if (error) throw error
         return data[0]
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -37,14 +39,16 @@ async function createTemplate(
             .from("templates")
             .insert(template)
             .select()
-        if (error)
-            throw new Error(
-                `Failed to create CI template for userId: ${store.getUserId} ERROR: ${error}`
-            )
+
+        if (error) throw error
         return data[0]
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to create CI template for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to create CI template for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -56,14 +60,16 @@ async function deleteTemplate(templateId: string): Promise<string> {
             .delete()
             .eq("id", templateId)
             .select()
-        if (error)
-            throw new Error(
-                `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+
+        if (error) throw error
         return data[0].id
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -78,14 +84,16 @@ async function updateTemplate(
             .eq("id", template.id)
             .select()
             .single()
-        if (error)
-            throw new Error(
-                `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+
+        if (error) throw error
         return data
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

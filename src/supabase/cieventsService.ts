@@ -34,15 +34,15 @@ async function getCIEvent(id: string): Promise<CIEvent> {
             .select("*")
             .eq("id", id)
             .single()
-        if (error)
-            throw new Error(
-                `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data as CIEvent
     } catch (error) {
-        console.error("Error fetching CI event:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -112,10 +112,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         }
 
         const { data, error } = await query
-        if (error)
-            throw new Error(
-                `Failed to get CI events for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
 
         const eventsWithUsers = data.map((event) => {
             const { ci_events_users_junction } = event
@@ -129,9 +126,12 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
         })
         return eventsWithUsers as CIEvent[]
     } catch (error) {
-        console.error("Error fetching CI events:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI events for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -147,11 +147,7 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
         )`
             )
             .gte("start_date", dayjs().startOf("day").toISOString())
-
-        if (error)
-            throw new Error(
-                `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
 
         const creators = new Map<string, string>()
 
@@ -170,9 +166,12 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
             label,
         })) as SelectOption[]
     } catch (error) {
-        console.error("Error fetching CI events creators:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -189,7 +188,9 @@ async function createCIEvent(
 
         if (error)
             throw new Error(
-                `Failed to create CI event for userId: ${store.getUserId} ERROR: ${error}`
+                `Failed to create CI event for userId: ${
+                    store.getUserId
+                } ERROR: ${JSON.stringify(error, null, 2)}`
             )
 
         const cieventId = data.id
@@ -211,14 +212,19 @@ async function createCIEvent(
 
         if (junctionError)
             throw new Error(
-                `Create new junctionError.message for userId: ${store.getUserId} ERROR: ${junctionError.message}`
+                `Create new junctionError.message for userId: ${
+                    store.getUserId
+                } ERROR: ${JSON.stringify(junctionError, null, 2)}`
             )
 
         return data as CIEvent
     } catch (error) {
-        console.error("Error creating CI event:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to create CI event for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to create CI event for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -235,10 +241,7 @@ async function updateCIEvent(
             .select("*")
             .single()
 
-        if (error)
-            throw new Error(
-                `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
 
         const cieventId = data.id
         const teacherIds = utilService.getCIEventTeachers(data as CIEvent)
@@ -274,9 +277,12 @@ async function updateCIEvent(
         //TODO remove - removed teachers
         return data as CIEvent
     } catch (error) {
-        console.error("Error updating CI event:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -292,15 +298,15 @@ async function updateMultipleCIEvents(
             .in("id", ids)
             .select("*")
 
-        if (error)
-            throw new Error(
-                `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data as CIEvent[]
     } catch (error) {
-        console.error("Error updating multiple CI events:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -314,16 +320,15 @@ async function deleteCIEvent(id: string): Promise<string> {
             .select("id")
             .single()
 
-        if (error)
-            throw new Error(
-                `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
-
+        if (error) throw error
         return data.id
     } catch (error) {
-        console.error("Error deleting CI event:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -336,15 +341,15 @@ async function deleteMultipleCIEvents(ids: string[]): Promise<string[]> {
             .in("id", ids)
             .select("id")
 
-        if (error)
-            throw new Error(
-                `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data ? data.map((event) => event.id) : []
     } catch (error) {
-        console.error("Error deleting multiple CI events:", error)
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

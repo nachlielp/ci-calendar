@@ -17,14 +17,15 @@ async function createNotification(notification: NotificationDB) {
             .select()
             .single()
 
-        if (error)
-            throw new Error(
-                `Failed to create notification for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to create notification for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to create notification for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -37,17 +38,19 @@ async function updateNotification(notification: NotificationDB) {
             .eq("id", notification.id)
             .select()
             .single()
-        if (error)
-            throw new Error(
-                `Failed to update notification for notificationId: ${notification.id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update notification for notificationId: ${notification.id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to update notification for notificationId: ${notification.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
+
 async function upsertNotification(notification: NotificationDB) {
     try {
         const { data, error } = await supabase
@@ -57,14 +60,15 @@ async function upsertNotification(notification: NotificationDB) {
             })
             .select()
             .single()
-        if (error)
-            throw new Error(
-                `Failed to upsert notification for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
         return data
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to upsert notification for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to upsert notification for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
@@ -77,10 +81,7 @@ async function getNotificationById(id: string) {
             .eq("id", id)
             .single()
 
-        if (error)
-            throw new Error(
-                `Failed to get notification for notificationId: ${id} for userId: ${store.getUserId} ERROR: ${error}`
-            )
+        if (error) throw error
 
         const formattedData = {
             ...data,
@@ -91,8 +92,12 @@ async function getNotificationById(id: string) {
         delete formattedData.ci_events
         return formattedData
     } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get notification for notificationId: ${id} for userId: ${store.getUserId} ERROR: ${error}`
+            `Failed to get notification for notificationId: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }
