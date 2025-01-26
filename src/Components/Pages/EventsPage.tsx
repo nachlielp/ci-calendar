@@ -25,15 +25,9 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
 import EventsPageSkeleton from "../Events/Display/EventsPageSkeleton"
-import React from "react"
 
 const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
 const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
-
-const Title = React.memo(() => {
-    console.log("Title rendered at:", Date.now())
-    return <h1 className="title">{DEFAULT_TITLE}</h1>
-})
 
 const EventsPage = () => {
     const events = store.getSortedEvents
@@ -75,7 +69,7 @@ const EventsPage = () => {
         >
             <header className="header">
                 <AlertsAnchor />
-                <Title />
+                <h1 className="title">{DEFAULT_TITLE}</h1>
                 <p className="subtitle">{DEFAULT_DESCRIPTION}</p>
                 <main className="menu-container">
                     <MenuButtons
