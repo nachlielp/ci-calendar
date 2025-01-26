@@ -1,4 +1,4 @@
-const CACHE_VERSION = "1.6.8"
+const CACHE_VERSION = "1.6.81"
 const CACHE_NAME = `ci-calendar-cache-v${CACHE_VERSION}`
 
 const TIMEOUT_DURATION = 8000
