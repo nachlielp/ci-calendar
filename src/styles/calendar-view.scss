@@ -13,11 +13,19 @@
             transform: rotate(180deg);
             margin-bottom: 4px;
             cursor: pointer;
+
+            &.disabled {
+                color: #d2bcbc;
+            }
         }
 
         .next {
             margin-top: 4px;
             cursor: pointer;
+
+            &.disabled {
+                color: #d2bcbc;
+            }
         }
 
         .label {

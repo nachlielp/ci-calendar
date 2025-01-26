@@ -74,15 +74,21 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
         <section className="calendar-view">
             <header className="calendar-controller">
                 <Icon
-                    onClick={prevMonth}
+                    onClick={nextMonth}
                     icon="chevron_right"
-                    className="back"
+                    className={`back ${
+                        value.isAfter(
+                            dayjs().add(1, "months").startOf("month")
+                        ) && "disabled"
+                    }`}
                 />
                 <label className="label">{value.format("MMMM YYYY")}</label>
                 <Icon
-                    onClick={nextMonth}
+                    onClick={prevMonth}
                     icon="chevron_right"
-                    className="next"
+                    className={`next ${
+                        value.month() === dayjs().month() && "disabled"
+                    }`}
                 />
             </header>
             <section className="calendar-view__card card">
