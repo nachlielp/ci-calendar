@@ -187,13 +187,11 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     <article className="event-tags">
                         {Object.values(event.segments)
                             .flatMap((segment) => {
-                                console.log("Segment type:", segment.type)
                                 return segment.type as EventlyType
                             })
-                            .filter((type): type is EventlyType => !null)
+                            .filter((type): type is EventlyType => !!type)
                             .concat(event.type as EventlyType)
                             .map((type, index) => {
-                                console.log("Type:", type)
                                 if (!type) {
                                     return null
                                 }
