@@ -3,7 +3,7 @@ import OpenRequest from "../Requests/OpenRequest"
 import { userRequestVM } from "../Requests/UserRequestVM"
 import { observer } from "mobx-react-lite"
 import { UserTypeHebrew } from "../../util/interfaces"
-import '../../styles/support-page.scss'
+import "../../styles/support-page.scss"
 import { EMAIL_SUPPORT } from "../../App"
 
 const SupportPage = () => {
@@ -13,7 +13,7 @@ const SupportPage = () => {
             {userRequestVM.showUserStatus && (
                 <article className="support-page-description">
                     <section className="card">
-                        <p dir="rtl" className="text">
+                        <p className="text">
                             <label>
                                 אתם רשומים כ
                                 <b>
