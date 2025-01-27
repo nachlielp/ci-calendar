@@ -3,13 +3,10 @@ import { observer } from "mobx-react-lite"
 import ProfileForm from "../Users/ProfileForm"
 import BioCard from "../Users/BioCard"
 import { store } from "../../Store/store"
-import { useNavigate } from "react-router"
 import "../../styles/bio-page.scss"
 import { UserTypeHebrew } from "../../util/interfaces"
-import { Icon } from "../Common/Icon"
 import Switch from "antd/es/switch"
 const BioPage = () => {
-    const navigate = useNavigate()
     const [editProfile, setEditProfile] = useState(!store.getBio.bio_name)
     const [isLoading, setIsLoading] = useState(false)
     const handleSubmitEdit = () => {
