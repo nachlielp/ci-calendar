@@ -1,4 +1,4 @@
-PostHog PageView
+### Get the total number of views for each page in given time period
 
 ```
 SELECT
@@ -16,8 +16,8 @@ SELECT
 FROM events
 WHERE properties.$current_url LIKE '%ci-events.org/event/%'
   AND clean_url != ''
-  AND timestamp >= '2025-01-12'
-  AND timestamp <= '2025-01-13'
+  AND timestamp >= '2025-01-01'
+  AND timestamp <= '2025-01-31'
 GROUP BY clean_url
 ORDER BY view_count DESC
 ```
