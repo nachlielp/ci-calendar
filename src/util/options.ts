@@ -16,7 +16,7 @@ export const eventOptions: SelectOption[] = [
     { value: "underscore", label: "אנדרסקור" },
     { value: "workshop", label: "סדנה" },
     { value: "retreat", label: "ריטריט" },
-    { value: "conference", label: "כנס" },
+    // { value: "conference", label: "כנס" },
     { value: "warmup", label: "חימום" },
     { value: "course", label: "קורס" },
     { value: "score", label: "סקור" },
