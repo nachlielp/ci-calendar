@@ -14,6 +14,7 @@ import {
     CIUserData,
     DBCIEvent,
     EventPayloadType,
+    Language,
     ManageUserOption,
     NotificationDB,
     NotificationType,
@@ -61,6 +62,7 @@ class Store {
     @observable loading: boolean = true
     @observable isOnline: boolean = navigator.onLine
     @observable networkFlag: boolean = false
+    @observable language: Language = Language.he
 
     @observable requestNotification: boolean = false
 
@@ -444,6 +446,11 @@ class Store {
     @computed
     get getNetworkFlag() {
         return this.networkFlag
+    }
+
+    @computed
+    get getLanguage() {
+        return this.language
     }
 
     @computed
@@ -1296,6 +1303,11 @@ class Store {
         const bios = utilService.getBiosFromLocalStorage()
         this.setAppPublicBios(bios)
         this.setCIEvents(filteredEvents)
+    }
+
+    @action
+    setLanguage = (language: Language) => {
+        this.language = language
     }
 
     async init() {

@@ -69,8 +69,8 @@ const EventsPage = () => {
         >
             <header className="header">
                 <AlertsAnchor />
-                <h1 className="title">{DEFAULT_TITLE}</h1>
-                <p className="subtitle">{DEFAULT_DESCRIPTION}</p>
+                <h1 className="title ">{DEFAULT_TITLE}</h1>
+                <p className="subtitle ">{DEFAULT_DESCRIPTION}</p>
                 <main className="menu-container">
                     <MenuButtons
                         onSelectKey={onSelectKey}

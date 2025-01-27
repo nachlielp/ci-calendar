@@ -80,7 +80,9 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     }`}
                 >
                     <article className="event-header">
-                        <h2 className="event-title">{event.title}&nbsp;</h2>
+                        <h2 className="event-title translate-this">
+                            {event.title}&nbsp;
+                        </h2>
                     </article>
                     {orgs.length > 0 && (
                         <article className="event-org">

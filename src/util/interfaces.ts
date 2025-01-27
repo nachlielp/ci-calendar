@@ -441,3 +441,9 @@ export enum SupabaseSessionEvent {
     userDeleted = "USER_DELETED",
     passwordRecovery = "PASSWORD_RECOVERY",
 }
+
+export enum Language {
+    he = "he",
+    en = "en",
+    ru = "ru",
+}

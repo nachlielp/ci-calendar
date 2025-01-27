@@ -1,6 +1,6 @@
 import React from "react"
 import "../../styles/header.scss"
-import { CIUser } from "../../util/interfaces"
+import { CIUser, Language } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import InstallPWABanner from "../Common/InstallPWABanner"
 import { LinkButton } from "../Common/LinkButton"
@@ -12,8 +12,9 @@ import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
-import { Spin } from "antd/lib"
-
+import { RadioChangeEvent, Spin } from "antd/lib"
+import Radio from "antd/es/radio"
+import { switchLanguage } from "../../util/translate"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -27,6 +28,13 @@ const AppHeader = () => {
         vm.setCurrentPath(location.pathname)
     }, [location.pathname])
 
+    const changeLocale = async (e: RadioChangeEvent) => {
+        console.log("changeLocale", e.target.value)
+        const newLang = e.target.value as Language
+        store.setLanguage(newLang)
+        switchLanguage(newLang)
+    }
+
     return (
         <section className="header-container-wapper">
             <div>
@@ -38,6 +46,7 @@ const AppHeader = () => {
             </div>
             <section className="header-container">
                 <RequestPermissionModal />
+
                 {vm.showLoginButton && (
                     <LinkButton
                         to="/login"
@@ -55,6 +64,21 @@ const AppHeader = () => {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
+                <Radio.Group
+                    value={store.getLanguage}
+                    onChange={changeLocale}
+                    className="header-language-toggle"
+                >
+                    <Radio.Button key="en" value={Language.en}>
+                        En
+                    </Radio.Button>
+                    <Radio.Button key="he" value={Language.he}>
+                        עב
+                    </Radio.Button>
+                    <Radio.Button key="ru" value={Language.ru}>
+                        RU
+                    </Radio.Button>
+                </Radio.Group>
                 <>
                     <div className="header-actions">
                         {store.getOffline && (
