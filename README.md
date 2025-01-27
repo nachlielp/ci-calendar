@@ -11,20 +11,19 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 
 ### Users
 
--   The app is a PWA, installable to the home screen on iOS and Android and enabling push notifications regarding upcoming events
+-   The app is a PWA, installable to the home screen on iOS and Android devices, and enabling push notifications regarding upcoming events
 -   List and calendar view of upcoming event previews by date
 -   Events can be filtered by region and type (workshop, jame, etc.)
--   Event previews open to a modal on desktop, and a side page (drawer) on mobile, containing full details, linke to share, and google maps link (maps and share in PWA only)
+-   Event previews open to a modal on desktop, and a side page (drawer) on mobile, containing full details, link to share, add to calendar button, and google maps link (maps and share in PWA only)
 -   Users can set notifications for new events of selected Teachers and Organizers (in PWA only)
 -   Users can set alerts for events that are starting soon (in PWA only)
 -   Users can set default filters for event list
--   Users can submit support tickets and ask to be configerd as teachers or organizers
 
 ### Teachers and Organizers
 
--   Can add new events to the calendar
--   Can edit and delete their events
--   Can edit their profile and settings
+-   Can add new events to the calendar, as a single event or as a recurring event
+-   Can edit and delete their events, and batch edit recurring events
+-   Can edit their profile
 -   Can create templates for their events, and use them to create new events
 
 ### Admins
@@ -42,6 +41,9 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 -   Firebase Cloud Messaging
 -   Ant Design
 -   Vercel
+-   Google Maps API
+-   PostHog
+-   Sentry
 
 ## Prerequisites
 
@@ -50,7 +52,8 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 -   Firebase Console with Cloud Messaging enabled (for push notifications)
 -   Vercel Account (for deployment)
 -   Google Maps API Key (For geocoding event locations)
--   Cloudnary Account (For Teacher and Organizer profile images hosting)
+-   PostHog Account (For analytics)
+-   Sentry Account (For error tracking)
 
 ## Environment Variables
 
@@ -68,3 +71,16 @@ This app is a work in progress, attempting, together with the [Israeli Contact I
 -   VITE_SUPABASE_STORAGE_BUCKET
 -   VITE_SUPABASE_BIO_STORAGE_PATH
 -   VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL
+-   VITE_POSTHOG_API_KEY
+-   VITE_SENTRY_AUTH_TOKEN
+-   VITE_SENTRY_PROJECT
+-   VITE_SENTRY_ORG
+
+## Database Schema
+
+-   [Database Schema](./docs/database-schema.md)
+-   [Database Functions](./docs/database-functions.md)
+
+## Harvesting Analytics Data
+
+-   [PostHog](./docs/posthog.md)
