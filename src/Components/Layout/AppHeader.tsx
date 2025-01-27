@@ -29,6 +29,17 @@ const AppHeader = () => {
         vm.setCurrentPath(location.pathname)
     }, [location.pathname])
 
+    React.useEffect(() => {
+        if (store.getLanguage !== Language.he) {
+            changeLocale({
+                target: {
+                    value: store.getLanguage,
+                    checked: true,
+                },
+            } as RadioChangeEvent)
+        }
+    }, [])
+
     const changeLocale = async (e: RadioChangeEvent) => {
         console.log("changeLocale", e.target.value)
         const newLang = e.target.value as Language

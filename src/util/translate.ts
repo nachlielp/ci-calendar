@@ -11,7 +11,6 @@ interface TranslationCache {
 const memoryCache: TranslationCache = {}
 
 export const switchLanguage = async (lang: Language) => {
-    //Todo Remove
     store.setLanguage(lang)
 
     const elementsToTranslate = document.querySelectorAll(".translate-this")
@@ -31,6 +30,7 @@ export const switchLanguage = async (lang: Language) => {
                 // If Hebrew is selected, revert to original text
                 element.textContent = originalText
             } else {
+                // Always translate if target language is not Hebrew
                 try {
                     console.log(`Translating: ${originalText} to ${lang}`)
                     const translatedText = await translateText(
