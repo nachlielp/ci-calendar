@@ -62,7 +62,7 @@ class Store {
     @observable loading: boolean = true
     @observable isOnline: boolean = navigator.onLine
     @observable networkFlag: boolean = false
-    @observable language: Language = Language.he
+    @observable language: Language = utilService.getLanguage()
 
     @observable requestNotification: boolean = false
 
@@ -1308,6 +1308,7 @@ class Store {
     @action
     setLanguage = (language: Language) => {
         this.language = language
+        utilService.setLanguage(language)
     }
 
     async init() {
