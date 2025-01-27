@@ -12,7 +12,7 @@ export interface SelectOption {
 }
 export const eventOptions: SelectOption[] = [
     { value: "class", label: "שיעור" },
-    { value: "jame", label: "ג'אם" },
+    { value: "jam", label: "ג'אם" },
     { value: "underscore", label: "אנדרסקור" },
     { value: "workshop", label: "סדנה" },
     { value: "retreat", label: "ריטריט" },
@@ -63,7 +63,7 @@ export const districtOptions: SelectOption[] = [
     { value: "galilee", label: "גליל" },
     { value: "haifa", label: "חיפה" },
     { value: "carmel", label: "חוף כרמל" },
-    { value: "pardes-hana", label: "פרדס חנה" },
+    { value: "pardesHanna", label: "פרדס חנה" },
     { value: "south", label: "דרום" },
     // Add more districts as needed
 ]

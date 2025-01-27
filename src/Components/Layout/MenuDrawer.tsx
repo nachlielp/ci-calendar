@@ -7,7 +7,8 @@ import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-import '../../styles/menu-drawer.scss'
+import "../../styles/menu-drawer.scss"
+import { translations } from "../../util/translations"
 
 const MenuDrawer = () => {
     const [open, setOpen] = useState<boolean>(false)
@@ -53,13 +54,13 @@ const MenuDrawer = () => {
         {
             key: "all-events",
             icon: "home",
-            label: "כל האירועים",
+            label: translations[store.getLanguage].home,
             onClick: goHome,
         },
         {
             key: "manage-events",
             icon: "calendar",
-            label: "הארועים שלי",
+            label: translations[store.getLanguage].myEvents,
             onClick: () => {
                 navigate("/manage-events")
                 setOpen(false)
@@ -69,7 +70,7 @@ const MenuDrawer = () => {
         {
             key: "create-events",
             icon: "calendar_add_on",
-            label: " יצירת ארועים",
+            label: translations[store.getLanguage].createEvents,
             onClick: () => {
                 navigate("/create-events")
                 setOpen(false)
@@ -79,7 +80,7 @@ const MenuDrawer = () => {
         {
             key: "manage-all-events",
             icon: "calendar_add_on",
-            label: "ניהול אירועים",
+            label: translations[store.getLanguage].manageAllEvents,
             onClick: () => {
                 navigate("/manage-all-events")
                 setOpen(false)
@@ -89,7 +90,7 @@ const MenuDrawer = () => {
         {
             key: "manage-users",
             icon: "group",
-            label: "ניהול משתמשים",
+            label: translations[store.getLanguage].manageUsers,
             onClick: () => {
                 navigate("/manage-users")
                 setOpen(false)
@@ -99,7 +100,7 @@ const MenuDrawer = () => {
         {
             key: "bio",
             icon: "account",
-            label: "פרופיל",
+            label: translations[store.getLanguage].profile,
             onClick: () => {
                 navigate("/bio")
                 setOpen(false)
@@ -109,7 +110,7 @@ const MenuDrawer = () => {
         {
             key: "filters-and-notifications",
             icon: "notifications",
-            label: "התראות ",
+            label: translations[store.getLanguage].notifications,
             onClick: () => {
                 navigate("/filters-and-notifications")
                 setOpen(false)
@@ -119,7 +120,7 @@ const MenuDrawer = () => {
         {
             key: "request",
             icon: "verified_user",
-            label: "הרשמה כמורה או ארגון",
+            label: translations[store.getLanguage].registerAsOrganization,
             onClick: () => {
                 navigate("/request")
                 setOpen(false)
@@ -129,7 +130,7 @@ const MenuDrawer = () => {
         {
             key: "manage-support",
             icon: "support_agent",
-            label: "ניהול תמיכה",
+            label: translations[store.getLanguage].manageSupport,
             onClick: () => {
                 navigate("/manage-support")
                 setOpen(false)
@@ -139,7 +140,7 @@ const MenuDrawer = () => {
         {
             key: "reset-password",
             icon: "lock_reset",
-            label: "איפוס סיסמה",
+            label: translations[store.getLanguage].resetPassword,
             onClick: () => {
                 navigate("/reset-password")
                 setOpen(false)
@@ -149,7 +150,7 @@ const MenuDrawer = () => {
         {
             key: "about",
             icon: "info",
-            label: "אודות",
+            label: translations[store.getLanguage].about,
             onClick: () => {
                 navigate("/about")
                 setOpen(false)
@@ -158,7 +159,7 @@ const MenuDrawer = () => {
         {
             key: "logout",
             icon: "logout",
-            label: "התנתקות",
+            label: translations[store.getLanguage].logout,
             onClick: async () => {
                 try {
                     await supabase.auth.signOut()

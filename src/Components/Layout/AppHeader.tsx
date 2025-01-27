@@ -15,6 +15,7 @@ import { utilService } from "../../util/utilService"
 import { RadioChangeEvent, Spin } from "antd/lib"
 import Radio from "antd/es/radio"
 import { switchLanguage } from "../../util/translate"
+import { translations } from "../../util/translations"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -52,8 +53,9 @@ const AppHeader = () => {
                         to="/login"
                         className="header-btn no-border align-to-content"
                     >
-                        התחבר/י&nbsp;
                         <Icon icon="account" className="icon-main" />
+                        &nbsp;
+                        {translations[store.getLanguage].login}
                     </LinkButton>
                 )}
                 {vm.showBackButton && (
@@ -136,7 +138,7 @@ const InstallPWABannerAnchor = () => {
                 onClick={() => vm.setShowInstallPWAModal(true)}
             >
                 <div className="install-pwa-btn-text">
-                    <span>לקבלת עדכונים הוסיפו לעמוד הבית</span>
+                    <span>{translations[store.getLanguage].addPWABanner}</span>
                     <Icon icon="touch_app" className="add-alert-icon white" />
                 </div>
             </button>

@@ -1,4 +1,7 @@
 .event-preview {
+    &.rtl {
+        direction: rtl;
+    }
     margin-top: 1rem;
     /* max-width: calc(100% - 32px);
     min-width: 250px; */

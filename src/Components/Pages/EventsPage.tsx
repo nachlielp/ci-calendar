@@ -16,7 +16,6 @@ import { useIsMobile } from "../../hooks/useIsMobile"
 import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByParams"
 import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
 import FullEventCardContainer from "../Events/Display/FullEventCardContainer"
-import { utilService } from "../../util/utilService"
 
 import AlertsAnchor from "../Alerts/AlertsAnchor"
 import { Icon } from "../Common/Icon"
@@ -25,9 +24,7 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
 import EventsPageSkeleton from "../Events/Display/EventsPageSkeleton"
-
-const DEFAULT_TITLE = "קונטקט אימפרוביזציה ישראל"
-const DEFAULT_DESCRIPTION = "כל האירועים במקום אחד"
+import { isTranslationKey, translations } from "../../util/translations"
 
 const EventsPage = () => {
     const events = store.getSortedEvents
@@ -69,8 +66,12 @@ const EventsPage = () => {
         >
             <header className="header">
                 <AlertsAnchor />
-                <h1 className="title ">{DEFAULT_TITLE}</h1>
-                <p className="subtitle ">{DEFAULT_DESCRIPTION}</p>
+                <h1 className="title ">
+                    {translations[store.getLanguage].title}
+                </h1>
+                <p className="subtitle ">
+                    {translations[store.getLanguage].description}
+                </p>
                 <main className="menu-container">
                     <MenuButtons
                         onSelectKey={onSelectKey}
@@ -98,7 +99,9 @@ const EventsPage = () => {
                             key={eventType}
                             onClick={() => onRemoveFilter(eventType)}
                         >
-                            {utilService.getLabelByValue(eventType)}
+                            {isTranslationKey(eventType)
+                                ? translations[store.getLanguage][eventType]
+                                : eventType}
                             <Icon icon="close" />
                         </Tag>
                     ))}

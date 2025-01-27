@@ -1,7 +1,7 @@
 import React from "react"
 import Tag from "antd/es/tag"
 import dayjs from "dayjs"
-import { EventlyType, CIEvent } from "../../../util/interfaces"
+import { EventlyType, CIEvent, Language } from "../../../util/interfaces"
 import {
     tagOptions,
     eventOptions,
@@ -14,6 +14,11 @@ import "../../../styles/generics/card.scss"
 import { Spin } from "antd"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
+import {
+    getTranslation,
+    isTranslationKey,
+    translations,
+} from "../../../util/translations"
 
 interface EventPreviewProps {
     event: CIEvent
@@ -23,7 +28,6 @@ interface EventPreviewProps {
 const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
     ({ event, isClicked }, ref) => {
         const segmentsLength = Object.values(event.segments).length
-
         const singleDayTeacherNames = Array.from(
             new Set(
                 Object.values(event.segments)
@@ -59,12 +63,22 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             return publicOrg?.bio_name || org.label
         })
 
+        const isRTL = store.getLanguage === Language.he
+
         return (
-            <section ref={ref} className={`event-preview card`}>
+            <section
+                ref={ref}
+                className={`event-preview card ${isRTL ? "rtl" : ""}`}
+            >
                 {event.cancelled && (
                     <article className="cancelled-event-cover">
-                        <h1 className="cancelled-event-title">האירוע בוטל</h1>
-                        <h2 className="cancelled-event-text">
+                        <h1 className="cancelled-event-title">
+                            {getTranslation(
+                                "eventCancelled",
+                                store.getLanguage
+                            )}
+                        </h1>
+                        <h2 className="cancelled-event-text translate-this">
                             {event.cancelled_text}
                         </h2>
                     </article>
@@ -80,14 +94,14 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     }`}
                 >
                     <article className="event-header">
-                        <h2 className="event-title translate-this">
-                            {event.title}&nbsp;
+                        <h2 className="event-title translate-this ">
+                            {event.title}
                         </h2>
                     </article>
                     {orgs.length > 0 && (
                         <article className="event-org">
                             <Icon icon="domain" className="event-icon" />
-                            <label className="event-label">
+                            <label className="event-label translate-this">
                                 {orgs.join(", ")}
                             </label>
                         </article>
@@ -96,7 +110,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         {event.segments.length > 0 ? (
                             <>
                                 <Icon icon="calendar" className="event-icon" />
-                                <label className="event-label">
+                                <label className="event-label translate-this">
                                     {
                                         shortHebrewDays[
                                             dayjs(event.start_date).day()
@@ -122,7 +136,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         ) : (
                             <>
                                 <Icon icon="calendar" className="event-icon" />
-                                <label className="event-label">
+                                <label className="event-label translate-this">
                                     {
                                         shortHebrewDays[
                                             dayjs(event.start_date).day()
@@ -149,7 +163,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
 
                     <article className="event-location">
                         <Icon icon="pinDrop" className="event-icon" />
-                        <label className="event-label">
+                        <label className="event-label translate-this">
                             {event.address.label}
                         </label>
                     </article>
@@ -158,7 +172,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         singleDayTeacherNames.length > 0) && (
                         <article className="event-teachers">
                             <Icon icon="person" className="event-icon" />
-                            <label className="event-label">
+                            <label className="event-label translate-this">
                                 עם{" "}
                                 {teachers.map((item, index, array) => (
                                     <React.Fragment key={index}>
@@ -171,21 +185,32 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     )}
 
                     <article className="event-tags">
-                        {getTypes(
-                            Object.values(event.segments)
-                                .flatMap(
-                                    (segment) => segment.type as EventlyType
+                        {Object.values(event.segments)
+                            .flatMap((segment) => {
+                                console.log("Segment type:", segment.type)
+                                return segment.type as EventlyType
+                            })
+                            .filter((type): type is EventlyType => !null)
+                            .concat(event.type as EventlyType)
+                            .map((type, index) => {
+                                console.log("Type:", type)
+                                if (!type) {
+                                    return null
+                                }
+                                return (
+                                    <Tag
+                                        color="blue"
+                                        key={`${type}-${index}`}
+                                        className="event-tag"
+                                    >
+                                        {isTranslationKey(type)
+                                            ? translations[store.getLanguage][
+                                                  type
+                                              ]
+                                            : type}
+                                    </Tag>
                                 )
-                                .concat(event.type as EventlyType)
-                        ).map((type, index) => (
-                            <Tag
-                                color="blue"
-                                key={`${type}-${index}`}
-                                className="event-tag"
-                            >
-                                {type}
-                            </Tag>
-                        ))}
+                            })}
                     </article>
                 </section>
             </section>
