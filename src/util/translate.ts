@@ -1,6 +1,10 @@
 import { store } from "../Store/store"
 import { Language } from "./interfaces"
-
+import dayjs from "dayjs"
+import "dayjs/locale/en"
+import "dayjs/locale/ru"
+import "dayjs/locale/he"
+import { utilService } from "./utilService"
 // Add cache interface and cache map at the top of the file
 interface TranslationCache {
     [key: string]: {
@@ -10,13 +14,21 @@ interface TranslationCache {
 
 const memoryCache: TranslationCache = {}
 
+// Add a type for translation context
+type TranslationContext = "name" | "general" | "month"
+
 export const switchLanguage = async (lang: Language) => {
     store.setLanguage(lang)
 
     const elementsToTranslate = document.querySelectorAll(".translate-this")
 
     for (const element of elementsToTranslate) {
-        // Store original text if not already stored
+        // Get translation context from data attribute
+        const context =
+            (element.getAttribute(
+                "data-translation-context"
+            ) as TranslationContext) || "general"
+
         if (!element.getAttribute("data-original-text")) {
             element.setAttribute(
                 "data-original-text",
@@ -27,15 +39,13 @@ export const switchLanguage = async (lang: Language) => {
         const originalText = element.getAttribute("data-original-text")
         if (originalText) {
             if (lang === Language.he) {
-                // If Hebrew is selected, revert to original text
                 element.textContent = originalText
             } else {
-                // Always translate if target language is not Hebrew
                 try {
-                    console.log(`Translating: ${originalText} to ${lang}`)
                     const translatedText = await translateText(
                         originalText,
-                        lang
+                        lang,
+                        context
                     )
                     element.textContent = translatedText
                 } catch (error) {
@@ -46,13 +56,13 @@ export const switchLanguage = async (lang: Language) => {
     }
 }
 
-const translateText = async (
+export const translateText = async (
     text: string,
-    targetLang: Language
+    targetLang: Language,
+    context: TranslationContext = "general" // Default context
 ): Promise<string> => {
     // Check memory cache first
     if (memoryCache[text]?.[targetLang]) {
-        console.log("Translation found in memory cache")
         return memoryCache[text][targetLang]
     }
 
@@ -61,7 +71,6 @@ const translateText = async (
         const localStorageKey = `translation_${text}_${targetLang}`
         const localStorageTranslation = localStorage.getItem(localStorageKey)
         if (localStorageTranslation) {
-            console.log("Translation found in localStorage")
             // Store in memory cache too
             if (!memoryCache[text]) memoryCache[text] = {}
             memoryCache[text][targetLang] = localStorageTranslation
@@ -78,7 +87,6 @@ const translateText = async (
         const cachedResponse = await cache.match(cacheKey)
         if (cachedResponse) {
             const cachedTranslation = await cachedResponse.text()
-            console.log("Translation found in browser cache")
 
             // Store in memory cache too
             if (!memoryCache[text]) memoryCache[text] = {}
@@ -89,6 +97,9 @@ const translateText = async (
     } catch (error) {
         console.warn("Cache access error:", error)
     }
+
+    // At this point, we need to call the API - log the translation request
+    console.log(`Translating via API: ${text} to ${targetLang}`)
 
     // Proceed with API translation if not cached
     const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -110,6 +121,10 @@ const translateText = async (
                     q: text,
                     target: targetLang,
                     source: "he",
+                    format: "text", // Preserve formatting
+                    model: "nmt", // Use Neural Machine Translation
+                    context: text, // Provide surrounding text as context
+                    glossary: context === "name" ? "preserve-names" : undefined, // Special handling for names
                 }),
             }
         )
@@ -143,4 +158,35 @@ const translateText = async (
         console.error("Translation failed:", error)
         return text
     }
+}
+
+export const getMonthName = (date: dayjs.Dayjs, lang: Language): string => {
+    if (lang === Language.he) {
+        return utilService.formatHebrewDate(date.toISOString())
+    }
+    // Set locale based on target language
+    const locale = lang === Language.ru ? "ru" : "en"
+
+    // Get the day number
+    const day = date.date()
+
+    // Get ordinal suffix for the day (st, nd, rd, th)
+    const getOrdinalSuffix = (day: number): string => {
+        if (day > 3 && day < 21) return "th"
+        switch (day % 10) {
+            case 1:
+                return "st"
+            case 2:
+                return "nd"
+            case 3:
+                return "rd"
+            default:
+                return "th"
+        }
+    }
+
+    // Format as "Month Day[ordinal]" (e.g., "January 1st")
+    return `${date.locale(locale).format("MMMM")} ${day}${getOrdinalSuffix(
+        day
+    )}`
 }

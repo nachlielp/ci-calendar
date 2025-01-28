@@ -60,6 +60,7 @@ export type TranslationKeys = {
 
     //event preview
     eventCancelled: string
+    with: string
 
     // Actions
     save: string
@@ -214,6 +215,7 @@ export const translations: Translations = {
 
         //event preview
         eventCancelled: "Event Cancelled",
+        with: "With",
     },
     [Language.he]: {
         // Common
@@ -321,6 +323,7 @@ export const translations: Translations = {
 
         //event preview
         eventCancelled: "האירוע בוטל",
+        with: "עם",
     },
     [Language.ru]: {
         // Common
@@ -425,6 +428,7 @@ export const translations: Translations = {
 
         //event preview
         eventCancelled: "Событие отменено",
+        with: "С",
     },
 }
 

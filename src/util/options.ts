@@ -5,6 +5,7 @@ import {
     RequestType,
     RequestTypeHebrew,
 } from "./interfaces"
+import { TranslationKeys } from "./translations"
 
 export interface SelectOption {
     value: string
@@ -46,6 +47,15 @@ export const shortHebrewDays = {
     5: "שישי",
     6: "שבת",
 }
+export const shortEnglishDays = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+] as const satisfies readonly (keyof TranslationKeys)[]
 
 export const tagOptions: SelectOption[] = [
     { value: "everyone", label: "פתוח לכולם" },

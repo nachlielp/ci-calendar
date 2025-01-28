@@ -6,6 +6,7 @@ import {
     tagOptions,
     eventOptions,
     shortHebrewDays,
+    shortEnglishDays,
 } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
@@ -19,6 +20,7 @@ import {
     isTranslationKey,
     translations,
 } from "../../../util/translations"
+import { getMonthName } from "../../../util/translate"
 
 interface EventPreviewProps {
     event: CIEvent
@@ -78,7 +80,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                 store.getLanguage
                             )}
                         </h1>
-                        <h2 className="cancelled-event-text translate-this">
+                        <h2 className="cancelled-event-text">
                             {event.cancelled_text}
                         </h2>
                     </article>
@@ -94,14 +96,21 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     }`}
                 >
                     <article className="event-header">
-                        <h2 className="event-title translate-this ">
-                            {event.title}
+                        <h2 className="event-title">
+                            {store.getLanguage === Language.he
+                                ? event.title
+                                : store.getLanguage === Language.ru
+                                ? event.lng_titles?.ru
+                                : event.lng_titles?.en || event.title}
                         </h2>
                     </article>
                     {orgs.length > 0 && (
                         <article className="event-org">
                             <Icon icon="domain" className="event-icon" />
-                            <label className="event-label translate-this">
+                            <label
+                                className="event-label  "
+                                data-translation-context="name"
+                            >
                                 {orgs.join(", ")}
                             </label>
                         </article>
@@ -110,15 +119,17 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         {event.segments.length > 0 ? (
                             <>
                                 <Icon icon="calendar" className="event-icon" />
-                                <label className="event-label translate-this">
-                                    {
-                                        shortHebrewDays[
+                                <label className="event-label">
+                                    {getTranslation(
+                                        shortEnglishDays[
                                             dayjs(event.start_date).day()
-                                        ]
-                                    }
+                                        ],
+                                        store.getLanguage
+                                    )}
                                     {", "}
-                                    {utilService.formatHebrewDate(
-                                        event.start_date
+                                    {getMonthName(
+                                        dayjs(event.start_date),
+                                        store.getLanguage
                                     )}
                                 </label>
                                 <Icon icon="schedule" className="event-icon" />
@@ -136,7 +147,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         ) : (
                             <>
                                 <Icon icon="calendar" className="event-icon" />
-                                <label className="event-label translate-this">
+                                <label className="event-label ">
                                     {
                                         shortHebrewDays[
                                             dayjs(event.start_date).day()
@@ -163,8 +174,10 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
 
                     <article className="event-location">
                         <Icon icon="pinDrop" className="event-icon" />
-                        <label className="event-label translate-this">
-                            {event.address.label}
+                        <label className="event-label ">
+                            {store.getLanguage === Language.he
+                                ? event.address.label
+                                : event.address.en_label || event.address.label}
                         </label>
                     </article>
 
@@ -172,11 +185,14 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         singleDayTeacherNames.length > 0) && (
                         <article className="event-teachers">
                             <Icon icon="person" className="event-icon" />
-                            <label className="event-label translate-this">
-                                עם{" "}
+                            <label className="event-label ">
+                                {getTranslation("with", store.getLanguage)}
+                                &nbsp;
                                 {teachers.map((item, index, array) => (
                                     <React.Fragment key={index}>
-                                        {item}
+                                        <label data-translation-context="name">
+                                            {item}
+                                        </label>
                                         {index < array.length - 1 && ", "}
                                     </React.Fragment>
                                 ))}
