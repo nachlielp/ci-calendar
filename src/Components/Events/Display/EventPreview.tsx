@@ -97,11 +97,10 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                 >
                     <article className="event-header">
                         <h2 className="event-title">
-                            {store.getLanguage === Language.he
-                                ? event.title
-                                : store.getLanguage === Language.ru
-                                ? event.lng_titles?.ru
-                                : event.lng_titles?.en || event.title}
+                            {utilService.getTitleByLanguage(
+                                event,
+                                store.getLanguage
+                            )}
                         </h2>
                     </article>
                     {orgs.length > 0 && (

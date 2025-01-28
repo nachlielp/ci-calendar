@@ -88,6 +88,7 @@ export const utilService = {
     addToGoogleCalendar,
     setLanguage,
     getLanguage,
+    getTitleByLanguage,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -1247,4 +1248,11 @@ function setLanguage(language: Language) {
 
 function getLanguage() {
     return (localStorage.getItem("language") as Language) || Language.he
+}
+
+function getTitleByLanguage(ci_event: CIEvent, language: Language) {
+    if (language === Language.he) return ci_event.title
+    if (language === Language.ru)
+        return ci_event.lng_titles?.ru || ci_event.title
+    return ci_event.lng_titles?.en || ci_event.title
 }

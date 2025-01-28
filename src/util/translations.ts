@@ -58,10 +58,6 @@ export type TranslationKeys = {
     score: string
     course: string
 
-    //event preview
-    eventCancelled: string
-    with: string
-
     // Actions
     save: string
     cancel: string
@@ -105,6 +101,15 @@ export type TranslationKeys = {
     thursday: string
     friday: string
     saturday: string
+
+    //event preview
+    eventCancelled: string
+    with: string
+
+    //event details
+    additionalInfo: string
+    price: string
+    link: string
 }
 
 type Translations = {
@@ -216,6 +221,11 @@ export const translations: Translations = {
         //event preview
         eventCancelled: "Event Cancelled",
         with: "With",
+
+        //event details
+        additionalInfo: "Additional Information",
+        price: "Price",
+        link: "Link",
     },
     [Language.he]: {
         // Common
@@ -324,6 +334,11 @@ export const translations: Translations = {
         //event preview
         eventCancelled: "האירוע בוטל",
         with: "עם",
+
+        //event details
+        additionalInfo: "פרטים נוספים",
+        price: "מחיר",
+        link: "קישור",
     },
     [Language.ru]: {
         // Common
@@ -429,6 +444,11 @@ export const translations: Translations = {
         //event preview
         eventCancelled: "Событие отменено",
         with: "С",
+
+        //event details
+        additionalInfo: "Дополнительная информация",
+        price: "Цена",
+        link: "Ссылка",
     },
 }
 

@@ -1,4 +1,3 @@
-import { store } from "../Store/store"
 import { Language } from "./interfaces"
 import dayjs from "dayjs"
 import "dayjs/locale/en"
@@ -17,9 +16,7 @@ const memoryCache: TranslationCache = {}
 // Add a type for translation context
 type TranslationContext = "name" | "general" | "month"
 
-export const switchLanguage = async (lang: Language) => {
-    store.setLanguage(lang)
-
+export const translatePage = async (lang: Language) => {
     const elementsToTranslate = document.querySelectorAll(".translate-this")
 
     for (const element of elementsToTranslate) {

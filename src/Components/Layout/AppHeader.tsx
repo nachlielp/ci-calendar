@@ -14,7 +14,6 @@ import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
 import { RadioChangeEvent, Spin } from "antd/lib"
 import Radio from "antd/es/radio"
-import { switchLanguage } from "../../util/translate"
 import { translations } from "../../util/translations"
 const AppHeader = () => {
     const isMobile = useIsMobile()
@@ -29,22 +28,9 @@ const AppHeader = () => {
         vm.setCurrentPath(location.pathname)
     }, [location.pathname])
 
-    React.useEffect(() => {
-        if (store.getLanguage !== Language.he) {
-            changeLocale({
-                target: {
-                    value: store.getLanguage,
-                    checked: true,
-                },
-            } as RadioChangeEvent)
-        }
-    }, [])
-
-    const changeLocale = async (e: RadioChangeEvent) => {
-        console.log("changeLocale", e.target.value)
+    const changeLocale = (e: RadioChangeEvent) => {
         const newLang = e.target.value as Language
         store.setLanguage(newLang)
-        switchLanguage(newLang)
     }
 
     return (
