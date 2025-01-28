@@ -8,6 +8,9 @@ import { useNavigate } from "react-router"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
 import { useClearUser } from "../../hooks/useClearUser"
+import { translations } from "../../util/translations"
+import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
 
 enum SignupError {
     none = "",
@@ -15,7 +18,7 @@ enum SignupError {
     passwordToShort = "סיסמה חייבת להיות לפחות 6 תווים",
 }
 
-export default function Signup() {
+export default observer(function Signup() {
     const nameRef = useRef<InputRef>(null)
     const emailRef = useRef<InputRef>(null)
     const passwordRef = useRef<InputRef>(null)
@@ -75,11 +78,18 @@ export default function Signup() {
     }
 
     return (
-        <section id="signup-form" className="signup-form card">
-            <h1 className="signup-title">הרשמה</h1>
+        <section
+            id="signup-form"
+            className={`signup-form card ${
+                store.getLanguage === "he" ? "rtl" : "ltr"
+            }`}
+        >
+            <h1 className="signup-title">
+                {translations[store.getLanguage].signUp}
+            </h1>
 
             <Form
-                title="הרשמה"
+                title={translations[store.getLanguage].signUp}
                 name="basic"
                 labelCol={{ span: 16 }}
                 wrapperCol={{ span: 24 }}
@@ -89,7 +99,7 @@ export default function Signup() {
                 <Form.Item style={{ margin: "8px" }}>
                     <Input
                         type="text"
-                        placeholder="שם"
+                        placeholder={translations[store.getLanguage].name}
                         ref={nameRef}
                         required
                         className="form-input-large signup-input"
@@ -99,7 +109,7 @@ export default function Signup() {
                 <Form.Item style={{ margin: "8px" }}>
                     <Input
                         type="email"
-                        placeholder="כתובת מייל"
+                        placeholder={translations[store.getLanguage].email}
                         ref={emailRef}
                         required
                         className="form-input-large signup-input"
@@ -109,7 +119,7 @@ export default function Signup() {
                 <Form.Item style={{ margin: "8px" }}>
                     <Input.Password
                         status={error ? "error" : undefined}
-                        placeholder="סיסמה"
+                        placeholder={translations[store.getLanguage].password}
                         ref={passwordRef}
                         required
                         className="form-input-large signup-input"
@@ -119,7 +129,9 @@ export default function Signup() {
                 <Form.Item style={{ margin: "8px" }}>
                     <Input.Password
                         status={error ? "error" : undefined}
-                        placeholder="אימות סיסמה"
+                        placeholder={
+                            translations[store.getLanguage].repeatPassword
+                        }
                         ref={passwordConfRef}
                         required
                         className="form-input-large signup-input"
@@ -143,14 +155,16 @@ export default function Signup() {
                         disabled={loading}
                         className="general-action-btn black-btn large-btn"
                     >
-                        הרשמה
+                        {translations[store.getLanguage].signUp}
                     </button>
                     <button
                         onClick={onSupabaseGoogleSignIn}
                         disabled={loading}
                         className="google-button default-font "
                     >
-                        <label className="google-button-label">כניסה עם </label>
+                        <label className="google-button-label">
+                            {translations[store.getLanguage].loginWith}
+                        </label>
                         <Icon
                             icon="google_color"
                             className="icon-main google-icon"
@@ -160,4 +174,4 @@ export default function Signup() {
             </Form>
         </section>
     )
-}
+})

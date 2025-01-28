@@ -33,6 +33,18 @@ export type TranslationKeys = {
     // Login
     login: string
     logout: string
+    loginWith: string
+    loginTitle: string
+    loginSubtitle: string
+    loginWithPassword: string
+    email: string
+    password: string
+    signin: string
+    signUp: string
+    hereForTheFirstTime: string
+    forgotPassword: string
+    name: string
+    repeatPassword: string
 
     // Navigation
     home: string
@@ -47,6 +59,7 @@ export type TranslationKeys = {
     registerAsOrganization: string
     manageSupport: string
     resetPassword: string
+    enterTheEmailYouRegisteredWith: string
 
     //Options
     retreat: string
@@ -131,7 +144,19 @@ export const translations: Translations = {
         // Login
         login: "Login",
         logout: "Logout",
-
+        loginWith: "Login with",
+        loginTitle: "Login",
+        loginSubtitle: "To receive reminders for events, please sign up:",
+        loginWithPassword: "Login with Password",
+        email: "Email",
+        password: "Password",
+        signin: "Sign In",
+        signUp: "Sign Up",
+        hereForTheFirstTime: "Here for the first time?",
+        forgotPassword: "Forgot Password?",
+        name: "Name",
+        repeatPassword: "Repeat Password",
+        enterTheEmailYouRegisteredWith: "Enter the email you registered with",
         //add pwa
         addPWABanner: "For updates, add to Home Screen",
         installOnAndroid: "Install on Android",
@@ -260,6 +285,17 @@ export const translations: Translations = {
         // Login
         login: "התחבר/י",
         logout: "התנתק/י",
+        loginWith: "כניסה עם",
+        loginTitle: "כניסה והזדהות",
+        loginSubtitle: "על מנת לקבל תזכורות על אירועים יש להירשם:",
+        loginWithPassword: "כניסה עם סיסמה",
+        email: "אימייל",
+        password: "סיסמה",
+        signin: "כניסה",
+        signUp: "הרשם",
+        hereForTheFirstTime: "פה בפעם הראשונה?",
+        forgotPassword: "שכחת סיסמה?",
+        enterTheEmailYouRegisteredWith: "נא להזין את המייל שאיתו נרשמתם:",
 
         // Navigation
         home: "כל הארועים",
@@ -274,6 +310,8 @@ export const translations: Translations = {
         registerAsOrganization: "הרשם כמורה או ארגון",
         manageSupport: "ניהול תמיכה",
         resetPassword: "איפוס סיסמה",
+        name: "שם",
+        repeatPassword: "אימות סיסמה",
 
         //Options
         retreat: "רטירט",
@@ -354,6 +392,19 @@ export const translations: Translations = {
         // Login
         login: "Войти",
         logout: "Выйти",
+        loginWith: "Войти с",
+        loginTitle: "Вход и идентификация",
+        loginSubtitle:
+            "Чтобы получать напоминания о любимых джаммерах, пожалуйста, зарегистрируйтесь:",
+        loginWithPassword: "Вход с паролем",
+        email: "Электронная почта",
+        password: "Пароль",
+        signin: "Войти",
+        signUp: "Зарегистрироваться",
+        hereForTheFirstTime: "Здесь впервые?",
+        forgotPassword: "Забыли пароль?",
+        name: "Имя",
+        repeatPassword: "Повторите пароль",
 
         // Navigation
         home: "Главная",
@@ -368,7 +419,8 @@ export const translations: Translations = {
         registerAsOrganization: "Зарегистрироваться как учитель/организация",
         manageSupport: "Управление поддержкой",
         resetPassword: "Сбросить пароль",
-
+        enterTheEmailYouRegisteredWith:
+            "Введите электронную почту, с которой вы зарегистрировались:",
         //PWA
         addPWABanner: "Для обновлений добавьте на главный экран",
         installOnAndroid: "Установить на Android",

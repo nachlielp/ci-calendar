@@ -4,7 +4,10 @@ import Form from "antd/es/form"
 import Input, { InputRef } from "antd/es/input"
 import { supabase } from "../../supabase/client"
 import { Icon } from "../Common/Icon"
-import '../../styles/reset-password-request.scss'
+import "../../styles/reset-password-request.scss"
+import { observer } from "mobx-react-lite"
+import { translations } from "../../util/translations"
+import { store } from "../../Store/store"
 
 function ResetPasswordRequest() {
     const emailRef = useRef<InputRef>(null)
@@ -46,11 +49,15 @@ function ResetPasswordRequest() {
 
     return (
         <section className="reset-password-request card">
-            <h1 className="title">איפוס סיסמה</h1>
+            <h1 className="title">
+                {translations[store.getLanguage].forgotPassword}
+            </h1>
 
-            <h3 className="login-subtitle">נא להזין את המייל שאיתו נרשמתם:</h3>
+            <h3 className="login-subtitle">
+                {translations[store.getLanguage].enterTheEmailYouRegisteredWith}
+            </h3>
             <Form
-                title=" איפוס סיסמה"
+                title={translations[store.getLanguage].resetPassword}
                 name="basic"
                 labelCol={{ span: 16 }}
                 wrapperCol={{ span: 24 }}
@@ -60,7 +67,7 @@ function ResetPasswordRequest() {
                 <Form.Item>
                     <Input
                         type="email"
-                        placeholder="אימייל"
+                        placeholder={translations[store.getLanguage].email}
                         ref={emailRef}
                         required
                         disabled={loading || mailSent}
@@ -82,7 +89,7 @@ function ResetPasswordRequest() {
                             disabled={mailSent}
                             className="general-action-btn black-btn large-btn"
                         >
-                            איפוס סיסמה
+                            {translations[store.getLanguage].resetPassword}
                         </button>
                     </Form.Item>
                 ) : (
@@ -93,4 +100,4 @@ function ResetPasswordRequest() {
     )
 }
 
-export default ResetPasswordRequest
+export default observer(ResetPasswordRequest)
