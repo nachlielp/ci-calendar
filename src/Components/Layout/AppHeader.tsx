@@ -18,7 +18,7 @@ import { translations } from "../../util/translations"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
-
+    const languagesToShow = import.meta.env.VITE_LANGUAGES_TO_SHOW.split(",")
     // Update VM with values from hooks
     React.useEffect(() => {
         vm.setIsMobile(isMobile)
@@ -68,15 +68,11 @@ const AppHeader = () => {
                     onChange={changeLocale}
                     className="header-language-toggle"
                 >
-                    <Radio.Button key="en" value={Language.en}>
-                        En
-                    </Radio.Button>
-                    <Radio.Button key="he" value={Language.he}>
-                        עב
-                    </Radio.Button>
-                    <Radio.Button key="ru" value={Language.ru}>
-                        RU
-                    </Radio.Button>
+                    {languagesToShow.map((lang: Language) => (
+                        <Radio.Button key={lang} value={lang}>
+                            {lang}
+                        </Radio.Button>
+                    ))}
                 </Radio.Group>
                 <>
                     <div className="header-actions">
