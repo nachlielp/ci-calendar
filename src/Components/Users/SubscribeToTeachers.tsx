@@ -4,6 +4,7 @@ import AsyncButton from "../Common/AsyncButton"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { makeObservable, observable, reaction, computed, action } from "mobx"
+import { getTranslation } from "../../util/translations"
 
 class SubscribeToTeachersVM {
     @observable isSubmitting = false
@@ -77,7 +78,7 @@ const SubscribeToTeachers = () => {
     return (
         <div>
             <label style={{ fontSize: "1.2rem", fontWeight: "600" }}>
-                הרשמה להתראות על ארועים חדשים של מורים וארגונים
+                {getTranslation("subscribeToTeachers", store.language)}
             </label>
             <DoubleBindedSelect
                 options={store.getPublicTeacherBios}
@@ -86,7 +87,7 @@ const SubscribeToTeachers = () => {
                     const selectedTeachers = values
                     vm.setSelectedTeachers(selectedTeachers)
                 }}
-                placeholder="בחירת מורים"
+                placeholder={getTranslation("selectTeachers", store.language)}
                 className="select-filter"
             />
             <DoubleBindedSelect
@@ -96,7 +97,7 @@ const SubscribeToTeachers = () => {
                     const selectedOrgs = values
                     vm.setSelectedOrgs(selectedOrgs)
                 }}
-                placeholder="בחירת ארגונים"
+                placeholder={getTranslation("selectOrgs", store.language)}
                 className="select-filter"
             />
             <AsyncButton
@@ -105,7 +106,7 @@ const SubscribeToTeachers = () => {
                 callback={vm.saveSubscriptions}
                 disabled={vm.subscriptionsEqual}
             >
-                שמירה
+                {getTranslation("save", store.language)}
             </AsyncButton>
         </div>
     )

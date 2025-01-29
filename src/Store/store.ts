@@ -455,6 +455,10 @@ class Store {
     get getLanguage() {
         return this.language
     }
+    @computed
+    get getDirection() {
+        return this.language === Language.he ? "rtl" : "ltr"
+    }
 
     @computed
     get getAppTaggableTeachers() {

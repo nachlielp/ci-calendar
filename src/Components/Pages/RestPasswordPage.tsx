@@ -3,9 +3,12 @@ import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { supabase } from "../../supabase/client"
 import { useState } from "react"
-import '../../styles/reset-password-page.scss'
+import "../../styles/reset-password-page.scss"
+import { getTranslation } from "../../util/translations"
+import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
 
-export default function ResetPasswordPage() {
+export default observer(function ResetPasswordPage() {
     const [form] = Form.useForm()
     const [message, setMessage] = useState<string | null>(null)
     const [messageType, setMessageType] = useState<
@@ -45,13 +48,18 @@ export default function ResetPasswordPage() {
         }
     }
     return (
-        <section className="reset-password-page">
+        <section className={`reset-password-page ${store.getDirection}`}>
             <section className="card">
-                <h1 className="general-title">עדכון סיסמה</h1>
+                <h1 className="general-title">
+                    {getTranslation("resetPassword", store.getLanguage)}
+                </h1>
 
                 <Form form={form} onFinish={onFinish}>
-                    <label style={{ marginBottom: "0.5rem" }}>
-                        נא להזין את הסיסמה החדשה פעמים:
+                    <label className="subTitle">
+                        {getTranslation(
+                            "resetPasswordSubTitle",
+                            store.getLanguage
+                        )}
                     </label>
                     <Form.Item
                         name="password"
@@ -65,7 +73,10 @@ export default function ResetPasswordPage() {
                         style={{ marginBottom: "0" }}
                     >
                         <Input.Password
-                            placeholder="סיסמה חדשה"
+                            placeholder={getTranslation(
+                                "newPassword",
+                                store.getLanguage
+                            )}
                             style={{ marginBottom: "0.5rem" }}
                             className="form-input-large"
                         />
@@ -91,7 +102,10 @@ export default function ResetPasswordPage() {
                         style={{ marginBottom: "8px" }}
                     >
                         <Input.Password
-                            placeholder="אימות סיסמה חדשה"
+                            placeholder={getTranslation(
+                                "repeatPassword",
+                                store.getLanguage
+                            )}
                             style={{ marginBottom: "0.5rem" }}
                             className="form-input-large"
                         />
@@ -104,10 +118,10 @@ export default function ResetPasswordPage() {
                         <></>
                     )}
                     <button type="submit" className="general-action-btn">
-                        שמירה
+                        {getTranslation("save", store.getLanguage)}
                     </button>
                 </Form>
             </section>
         </section>
     )
-}
+})

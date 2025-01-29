@@ -45,7 +45,8 @@ export type TranslationKeys = {
     forgotPassword: string
     name: string
     repeatPassword: string
-
+    resetPasswordSubTitle: string
+    newPassword: string
     // Navigation
     home: string
     about: string
@@ -123,6 +124,18 @@ export type TranslationKeys = {
     additionalInfo: string
     price: string
     link: string
+
+    //notifications
+    manageNotifications: string
+    ios_notification_error: string
+    android_notification_error: string
+    browser_notification_error: string
+
+    subscribeToTeachers: string
+    selectTeachers: string
+    selectOrgs: string
+
+    supportTitle: string
 }
 
 type Translations = {
@@ -157,6 +170,8 @@ export const translations: Translations = {
         name: "Name",
         repeatPassword: "Repeat Password",
         enterTheEmailYouRegisteredWith: "Enter the email you registered with",
+        resetPasswordSubTitle: "Enter the new password twice:",
+        newPassword: "New Password",
         //add pwa
         addPWABanner: "For updates, add to Home Screen",
         installOnAndroid: "Install on Android",
@@ -251,6 +266,22 @@ export const translations: Translations = {
         additionalInfo: "Additional Information",
         price: "Price",
         link: "Link",
+
+        //notifications
+        manageNotifications: "Manage Notifications",
+        ios_notification_error:
+            "The permissions for this app are blocked. You can enable them in Settings => Notifications => scroll down to the CI app, and click 'Allow Notifications'",
+        android_notification_error:
+            "The permissions for this app are blocked. You can enable them in Settings => Notifications => Notification Management => scroll down to the CI app, and click 'Allow Notifications'",
+        browser_notification_error:
+            "You can only receive notifications when installed on a phone",
+
+        subscribeToTeachers:
+            "Subscribe to notifications for new events by teachers and organizations",
+        selectTeachers: "Select Teachers",
+        selectOrgs: "Select Organizations",
+
+        supportTitle: ":For support, please contact us by email",
     },
     [Language.he]: {
         // Common
@@ -296,7 +327,9 @@ export const translations: Translations = {
         hereForTheFirstTime: "פה בפעם הראשונה?",
         forgotPassword: "שכחת סיסמה?",
         enterTheEmailYouRegisteredWith: "נא להזין את המייל שאיתו נרשמתם:",
-
+        resetPasswordSubTitle: "נא להזין את הסיסמה החדשה פעמיים:",
+        newPassword: "סיסמה חדשה",
+        repeatPassword: "אימות סיסמה חדשה",
         // Navigation
         home: "כל הארועים",
         about: "אודות",
@@ -311,7 +344,6 @@ export const translations: Translations = {
         manageSupport: "ניהול תמיכה",
         resetPassword: "איפוס סיסמה",
         name: "שם",
-        repeatPassword: "אימות סיסמה",
 
         //Options
         retreat: "רטירט",
@@ -326,7 +358,7 @@ export const translations: Translations = {
         //locations
 
         // Actions
-        save: "שמור",
+        save: "שמירה",
         cancel: "ביטול",
         confirm: "אישור",
         delete: "מחק",
@@ -377,6 +409,21 @@ export const translations: Translations = {
         additionalInfo: "פרטים נוספים",
         price: "מחיר",
         link: "קישור",
+
+        //notifications
+        manageNotifications: "ניהול התראות",
+        ios_notification_error:
+            "ההרשאות לאפליקציה הזו חסומות. ניתן להפעיל אותן בהגדרות =&gt; עדכונים =&gt; גלילה מטה אל האפליקציה CI, ולחיצה על ״קבלת עדכונים״",
+        android_notification_error:
+            "ההרשאות לאפליקציה הזו חסומות. ניתן להפעיל אותן בהגדרות =&gt; עדכונים =&gt; ניהול עדכונים =&gt; גלילה מטה אל האפליקציה CI, ולחיצה על ״קבלת עדכונים״",
+        browser_notification_error:
+            "ניתן לקבל התראות באפליקציה שמותקנת בסלולרי בלבד",
+
+        subscribeToTeachers: "הרשמה להתראות על ארועים חדשים של מורים וארגונים",
+        selectTeachers: "בחירת מורים",
+        selectOrgs: "בחירת ארגונים",
+
+        supportTitle: "לתמיכה שאלות או הערות ניתן לפנות אלינו במייל:",
     },
     [Language.ru]: {
         // Common
@@ -421,6 +468,8 @@ export const translations: Translations = {
         resetPassword: "Сбросить пароль",
         enterTheEmailYouRegisteredWith:
             "Введите электронную почту, с которой вы зарегистрировались:",
+        resetPasswordSubTitle: "Введите новый пароль дважды:",
+        newPassword: "Новый пароль",
         //PWA
         addPWABanner: "Для обновлений добавьте на главный экран",
         installOnAndroid: "Установить на Android",
@@ -501,6 +550,23 @@ export const translations: Translations = {
         additionalInfo: "Дополнительная информация",
         price: "Цена",
         link: "Ссылка",
+
+        //notifications
+        manageNotifications: "Управление уведомлениями",
+        ios_notification_error:
+            "Разрешения для этого приложения заблокированы. Вы можете их включить в настройках =&gt; Уведомления =&gt; прокрутите вниз до приложения CI, и нажмите на 'Разрешить уведомления'",
+        android_notification_error:
+            "Разрешения для этого приложения заблокированы. Вы можете их включить в настройках =&gt; Уведомления =&gt; Управление уведомлениями =&gt; прокрутите вниз до приложения CI, и нажмите на 'Разрешить уведомления'",
+        browser_notification_error:
+            "Вы можете получать уведомления только в приложении, установленном на смартфоне",
+
+        subscribeToTeachers:
+            "Подпишитесь на уведомления о новых событиях от учителей и организаций",
+        selectTeachers: "Выберите учителей",
+        selectOrgs: "Выберите организации",
+
+        supportTitle:
+            ":Для поддержки, пожалуйста, свяжитесь с нами по электронной почте",
     },
 }
 

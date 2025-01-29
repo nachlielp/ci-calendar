@@ -11,7 +11,6 @@ import { useNavigate } from "react-router"
 import { translations } from "../../util/translations"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
-import { Language } from "../../util/interfaces"
 
 enum LoginError {
     none = "",
@@ -66,9 +65,7 @@ export default observer(function Login() {
     return (
         <section
             id="login-form"
-            className={`login-form card ${
-                store.getLanguage === Language.he ? "rtl" : "ltr"
-            }`}
+            className={`login-form card ${store.getDirection}`}
         >
             <h1 className="login-title">
                 {translations[store.getLanguage].loginTitle}
