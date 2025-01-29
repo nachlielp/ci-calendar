@@ -120,3 +120,9 @@ export const recurringOptions: SelectOption[] = [
     { label: "חודשי", value: "monthly" },
     { label: "חודשי - יום בשבוע", value: "monthly-pattern" },
 ]
+
+export const languageNames = {
+    he: "עב",
+    en: "En",
+    ru: "Ру",
+}

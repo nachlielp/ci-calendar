@@ -15,6 +15,7 @@ import { utilService } from "../../util/utilService"
 import { RadioChangeEvent, Spin } from "antd/lib"
 import Radio from "antd/es/radio"
 import { translations } from "../../util/translations"
+import { languageNames } from "../../util/options"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -69,8 +70,12 @@ const AppHeader = () => {
                     className="header-language-toggle"
                 >
                     {languagesToShow.map((lang: Language) => (
-                        <Radio.Button key={lang} value={lang}>
-                            {lang}
+                        <Radio.Button
+                            key={lang}
+                            value={lang}
+                            className={`header-language-toggle-btn ${lang}`}
+                        >
+                            {languageNames[lang]}
                         </Radio.Button>
                     ))}
                 </Radio.Group>
