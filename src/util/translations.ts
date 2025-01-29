@@ -136,6 +136,14 @@ export type TranslationKeys = {
     selectOrgs: string
 
     supportTitle: string
+
+    //Tags
+    everyone: string
+    beginner: string
+    advanced: string
+    male: string
+    female: string
+    preRegistration: string
 }
 
 type Translations = {
@@ -282,6 +290,14 @@ export const translations: Translations = {
         selectOrgs: "Select Organizations",
 
         supportTitle: ":For support, please contact us by email",
+
+        //Tags
+        everyone: "Open to everyone",
+        beginner: "Beginners",
+        advanced: "Advanced",
+        male: "Men",
+        female: "Women",
+        preRegistration: "Pre-Registration",
     },
     [Language.he]: {
         // Common
@@ -424,6 +440,14 @@ export const translations: Translations = {
         selectOrgs: "בחירת ארגונים",
 
         supportTitle: "לתמיכה שאלות או הערות ניתן לפנות אלינו במייל:",
+
+        //Tags
+        everyone: "פתוח לכולם",
+        beginner: "מתחילים",
+        advanced: "מתקדמים",
+        male: "גברים",
+        female: "נשים",
+        preRegistration: "הרשמה מראש",
     },
     [Language.ru]: {
         // Common
@@ -567,6 +591,14 @@ export const translations: Translations = {
 
         supportTitle:
             ":Для поддержки, пожалуйста, свяжитесь с нами по электронной почте",
+
+        //Tags
+        everyone: "Открыто для всех",
+        beginner: "Начинающие",
+        advanced: "Продвинутые",
+        male: "Мужчины",
+        female: "Женщины",
+        preRegistration: "Предварительная регистрация",
     },
 }
 

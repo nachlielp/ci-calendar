@@ -18,6 +18,7 @@ import { shortEnglishDays, shortHebrewDays } from "../../../util/options"
 import {
     getTranslation,
     isTranslationKey,
+    TranslationKeys,
     translations,
 } from "../../../util/translations"
 import { getMonthName, translatePage } from "../../../util/translate"
@@ -195,7 +196,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                       ]
                                     : segment.type}
                                 {segment.teachers.length > 0 && (
-                                    <span>
+                                    <span className="sub-event-teachers">
                                         &nbsp;
                                         {getTranslation(
                                             "with",
@@ -245,7 +246,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                                 color="green"
                                                 className="f-18"
                                             >
-                                                {getTag(tag)}
+                                                {getTranslation(
+                                                    tag as keyof TranslationKeys,
+                                                    store.getLanguage
+                                                )}
                                             </Tag>
                                         ))}
                                     </span>
@@ -271,9 +275,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                     key={`${type}-${index}`}
                                     className="event-tag"
                                 >
-                                    {isTranslationKey(type)
-                                        ? translations[store.getLanguage][type]
-                                        : type}
+                                    {getTranslation(
+                                        type as keyof TranslationKeys,
+                                        store.getLanguage
+                                    )}
                                 </Tag>
                             )
                         })}

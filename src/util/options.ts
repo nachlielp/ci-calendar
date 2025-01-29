@@ -63,7 +63,7 @@ export const tagOptions: SelectOption[] = [
     { value: "advanced", label: "מתקדמים" },
     { value: "male", label: "גברים" },
     { value: "female", label: "נשים" },
-    { value: "pre-registration", label: "הרשמה מראש" },
+    { value: "preRegistration", label: "הרשמה מראש" },
 ]
 
 export const districtOptions: SelectOption[] = [
