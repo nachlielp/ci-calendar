@@ -5,21 +5,28 @@ import type { Dayjs } from "dayjs"
 import { CIEvent } from "../../../util/interfaces"
 import isBetween from "dayjs/plugin/isBetween"
 import dayjs from "dayjs"
-import "dayjs/locale/he"
+import "dayjs/locale/en"
+import hb from "antd/locale/he_IL"
+import en from "antd/locale/en_US"
+import ru from "antd/locale/ru_RU"
+// import "dayjs/locale/he"
 dayjs.extend(isBetween)
 dayjs.extend(utc)
-dayjs.locale("he")
-import hb from "antd/locale/he_IL"
+dayjs.locale("en")
+// import hb from "antd/locale/he_IL"
 import { useState } from "react"
 import { Icon } from "../../Common/Icon"
 import "../../../styles/calendar-view.scss"
+import { getTranslation, TranslationKeys } from "../../../util/translations"
+import { store } from "../../../Store/store"
+import { observer } from "mobx-react-lite"
 
 interface CalendarViewProps {
     events: CIEvent[]
     onSelect: (value: Dayjs) => void
 }
 
-export default function CalendarView({ events, onSelect }: CalendarViewProps) {
+const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
     const [value, setValue] = useState<Dayjs>(dayjs())
 
     const onChange = (newValue: Dayjs) => {
@@ -64,35 +71,55 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 
     const nextMonth = () => {
         const newValue = value.add(1, "month")
-        const threeMonthsAhead = dayjs().add(1, "months").endOf("month")
-        if (newValue.isBefore(threeMonthsAhead)) {
+        const twoMonthsAhead = dayjs().add(2, "months").endOf("month")
+        if (newValue.isBefore(twoMonthsAhead)) {
             setValue(newValue)
         }
     }
 
     return (
         <section className="calendar-view">
-            <header className="calendar-controller">
+            <header className={`calendar-controller ${store.getDirection} `}>
                 <Icon
                     onClick={nextMonth}
                     icon="chevron_right"
-                    className={`back ${
+                    className={`${
+                        store.getDirection === "ltr" ? "next" : "back"
+                    } ${
                         value.isAfter(
-                            dayjs().add(1, "months").startOf("month")
+                            dayjs().add(2, "months").startOf("month")
                         ) && "disabled"
                     }`}
                 />
-                <label className="label">{value.format("MMMM YYYY")}</label>
+                {/* <label className="label">{value.format("MMMM YYYY")}</label> */}
+                <label className="label">
+                    {getTranslation(
+                        value
+                            .locale("en")
+                            .format("MMMM")
+                            .toLocaleLowerCase() as keyof TranslationKeys,
+                        store.getLanguage
+                    )}
+                </label>
                 <Icon
                     onClick={prevMonth}
                     icon="chevron_right"
-                    className={`next ${
-                        value.month() === dayjs().month() && "disabled"
-                    }`}
+                    className={`${
+                        store.getDirection === "ltr" ? "back" : "next"
+                    } ${value.month() === dayjs().month() && "disabled"}`}
                 />
             </header>
             <section className="calendar-view__card card">
-                <ConfigProvider locale={hb} direction="rtl">
+                <ConfigProvider
+                    direction={store.getDirection}
+                    locale={
+                        store.getLanguage === "he"
+                            ? hb
+                            : store.getLanguage === "ru"
+                            ? ru
+                            : en
+                    }
+                >
                     <Calendar
                         value={value}
                         mode="month"
@@ -107,6 +134,8 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
         </section>
     )
 }
+
+export default observer(CalendarView)
 
 function eventsOnDay(day: Dayjs, events: CIEvent[]) {
     return events.filter((event) => {

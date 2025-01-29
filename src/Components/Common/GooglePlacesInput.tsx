@@ -16,7 +16,19 @@ const GooglePlacesInput = ({
         if (defaultValue) {
             const defaultOption = {
                 label: defaultValue.label,
-                value: defaultValue.place_id,
+                value: {
+                    place_id: defaultValue.place_id,
+                    description: defaultValue.label,
+                    matched_substrings: [],
+                    reference: defaultValue.place_id,
+                    structured_formatting: {
+                        main_text: defaultValue.label,
+                        main_text_matched_substrings: [],
+                        secondary_text: "",
+                    },
+                    terms: [],
+                    types: [],
+                },
             }
             setSelectedOption(defaultOption)
         }
@@ -68,4 +80,32 @@ export interface IGooglePlaceOption {
         }>
         types: string[]
     }
+}
+
+export async function getAddressFromGooglePlaceId(
+    placeId: string
+): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const service = new google.maps.places.PlacesService(
+            document.createElement("div")
+        )
+
+        const request = {
+            placeId: placeId,
+            fields: ["formatted_address"],
+            language: "en", // Request English address
+        }
+
+        service.getDetails(request, (result, status) => {
+            if (
+                status === google.maps.places.PlacesServiceStatus.OK &&
+                result
+            ) {
+                resolve(result.formatted_address ?? "")
+            } else {
+                console.error("Error fetching English address:", status)
+                reject(new Error(`Failed to fetch address: ${status}`))
+            }
+        })
+    })
 }

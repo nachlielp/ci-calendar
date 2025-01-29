@@ -64,6 +64,7 @@ interface ILink {
 export interface IAddress {
     place_id: string
     label: string
+    en_label?: string
 }
 export interface CIEvent {
     id: string
@@ -96,6 +97,10 @@ export interface CIEvent {
     cancelled: boolean
     cancelled_text: string
     recurring_ref_key?: string
+    lng_titles?: {
+        ru?: string
+        en?: string
+    }
 }
 export interface CITemplate {
     id: string
@@ -440,4 +445,10 @@ export enum SupabaseSessionEvent {
     userUpdated = "USER_UPDATED",
     userDeleted = "USER_DELETED",
     passwordRecovery = "PASSWORD_RECOVERY",
+}
+
+export enum Language {
+    he = "he",
+    en = "en",
+    ru = "ru",
 }

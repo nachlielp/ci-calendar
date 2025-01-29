@@ -2,7 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/ci-logo-192-circle.png" />
+        <link rel="icon" type="image/svg+xml" href="/ci-logo-192-bg.png" />
+        <link rel="shortcut icon" type="image/png" href="/ci-logo-192-bg.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>לוח אירועי קונטקט אימפרוביזציה | CI Calendar</title>
 
@@ -61,7 +62,7 @@
         <!-- PWA -->
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#171717" />
-        <link rel="apple-touch-icon" href="/ci-circle-192.png" />
+        <link rel="apple-touch-icon" href="/ci-logo-192-bg.png" />
 
         <!-- Viewport -->
         <meta
@@ -142,6 +143,20 @@
                 canonicalTag.href = `https://${prodDomain}${window.location.pathname}`
             }
         </script>
+
+        <!-- Add explicit favicon sizes -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="/ci-logo-192-bg.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/ci-logo-512-bg.png"
+        />
     </head>
 
     <body>

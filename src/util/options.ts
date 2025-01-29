@@ -5,6 +5,7 @@ import {
     RequestType,
     RequestTypeHebrew,
 } from "./interfaces"
+import { TranslationKeys } from "./translations"
 
 export interface SelectOption {
     value: string
@@ -12,7 +13,7 @@ export interface SelectOption {
 }
 export const eventOptions: SelectOption[] = [
     { value: "class", label: "שיעור" },
-    { value: "jame", label: "ג'אם" },
+    { value: "jam", label: "ג'אם" },
     { value: "underscore", label: "אנדרסקור" },
     { value: "workshop", label: "סדנה" },
     { value: "retreat", label: "ריטריט" },
@@ -46,6 +47,15 @@ export const shortHebrewDays = {
     5: "שישי",
     6: "שבת",
 }
+export const shortEnglishDays = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+] as const satisfies readonly (keyof TranslationKeys)[]
 
 export const tagOptions: SelectOption[] = [
     { value: "everyone", label: "פתוח לכולם" },
@@ -63,7 +73,7 @@ export const districtOptions: SelectOption[] = [
     { value: "galilee", label: "גליל" },
     { value: "haifa", label: "חיפה" },
     { value: "carmel", label: "חוף כרמל" },
-    { value: "pardes-hana", label: "פרדס חנה" },
+    { value: "pardesHanna", label: "פרדס חנה" },
     { value: "south", label: "דרום" },
     // Add more districts as needed
 ]
@@ -110,3 +120,9 @@ export const recurringOptions: SelectOption[] = [
     { label: "חודשי", value: "monthly" },
     { label: "חודשי - יום בשבוע", value: "monthly-pattern" },
 ]
+
+export const languageNames = {
+    he: "עב",
+    en: "En",
+    ru: "Ру",
+}

@@ -1,6 +1,6 @@
 import React from "react"
 import "../../styles/header.scss"
-import { CIUser } from "../../util/interfaces"
+import { CIUser, Language } from "../../util/interfaces"
 import { Icon } from "../Common/Icon"
 import InstallPWABanner from "../Common/InstallPWABanner"
 import { LinkButton } from "../Common/LinkButton"
@@ -12,12 +12,14 @@ import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
-import { Spin } from "antd/lib"
-
+import { RadioChangeEvent, Spin } from "antd/lib"
+import Radio from "antd/es/radio"
+import { translations } from "../../util/translations"
+import { languageNames } from "../../util/options"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
-
+    const languagesToShow = import.meta.env.VITE_LANGUAGES_TO_SHOW.split(",")
     // Update VM with values from hooks
     React.useEffect(() => {
         vm.setIsMobile(isMobile)
@@ -26,6 +28,11 @@ const AppHeader = () => {
     React.useEffect(() => {
         vm.setCurrentPath(location.pathname)
     }, [location.pathname])
+
+    const changeLocale = (e: RadioChangeEvent) => {
+        const newLang = e.target.value as Language
+        store.setLanguage(newLang)
+    }
 
     return (
         <section className="header-container-wapper">
@@ -38,13 +45,15 @@ const AppHeader = () => {
             </div>
             <section className="header-container">
                 <RequestPermissionModal />
+
                 {vm.showLoginButton && (
                     <LinkButton
                         to="/login"
                         className="header-btn no-border align-to-content"
                     >
-                        התחבר/י&nbsp;
                         <Icon icon="account" className="icon-main" />
+                        &nbsp;
+                        {translations[store.getLanguage].login}
                     </LinkButton>
                 )}
                 {vm.showBackButton && (
@@ -55,6 +64,21 @@ const AppHeader = () => {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
+                <Radio.Group
+                    value={store.getLanguage}
+                    onChange={changeLocale}
+                    className="header-language-toggle"
+                >
+                    {languagesToShow.map((lang: Language) => (
+                        <Radio.Button
+                            key={lang}
+                            value={lang}
+                            className={`header-language-toggle-btn ${lang}`}
+                        >
+                            {languageNames[lang]}
+                        </Radio.Button>
+                    ))}
+                </Radio.Group>
                 <>
                     <div className="header-actions">
                         {store.getOffline && (
@@ -112,7 +136,7 @@ const InstallPWABannerAnchor = () => {
                 onClick={() => vm.setShowInstallPWAModal(true)}
             >
                 <div className="install-pwa-btn-text">
-                    <span>לקבלת עדכונים הוסיפו לעמוד הבית</span>
+                    <span>{translations[store.getLanguage].addPWABanner}</span>
                     <Icon icon="touch_app" className="add-alert-icon white" />
                 </div>
             </button>

@@ -10,6 +10,7 @@ import {
     CIAlert,
     IAddress,
     UserBio,
+    Language,
 } from "./interfaces"
 import { User } from "@supabase/supabase-js"
 import {
@@ -85,6 +86,9 @@ export const utilService = {
     calculateRecurringEventDates,
     duplicateEvent,
     addToGoogleCalendar,
+    setLanguage,
+    getLanguage,
+    getTitleByLanguage,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -1236,4 +1240,19 @@ function addToGoogleCalendar(event: CIEvent) {
     )}&location=${encodeURIComponent(event.address.label || "")}`
 
     window.open(url, "_blank")
+}
+
+function setLanguage(language: Language) {
+    localStorage.setItem("language", language)
+}
+
+function getLanguage() {
+    return (localStorage.getItem("language") as Language) || Language.he
+}
+
+function getTitleByLanguage(ci_event: CIEvent, language: Language) {
+    if (language === Language.he) return ci_event.title
+    if (language === Language.ru)
+        return ci_event.lng_titles?.ru || ci_event.title
+    return ci_event.lng_titles?.en || ci_event.title
 }

@@ -1,4 +1,4 @@
-import { sentryVitePlugin } from "@sentry/vite-plugin";
+import { sentryVitePlugin } from "@sentry/vite-plugin"
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa"
@@ -9,37 +9,26 @@ const timestamp = new Date().getTime()
 const buildVersion = `${pkg.version}-${timestamp}`
 //
 const manifestForPlugin: Partial<VitePWAOptions> = {
-    disable: true,
+    disable: false,
     registerType: "autoUpdate",
     includeAssets: ["ci-logo-512-bg.png", "ci-logo-192-bg.png"],
     manifest: {
-        name: "CI",
-        short_name: "CI",
-        description: "CI Events near you",
+        name: "CI Events Israel",
+        short_name: "CI Events",
+        description:
+            "Contact Improvisation events in Israel - ג'אמים, שיעורים, סדנאות",
         icons: [
             {
                 src: "/ci-logo-192-bg.png",
                 sizes: "192x192",
                 type: "image/png",
-                purpose: "monochrome",
-            },
-            {
-                src: "/ci-logo-192-bg.png",
-                sizes: "192x192",
-                type: "image/png",
-                purpose: "monochrome",
+                purpose: "any",
             },
             {
                 src: "/ci-logo-512-bg.png",
                 sizes: "512x512",
                 type: "image/png",
-                purpose: "any",
-            },
-            {
-                src: "/ci-logo-192-bg.png",
-                sizes: "192x192",
-                type: "image/png",
-                purpose: "maskable",
+                purpose: "any maskable",
             },
         ],
         theme_color: "#171717",
@@ -74,6 +63,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
         ],
         navigateFallback: "index.html",
         cleanupOutdatedCaches: true,
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // Set to 3MB
     },
     // Add notification related strategies
     strategies: "generateSW",
@@ -109,24 +99,28 @@ export default defineConfig({
             },
         },
 
-        sourcemap: true
+        sourcemap: true,
     },
     base: "/",
-    plugins: [react({
-        babel: {
-            plugins: [
-                ["@babel/plugin-proposal-decorators", { legacy: true }],
-                [
-                    "@babel/plugin-proposal-class-properties",
-                    { loose: true },
+    plugins: [
+        react({
+            babel: {
+                plugins: [
+                    ["@babel/plugin-proposal-decorators", { legacy: true }],
+                    [
+                        "@babel/plugin-proposal-class-properties",
+                        { loose: true },
+                    ],
                 ],
-            ],
-        },
-    }), VitePWA(manifestForPlugin), // This plugin helps visualize the size of your bundles
-    visualizer({ open: true }), sentryVitePlugin({
-        org: "nachliel",
-        project: "ci-calendar"
-    })],
+            },
+        }),
+        VitePWA(manifestForPlugin), // This plugin helps visualize the size of your bundles
+        visualizer({ open: true }),
+        sentryVitePlugin({
+            org: "nachliel",
+            project: "ci-calendar",
+        }),
+    ],
 
     server: {
         host: "localhost",

@@ -12,6 +12,12 @@ import React from "react"
 
 // Immediately invoke Sentry initialization
 const initSentry = () => {
+    // Don't initialize Sentry in development mode
+    if (import.meta.env.MODE === "development") {
+        console.log("Sentry disabled in development mode")
+        return
+    }
+
     const dsn = import.meta.env.VITE_SENTRY_DSN
     // console.log("__dsn: ", dsn)
     if (!dsn || dsn === "null" || dsn === "undefined") {
@@ -24,29 +30,21 @@ const initSentry = () => {
             dsn,
             enabled: true,
             environment: import.meta.env.MODE,
-            integrations:
-                import.meta.env.MODE === "production"
-                    ? [
-                          Sentry.reactRouterV7BrowserTracingIntegration({
-                              useEffect: React.useEffect,
-                              useLocation,
-                              useNavigationType,
-                              createRoutesFromChildren,
-                              matchRoutes,
-                          }),
-                          Sentry.replayIntegration(),
-                      ]
-                    : [], // No performance monitoring integrations in development
+            integrations: [
+                Sentry.reactRouterV7BrowserTracingIntegration({
+                    useEffect: React.useEffect,
+                    useLocation,
+                    useNavigationType,
+                    createRoutesFromChildren,
+                    matchRoutes,
+                }),
+                Sentry.replayIntegration(),
+            ],
             beforeSend(event) {
-                if (process.env.NODE_ENV === "development") {
-                    console.log(
-                        "Test error sent to Sentry. Check your Sentry dashboard."
-                    )
-                }
                 return event
             },
             debug: false,
-            tracesSampleRate: import.meta.env.MODE === "production" ? 0.2 : 1.0,
+            tracesSampleRate: 0.2,
             allowUrls: [
                 window.location.origin,
                 "https://ci-events.org",
@@ -58,10 +56,8 @@ const initSentry = () => {
                 "https://www.ci-events.org",
             ],
             // Reduce sampling rates in production to prevent timeouts
-            replaysSessionSampleRate:
-                import.meta.env.MODE === "production" ? 0.05 : 0.1,
-            replaysOnErrorSampleRate:
-                import.meta.env.MODE === "production" ? 0.5 : 1.0,
+            replaysSessionSampleRate: 0.05,
+            replaysOnErrorSampleRate: 0.5,
         })
     } catch (error) {
         console.error("Failed to initialize Sentry:", error)

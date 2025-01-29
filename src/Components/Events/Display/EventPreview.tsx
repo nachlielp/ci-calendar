@@ -1,11 +1,12 @@
 import React from "react"
 import Tag from "antd/es/tag"
 import dayjs from "dayjs"
-import { EventlyType, CIEvent } from "../../../util/interfaces"
+import { EventlyType, CIEvent, Language } from "../../../util/interfaces"
 import {
     tagOptions,
     eventOptions,
     shortHebrewDays,
+    shortEnglishDays,
 } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
@@ -14,6 +15,12 @@ import "../../../styles/generics/card.scss"
 import { Spin } from "antd"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
+import {
+    getTranslation,
+    isTranslationKey,
+    translations,
+} from "../../../util/translations"
+import { getMonthName } from "../../../util/translate"
 
 interface EventPreviewProps {
     event: CIEvent
@@ -23,7 +30,6 @@ interface EventPreviewProps {
 const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
     ({ event, isClicked }, ref) => {
         const segmentsLength = Object.values(event.segments).length
-
         const singleDayTeacherNames = Array.from(
             new Set(
                 Object.values(event.segments)
@@ -59,11 +65,21 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
             return publicOrg?.bio_name || org.label
         })
 
+        const isRTL = store.getLanguage === Language.he
+
         return (
-            <section ref={ref} className={`event-preview card`}>
+            <section
+                ref={ref}
+                className={`event-preview card ${isRTL ? "rtl" : ""}`}
+            >
                 {event.cancelled && (
                     <article className="cancelled-event-cover">
-                        <h1 className="cancelled-event-title">האירוע בוטל</h1>
+                        <h1 className="cancelled-event-title">
+                            {getTranslation(
+                                "eventCancelled",
+                                store.getLanguage
+                            )}
+                        </h1>
                         <h2 className="cancelled-event-text">
                             {event.cancelled_text}
                         </h2>
@@ -80,12 +96,20 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     }`}
                 >
                     <article className="event-header">
-                        <h2 className="event-title">{event.title}&nbsp;</h2>
+                        <h2 className="event-title">
+                            {utilService.getTitleByLanguage(
+                                event,
+                                store.getLanguage
+                            )}
+                        </h2>
                     </article>
                     {orgs.length > 0 && (
                         <article className="event-org">
                             <Icon icon="domain" className="event-icon" />
-                            <label className="event-label">
+                            <label
+                                className="event-label  "
+                                data-translation-context="name"
+                            >
                                 {orgs.join(", ")}
                             </label>
                         </article>
@@ -95,14 +119,16 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                             <>
                                 <Icon icon="calendar" className="event-icon" />
                                 <label className="event-label">
-                                    {
-                                        shortHebrewDays[
+                                    {getTranslation(
+                                        shortEnglishDays[
                                             dayjs(event.start_date).day()
-                                        ]
-                                    }
+                                        ],
+                                        store.getLanguage
+                                    )}
                                     {", "}
-                                    {utilService.formatHebrewDate(
-                                        event.start_date
+                                    {getMonthName(
+                                        dayjs(event.start_date),
+                                        store.getLanguage
                                     )}
                                 </label>
                                 <Icon icon="schedule" className="event-icon" />
@@ -120,7 +146,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         ) : (
                             <>
                                 <Icon icon="calendar" className="event-icon" />
-                                <label className="event-label">
+                                <label className="event-label ">
                                     {
                                         shortHebrewDays[
                                             dayjs(event.start_date).day()
@@ -147,8 +173,10 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
 
                     <article className="event-location">
                         <Icon icon="pinDrop" className="event-icon" />
-                        <label className="event-label">
-                            {event.address.label}
+                        <label className="event-label ">
+                            {store.getLanguage === Language.he
+                                ? event.address.label
+                                : event.address.en_label || event.address.label}
                         </label>
                     </article>
 
@@ -156,11 +184,14 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         singleDayTeacherNames.length > 0) && (
                         <article className="event-teachers">
                             <Icon icon="person" className="event-icon" />
-                            <label className="event-label">
-                                עם{" "}
+                            <label className="event-label ">
+                                {getTranslation("with", store.getLanguage)}
+                                &nbsp;
                                 {teachers.map((item, index, array) => (
                                     <React.Fragment key={index}>
-                                        {item}
+                                        <label data-translation-context="name">
+                                            {item}
+                                        </label>
                                         {index < array.length - 1 && ", "}
                                     </React.Fragment>
                                 ))}
@@ -169,21 +200,30 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     )}
 
                     <article className="event-tags">
-                        {getTypes(
-                            Object.values(event.segments)
-                                .flatMap(
-                                    (segment) => segment.type as EventlyType
+                        {Object.values(event.segments)
+                            .flatMap((segment) => {
+                                return segment.type as EventlyType
+                            })
+                            .filter((type): type is EventlyType => !!type)
+                            .concat(event.type as EventlyType)
+                            .map((type, index) => {
+                                if (!type) {
+                                    return null
+                                }
+                                return (
+                                    <Tag
+                                        color="blue"
+                                        key={`${type}-${index}`}
+                                        className="event-tag"
+                                    >
+                                        {isTranslationKey(type)
+                                            ? translations[store.getLanguage][
+                                                  type
+                                              ]
+                                            : type}
+                                    </Tag>
                                 )
-                                .concat(event.type as EventlyType)
-                        ).map((type, index) => (
-                            <Tag
-                                color="blue"
-                                key={`${type}-${index}`}
-                                className="event-tag"
-                            >
-                                {type}
-                            </Tag>
-                        ))}
+                            })}
                     </article>
                 </section>
             </section>

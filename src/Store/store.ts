@@ -14,6 +14,8 @@ import {
     CIUserData,
     DBCIEvent,
     EventPayloadType,
+    IAddress,
+    Language,
     ManageUserOption,
     NotificationDB,
     NotificationType,
@@ -39,6 +41,8 @@ import { alertsService } from "../supabase/alertsService"
 import { userRoleService } from "../supabase/userRoleService"
 import { CACHE_VERSION } from "../App"
 import { AuthChangeEvent } from "@supabase/supabase-js"
+import { getAddressFromGooglePlaceId } from "../Components/Common/GooglePlacesInput"
+import { translateText } from "../util/translate"
 
 class Store {
     @observable session: Session | null = null
@@ -61,6 +65,7 @@ class Store {
     @observable loading: boolean = true
     @observable isOnline: boolean = navigator.onLine
     @observable networkFlag: boolean = false
+    @observable language: Language = utilService.getLanguage()
 
     @observable requestNotification: boolean = false
 
@@ -447,6 +452,15 @@ class Store {
     }
 
     @computed
+    get getLanguage() {
+        return this.language
+    }
+    @computed
+    get getDirection() {
+        return this.language === Language.he ? "rtl" : "ltr"
+    }
+
+    @computed
     get getAppTaggableTeachers() {
         const teachers = this.app_taggable_teachers
             .filter((t) => t.user_type !== UserType.org)
@@ -826,6 +840,31 @@ class Store {
     @action
     updateCIEvent = async (ci_event: Partial<CIEvent>) => {
         if (!ci_event.id) return
+
+        const sorceAddress = this.user_future_ci_events.find(
+            (e) => e.id === ci_event.id
+        )?.address
+
+        if (
+            ci_event.address &&
+            ci_event.address.place_id &&
+            ci_event.address.place_id !== sorceAddress?.place_id
+        ) {
+            ci_event.address = await this.fetchAddressTranslation(
+                ci_event.address
+            )
+        }
+
+        const sourceTitle = this.user_future_ci_events.find(
+            (e) => e.id === ci_event.id
+        )?.title
+
+        if (ci_event.title && ci_event.title !== sourceTitle) {
+            ci_event.lng_titles = await this.fetchTitleTranslation(
+                ci_event.title
+            )
+        }
+
         const updatedCIEvent = await cieventsService.updateCIEvent(
             ci_event.id,
             ci_event
@@ -851,7 +890,16 @@ class Store {
     createCIEvent = async (
         ci_event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">
     ) => {
-        const newCIEvent = await cieventsService.createCIEvent(ci_event)
+        const [address, lng_titles] = await Promise.all([
+            this.fetchAddressTranslation(ci_event.address),
+            this.fetchTitleTranslation(ci_event.title),
+        ])
+
+        const newCIEvent = await cieventsService.createCIEvent({
+            ...ci_event,
+            address,
+            lng_titles,
+        })
         this.setCIEvent(newCIEvent, EventPayloadType.INSERT)
     }
 
@@ -1022,6 +1070,7 @@ class Store {
     @action
     updateTemplate = async (template: Partial<CITemplate> & { id: string }) => {
         if (!template.id) return
+
         const updatedTemplate = await templateService.updateTemplate(template)
         this.setTemplate(updatedTemplate, EventPayloadType.UPDATE)
     }
@@ -1298,6 +1347,12 @@ class Store {
         this.setCIEvents(filteredEvents)
     }
 
+    @action
+    setLanguage = (language: Language) => {
+        this.language = language
+        utilService.setLanguage(language)
+    }
+
     async init() {
         console.log("init")
         this.setNetworkFlag(false)
@@ -1317,6 +1372,7 @@ class Store {
             console.error("Error in initialization:", error)
             this.setNetworkFlag(true)
         } finally {
+            this.fetchNextMonthCIEvents()
             this.finalizeInitialization()
         }
     }
@@ -1497,6 +1553,55 @@ class Store {
     fetchAppTaggableTeachers = async () => {
         const appTaggableTeachers = await publicBioService.getTaggableUsers()
         this.setAppTaggableTeachers(appTaggableTeachers)
+    }
+
+    @action
+    fetchNextMonthCIEvents = async () => {
+        const nextMonthCIEvents = await cieventsService.getCIEvents({
+            from_start_date: dayjs()
+                .tz("Asia/Jerusalem")
+                .add(30, "day")
+                .toISOString(),
+            to_start_date: dayjs()
+                .tz("Asia/Jerusalem")
+                .add(60, "day")
+                .toISOString(),
+            sort_by: "start_date",
+            sort_direction: "asc",
+            future_events: true,
+        })
+        // Get only new events that don't exist in app_ci_events
+        const existingEventIds = new Set(
+            this.app_ci_events.map((event) => event.id)
+        )
+        const newEvents = nextMonthCIEvents.filter(
+            (event) => !existingEventIds.has(event.id)
+        )
+        // If there are new events, append them to the existing array
+        if (newEvents.length > 0) {
+            this.app_ci_events.push(...newEvents)
+        }
+    }
+
+    fetchAddressTranslation = async (address: IAddress) => {
+        try {
+            const enAddress = await getAddressFromGooglePlaceId(
+                address.place_id
+            )
+            address.en_label = enAddress
+        } catch (error) {
+            console.error("Error in fetchAddressTranslation:", error)
+        } finally {
+            return address
+        }
+    }
+
+    fetchTitleTranslation = async (title: string) => {
+        const [ruTitle, enTitle] = await Promise.all([
+            translateText(title, Language.ru, "name"),
+            translateText(title, Language.en, "name"),
+        ])
+        return { ru: ruTitle, en: enTitle }
     }
 
     checkNotifications = async () => {

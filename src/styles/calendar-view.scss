@@ -3,6 +3,10 @@
     margin-top: 1rem;
 
     .calendar-controller {
+        &.ltr {
+            flex-direction: row-reverse;
+        }
+
         display: flex;
         flex-direction: row;
         justify-content: center;

@@ -8,6 +8,9 @@ import { Icon } from "../Common/Icon"
 import { LinkButton } from "../Common/LinkButton"
 import { useClearUser } from "../../hooks/useClearUser"
 import { useNavigate } from "react-router"
+import { translations } from "../../util/translations"
+import { store } from "../../Store/store"
+import { observer } from "mobx-react-lite"
 
 enum LoginError {
     none = "",
@@ -15,7 +18,7 @@ enum LoginError {
     default = "שגיאת התחברות",
 }
 
-export default function Login() {
+export default observer(function Login() {
     const emailRef = useRef<InputRef>(null)
     const passwordRef = useRef<InputRef>(null)
     const [error, setError] = useState<LoginError>(LoginError.none)
@@ -60,10 +63,15 @@ export default function Login() {
     }
 
     return (
-        <section id="login-form" className="login-form card">
-            <h1 className="login-title">כניסה והזדהות</h1>
+        <section
+            id="login-form"
+            className={`login-form card ${store.getDirection}`}
+        >
+            <h1 className="login-title">
+                {translations[store.getLanguage].loginTitle}
+            </h1>
             <h3 className="login-subtitle">
-                על מנת לקבל תזכורות על אירועים יש להירשם:
+                {translations[store.getLanguage].loginSubtitle}
             </h3>
             <div>
                 <button
@@ -71,7 +79,9 @@ export default function Login() {
                     disabled={loading}
                     className="google-button default-font "
                 >
-                    <label className="google-button-label">כניסה עם </label>
+                    <label className="google-button-label">
+                        {translations[store.getLanguage].loginWith}
+                    </label>
                     <Icon
                         icon="google_color"
                         className="icon-main google-icon"
@@ -85,12 +95,14 @@ export default function Login() {
                 style={{ maxWidth: 500 }}
                 onFinish={onFinish}
             >
-                <h3 className="login-subtitle">כניסה עם סיסמה:</h3>
+                <h3 className="login-subtitle">
+                    {translations[store.getLanguage].loginWithPassword}
+                </h3>
 
                 <Form.Item>
                     <Input
                         type="email"
-                        placeholder="כתובת מייל"
+                        placeholder={translations[store.getLanguage].email}
                         ref={emailRef}
                         required
                         style={{ marginBottom: "8px" }}
@@ -102,7 +114,7 @@ export default function Login() {
 
                     <Input.Password
                         status={error ? "error" : undefined}
-                        placeholder="סיסמה"
+                        placeholder={translations[store.getLanguage].password}
                         ref={passwordRef}
                         required
                         className="form-input-large login-input"
@@ -125,28 +137,28 @@ export default function Login() {
                         disabled={loading}
                         className="general-action-btn black-btn large-btn"
                     >
-                        כניסה
+                        {translations[store.getLanguage].signin}
                     </button>
                 </Form.Item>
             </Form>
 
             <div className="link-container">
                 <div className="spacer">
-                    פה בפעם הראשונה?
+                    {translations[store.getLanguage].hereForTheFirstTime}
                     <LinkButton to="/signup" className="text-btn">
-                        הרשמה
+                        {translations[store.getLanguage].signUp}
                     </LinkButton>
                 </div>
                 <div className="spacer">
-                    שכחת סיסמה?
+                    {translations[store.getLanguage].forgotPassword}
                     <LinkButton
                         to="/reset-password-request"
                         className="text-btn"
                     >
-                        איפוס סיסמה
+                        {translations[store.getLanguage].resetPassword}
                     </LinkButton>
                 </div>
             </div>
         </section>
     )
-}
+})

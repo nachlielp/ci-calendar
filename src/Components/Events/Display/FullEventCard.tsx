@@ -1,6 +1,6 @@
 import Tag from "antd/es/tag"
-import { EventlyType, CIEvent } from "../../../util/interfaces"
-import { getTag, getType, getTypes } from "./EventPreview"
+import { EventlyType, CIEvent, Language } from "../../../util/interfaces"
+import { getTag } from "./EventPreview"
 import dayjs from "dayjs"
 import { utilService } from "../../../util/utilService"
 import BioModal from "../../Users/BioModal"
@@ -9,12 +9,18 @@ import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
 import { useIsMobile } from "../../../hooks/useIsMobile"
-import '../../../styles/full-event-card.scss'
+import "../../../styles/full-event-card.scss"
 import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 import React, { Component } from "react"
 import { observer } from "mobx-react-lite"
-import { shortHebrewDays } from "../../../util/options"
+import { shortEnglishDays, shortHebrewDays } from "../../../util/options"
+import {
+    getTranslation,
+    isTranslationKey,
+    translations,
+} from "../../../util/translations"
+import { getMonthName, translatePage } from "../../../util/translate"
 
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
@@ -61,37 +67,23 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
 
     return (
         <EventErrorBoundary>
-            <section className="full-event-card" dir="rtl">
+            <section className="full-event-card">
                 <article className="event-header">
-                    <div className="event-title">{ci_event.title}&nbsp;</div>
+                    <div className="event-title">
+                        {utilService.getTitleByLanguage(
+                            ci_event,
+                            store.getLanguage
+                        )}
+                    </div>
                 </article>
-                {ci_event.organisations.length > 0 && (
+                {store.getLanguage !== Language.he && (
                     <article className="event-org">
-                        <Icon icon="domain" className="event-icon" />
-                        <label className="event-label">
-                            {ci_event.organisations.map(
-                                (orgOption, index, array) => {
-                                    const orgId = orgOption.value
-
-                                    const org = store.getAppPublicBios?.find(
-                                        (u) => u.user_id === orgId
-                                    )
-
-                                    return (
-                                        <React.Fragment key={orgOption.value}>
-                                            {org ? (
-                                                <BioModal teacher={org} />
-                                            ) : (
-                                                orgOption.label
-                                            )}
-                                            {index < array.length - 1
-                                                ? ", "
-                                                : ""}
-                                        </React.Fragment>
-                                    )
-                                }
-                            )}
-                        </label>
+                        <button
+                            className="general-action-btn translate-button"
+                            onClick={() => translatePage(store.getLanguage)}
+                        >
+                            <Icon icon="translate" />
+                        </button>
                     </article>
                 )}
                 <article className="event-dates">
@@ -99,14 +91,16 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <>
                             <Icon icon="calendar" className="event-icon" />
                             <label className="event-label">
-                                {
-                                    shortHebrewDays[
+                                {getTranslation(
+                                    shortEnglishDays[
                                         dayjs(ci_event.start_date).day()
-                                    ]
-                                }
+                                    ],
+                                    store.getLanguage
+                                )}
                                 {", "}
-                                {utilService.formatHebrewDate(
-                                    ci_event.start_date
+                                {getMonthName(
+                                    dayjs(ci_event.start_date),
+                                    store.getLanguage
                                 )}
                             </label>
                             <Icon icon="schedule" className="event-icon" />
@@ -150,7 +144,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                 <article className="event-location">
                     <Icon icon="pinDrop" className="event-icon" />
                     <label className="event-label">
-                        {ci_event.address.label}
+                        {store.getLanguage === Language.he
+                            ? ci_event.address.label
+                            : ci_event.address.en_label ||
+                              ci_event.address.label}
                     </label>
                 </article>
 
@@ -169,7 +166,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                             {isTeacher ? (
                                                 <BioModal teacher={isTeacher} />
                                             ) : (
-                                                <label className="teacher-name-label">
+                                                <label className="teacher-name-label translate-this">
                                                     {teacher.label}
                                                 </label>
                                             )}
@@ -192,10 +189,19 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 &nbsp;-&nbsp;
                                 {dayjs(segment.endTime).format("HH:mm")}
                                 &nbsp;
-                                {getType(segment.type as EventlyType)}
+                                {isTranslationKey(segment.type)
+                                    ? translations[store.getLanguage][
+                                          segment.type
+                                      ]
+                                    : segment.type}
                                 {segment.teachers.length > 0 && (
                                     <span>
-                                        &nbsp;עם{" "}
+                                        &nbsp;
+                                        {getTranslation(
+                                            "with",
+                                            store.getLanguage
+                                        )}
+                                        &nbsp;
                                         {segment.teachers.map(
                                             (teacher, index, array) => {
                                                 const isTeacher =
@@ -249,19 +255,28 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                     ))}
 
                 <article className="event-tags">
-                    {getTypes(
-                        ci_event.segments
-                            .flatMap((segment) => segment.type as EventlyType)
-                            .concat(ci_event.type as EventlyType)
-                    ).map((type, index) => (
-                        <Tag
-                            color="blue"
-                            key={`${type}-${index}`}
-                            className="event-tag "
-                        >
-                            {type}
-                        </Tag>
-                    ))}
+                    {Object.values(ci_event.segments)
+                        .flatMap((segment) => {
+                            return segment.type as EventlyType
+                        })
+                        .filter((type): type is EventlyType => !!type)
+                        .concat(ci_event.type as EventlyType)
+                        .map((type, index) => {
+                            if (!type) {
+                                return null
+                            }
+                            return (
+                                <Tag
+                                    color="blue"
+                                    key={`${type}-${index}`}
+                                    className="event-tag"
+                                >
+                                    {isTranslationKey(type)
+                                        ? translations[store.getLanguage][type]
+                                        : type}
+                                </Tag>
+                            )
+                        })}
                 </article>
 
                 <article className="event-links">
@@ -273,7 +288,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 target="_blank"
                                 className="link-button"
                             >
-                                <label className="link-label">
+                                <label className="link-label translate-this">
                                     {link.title}
                                 </label>
                                 <Icon icon="openInNew" className="link-icon" />
@@ -284,9 +299,14 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                 {ci_event.description.length > 0 && (
                     <>
                         <hr className="hr" />
-                        <h3 className="section-title">פרטים נוספים</h3>
+                        <h3 className="section-title">
+                            {getTranslation(
+                                "additionalInfo",
+                                store.getLanguage
+                            )}
+                        </h3>
                         <article className="event-description">
-                            <label className="event-label ">
+                            <label className="event-label translate-this">
                                 {ci_event.description}
                             </label>
                         </article>
@@ -296,12 +316,14 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                 {ci_event.price.length > 0 && (
                     <>
                         <hr className="hr" />
-                        <h3 className="section-title">מחיר</h3>
+                        <h3 className="section-title">
+                            {getTranslation("price", store.getLanguage)}
+                        </h3>
                         <article className="event-price f-18">
                             {ci_event.price.map((price, index) => (
                                 <React.Fragment key={`${price.sum}-${index}`}>
                                     <label className="price-label">
-                                        <span className="price-title">
+                                        <span className="price-title translate-this">
                                             {price.title}
                                         </span>
                                         :&nbsp;
@@ -383,7 +405,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         )}
                         {!utilService.isPWA() && (
                             <SecondaryButton
-                                label="קישור"
+                                label={getTranslation(
+                                    "link",
+                                    store.getLanguage
+                                )}
                                 successLabel="הועתק"
                                 icon="contentCopy"
                                 successIcon="check"

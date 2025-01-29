@@ -4,7 +4,10 @@ import Tag from "antd/es/tag"
 import { eventOptions, districtOptions } from "../../util/options"
 import { useParamsFilterHandler } from "../../hooks/useParamsFilterHandler"
 import { Icon } from "../Common/Icon"
-import '../../styles/filter-drawer.scss'
+import "../../styles/filter-drawer.scss"
+import { isTranslationKey } from "../../util/translations"
+import { store } from "../../Store/store"
+import { translations } from "../../util/translations"
 
 export default function FilterDrawer() {
     const [modalOpen, setModalOpen] = useState(false)
@@ -20,12 +23,12 @@ export default function FilterDrawer() {
                 onClick={() => setModalOpen(true)}
                 className={`anchor-btn ${isSelectedFilter && "active"}`}
             >
-                <p className="text">סינון</p>
+                <p className="text">{translations[store.getLanguage].filter}</p>
                 <Icon icon="instantMix" className="filter-drawer-icon" />
             </button>
 
             <Drawer
-                title={<h2 className="filter-drawer-title">סינון</h2>}
+                title={null}
                 className="filter-drawer custom-drawer"
                 open={modalOpen}
                 onClose={() => setModalOpen(false)}
@@ -33,7 +36,9 @@ export default function FilterDrawer() {
                 placement="bottom"
             >
                 <article className="filter-tags-container">
-                    <h3 className="sub-title">סוג אירוע</h3>
+                    <h3 className="sub-title">
+                        {translations[store.getLanguage].eventType}
+                    </h3>
                     <div className="filter-model-tags">
                         {eventOptions
                             .filter((eventType) => eventType.value !== "warmup")
@@ -48,7 +53,11 @@ export default function FilterDrawer() {
                                             removeOption(eventType.value)
                                         }
                                     >
-                                        {eventType.label}
+                                        {isTranslationKey(eventType.value)
+                                            ? translations[store.getLanguage][
+                                                  eventType.value
+                                              ]
+                                            : eventType.label}
                                     </Tag>
                                 ) : (
                                     <Tag
@@ -58,12 +67,18 @@ export default function FilterDrawer() {
                                             selectOption(eventType.value)
                                         }
                                     >
-                                        {eventType.label}
+                                        {isTranslationKey(eventType.value)
+                                            ? translations[store.getLanguage][
+                                                  eventType.value
+                                              ]
+                                            : eventType.label}
                                     </Tag>
                                 )
                             })}
                     </div>
-                    <h3 className="sub-title">אזור</h3>
+                    <h3 className="sub-title">
+                        {translations[store.getLanguage].region}
+                    </h3>
                     <div className="filter-model-tags">
                         {districtOptions.map((district) => {
                             return currentValues.includes(district.value) ? (
@@ -72,7 +87,11 @@ export default function FilterDrawer() {
                                     key={district.value}
                                     onClick={() => removeOption(district.value)}
                                 >
-                                    {district.label}
+                                    {isTranslationKey(district.value)
+                                        ? translations[store.getLanguage][
+                                              district.value
+                                          ]
+                                        : district.label}
                                 </Tag>
                             ) : (
                                 <Tag
@@ -80,7 +99,11 @@ export default function FilterDrawer() {
                                     key={district.value}
                                     onClick={() => selectOption(district.value)}
                                 >
-                                    {district.label}
+                                    {isTranslationKey(district.value)
+                                        ? translations[store.getLanguage][
+                                              district.value
+                                          ]
+                                        : district.label}
                                 </Tag>
                             )
                         })}

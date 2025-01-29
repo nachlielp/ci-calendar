@@ -64,13 +64,6 @@ const SingleDayEventForm = observer(
             useState<dayjs.Dayjs | null>(null)
 
         useEffect(() => {
-            console.log(
-                "store.getAppTaggableTeachers",
-                store.getAppTaggableTeachers
-            )
-        }, [store.getAppTaggableTeachers])
-
-        useEffect(() => {
             if (isTemplate) {
                 const currentFormValuesObj =
                     utilService.getDraftEvent(DRAFT_KEY)
@@ -188,6 +181,7 @@ const SingleDayEventForm = observer(
             if (!address) {
                 return
             }
+
             setIsSubmitting(true)
             try {
                 if (!isTemplate) {

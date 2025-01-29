@@ -1,5 +1,5 @@
 import { ReactSVG } from "react-svg"
-import '../../styles/icon.scss'
+import "../../styles/icon.scss"
 import expand from "../../assets/svgs/expand.svg"
 import collapse from "../../assets/svgs/collapse.svg"
 import calendar from "../../assets/svgs/calendar.svg"
@@ -28,6 +28,7 @@ import schedule from "../../assets/svgs/schedule.svg"
 import pinDrop from "../../assets/svgs/pin_drop.svg"
 import person from "../../assets/svgs/person.svg"
 import chevron_right from "../../assets/svgs/chevron_right.svg"
+import translate from "../../assets/svgs/translate.svg"
 import menu from "../../assets/svgs/menu.svg"
 import group from "../../assets/svgs/group.svg"
 import calendar_add_on from "../../assets/svgs/calendar_add_on.svg"
@@ -134,6 +135,7 @@ export const Icon = ({
         paybox,
         signal_cellular_connected_no_internet_0_bar,
         touch_app,
+        translate,
     }
     return (
         <label className="icon-component" onClick={onClick}>
