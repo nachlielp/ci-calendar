@@ -63,6 +63,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
         ],
         navigateFallback: "index.html",
         cleanupOutdatedCaches: true,
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // Set to 3MB
     },
     // Add notification related strategies
     strategies: "generateSW",
