@@ -1,6 +1,5 @@
 import Tag from "antd/es/tag"
 import { EventlyType, CIEvent, Language } from "../../../util/interfaces"
-import { getTag } from "./EventPreview"
 import dayjs from "dayjs"
 import { utilService } from "../../../util/utilService"
 import BioModal from "../../Users/BioModal"
