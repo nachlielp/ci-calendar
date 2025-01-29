@@ -64,8 +64,8 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
 
     const nextMonth = () => {
         const newValue = value.add(1, "month")
-        const threeMonthsAhead = dayjs().add(1, "months").endOf("month")
-        if (newValue.isBefore(threeMonthsAhead)) {
+        const twoMonthsAhead = dayjs().add(2, "months").endOf("month")
+        if (newValue.isBefore(twoMonthsAhead)) {
             setValue(newValue)
         }
     }
@@ -78,7 +78,7 @@ export default function CalendarView({ events, onSelect }: CalendarViewProps) {
                     icon="chevron_right"
                     className={`back ${
                         value.isAfter(
-                            dayjs().add(1, "months").startOf("month")
+                            dayjs().add(2, "months").startOf("month")
                         ) && "disabled"
                     }`}
                 />

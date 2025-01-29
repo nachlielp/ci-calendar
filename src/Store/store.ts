@@ -1372,6 +1372,7 @@ class Store {
             console.error("Error in initialization:", error)
             this.setNetworkFlag(true)
         } finally {
+            this.fetchNextMonthCIEvents()
             this.finalizeInitialization()
         }
     }
@@ -1552,6 +1553,34 @@ class Store {
     fetchAppTaggableTeachers = async () => {
         const appTaggableTeachers = await publicBioService.getTaggableUsers()
         this.setAppTaggableTeachers(appTaggableTeachers)
+    }
+
+    @action
+    fetchNextMonthCIEvents = async () => {
+        const nextMonthCIEvents = await cieventsService.getCIEvents({
+            from_start_date: dayjs()
+                .tz("Asia/Jerusalem")
+                .add(30, "day")
+                .toISOString(),
+            to_start_date: dayjs()
+                .tz("Asia/Jerusalem")
+                .add(60, "day")
+                .toISOString(),
+            sort_by: "start_date",
+            sort_direction: "asc",
+            future_events: true,
+        })
+        // Get only new events that don't exist in app_ci_events
+        const existingEventIds = new Set(
+            this.app_ci_events.map((event) => event.id)
+        )
+        const newEvents = nextMonthCIEvents.filter(
+            (event) => !existingEventIds.has(event.id)
+        )
+        // If there are new events, append them to the existing array
+        if (newEvents.length > 0) {
+            this.app_ci_events.push(...newEvents)
+        }
     }
 
     fetchAddressTranslation = async (address: IAddress) => {
