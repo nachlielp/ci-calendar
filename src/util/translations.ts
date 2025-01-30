@@ -454,7 +454,7 @@ export const translations: Translations = {
         welcome: "Добро пожаловать",
         loading: "Загрузка...",
         error: "Ошибка",
-        title: "Контактная импровизация",
+        title: "Контактная импровизация в Израиле",
         description: "Всё, везде",
         filter: "Фильтр",
         eventType: "Тип события",
@@ -466,13 +466,13 @@ export const translations: Translations = {
         loginWith: "Войти с",
         loginTitle: "Вход и идентификация",
         loginSubtitle:
-            "Чтобы получать напоминания о любимых джаммерах, пожалуйста, зарегистрируйтесь:",
+            "Чтобы получать напоминания о любимых джемах, пожалуйста, зарегистрируйтесь:",
         loginWithPassword: "Вход с паролем",
         email: "Электронная почта",
         password: "Пароль",
         signin: "Войти",
         signUp: "Зарегистрироваться",
-        hereForTheFirstTime: "Здесь впервые?",
+        hereForTheFirstTime: "Впервые здесь?",
         forgotPassword: "Забыли пароль?",
         name: "Имя",
         repeatPassword: "Повторите пароль",
@@ -495,11 +495,11 @@ export const translations: Translations = {
         resetPasswordSubTitle: "Введите новый пароль дважды:",
         newPassword: "Новый пароль",
         //PWA
-        addPWABanner: "Для обновлений добавьте на главный экран",
+        addPWABanner: "Для получения обновлений добавьте на главный экран",
         installOnAndroid: "Установить на Android",
         PWAinstallOnIOS: "Установить на iOS",
         PWAnotification: "Хотите получать уведомления о новых событиях?",
-        PWAReminder: "Хотите получать напоминания о любимых джаммерах?",
+        PWAReminder: "Хотите получать напоминания о любимых джемах?",
         PWAFooter: "Добавьте сайт на главный экран в телефоне",
         PWAins1: "1. Откройте сайт в Safari",
         PWAins2: "2. Нажмите на",
@@ -514,14 +514,14 @@ export const translations: Translations = {
         PWAins10: "Добавить на главный экран",
 
         //Options
-        retreat: "Ретрейт",
-        warmup: "Горячий",
+        retreat: "Ретрит",
+        warmup: "Размика",
         workshop: "Семинар",
-        jam: "Гимн",
+        jam: "Джем",
         class: "Класс",
-        underscore: "Подчеркивание",
+        underscore: "Андерскор",
         score: "Счет",
-        course: "Курс",
+        course: "Скор",
 
         // Actions
         save: "Сохранить",
@@ -541,7 +541,7 @@ export const translations: Translations = {
         haifa: "Хайфа",
         galilee: "Галилея",
         pardesHanna: "Пардэс Ханна",
-        carmel: "Хоф Хакармэль",
+        carmel: "Хоф ха-Кармэль",
 
         //months
         january: "Январь",
