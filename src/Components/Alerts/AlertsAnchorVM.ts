@@ -14,7 +14,7 @@ class AlertsAnchorVM {
             reaction(
                 () => store.getAlerts,
                 () => {
-                    // this.cleanup()
+                    this.cleanup()
                     if (navigator.setAppBadge) {
                         navigator.setAppBadge(this.alertsCount)
                     }
