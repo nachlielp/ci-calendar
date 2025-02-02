@@ -343,7 +343,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                     </>
                 )}
 
-                {!utilService.isEventStarted(ci_event) && (
+                {
                     <article className="event-card-footer">
                         <div>
                             <button
@@ -420,7 +420,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                             />
                         )}
                     </article>
-                )}
+                }
             </section>
         </EventErrorBoundary>
     )
