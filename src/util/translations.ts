@@ -520,7 +520,7 @@ export const translations: Translations = {
         jam: "Джем",
         class: "Класс",
         underscore: "Андерскор",
-        score: "Счет",
+        score: "Фокус- Джем",
         course: "Скор",
 
         // Actions

@@ -95,9 +95,6 @@ export const translateText = async (
         console.warn("Cache access error:", error)
     }
 
-    // At this point, we need to call the API - log the translation request
-    console.log(`Translating via API: ${text} to ${targetLang}`)
-
     // Proceed with API translation if not cached
     const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
