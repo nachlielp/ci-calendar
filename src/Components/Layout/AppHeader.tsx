@@ -141,7 +141,6 @@ const languageMenu = (
             value={store.getLanguage}
             dropdownRender={(menu) => <div>{menu}</div>}
             popupClassName="header-language-toggle-select"
-            open
         >
             {languagesToShow.map((lang: Language) => {
                 console.log(`Rendering icon for language: ${store.getLanguage}`)
