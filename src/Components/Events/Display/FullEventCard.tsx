@@ -11,7 +11,7 @@ import { useIsMobile } from "../../../hooks/useIsMobile"
 import "../../../styles/full-event-card.scss"
 import InstallPWABanner from "../../Common/InstallPWABanner"
 import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
-import React, { Component } from "react"
+import React, { Component, useEffect } from "react"
 import { observer } from "mobx-react-lite"
 import { shortEnglishDays, shortHebrewDays } from "../../../util/options"
 import {
@@ -57,6 +57,11 @@ class EventErrorBoundary extends Component<
 
 const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
     const isMobile = useIsMobile()
+    useEffect(() => {
+        if (store.getLanguage !== Language.he) {
+            translatePage(store.getLanguage)
+        }
+    }, [])
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
@@ -76,16 +81,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         )}
                     </div>
                 </article>
-                {store.getLanguage !== Language.he && (
-                    <article className="event-org">
-                        <button
-                            className="general-action-btn translate-button"
-                            onClick={() => translatePage(store.getLanguage)}
-                        >
-                            <Icon icon="translate" />
-                        </button>
-                    </article>
-                )}
+
                 <article className="event-dates">
                     {ci_event.segments.length > 0 ? (
                         <>
