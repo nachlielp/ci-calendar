@@ -1,5 +1,5 @@
 import React from "react"
-import { ConfigProvider } from "antd"
+import ConfigProvider from "antd/es/config-provider"
 import * as Sentry from "@sentry/react"
 import { Routes } from "react-router"
 import enUS from "antd/locale/en_US"

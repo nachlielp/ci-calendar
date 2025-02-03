@@ -2,10 +2,10 @@ import MenuButtons from "../../Common/MenuButtons"
 import { Icon } from "../../Common/Icon"
 import Skeleton from "antd/es/skeleton"
 import { utilService } from "../../../util/utilService"
-import { Tag } from "antd"
+import Tag from "antd/es/tag"
 import { ReactSVG } from "react-svg"
 import close from "../../../assets/svgs/close.svg"
-import '../../../styles/events-page-skeleton.scss'
+import "../../../styles/events-page-skeleton.scss"
 
 export default function EventsPageSkeleton({
     withHeader = true,

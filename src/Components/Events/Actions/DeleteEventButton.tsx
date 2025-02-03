@@ -1,11 +1,12 @@
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
-import { Checkbox, Modal } from "antd"
+import Modal from "antd/lib/modal"
+import Checkbox from "antd/lib/checkbox"
 import type { CheckboxChangeEvent } from "antd/es/checkbox"
 import { CIEvent } from "../../../util/interfaces"
 import dayjs from "dayjs"
 import { useState } from "react"
-import '../../../styles/batch-action-event-modal.scss'
+import "../../../styles/batch-action-event-modal.scss"
 
 interface IDeleteEventProps {
     event: CIEvent

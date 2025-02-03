@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react"
 import { useNavigate, useLocation } from "react-router"
 import MultiDayEventForm from "../Events/Forms/MultiDayEventForm"
 import "../../styles/single-day-form-page.scss"
-import { Alert } from "antd"
+import Alert from "antd/es/alert"
 
 const EVENT_TYPE_LABEL = "אירוע רב יומי"
 const TEMPLATE_TYPE_LABEL = "תבנית רב יומית"

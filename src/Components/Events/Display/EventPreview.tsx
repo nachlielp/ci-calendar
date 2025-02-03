@@ -12,7 +12,7 @@ import { Icon } from "../../Common/Icon"
 import { utilService } from "../../../util/utilService"
 import "../../../styles/event-preview.scss"
 import "../../../styles/generics/card.scss"
-import { Spin } from "antd"
+import Spin from "antd/es/spin"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
 import {
