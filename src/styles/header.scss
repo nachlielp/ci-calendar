@@ -11,9 +11,17 @@
     z-index: 100;
 
     .header-language-toggle-select .ant-select-selector {
-        background-color: #fce7c0;
+        background-color: transparent;
         border: none;
         box-shadow: none;
+        &:focus-visible,
+        &:active,
+        &:hover,
+        &:focus,
+        &:focus-within {
+            border: none;
+            box-shadow: none !important;
+        }
     }
     .header-language-toggle-btn {
         width: 24px;
