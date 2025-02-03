@@ -12,10 +12,12 @@ import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
-import { RadioChangeEvent, Spin } from "antd/lib"
-import Radio from "antd/es/radio"
+import { Spin, Select } from "antd/lib"
+
 import { translations } from "../../util/translations"
-import { languageNames } from "../../util/options"
+import he from "../../assets/img/he.png"
+import en from "../../assets/img/en.png"
+import ru from "../../assets/img/ru.png"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -29,9 +31,8 @@ const AppHeader = () => {
         vm.setCurrentPath(location.pathname)
     }, [location.pathname])
 
-    const changeLocale = (e: RadioChangeEvent) => {
-        const newLang = e.target.value as Language
-        store.setLanguage(newLang)
+    const changeLocale = (lang: Language) => {
+        store.setLanguage(lang)
     }
 
     return (
@@ -64,21 +65,7 @@ const AppHeader = () => {
                         <Icon icon="home" className="icon-main" />
                     </LinkButton>
                 )}
-                <Radio.Group
-                    value={store.getLanguage}
-                    onChange={changeLocale}
-                    className="header-language-toggle"
-                >
-                    {languagesToShow.map((lang: Language) => (
-                        <Radio.Button
-                            key={lang}
-                            value={lang}
-                            className={`header-language-toggle-btn ${lang}`}
-                        >
-                            {languageNames[lang]}
-                        </Radio.Button>
-                    ))}
-                </Radio.Group>
+                {languageMenu(languagesToShow, changeLocale)}
                 <>
                     <div className="header-actions">
                         {store.getOffline && (
@@ -137,9 +124,37 @@ const InstallPWABannerAnchor = () => {
             >
                 <div className="install-pwa-btn-text">
                     <span>{translations[store.getLanguage].addPWABanner}</span>
-                    <Icon icon="touch_app" className="add-alert-icon white" />
+                    <img src="../../assets/svgs/he.svg" alt="touch_app" />
                 </div>
             </button>
         </div>
     )
 }
+
+const languageMenu = (
+    languagesToShow: Language[],
+    changeLocale: (lang: Language) => void
+) => (
+    <Select
+        onChange={(value) => changeLocale(value as Language)}
+        value={store.getLanguage}
+        dropdownRender={(menu) => <div>{menu}</div>}
+        className="header-language-toggle-select"
+    >
+        {languagesToShow.map((lang: Language) => {
+            console.log(`Rendering icon for language: ${lang}`)
+            return (
+                <Select.Option key={lang} value={lang}>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                        <img
+                            src={lang === "he" ? he : lang === "en" ? en : ru}
+                            alt={lang}
+                            className="header-language-toggle-btn"
+                            style={{ width: 24, height: 24 }}
+                        />
+                    </div>
+                </Select.Option>
+            )
+        })}
+    </Select>
+)
