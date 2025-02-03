@@ -10,19 +10,22 @@
     top: 0;
     z-index: 100;
 
-    .header-language-toggle-select .ant-select-selector {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-        &:focus-visible,
-        &:active,
-        &:hover,
-        &:focus,
-        &:focus-within {
+    .header-language-toggle-container {
+        .ant-select-selector {
+            background-color: transparent;
             border: none;
-            box-shadow: none !important;
+            box-shadow: none;
+            &:focus-visible,
+            &:active,
+            &:hover,
+            &:focus,
+            &:focus-within {
+                border: none;
+                box-shadow: none !important;
+            }
         }
     }
+
     .header-language-toggle-btn {
         width: 24px;
         height: 24px;
@@ -193,4 +196,21 @@
             height: 16px;
         }
     }
+}
+
+.header-language-toggle-select {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    &:focus-visible,
+    &:active,
+    &:hover,
+    &:focus,
+    &:focus-within {
+        border: none;
+        box-shadow: none !important;
+    }
+}
+.header-language-toggle-select-option {
+    background: rgba(0, 0, 0, 0.2) !important;
 }

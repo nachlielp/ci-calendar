@@ -135,26 +135,40 @@ const languageMenu = (
     languagesToShow: Language[],
     changeLocale: (lang: Language) => void
 ) => (
-    <Select
-        onChange={(value) => changeLocale(value as Language)}
-        value={store.getLanguage}
-        dropdownRender={(menu) => <div>{menu}</div>}
-        className="header-language-toggle-select"
-    >
-        {languagesToShow.map((lang: Language) => {
-            console.log(`Rendering icon for language: ${lang}`)
-            return (
-                <Select.Option key={lang} value={lang}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <img
-                            src={lang === "he" ? he : lang === "en" ? en : ru}
-                            alt={lang}
-                            className="header-language-toggle-btn"
-                            style={{ width: 24, height: 24 }}
-                        />
-                    </div>
-                </Select.Option>
-            )
-        })}
-    </Select>
+    <div className="header-language-toggle-container">
+        <Select
+            onChange={(value) => changeLocale(value as Language)}
+            value={store.getLanguage}
+            dropdownRender={(menu) => <div>{menu}</div>}
+            popupClassName="header-language-toggle-select"
+            open
+        >
+            {languagesToShow.map((lang: Language) => {
+                console.log(`Rendering icon for language: ${store.getLanguage}`)
+                const isSelected = store.getLanguage === lang
+                return (
+                    <Select.Option
+                        key={lang}
+                        value={lang}
+                        className={
+                            isSelected
+                                ? "header-language-toggle-select-option"
+                                : ""
+                        }
+                    >
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <img
+                                src={
+                                    lang === "he" ? he : lang === "en" ? en : ru
+                                }
+                                alt={lang}
+                                className="header-language-toggle-btn"
+                                style={{ width: 24, height: 24 }}
+                            />
+                        </div>
+                    </Select.Option>
+                )
+            })}
+        </Select>
+    </div>
 )
