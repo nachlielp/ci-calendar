@@ -143,7 +143,6 @@ const languageMenu = (
             popupClassName="header-language-toggle-select"
         >
             {languagesToShow.map((lang: Language) => {
-                console.log(`Rendering icon for language: ${store.getLanguage}`)
                 const isSelected = store.getLanguage === lang
                 return (
                     <Select.Option
