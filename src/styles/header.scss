@@ -11,6 +11,8 @@
     z-index: 100;
 
     .header-language-toggle-container {
+        padding: 0;
+
         .ant-select-selector {
             background-color: transparent;
             border: none;
@@ -107,7 +109,7 @@
         font-weight: 600;
     }
     .header-language-toggle {
-        direction: rtl;
+        // direction: rtl;
         padding-left: 1rem;
 
         .header-language-toggle-btn {
@@ -211,11 +213,7 @@
         border: none;
         box-shadow: none !important;
     }
+    .ant-select-item-option {
+        padding: 4px;
+    }
 }
-// .header-language-toggle-select-option,
-// .header-language-toggle-select-option:active,
-// .header-language-toggle-select-option:hover,
-// .header-language-toggle-select-option:focus,
-// .header-language-toggle-select-option:focus-within {
-//     background: rgba(0, 0, 0, 0.2) !important;
-// }

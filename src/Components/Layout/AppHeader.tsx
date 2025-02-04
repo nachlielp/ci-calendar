@@ -125,7 +125,7 @@ const InstallPWABannerAnchor = () => {
             >
                 <div className="install-pwa-btn-text">
                     <span>{translations[store.getLanguage].addPWABanner}</span>
-                    <img src="../../assets/svgs/he.svg" alt="touch_app" />
+                    <Icon icon="touch_app" className="add-alert-icon white" />
                 </div>
             </button>
         </div>
@@ -142,6 +142,8 @@ const languageMenu = (
             value={store.getLanguage}
             dropdownRender={(menu) => <div>{menu}</div>}
             popupClassName="header-language-toggle-select"
+            popupMatchSelectWidth={40}
+            suffixIcon={null}
         >
             {languagesToShow.map((lang: Language) => {
                 const isSelected = store.getLanguage === lang
