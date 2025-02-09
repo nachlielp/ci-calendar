@@ -1,6 +1,7 @@
 import { Suspense, useState } from "react"
 import { useNavigate } from "react-router"
 import "./styles/overrides.scss"
+import settings from "./assets/svgs/settings.svg"
 
 import EventsPageSkeleton from "./Components/Events/Display/EventsPageSkeleton"
 import AppHeader from "./Components/Layout/AppHeader"
@@ -16,9 +17,9 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import { useRemoveAppLoadingScreen } from "./hooks/useRemoveAppLoadingScreen"
-import { Icon } from "./Components/Common/Icon"
 import PostHogPageView from "./Components/Common/PHPageView"
 import { AppRoutes } from "./routes"
+import { ReactSVG } from "react-svg"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -84,7 +85,12 @@ const DisableAppNotice = () => {
             >
                 <section className="app-disabled">
                     <span>
-                        <Icon icon="settings" className="event-icon spinning" />
+                        <label className="icon-component">
+                            <ReactSVG
+                                src={settings}
+                                className="event-icon spinning"
+                            />
+                        </label>
                     </span>
                     <h2 className="app-disabled-title">
                         קונטקט אימפרוביזציה ישראל
