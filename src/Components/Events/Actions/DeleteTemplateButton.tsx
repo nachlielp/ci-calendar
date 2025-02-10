@@ -1,13 +1,14 @@
 import { Icon } from "../../Common/Icon"
 import { confirm } from "../../Common/Confirm"
-
+import warning from "../../../assets/svgs/warning.svg"
+import deleteIcon from "../../../assets/svgs/delete.svg"
 const showDeleteConfirm = (
     templateId: string,
     handleDeleteTemplate: (templateId: string) => void
 ) => {
     confirm({
         title: <div>מחיקת תבנית</div>,
-        icon: <Icon icon="warning" />,
+        icon: <Icon icon={warning} />,
         content: (
             <div>
                 האם אתם בטוחים שאתם רוצים למחוק את התבנית ? מחיקת התבנית תמחק את
@@ -43,7 +44,7 @@ export default function DeleteTemplateButton({
             className="list-btn"
             onClick={() => showDeleteConfirm(templateId, handleDeleteTemplate)}
         >
-            <Icon icon="deleteIcon" />
+            <Icon icon={deleteIcon} />
         </button>
     )
 }

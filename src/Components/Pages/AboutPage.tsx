@@ -1,8 +1,8 @@
 import { EMAIL_SUPPORT, PAYBOX_URL } from "../../App"
-import '../../styles/about-page.scss'
+import "../../styles/about-page.scss"
 import PageFooter from "../Common/PageFooter"
 import { Icon } from "../Common/Icon"
-
+import paybox from "../../assets/svgs/paybox.svg"
 export function AboutPage() {
     return (
         <section className="about-page ">
@@ -17,7 +17,7 @@ export function AboutPage() {
                         className="general-action-btn paybox-btn"
                         onClick={() => window.open(PAYBOX_URL, "_blank")}
                     >
-                        <Icon icon="paybox" />
+                        <Icon icon={paybox} />
                         תרומה בפייבוקס
                     </button>
                 </article>
@@ -60,7 +60,7 @@ export function AboutPage() {
                     className="general-action-btn paybox-btn"
                     onClick={() => window.open(PAYBOX_URL, "_blank")}
                 >
-                    <Icon icon="paybox" />
+                    <Icon icon={paybox} />
                     תרומה בפייבוקס
                 </button>
                 <hr className="hr" />

@@ -4,7 +4,9 @@ import Row from "antd/es/row"
 import Col from "antd/es/col"
 import InputNumber from "antd/es/input-number"
 import { Icon } from "../../Common/Icon"
-import '../../../styles/add-prices-form.scss'
+import "../../../styles/add-prices-form.scss"
+import do_not_disturb from "../../../assets/svgs/doNotDisturb.svg"
+import add_circle from "../../../assets/svgs/addCircle.svg"
 export default function AddPricesForm() {
     return (
         <section className="add-prices-form">
@@ -68,7 +70,7 @@ export default function AddPricesForm() {
                                         className="remove-button"
                                         onClick={() => remove(name)}
                                     >
-                                        <Icon icon="doNotDisturb" />
+                                        <Icon icon={do_not_disturb} />
                                         <span className="remove-button-label">
                                             הסרת מחיר
                                         </span>
@@ -83,7 +85,7 @@ export default function AddPricesForm() {
                             >
                                 <span className="add-button-content">
                                     <Icon
-                                        icon="addCircle"
+                                        icon={add_circle}
                                         className="add-icon"
                                     />
                                     <span className="add-button-label">

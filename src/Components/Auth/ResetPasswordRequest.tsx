@@ -8,7 +8,7 @@ import "../../styles/reset-password-request.scss"
 import { observer } from "mobx-react-lite"
 import { translations } from "../../util/translations"
 import { store } from "../../Store/store"
-
+import mail from "../../assets/svgs/mail.svg"
 function ResetPasswordRequest() {
     const emailRef = useRef<InputRef>(null)
 
@@ -72,7 +72,7 @@ function ResetPasswordRequest() {
                         required
                         disabled={loading || mailSent}
                         className="form-input-large"
-                        prefix={<Icon icon="mail" />}
+                        prefix={<Icon icon={mail} />}
                     />
                 </Form.Item>
                 {message ? (

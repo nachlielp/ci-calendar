@@ -25,7 +25,9 @@ import { store } from "../../Store/store"
 import { appHeaderVM as headerVM } from "../Layout/AppHeaderVM"
 import EventsPageSkeleton from "../Events/Display/EventsPageSkeleton"
 import { isTranslationKey, translations } from "../../util/translations"
-
+import close from "../../assets/svgs/close.svg"
+import view_day from "../../assets/svgs/viewDay.svg"
+import calendar from "../../assets/svgs/calendar.svg"
 const EventsPage = () => {
     const events = store.getSortedEvents
     const { selectedEvent } = useSetSelectedEventByParams()
@@ -78,12 +80,12 @@ const EventsPage = () => {
                         options={[
                             {
                                 key: "list",
-                                icon: "viewDay",
+                                icon: view_day,
                                 ariaLabel: "צפייה ברשימת אירועים",
                             },
                             {
                                 key: "calendar",
-                                icon: "calendar",
+                                icon: calendar,
                                 ariaLabel: "צפייה באירועים לפי לוח שנה",
                             },
                         ]}
@@ -102,7 +104,7 @@ const EventsPage = () => {
                             {isTranslationKey(eventType)
                                 ? translations[store.getLanguage][eventType]
                                 : eventType}
-                            <Icon icon="close" />
+                            <Icon icon={close} />
                         </Tag>
                     ))}
                 </article>

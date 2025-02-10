@@ -8,12 +8,12 @@ import { useWindowSize } from "../../hooks/useWindowSize"
 import Select from "antd/es/select"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
-import '../../styles/manage-users.scss'
+import "../../styles/manage-users.scss"
 import { action, computed, makeObservable, observable } from "mobx"
 import { reaction } from "mobx"
 import message from "antd/es/message"
 import { Icon } from "../Common/Icon"
-
+import content_copy from "../../assets/svgs/content_copy.svg"
 class ManageUsersVM {
     @observable users: ManageUserOption[] = []
     @observable selectedUser: ManageUserOption | null = null
@@ -241,7 +241,7 @@ function ManageUsersPage() {
                             title="Click to copy"
                         >
                             {vm.getSelectedUser?.phone}
-                            <Icon icon="contentCopy" className="copy-icon" />
+                            <Icon icon={content_copy} className="copy-icon" />
                         </p>
                         <p>
                             {

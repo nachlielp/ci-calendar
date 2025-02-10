@@ -5,7 +5,9 @@ import Col from "antd/es/col"
 import { eventOptions, tagOptions } from "../../../util/options"
 import { Icon } from "../../Common/Icon"
 import TimeInputModal from "./TimeInputModal"
-import '../../../styles/event-segments-form.scss'
+import "../../../styles/event-segments-form.scss"
+import do_not_disturb from "../../../assets/svgs/doNotDisturb.svg"
+import add_circle from "../../../assets/svgs/addCircle.svg"
 interface EventSegmentsFormProps {
     form: any
     teachers: { label: string; value: string }[]
@@ -151,7 +153,7 @@ export default function EventSegmentsForm({
                                         className="remove-button"
                                         onClick={() => remove(name)}
                                     >
-                                        <Icon icon="doNotDisturb" />
+                                        <Icon icon={do_not_disturb} />
                                         <span className="remove-button-label">
                                             הסר אירוע המשך
                                         </span>
@@ -167,7 +169,7 @@ export default function EventSegmentsForm({
                                     form.setFieldsValue({ newSubTeacher: "" })
                                 }}
                             >
-                                <Icon icon="addCircle" />
+                                <Icon icon={add_circle} />
                                 <span className="add-button-label">
                                     הוספת אירוע המשך
                                 </span>

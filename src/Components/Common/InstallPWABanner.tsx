@@ -12,7 +12,8 @@ import { observer } from "mobx-react-lite"
 import Modal from "antd/es/modal"
 import { getTranslation } from "../../util/translations"
 import { store } from "../../Store/store"
-
+import notifications_active from "../../assets/svgs/notifications_active.svg"
+import ad_units from "../../assets/svgs/ad_units.svg"
 const InstallPWABanner = ({
     anchorElement,
 }: {
@@ -55,7 +56,7 @@ const InstallPWABanner = ({
             <section className="section-info">
                 <article className="article-info">
                     <Icon
-                        icon="notifications_active"
+                        icon={notifications_active}
                         className="article-icon"
                     />
                     <p className="article-item">
@@ -64,7 +65,7 @@ const InstallPWABanner = ({
                     </p>
                 </article>
                 <article className="article-info">
-                    <Icon icon="ad_units" className="article-icon" />
+                    <Icon icon={ad_units} className="article-icon" />
                     <p className="article-item">
                         {getTranslation("PWAReminder", store.getLanguage) ||
                             "רוצים תזכורות לג׳אמים האהובים עליכם?"}
@@ -115,7 +116,7 @@ const InstallPWABanner = ({
             <section className="section-info">
                 <article className="article-info">
                     <Icon
-                        icon="notifications_active"
+                        icon={notifications_active}
                         className="article-icon"
                     />
                     <p className="article-item">
@@ -124,7 +125,7 @@ const InstallPWABanner = ({
                     </p>
                 </article>
                 <article className="article-info">
-                    <Icon icon="ad_units" className="article-icon" />
+                    <Icon icon={ad_units} className="article-icon" />
                     <p className="article-item">
                         {getTranslation("PWAReminder", store.getLanguage) ||
                             "רוצים תזכורות לג׳אמים האהובים עליכם?"}

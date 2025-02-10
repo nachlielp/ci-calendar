@@ -2,11 +2,11 @@ import { store } from "../../Store/store"
 import { confirm } from "../Common/Confirm"
 import { Icon } from "../Common/Icon"
 import { CACHE_VERSION } from "../../App"
-
+import warning from "../../assets/svgs/warning.svg"
 const showClearStorageConfirm = () => {
     confirm({
         title: <div>האם לאפס את האפליקציה?</div>,
-        icon: <Icon icon="warning" />,
+        icon: <Icon icon={warning} />,
         content: <div></div>,
         okText: "איפוס",
         okType: "danger",

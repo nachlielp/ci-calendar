@@ -3,8 +3,8 @@ import DeleteTemplateButton from "../Actions/DeleteTemplateButton"
 import { Icon } from "../../Common/Icon"
 import { observer } from "mobx-react-lite"
 import { store } from "../../../Store/store"
-import '../../../styles/manage-templates-list.scss'
-
+import "../../../styles/manage-templates-list.scss"
+import edit from "../../../assets/svgs/edit.svg"
 //TODO move edit to page with save state
 const ManageTemplatesList = () => {
     async function handleDeleteTemplate(templateId: string) {
@@ -26,7 +26,7 @@ const ManageTemplatesList = () => {
                                         key="list-btn-edit"
                                         className="list-btn"
                                     >
-                                        <Icon icon="edit" />
+                                        <Icon icon={edit} />
                                     </button>
                                 }
                                 eventType={

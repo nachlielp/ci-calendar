@@ -1,6 +1,6 @@
 import Spin from "antd/es/spin"
-import '../../styles/loading.scss'
-import '../../styles/error-boundary.scss'
+import "../../styles/loading.scss"
+import "../../styles/error-boundary.scss"
 
 // export default function Loading() {
 //     return (
@@ -13,6 +13,7 @@ import '../../styles/error-boundary.scss'
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { Icon } from "./Icon"
+import warning from "../../assets/svgs/warning.svg"
 
 const Loading = () => {
     const [isStuck, setIsStuck] = useState(false)
@@ -31,7 +32,7 @@ const Loading = () => {
         return (
             <div className="error-container">
                 <h2> נראה שמשהו השתבש</h2>
-                <Icon icon="warning" className="warning-icon" />
+                <Icon icon={warning} className="warning-icon" />
                 <button
                     onClick={() => {
                         navigate("/")

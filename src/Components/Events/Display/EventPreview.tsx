@@ -21,7 +21,11 @@ import {
     translations,
 } from "../../../util/translations"
 import { getMonthName } from "../../../util/translate"
-
+import domain from "../../../assets/svgs/domain.svg"
+import calendar from "../../../assets/svgs/calendar.svg"
+import schedule from "../../../assets/svgs/schedule.svg"
+import pin_drop from "../../../assets/svgs/pin_drop.svg"
+import person from "../../../assets/svgs/person.svg"
 interface EventPreviewProps {
     event: CIEvent
     isClicked: boolean
@@ -105,7 +109,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     </article>
                     {orgs.length > 0 && (
                         <article className="event-org">
-                            <Icon icon="domain" className="event-icon" />
+                            <Icon icon={domain} className="event-icon" />
                             <label
                                 className="event-label  "
                                 data-translation-context="name"
@@ -117,7 +121,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     <article className="event-dates">
                         {event.segments.length > 0 ? (
                             <>
-                                <Icon icon="calendar" className="event-icon" />
+                                <Icon icon={calendar} className="event-icon" />
                                 <label className="event-label">
                                     {getTranslation(
                                         shortEnglishDays[
@@ -131,7 +135,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                         store.getLanguage
                                     )}
                                 </label>
-                                <Icon icon="schedule" className="event-icon" />
+                                <Icon icon={schedule} className="event-icon" />
                                 <label className="event-label">
                                     {dayjs(event.segments[0].startTime).format(
                                         "HH:mm"
@@ -145,7 +149,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                             </>
                         ) : (
                             <>
-                                <Icon icon="calendar" className="event-icon" />
+                                <Icon icon={calendar} className="event-icon" />
                                 <label className="event-label ">
                                     {
                                         shortHebrewDays[
@@ -172,7 +176,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     </article>
 
                     <article className="event-location">
-                        <Icon icon="pinDrop" className="event-icon" />
+                        <Icon icon={pin_drop} className="event-icon" />
                         <label className="event-label ">
                             {store.getLanguage === Language.he
                                 ? event.address.label
@@ -183,7 +187,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     {(teachers.length > 0 ||
                         singleDayTeacherNames.length > 0) && (
                         <article className="event-teachers">
-                            <Icon icon="person" className="event-icon" />
+                            <Icon icon={person} className="event-icon" />
                             <label className="event-label ">
                                 {getTranslation("with", store.getLanguage)}
                                 &nbsp;

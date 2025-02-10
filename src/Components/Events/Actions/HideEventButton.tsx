@@ -7,7 +7,8 @@ import { useState } from "react"
 import { CIEvent } from "../../../util/interfaces"
 import { CheckboxChangeEvent } from "antd/es/checkbox"
 import "../../../styles/batch-action-event-modal.scss"
-
+import visibility from "../../../assets/svgs/visibility.svg"
+import visibility_off from "../../../assets/svgs/visibilityOff.svg"
 export default function HideEventButton({ event }: { event: CIEvent }) {
     const [open, setOpen] = useState(false)
     const [checkedAll, setCheckedAll] = useState(false)
@@ -52,9 +53,9 @@ export default function HideEventButton({ event }: { event: CIEvent }) {
                 style={{ borderRadius: "5px 0px 0px 5px" }}
             >
                 {event.hide ? (
-                    <Icon icon="visibility" />
+                    <Icon icon={visibility} />
                 ) : (
-                    <Icon icon="visibilityOff" />
+                    <Icon icon={visibility_off} />
                 )}
             </button>
             <Modal

@@ -11,6 +11,9 @@ import { useNavigate } from "react-router"
 import { translations } from "../../util/translations"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
+import google_color from "../../assets/svgs/google_color.svg"
+import mail from "../../assets/svgs/mail.svg"
+import lock from "../../assets/svgs/lock.svg"
 
 enum LoginError {
     none = "",
@@ -83,7 +86,7 @@ export default observer(function Login() {
                         {translations[store.getLanguage].loginWith}
                     </label>
                     <Icon
-                        icon="google_color"
+                        icon={google_color}
                         className="icon-main google-icon"
                     />
                 </button>
@@ -108,7 +111,7 @@ export default observer(function Login() {
                         style={{ marginBottom: "8px" }}
                         allowClear
                         size="large"
-                        prefix={<Icon icon="mail" />}
+                        prefix={<Icon icon={mail} />}
                         className="form-input-large login-input"
                     />
 
@@ -120,7 +123,7 @@ export default observer(function Login() {
                         className="form-input-large login-input"
                         allowClear
                         size="large"
-                        prefix={<Icon icon="lock" />}
+                        prefix={<Icon icon={lock} />}
                     />
                 </Form.Item>
                 {error ? (

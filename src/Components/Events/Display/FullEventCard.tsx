@@ -21,7 +21,14 @@ import {
     translations,
 } from "../../../util/translations"
 import { getMonthName, translatePage } from "../../../util/translate"
-
+import calendar from "../../../assets/svgs/calendar.svg"
+import schedule from "../../../assets/svgs/schedule.svg"
+import pin_drop from "../../../assets/svgs/pin_drop.svg"
+import person from "../../../assets/svgs/person.svg"
+import open_in_new from "../../../assets/svgs/openInNew.svg"
+import calendar_add_on from "../../../assets/svgs/calendar_add_on.svg"
+import notifications from "../../../assets/svgs/notifications.svg"
+import content_copy from "../../../assets/svgs/content_copy.svg"
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
     { hasError: boolean }
@@ -85,7 +92,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                 <article className="event-dates">
                     {ci_event.segments.length > 0 ? (
                         <>
-                            <Icon icon="calendar" className="event-icon" />
+                            <Icon icon={calendar} className="event-icon" />
                             <label className="event-label">
                                 {getTranslation(
                                     shortEnglishDays[
@@ -99,7 +106,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                     store.getLanguage
                                 )}
                             </label>
-                            <Icon icon="schedule" className="event-icon" />
+                            <Icon icon={schedule} className="event-icon" />
                             <label className="event-label">
                                 {dayjs(ci_event.segments[0].startTime).format(
                                     "HH:mm"
@@ -112,7 +119,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         </>
                     ) : (
                         <>
-                            <Icon icon="calendar" className="event-icon" />
+                            <Icon icon={calendar} className="event-icon" />
                             <label className="event-label">
                                 {
                                     shortHebrewDays[
@@ -138,7 +145,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                     )}
                 </article>
                 <article className="event-location">
-                    <Icon icon="pinDrop" className="event-icon" />
+                    <Icon icon={pin_drop} className="event-icon" />
                     <label className="event-label">
                         {store.getLanguage === Language.he
                             ? ci_event.address.label
@@ -149,7 +156,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
 
                 {multiDayTeachersLen.length > 0 && (
                     <article className="event-multi-day-teachers">
-                        <Icon icon="person" className="event-icon" />
+                        <Icon icon={person} className="event-icon" />
                         <label className="event-labels">
                             {multiDayTeachersLen.map(
                                 (teacher, index, array) => {
@@ -291,7 +298,10 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 <label className="link-label translate-this">
                                     {link.title}
                                 </label>
-                                <Icon icon="openInNew" className="link-icon" />
+                                <Icon
+                                    icon={open_in_new}
+                                    className="link-icon"
+                                />
                             </a>
                         ))}
                 </article>
@@ -348,7 +358,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 }
                                 className={`secondary-action-btn `}
                             >
-                                <Icon icon="calendar_add_on" />
+                                <Icon icon={calendar_add_on} />
                             </button>
                         </div>
                         {isMobile && !utilService.isPWA() && (
@@ -360,7 +370,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                         }
                                         className={`secondary-action-btn `}
                                     >
-                                        <Icon icon="notifications" />
+                                        <Icon icon={notifications} />
                                     </button>
                                 }
                             />
@@ -410,7 +420,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                     store.getLanguage
                                 )}
                                 successLabel="הועתק"
-                                icon="contentCopy"
+                                icon={content_copy}
                                 successIcon="check"
                                 callback={handleCopy}
                             />

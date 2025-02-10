@@ -7,7 +7,7 @@ import { Icon } from "../Common/Icon"
 import Modal from "antd/es/modal"
 import { isTranslationKey, translations } from "../../util/translations"
 import { store } from "../../Store/store"
-
+import instant_mix from "../../assets/svgs/instantMix.svg"
 export default function FilterModal() {
     const [modalOpen, setModalOpen] = useState(false)
 
@@ -23,7 +23,7 @@ export default function FilterModal() {
                 className={`anchor-btn ${isSelectedFilter && "active"}`}
             >
                 <p className="text">{translations[store.getLanguage].filter}</p>
-                <Icon icon="instantMix" className="filter-model-icon" />
+                <Icon icon={instant_mix} className="filter-model-icon" />
             </button>
 
             <Modal

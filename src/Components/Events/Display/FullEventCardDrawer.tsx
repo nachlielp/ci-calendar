@@ -7,6 +7,7 @@ import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
+import chevron_right from "../../../assets/svgs/chevron_right.svg"
 
 interface EventDrawerProps {
     event: CIEvent | null
@@ -67,7 +68,7 @@ const FullEventCardDrawer = ({
                 onClose={onClose}
                 open={isModalOpen}
                 closeIcon={
-                    <Icon icon="chevron_right" className="event-drawer-close" />
+                    <Icon icon={chevron_right} className="event-drawer-close" />
                 }
             >
                 <FullEventCard event={event} />

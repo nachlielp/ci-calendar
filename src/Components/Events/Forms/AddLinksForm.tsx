@@ -3,8 +3,9 @@ import Col from "antd/es/col"
 import Form from "antd/es/form"
 import Input from "antd/es/input"
 import { Icon } from "../../Common/Icon"
-import '../../../styles/add-links-form.scss'
-
+import "../../../styles/add-links-form.scss"
+import do_not_disturb from "../../../assets/svgs/doNotDisturb.svg"
+import add_circle from "../../../assets/svgs/addCircle.svg"
 export default function AddLinksForm() {
     return (
         <section className="add-links-form">
@@ -73,7 +74,7 @@ export default function AddLinksForm() {
                                         className="remove-button"
                                         onClick={() => remove(name)}
                                     >
-                                        <Icon icon="doNotDisturb" />
+                                        <Icon icon={do_not_disturb} />
                                         <span className="remove-button-label">
                                             הסרת קישור
                                         </span>
@@ -87,7 +88,7 @@ export default function AddLinksForm() {
                                 onClick={() => add()}
                             >
                                 <span className="add-button-content">
-                                    <Icon icon="addCircle" />
+                                    <Icon icon={add_circle} />
                                     <span className="add-button-label">
                                         הוספת קישור
                                     </span>

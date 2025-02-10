@@ -9,7 +9,18 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import "../../styles/menu-drawer.scss"
 import { translations } from "../../util/translations"
-
+import menu from "../../assets/svgs/menu.svg"
+import home from "../../assets/svgs/home.svg"
+import calendar from "../../assets/svgs/calendar.svg"
+import calendar_add_on from "../../assets/svgs/calendar_add_on.svg"
+import group from "../../assets/svgs/group.svg"
+import account from "../../assets/svgs/account.svg"
+import notifications from "../../assets/svgs/notifications.svg"
+import verified_user from "../../assets/svgs/verified_user.svg"
+import support_agent from "../../assets/svgs/support_agent.svg"
+import lock_reset from "../../assets/svgs/lock_reset.svg"
+import info from "../../assets/svgs/info.svg"
+import logout from "../../assets/svgs/logout.svg"
 const MenuDrawer = () => {
     const [open, setOpen] = useState<boolean>(false)
     const user = store.getUser
@@ -53,13 +64,13 @@ const MenuDrawer = () => {
     let mapOfMenu = [
         {
             key: "all-events",
-            icon: "home",
+            icon: home,
             label: translations[store.getLanguage].home,
             onClick: goHome,
         },
         {
             key: "manage-events",
-            icon: "calendar",
+            icon: calendar,
             label: translations[store.getLanguage].myEvents,
             onClick: () => {
                 navigate("/manage-events")
@@ -69,7 +80,7 @@ const MenuDrawer = () => {
         },
         {
             key: "create-events",
-            icon: "calendar_add_on",
+            icon: calendar_add_on,
             label: translations[store.getLanguage].createEvents,
             onClick: () => {
                 navigate("/create-events")
@@ -79,7 +90,7 @@ const MenuDrawer = () => {
         },
         {
             key: "manage-all-events",
-            icon: "calendar_add_on",
+            icon: calendar_add_on,
             label: translations[store.getLanguage].manageAllEvents,
             onClick: () => {
                 navigate("/manage-all-events")
@@ -89,7 +100,7 @@ const MenuDrawer = () => {
         },
         {
             key: "manage-users",
-            icon: "group",
+            icon: group,
             label: translations[store.getLanguage].manageUsers,
             onClick: () => {
                 navigate("/manage-users")
@@ -99,7 +110,7 @@ const MenuDrawer = () => {
         },
         {
             key: "bio",
-            icon: "account",
+            icon: account,
             label: translations[store.getLanguage].profile,
             onClick: () => {
                 navigate("/bio")
@@ -109,7 +120,7 @@ const MenuDrawer = () => {
         },
         {
             key: "filters-and-notifications",
-            icon: "notifications",
+            icon: notifications,
             label: translations[store.getLanguage].notifications,
             onClick: () => {
                 navigate("/filters-and-notifications")
@@ -119,7 +130,7 @@ const MenuDrawer = () => {
         },
         {
             key: "request",
-            icon: "verified_user",
+            icon: verified_user,
             label: translations[store.getLanguage].registerAsOrganization,
             onClick: () => {
                 navigate("/request")
@@ -129,7 +140,7 @@ const MenuDrawer = () => {
         },
         {
             key: "manage-support",
-            icon: "support_agent",
+            icon: support_agent,
             label: translations[store.getLanguage].manageSupport,
             onClick: () => {
                 navigate("/manage-support")
@@ -139,7 +150,7 @@ const MenuDrawer = () => {
         },
         {
             key: "reset-password",
-            icon: "lock_reset",
+            icon: lock_reset,
             label: translations[store.getLanguage].resetPassword,
             onClick: () => {
                 navigate("/reset-password")
@@ -149,7 +160,7 @@ const MenuDrawer = () => {
         },
         {
             key: "about",
-            icon: "info",
+            icon: info,
             label: translations[store.getLanguage].about,
             onClick: () => {
                 navigate("/about")
@@ -158,7 +169,7 @@ const MenuDrawer = () => {
         },
         {
             key: "logout",
-            icon: "logout",
+            icon: logout,
             label: translations[store.getLanguage].logout,
             onClick: async () => {
                 try {
@@ -183,7 +194,7 @@ const MenuDrawer = () => {
                 className="menu-drawer-btn"
                 aria-label="פתח תפריט"
             >
-                <Icon icon="menu" className="menu-drawer-icon" />
+                <Icon icon={menu} className="menu-drawer-icon" />
             </button>
             <Drawer
                 closable

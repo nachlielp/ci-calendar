@@ -7,7 +7,7 @@ import { CIEvent } from "../../../util/interfaces"
 import dayjs from "dayjs"
 import { useState } from "react"
 import "../../../styles/batch-action-event-modal.scss"
-
+import deleteIcon from "../../../assets/svgs/delete.svg"
 interface IDeleteEventProps {
     event: CIEvent
 }
@@ -50,7 +50,7 @@ export default function DeleteEventButton({ event }: IDeleteEventProps) {
                 onClick={() => setOpen(true)}
                 style={{ borderRadius: "0px", borderLeft: "none" }}
             >
-                <Icon icon="deleteIcon" />
+                <Icon icon={deleteIcon} />
             </button>
             <Modal
                 open={open}

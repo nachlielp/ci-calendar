@@ -14,11 +14,14 @@ import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
 import Spin from "antd/es/spin"
 import Select from "antd/es/select"
-
+import account from "../../assets/svgs/account.svg"
+import home from "../../assets/svgs/home.svg"
+import cloud_offline from "../../assets/svgs/cloud_offline.svg"
 import { translations } from "../../util/translations"
 import he from "../../assets/img/he.png"
 import en from "../../assets/img/en.png"
 import ru from "../../assets/img/ru.png"
+import touch_app from "../../assets/svgs/touch_app.svg"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -53,7 +56,7 @@ const AppHeader = () => {
                         to="/login"
                         className="header-btn no-border align-to-content"
                     >
-                        <Icon icon="account" className="icon-main" />
+                        <Icon icon={account} className="icon-main" />
                         &nbsp;
                         {translations[store.getLanguage].login}
                     </LinkButton>
@@ -63,7 +66,7 @@ const AppHeader = () => {
                         to="/"
                         className="header-btn no-border align-to-content"
                     >
-                        <Icon icon="home" className="icon-main" />
+                        <Icon icon={home} className="icon-main" />
                     </LinkButton>
                 )}
                 {languageMenu(languagesToShow, changeLocale)}
@@ -71,7 +74,7 @@ const AppHeader = () => {
                     <div className="header-actions">
                         {store.getOffline && (
                             <Icon
-                                icon="cloud_offline"
+                                icon={cloud_offline}
                                 className="offline-icon"
                             />
                         )}
@@ -125,7 +128,7 @@ const InstallPWABannerAnchor = () => {
             >
                 <div className="install-pwa-btn-text">
                     <span>{translations[store.getLanguage].addPWABanner}</span>
-                    <Icon icon="touch_app" className="add-alert-icon white" />
+                    <Icon icon={touch_app} className="add-alert-icon white" />
                 </div>
             </button>
         </div>

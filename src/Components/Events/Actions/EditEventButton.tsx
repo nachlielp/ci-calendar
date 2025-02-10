@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router"
 import { Icon } from "../../Common/Icon"
-
+import edit from "../../../assets/svgs/edit.svg"
 interface EditEventButtonProps {
     eventId: string
     isMultiDay: boolean
@@ -26,7 +26,7 @@ export default function EditEventButton({
             onClick={handleEdit}
             style={{ borderRadius: "0px 5px 5px 0px" }}
         >
-            <Icon icon="edit" />
+            <Icon icon={edit} />
         </button>
     )
 }

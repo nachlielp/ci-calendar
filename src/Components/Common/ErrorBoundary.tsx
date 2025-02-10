@@ -1,8 +1,8 @@
 import { Icon } from "../Common/Icon"
 import React from "react"
 import { NavigateFunction } from "react-router"
-import '../../styles/error-boundary.scss'
-
+import "../../styles/error-boundary.scss"
+import warning from "../../assets/svgs/warning.svg"
 interface ErrorBoundaryProps {
     children: React.ReactNode
     fallback?: React.ReactNode
@@ -28,7 +28,7 @@ class ErrorBoundaryClass extends React.Component<
                 this.props.fallback || (
                     <div className="error-container">
                         <h2> נראה שמשהו השתבש</h2>
-                        <Icon icon="warning" className="warning-icon" />
+                        <Icon icon={warning} className="warning-icon" />
                         <button
                             onClick={() => {
                                 this.props.navigate("/")

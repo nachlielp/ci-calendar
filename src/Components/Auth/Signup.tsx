@@ -11,6 +11,10 @@ import { useClearUser } from "../../hooks/useClearUser"
 import { translations } from "../../util/translations"
 import { store } from "../../Store/store"
 import { observer } from "mobx-react-lite"
+import person from "../../assets/svgs/person.svg"
+import mail from "../../assets/svgs/mail.svg"
+import lock from "../../assets/svgs/lock.svg"
+import google_color from "../../assets/svgs/google_color.svg"
 
 enum SignupError {
     none = "",
@@ -103,7 +107,7 @@ export default observer(function Signup() {
                         ref={nameRef}
                         required
                         className="form-input-large signup-input"
-                        prefix={<Icon icon="person" />}
+                        prefix={<Icon icon={person} />}
                     />
                 </Form.Item>
                 <Form.Item style={{ margin: "8px" }}>
@@ -113,7 +117,7 @@ export default observer(function Signup() {
                         ref={emailRef}
                         required
                         className="form-input-large signup-input"
-                        prefix={<Icon icon="mail" />}
+                        prefix={<Icon icon={mail} />}
                     />
                 </Form.Item>
                 <Form.Item style={{ margin: "8px" }}>
@@ -123,7 +127,7 @@ export default observer(function Signup() {
                         ref={passwordRef}
                         required
                         className="form-input-large signup-input"
-                        prefix={<Icon icon="lock" />}
+                        prefix={<Icon icon={lock} />}
                     />
                 </Form.Item>
                 <Form.Item style={{ margin: "8px" }}>
@@ -135,7 +139,7 @@ export default observer(function Signup() {
                         ref={passwordConfRef}
                         required
                         className="form-input-large signup-input"
-                        prefix={<Icon icon="lock" />}
+                        prefix={<Icon icon={lock} />}
                     />
                 </Form.Item>
 
@@ -166,7 +170,7 @@ export default observer(function Signup() {
                             {translations[store.getLanguage].loginWith}
                         </label>
                         <Icon
-                            icon="google_color"
+                            icon={google_color}
                             className="icon-main google-icon"
                         />
                     </button>

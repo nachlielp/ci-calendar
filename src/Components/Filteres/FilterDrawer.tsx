@@ -8,7 +8,7 @@ import "../../styles/filter-drawer.scss"
 import { isTranslationKey } from "../../util/translations"
 import { store } from "../../Store/store"
 import { translations } from "../../util/translations"
-
+import instant_mix from "../../assets/svgs/instantMix.svg"
 export default function FilterDrawer() {
     const [modalOpen, setModalOpen] = useState(false)
 
@@ -24,7 +24,7 @@ export default function FilterDrawer() {
                 className={`anchor-btn ${isSelectedFilter && "active"}`}
             >
                 <p className="text">{translations[store.getLanguage].filter}</p>
-                <Icon icon="instantMix" className="filter-drawer-icon" />
+                <Icon icon={instant_mix} className="filter-drawer-icon" />
             </button>
 
             <Drawer

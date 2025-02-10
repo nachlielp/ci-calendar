@@ -7,7 +7,8 @@ import { districtOptions } from "../../util/options"
 import { Icon } from "../Common/Icon"
 import Alert from "antd/es/alert/Alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
-
+import do_not_disturb from "../../assets/svgs/doNotDisturb.svg"
+import add_circle from "../../assets/svgs/addCircle.svg"
 const NewsletterFilter = () => {
     return (
         <section className="newsletter-filter">
@@ -87,7 +88,7 @@ const NewsletterFilter = () => {
                                                 className="remove-button"
                                                 onClick={() => remove(name)}
                                             >
-                                                <Icon icon="doNotDisturb" />
+                                                <Icon icon={do_not_disturb} />
                                                 <span className="remove-button-label">
                                                     הסרת התראה
                                                 </span>
@@ -101,7 +102,7 @@ const NewsletterFilter = () => {
                                         onClick={() => add()}
                                     >
                                         <Icon
-                                            icon="addCircle"
+                                            icon={add_circle}
                                             className="add-icon"
                                         />
                                         <span className="add-button-label">

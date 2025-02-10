@@ -1,11 +1,12 @@
 import Image from "antd/es/image"
-import '../../styles/bio-card.scss'
-import '../../styles/profile-form.scss'
+import "../../styles/bio-card.scss"
+import "../../styles/profile-form.scss"
 import Typography from "antd/es/typography"
 import { Icon } from "../Common/Icon"
 import { UserBio } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
 import { useIsMobile } from "../../hooks/useIsMobile"
+import open_in_new from "../../assets/svgs/openInNew.svg"
 const { Text } = Typography
 
 const BioCard = ({ teacher }: { teacher: UserBio }) => {
@@ -47,7 +48,7 @@ const BioCard = ({ teacher }: { teacher: UserBio }) => {
                         target="_blank"
                     >
                         {teacher.page_title || "דף פרופיל"}
-                        <Icon icon="openInNew" className="event-link-icon" />
+                        <Icon icon={open_in_new} className="event-link-icon" />
                     </a>
                 )}
                 {teacher.page_url_2 && (
@@ -58,7 +59,7 @@ const BioCard = ({ teacher }: { teacher: UserBio }) => {
                         target="_blank"
                     >
                         {teacher.page_title_2 || "דף פרופיל"}
-                        <Icon icon="openInNew" className="event-link-icon" />
+                        <Icon icon={open_in_new} className="event-link-icon" />
                     </a>
                 )}
             </article>

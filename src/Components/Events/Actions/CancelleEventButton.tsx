@@ -1,12 +1,14 @@
 import { Icon } from "../../Common/Icon"
 import { store } from "../../../Store/store"
 import { confirm } from "../../Common/Confirm"
-
+import warning from "../../../assets/svgs/warning.svg"
+import check_circle from "../../../assets/svgs/check_circle.svg"
+import cancel from "../../../assets/svgs/cancel.svg"
 const showCancelledConfirm = (eventId: string, cancelled: boolean) => {
     let cancelledText = ""
     confirm({
         title: <div>{cancelled ? "הפעלת אירוע" : "ביטול אירוע"}</div>,
-        icon: <Icon icon="warning" />,
+        icon: <Icon icon={warning} />,
         content: (
             <div>
                 <div>
@@ -86,7 +88,7 @@ export default function CancelledEventButton({
             onClick={() => showCancelledConfirm(eventId, cancelled)}
             style={{ borderRadius: " 0px", borderLeft: "none" }}
         >
-            {cancelled ? <Icon icon="check_circle" /> : <Icon icon="cancel" />}
+            {cancelled ? <Icon icon={check_circle} /> : <Icon icon={cancel} />}
         </button>
     )
 }
