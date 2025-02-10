@@ -17,7 +17,7 @@ import { store } from "../../Store/store"
 import { action, computed, makeObservable, observable, reaction } from "mobx"
 import message from "antd/es/message"
 import { Icon } from "../Common/Icon"
-
+import contentCopy from "../../assets/svgs/content_copy.svg"
 class ManageSupportPageVM {
     @observable showOpenRequests = true
     @observable selectedTypes: RequestType[] = []
@@ -306,7 +306,7 @@ const ManageSupportPage = () => {
                                         >
                                             פלאפון :{request.phone}
                                             <Icon
-                                                icon="contentCopy"
+                                                icon={contentCopy}
                                                 className="copy-icon"
                                             />
                                         </span>

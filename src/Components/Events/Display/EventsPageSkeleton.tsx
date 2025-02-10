@@ -6,7 +6,9 @@ import Tag from "antd/es/tag"
 import { ReactSVG } from "react-svg"
 import close from "../../../assets/svgs/close.svg"
 import "../../../styles/events-page-skeleton.scss"
-
+import instantMix from "../../../assets/svgs/instantMix.svg"
+import viewDay from "../../../assets/svgs/viewDay.svg"
+import calendar from "../../../assets/svgs/calendar.svg"
 export default function EventsPageSkeleton({
     withHeader = true,
 }: {
@@ -93,8 +95,8 @@ export default function EventsPageSkeleton({
                                 <MenuButtons
                                     onSelectKey={() => {}}
                                     options={[
-                                        { key: "list", icon: "viewDay" },
-                                        { key: "calendar", icon: "calendar" },
+                                        { key: "list", icon: viewDay },
+                                        { key: "calendar", icon: calendar },
                                     ]}
                                     defaultKey="list"
                                 />
@@ -110,7 +112,7 @@ export default function EventsPageSkeleton({
                                     >
                                         <p className="text">סינון</p>
                                         <Icon
-                                            icon="instantMix"
+                                            icon={instantMix}
                                             className="filter-model-icon"
                                         />
                                     </button>

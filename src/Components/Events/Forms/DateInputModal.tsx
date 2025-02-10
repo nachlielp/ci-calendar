@@ -13,10 +13,10 @@ import hb from "antd/locale/he_IL"
 import ConfigProvider from "antd/es/config-provider"
 import { Icon } from "../../Common/Icon"
 import DatePicker from "antd/es/date-picker"
-import '../../../styles/date-input-modal.scss'
+import "../../../styles/date-input-modal.scss"
 import { DATE_LIMIT } from "../../../App"
 import Modal from "antd/es/modal"
-
+import chevron_right from "../../../assets/svgs/chevron_right.svg"
 export enum DateInputModalType {
     date = "date",
     time = "time",
@@ -154,7 +154,7 @@ const DateInputModal = ({
                     <header className="calendar-controller">
                         <Icon
                             onClick={prevMonth}
-                            icon="chevron_right"
+                            icon={chevron_right}
                             className="back"
                         />
                         <label className="label">
@@ -162,7 +162,7 @@ const DateInputModal = ({
                         </label>
                         <Icon
                             onClick={nextMonth}
-                            icon="chevron_right"
+                            icon={chevron_right}
                             className="next"
                         />
                     </header>

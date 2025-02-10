@@ -66,7 +66,7 @@ const BioPage = () => {
                         className="edit-user-type-btn"
                         onClick={() => navigate("/bio/request")}
                     >
-                        <Icon icon="edit" className="edit-user-type-icon" />
+                        <Icon icon={edit} className="edit-user-type-icon" />
                     </button> */}
                 </article>
                 <article className="bio-page-footer-article">

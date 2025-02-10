@@ -20,7 +20,7 @@ import "../../../styles/calendar-view.scss"
 import { getTranslation, TranslationKeys } from "../../../util/translations"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
-
+import chevron_right from "../../../assets/svgs/chevron_right.svg"
 interface CalendarViewProps {
     events: CIEvent[]
     onSelect: (value: Dayjs) => void
@@ -82,7 +82,7 @@ const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
             <header className={`calendar-controller ${store.getDirection} `}>
                 <Icon
                     onClick={nextMonth}
-                    icon="chevron_right"
+                    icon={chevron_right}
                     className={`${
                         store.getDirection === "ltr" ? "next" : "back"
                     } ${
@@ -103,7 +103,7 @@ const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
                 </label>
                 <Icon
                     onClick={prevMonth}
-                    icon="chevron_right"
+                    icon={chevron_right}
                     className={`${
                         store.getDirection === "ltr" ? "back" : "next"
                     } ${value.month() === dayjs().month() && "disabled"}`}

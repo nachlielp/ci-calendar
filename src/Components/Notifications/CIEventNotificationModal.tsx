@@ -16,8 +16,8 @@ import { store } from "../../Store/store"
 import { observable, reaction, action, computed } from "mobx"
 import { makeObservable } from "mobx"
 import { utilService } from "../../util/utilService"
-import '../../styles/cievent-notification-modal.scss'
-
+import "../../styles/cievent-notification-modal.scss"
+import notifications from "../../assets/svgs/notifications.svg"
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
 const NOTIFICATION_MODAL_NOT_INSTALLED =
@@ -143,7 +143,7 @@ const CIEventNotificationModal = ({
                 <section className="notification-modal-container">
                     <article className="notification-modal-title">
                         <Icon
-                            icon="notifications"
+                            icon={notifications}
                             className="notification-icon"
                         />
                         <label className="label-text">

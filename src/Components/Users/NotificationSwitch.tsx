@@ -3,7 +3,9 @@ import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
 import { useState } from "react"
 import { Icon } from "../Common/Icon"
-import '../../styles/notification-switch.scss'
+import "../../styles/notification-switch.scss"
+import notifications_active from "../../assets/svgs/notifications_active.svg"
+import notifications_off from "../../assets/svgs/notifications_off.svg"
 const NotificationSwitch = () => {
     const [loading, setLoading] = useState(false)
 
@@ -23,13 +25,13 @@ const NotificationSwitch = () => {
                 loading={loading}
                 checkedChildren={
                     <Icon
-                        icon="notifications_active"
+                        icon={notifications_active}
                         className="notification-switch-icon active"
                     />
                 }
                 unCheckedChildren={
                     <Icon
-                        icon="notificationsOff"
+                        icon={notifications_off}
                         className="notification-switch-icon"
                     />
                 }
