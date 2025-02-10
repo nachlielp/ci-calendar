@@ -29,6 +29,8 @@ import open_in_new from "../../../assets/svgs/openInNew.svg"
 import calendar_add_on from "../../../assets/svgs/calendar_add_on.svg"
 import notifications from "../../../assets/svgs/notifications.svg"
 import content_copy from "../../../assets/svgs/content_copy.svg"
+import domain from "../../../assets/svgs/domain.svg"
+
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
     { hasError: boolean }
@@ -69,6 +71,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
             translatePage(store.getLanguage)
         }
     }, [])
+    const orgs = ci_event.organisations || []
     const segmentLen = ci_event.segments.length
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
@@ -88,6 +91,59 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         )}
                     </div>
                 </article>
+                {orgs.length > 0 && (
+                    <article className="event-org">
+                        <Icon icon={domain} className="event-icon" />
+                        <label className="event-labels">
+                            {orgs.map((org, index, array) => {
+                                const isTeacher = store.getAppPublicBios?.find(
+                                    (t) => t.user_id === org.value
+                                )
+                                return (
+                                    <React.Fragment key={org.value}>
+                                        {isTeacher ? (
+                                            <BioModal teacher={isTeacher} />
+                                        ) : (
+                                            <label className="teacher-name-label translate-this">
+                                                {org.label}
+                                            </label>
+                                        )}
+                                        {index < array.length - 1 ? ", " : ""}
+                                    </React.Fragment>
+                                )
+                            })}
+                        </label>
+                    </article>
+                )}
+                {multiDayTeachersLen.length > 0 && (
+                    <article className="event-multi-day-teachers">
+                        <Icon icon={person} className="event-icon" />
+                        <label className="event-labels">
+                            {multiDayTeachersLen.map(
+                                (teacher, index, array) => {
+                                    const isTeacher =
+                                        store.getAppPublicBios?.find(
+                                            (t) => t.user_id === teacher.value
+                                        )
+                                    return (
+                                        <React.Fragment key={teacher.value}>
+                                            {isTeacher ? (
+                                                <BioModal teacher={isTeacher} />
+                                            ) : (
+                                                <label className="teacher-name-label translate-this">
+                                                    {teacher.label}
+                                                </label>
+                                            )}
+                                            {index < array.length - 1
+                                                ? ", "
+                                                : ""}
+                                        </React.Fragment>
+                                    )
+                                }
+                            )}
+                        </label>
+                    </article>
+                )}
 
                 <article className="event-dates">
                     {ci_event.segments.length > 0 ? (
