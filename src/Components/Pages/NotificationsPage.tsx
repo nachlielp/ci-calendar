@@ -20,7 +20,7 @@ const NotificationsPage = observer(() => {
                 <NotificationSwitch />
                 <SubscribeToTeachers />
 
-                {/* {branch !== "prod" && <NewsletterFilter />}  */}
+                {/* {branch !== "   prod" && <NewsletterFilter />} */}
                 {/* <UserNotificationsList /> */}
             </section>
             <label className="support-email">
