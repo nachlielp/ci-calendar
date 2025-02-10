@@ -30,6 +30,9 @@ import calendar_add_on from "../../../assets/svgs/calendar_add_on.svg"
 import notifications from "../../../assets/svgs/notifications.svg"
 import content_copy from "../../../assets/svgs/content_copy.svg"
 import domain from "../../../assets/svgs/domain.svg"
+import ios_share from "../../../assets/svgs/ios_share.svg"
+import share from "../../../assets/svgs/share.svg"
+import map from "../../../assets/svgs/map.svg"
 
 class EventErrorBoundary extends Component<
     { children: React.ReactNode },
@@ -441,8 +444,8 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                             <SecondaryButton
                                 label=""
                                 successLabel=""
-                                icon={"map"}
-                                successIcon={"map"}
+                                icon={map}
+                                successIcon={map}
                                 callback={() =>
                                     utilService.openGoogleMaps(
                                         ci_event.address.place_id,
@@ -455,11 +458,9 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                             <SecondaryButton
                                 label=""
                                 successLabel=""
-                                icon={
-                                    utilService.isIos() ? "ios_share" : "share"
-                                }
+                                icon={utilService.isIos() ? ios_share : share}
                                 successIcon={
-                                    utilService.isIos() ? "ios_share" : "share"
+                                    utilService.isIos() ? ios_share : share
                                 }
                                 callback={() =>
                                     utilService.handleShareEvent(
