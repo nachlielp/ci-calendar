@@ -18,6 +18,7 @@ import { makeObservable } from "mobx"
 import { utilService } from "../../util/utilService"
 import "../../styles/cievent-notification-modal.scss"
 import notifications from "../../assets/svgs/notifications.svg"
+import notifications_active from "../../assets/svgs/notifications_active.svg"
 const NOTIFICATION_MODAL_BUTTON_OFF_ALERT =
     "צריך להפעיל את ההתראות בהגדרות לפני שניתן ליצור ולערוך התראות"
 const NOTIFICATION_MODAL_NOT_INSTALLED =
@@ -128,9 +129,9 @@ const CIEventNotificationModal = ({
             <SecondaryButton
                 label=""
                 successLabel=""
-                icon={vm.getIsActive ? "notifications_active" : "notifications"}
+                icon={vm.getIsActive ? notifications_active : notifications}
                 successIcon={
-                    vm.getIsActive ? "notifications_active" : "notifications"
+                    vm.getIsActive ? notifications_active : notifications
                 }
                 callback={() => vm.setIsOpen(true)}
             />
