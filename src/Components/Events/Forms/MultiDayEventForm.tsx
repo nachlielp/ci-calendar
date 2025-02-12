@@ -35,7 +35,8 @@ const DRAFT_TEMPLATE_KEY = "multi-day-draft-template"
 const DRAFT_TEMPLATE_ADDRESS_KEY = "multi-day-draft-template-address"
 
 const ERROR_MESSAGE_TOO_LONG = "אירוע לא יכול להמשך מעל ל-14 ימים"
-
+const ERROR_MESSAGE_START_DATE_AFTER_END_DATE =
+    "אירוע רב יומי לא יכול להתחיל ולהסתיים באותו יום, בשביל זה יש אירוע חד יומי"
 const MultiDayEventForm = observer(
     ({
         closeForm,
@@ -150,6 +151,21 @@ const MultiDayEventForm = observer(
         const handleSubmit = async (values: any) => {
             if (!address) {
                 setErrorMessage("שדה חובה")
+                console.log("address is required")
+                return
+            }
+
+            if (
+                dayjs(values["event-start-date"]).isSame(
+                    dayjs(values["event-end-date"]),
+                    "day"
+                )
+            ) {
+                setErrorMessage(ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
+                setTimeout(() => {
+                    onFinishFailed(), 0
+                })
+                console.log("start date is same as end date")
                 return
             }
 
@@ -163,6 +179,7 @@ const MultiDayEventForm = observer(
                 setTimeout(() => {
                     onFinishFailed(), 0
                 })
+                console.log("too long")
                 return
             }
 
@@ -269,7 +286,7 @@ const MultiDayEventForm = observer(
             setTimeout(() => {
                 setInputErrors(false)
                 setErrorMessage(null)
-            }, 5000)
+            }, 10000)
         }
 
         return (
