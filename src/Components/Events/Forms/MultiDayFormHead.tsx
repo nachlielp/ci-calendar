@@ -5,7 +5,7 @@ import GooglePlacesInput, {
     IGooglePlaceOption,
 } from "../../Common/GooglePlacesInput"
 import { IAddress, UserOption } from "../../../util/interfaces"
-import { districtOptions, eventOptions } from "../../../util/options"
+import { districtOptions, multiDayEventOptions } from "../../../util/options"
 import DateInputModal from "./DateInputModal"
 import Row from "antd/es/row"
 import Col from "antd/es/col"
@@ -103,13 +103,16 @@ export default function MultiDayFormHead({
                 className="multi-day-form-head-full-width"
                 name="main-event-type"
                 rules={[{ required: true, message: "שדה חובה" }]}
+                tooltip="סוג האירוע יכול להיות כל סוג אירוע חד יומי או רב יומי"
+                validateTrigger={["onChange", "onBlur"]}
             >
                 <Select
-                    options={eventOptions}
+                    options={multiDayEventOptions}
                     placeholder="סוג האירוע"
                     className="form-input-large"
                     popupClassName="form-input-large"
                     showSearch
+                    allowClear={false}
                     filterOption={(input, option) =>
                         (option?.label ?? "")
                             .toLowerCase()

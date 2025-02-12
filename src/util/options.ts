@@ -15,12 +15,17 @@ export const eventOptions: SelectOption[] = [
     { value: "class", label: "שיעור" },
     { value: "jam", label: "ג'אם" },
     { value: "underscore", label: "אנדרסקור" },
+    // { value: "conference", label: "כנס" },
     { value: "workshop", label: "סדנה" },
     { value: "retreat", label: "ריטריט" },
-    // { value: "conference", label: "כנס" },
     { value: "warmup", label: "חימום" },
     { value: "course", label: "קורס" },
     { value: "score", label: "סקור" },
+]
+export const multiDayEventOptions: SelectOption[] = [
+    { value: "workshop", label: "סדנה" },
+    { value: "retreat", label: "ריטריט" },
+    { value: "course", label: "קורס" },
 ]
 
 export const hebrewMonths: SelectOption[] = [
