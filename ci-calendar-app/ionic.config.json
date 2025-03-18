@@ -1,0 +1,7 @@
+{
+  "name": "ci-calendar-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
