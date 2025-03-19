@@ -76,6 +76,7 @@ const NewsletterFilter = () => {
                                     name={"phone"}
                                     rules={[
                                         {
+                                            required: true,
                                             pattern: /^(\+|05)\d+$/,
                                             message:
                                                 'מספר פלאפון חייב להתחיל עם "+" או "05"',
@@ -99,13 +100,13 @@ const NewsletterFilter = () => {
                                         onKeyDown={
                                             utilService.handlePhoneNumberInput
                                         }
-                                        placeholder="הזן מספר פלאפון המתחיל ב + או 05"
+                                        placeholder="הזינו מספר פלאפון שמתחיל ב + או 05"
                                         allowClear
                                         type="tel"
                                     />
                                 </Form.Item>
                                 <label className="filter-form-label">
-                                    אירועים בשבוע הקרוב
+                                    איזורים - ניתן להשאיר ריק לכל הארץ
                                 </label>
                                 <Form.Item
                                     className="filter-form-item"
@@ -113,7 +114,7 @@ const NewsletterFilter = () => {
                                 >
                                     <Select
                                         options={[...districtOptions]}
-                                        placeholder="איזורים - ניתן להשאיר ריק לכל הארץ"
+                                        placeholder="איזורים"
                                         size="large"
                                         className="form-input-large"
                                         popupClassName="form-input-large"
@@ -121,6 +122,9 @@ const NewsletterFilter = () => {
                                         mode="tags"
                                     />
                                 </Form.Item>
+                                <label className="filter-form-label">
+                                    סוגי ארועים - ניתן להשאיר ריק לכל הסוגים
+                                </label>
                                 <Form.Item
                                     className="filter-form-item"
                                     name={"weekly-event-type"}
@@ -134,7 +138,7 @@ const NewsletterFilter = () => {
                                                     )
                                             ),
                                         ]}
-                                        placeholder="סוגי ארועים - ניתן להשאיר ריק לכל הסוגים"
+                                        placeholder="סוגי ארועים"
                                         size="large"
                                         className="form-input-large"
                                         popupClassName="form-input-large"
@@ -145,7 +149,8 @@ const NewsletterFilter = () => {
                             </div>
                             <div className="filter-form-section">
                                 <label className="filter-form-label">
-                                    קורסים, סדנאות וריטרטים בחודש הקרוב
+                                    סדנאות וקורסים בחודש הקרוב - ניתן להשאיר ריק
+                                    לכל הארץ
                                 </label>
                                 <Form.Item
                                     className="filter-form-item"
@@ -153,7 +158,7 @@ const NewsletterFilter = () => {
                                 >
                                     <Select
                                         options={districtOptions}
-                                        placeholder="איזורים - ניתן להשאיר ריק לכל הארץ"
+                                        placeholder="איזורים"
                                         size="large"
                                         className="form-input-large"
                                         popupClassName="form-input-large"
