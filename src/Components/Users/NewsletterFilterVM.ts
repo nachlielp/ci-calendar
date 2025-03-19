@@ -1,10 +1,4 @@
-import {
-    makeAutoObservable,
-    observable,
-    computed,
-    action,
-    reaction,
-} from "mobx"
+import { makeAutoObservable, observable, computed, action } from "mobx"
 import { store } from "../../Store/store"
 
 class NewsletterFilterVM {
