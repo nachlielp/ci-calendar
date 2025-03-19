@@ -6,6 +6,7 @@ import {
     CIUser,
     CIUserData,
     ManageUserOption,
+    WeeklyScheduleFilters,
 } from "../util/interfaces"
 import dayjs from "dayjs"
 import { store } from "../Store/store"
@@ -16,6 +17,8 @@ export const usersService = {
     updateUser,
     createUser,
     subscribeToUser,
+    updateUserWeeklyScheduleFilters,
+    toggleUserReceiveWeeklySchedule,
 }
 
 interface UserWithRole {
@@ -307,6 +310,54 @@ async function getUsers(): Promise<ManageUserOption[]> {
                 : JSON.stringify(error, null, 2)
         throw new Error(
             `Failed to get users for userId: ${store.getUserId} ERROR: ${errorMessage}`
+        )
+    }
+}
+
+async function updateUserWeeklyScheduleFilters(
+    id: string,
+    weeklyScheduleFilters: WeeklyScheduleFilters
+) {
+    try {
+        const { data, error } = await supabase
+            .from("users")
+            .update({ weekly_schedule: weeklyScheduleFilters })
+            .eq("id", id)
+            .select()
+            .single()
+        if (error) {
+            throw new Error(
+                `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`
+            )
+        }
+        return data
+    } catch (error: any) {
+        throw new Error(
+            `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`
+        )
+    }
+}
+
+async function toggleUserReceiveWeeklySchedule(
+    id: string,
+    receive_weekly_schedule: boolean
+) {
+    try {
+        const { data, error } = await supabase
+            .from("users")
+            .update({ receive_weekly_schedule })
+            .eq("id", id)
+            .select()
+            .single()
+        if (error) {
+            throw new Error(
+                `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`
+            )
+        }
+        return data
+    } catch (error: any) {
+        throw new Error(
+            `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`
         )
     }
 }

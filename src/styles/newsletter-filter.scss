@@ -1,4 +1,5 @@
 .newsletter-filter {
+    direction: rtl;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -35,5 +36,17 @@
 
     .general-action-btn {
         margin-top: 1rem;
+    }
+
+    .filter-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        margin: 1rem 0;
+
+        .filter-toggle-label {
+            margin: 0 1rem;
+        }
     }
 }

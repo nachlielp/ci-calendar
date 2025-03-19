@@ -25,6 +25,7 @@ import {
     UserNotification,
     UserRole,
     UserType,
+    WeeklyScheduleFilters,
 } from "../util/interfaces"
 import { supabase } from "../supabase/client"
 import { usersService } from "../supabase/usersService"
@@ -516,6 +517,16 @@ class Store {
         }
 
         return orgs
+    }
+
+    @computed
+    get getReceiveWeeklySchedule() {
+        return this.user.receive_weekly_schedule
+    }
+
+    @computed
+    get getWeeklyScheduleFilters() {
+        return this.user.weekly_schedule
     }
 
     @action
@@ -1351,6 +1362,31 @@ class Store {
     setLanguage = (language: Language) => {
         this.language = language
         utilService.setLanguage(language)
+    }
+
+    @action
+    toggleUserReceiveWeeklySchedule = async (
+        id: string,
+        receive_weekly_schedule: boolean
+    ) => {
+        this.user.receive_weekly_schedule = receive_weekly_schedule
+        const updatedUser = await usersService.toggleUserReceiveWeeklySchedule(
+            id,
+            receive_weekly_schedule
+        )
+        if (updatedUser.receive_weekly_schedule !== receive_weekly_schedule) {
+            this.user.receive_weekly_schedule =
+                updatedUser.receive_weekly_schedule
+        }
+    }
+
+    @action
+    setWeeklyScheduleFilters = async (filters: WeeklyScheduleFilters) => {
+        this.user.weekly_schedule = filters
+        await usersService.updateUserWeeklyScheduleFilters(
+            this.user.id,
+            filters
+        )
     }
 
     async init() {

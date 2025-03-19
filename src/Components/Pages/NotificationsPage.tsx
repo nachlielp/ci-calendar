@@ -8,8 +8,9 @@ import { EMAIL_SUPPORT } from "../../App"
 // import NewsletterFilter from "../Users/NewsletterFilter"
 import { getTranslation } from "../../util/translations"
 import { store } from "../../Store/store"
+import NewsletterFilter from "../Users/NewsletterFilter"
 const NotificationsPage = observer(() => {
-    // const branch = import.meta.env.VITE_BRANCH
+    const branch = import.meta.env.VITE_BRANCH
     return (
         <div className="notifications-page page">
             <label className="notifications-page-title">
@@ -20,7 +21,7 @@ const NotificationsPage = observer(() => {
                 <NotificationSwitch />
                 <SubscribeToTeachers />
 
-                {/* {branch !== "   prod" && <NewsletterFilter />} */}
+                {branch !== "prod" && <NewsletterFilter />}
                 {/* <UserNotificationsList /> */}
             </section>
             <label className="support-email">

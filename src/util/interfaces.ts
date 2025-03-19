@@ -14,6 +14,7 @@ export enum WeekendEventType {
     u = "underscore",
     r = "retreat",
 }
+
 export enum WeekendDistrict {
     n = "north",
     s = "south",
@@ -144,15 +145,6 @@ export enum UserTypeHebrew {
     user = "משתמש רגיל",
 }
 
-export interface IMailingList {
-    createdAt: string
-    updatedAt: string
-    subscribedForUpdatesAt: string
-    active: boolean
-    districts: District[]
-    eventTypes: EventlyType[]
-}
-
 export interface PushNotificationToken {
     token: string
     created_at: string
@@ -209,6 +201,12 @@ export interface NewsletterFilter {
     eventTypes: EventlyType[]
 }
 
+export interface WeeklyScheduleFilters {
+    "district-weekly": string[]
+    "district-monthly": string[]
+    "weekly-event-type": string[]
+}
+
 export interface CIUser {
     id: string
     created_at: string
@@ -230,7 +228,8 @@ export interface CIUser {
     pwa_install_id: string | null
     fcm_token: string | null
     is_internal: boolean
-    newsletter_filter: NewsletterFilter[]
+    receive_weekly_schedule: boolean
+    weekly_schedule: WeeklyScheduleFilters
 }
 
 export interface CIUserData {
