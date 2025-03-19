@@ -19,6 +19,7 @@ export const usersService = {
     subscribeToUser,
     updateUserWeeklyScheduleFilters,
     toggleUserReceiveWeeklySchedule,
+    updateUserPhoneNumber,
 }
 
 interface UserWithRole {
@@ -316,12 +317,16 @@ async function getUsers(): Promise<ManageUserOption[]> {
 
 async function updateUserWeeklyScheduleFilters(
     id: string,
-    weeklyScheduleFilters: WeeklyScheduleFilters
+    weeklyScheduleFilters: WeeklyScheduleFilters,
+    phone: string
 ) {
     try {
         const { data, error } = await supabase
             .from("users")
-            .update({ weekly_schedule: weeklyScheduleFilters })
+            .update({
+                weekly_schedule: weeklyScheduleFilters,
+                phone: phone,
+            })
             .eq("id", id)
             .select()
             .single()
@@ -358,6 +363,27 @@ async function toggleUserReceiveWeeklySchedule(
     } catch (error: any) {
         throw new Error(
             `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`
+        )
+    }
+}
+
+async function updateUserPhoneNumber(id: string, phoneNumber: string) {
+    try {
+        const { data, error } = await supabase
+            .from("users")
+            .update({ phone: phoneNumber })
+            .eq("id", id)
+            .select()
+            .single()
+        if (error) {
+            throw new Error(
+                `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`
+            )
+        }
+        return data
+    } catch (error: any) {
+        throw new Error(
+            `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`
         )
     }
 }

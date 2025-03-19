@@ -1381,12 +1381,29 @@ class Store {
     }
 
     @action
-    setWeeklyScheduleFilters = async (filters: WeeklyScheduleFilters) => {
+    setWeeklyScheduleFilters = async (
+        filters: WeeklyScheduleFilters,
+        phone: string
+    ) => {
         this.user.weekly_schedule = filters
         await usersService.updateUserWeeklyScheduleFilters(
             this.user.id,
-            filters
+            filters,
+            phone
         )
+    }
+
+    @action
+    updateUserPhoneNumber = async (phoneNumber: string) => {
+        this.user.phone = phoneNumber
+        const updatedUser = await usersService.updateUserPhoneNumber(
+            this.user.id,
+            phoneNumber
+        )
+        if (updatedUser.phone !== phoneNumber) {
+            this.user.phone = updatedUser.phone
+        }
+        return updatedUser
     }
 
     async init() {

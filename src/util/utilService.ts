@@ -89,6 +89,8 @@ export const utilService = {
     setLanguage,
     getLanguage,
     getTitleByLanguage,
+    areArraysEqual,
+    handlePhoneNumberInput,
 }
 
 function CIEventToFormValues(event: CIEvent) {
@@ -1255,4 +1257,38 @@ function getTitleByLanguage(ci_event: CIEvent, language: Language) {
     if (language === Language.ru)
         return ci_event.lng_titles?.ru || ci_event.title
     return ci_event.lng_titles?.en || ci_event.title
+}
+
+function areArraysEqual(arr1: any[], arr2: any[]) {
+    if (!arr1 && !arr2) return true
+    if (!arr1 || !arr2) return false
+    if (arr1.length !== arr2.length) return false
+
+    const sortedArr1 = [...arr1].sort()
+    const sortedArr2 = [...arr2].sort()
+
+    return JSON.stringify(sortedArr1) === JSON.stringify(sortedArr2)
+}
+
+function handlePhoneNumberInput(e: React.KeyboardEvent<HTMLInputElement>) {
+    const isDigit = /\d/.test(e.key)
+    const isPlus = e.key === "+"
+    const isControlKey =
+        e.key === "Backspace" ||
+        e.key === "Delete" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.key === "Tab" ||
+        e.ctrlKey ||
+        e.metaKey
+
+    // Allow digits, plus sign only at start, and control keys
+    if (!isDigit && !isPlus && !isControlKey) {
+        e.preventDefault()
+    }
+
+    // If plus sign, only allow at beginning of input
+    if (isPlus && e.currentTarget.value.length > 0) {
+        e.preventDefault()
+    }
 }

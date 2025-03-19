@@ -8,24 +8,27 @@ import Alert from "antd/es/alert/Alert"
 import AsyncFormSubmitButton from "../Common/AsyncFormSubmitButton"
 import { store } from "../../Store/store"
 import Switch from "antd/es/switch"
-import { useState } from "react"
+import { useEffect } from "react"
+import Input from "antd/es/input"
+import { utilService } from "../../util/utilService"
+import { newsletterFilterVM } from "./NewsletterFilterVM"
+
 const EventTypeOptionsToRemove = [
     "warmup",
     ...multiDayEventOptions.map((option) => option.value),
 ]
-const NewsletterFilter = () => {
-    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    async function onSubmit(values: any) {
-        setIsSubmitting(true)
-        const weeklyScheduleFilters = {
-            "district-weekly": values["district-weekly"] || [],
-            "weekly-event-type": values["weekly-event-type"] || [],
-            "district-monthly": values["district-monthly"] || [],
-        }
-        await store.setWeeklyScheduleFilters(weeklyScheduleFilters)
-        setIsSubmitting(false)
-    }
+const NewsletterFilter = () => {
+    const [form] = Form.useForm()
+
+    // Reset form changed state when store values change
+    useEffect(() => {
+        const currentValues = form.getFieldsValue()
+        newsletterFilterVM.setIsFormChanged(
+            newsletterFilterVM.checkFormChanged(currentValues)
+        )
+    }, [store.getWeeklyScheduleFilters])
+
     return (
         <section className="newsletter-filter">
             <hr className="divider" />
@@ -39,104 +42,136 @@ const NewsletterFilter = () => {
                     האם תרצו לקבל עדכון שבועי בווצאפ?
                 </label>
                 <Switch
-                    checked={store.getReceiveWeeklySchedule}
+                    checked={newsletterFilterVM.receiveWeeklySchedule}
                     checkedChildren="כן"
                     unCheckedChildren="לא"
-                    onChange={(checked) => {
-                        store.toggleUserReceiveWeeklySchedule(
-                            store.user.id,
-                            checked
-                        )
-                    }}
+                    onChange={(checked) =>
+                        newsletterFilterVM.toggleReceiveWeeklySchedule(checked)
+                    }
                 />
             </article>
-            {store.getReceiveWeeklySchedule && (
-                <article className="filter-container">
-                    <Form
-                        onFinish={onSubmit}
-                        initialValues={{
-                            "district-weekly":
-                                store.getWeeklyScheduleFilters[
-                                    "district-weekly"
-                                ],
-                            "weekly-event-type":
-                                store.getWeeklyScheduleFilters[
-                                    "weekly-event-type"
-                                ],
-                            "district-monthly":
-                                store.getWeeklyScheduleFilters[
-                                    "district-monthly"
-                                ],
-                        }}
-                    >
-                        <div className="filter-form-section">
-                            <label className="filter-form-label">
-                                אירועים בשבוע הקרוב
-                            </label>
-                            <Form.Item
-                                className="filter-form-item"
-                                name={"district-weekly"}
-                            >
-                                <Select
-                                    options={[...districtOptions]}
-                                    placeholder="איזורים - ניתן להשאיר ריק לכל הארץ"
-                                    size="large"
-                                    className="form-input-large"
-                                    popupClassName="form-input-large"
-                                    allowClear
-                                    mode="tags"
-                                />
-                            </Form.Item>
-                            <Form.Item
-                                className="filter-form-item"
-                                name={"weekly-event-type"}
-                            >
-                                <Select
-                                    options={[
-                                        ...eventOptions.filter(
-                                            (option) =>
-                                                !EventTypeOptionsToRemove.includes(
-                                                    option.value
-                                                )
-                                        ),
-                                    ]}
-                                    placeholder="סוגי ארועים - ניתן להשאיר ריק לכל הסוגים"
-                                    size="large"
-                                    className="form-input-large"
-                                    popupClassName="form-input-large"
-                                    allowClear
-                                    mode="tags"
-                                />
-                            </Form.Item>
-                        </div>
-                        <div className="filter-form-section">
-                            <label className="filter-form-label">
-                                קורסים, סדנאות וריטרטים בחודש הקרוב
-                            </label>
-                            <Form.Item
-                                className="filter-form-item"
-                                name={"district-monthly"}
-                            >
-                                <Select
-                                    options={districtOptions}
-                                    placeholder="איזורים - ניתן להשאיר ריק לכל הארץ"
-                                    size="large"
-                                    className="form-input-large"
-                                    popupClassName="form-input-large"
-                                    allowClear
-                                    mode="tags"
-                                />
-                            </Form.Item>
-                        </div>
-                        <AsyncFormSubmitButton
-                            className="general-action-btn large-btn"
-                            isSubmitting={isSubmitting}
-                            disabled={false}
+            {newsletterFilterVM.receiveWeeklySchedule && (
+                <>
+                    <article className="filter-container">
+                        <Form
+                            form={form}
+                            onFinish={(values) =>
+                                newsletterFilterVM.submitForm(values)
+                            }
+                            initialValues={newsletterFilterVM.initialFormValues}
+                            onValuesChange={(_, allValues) => {
+                                newsletterFilterVM.setIsFormChanged(
+                                    newsletterFilterVM.checkFormChanged(
+                                        allValues
+                                    )
+                                )
+                            }}
                         >
-                            שמירה
-                        </AsyncFormSubmitButton>
-                    </Form>
-                </article>
+                            <div className="filter-form-section">
+                                <label className="filter-form-label">
+                                    מספר פלאפון
+                                </label>
+                                <Form.Item
+                                    className="filter-form-item"
+                                    name={"phone"}
+                                    rules={[
+                                        {
+                                            pattern: /^(\+|05)\d+$/,
+                                            message:
+                                                'מספר פלאפון חייב להתחיל עם "+" או "05"',
+                                            validator: (_, value) => {
+                                                if (
+                                                    !value ||
+                                                    /^(\+|05)\d+$/.test(value)
+                                                ) {
+                                                    return Promise.resolve()
+                                                }
+                                                return Promise.reject(
+                                                    new Error(
+                                                        'מספר פלאפון חייב להתחיל עם "+" או "05"'
+                                                    )
+                                                )
+                                            },
+                                        },
+                                    ]}
+                                >
+                                    <Input
+                                        onKeyDown={
+                                            utilService.handlePhoneNumberInput
+                                        }
+                                        placeholder="הזן מספר פלאפון המתחיל ב + או 05"
+                                        allowClear
+                                        type="tel"
+                                    />
+                                </Form.Item>
+                                <label className="filter-form-label">
+                                    אירועים בשבוע הקרוב
+                                </label>
+                                <Form.Item
+                                    className="filter-form-item"
+                                    name={"district-weekly"}
+                                >
+                                    <Select
+                                        options={[...districtOptions]}
+                                        placeholder="איזורים - ניתן להשאיר ריק לכל הארץ"
+                                        size="large"
+                                        className="form-input-large"
+                                        popupClassName="form-input-large"
+                                        allowClear
+                                        mode="tags"
+                                    />
+                                </Form.Item>
+                                <Form.Item
+                                    className="filter-form-item"
+                                    name={"weekly-event-type"}
+                                >
+                                    <Select
+                                        options={[
+                                            ...eventOptions.filter(
+                                                (option) =>
+                                                    !EventTypeOptionsToRemove.includes(
+                                                        option.value
+                                                    )
+                                            ),
+                                        ]}
+                                        placeholder="סוגי ארועים - ניתן להשאיר ריק לכל הסוגים"
+                                        size="large"
+                                        className="form-input-large"
+                                        popupClassName="form-input-large"
+                                        allowClear
+                                        mode="tags"
+                                    />
+                                </Form.Item>
+                            </div>
+                            <div className="filter-form-section">
+                                <label className="filter-form-label">
+                                    קורסים, סדנאות וריטרטים בחודש הקרוב
+                                </label>
+                                <Form.Item
+                                    className="filter-form-item"
+                                    name={"district-monthly"}
+                                >
+                                    <Select
+                                        options={districtOptions}
+                                        placeholder="איזורים - ניתן להשאיר ריק לכל הארץ"
+                                        size="large"
+                                        className="form-input-large"
+                                        popupClassName="form-input-large"
+                                        allowClear
+                                        mode="tags"
+                                    />
+                                </Form.Item>
+                            </div>
+                            <AsyncFormSubmitButton
+                                className="general-action-btn large-btn"
+                                isSubmitting={newsletterFilterVM.isSubmitting}
+                                disabled={!newsletterFilterVM.isFormChanged}
+                            >
+                                שמירה
+                            </AsyncFormSubmitButton>
+                        </Form>
+                    </article>
+                </>
             )}
         </section>
     )
