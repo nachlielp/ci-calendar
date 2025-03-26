@@ -362,7 +362,7 @@ export const translations: Translations = {
         name: "שם",
 
         //Options
-        retreat: "רטירט",
+        retreat: "ריטריט",
         warmup: "חימום",
         workshop: "סדנה",
         jam: "ג'אם",
