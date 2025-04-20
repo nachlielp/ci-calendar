@@ -304,7 +304,7 @@ export const translations: Translations = {
         preRegistration: "Pre-Registration",
 
         //WhatsApp Banner
-        whatsappMessage: "Hello",
+        whatsappMessage: "Hey let's chat🙃 ",
     },
     [Language.he]: {
         // Common
@@ -457,7 +457,7 @@ export const translations: Translations = {
         preRegistration: "הרשמה מראש",
 
         //WhatsApp Banner
-        whatsappMessage: "היי",
+        whatsappMessage: " היי בואו נפטפט🙃 ",
     },
     [Language.ru]: {
         // Common
@@ -611,7 +611,7 @@ export const translations: Translations = {
         preRegistration: "Предварительная регистрация",
 
         //WhatsApp Banner
-        whatsappMessage: "Привет",
+        whatsappMessage: "Привет, давай поговорим🙃 ",
     },
 }
 
