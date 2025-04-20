@@ -22,6 +22,7 @@ import he from "../../assets/img/he.png"
 import en from "../../assets/img/en.png"
 import ru from "../../assets/img/ru.png"
 import touch_app from "../../assets/svgs/touch_app.svg"
+import WhatsAppBanner from "../Notifications/WhatsAppBanner"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -72,6 +73,7 @@ const AppHeader = () => {
                 {languageMenu(languagesToShow, changeLocale)}
                 <>
                     <div className="header-actions">
+                        <WhatsAppBanner />
                         {store.getOffline && (
                             <Icon
                                 icon={cloud_offline}

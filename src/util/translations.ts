@@ -47,6 +47,7 @@ export type TranslationKeys = {
     repeatPassword: string
     resetPasswordSubTitle: string
     newPassword: string
+
     // Navigation
     home: string
     about: string
@@ -144,6 +145,10 @@ export type TranslationKeys = {
     male: string
     female: string
     preRegistration: string
+
+    //WhatsApp Banner
+    whatsappBannerTitle: string
+    whatsappBannerDescription: string
 }
 
 type Translations = {
@@ -298,6 +303,10 @@ export const translations: Translations = {
         male: "Men",
         female: "Women",
         preRegistration: "Pre-Registration",
+
+        //WhatsApp Banner
+        whatsappBannerTitle: "WhatsApp Banner",
+        whatsappBannerDescription: "WhatsApp Banner Description",
     },
     [Language.he]: {
         // Common
@@ -448,6 +457,11 @@ export const translations: Translations = {
         male: "גברים",
         female: "נשים",
         preRegistration: "הרשמה מראש",
+
+        //WhatsApp Banner
+        whatsappBannerTitle: "בוט WhatsApp",
+        whatsappBannerDescription:
+            "מוזמנים לחפש אירועים ולהרשם לעדכונים בבוט הוואצאפ שלנו",
     },
     [Language.ru]: {
         // Common
@@ -599,6 +613,10 @@ export const translations: Translations = {
         male: "Мужчины",
         female: "Женщины",
         preRegistration: "Предварительная регистрация",
+
+        //WhatsApp Banner
+        whatsappBannerTitle: "WhatsApp Banner",
+        whatsappBannerDescription: "WhatsApp Banner Description",
     },
 }
 
