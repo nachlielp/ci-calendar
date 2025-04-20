@@ -3,6 +3,7 @@ import { Icon } from "../Common/Icon"
 import "../../styles/whatsapp-banner.scss"
 import { store } from "../../Store/store"
 import { translations } from "../../util/translations"
+import { utilService } from "../../util/utilService"
 
 function WhatsAppBanner() {
     const whatsappUrl = `https://wa.me/${
@@ -10,11 +11,34 @@ function WhatsAppBanner() {
     }?text=${encodeURIComponent(
         translations[store.getLanguage].whatsappMessage
     )}`
+
+    const handleWhatsAppClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+
+        if (utilService.isPWA()) {
+            if (utilService.isIos()) {
+                window.location.href = `whatsapp://send?phone=${
+                    import.meta.env.VITE_WHATSAPP_NUMBER
+                }&text=${encodeURIComponent(
+                    translations[store.getLanguage].whatsappMessage
+                )}`
+            } else {
+                window.open(whatsappUrl, "_blank")
+            }
+        } else {
+            window.open(whatsappUrl, "_blank")
+        }
+    }
+
     return (
         <section className={`whatsapp-banner`}>
-            <a href={whatsappUrl} className="whatsapp-btn">
+            <button
+                className="whatsapp-btn"
+                onClick={handleWhatsAppClick}
+                rel="noreferrer"
+            >
                 <Icon icon={whatsapp} className="whatsapp-icon" />
-            </a>
+            </button>
         </section>
     )
 }
