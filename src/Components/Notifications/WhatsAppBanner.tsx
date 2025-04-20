@@ -1,21 +1,20 @@
 import whatsapp from "../../assets/svgs/whatsapp.wine.svg"
 import { Icon } from "../Common/Icon"
 import "../../styles/whatsapp-banner.scss"
+import { store } from "../../Store/store"
+import { translations } from "../../util/translations"
 
 function WhatsAppBanner() {
-    const onClick = () => {
-        window.open(
-            `https://wa.me/${
-                import.meta.env.VITE_WHATSAPP_NUMBER
-            }?text=${encodeURIComponent("היי")}`,
-            "_blank"
-        )
-    }
+    const whatsappUrl = `https://wa.me/${
+        import.meta.env.VITE_WHATSAPP_NUMBER
+    }?text=${encodeURIComponent(
+        translations[store.getLanguage].whatsappMessage
+    )}`
     return (
         <section className={`whatsapp-banner`}>
-            <button className="whatsapp-btn" onClick={onClick}>
+            <a href={whatsappUrl} className="whatsapp-btn">
                 <Icon icon={whatsapp} className="whatsapp-icon" />
-            </button>
+            </a>
         </section>
     )
 }

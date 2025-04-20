@@ -147,8 +147,7 @@ export type TranslationKeys = {
     preRegistration: string
 
     //WhatsApp Banner
-    whatsappBannerTitle: string
-    whatsappBannerDescription: string
+    whatsappMessage: string
 }
 
 type Translations = {
@@ -305,8 +304,7 @@ export const translations: Translations = {
         preRegistration: "Pre-Registration",
 
         //WhatsApp Banner
-        whatsappBannerTitle: "WhatsApp Banner",
-        whatsappBannerDescription: "WhatsApp Banner Description",
+        whatsappMessage: "Hello",
     },
     [Language.he]: {
         // Common
@@ -459,9 +457,7 @@ export const translations: Translations = {
         preRegistration: "הרשמה מראש",
 
         //WhatsApp Banner
-        whatsappBannerTitle: "בוט WhatsApp",
-        whatsappBannerDescription:
-            "מוזמנים לחפש אירועים ולהרשם לעדכונים בבוט הוואצאפ שלנו",
+        whatsappMessage: "היי",
     },
     [Language.ru]: {
         // Common
@@ -615,8 +611,7 @@ export const translations: Translations = {
         preRegistration: "Предварительная регистрация",
 
         //WhatsApp Banner
-        whatsappBannerTitle: "WhatsApp Banner",
-        whatsappBannerDescription: "WhatsApp Banner Description",
+        whatsappMessage: "Привет",
     },
 }
 
