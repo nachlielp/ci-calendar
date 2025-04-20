@@ -118,16 +118,16 @@ const MenuDrawer = () => {
             },
             disabled: !isProfile,
         },
-        {
-            key: "filters-and-notifications",
-            icon: notifications,
-            label: translations[store.getLanguage].notifications,
-            onClick: () => {
-                navigate("/filters-and-notifications")
-                setOpen(false)
-            },
-            disabled: !isUser,
-        },
+        // {
+        //     key: "filters-and-notifications",
+        //     icon: notifications,
+        //     label: translations[store.getLanguage].notifications,
+        //     onClick: () => {
+        //         navigate("/filters-and-notifications")
+        //         setOpen(false)
+        //     },
+        //     disabled: !isUser,
+        // },
         {
             key: "request",
             icon: verified_user,
