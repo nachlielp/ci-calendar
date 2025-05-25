@@ -202,11 +202,7 @@ const MultiDayEventForm = observer(
                             .minute(0)
                             .second(0)
                             .format("YYYY-MM-DDTHH:mm:ss"),
-                        type:
-                            eventOptions.find(
-                                (type) =>
-                                    type.label === values["main-event-type"]
-                            )?.value || "",
+                        type: values["main-event-type"],
                         address: address,
                         created_at: dayjs().toISOString(),
                         updated_at: dayjs().toISOString(),
