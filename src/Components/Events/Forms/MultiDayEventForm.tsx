@@ -7,7 +7,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat"
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
-import { eventOptions, tagOptions } from "../../../util/options"
+import { tagOptions } from "../../../util/options"
 import { CITemplate, DBCIEvent, IAddress } from "../../../util/interfaces"
 import { useEffect, useState } from "react"
 import { utilService } from "../../../util/utilService"
@@ -202,11 +202,7 @@ const MultiDayEventForm = observer(
                             .minute(0)
                             .second(0)
                             .format("YYYY-MM-DDTHH:mm:ss"),
-                        type:
-                            eventOptions.find(
-                                (type) =>
-                                    type.label === values["main-event-type"]
-                            )?.value || "",
+                        type: values["main-event-type"],
                         address: address,
                         created_at: dayjs().toISOString(),
                         updated_at: dayjs().toISOString(),
