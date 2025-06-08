@@ -118,35 +118,6 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         </label>
                     </article>
                 )}
-                {multiDayTeachersLen.length > 0 && (
-                    <article className="event-multi-day-teachers">
-                        <Icon icon={person} className="event-icon" />
-                        <label className="event-labels">
-                            {multiDayTeachersLen.map(
-                                (teacher, index, array) => {
-                                    const isTeacher =
-                                        store.getAppPublicBios?.find(
-                                            (t) => t.user_id === teacher.value
-                                        )
-                                    return (
-                                        <React.Fragment key={teacher.value}>
-                                            {isTeacher ? (
-                                                <BioModal teacher={isTeacher} />
-                                            ) : (
-                                                <label className="teacher-name-label translate-this">
-                                                    {teacher.label}
-                                                </label>
-                                            )}
-                                            {index < array.length - 1
-                                                ? ", "
-                                                : ""}
-                                        </React.Fragment>
-                                    )
-                                }
-                            )}
-                        </label>
-                    </article>
-                )}
 
                 <article className="event-dates">
                     {ci_event.segments.length > 0 ? (
