@@ -1617,7 +1617,7 @@ class Store {
                 .toISOString(),
             to_start_date: dayjs()
                 .tz("Asia/Jerusalem")
-                .add(60, "day")
+                .add(90, "day")
                 .toISOString(),
             sort_by: "start_date",
             sort_direction: "asc",
