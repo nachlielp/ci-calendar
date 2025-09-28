@@ -1,6 +1,6 @@
 //get eventId from url, handle edge cases where event is filtered out
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router"
 import { CIEvent } from "../util/interfaces"
 import { store } from "../Store/store"
@@ -11,13 +11,30 @@ export const useSetSelectedEventByParams = () => {
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | undefined>(
         undefined
     )
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     useEffect(() => {
-        if (eventId && eventId !== selectedEvent?.id) {
-            setSelectedEvent(undefined)
-            const event = store.getCIEventById(eventId)
-            if (event) {
-                setSelectedEvent(event)
+        const getEvent = () => {
+            if (!store.getLoadedAllEvents) {
+                timerRef.current = setTimeout(() => {
+                    getEvent()
+                }, 300)
+                return
+            }
+            if (eventId && eventId !== selectedEvent?.id) {
+                const event = store.getCIEventById(eventId)
+                if (event) {
+                    setSelectedEvent(event)
+                }
+            }
+        }
+
+        setSelectedEvent(undefined)
+        getEvent()
+
+        return () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current)
             }
         }
     }, [eventId, store.isLoading])

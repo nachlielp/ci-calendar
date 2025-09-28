@@ -75,6 +75,8 @@ class Store {
     @observable private lastActivityTimestamp: number = 0
     @observable private lastFetchTimestamp: number = 0
 
+    @observable private loadedAllEvents: boolean = false
+
     private subscriptionRef: RealtimeChannel | null = null
     private pollingRef: NodeJS.Timeout | null = null
     private isInitializing = false
@@ -527,6 +529,11 @@ class Store {
     @computed
     get getWeeklyScheduleFilters() {
         return this.user.weekly_schedule
+    }
+
+    @computed
+    get getLoadedAllEvents() {
+        return this.loadedAllEvents
     }
 
     @action
@@ -1610,29 +1617,33 @@ class Store {
 
     @action
     fetchNextMonthCIEvents = async () => {
-        const nextMonthCIEvents = await cieventsService.getCIEvents({
-            from_start_date: dayjs()
-                .tz("Asia/Jerusalem")
-                .add(30, "day")
-                .toISOString(),
-            to_start_date: dayjs()
-                .tz("Asia/Jerusalem")
-                .add(90, "day")
-                .toISOString(),
-            sort_by: "start_date",
-            sort_direction: "asc",
-            future_events: true,
-        })
-        // Get only new events that don't exist in app_ci_events
-        const existingEventIds = new Set(
-            this.app_ci_events.map((event) => event.id)
-        )
-        const newEvents = nextMonthCIEvents.filter(
-            (event) => !existingEventIds.has(event.id)
-        )
-        // If there are new events, append them to the existing array
-        if (newEvents.length > 0) {
-            this.app_ci_events.push(...newEvents)
+        try {
+            const nextMonthCIEvents = await cieventsService.getCIEvents({
+                from_start_date: dayjs()
+                    .tz("Asia/Jerusalem")
+                    .add(30, "day")
+                    .toISOString(),
+                to_start_date: dayjs()
+                    .tz("Asia/Jerusalem")
+                    .add(90, "day")
+                    .toISOString(),
+                sort_by: "start_date",
+                sort_direction: "asc",
+                future_events: true,
+            })
+            const existingEventIds = new Set(
+                this.app_ci_events.map((event) => event.id)
+            )
+            const newEvents = nextMonthCIEvents.filter(
+                (event) => !existingEventIds.has(event.id)
+            )
+            if (newEvents.length > 0) {
+                this.app_ci_events.push(...newEvents)
+            }
+        } catch (error) {
+            console.error("Error in fetchNextMonthCIEvents:", error)
+        } finally {
+            this.loadedAllEvents = true
         }
     }
 
