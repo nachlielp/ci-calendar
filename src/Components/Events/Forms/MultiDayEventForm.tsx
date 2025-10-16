@@ -156,6 +156,7 @@ const MultiDayEventForm = observer(
             }
 
             if (
+                !isTemplate &&
                 dayjs(values["event-start-date"]).isSame(
                     dayjs(values["event-end-date"]),
                     "day"
