@@ -59,6 +59,7 @@
     "react-google-places-autocomplete": {
       "@emotion/react": "^11.5.0"
     },
-    "immutable": ">=5.1.5"
+    "immutable": ">=5.1.5",
+    "minimatch": ">=9.0.7"
   }
 }
