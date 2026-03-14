@@ -3,14 +3,10 @@ import { EventlyType, CIEvent, Language } from "../../../util/interfaces"
 import dayjs from "dayjs"
 import { utilService } from "../../../util/utilService"
 import BioModal from "../../Users/BioModal"
-import CIEventNotificationModal from "../../Notifications/CIEventNotificationModal"
 import { Icon } from "../../Common/Icon"
 import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
-import { useIsMobile } from "../../../hooks/useIsMobile"
 import "../../../styles/full-event-card.scss"
-import InstallPWABanner from "../../Common/InstallPWABanner"
-import { appHeaderVM as vm } from "../../Layout/AppHeaderVM"
 import React, { Component, useEffect } from "react"
 import { observer } from "mobx-react-lite"
 import { shortEnglishDays, shortHebrewDays } from "../../../util/options"
@@ -27,7 +23,6 @@ import pin_drop from "../../../assets/svgs/pin_drop.svg"
 import person from "../../../assets/svgs/person.svg"
 import open_in_new from "../../../assets/svgs/openInNew.svg"
 import calendar_add_on from "../../../assets/svgs/calendar_add_on.svg"
-import notifications from "../../../assets/svgs/notifications.svg"
 import content_copy from "../../../assets/svgs/content_copy.svg"
 import domain from "../../../assets/svgs/domain.svg"
 import ios_share from "../../../assets/svgs/ios_share.svg"
@@ -68,7 +63,6 @@ class EventErrorBoundary extends Component<
 }
 
 const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
-    const isMobile = useIsMobile()
     useEffect(() => {
         if (store.getLanguage !== Language.he) {
             translatePage(store.getLanguage)
@@ -391,26 +385,6 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 <Icon icon={calendar_add_on} />
                             </button>
                         </div>
-                        {isMobile && !utilService.isPWA() && (
-                            <InstallPWABanner
-                                anchorElement={
-                                    <button
-                                        onClick={() =>
-                                            vm.setShowInstallPWAModal(true)
-                                        }
-                                        className={`secondary-action-btn `}
-                                    >
-                                        <Icon icon={notifications} />
-                                    </button>
-                                }
-                            />
-                        )}
-                        {utilService.isPWA() && (
-                            <CIEventNotificationModal
-                                eventId={ci_event.id}
-                                isMultiDay={ci_event.is_multi_day}
-                            />
-                        )}
                         {utilService.isPWA() && (
                             <SecondaryButton
                                 label=""

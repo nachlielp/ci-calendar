@@ -17,7 +17,6 @@ import { useSetSelectedEventByParams } from "../../hooks/useSetSelectedEventByPa
 import { useSelectedDayEvents } from "../../hooks/useSelectedDayEvents"
 import FullEventCardContainer from "../Events/Display/FullEventCardContainer"
 
-import AlertsAnchor from "../Alerts/AlertsAnchor"
 import { Icon } from "../Common/Icon"
 import MenuButtons from "../Common/MenuButtons"
 import { observer } from "mobx-react-lite"
@@ -67,7 +66,6 @@ const EventsPage = () => {
             }`}
         >
             <header className="header">
-                <AlertsAnchor />
                 <h1 className="title ">
                     {translations[store.getLanguage].title}
                 </h1>

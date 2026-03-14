@@ -5,9 +5,7 @@ import {
     DbUserWithoutJoin,
     RawAppConfigRecord,
     UserType,
-    UserNotification,
     DBCIEvent,
-    CIAlert,
     IAddress,
     UserBio,
     Language,
@@ -45,9 +43,6 @@ export const utilService = {
     deepCompareArraysUnordered,
     getPWAInstallId,
     isPWA,
-    isFirstNotificationPermissionRequest,
-    setFirstNotificationPermissionRequest,
-    getNotificationPermission,
     openGoogleMaps,
     isIos,
     handleShareEvent,
@@ -59,13 +54,10 @@ export const utilService = {
     notAUserId,
     getUniqueOwnersList,
     removeDuplicates,
-    isSingleDayEventNotStarted,
-    isNotificationNotStarted,
     sleep,
     formatConfig,
     isEventStarted,
     formatHebrewDateByStartTime,
-    validateEventNotification,
     formatFormValuesToCreateCIEvent,
     formatFormValuesToCreateCITemplate,
     formatFormValuesToEditCIEvent,
@@ -320,7 +312,6 @@ function formatFormValuesToCreateCIEvent(
         is_multi_day: is_multi_day,
         user_id: store.user.id,
         source_template_id: values["template-description"],
-        is_notified: false,
         cancelled: false,
         start_date: dayjs(values["event-start-date"])
             .tz("Asia/Jerusalem")
@@ -712,16 +703,13 @@ function createDbUserFromUser(user: User): DbUserWithoutJoin {
         updated_at: new Date().toISOString(),
         subscribed_for_updates_at: new Date().toISOString(),
         provider: user.app_metadata["provider"] || "",
-        push_notification_tokens: [],
         subscriptions: {
             teachers: [],
             orgs: [],
         },
-        receive_notifications: true,
         version: CACHE_VERSION,
         last_signin: new Date().toISOString(),
         pwa_install_id: null,
-        fcm_token: null,
     }
 }
 
@@ -859,16 +847,6 @@ function isPWA() {
         window.matchMedia("(display-mode: standalone)").matches ||
         (window.navigator as any).standalone === true
     )
-}
-
-function isFirstNotificationPermissionRequest() {
-    return !localStorage.getItem("notificationPermission")
-}
-function setFirstNotificationPermissionRequest(permission: string) {
-    localStorage.setItem("notificationPermission", permission)
-}
-function getNotificationPermission() {
-    return localStorage.getItem("notificationPermission")
 }
 
 function openGoogleMaps(placeId: string, address: string) {
@@ -1048,14 +1026,6 @@ function removeDuplicates(values: string[]) {
     return Array.from(new Set(values))
 }
 
-function isSingleDayEventNotStarted(event: CIEvent) {
-    if (event.is_multi_day) return true
-    return !isEventStartedByFirstSegment(
-        event.start_date,
-        event.segments[0].startTime
-    )
-}
-
 function isEventStartedByFirstSegment(startDate: string, startTime: string) {
     const now = dayjs().tz("Asia/Jerusalem")
     const eventStartTime = dayjs(startDate)
@@ -1080,18 +1050,6 @@ function isEventStarted(event: CIEvent) {
         event.segments[0].startTime
     )
 }
-function isNotificationNotStarted(notification: UserNotification) {
-    if (notification.is_multi_day) {
-        return !isEventStartedByDay(notification.start_date)
-    } else {
-        if (!notification.firstSegment) return false
-        return !isEventStartedByFirstSegment(
-            notification.start_date,
-            notification.firstSegment.startTime
-        )
-    }
-}
-
 function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
@@ -1102,14 +1060,6 @@ function formatConfig(config: RawAppConfigRecord[]) {
         app_description:
             config.find((c) => c.title === "app_description")?.data || "",
     }
-}
-
-function validateEventNotification(alert: CIAlert, events: CIEvent[]) {
-    const event = events.find((e) => e.id === alert.ci_event_id)
-    if (!event) {
-        return false
-    }
-    return true
 }
 
 function isUUID(uuid: string) {
@@ -1206,9 +1156,6 @@ function duplicateEvent(
     return {
         ...event,
         start_date: date.format("YYYY/MM/DD"),
-        is_notified:
-            date.format("YYYY/MM/DD") !==
-            dayjs(event.start_date).format("YYYY/MM/DD"),
         end_date: isMultiDayEvent
             ? date.add(eventLength, "day").format("YYYY/MM/DD")
             : date.format("YYYY/MM/DD"),

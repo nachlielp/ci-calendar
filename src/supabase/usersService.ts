@@ -44,42 +44,17 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 .select(
                     `
                     *,
-                    notifications!left (
-                        id,
-                        ci_event_id,
-                        remind_in_hours,
-                        sent,
-                        ci_events!inner (
-                            title,
-                            start_date,
-                            segments,
-                            is_multi_day
-                        )
-                    ),
                     requests!left (*),
                     templates!left (*),
                     bio:public_bio!left (*),
-                    ci_events:ci_events!left (*),
-                    alerts:alerts!left (
-                        id,
-                        ci_event_id,
-                        request_id,
-                        user_id,
-                        viewed,
-                        type,
-                        title
-                    )
+                    ci_events:ci_events!left (*)
                 `
                 )
                 .eq("id", id)
-                .eq("notifications.user_id", id)
-                .eq("notifications.sent", false)
                 .eq("requests.user_id", id)
                 .eq("templates.user_id", id)
                 .eq("public_bio.user_id", id)
                 .eq("ci_events.user_id", id)
-                .eq("alerts.user_id", id)
-                .eq("alerts.viewed", false)
                 .single(),
 
             // Second query - events data
@@ -112,48 +87,6 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 )}`
             )
 
-        const notifications = userData?.notifications
-            .map((notification: any) => {
-                const title = notification.ci_events.title
-                const start_date = notification.ci_events.start_date
-
-                const formattedNotification = {
-                    ...notification,
-                    title,
-                    start_date,
-                    firstSegment: notification.ci_events.segments[0],
-                    is_multi_day: notification.ci_events.is_multi_day,
-                }
-                delete formattedNotification.ci_events
-                return formattedNotification
-            })
-            .filter((notification: any) => {
-                if (notification.start_date)
-                    return dayjs(notification.start_date)
-                        .endOf("day")
-                        .isAfter(dayjs())
-                return true
-            })
-
-        const alerts = userData.alerts.map((alert: any) => {
-            const event = eventsData.find(
-                (event) => event.id === alert.ci_event_id
-            )
-            const request = userData.requests.find(
-                (request: any) => request.id === alert.request_id
-            )
-            let formattedAlert = {
-                ...alert,
-                title: alert.title || event?.title || request?.title || "",
-                start_date: event?.start_date || "",
-                firstSegment: event?.segments[0] || "",
-                address: event?.address.label || "",
-                type: alert.type || request?.type,
-            }
-            delete formattedAlert.ci_events
-            return formattedAlert
-        })
-
         const templates = userData.templates
         const requests = userData.requests
         const past_ci_events = userData.ci_events.filter((event: any) =>
@@ -170,8 +103,6 @@ async function getUserData(id: string): Promise<CIUserData | null> {
 
         const user = { ...userData }
 
-        delete user.notifications
-        delete user.alerts
         delete user.templates
         delete user.requests
         delete user.ci_events
@@ -179,8 +110,6 @@ async function getUserData(id: string): Promise<CIUserData | null> {
 
         return {
             user,
-            notifications,
-            alerts,
             templates,
             requests,
             ci_events: eventsData,
@@ -429,19 +358,6 @@ async function subscribeToUser(
             {
                 event: "*",
                 schema: "public",
-                table: "notifications",
-                filter: `user_id=eq.${userId}`,
-            },
-
-            (payload) => {
-                callback({ table: "notifications", payload })
-            }
-        )
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
                 table: "requests",
                 filter:
                     userType === "admin" ? undefined : `user_id=eq.${userId}`,
@@ -473,18 +389,6 @@ async function subscribeToUser(
             (payload) => {
                 //TODO handle delete
                 callback({ table: "templates", payload })
-            }
-        )
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "alerts",
-                filter: `user_id=eq.${userId}`,
-            },
-            (payload) => {
-                callback({ table: "alerts", payload })
             }
         )
         .subscribe((status) => {

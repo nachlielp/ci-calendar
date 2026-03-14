@@ -6,7 +6,6 @@ import {
     reaction,
 } from "mobx"
 import {
-    CIAlert,
     CIEvent,
     CIRequest,
     CITemplate,
@@ -17,12 +16,9 @@ import {
     IAddress,
     Language,
     ManageUserOption,
-    NotificationDB,
-    NotificationType,
     SupabaseSessionEvent,
     TaggableUserOptions,
     UserBio,
-    UserNotification,
     UserRole,
     UserType,
     WeeklyScheduleFilters,
@@ -33,12 +29,10 @@ import { utilService } from "../util/utilService"
 import { RealtimeChannel, Session } from "@supabase/supabase-js"
 import { cieventsService } from "../supabase/cieventsService"
 import dayjs from "dayjs"
-import { notificationService } from "../supabase/notificationService"
 import { requestsService, UpdateRequest } from "../supabase/requestsService"
 import { SelectOption } from "../util/options"
 import { templateService } from "../supabase/templateService"
 import { publicBioService } from "../supabase/publicBioService"
-import { alertsService } from "../supabase/alertsService"
 import { userRoleService } from "../supabase/userRoleService"
 import { CACHE_VERSION } from "../App"
 import { AuthChangeEvent } from "@supabase/supabase-js"
@@ -48,11 +42,9 @@ import { translateText } from "../util/translate"
 class Store {
     @observable session: Session | null = null
     @observable user: CIUser = {} as CIUser
-    @observable notifications: UserNotification[] = []
     @observable templates: CITemplate[] = []
     @observable requests: CIRequest[] = []
     @observable bio: UserBio = {} as UserBio
-    @observable alerts: CIAlert[] = []
 
     @observable user_past_ci_events: CIEvent[] = []
     @observable user_future_ci_events: CIEvent[] = []
@@ -67,8 +59,6 @@ class Store {
     @observable isOnline: boolean = navigator.onLine
     @observable networkFlag: boolean = false
     @observable language: Language = utilService.getLanguage()
-
-    @observable requestNotification: boolean = false
 
     @observable private currentSessionId: string | null = null
 
@@ -315,38 +305,7 @@ class Store {
         }
     }
 
-    @computed
-    get getSortedNotifications() {
-        return this.notifications
-            .slice()
-            .sort((a, b) =>
-                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? -1 : 1
-            )
-    }
 
-    @computed
-    get getUserReceiveNotifications() {
-        if (!this.isOnline) return false
-        return this.user.receive_notifications
-    }
-
-    @computed
-    get getNotifications() {
-        return this.notifications
-    }
-
-    @computed
-    get getNotificationByEventId() {
-        return (eventId: string) => {
-            if (!this.isOnline || !this.isUser) return undefined
-            const notification = this.notifications.find(
-                (n) =>
-                    n.ci_event_id === eventId &&
-                    utilService.isNotificationNotStarted(n)
-            )
-            return notification
-        }
-    }
 
     @computed
     get getRequests() {
@@ -396,10 +355,7 @@ class Store {
             }))
     }
 
-    @computed
-    get getAlerts() {
-        return this.alerts
-    }
+
 
     @computed
     get getAppRequests() {
@@ -661,42 +617,11 @@ class Store {
             case "ci_events":
                 this.setCIEvent(payload.new, payload.eventType)
                 break
-            case "notifications":
-                this.setNotification(payload.new, payload.eventType)
-                break
             case "requests":
                 this.setRequest(payload.new, payload.eventType)
                 break
             case "public_bio":
                 this.setBio(payload.new, payload.eventType)
-                break
-            case "alerts":
-                let alert = payload.new
-                if (
-                    [
-                        NotificationType.reminder,
-                        NotificationType.subscription,
-                    ].includes(payload.new.type)
-                ) {
-                    const event = this.app_ci_events.find(
-                        (e) => e.id === alert.ci_event_id
-                    )
-                    if (!event) {
-                        console.error(`Event not found for alert: ${alert.id}`)
-                        break
-                    }
-                } else if (NotificationType.response === payload.new.type) {
-                    //currently no formatting needed
-                } else if (
-                    NotificationType.admin_response === payload.new.type
-                ) {
-                    //currently no formatting needed
-                } else {
-                    throw new Error(`Unknown alert type: ${alert.type}`)
-                }
-
-                this.setAlert(alert, payload.eventType)
-
                 break
             case "templates":
                 this.setTemplate(payload.new, payload.eventType)
@@ -777,13 +702,11 @@ class Store {
     @action
     setStore = (userData: CIUserData) => {
         this.user = userData.user
-        this.notifications = userData.notifications
         this.templates = userData.templates
         this.requests = userData.requests
         this.app_ci_events = userData.ci_events
         this.user_past_ci_events = userData.past_ci_events
         this.user_future_ci_events = userData.future_ci_events
-        this.alerts = userData.alerts
         this.bio = userData.userBio
     }
 
@@ -921,86 +844,7 @@ class Store {
         this.setCIEvent(newCIEvent, EventPayloadType.INSERT)
     }
 
-    @action
-    setNotification = (
-        notification: UserNotification,
-        eventType: EventPayloadType
-    ) => {
-        switch (eventType) {
-            case EventPayloadType.UPDATE:
-                this.notifications = this.notifications.map((n) =>
-                    n.id === notification.id ? { ...n, ...notification } : n
-                )
-                break
-            case EventPayloadType.DELETE:
-                this.notifications = this.notifications.filter(
-                    (n) => n.id !== notification.id
-                )
-                break
-            case EventPayloadType.INSERT:
-                if (this.notifications.find((n) => n.id === notification.id))
-                    return
 
-                const event = this.app_ci_events.find(
-                    (e) => e.id === notification.ci_event_id
-                )
-                if (!event) {
-                    console.error(
-                        `Event not found for notification: ${notification.id}`
-                    )
-                    return
-                }
-                notification.title = event.title
-                notification.start_date = event.start_date
-                notification.firstSegment = event.segments[0]
-
-                this.notifications = [...this.notifications, notification]
-
-                this.fetchNotification(notification.id).then(
-                    (fetchedNotification) => {
-                        if (fetchedNotification) {
-                            this.notifications = this.notifications.map((n) =>
-                                n.id === notification.id
-                                    ? fetchedNotification
-                                    : n
-                            )
-                        }
-                    }
-                )
-                break
-            case EventPayloadType.UPSERT:
-                if (this.notifications.find((n) => n.id === notification.id)) {
-                    this.notifications = this.notifications.map((n) =>
-                        n.id === notification.id ? { ...n, ...notification } : n
-                    )
-                } else {
-                    this.notifications = [...this.notifications, notification]
-                }
-
-                break
-        }
-    }
-
-    @action
-    upsertNotification = async (notification: NotificationDB) => {
-        const updatedNotification =
-            await notificationService.upsertNotification(notification)
-        const event = this.app_ci_events.find(
-            (e) => e.id === updatedNotification.ci_event_id
-        )
-        if (event) {
-            updatedNotification.title = event.title
-            updatedNotification.start_date = event.start_date
-            updatedNotification.is_multi_day = event.is_multi_day
-            if (event.segments.length > 0) {
-                updatedNotification.firstSegment = event.segments[0]
-            } else {
-                updatedNotification.firstSegment = null
-            }
-        }
-
-        this.setNotification(updatedNotification, EventPayloadType.UPSERT)
-    }
 
     @action
     setRequest = (request: CIRequest, eventType: EventPayloadType) => {
@@ -1138,121 +982,7 @@ class Store {
         return newRequest
     }
 
-    @action
-    setAlert = (alert: CIAlert, eventType: EventPayloadType) => {
-        switch (eventType) {
-            case EventPayloadType.INSERT:
-                if (
-                    alert.type === NotificationType.subscription ||
-                    alert.type === NotificationType.reminder
-                ) {
-                    const event = this.app_ci_events.find(
-                        (e) => e.id === alert.ci_event_id
-                    )
-                    if (!event) {
-                        console.error(`Event not found for alert: ${alert.id}`)
-                        return
-                    }
-                    alert.title = event.title
-                    alert.start_date = event.start_date
-                    alert.firstSegment = event.segments[0]
-                } else if (alert.type === NotificationType.admin_response) {
-                    //No need to set title or start_date for admin response
-                } else {
-                    throw new Error(
-                        `setAlert - unknown alert type: ${alert.type}`
-                    )
-                }
-                this.alerts = [...this.alerts, alert]
-                break
-            case EventPayloadType.UPDATE:
-                this.alerts = this.alerts.map((a) =>
-                    a.id === alert.id ? { ...a, ...alert } : a
-                )
-                break
-        }
-    }
 
-    @action
-    updateAlert = async (alert: Partial<CIAlert>) => {
-        if (!alert.id) return
-        const updatedAlert = await alertsService.updateAlert(alert)
-        this.setAlert(updatedAlert, EventPayloadType.UPDATE)
-    }
-
-    @action
-    viewEventAlert = async (eventId: string) => {
-        const alert = this.alerts.find((a) => a.ci_event_id === eventId)
-        if (alert && !alert.viewed) {
-            const updatedAlert = await alertsService.updateAlert({
-                id: alert.id,
-                viewed: true,
-            })
-            this.setAlert(
-                { ...alert, ...updatedAlert },
-                EventPayloadType.UPDATE
-            )
-        }
-    }
-
-    @action
-    viewRequestAlert = async (requestId: string) => {
-        //Notice - batch updates are blocked by policy
-        const alerts = this.alerts.filter((a) => a.request_id === requestId)
-        const request = this.requests.find((r) => r.id === requestId)
-
-        for (const alert of alerts) {
-            if (alert && !alert.viewed && request) {
-                const updatedAlert = await alertsService.updateAlert({
-                    id: alert.id,
-                    viewed: true,
-                })
-                this.setAlert(
-                    { ...alert, ...updatedAlert },
-                    EventPayloadType.UPDATE
-                )
-                const updatedRequest = await requestsService.updateRequest({
-                    id: requestId,
-                    viewed: true,
-                })
-                this.setRequest(
-                    { ...request, ...updatedRequest },
-                    EventPayloadType.UPDATE
-                )
-            }
-        }
-    }
-    @action
-    viewRequestAlerts = async () => {
-        //Notice - batch updates are blocked by policy issues
-        const alerts = this.alerts.filter((a) => !!a.request_id)
-
-        for (const alert of alerts) {
-            if (alert && !alert.viewed) {
-                const updatedAlert = await alertsService.updateAlert({
-                    id: alert.id,
-                    viewed: true,
-                })
-                this.setAlert(
-                    { ...alert, ...updatedAlert },
-                    EventPayloadType.UPDATE
-                )
-                if (!alert.request_id) continue
-                const updatedRequest = await requestsService.updateRequest({
-                    id: alert.request_id,
-                    viewed: true,
-                })
-                const request = this.requests.find(
-                    (r) => r.id === alert.request_id
-                )
-                if (!request) continue
-                this.setRequest(
-                    { ...request, ...updatedRequest },
-                    EventPayloadType.UPDATE
-                )
-            }
-        }
-    }
 
     // @action
     // setConfig = (config: CIConfig, eventType: EventPayloadType) => {
@@ -1328,11 +1058,6 @@ class Store {
             last_signin: dayjs().toISOString(),
         }
         await usersService.updateUser(this.user.id, payload)
-    }
-
-    @action
-    setRequestNotification = (flag: boolean) => {
-        this.requestNotification = flag
     }
 
     @action
@@ -1525,7 +1250,6 @@ class Store {
         if (this.getSession?.user?.id && this.isOnline) {
             this.setupSubscription()
             this.updateUserAppVersion()
-            this.checkNotifications()
             utilService.saveIsInternalToLocalStorage(this.user.is_internal)
         }
     }
@@ -1577,12 +1301,7 @@ class Store {
         }
     }
 
-    fetchNotification = async (notificationId: string) => {
-        const notification = await notificationService.getNotificationById(
-            notificationId
-        )
-        return notification
-    }
+
 
     fetchAppUsers = async () => {
         const appUsers = await usersService.getUsers()
@@ -1668,15 +1387,6 @@ class Store {
         return { ru: ruTitle, en: enTitle }
     }
 
-    checkNotifications = async () => {
-        const pwaInstallId = utilService.getPWAInstallId()
-
-        if (pwaInstallId && pwaInstallId === this.user.pwa_install_id) {
-            return
-        }
-        this.setRequestNotification(true)
-    }
-
     cleanup = () => {
         this.currentSessionId = null
         if (this.subscriptionRef) {
@@ -1700,10 +1410,8 @@ class Store {
             past_ci_events: this.user_past_ci_events,
             future_ci_events: this.user_future_ci_events,
             user: {} as CIUser,
-            notifications: [],
             templates: [],
             requests: [],
-            alerts: [],
             userBio: {} as UserBio,
         } as CIUserData)
         this.currentSessionId = null
