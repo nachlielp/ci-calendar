@@ -90,7 +90,6 @@ export interface CIEvent {
     is_multi_day: boolean
     multi_day_teachers: UserOption[] | null
     organisations: UserOption[]
-    is_notified: boolean
     creator: {
         user_id: string
         full_name: string
@@ -145,61 +144,7 @@ export enum UserTypeHebrew {
     user = "משתמש רגיל",
 }
 
-export interface PushNotificationToken {
-    token: string
-    created_at: string
-    device_id: string
-    is_pwa: boolean
-    branch: string
-}
 
-export enum NotificationType {
-    reminder = "reminder",
-    subscription = "subscription",
-    response = "response",
-    admin_response = "admin_response",
-}
-
-export interface CINotification {
-    id: string
-    created_at: string
-    ci_event_id: string
-    user_id: string
-    remind_in_hours: string
-    type: NotificationType
-    title: string
-    body: string
-    send_at: string
-    timezone: string
-    sent: boolean
-    is_multi_day: boolean
-}
-
-export interface UserNotification
-    extends Omit<CINotification, "user_id" | "body" | "send_at" | "timezone"> {
-    title: string
-    start_date: string
-    firstSegment: CIEventSegments
-}
-
-export interface NotificationDB
-    extends Omit<
-        CINotification,
-        | "id"
-        | "created_at"
-        | "title"
-        | "body"
-        | "send_at"
-        | "timezone"
-        | "is_multi_day"
-    > {
-    id?: string
-}
-
-export interface NewsletterFilter {
-    districts: District[]
-    eventTypes: EventlyType[]
-}
 
 export interface WeeklyScheduleFilters {
     "district-weekly": string[]
@@ -218,15 +163,12 @@ export interface CIUser {
     subscribed_for_updates_at: string
     allow_tagging: boolean
     provider: string
-    receive_notifications: boolean
     subscriptions: {
         teachers: string[]
         orgs: string[]
     }
-    push_notification_tokens: PushNotificationToken[]
     version: string
     pwa_install_id: string | null
-    fcm_token: string | null
     is_internal: boolean
     receive_weekly_schedule: boolean
     weekly_schedule: WeeklyScheduleFilters
@@ -235,19 +177,16 @@ export interface CIUser {
 export interface CIUserData {
     user: CIUser
     userBio: UserBio
-    notifications: UserNotification[]
     requests: CIRequest[]
     templates: CITemplate[]
     ci_events: CIEvent[]
     past_ci_events: CIEvent[]
     future_ci_events: CIEvent[]
-    alerts: CIAlert[]
 }
 
 export interface DbUserWithoutJoin
     extends Omit<
         DbUser,
-        | "notifications"
         | "requests"
         | "templates"
         | "bio_name"
@@ -258,7 +197,6 @@ export interface DbUserWithoutJoin
         | "img"
         | "bio"
         | "ci_events"
-        | "alerts"
     > {}
 
 export interface DbUser {
@@ -274,41 +212,18 @@ export interface DbUser {
     allow_tagging: boolean
     provider: string
     bio: UserBio
-    push_notification_tokens: PushNotificationToken[]
-    notifications: UserNotification[]
     subscriptions: {
         teachers: string[]
         orgs: string[]
     }
-    receive_notifications: boolean
     requests: CIRequest[]
     templates: CITemplate[]
     ci_events: CIEvent[]
-    alerts: CIAlert[]
     version: string
     pwa_install_id: string | null
-    fcm_token: string | null
 }
 
-export interface CIAlert {
-    id: string
-    ci_event_id?: string
-    request_id?: string
-    viewed: boolean
-    type: NotificationType
-    title: string
-    start_date: string
-    firstSegment: CIEventSegments
-    address: IAddress
-}
 
-export interface DBCIAlert
-    extends Omit<
-        CIAlert,
-        "ci_event_id" | "title" | "start_date" | "firstSegment" | "address"
-    > {
-    ci_event_id?: string
-}
 export interface UserBio {
     user_id: string
     bio_name: string

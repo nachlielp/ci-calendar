@@ -12,7 +12,6 @@ import { observer } from "mobx-react-lite"
 import Modal from "antd/es/modal"
 import { getTranslation } from "../../util/translations"
 import { store } from "../../Store/store"
-import notifications_active from "../../assets/svgs/notifications_active.svg"
 import ad_units from "../../assets/svgs/ad_units.svg"
 const InstallPWABanner = ({
     anchorElement,
@@ -54,16 +53,6 @@ const InstallPWABanner = ({
             </ol>
             <div className="install-pwa-modal-br" />
             <section className="section-info">
-                <article className="article-info">
-                    <Icon
-                        icon={notifications_active}
-                        className="article-icon"
-                    />
-                    <p className="article-item">
-                        {getTranslation("PWAnotification", store.getLanguage) ||
-                            "רוצים הודעה כשהמורה המועדף מעלה אירוע חדש?"}
-                    </p>
-                </article>
                 <article className="article-info">
                     <Icon icon={ad_units} className="article-icon" />
                     <p className="article-item">
@@ -114,16 +103,6 @@ const InstallPWABanner = ({
             </ol>
             <div className="install-pwa-modal-br" />
             <section className="section-info">
-                <article className="article-info">
-                    <Icon
-                        icon={notifications_active}
-                        className="article-icon"
-                    />
-                    <p className="article-item">
-                        {getTranslation("PWAnotification", store.getLanguage) ||
-                            "רוצים הודעה כשהמורה המועדף מעלה אירוע חדש?"}
-                    </p>
-                </article>
                 <article className="article-info">
                     <Icon icon={ad_units} className="article-icon" />
                     <p className="article-item">

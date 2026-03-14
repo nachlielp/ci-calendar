@@ -1,11 +1,8 @@
 import { store } from "../../Store/store"
-import { action, computed, makeObservable, observable, reaction } from "mobx"
+import { action, computed, makeObservable, observable } from "mobx"
 import { utilService } from "../../util/utilService"
-import { getToken } from "firebase/messaging"
-import { messaging } from "../../firebase.messaging"
 
 class AppHeaderVM {
-    @observable _showRequestPermissionModal: boolean = false
     @observable _isMobile: boolean = false
     @observable _currentPath: string = ""
     @observable _loading: boolean = false
@@ -13,27 +10,6 @@ class AppHeaderVM {
 
     constructor() {
         makeObservable(this)
-
-        setTimeout(() => {
-            reaction(
-                () => store.requestNotification,
-                (requestNotification) => {
-                    if (
-                        requestNotification &&
-                        utilService.isPWA() &&
-                        store.user.receive_notifications
-                    ) {
-                        const permission = Notification.permission
-
-                        if (permission === "granted") {
-                            this.setFCMToken()
-                        } else if (permission !== "denied") {
-                            this.setShowRequestPermissionModal(true)
-                        }
-                    }
-                }
-            )
-        }, 0)
     }
 
     @computed
@@ -110,11 +86,6 @@ class AppHeaderVM {
     }
 
     @computed
-    get showRequestPermissionModal() {
-        return this._showRequestPermissionModal
-    }
-
-    @computed
     get isLoading() {
         return this._loading
     }
@@ -146,46 +117,8 @@ class AppHeaderVM {
     }
 
     @action
-    setShowRequestPermissionModal = (show: boolean) => {
-        this._showRequestPermissionModal = show
-    }
-
-    @action
-    setDontReceiveNotifications = () => {
-        this._showRequestPermissionModal = false
-        store.updateUser({ receive_notifications: false })
-    }
-
-    @action
-    setReceiveNotifications = () => {
-        this._showRequestPermissionModal = false
-        store.updateUser({ receive_notifications: true })
-    }
-
-    @action
     setShowInstallPWAModal = (show: boolean) => {
         this._showInstallPWAModal = show
-    }
-
-    @action
-    setFCMToken = async () => {
-        const pwaInstallId = utilService.getPWAInstallId()
-
-        let token = ""
-        try {
-            token = await getToken(messaging, {
-                vapidKey: import.meta.env.VITE_VAPID_PUBLIC_FIREBASE_KEY,
-            })
-            store.updateUser({
-                pwa_install_id: pwaInstallId,
-                fcm_token: token,
-            })
-        } catch (error) {
-            console.error("checkAndUpdateToken - error", error)
-        } finally {
-            this._loading = false
-            this.setShowRequestPermissionModal(false)
-        }
     }
 }
 

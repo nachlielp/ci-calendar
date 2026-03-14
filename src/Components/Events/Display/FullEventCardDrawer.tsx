@@ -33,13 +33,6 @@ const FullEventCardDrawer = ({
         }
     }, [store.isLoading])
 
-    //TODO - handle seen when offline
-    useEffect(() => {
-        if (isModalOpen && store.isUser && store.isOnline) {
-            store.viewEventAlert(event.id)
-        }
-    }, [isModalOpen, event.id, store.isUser, store.isOnline])
-
     const onOpen = () => {
         if (store.isLoading) {
             setIsClicked(true)

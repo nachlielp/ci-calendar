@@ -8,7 +8,6 @@ import { observer } from "mobx-react-lite"
 import MenuDrawer from "./MenuDrawer"
 import { store } from "../../Store/store"
 import { appHeaderVM as vm } from "./AppHeaderVM"
-import RequestPermissionModal from "../Common/RequestPermissionModal"
 import { useIsMobile } from "../../hooks/useIsMobile"
 import { useLocation } from "react-router"
 import { utilService } from "../../util/utilService"
@@ -22,7 +21,7 @@ import he from "../../assets/img/he.png"
 import en from "../../assets/img/en.png"
 import ru from "../../assets/img/ru.png"
 import touch_app from "../../assets/svgs/touch_app.svg"
-import WhatsAppBanner from "../Notifications/WhatsAppBanner"
+import WhatsAppBanner from "../Common/WhatsAppBanner"
 const AppHeader = () => {
     const isMobile = useIsMobile()
     const location = useLocation()
@@ -50,7 +49,6 @@ const AppHeader = () => {
                 )}
             </div>
             <section className="header-container">
-                <RequestPermissionModal />
 
                 {vm.showLoginButton && (
                     <LinkButton

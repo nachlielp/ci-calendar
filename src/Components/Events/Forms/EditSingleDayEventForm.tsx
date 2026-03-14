@@ -158,7 +158,6 @@ const EditSingleDayEventForm = observer(
                             short_id,
                             cancelled,
                             cancelled_text,
-                            is_notified,
                             created_at,
                             hide,
                             id,
