@@ -53,13 +53,6 @@ const InstallPWABanner = ({
             </ol>
             <div className="install-pwa-modal-br" />
             <section className="section-info">
-                <article className="article-info">
-                    <Icon icon={ad_units} className="article-icon" />
-                    <p className="article-item">
-                        {getTranslation("PWAReminder", store.getLanguage) ||
-                            "רוצים תזכורות לג׳אמים האהובים עליכם?"}
-                    </p>
-                </article>
                 <p className="install-pwa-modal-p">
                     {getTranslation("PWAFooter", store.getLanguage) ||
                         "הוסיפו את האתר לעמוד הבית בטלפון"}
@@ -103,13 +96,6 @@ const InstallPWABanner = ({
             </ol>
             <div className="install-pwa-modal-br" />
             <section className="section-info">
-                <article className="article-info">
-                    <Icon icon={ad_units} className="article-icon" />
-                    <p className="article-item">
-                        {getTranslation("PWAReminder", store.getLanguage) ||
-                            "רוצים תזכורות לג׳אמים האהובים עליכם?"}
-                    </p>
-                </article>
                 <p className="install-pwa-modal-p">
                     {getTranslation("PWAFooter", store.getLanguage) ||
                         "הוסיפו את האתר לעמוד הבית בטלפון"}
