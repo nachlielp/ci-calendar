@@ -6,13 +6,11 @@ import add_to_home_screen from "../../assets/svgs/add_to_home_screen.svg"
 import add_box from "../../assets/svgs/add_box.svg"
 import { ReactSVG } from "react-svg"
 import "../../styles/install-pwa-banner.scss"
-import { Icon } from "./Icon"
 import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import { observer } from "mobx-react-lite"
 import Modal from "antd/es/modal"
 import { getTranslation } from "../../util/translations"
 import { store } from "../../Store/store"
-import ad_units from "../../assets/svgs/ad_units.svg"
 const InstallPWABanner = ({
     anchorElement,
 }: {
