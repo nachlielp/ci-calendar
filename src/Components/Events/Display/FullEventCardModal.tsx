@@ -23,12 +23,6 @@ const FullEventCardModal = ({
     const [isClicked, setIsClicked] = useState(false)
 
     useEffect(() => {
-        if (isModalOpen && store.isUser && event.id) {
-            store.viewEventAlert(event.id)
-        }
-    }, [isModalOpen])
-
-    useEffect(() => {
         if (isClicked) {
             setIsClicked(false)
         }

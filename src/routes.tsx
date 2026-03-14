@@ -24,9 +24,6 @@ const SupportPage = lazy(() => import("./Components/Pages/SupportPage"))
 const ManageSupportPage = lazy(
     () => import("./Components/Pages/ManageSupportPage")
 )
-const NotificationsPage = lazy(
-    () => import("./Components/Pages/NotificationsPage")
-)
 const EditSingleDayFormPage = lazy(
     () => import("./Components/Pages/EditSingleDayFormPage")
 )
@@ -85,18 +82,10 @@ export const AppRoutes = () => (
                         UserType.org,
                         UserType.user,
                         UserType.profile,
-                    ]}
+                    ]}  
                 />
             }
         >
-            <Route
-                path="/filters-and-notifications"
-                element={
-                    <Suspense fallback={<Loading />}>
-                        <NotificationsPage />
-                    </Suspense>
-                }
-            />
             <Route
                 path="/request"
                 element={

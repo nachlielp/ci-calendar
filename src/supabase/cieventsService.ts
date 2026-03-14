@@ -18,6 +18,7 @@ export interface FilterOptions {
 
 export const cieventsService = {
     getCIEvent,
+    getCIEventByShortId,
     getCIEvents,
     createCIEvent,
     updateCIEvent,
@@ -43,6 +44,27 @@ async function getCIEvent(id: string): Promise<CIEvent> {
                 : JSON.stringify(error, null, 2)
         throw new Error(
             `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+        )
+    }
+}
+
+async function getCIEventByShortId(shortId: string): Promise<CIEvent> {
+    try {
+        const { data, error } = await supabase
+            .from("ci_events")
+            .select("*")
+            .eq("short_id", shortId)
+            .single()
+
+        if (error) throw error
+        return data as CIEvent
+    } catch (error) {
+        const errorMessage =
+            error instanceof Error
+                ? error.message
+                : JSON.stringify(error, null, 2)
+        throw new Error(
+            `Failed to get CI event for shortId: ${shortId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
         )
     }
 }

@@ -19,12 +19,6 @@ const RequestsList = ({
     )
 
     useEffect(() => {
-        if (expandedRequestId) {
-            store.viewRequestAlert(expandedRequestId)
-        }
-    }, [expandedRequestId])
-
-    useEffect(() => {
         if (selectedRequestId) {
             setExpandedRequestId(selectedRequestId)
             console.log("expandedRequestId", expandedRequestId)

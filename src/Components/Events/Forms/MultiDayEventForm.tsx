@@ -156,6 +156,7 @@ const MultiDayEventForm = observer(
             }
 
             if (
+                !isTemplate &&
                 dayjs(values["event-start-date"]).isSame(
                     dayjs(values["event-end-date"]),
                     "day"
@@ -190,7 +191,6 @@ const MultiDayEventForm = observer(
                         DBCIEvent,
                         "id" | "cancelled_text" | "short_id"
                     > = {
-                        is_notified: false,
                         cancelled: false,
                         start_date: dayjs(values["event-start-date"])
                             .hour(13)
