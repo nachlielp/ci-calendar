@@ -6,13 +6,11 @@ import add_to_home_screen from "../../assets/svgs/add_to_home_screen.svg"
 import add_box from "../../assets/svgs/add_box.svg"
 import { ReactSVG } from "react-svg"
 import "../../styles/install-pwa-banner.scss"
-import { Icon } from "./Icon"
 import { appHeaderVM as vm } from "../Layout/AppHeaderVM"
 import { observer } from "mobx-react-lite"
 import Modal from "antd/es/modal"
 import { getTranslation } from "../../util/translations"
 import { store } from "../../Store/store"
-import ad_units from "../../assets/svgs/ad_units.svg"
 const InstallPWABanner = ({
     anchorElement,
 }: {
@@ -53,13 +51,6 @@ const InstallPWABanner = ({
             </ol>
             <div className="install-pwa-modal-br" />
             <section className="section-info">
-                <article className="article-info">
-                    <Icon icon={ad_units} className="article-icon" />
-                    <p className="article-item">
-                        {getTranslation("PWAReminder", store.getLanguage) ||
-                            "רוצים תזכורות לג׳אמים האהובים עליכם?"}
-                    </p>
-                </article>
                 <p className="install-pwa-modal-p">
                     {getTranslation("PWAFooter", store.getLanguage) ||
                         "הוסיפו את האתר לעמוד הבית בטלפון"}
@@ -103,13 +94,6 @@ const InstallPWABanner = ({
             </ol>
             <div className="install-pwa-modal-br" />
             <section className="section-info">
-                <article className="article-info">
-                    <Icon icon={ad_units} className="article-icon" />
-                    <p className="article-item">
-                        {getTranslation("PWAReminder", store.getLanguage) ||
-                            "רוצים תזכורות לג׳אמים האהובים עליכם?"}
-                    </p>
-                </article>
                 <p className="install-pwa-modal-p">
                     {getTranslation("PWAFooter", store.getLanguage) ||
                         "הוסיפו את האתר לעמוד הבית בטלפון"}

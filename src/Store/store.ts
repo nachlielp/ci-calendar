@@ -1250,7 +1250,6 @@ class Store {
         if (this.getSession?.user?.id && this.isOnline) {
             this.setupSubscription()
             this.updateUserAppVersion()
-            this.checkNotifications()
             utilService.saveIsInternalToLocalStorage(this.user.is_internal)
         }
     }
