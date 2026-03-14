@@ -1387,14 +1387,6 @@ class Store {
         return { ru: ruTitle, en: enTitle }
     }
 
-    checkNotifications = async () => {
-        const pwaInstallId = utilService.getPWAInstallId()
-
-        if (pwaInstallId && pwaInstallId === this.user.pwa_install_id) {
-            return
-        }
-    }
-
     cleanup = () => {
         this.currentSessionId = null
         if (this.subscriptionRef) {
