@@ -58,7 +58,7 @@ const SingleDayEventForm = observer(
         const [inputErrors, setInputErrors] = useState<boolean>(false)
         const [address, setAddress] = useState<IAddress | undefined>()
         const [recurringOption, setRecurringOption] = useState<string | null>(
-            null
+            null,
         )
         const [recurringEndDate, setRecurringEndDate] =
             useState<dayjs.Dayjs | null>(null)
@@ -70,7 +70,7 @@ const SingleDayEventForm = observer(
                 if (currentFormValuesObj) {
                     const { currentFormValues } =
                         utilService.CIEventDraftToFormValues(
-                            currentFormValuesObj
+                            currentFormValuesObj,
                         )
                     form.setFieldsValue({
                         ...currentFormValues,
@@ -115,7 +115,7 @@ const SingleDayEventForm = observer(
             const draftEvent = utilService.formatFormValuesToDraftCIEvent(
                 updatedFields,
                 address,
-                false
+                false,
             )
             utilService.saveDraftEvent(draftEvent, DRAFT_KEY)
         }
@@ -133,7 +133,7 @@ const SingleDayEventForm = observer(
             setAddress(selectedAddress)
             utilService.saveDraftEvent(
                 { address: selectedAddress },
-                DRAFT_ADDRESS_KEY
+                DRAFT_ADDRESS_KEY,
             )
             form.setFieldValue("address", selectedAddress)
         }
@@ -170,7 +170,7 @@ const SingleDayEventForm = observer(
                 setAddress(address)
                 utilService.saveDraftEvent(
                     { address: address },
-                    DRAFT_ADDRESS_KEY
+                    DRAFT_ADDRESS_KEY,
                 )
                 onFormValueChange(currentFormValues, form.getFieldsValue())
             }
@@ -192,7 +192,7 @@ const SingleDayEventForm = observer(
                         > = utilService.formatFormValuesToCreateCIEvent(
                             values,
                             address,
-                            false
+                            false,
                         )
                         await store.createCIEvent(event)
                     } else {
@@ -203,7 +203,7 @@ const SingleDayEventForm = observer(
                         > = utilService.formatFormValuesToCreateCIEvent(
                             values,
                             address,
-                            false
+                            false,
                         )
 
                         if (
@@ -213,7 +213,7 @@ const SingleDayEventForm = observer(
                         ) {
                             const startDate = eventDate
                             const recurringEndDate = dayjs(
-                                values["recurring-event-end-date"]
+                                values["recurring-event-end-date"],
                             )
                             const recurringOption =
                                 values["recurring-event-option"]
@@ -221,14 +221,14 @@ const SingleDayEventForm = observer(
                                 utilService.calculateRecurringEventDates(
                                     startDate,
                                     recurringEndDate,
-                                    recurringOption
+                                    recurringOption,
                                 )
                             const recurringEvents =
                                 recurringEventStartDates.map((date) => {
                                     return utilService.duplicateEvent(
                                         date,
                                         event,
-                                        false
+                                        false,
                                     )
                                 })
                             Promise.all(
@@ -236,8 +236,8 @@ const SingleDayEventForm = observer(
                                     store.createCIEvent({
                                         ...event,
                                         recurring_ref_key,
-                                    })
-                                )
+                                    }),
+                                ),
                             )
                         }
                     }
@@ -246,7 +246,7 @@ const SingleDayEventForm = observer(
                         utilService.formatFormValuesToCreateCITemplate(
                             values,
                             address,
-                            false
+                            false,
                         )
                     await store.createTemplate(template)
                 }
@@ -336,7 +336,7 @@ const SingleDayEventForm = observer(
                                                     (option?.label ?? "")
                                                         .toLowerCase()
                                                         .includes(
-                                                            input.toLowerCase()
+                                                            input.toLowerCase(),
                                                         )
                                                 }
                                             />
@@ -408,7 +408,7 @@ const SingleDayEventForm = observer(
                 </section>
             </div>
         )
-    }
+    },
 )
 
 SingleDayEventForm.displayName = "SingleDayEventForm"

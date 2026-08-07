@@ -104,7 +104,7 @@ class Store {
                     !needsReinitialization
                 ) {
                     console.log(
-                        "Skipping initialization - same session and recently active"
+                        "Skipping initialization - same session and recently active",
                     )
 
                     return
@@ -113,7 +113,7 @@ class Store {
                 switch (event) {
                     case SupabaseSessionEvent.signedIn:
                     case SupabaseSessionEvent.initialSession:
-                    case SupabaseSessionEvent.tokenRefreshed:
+                    case SupabaseSessionEvent.tokenRefreshed: {
                         const isValidToken =
                             session?.access_token &&
                             session.access_token !== this.session?.access_token
@@ -130,10 +130,11 @@ class Store {
                             this.init()
                         } else {
                             console.log(
-                                "Skipping initialization - token/user are already initialized"
+                                "Skipping initialization - token/user are already initialized",
                             )
                         }
                         break
+                    }
 
                     case SupabaseSessionEvent.signedOut:
                         this.currentSessionId = null
@@ -152,7 +153,7 @@ class Store {
                         this.lastActivityTimestamp = Date.now()
                         break
                 }
-            }
+            },
         )
 
         reaction(
@@ -165,7 +166,7 @@ class Store {
                     this.fetchAppPublicBios()
                     this.fetchAppTaggableTeachers()
                 }
-            }
+            },
         )
     }
 
@@ -240,10 +241,10 @@ class Store {
                         .isAfter(dayjs().startOf("day")) ||
                     dayjs(e.start_date)
                         .startOf("day")
-                        .isSame(dayjs().startOf("day"))
+                        .isSame(dayjs().startOf("day")),
             )
             .sort((a, b) =>
-                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1,
             )
     }
 
@@ -252,7 +253,7 @@ class Store {
         return this.user_future_ci_events
             .slice()
             .sort((a, b) =>
-                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? -1 : 1,
             )
     }
 
@@ -261,7 +262,7 @@ class Store {
         return this.user_past_ci_events
             .slice()
             .sort((a, b) =>
-                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1
+                dayjs(a.start_date).isBefore(dayjs(b.start_date)) ? 1 : -1,
             )
     }
 
@@ -269,11 +270,11 @@ class Store {
     get getCIEventById() {
         return (eventId: string) => {
             let event = this.app_ci_events.find(
-                (e) => e.id === eventId || e.short_id === eventId
+                (e) => e.id === eventId || e.short_id === eventId,
             )
             if (!event) {
                 event = this.user_future_ci_events.find(
-                    (e) => e.id === eventId || e.short_id === eventId
+                    (e) => e.id === eventId || e.short_id === eventId,
                 )
             }
             return event
@@ -287,7 +288,7 @@ class Store {
                 (e) =>
                     e.recurring_ref_key &&
                     e.recurring_ref_key === event.recurring_ref_key &&
-                    dayjs(e.start_date).isAfter(dayjs(event.start_date))
+                    dayjs(e.start_date).isAfter(dayjs(event.start_date)),
             )
         }
     }
@@ -299,20 +300,18 @@ class Store {
                     (e) =>
                         e.recurring_ref_key &&
                         e.recurring_ref_key === event.recurring_ref_key &&
-                        dayjs(e.start_date).isAfter(dayjs(event.start_date))
+                        dayjs(e.start_date).isAfter(dayjs(event.start_date)),
                 ).length > 0
             )
         }
     }
-
-
 
     @computed
     get getRequests() {
         return this.requests
             .slice()
             .sort((a, b) =>
-                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
+                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1,
             )
     }
 
@@ -331,7 +330,7 @@ class Store {
         return this.templates
             .slice()
             .sort((a, b) =>
-                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1
+                dayjs(a.created_at).isBefore(dayjs(b.created_at)) ? 1 : -1,
             )
     }
 
@@ -355,8 +354,6 @@ class Store {
             }))
     }
 
-
-
     @computed
     get getAppRequests() {
         return this.app_requests
@@ -377,7 +374,7 @@ class Store {
         if (
             this.bio &&
             !this.app_public_bios.find(
-                (bio) => bio.user_id === this.bio?.user_id
+                (bio) => bio.user_id === this.bio?.user_id,
             )
         ) {
             return [...this.app_public_bios, this.bio]
@@ -551,7 +548,7 @@ class Store {
         return () => {
             document.removeEventListener(
                 "visibilitychange",
-                handleVisibilityChange
+                handleVisibilityChange,
             )
         }
     }
@@ -599,7 +596,7 @@ class Store {
         const channel = usersService.subscribeToUser(
             this.user.user_type,
             this.user.id,
-            this.handleSubscriptionUpdates
+            this.handleSubscriptionUpdates,
         )
 
         return channel
@@ -643,7 +640,7 @@ class Store {
         return () => {
             document.removeEventListener(
                 "visibilitychange",
-                handleVisibilityChange
+                handleVisibilityChange,
             )
             if (this.inactivityTimeout) {
                 clearTimeout(this.inactivityTimeout)
@@ -682,7 +679,7 @@ class Store {
         try {
             const updatedUserData = await usersService.updateUser(
                 this.user.id,
-                user
+                user,
             )
             if (updatedUserData) {
                 this.setUser(updatedUserData)
@@ -712,19 +709,19 @@ class Store {
         switch (eventType) {
             case EventPayloadType.UPDATE:
                 this.app_ci_events = this.app_ci_events.map((e) =>
-                    e.id === ci_event.id ? { ...e, ...ci_event } : e
+                    e.id === ci_event.id ? { ...e, ...ci_event } : e,
                 )
                 this.user_future_ci_events = this.user_future_ci_events.map(
-                    (e) => (e.id === ci_event.id ? { ...e, ...ci_event } : e)
+                    (e) => (e.id === ci_event.id ? { ...e, ...ci_event } : e),
                 )
 
                 break
             case EventPayloadType.DELETE:
                 this.app_ci_events = this.app_ci_events.filter(
-                    (e) => e.id !== ci_event.id
+                    (e) => e.id !== ci_event.id,
                 )
                 this.user_future_ci_events = this.user_future_ci_events.filter(
-                    (e) => e.id !== ci_event.id
+                    (e) => e.id !== ci_event.id,
                 )
 
                 break
@@ -744,7 +741,7 @@ class Store {
         if (!ci_event.id) return
 
         const sorceAddress = this.user_future_ci_events.find(
-            (e) => e.id === ci_event.id
+            (e) => e.id === ci_event.id,
         )?.address
 
         if (
@@ -753,23 +750,23 @@ class Store {
             ci_event.address.place_id !== sorceAddress?.place_id
         ) {
             ci_event.address = await this.fetchAddressTranslation(
-                ci_event.address
+                ci_event.address,
             )
         }
 
         const sourceTitle = this.user_future_ci_events.find(
-            (e) => e.id === ci_event.id
+            (e) => e.id === ci_event.id,
         )?.title
 
         if (ci_event.title && ci_event.title !== sourceTitle) {
             ci_event.lng_titles = await this.fetchTitleTranslation(
-                ci_event.title
+                ci_event.title,
             )
         }
 
         const updatedCIEvent = await cieventsService.updateCIEvent(
             ci_event.id,
-            ci_event
+            ci_event,
         )
         this.setCIEvent(updatedCIEvent, EventPayloadType.UPDATE)
     }
@@ -778,19 +775,19 @@ class Store {
     deleteCIEvent = async (eventId: string) => {
         //DELETE does not emit a payload, so we need to update the event to cancelled and then delete it incase some other user is online
         const ci_event = this.user_future_ci_events.find(
-            (e) => e.id === eventId
+            (e) => e.id === eventId,
         )
         if (!ci_event) return
         const deletedEventId = await cieventsService.deleteCIEvent(eventId)
         this.setCIEvent(
             { id: deletedEventId } as CIEvent,
-            EventPayloadType.DELETE
+            EventPayloadType.DELETE,
         )
     }
 
     @action
     createCIEvent = async (
-        ci_event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">
+        ci_event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">,
     ) => {
         const [address, lng_titles] = await Promise.all([
             this.fetchAddressTranslation(ci_event.address),
@@ -805,8 +802,6 @@ class Store {
         this.setCIEvent(newCIEvent, EventPayloadType.INSERT)
     }
 
-
-
     @action
     setRequest = (request: CIRequest, eventType: EventPayloadType) => {
         if (this.user.user_type === UserType.admin) {
@@ -818,7 +813,7 @@ class Store {
                     break
                 case EventPayloadType.UPDATE:
                     this.app_requests = this.app_requests.map((r) =>
-                        r.id === request.id ? { ...r, ...request } : r
+                        r.id === request.id ? { ...r, ...request } : r,
                     )
                     break
             }
@@ -830,7 +825,7 @@ class Store {
                     break
                 case EventPayloadType.UPDATE:
                     this.requests = this.requests.map((r) =>
-                        r.id === request.id ? { ...r, ...request } : r
+                        r.id === request.id ? { ...r, ...request } : r,
                     )
                     break
             }
@@ -860,12 +855,12 @@ class Store {
         switch (eventType) {
             case EventPayloadType.UPDATE:
                 this.templates = this.templates.map((t) =>
-                    t.id === template.id ? { ...t, ...template } : t
+                    t.id === template.id ? { ...t, ...template } : t,
                 )
                 break
             case EventPayloadType.DELETE:
                 this.templates = this.templates.filter(
-                    (t) => t.id !== template.id
+                    (t) => t.id !== template.id,
                 )
                 break
             case EventPayloadType.INSERT:
@@ -886,7 +881,7 @@ class Store {
         await templateService.deleteTemplate(templateId)
         this.setTemplate(
             { id: templateId } as CITemplate,
-            EventPayloadType.DELETE
+            EventPayloadType.DELETE,
         )
     }
 
@@ -913,7 +908,7 @@ class Store {
         switch (eventType) {
             case EventPayloadType.UPDATE:
                 this.app_requests = this.app_requests.map((r) =>
-                    r.id === appRequest.id ? { ...r, ...appRequest } : r
+                    r.id === appRequest.id ? { ...r, ...appRequest } : r,
                 )
                 break
             case EventPayloadType.INSERT:
@@ -933,7 +928,7 @@ class Store {
 
     @action
     createRequest = async (
-        request: Omit<CIRequest, "id" | "number">
+        request: Omit<CIRequest, "id" | "number">,
     ): Promise<CIRequest> => {
         const newRequest = await requestsService.createRequest(request)
         if (!this.user.phone) {
@@ -942,8 +937,6 @@ class Store {
         this.setAppRequest(newRequest, EventPayloadType.INSERT)
         return newRequest
     }
-
-
 
     // @action
     // setConfig = (config: CIConfig, eventType: EventPayloadType) => {
@@ -957,7 +950,7 @@ class Store {
     @action
     setUserRole = (userRole: UserRole) => {
         this.app_users = this.app_users.map((u) =>
-            u.id === userRole.user_id ? { ...u, ...userRole } : u
+            u.id === userRole.user_id ? { ...u, ...userRole } : u,
         )
     }
 
@@ -965,7 +958,7 @@ class Store {
     updateUserData(
         user: ManageUserOption,
         userTypeByRoleId: UserType,
-        userRole: { role_id: number }
+        userRole: { role_id: number },
     ) {
         user.user_type = userTypeByRoleId
         user.role = {
@@ -979,7 +972,7 @@ class Store {
         await userRoleService.updateUserRole(userRole)
 
         const userTypeByRoleId = utilService.getUserTypeByRoleId(
-            userRole.role_id.toString()
+            userRole.role_id.toString(),
         )
 
         this.setUserRole({
@@ -993,7 +986,7 @@ class Store {
         this.updateUserData(user, userTypeByRoleId, userRole)
 
         this.setAppUsers(
-            this.app_users.map((u) => (u.id === userRole.user_id ? user : u))
+            this.app_users.map((u) => (u.id === userRole.user_id ? user : u)),
         )
     }
 
@@ -1044,7 +1037,7 @@ class Store {
     @action getOfflineData = () => {
         const events = utilService.getEventsFromLocalStorage()
         const filteredEvents = events.filter((e) =>
-            dayjs(e.start_date).isAfter(dayjs().subtract(1, "day"))
+            dayjs(e.start_date).isAfter(dayjs().subtract(1, "day")),
         )
         const bios = utilService.getBiosFromLocalStorage()
         this.setAppPublicBios(bios)
@@ -1060,12 +1053,12 @@ class Store {
     @action
     toggleUserReceiveWeeklySchedule = async (
         id: string,
-        receive_weekly_schedule: boolean
+        receive_weekly_schedule: boolean,
     ) => {
         this.user.receive_weekly_schedule = receive_weekly_schedule
         const updatedUser = await usersService.toggleUserReceiveWeeklySchedule(
             id,
-            receive_weekly_schedule
+            receive_weekly_schedule,
         )
         if (updatedUser.receive_weekly_schedule !== receive_weekly_schedule) {
             this.user.receive_weekly_schedule =
@@ -1076,13 +1069,13 @@ class Store {
     @action
     setWeeklyScheduleFilters = async (
         filters: WeeklyScheduleFilters,
-        phone: string
+        phone: string,
     ) => {
         this.user.weekly_schedule = filters
         await usersService.updateUserWeeklyScheduleFilters(
             this.user.id,
             filters,
-            phone
+            phone,
         )
     }
 
@@ -1091,7 +1084,7 @@ class Store {
         this.user.phone = phoneNumber
         const updatedUser = await usersService.updateUserPhoneNumber(
             this.user.id,
-            phoneNumber
+            phoneNumber,
         )
         if (updatedUser.phone !== phoneNumber) {
             this.user.phone = updatedUser.phone
@@ -1125,7 +1118,7 @@ class Store {
 
     private createTimeout(ms: number): Promise<never> {
         return new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Network timeout")), ms)
+            setTimeout(() => reject(new Error("Network timeout")), ms),
         )
     }
 
@@ -1149,7 +1142,7 @@ class Store {
         }
         this.isInitializing = true
         try {
-            let userData = await this.getUserData()
+            const userData = await this.getUserData()
 
             if (!userData) {
                 await this.createNewUser()
@@ -1225,7 +1218,7 @@ class Store {
 
             if (
                 [UserType.admin, UserType.creator, UserType.org].includes(
-                    this.user.user_type
+                    this.user.user_type,
                 )
             ) {
                 await Promise.allSettled([
@@ -1261,8 +1254,6 @@ class Store {
             this.setLoading(false)
         }
     }
-
-
 
     fetchAppUsers = async () => {
         const appUsers = await usersService.getUsers()
@@ -1312,10 +1303,10 @@ class Store {
                 future_events: true,
             })
             const existingEventIds = new Set(
-                this.app_ci_events.map((event) => event.id)
+                this.app_ci_events.map((event) => event.id),
             )
             const newEvents = nextMonthCIEvents.filter(
-                (event) => !existingEventIds.has(event.id)
+                (event) => !existingEventIds.has(event.id),
             )
             if (newEvents.length > 0) {
                 this.app_ci_events.push(...newEvents)
@@ -1330,14 +1321,13 @@ class Store {
     fetchAddressTranslation = async (address: IAddress) => {
         try {
             const enAddress = await getAddressFromGooglePlaceId(
-                address.place_id
+                address.place_id,
             )
             address.en_label = enAddress
         } catch (error) {
             console.error("Error in fetchAddressTranslation:", error)
-        } finally {
-            return address
         }
+        return address
     }
 
     fetchTitleTranslation = async (title: string) => {

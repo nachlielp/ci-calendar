@@ -45,7 +45,7 @@ const EventsList = ({ events }: IEventsListProps) => {
                             }
                         />
                     </div>
-                )
+                ),
             )}
             <PageFooter />
         </div>

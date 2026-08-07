@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 
 export const useScrollToEventById = (
     eventId: string,
-    eventRefs: React.RefObject<{ [key: string]: HTMLDivElement | null }>
+    eventRefs: React.RefObject<{ [key: string]: HTMLDivElement | null }>,
 ) => {
     const isFirstRender = useRef(true)
 

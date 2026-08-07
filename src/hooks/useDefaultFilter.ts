@@ -21,7 +21,7 @@ export const useDefaultFilter = () => {
                 navigate(
                     `/?${defaultFilter
                         .map((filterItem: any) => `f=${filterItem}`)
-                        .join("&")}`
+                        .join("&")}`,
                 )
             }
         }

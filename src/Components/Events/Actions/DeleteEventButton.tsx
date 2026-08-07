@@ -86,7 +86,7 @@ export default function DeleteEventButton({ event }: IDeleteEventProps) {
                                     value={selectedEventIds}
                                     onChange={(checkedValues) => {
                                         onSelectEventIds(
-                                            checkedValues as string[]
+                                            checkedValues as string[],
                                         )
                                     }}
                                 />

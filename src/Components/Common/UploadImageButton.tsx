@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite"
 import { useCallback, useEffect, useState, useRef } from "react"
 import Cropper from "react-easy-crop"
-import '../../styles/upload-image-button.scss'
+import "../../styles/upload-image-button.scss"
 import Modal from "antd/es/modal"
 const MAX_FILE_SIZE = 30 * 1024 // 30KB in bytes
 
@@ -63,7 +63,7 @@ const UploadImageButton = observer(
         const [rotation, setRotation] = useState(defaultRotation)
         const [zoom, setZoom] = useState(defaultZoom)
         const [croppedAreaPixels, setCroppedAreaPixels] = useState(
-            defaultCroppedAreaPixels
+            defaultCroppedAreaPixels,
         )
         const mounted = useRef(true)
 
@@ -79,7 +79,7 @@ const UploadImageButton = observer(
             }
         }, [])
 
-        const safeSetState = (setter: Function, value: any) => {
+        const safeSetState = (setter: (value: any) => void, value: any) => {
             if (mounted.current) {
                 setter(value)
             }
@@ -90,7 +90,7 @@ const UploadImageButton = observer(
                 "Image state changed:",
                 image?.slice(0, 50),
                 "... length:",
-                image?.length
+                image?.length,
             )
         }, [image])
 
@@ -99,7 +99,7 @@ const UploadImageButton = observer(
                 "Modal open state changed:",
                 open,
                 "at:",
-                new Date().toISOString()
+                new Date().toISOString(),
             )
         }, [open])
 
@@ -107,7 +107,7 @@ const UploadImageButton = observer(
             (_croppedArea: any, croppedAreaPixels: any) => {
                 setCroppedAreaPixels(croppedAreaPixels)
             },
-            []
+            [],
         )
 
         const compressImage = async (file: Blob): Promise<Blob> => {
@@ -120,14 +120,14 @@ const UploadImageButton = observer(
                     // Start with original dimensions
                     let width = img.width
                     let height = img.height
-                    let quality = 0.7 // Starting quality
+                    const quality = 0.7 // Starting quality
 
                     // If either dimension is greater than 800, scale down proportionally
                     const MAX_DIMENSION = 800
                     if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
                         const ratio = Math.min(
                             MAX_DIMENSION / width,
-                            MAX_DIMENSION / height
+                            MAX_DIMENSION / height,
                         )
                         width *= ratio
                         height *= ratio
@@ -164,7 +164,7 @@ const UploadImageButton = observer(
                 const croppedImage = await getCroppedImg(
                     image,
                     croppedAreaPixels,
-                    rotation
+                    rotation,
                 )
 
                 const compressedBlob = await compressImage(croppedImage.file)
@@ -174,12 +174,12 @@ const UploadImageButton = observer(
                     `img-${Date.now()}.jpg`,
                     {
                         type: "image/jpg",
-                    }
+                    },
                 )
                 console.log(
                     "Compressed file size:",
                     imageFile.size / 1024,
-                    "KB"
+                    "KB",
                 )
 
                 return imageFile
@@ -195,7 +195,7 @@ const UploadImageButton = observer(
         }
 
         const handleFileChange = async (
-            e: React.ChangeEvent<HTMLInputElement>
+            e: React.ChangeEvent<HTMLInputElement>,
         ) => {
             e.preventDefault()
             e.stopPropagation()
@@ -221,7 +221,7 @@ const UploadImageButton = observer(
                             .then(() => {
                                 safeSetState(setImage, imageUrl)
                                 return new Promise((resolve) =>
-                                    setTimeout(resolve, 50)
+                                    setTimeout(resolve, 50),
                                 )
                             })
                             .then(() => {
@@ -257,7 +257,7 @@ const UploadImageButton = observer(
                 } else {
                     console.error(
                         "UploadImageButton.handleSave.error: ",
-                        "no onImageSave prop"
+                        "no onImageSave prop",
                     )
                 }
             }
@@ -349,7 +349,7 @@ const UploadImageButton = observer(
                 </Modal>
             </>
         )
-    }
+    },
 )
 
 export default UploadImageButton
@@ -377,7 +377,7 @@ const rotateSize = (width: number, height: number, rotation: number) => {
 const getCroppedImg = async (
     imageSrc: string,
     pixelCrop: { width: number; height: number; x: number; y: number },
-    rotation = 0
+    rotation = 0,
 ): Promise<{ file: Blob; url: string }> => {
     const image = await createImage(imageSrc)
     const canvas = document.createElement("canvas")
@@ -392,7 +392,7 @@ const getCroppedImg = async (
     const { width: bBoxWidth, height: bBoxHeight } = rotateSize(
         image.width,
         image.height,
-        rotation
+        rotation,
     )
 
     // Set canvas size to match the bounding box
@@ -427,7 +427,7 @@ const getCroppedImg = async (
         0,
         0,
         pixelCrop.width,
-        pixelCrop.height
+        pixelCrop.height,
     )
 
     // Convert canvas to blob

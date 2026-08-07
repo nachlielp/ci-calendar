@@ -4,7 +4,7 @@ import warning from "../../../assets/svgs/warning.svg"
 import deleteIcon from "../../../assets/svgs/delete.svg"
 const showDeleteConfirm = (
     templateId: string,
-    handleDeleteTemplate: (templateId: string) => void
+    handleDeleteTemplate: (templateId: string) => void,
 ) => {
     confirm({
         title: <div>מחיקת תבנית</div>,
@@ -24,7 +24,7 @@ const showDeleteConfirm = (
         },
         onCancel() {
             console.log(
-                "DeleteEvent.showDeleteConfirm.onCancel: User cancelled deletion"
+                "DeleteEvent.showDeleteConfirm.onCancel: User cancelled deletion",
             )
         },
     })

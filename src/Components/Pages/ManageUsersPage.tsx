@@ -28,7 +28,7 @@ class ManageUsersVM {
                 if (this.selectedUser) {
                     this.setSelectedUser(this.selectedUser.id)
                 }
-            }
+            },
         )
     }
 
@@ -63,14 +63,14 @@ class ManageUsersVM {
     @computed
     get getNumOfAdmins() {
         return store.app_users.filter(
-            (user) => user.user_type === UserType.admin
+            (user) => user.user_type === UserType.admin,
         ).length
     }
 
     @computed
     get getNumOfCreators() {
         return store.app_users.filter(
-            (user) => user.user_type === UserType.creator
+            (user) => user.user_type === UserType.creator,
         ).length
     }
 
@@ -83,14 +83,14 @@ class ManageUsersVM {
     @computed
     get getNumOfProfiles() {
         return store.app_users.filter(
-            (user) => user.user_type === UserType.profile
+            (user) => user.user_type === UserType.profile,
         ).length
     }
 
     @computed
     get getNumOfTypeUsers() {
         return store.app_users.filter(
-            (user) => user.user_type === UserType.user
+            (user) => user.user_type === UserType.user,
         ).length
     }
 
@@ -226,11 +226,11 @@ function ManageUsersPage() {
                         <p
                             onClick={async () => {
                                 await navigator.clipboard.writeText(
-                                    vm.getSelectedUser?.phone || ""
+                                    vm.getSelectedUser?.phone || "",
                                 )
                                 // If you're using antd, you can use their message component
                                 message.success(
-                                    "Phone number copied to clipboard"
+                                    "Phone number copied to clipboard",
                                 )
                             }}
                             style={{

@@ -18,7 +18,7 @@ export const useSelectedDayEvents = (events: CIEvent[], selectedDay: Dayjs) => {
                     dayjs(event.start_date),
                     dayjs(event.end_date),
                     "day",
-                    "[]"
+                    "[]",
                 )
             }
             return dayjs(selectedDay).isSame(dayjs(event.start_date), "day")

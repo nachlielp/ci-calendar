@@ -26,5 +26,5 @@ export const LanguageProvider = observer(
                 {children}
             </LanguageContext.Provider>
         )
-    }
+    },
 )

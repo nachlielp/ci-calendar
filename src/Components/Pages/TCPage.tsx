@@ -1,4 +1,4 @@
-import '../../styles/about-page.scss'
+import "../../styles/about-page.scss"
 import PageFooter from "../Common/PageFooter"
 
 export function TCPage() {

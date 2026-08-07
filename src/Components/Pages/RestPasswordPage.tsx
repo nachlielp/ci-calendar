@@ -58,7 +58,7 @@ export default observer(function ResetPasswordPage() {
                     <label className="subTitle">
                         {getTranslation(
                             "resetPasswordSubTitle",
-                            store.getLanguage
+                            store.getLanguage,
                         )}
                     </label>
                     <Form.Item
@@ -75,7 +75,7 @@ export default observer(function ResetPasswordPage() {
                         <Input.Password
                             placeholder={getTranslation(
                                 "newPassword",
-                                store.getLanguage
+                                store.getLanguage,
                             )}
                             style={{ marginBottom: "0.5rem" }}
                             className="form-input-large"
@@ -94,7 +94,7 @@ export default observer(function ResetPasswordPage() {
                                         return Promise.resolve()
                                     }
                                     return Promise.reject(
-                                        new Error("הסיסמאות אינן תואמות")
+                                        new Error("הסיסמאות אינן תואמות"),
                                     )
                                 },
                             }),
@@ -104,7 +104,7 @@ export default observer(function ResetPasswordPage() {
                         <Input.Password
                             placeholder={getTranslation(
                                 "repeatPassword",
-                                store.getLanguage
+                                store.getLanguage,
                             )}
                             style={{ marginBottom: "0.5rem" }}
                             className="form-input-large"

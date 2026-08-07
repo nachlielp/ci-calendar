@@ -1,5 +1,5 @@
 import "./instrument.js"
-import './index.scss'
+import "./index.scss"
 import Providers from "./Providers.tsx"
 import { BrowserRouter } from "react-router"
 import App from "./App.tsx"
@@ -14,5 +14,5 @@ root.render(
         <Providers>
             <App />
         </Providers>
-    </BrowserRouter>
+    </BrowserRouter>,
 )

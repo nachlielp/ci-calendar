@@ -54,7 +54,7 @@ export default function EditRecurringEventButton({
         const form = document.querySelector("form") as HTMLFormElement
         if (form) {
             form.dispatchEvent(
-                new Event("submit", { bubbles: true, cancelable: true })
+                new Event("submit", { bubbles: true, cancelable: true }),
             )
         }
         setOpen(false)
@@ -103,7 +103,7 @@ export default function EditRecurringEventButton({
                                     value={selectedEventIds}
                                     onChange={(checkedValues) => {
                                         onSelectEventIds(
-                                            checkedValues as string[]
+                                            checkedValues as string[],
                                         )
                                     }}
                                 />

@@ -178,7 +178,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                                     /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
                                 if (urlRegex.test(value)) {
                                     return Promise.reject(
-                                        "כותרת לא יכולה להיות קישור"
+                                        "כותרת לא יכולה להיות קישור",
                                     )
                                 }
                                 return Promise.resolve()
@@ -201,7 +201,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                                 // Check if URL has a title when URL is present
                                 if (value && !getFieldValue("page_title")) {
                                     return Promise.reject(
-                                        new Error("נא להזין כותרת לקישור")
+                                        new Error("נא להזין כותרת לקישור"),
                                     )
                                 }
 
@@ -210,7 +210,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                                     /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
                                 if (!urlRegex.test(value)) {
                                     return Promise.reject(
-                                        new Error("נא להזין כתובת אתר תקינה")
+                                        new Error("נא להזין כתובת אתר תקינה"),
                                     )
                                 }
 
@@ -237,7 +237,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                                     /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
                                 if (urlRegex.test(value)) {
                                     return Promise.reject(
-                                        "כותרת לא יכולה להיות קישור"
+                                        "כותרת לא יכולה להיות קישור",
                                     )
                                 }
                                 return Promise.resolve()
@@ -254,12 +254,12 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                             validator(_, value) {
                                 if (
                                     value &&
-                                    !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(
-                                        value
+                                    !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(
+                                        value,
                                     )
                                 ) {
                                     return Promise.reject(
-                                        new Error("נא להזין כתובת תקינה")
+                                        new Error("נא להזין כתובת תקינה"),
                                     )
                                 }
                                 if (
@@ -267,7 +267,7 @@ const ProfileForm = ({ closeEditProfile }: ProfileFormProps) => {
                                     !getFieldValue("page_title")
                                 ) {
                                     return Promise.reject(
-                                        new Error("נא להזין קישור לדף פרופיל")
+                                        new Error("נא להזין קישור לדף פרופיל"),
                                     )
                                 }
                                 return Promise.resolve()

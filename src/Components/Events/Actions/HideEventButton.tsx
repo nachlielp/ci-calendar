@@ -26,7 +26,7 @@ export default function HideEventButton({ event }: { event: CIEvent }) {
         await Promise.all([
             store.updateCIEvent({ id: event.id, hide: !event.hide }),
             ...selectedEventIds.map((eventId) =>
-                store.updateCIEvent({ id: eventId, hide: !event.hide })
+                store.updateCIEvent({ id: eventId, hide: !event.hide }),
             ),
         ])
         setOpen(false)
@@ -95,7 +95,7 @@ export default function HideEventButton({ event }: { event: CIEvent }) {
                                     value={selectedEventIds}
                                     onChange={(checkedValues) => {
                                         onSelectEventIds(
-                                            checkedValues as string[]
+                                            checkedValues as string[],
                                         )
                                     }}
                                 />

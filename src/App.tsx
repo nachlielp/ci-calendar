@@ -43,7 +43,7 @@ const disableApp = import.meta.env.VITE_DISABLE_APP
 const App = () => {
     const [isDev] = useState(
         localStorage.getItem("isInternal") === "true" ||
-            import.meta.env.VITE_BRANCH !== "prod"
+            import.meta.env.VITE_BRANCH !== "prod",
     )
 
     const navigate = useNavigate()

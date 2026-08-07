@@ -73,7 +73,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
     const multiDayTeachersLen = ci_event.multi_day_teachers || []
     const handleCopy = async () => {
         await navigator.clipboard.writeText(
-            `${window.location.origin}/event/${ci_event.short_id}`
+            `${window.location.origin}/event/${ci_event.short_id}`,
         )
     }
 
@@ -84,7 +84,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                     <div className="event-title">
                         {utilService.getTitleByLanguage(
                             ci_event,
-                            store.getLanguage
+                            store.getLanguage,
                         )}
                     </div>
                 </article>
@@ -94,7 +94,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <label className="event-labels">
                             {orgs.map((org, index, array) => {
                                 const isTeacher = store.getAppPublicBios?.find(
-                                    (t) => t.user_id === org.value
+                                    (t) => t.user_id === org.value,
                                 )
                                 return (
                                     <React.Fragment key={org.value}>
@@ -122,22 +122,22 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                     shortEnglishDays[
                                         dayjs(ci_event.start_date).day()
                                     ],
-                                    store.getLanguage
+                                    store.getLanguage,
                                 )}
                                 {", "}
                                 {getMonthName(
                                     dayjs(ci_event.start_date),
-                                    store.getLanguage
+                                    store.getLanguage,
                                 )}
                             </label>
                             <Icon icon={schedule} className="event-icon" />
                             <label className="event-label">
                                 {dayjs(ci_event.segments[0].startTime).format(
-                                    "HH:mm"
+                                    "HH:mm",
                                 )}
                                 &nbsp;-&nbsp;
                                 {dayjs(
-                                    ci_event.segments[segmentLen - 1].endTime
+                                    ci_event.segments[segmentLen - 1].endTime,
                                 ).format("HH:mm")}
                             </label>
                         </>
@@ -152,7 +152,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 }
                                 {", "}
                                 {utilService.formatHebrewDate(
-                                    ci_event.start_date
+                                    ci_event.start_date,
                                 )}
                                 {" - "}
                                 {
@@ -162,7 +162,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 }
                                 {", "}
                                 {utilService.formatHebrewDate(
-                                    ci_event.end_date
+                                    ci_event.end_date,
                                 )}
                             </label>
                         </>
@@ -186,7 +186,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 (teacher, index, array) => {
                                     const isTeacher =
                                         store.getAppPublicBios?.find(
-                                            (t) => t.user_id === teacher.value
+                                            (t) => t.user_id === teacher.value,
                                         )
                                     return (
                                         <React.Fragment key={teacher.value}>
@@ -202,7 +202,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                                 : ""}
                                         </React.Fragment>
                                     )
-                                }
+                                },
                             )}
                         </label>
                     </article>
@@ -226,7 +226,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                         &nbsp;
                                         {getTranslation(
                                             "with",
-                                            store.getLanguage
+                                            store.getLanguage,
                                         )}
                                         &nbsp;
                                         {segment.teachers.map(
@@ -235,7 +235,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                                     store.getAppPublicBios?.find(
                                                         (t) =>
                                                             t.user_id ===
-                                                            teacher.value
+                                                            teacher.value,
                                                     )
 
                                                 return (
@@ -259,7 +259,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                                             : ""}
                                                     </React.Fragment>
                                                 )
-                                            }
+                                            },
                                         )}
                                     </span>
                                 )}
@@ -274,7 +274,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                             >
                                                 {getTranslation(
                                                     tag as keyof TranslationKeys,
-                                                    store.getLanguage
+                                                    store.getLanguage,
                                                 )}
                                             </Tag>
                                         ))}
@@ -303,7 +303,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 >
                                     {getTranslation(
                                         type as keyof TranslationKeys,
-                                        store.getLanguage
+                                        store.getLanguage,
                                     )}
                                 </Tag>
                             )
@@ -336,7 +336,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                         <h3 className="section-title">
                             {getTranslation(
                                 "additionalInfo",
-                                store.getLanguage
+                                store.getLanguage,
                             )}
                         </h3>
                         <article className="event-description">
@@ -394,7 +394,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 callback={() =>
                                     utilService.openGoogleMaps(
                                         ci_event.address.place_id,
-                                        ci_event.address.label
+                                        ci_event.address.label,
                                     )
                                 }
                             />
@@ -410,7 +410,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                                 callback={() =>
                                     utilService.handleShareEvent(
                                         ci_event.short_id,
-                                        ci_event.title
+                                        ci_event.title,
                                     )
                                 }
                             />
@@ -419,7 +419,7 @@ const FullEventCard = ({ event: ci_event }: { event: CIEvent }) => {
                             <SecondaryButton
                                 label={getTranslation(
                                     "link",
-                                    store.getLanguage
+                                    store.getLanguage,
                                 )}
                                 successLabel="הועתק"
                                 icon={content_copy}

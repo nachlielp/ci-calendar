@@ -49,7 +49,7 @@ const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
                     {Array.from({ length: Math.min(eventCount, 4) }).map(
                         (_, index) => (
                             <span key={index} className="event-dot"></span>
-                        )
+                        ),
                     )}
                 </div>
             </div>
@@ -87,7 +87,7 @@ const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
                         store.getDirection === "ltr" ? "next" : "back"
                     } ${
                         value.isAfter(
-                            dayjs().add(2, "months").startOf("month")
+                            dayjs().add(2, "months").startOf("month"),
                         ) && "disabled"
                     }`}
                 />
@@ -98,7 +98,7 @@ const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
                             .locale("en")
                             .format("MMMM")
                             .toLocaleLowerCase() as keyof TranslationKeys,
-                        store.getLanguage
+                        store.getLanguage,
                     )}
                 </label>
                 <Icon
@@ -116,8 +116,8 @@ const CalendarView = ({ events, onSelect }: CalendarViewProps) => {
                         store.getLanguage === "he"
                             ? hb
                             : store.getLanguage === "ru"
-                            ? ru
-                            : en
+                              ? ru
+                              : en
                     }
                 >
                     <Calendar
@@ -144,7 +144,7 @@ function eventsOnDay(day: Dayjs, events: CIEvent[]) {
                 dayjs(event.start_date).startOf("day"),
                 dayjs(event.end_date).endOf("day"),
                 null,
-                "[]"
+                "[]",
             )
         }
         return day.isSame(dayjs(event.start_date), "day")

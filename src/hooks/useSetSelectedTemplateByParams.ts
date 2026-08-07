@@ -15,7 +15,7 @@ export const useSetSelectedTemplateByParams = () => {
     useEffect(() => {
         if (templateId) {
             const template = store.getTemplates.find(
-                (template) => template.id === templateId
+                (template) => template.id === templateId,
             )
             if (template) {
                 setSelectedTemplate(undefined)

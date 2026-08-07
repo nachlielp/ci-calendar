@@ -21,10 +21,9 @@ class UserRequestVM {
                     this.isEditRequest = false
                     this.openPositionRequest =
                         store.getOpenPositionRequest ?? null
-                }
-            ),
-                0
-        })
+                },
+            )
+        }, 0)
     }
 
     @computed get getRequestType() {

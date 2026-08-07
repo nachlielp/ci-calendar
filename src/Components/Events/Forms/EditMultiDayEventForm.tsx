@@ -38,8 +38,8 @@ const EditMultiDayEventForm = observer(
         const { currentFormValues, address } = event
             ? utilService.CIEventToFormValues(event)
             : template
-            ? utilService.multiDayTemplateToFormValues(template)
-            : { currentFormValues: {}, address: null }
+              ? utilService.multiDayTemplateToFormValues(template)
+              : { currentFormValues: {}, address: null }
 
         if (!event && !template) return <Loading />
 
@@ -59,7 +59,7 @@ const EditMultiDayEventForm = observer(
                     utilService.formatFormValuesToEditCIEvent(
                         values,
                         newAddress || (address as IAddress),
-                        event.is_multi_day
+                        event.is_multi_day,
                     )
                 try {
                     await store.updateCIEvent({
@@ -78,7 +78,7 @@ const EditMultiDayEventForm = observer(
                     utilService.formatFormValuesToEditCITemplate(
                         values,
                         newAddress || (address as IAddress),
-                        template.is_multi_day
+                        template.is_multi_day,
                     )
                 try {
                     await store.updateTemplate({
@@ -89,7 +89,7 @@ const EditMultiDayEventForm = observer(
                 } catch (error) {
                     console.error(
                         "EventForm.handleSubmit.updateTemplate.error: ",
-                        error
+                        error,
                     )
                 } finally {
                     setIsSubmitting(false)
@@ -151,7 +151,7 @@ const EditMultiDayEventForm = observer(
                 </Form>
             </section>
         )
-    }
+    },
 )
 
 export default EditMultiDayEventForm

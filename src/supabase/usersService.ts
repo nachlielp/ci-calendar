@@ -48,7 +48,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                     templates!left (*),
                     bio:public_bio!left (*),
                     ci_events:ci_events!left (*)
-                `
+                `,
                 )
                 .eq("id", id)
                 .eq("requests.user_id", id)
@@ -64,7 +64,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 .gte("start_date", dayjs().startOf("day").toISOString())
                 .lte(
                     "start_date",
-                    dayjs().endOf("day").add(30, "day").toISOString()
+                    dayjs().endOf("day").add(30, "day").toISOString(),
                 ),
         ])
 
@@ -83,8 +83,8 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 `Failed to get events data for userId: ${id} ERROR: ${JSON.stringify(
                     eventsError,
                     null,
-                    2
-                )}`
+                    2,
+                )}`,
             )
 
         const templates = userData.templates
@@ -92,12 +92,12 @@ async function getUserData(id: string): Promise<CIUserData | null> {
         const past_ci_events = userData.ci_events.filter((event: any) =>
             dayjs(event.start_date)
                 .startOf("day")
-                .isBefore(dayjs().startOf("day"))
+                .isBefore(dayjs().startOf("day")),
         )
         const future_ci_events = userData.ci_events.filter((event: any) =>
             dayjs(event.start_date)
                 .startOf("day")
-                .isAfter(dayjs().startOf("day"))
+                .isAfter(dayjs().startOf("day")),
         )
         const userBio = userData.bio
 
@@ -136,7 +136,7 @@ async function getUserData(id: string): Promise<CIUserData | null> {
 
 async function updateUser(
     id: string,
-    user: Partial<DbUser>
+    user: Partial<DbUser>,
 ): Promise<CIUser | null> {
     try {
         const { data, error } = await supabase
@@ -151,7 +151,7 @@ async function updateUser(
                     ? error.message
                     : JSON.stringify(error, null, 2)
             throw new Error(
-                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`
+                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
             )
         }
         return data as CIUser
@@ -161,7 +161,7 @@ async function updateUser(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -181,7 +181,7 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
                     ? error.message
                     : JSON.stringify(error, null, 2)
             throw new Error(
-                `_1_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`
+                `_1_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
             )
         }
         console.log("__B_createUser", data)
@@ -192,7 +192,7 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `_2_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `_2_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -239,7 +239,7 @@ async function getUsers(): Promise<ManageUserOption[]> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get users for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get users for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -247,7 +247,7 @@ async function getUsers(): Promise<ManageUserOption[]> {
 async function updateUserWeeklyScheduleFilters(
     id: string,
     weeklyScheduleFilters: WeeklyScheduleFilters,
-    phone: string
+    phone: string,
 ) {
     try {
         const { data, error } = await supabase
@@ -261,20 +261,20 @@ async function updateUserWeeklyScheduleFilters(
             .single()
         if (error) {
             throw new Error(
-                `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`
+                `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`,
             )
         }
         return data
     } catch (error: any) {
         throw new Error(
-            `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`
+            `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`,
         )
     }
 }
 
 async function toggleUserReceiveWeeklySchedule(
     id: string,
-    receive_weekly_schedule: boolean
+    receive_weekly_schedule: boolean,
 ) {
     try {
         const { data, error } = await supabase
@@ -285,13 +285,13 @@ async function toggleUserReceiveWeeklySchedule(
             .single()
         if (error) {
             throw new Error(
-                `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`
+                `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`,
             )
         }
         return data
     } catch (error: any) {
         throw new Error(
-            `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`
+            `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`,
         )
     }
 }
@@ -306,13 +306,13 @@ async function updateUserPhoneNumber(id: string, phoneNumber: string) {
             .single()
         if (error) {
             throw new Error(
-                `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`
+                `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`,
             )
         }
         return data
     } catch (error: any) {
         throw new Error(
-            `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`
+            `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`,
         )
     }
 }
@@ -320,7 +320,7 @@ async function updateUserPhoneNumber(id: string, phoneNumber: string) {
 async function subscribeToUser(
     userType: UserType,
     userId: string,
-    callback: (payload: any) => void
+    callback: (payload: any) => void,
 ) {
     const channel = supabase
         .channel(`public:users:id=eq.${userId}`)
@@ -336,7 +336,7 @@ async function subscribeToUser(
 
             (payload) => {
                 callback({ table: "users", payload })
-            }
+            },
         )
         .on(
             "postgres_changes",
@@ -351,7 +351,7 @@ async function subscribeToUser(
 
             (payload) => {
                 callback({ table: "ci_events", payload })
-            }
+            },
         )
         .on(
             "postgres_changes",
@@ -364,7 +364,7 @@ async function subscribeToUser(
             },
             (payload) => {
                 callback({ table: "requests", payload })
-            }
+            },
         )
         .on(
             "postgres_changes",
@@ -376,7 +376,7 @@ async function subscribeToUser(
             },
             (payload) => {
                 callback({ table: "public_bio", payload })
-            }
+            },
         )
         .on(
             "postgres_changes",
@@ -389,7 +389,7 @@ async function subscribeToUser(
             (payload) => {
                 //TODO handle delete
                 callback({ table: "templates", payload })
-            }
+            },
         )
         .subscribe((status) => {
             if (status === "SUBSCRIBED") {

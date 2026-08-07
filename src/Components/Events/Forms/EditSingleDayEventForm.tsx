@@ -63,8 +63,8 @@ const EditSingleDayEventForm = observer(
         const { currentFormValues, address } = event
             ? utilService.CIEventToFormValues(event)
             : template
-            ? utilService.singleDayTemplateToFormValues(template)
-            : { currentFormValues: {}, address: null }
+              ? utilService.singleDayTemplateToFormValues(template)
+              : { currentFormValues: {}, address: null }
 
         const handleAddressSelect = (place: IGooglePlaceOption) => {
             const selectedAddress = {
@@ -95,7 +95,7 @@ const EditSingleDayEventForm = observer(
                     utilService.formatFormValuesToEditCIEvent(
                         values,
                         newAddress || (address as IAddress),
-                        event.is_multi_day
+                        event.is_multi_day,
                     )
                 try {
                     await store.updateCIEvent({
@@ -113,7 +113,7 @@ const EditSingleDayEventForm = observer(
                     utilService.formatFormValuesToEditCITemplate(
                         values,
                         newAddress || (address as IAddress),
-                        template.is_multi_day
+                        template.is_multi_day,
                     )
 
                 try {
@@ -125,7 +125,7 @@ const EditSingleDayEventForm = observer(
                 } catch (error) {
                     console.error(
                         "EventForm.handleSubmit.updateTemplate.error: ",
-                        error
+                        error,
                     )
                 } finally {
                     setIsSubmitting(false)
@@ -136,7 +136,7 @@ const EditSingleDayEventForm = observer(
         const handleBatchSubmit = async (
             values: any,
             event: CIEvent,
-            eventIds: string[]
+            eventIds: string[],
         ) => {
             setIsSubmitting(true)
             console.log("handleBatchSubmit")
@@ -144,7 +144,7 @@ const EditSingleDayEventForm = observer(
                 utilService.formatFormValuesToEditCIEvent(
                     values,
                     newAddress || (address as IAddress),
-                    event.is_multi_day
+                    event.is_multi_day,
                 )
             try {
                 const eventIdsToUpdate = new Set(eventIds)
@@ -255,7 +255,7 @@ const EditSingleDayEventForm = observer(
                 </Form>
             </section>
         )
-    }
+    },
 )
 
 export default EditSingleDayEventForm

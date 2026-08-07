@@ -41,7 +41,7 @@ export default function FilterModal() {
                             .filter((eventType) => eventType.value !== "warmup")
                             .map((eventType) => {
                                 return currentValues.includes(
-                                    eventType.value
+                                    eventType.value,
                                 ) ? (
                                     <Tag
                                         className="selected tag"

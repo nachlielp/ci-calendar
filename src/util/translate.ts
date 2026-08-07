@@ -23,13 +23,13 @@ export const translatePage = async (lang: Language) => {
         // Get translation context from data attribute
         const context =
             (element.getAttribute(
-                "data-translation-context"
+                "data-translation-context",
             ) as TranslationContext) || "general"
 
         if (!element.getAttribute("data-original-text")) {
             element.setAttribute(
                 "data-original-text",
-                element.textContent || ""
+                element.textContent || "",
             )
         }
 
@@ -42,7 +42,7 @@ export const translatePage = async (lang: Language) => {
                     const translatedText = await translateText(
                         originalText,
                         lang,
-                        context
+                        context,
                     )
                     element.textContent = translatedText
                 } catch (error) {
@@ -56,7 +56,7 @@ export const translatePage = async (lang: Language) => {
 export const translateText = async (
     text: string,
     targetLang: Language,
-    context: TranslationContext = "general" // Default context
+    context: TranslationContext = "general", // Default context
 ): Promise<string> => {
     // Check memory cache first
     if (memoryCache[text]?.[targetLang]) {
@@ -120,7 +120,7 @@ export const translateText = async (
                     context: text, // Provide surrounding text as context
                     glossary: context === "name" ? "preserve-names" : undefined, // Special handling for names
                 }),
-            }
+            },
         )
 
         if (!response.ok) {
@@ -181,6 +181,6 @@ export const getMonthName = (date: dayjs.Dayjs, lang: Language): string => {
 
     // Format as "Month Day[ordinal]" (e.g., "January 1st")
     return `${date.locale(locale).format("MMMM")} ${day}${getOrdinalSuffix(
-        day
+        day,
     )}`
 }

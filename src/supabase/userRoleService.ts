@@ -20,7 +20,7 @@ async function updateUserRole({
                 {
                     onConflict: "user_id",
                     ignoreDuplicates: false,
-                }
+                },
             )
             .select()
             .single()
@@ -31,7 +31,7 @@ async function updateUserRole({
                     ? roleError.message
                     : JSON.stringify(roleError, null, 2)
             throw new Error(
-                `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`
+                `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`,
             )
         }
 
@@ -47,7 +47,7 @@ async function updateUserRole({
                     ? userError.message
                     : JSON.stringify(userError, null, 2)
             throw new Error(
-                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`
+                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
             )
         }
 
@@ -56,7 +56,7 @@ async function updateUserRole({
             .from("public_bio")
             .upsert(
                 { user_type: user_type, user_id: user_id },
-                { onConflict: "user_id" }
+                { onConflict: "user_id" },
             )
             .select()
             .single()
@@ -67,7 +67,7 @@ async function updateUserRole({
                     ? updateError.message
                     : JSON.stringify(updateError, null, 2)
             throw new Error(
-                `Failed to update public bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
+                `Failed to update public bio for userId: ${store.getUserId} ERROR: ${errorMessage}`,
             )
         }
         return roleData
@@ -77,7 +77,7 @@ async function updateUserRole({
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }

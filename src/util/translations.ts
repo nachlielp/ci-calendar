@@ -618,7 +618,7 @@ export const translations: Translations = {
 // Helper function to get translations
 export const getTranslation = (
     key: keyof TranslationKeys,
-    language: Language
+    language: Language,
 ): string => {
     return translations[language][key]
 }

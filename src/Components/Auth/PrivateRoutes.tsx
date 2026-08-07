@@ -24,5 +24,5 @@ export const PrivateRoutes: React.FC<PrivateRoutesProps> = observer(
         }
 
         return <Outlet />
-    }
+    },
 )

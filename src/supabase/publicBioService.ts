@@ -28,7 +28,7 @@ async function updateTeacherBio(bio: Partial<UserBio>): Promise<UserBio> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -47,7 +47,7 @@ async function deleteTeacherBio(userId: string): Promise<void> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to delete teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -58,7 +58,7 @@ async function getPublicBioList(): Promise<UserBio[]> {
         const { data, error } = await supabase
             .from("public_bio")
             .select(
-                "id, user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2, show_profile, allow_tagging, user_type"
+                "id, user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2, show_profile, allow_tagging, user_type",
             )
             .eq("show_profile", true)
             .not("user_type", "eq", UserType.admin)
@@ -74,7 +74,7 @@ async function getPublicBioList(): Promise<UserBio[]> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get public bio list for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get public bio list for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -89,7 +89,7 @@ async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
                 user_id,
                 bio_name,
                 user_type
-            `
+            `,
             )
             .eq("allow_tagging", true)
             .not("bio_name", "eq", "")
@@ -108,7 +108,7 @@ async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get taggable teachers for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get taggable teachers for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }

@@ -20,7 +20,7 @@ async function uploadFile(filePath: string, file: Blob) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to upload file to path: ${filePath} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to upload file to path: ${filePath} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
