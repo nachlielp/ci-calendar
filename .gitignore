@@ -11,6 +11,9 @@ stats.html
 node_modules
 dist
 dist-ssr
+dev-dist
+.vite
+ci-calendar-app
 *.local
 
 # Editor directories and files
@@ -27,6 +30,7 @@ dist-ssr
 .env.*
 .env
 .env.local
+!.env.example
 
 
 # Sentry Config File

@@ -347,27 +347,6 @@ const ManageSupportPage = () => {
                                                 אישור
                                             </button>
                                         )}
-                                        {/* <AddResponseToSupportReqModal
-                                            isOpen={addResponseModalOpen}
-                                            setIsOpen={setAddResponseModalOpen}
-                                            onSubmit={(response) =>
-                                                handleAction("add_response", {
-                                                    ...request,
-                                                    responses: [
-                                                        ...request.responses,
-                                                        {
-                                                            response,
-                                                            created_at:
-                                                                new Date().toISOString(),
-                                                            responder_name:
-                                                                store.user
-                                                                    .user_name ||
-                                                                "",
-                                                        },
-                                                    ],
-                                                })
-                                            }
-                                        /> */}
                                         <button
                                             className="secondary-action-btn low-margin"
                                             onClick={() =>
