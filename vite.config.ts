@@ -70,9 +70,12 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
     includeManifestIcons: true,
 }
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     esbuild: {
         target: "es2022",
+        // Strip console/debugger from production bundles only (keeps them in
+        // dev and test).
+        drop: mode === "production" ? ["console", "debugger"] : [],
     },
     build: {
         target: "es2022",
@@ -134,4 +137,4 @@ export default defineConfig({
     server: {
         host: "localhost",
     },
-})
+}))
