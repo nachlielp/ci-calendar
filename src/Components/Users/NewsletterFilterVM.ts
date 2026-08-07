@@ -47,15 +47,15 @@ class NewsletterFilterVM {
         return !(
             this.areArraysEqual(
                 values["district-weekly"] || [],
-                storeValues["district-weekly"]
+                storeValues["district-weekly"],
             ) &&
             this.areArraysEqual(
                 values["weekly-event-type"] || [],
-                storeValues["weekly-event-type"]
+                storeValues["weekly-event-type"],
             ) &&
             this.areArraysEqual(
                 values["district-monthly"] || [],
-                storeValues["district-monthly"]
+                storeValues["district-monthly"],
             ) &&
             values.phone === storeValues.phone
         )
@@ -77,7 +77,7 @@ class NewsletterFilterVM {
         }
         await store.setWeeklyScheduleFilters(
             weeklyScheduleFilters,
-            values.phone
+            values.phone,
         )
         this.setIsFormChanged(false)
         this.setIsSubmitting(false)

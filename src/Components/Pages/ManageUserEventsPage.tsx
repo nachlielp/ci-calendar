@@ -74,7 +74,7 @@ const ManageUserEventsPage = () => {
                                 setExpandedEventId(
                                     expandedEventId === event.id
                                         ? null
-                                        : event.id
+                                        : event.id,
                                 )
                             }
                         >
@@ -84,7 +84,7 @@ const ManageUserEventsPage = () => {
                                     <time dateTime={event.start_date}>
                                         {formatDateRange(
                                             event.start_date,
-                                            event.end_date
+                                            event.end_date,
                                         )}
                                     </time>
                                     {event.hide && (

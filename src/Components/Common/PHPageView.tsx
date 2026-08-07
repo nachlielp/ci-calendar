@@ -3,7 +3,7 @@ import { useLocation } from "react-router"
 import posthog from "posthog-js"
 
 export default function PostHogPageView() {
-    let location = useLocation()
+    const location = useLocation()
 
     // Track pageviews
     useEffect(() => {

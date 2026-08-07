@@ -29,14 +29,14 @@ function ResetPasswordRequest() {
             const resetPasswordPage = `${baseUrl}/reset-password`
             const { error, data } = await supabase.auth.resetPasswordForEmail(
                 email,
-                { redirectTo: resetPasswordPage }
+                { redirectTo: resetPasswordPage },
             )
             console.log("error", error)
             if (error) throw error
             console.log("data", data)
             setMailSent(true)
             setMessage(
-                "במידה והכתובת נמצאת במערכת, הקישור לאיפוס הסיסמה ישלח לכתובת המייל שהזנתם בדקות הקרובות, אנא אתחלו את הסיסמה מתוך החשבון שלכם"
+                "במידה והכתובת נמצאת במערכת, הקישור לאיפוס הסיסמה ישלח לכתובת המייל שהזנתם בדקות הקרובות, אנא אתחלו את הסיסמה מתוך החשבון שלכם",
             )
             setMessageType("info")
         } catch (e) {

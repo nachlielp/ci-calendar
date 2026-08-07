@@ -13,30 +13,30 @@ import MultiDayFormPage from "./Components/Pages/MultiDayFormPage"
 import { Routes } from "react-router"
 
 const ResetPasswordRequest = lazy(
-    () => import("./Components/Auth/ResetPasswordRequest")
+    () => import("./Components/Auth/ResetPasswordRequest"),
 )
 const Login = lazy(() => import("./Components/Auth/Login"))
 const Signup = lazy(() => import("./Components/Auth/Signup"))
 const CreateEventsPage = lazy(
-    () => import("./Components/Pages/CreateEventsPage")
+    () => import("./Components/Pages/CreateEventsPage"),
 )
 const SupportPage = lazy(() => import("./Components/Pages/SupportPage"))
 const ManageSupportPage = lazy(
-    () => import("./Components/Pages/ManageSupportPage")
+    () => import("./Components/Pages/ManageSupportPage"),
 )
 const EditSingleDayFormPage = lazy(
-    () => import("./Components/Pages/EditSingleDayFormPage")
+    () => import("./Components/Pages/EditSingleDayFormPage"),
 )
 const EditMultiDayFormPage = lazy(
-    () => import("./Components/Pages/EditMultiDayFormPage")
+    () => import("./Components/Pages/EditMultiDayFormPage"),
 )
 const BioPage = lazy(() => import("./Components/Pages/BioPage"))
 const ManageUsersPage = lazy(() => import("./Components/Pages/ManageUsersPage"))
 const ManageAllEventsPage = lazy(
-    () => import("./Components/Pages/ManageAllEventsPage")
+    () => import("./Components/Pages/ManageAllEventsPage"),
 )
 const ManageUserEventsPage = lazy(
-    () => import("./Components/Pages/ManageUserEventsPage")
+    () => import("./Components/Pages/ManageUserEventsPage"),
 )
 
 export const AppRoutes = () => (
@@ -82,7 +82,7 @@ export const AppRoutes = () => (
                         UserType.org,
                         UserType.user,
                         UserType.profile,
-                    ]}  
+                    ]}
                 />
             }
         >

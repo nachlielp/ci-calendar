@@ -9,7 +9,7 @@ export const useSetSelectedEventByParams = () => {
     const { eventId } = useParams<{ eventId: string }>()
 
     const [selectedEvent, setSelectedEvent] = useState<CIEvent | undefined>(
-        undefined
+        undefined,
     )
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 

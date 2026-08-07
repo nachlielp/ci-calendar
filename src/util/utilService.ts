@@ -120,7 +120,7 @@ function CIEventToFormValues(event: CIEvent) {
 }
 
 function CIEventDraftToFormValues(
-    event: Partial<CIEvent & { template_name?: string }>
+    event: Partial<CIEvent & { template_name?: string }>,
 ) {
     // Safely handle segments
     const segments =
@@ -182,7 +182,7 @@ function CIEventDraftToFormValues(
 
 function reverseFormatTeachers(teachers: { label: string; value: string }[]) {
     return teachers?.map((teacher) =>
-        utilService.notAUserId(teacher.value) ? teacher.label : teacher.value
+        utilService.notAUserId(teacher.value) ? teacher.label : teacher.value,
     )
 }
 
@@ -198,13 +198,13 @@ function singleDayTemplateToFormValues(template: CITemplate) {
         teachers: reverseFormatTeachers(template.segments[0]?.teachers),
         "event-dates": dayjs.tz(
             dayjs(template.segments[0]?.startTime),
-            "Asia/Jerusalem"
+            "Asia/Jerusalem",
         ),
         "first-segment-start-time": dayjs(template.segments[0]?.startTime).tz(
-            "Asia/Jerusalem"
+            "Asia/Jerusalem",
         ),
         "first-segment-end-time": dayjs(template.segments[0]?.endTime).tz(
-            "Asia/Jerusalem"
+            "Asia/Jerusalem",
         ),
         segments: template.segments.slice(1).map((segment) => ({
             "event-type": segment.type,
@@ -237,7 +237,7 @@ function multiDayTemplateToFormValues(template: CITemplate) {
         address: template.address,
         district: template.district,
         "multi-day-event-teachers": template.multi_day_teachers?.map(
-            (teacher) => teacher.value
+            (teacher) => teacher.value,
         ),
         links: template.links.map((link) => ({
             title: link.title,
@@ -248,7 +248,7 @@ function multiDayTemplateToFormValues(template: CITemplate) {
             sum: price.sum,
         })),
         "main-event-type": eventOptions.find(
-            (type) => type.value === template.type
+            (type) => type.value === template.type,
         )?.label,
     }
     return { currentFormValues, address: template.address }
@@ -257,7 +257,7 @@ function multiDayTemplateToFormValues(template: CITemplate) {
 function formatFormValuesToCreateCIEvent(
     values: any,
     address: IAddress,
-    is_multi_day: boolean
+    is_multi_day: boolean,
 ): Omit<DBCIEvent, "id" | "cancelled_text" | "short_id"> {
     if (import.meta.env.VITE_HIDE_EVENTS_FLAG) {
         console.error("__HIDE EVENTS ON CREATION")
@@ -289,7 +289,7 @@ function formatFormValuesToCreateCIEvent(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers
+                        segment.teachers,
                     ),
                     startTime: dayjs(values["event-end-date"])
                         .hour(segmentDateString1.hour())
@@ -349,7 +349,7 @@ function formatFormValuesToCreateCIEvent(
 function formatFormValuesToEditCIEvent(
     values: any,
     address: IAddress,
-    is_multi_day: boolean
+    is_multi_day: boolean,
 ): Partial<DBCIEvent> {
     let segments: any[] = []
     if (!is_multi_day) {
@@ -378,7 +378,7 @@ function formatFormValuesToEditCIEvent(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers
+                        segment.teachers,
                     ),
                     startTime: dayjs(values["event-start-date"])
                         .hour(segmentDateString1.hour())
@@ -427,7 +427,7 @@ function formatFormValuesToEditCIEvent(
 function formatFormValuesToDraftCIEvent(
     values: any,
     address: IAddress | undefined,
-    is_multi_day: boolean
+    is_multi_day: boolean,
 ): Partial<DBCIEvent & { template_name?: string }> {
     let segments: any[] = []
 
@@ -478,13 +478,13 @@ function formatFormValuesToDraftCIEvent(
                         ? dayjs(values["event-start-date"])
                               .hour(
                                   dayjs(
-                                      values["first-segment-start-time"]
-                                  ).hour()
+                                      values["first-segment-start-time"],
+                                  ).hour(),
                               )
                               .minute(
                                   dayjs(
-                                      values["first-segment-start-time"]
-                                  ).minute()
+                                      values["first-segment-start-time"],
+                                  ).minute(),
                               )
                               .toISOString()
                         : "",
@@ -493,12 +493,14 @@ function formatFormValuesToDraftCIEvent(
                     values["first-segment-end-time"]
                         ? dayjs(values["event-start-date"])
                               .hour(
-                                  dayjs(values["first-segment-end-time"]).hour()
+                                  dayjs(
+                                      values["first-segment-end-time"],
+                                  ).hour(),
                               )
                               .minute(
                                   dayjs(
-                                      values["first-segment-end-time"]
-                                  ).minute()
+                                      values["first-segment-end-time"],
+                                  ).minute(),
                               )
                               .toISOString()
                         : "",
@@ -545,7 +547,7 @@ function formatFormValuesToDraftCIEvent(
 
     if (values["multi-day-event-teachers"]) {
         draftEvent.multi_day_teachers = formatUsersForCIEvent(
-            values["multi-day-event-teachers"]
+            values["multi-day-event-teachers"],
         )
     }
 
@@ -566,7 +568,7 @@ function formatFormValuesToDraftCIEvent(
 function formatFormValuesToCreateCITemplate(
     values: any,
     address: IAddress,
-    is_multi_day: boolean
+    is_multi_day: boolean,
 ): Omit<CITemplate, "id"> {
     let segments: any[] = []
     if (!is_multi_day) {
@@ -595,7 +597,7 @@ function formatFormValuesToCreateCITemplate(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers
+                        segment.teachers,
                     ),
                     startTime: dayjs(values["event-end-date"])
                         .hour(segmentDateString1.hour())
@@ -632,7 +634,7 @@ function formatFormValuesToCreateCITemplate(
 function formatFormValuesToEditCITemplate(
     values: any,
     address: IAddress,
-    is_multi_day: boolean
+    is_multi_day: boolean,
 ): Partial<CITemplate> {
     let segments: any[] = []
     if (!is_multi_day) {
@@ -661,7 +663,7 @@ function formatFormValuesToEditCITemplate(
                     type: segment["event-type"],
                     tags: segment["event-tags"] || [],
                     teachers: utilService.formatUsersForCIEvent(
-                        segment.teachers
+                        segment.teachers,
                     ),
                     startTime: dayjs(values["event-end-date"])
                         .hour(segmentDateString1.hour())
@@ -762,7 +764,7 @@ function formatHebrewDate(date: string) {
     const day = hebrewDate.format("D")
     const month = hebrewDate.format("MM")
     const hebrewMonth = hebrewMonths.find(
-        (m: SelectOption) => m.value === month
+        (m: SelectOption) => m.value === month,
     )?.label
     return `${hebrewDay(date)} ${day} ב${hebrewMonth}`
 }
@@ -790,21 +792,20 @@ function hebrewDay(date: string) {
 
 //allows to store teachers that dont exist in the teachers list as {label: teacherName, value: "NON_EXISTENT"+uuid4()}
 function formatUsersForCIEvent(
-    selectedUsers: (string | { label: string; value: string })[]
+    selectedUsers: (string | { label: string; value: string })[],
 ): { label: string; value: string }[] {
-    store.getAppPublicBios
     if (!selectedUsers) return []
     const formattedUsers = selectedUsers.map((user) => {
         if (typeof user === "string") {
             const userObj = store.getAppPublicBios.find(
-                (u) => u.user_id === user
+                (u) => u.user_id === user,
             )
             return userObj
                 ? { label: userObj.bio_name, value: userObj.user_id }
                 : { label: user, value: user }
         } else if (typeof user === "object") {
             const userObj = store.getAppPublicBios.find(
-                (u) => u.user_id === user.value
+                (u) => u.user_id === user.value,
             )
             return userObj
                 ? { label: userObj.bio_name, value: userObj.user_id }
@@ -826,7 +827,7 @@ function formatUsersForCIEvent(
             }
 
             return isValid
-        }
+        },
     )
 
     return validatedUsers
@@ -907,7 +908,7 @@ function getFilterItemType(item: string) {
 
 function getLabelByValue(value: string) {
     return [...eventOptions, ...districtOptions].find(
-        (option) => option.value === value
+        (option) => option.value === value,
     )?.label
 }
 function saveFiltersToLocalStorage(districts: string[], eventTypes: string[]) {
@@ -999,7 +1000,7 @@ function getCIEventTeachers(cievent: CIEvent | DBCIEvent) {
             ...singleDayEventTeachers,
             ...multiDayEventTeachers,
             ...organisations,
-        ])
+        ]),
     ).filter((teacher) => !utilService.notAUserId(teacher))
 
     return uniqueTeachers
@@ -1047,7 +1048,7 @@ function isEventStarted(event: CIEvent) {
     if (event.is_multi_day) return isEventStartedByDay(event.start_date)
     return isEventStartedByFirstSegment(
         event.start_date,
-        event.segments[0].startTime
+        event.segments[0].startTime,
     )
 }
 function sleep(ms: number) {
@@ -1100,7 +1101,7 @@ function clearDraftEvent(key: string) {
 function calculateRecurringEventDates(
     startDate: dayjs.Dayjs,
     recurringEndData: dayjs.Dayjs,
-    recurringOption: string
+    recurringOption: string,
 ) {
     const recurringDates = []
 
@@ -1127,14 +1128,18 @@ function calculateRecurringEventDates(
         const dayOfWeek = startDate.day() // Get day of week (0-6)
 
         for (let i = 0; i < 12; i++) {
-            let targetDate = startDate.clone().add(i, "months")
+            const targetDate = startDate.clone().add(i, "months")
 
-            let firstDayOfMonth = targetDate.clone().startOf("month")
+            const firstDayOfMonth = targetDate.clone().startOf("month")
 
-            let dayOffset = (dayOfWeek - firstDayOfMonth.day() + 7) % 7
-            let firstTargetDay = firstDayOfMonth.clone().add(dayOffset, "days")
+            const dayOffset = (dayOfWeek - firstDayOfMonth.day() + 7) % 7
+            const firstTargetDay = firstDayOfMonth
+                .clone()
+                .add(dayOffset, "days")
 
-            let finalDate = firstTargetDay.clone().add(weekOfMonth - 1, "weeks")
+            const finalDate = firstTargetDay
+                .clone()
+                .add(weekOfMonth - 1, "weeks")
 
             if (finalDate.isAfter(recurringEndData)) break
             recurringDates.push(finalDate)
@@ -1146,11 +1151,11 @@ function calculateRecurringEventDates(
 function duplicateEvent(
     date: Dayjs,
     event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">,
-    isMultiDayEvent: boolean
+    isMultiDayEvent: boolean,
 ): Omit<DBCIEvent, "id" | "cancelled_text" | "short_id"> {
     const eventLength = dayjs(event.start_date).diff(
         dayjs(event.end_date),
-        "day"
+        "day",
     )
 
     return {
@@ -1175,7 +1180,7 @@ function addToGoogleCalendar(event: CIEvent) {
         // For single-day events, use segment times with specific format required by Google Calendar
         startTime = dayjs(event.segments[0].startTime).format("YYYYMMDDTHHmmss")
         endTime = dayjs(
-            event.segments[event.segments.length - 1].endTime
+            event.segments[event.segments.length - 1].endTime,
         ).format("YYYYMMDDTHHmmss")
     }
 
@@ -1183,9 +1188,9 @@ function addToGoogleCalendar(event: CIEvent) {
     const description = `${eventLink}\n\n${event.description || ""}`
 
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-        event.title
+        event.title,
     )}&dates=${startTime}/${endTime}&details=${encodeURIComponent(
-        description
+        description,
     )}&location=${encodeURIComponent(event.address.label || "")}`
 
     window.open(url, "_blank")

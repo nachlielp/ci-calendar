@@ -1,6 +1,6 @@
 import { Icon } from "./Icon"
 import { useState } from "react"
-import '../../styles/menu-buttons.scss'
+import "../../styles/menu-buttons.scss"
 interface MenuButtonsProps {
     options: {
         key: string

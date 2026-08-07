@@ -48,7 +48,7 @@ async function getUserRequests(userId: string) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get user requests for userId: ${userId} ERROR: ${errorMessage}`
+            `Failed to get user requests for userId: ${userId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -68,13 +68,13 @@ async function getAllRequests() {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get all requests for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get all requests for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
 
 async function subscribeToAllRequests(
-    callback: (data: { data: CIRequest; eventType: string }) => void
+    callback: (data: { data: CIRequest; eventType: string }) => void,
 ) {
     try {
         const channel = supabase
@@ -87,7 +87,7 @@ async function subscribeToAllRequests(
                         data: payload.new as CIRequest,
                         eventType: payload.eventType,
                     })
-                }
+                },
             )
             .subscribe()
 
@@ -98,7 +98,7 @@ async function subscribeToAllRequests(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to subscribe to all requests for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to subscribe to all requests for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -119,7 +119,7 @@ async function getOpenRequestsByType(type: RequestType) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get open requests by type ${type} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get open requests by type ${type} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -140,7 +140,7 @@ async function createRequest(request: CreateRequest) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to create request for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to create request for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -161,7 +161,7 @@ async function updateRequest(request: UpdateRequest) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update request for requestId: ${request.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update request for requestId: ${request.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -181,7 +181,7 @@ async function deleteRequest(requestId: string) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete request for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to delete request for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -203,7 +203,7 @@ async function markAsViewedRequestByAdmin(requestId: string, userId: string) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to mark request as viewed by admin for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to mark request as viewed by admin for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -225,7 +225,7 @@ async function markAsViewedResponseByUser(requestId: string) {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to mark request as viewed by user for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to mark request as viewed by user for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }

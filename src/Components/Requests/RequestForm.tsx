@@ -50,7 +50,7 @@ const RequestForm = () => {
 
     const filteredRequestOptions = requestOptions.filter(
         (option) =>
-            String(option.value) !== String(userRequestVM.currentUserType)
+            String(option.value) !== String(userRequestVM.currentUserType),
     )
 
     const onFinish = async () => {
@@ -118,7 +118,7 @@ const RequestForm = () => {
                             options={filteredRequestOptions}
                             onChange={(value) =>
                                 userRequestVM.setRequestType(
-                                    value as RequestType
+                                    value as RequestType,
                                 )
                             }
                             size="large"

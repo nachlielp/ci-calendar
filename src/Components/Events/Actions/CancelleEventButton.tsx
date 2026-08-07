@@ -67,7 +67,7 @@ const showCancelledConfirm = (eventId: string, cancelled: boolean) => {
         },
         onCancel() {
             console.log(
-                "DeleteEvent.showDeleteConfirm.onCancel: User cancelled deletion"
+                "DeleteEvent.showDeleteConfirm.onCancel: User cancelled deletion",
             )
         },
     })

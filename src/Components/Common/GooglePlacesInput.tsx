@@ -83,11 +83,11 @@ export interface IGooglePlaceOption {
 }
 
 export async function getAddressFromGooglePlaceId(
-    placeId: string
+    placeId: string,
 ): Promise<string> {
     return new Promise((resolve, reject) => {
         const service = new google.maps.places.PlacesService(
-            document.createElement("div")
+            document.createElement("div"),
         )
 
         const request = {

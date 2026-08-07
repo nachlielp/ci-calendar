@@ -61,7 +61,7 @@ const MenuDrawer = () => {
         setOpen(false)
     }
 
-    let mapOfMenu = [
+    const mapOfMenu = [
         {
             key: "all-events",
             icon: home,

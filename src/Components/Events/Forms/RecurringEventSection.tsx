@@ -120,7 +120,7 @@ export default function RecurringEventSection({
                                     .calculateRecurringEventDates(
                                         startDate,
                                         recurringEndDate,
-                                        recurringOption
+                                        recurringOption,
                                     )
                                     .map((date: Dayjs) => (
                                         <div

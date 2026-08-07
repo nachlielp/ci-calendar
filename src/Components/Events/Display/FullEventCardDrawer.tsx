@@ -21,9 +21,6 @@ const FullEventCardDrawer = ({
     anchorEl,
 }: EventDrawerProps) => {
     const navigate = useNavigate()
-    if (!event) {
-        return null
-    }
     const [isModalOpen, setIsModalOpen] = useState(isSelectedEvent)
     const [isClicked, setIsClicked] = useState(false)
 
@@ -32,6 +29,10 @@ const FullEventCardDrawer = ({
             setIsClicked(false)
         }
     }, [store.isLoading])
+
+    if (!event) {
+        return null
+    }
 
     const onOpen = () => {
         if (store.isLoading) {

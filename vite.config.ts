@@ -54,7 +54,7 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
     workbox: {
         runtimeCaching: [
             {
-                urlPattern: ({ url }) => true, // Match all routes
+                urlPattern: () => true, // Match all routes
                 handler: "NetworkFirst",
                 options: {
                     cacheName: `api-cache-${buildVersion}`,

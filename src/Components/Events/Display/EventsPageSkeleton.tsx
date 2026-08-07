@@ -18,10 +18,10 @@ export default function EventsPageSkeleton({
     const districts = localStorage.getItem("district") || "[]"
     const defaultFilter = [
         ...(JSON.parse(eventTypes).map((t: string) =>
-            utilService.getLabelByValue(t)
+            utilService.getLabelByValue(t),
         ) || []),
         ...(JSON.parse(districts).map((t: string) =>
-            utilService.getLabelByValue(t)
+            utilService.getLabelByValue(t),
         ) || []),
     ]
 

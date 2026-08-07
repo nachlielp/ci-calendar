@@ -25,7 +25,7 @@ const NewsletterFilter = () => {
     useEffect(() => {
         const currentValues = form.getFieldsValue()
         newsletterFilterVM.setIsFormChanged(
-            newsletterFilterVM.checkFormChanged(currentValues)
+            newsletterFilterVM.checkFormChanged(currentValues),
         )
     }, [store.getWeeklyScheduleFilters])
 
@@ -62,8 +62,8 @@ const NewsletterFilter = () => {
                             onValuesChange={(_, allValues) => {
                                 newsletterFilterVM.setIsFormChanged(
                                     newsletterFilterVM.checkFormChanged(
-                                        allValues
-                                    )
+                                        allValues,
+                                    ),
                                 )
                             }}
                         >
@@ -89,8 +89,8 @@ const NewsletterFilter = () => {
                                                 }
                                                 return Promise.reject(
                                                     new Error(
-                                                        'מספר פלאפון חייב להתחיל עם "+" או "05"'
-                                                    )
+                                                        'מספר פלאפון חייב להתחיל עם "+" או "05"',
+                                                    ),
                                                 )
                                             },
                                         },
@@ -134,8 +134,8 @@ const NewsletterFilter = () => {
                                             ...eventOptions.filter(
                                                 (option) =>
                                                     !EventTypeOptionsToRemove.includes(
-                                                        option.value
-                                                    )
+                                                        option.value,
+                                                    ),
                                             ),
                                         ]}
                                         placeholder="סוגי ארועים"

@@ -26,13 +26,13 @@ async function getTemplate(templateId: string): Promise<CITemplate> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
 
 async function createTemplate(
-    template: CITemplateWithoutId
+    template: CITemplateWithoutId,
 ): Promise<CITemplate> {
     try {
         const { data, error } = await supabase
@@ -48,7 +48,7 @@ async function createTemplate(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to create CI template for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to create CI template for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -69,13 +69,13 @@ async function deleteTemplate(templateId: string): Promise<string> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
 
 async function updateTemplate(
-    template: Partial<CITemplate> & { id: string }
+    template: Partial<CITemplate> & { id: string },
 ): Promise<CITemplate> {
     try {
         const { data, error } = await supabase
@@ -93,7 +93,7 @@ async function updateTemplate(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }

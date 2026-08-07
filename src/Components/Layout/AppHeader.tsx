@@ -49,7 +49,6 @@ const AppHeader = () => {
                 )}
             </div>
             <section className="header-container">
-
                 {vm.showLoginButton && (
                     <LinkButton
                         to="/login"
@@ -137,7 +136,7 @@ const InstallPWABannerAnchor = () => {
 
 const languageMenu = (
     languagesToShow: Language[],
-    changeLocale: (lang: Language) => void
+    changeLocale: (lang: Language) => void,
 ) => (
     <div className="header-language-toggle-container">
         <Select

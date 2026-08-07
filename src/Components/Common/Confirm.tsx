@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 // import { Modal } from "./Modal"
-import '../../styles/confirm.scss'
+import "../../styles/confirm.scss"
 import { createRoot } from "react-dom/client"
 import Modal from "antd/es/modal"
 
@@ -97,6 +97,6 @@ export const confirm = (config: ConfirmProps) => {
                 config.onCancel?.()
                 cleanup()
             }}
-        />
+        />,
     )
 }

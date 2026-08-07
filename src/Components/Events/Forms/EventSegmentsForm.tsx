@@ -49,7 +49,7 @@ export default function EventSegmentsForm({
                                                     (option?.label ?? "")
                                                         .toLowerCase()
                                                         .includes(
-                                                            input.toLowerCase()
+                                                            input.toLowerCase(),
                                                         )
                                                 }
                                             />
@@ -113,7 +113,7 @@ export default function EventSegmentsForm({
                                                     (option?.label ?? "")
                                                         .toLowerCase()
                                                         .indexOf(
-                                                            input.toLowerCase()
+                                                            input.toLowerCase(),
                                                         ) >= 0
                                                 }
                                                 options={teachers}
@@ -140,7 +140,7 @@ export default function EventSegmentsForm({
                                                     (option?.label ?? "")
                                                         .toLowerCase()
                                                         .includes(
-                                                            input.toLowerCase()
+                                                            input.toLowerCase(),
                                                         )
                                                 }
                                             />

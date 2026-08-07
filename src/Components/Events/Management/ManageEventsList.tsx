@@ -9,7 +9,7 @@ import { CIEvent } from "../../../util/interfaces"
 import Input from "antd/es/input"
 import { store } from "../../../Store/store"
 import { observer } from "mobx-react-lite"
-import '../../../styles/manage-events-list.scss'
+import "../../../styles/manage-events-list.scss"
 
 dayjs.extend(isSameOrAfter)
 
@@ -32,7 +32,9 @@ const ManageEventsList = () => {
         }
         if (selectedEventTitle.length > 0) {
             events = events.filter((e) =>
-                e.title.toLowerCase().includes(selectedEventTitle.toLowerCase())
+                e.title
+                    .toLowerCase()
+                    .includes(selectedEventTitle.toLowerCase()),
             )
         }
         setFilteredEvents(events)
@@ -79,7 +81,7 @@ const ManageEventsList = () => {
                                 setExpandedEventId(
                                     expandedEventId === event.id
                                         ? null
-                                        : event.id
+                                        : event.id,
                                 )
                             }
                         >
@@ -89,14 +91,15 @@ const ManageEventsList = () => {
                                     <time dateTime={event.start_date}>
                                         {formatDateRange(
                                             event.start_date,
-                                            event.end_date
+                                            event.end_date,
                                         )}
                                     </time>
                                     <label>
                                         <span className="separator">|</span>
                                         {
                                             store.app_creators.find(
-                                                (t) => t.value === event.user_id
+                                                (t) =>
+                                                    t.value === event.user_id,
                                             )?.label
                                         }
                                     </label>

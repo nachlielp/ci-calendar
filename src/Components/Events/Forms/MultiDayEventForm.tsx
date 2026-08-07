@@ -56,7 +56,7 @@ const MultiDayEventForm = observer(
 
         const [address, setAddress] = useState<IAddress>()
         const [sourceTemplateId, setSourceTemplateId] = useState<string | null>(
-            null
+            null,
         )
 
         const [form] = Form.useForm()
@@ -64,7 +64,7 @@ const MultiDayEventForm = observer(
         useEffect(() => {
             if (isTemplate) {
                 const template = store.getTemplates.find(
-                    (t) => t.id === sourceTemplateId
+                    (t) => t.id === sourceTemplateId,
                 )
                 if (template) {
                     const { currentFormValues, address } = template.is_multi_day
@@ -102,7 +102,7 @@ const MultiDayEventForm = observer(
             const draftEvent = utilService.formatFormValuesToDraftCIEvent(
                 allFields,
                 address,
-                false
+                false,
             )
             utilService.saveDraftEvent(draftEvent, DRAFT_KEY)
         }
@@ -120,7 +120,7 @@ const MultiDayEventForm = observer(
             setAddress(selectedAddress)
             utilService.saveDraftEvent(
                 { address: selectedAddress },
-                DRAFT_ADDRESS_KEY
+                DRAFT_ADDRESS_KEY,
             )
             form.setFieldValue("address", selectedAddress)
         }
@@ -159,13 +159,11 @@ const MultiDayEventForm = observer(
                 !isTemplate &&
                 dayjs(values["event-start-date"]).isSame(
                     dayjs(values["event-end-date"]),
-                    "day"
+                    "day",
                 )
             ) {
                 setErrorMessage(ERROR_MESSAGE_START_DATE_AFTER_END_DATE)
-                setTimeout(() => {
-                    onFinishFailed(), 0
-                })
+                setTimeout(() => onFinishFailed(), 0)
                 console.log("start date is same as end date")
                 return
             }
@@ -173,13 +171,11 @@ const MultiDayEventForm = observer(
             if (
                 dayjs(values["event-end-date"]).diff(
                     dayjs(values["event-start-date"]),
-                    "days"
+                    "days",
                 ) > 14
             ) {
                 setErrorMessage(ERROR_MESSAGE_TOO_LONG)
-                setTimeout(() => {
-                    onFinishFailed(), 0
-                })
+                setTimeout(() => onFinishFailed(), 0)
                 console.log("too long")
                 return
             }
@@ -224,11 +220,11 @@ const MultiDayEventForm = observer(
                         is_multi_day: true,
                         multi_day_teachers:
                             utilService.formatUsersForCIEvent(
-                                values["multi-day-event-teachers"]
+                                values["multi-day-event-teachers"],
                             ) || [],
                         organisations:
                             utilService.formatUsersForCIEvent(
-                                values["event-orgs"]
+                                values["event-orgs"],
                             ) || [],
                     }
 
@@ -255,11 +251,11 @@ const MultiDayEventForm = observer(
                         is_multi_day: true,
                         multi_day_teachers:
                             utilService.formatUsersForCIEvent(
-                                values["multi-day-event-teachers"]
+                                values["multi-day-event-teachers"],
                             ) || [],
                         organisations:
                             utilService.formatUsersForCIEvent(
-                                values["event-orgs"]
+                                values["event-orgs"],
                             ) || [],
                         user_id: store.user.id,
                     }
@@ -351,7 +347,7 @@ const MultiDayEventForm = observer(
                                                 (option?.label ?? "")
                                                     .toLowerCase()
                                                     .includes(
-                                                        input.toLowerCase()
+                                                        input.toLowerCase(),
                                                     )
                                             }
                                         />
@@ -400,7 +396,7 @@ const MultiDayEventForm = observer(
                 </Form>
             </section>
         )
-    }
+    },
 )
 
 export default MultiDayEventForm

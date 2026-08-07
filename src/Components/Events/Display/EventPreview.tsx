@@ -40,31 +40,31 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                     .flatMap((segment) => segment.teachers)
                     .map((teacher) => {
                         const user = event.users?.find(
-                            (user) => user.user_id === teacher.value
+                            (user) => user.user_id === teacher.value,
                         )
                         return user?.bio_name || teacher.label
-                    })
-            )
+                    }),
+            ),
         )
 
         const multiDayTeacherNames = Array.from(
             new Set(
                 Object.values(event.multi_day_teachers || {}).map((teacher) => {
                     const user = event.users?.find(
-                        (user) => user.user_id === teacher.value
+                        (user) => user.user_id === teacher.value,
                     )
                     return user?.bio_name || teacher.label
-                })
-            )
+                }),
+            ),
         )
 
         const teachers = Array.from(
-            new Set([...multiDayTeacherNames, ...singleDayTeacherNames])
+            new Set([...multiDayTeacherNames, ...singleDayTeacherNames]),
         )
 
         const orgs = event.organisations.map((org) => {
             const publicOrg = event?.users?.find(
-                (user) => user.user_id === org.value
+                (user) => user.user_id === org.value,
             )
             return publicOrg?.bio_name || org.label
         })
@@ -81,7 +81,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         <h1 className="cancelled-event-title">
                             {getTranslation(
                                 "eventCancelled",
-                                store.getLanguage
+                                store.getLanguage,
                             )}
                         </h1>
                         <h2 className="cancelled-event-text">
@@ -103,7 +103,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                         <h2 className="event-title">
                             {utilService.getTitleByLanguage(
                                 event,
-                                store.getLanguage
+                                store.getLanguage,
                             )}
                         </h2>
                     </article>
@@ -127,23 +127,23 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                         shortEnglishDays[
                                             dayjs(event.start_date).day()
                                         ],
-                                        store.getLanguage
+                                        store.getLanguage,
                                     )}
                                     {", "}
                                     {getMonthName(
                                         dayjs(event.start_date),
-                                        store.getLanguage
+                                        store.getLanguage,
                                     )}
                                 </label>
                                 <Icon icon={schedule} className="event-icon" />
                                 <label className="event-label">
                                     {dayjs(event.segments[0].startTime).format(
-                                        "HH:mm"
+                                        "HH:mm",
                                     )}
                                     &nbsp;-&nbsp;
                                     {dayjs(
                                         event.segments[segmentsLength - 1]
-                                            .endTime
+                                            .endTime,
                                     ).format("HH:mm")}
                                 </label>
                             </>
@@ -158,7 +158,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                     }
                                     {", "}
                                     {utilService.formatHebrewDate(
-                                        event.start_date
+                                        event.start_date,
                                     )}
                                     {" - "}
                                     {
@@ -168,7 +168,7 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                                     }
                                     {", "}
                                     {utilService.formatHebrewDate(
-                                        event.end_date
+                                        event.end_date,
                                     )}
                                 </label>
                             </>
@@ -232,11 +232,11 @@ const EventPreview = React.forwardRef<HTMLDivElement, EventPreviewProps>(
                 </section>
             </section>
         )
-    }
+    },
 )
 
 export const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
-    let types = Array.from(new Set([...t1, ...(t2 || [])]))
+    const types = Array.from(new Set([...t1, ...(t2 || [])]))
     t2?.forEach((element) => {
         if (!types.includes(element)) {
             types.push(element)
@@ -246,7 +246,7 @@ export const getTypes = (t1: EventlyType[], t2?: EventlyType[]) => {
         types
             .filter((type) => !!type)
             .map(
-                (type) => eventOptions.find((et) => et.value === type)?.label
+                (type) => eventOptions.find((et) => et.value === type)?.label,
             ) || []
     )
 }

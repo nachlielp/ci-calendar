@@ -144,8 +144,6 @@ export enum UserTypeHebrew {
     user = "משתמש רגיל",
 }
 
-
-
 export interface WeeklyScheduleFilters {
     "district-weekly": string[]
     "district-monthly": string[]
@@ -184,20 +182,19 @@ export interface CIUserData {
     future_ci_events: CIEvent[]
 }
 
-export interface DbUserWithoutJoin
-    extends Omit<
-        DbUser,
-        | "requests"
-        | "templates"
-        | "bio_name"
-        | "page_url"
-        | "page_title"
-        | "show_profile"
-        | "allow_tagging"
-        | "img"
-        | "bio"
-        | "ci_events"
-    > {}
+export type DbUserWithoutJoin = Omit<
+    DbUser,
+    | "requests"
+    | "templates"
+    | "bio_name"
+    | "page_url"
+    | "page_title"
+    | "show_profile"
+    | "allow_tagging"
+    | "img"
+    | "bio"
+    | "ci_events"
+>
 
 export interface DbUser {
     id: string
@@ -222,7 +219,6 @@ export interface DbUser {
     version: string
     pwa_install_id: string | null
 }
-
 
 export interface UserBio {
     user_id: string

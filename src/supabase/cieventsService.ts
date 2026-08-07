@@ -43,7 +43,7 @@ async function getCIEvent(id: string): Promise<CIEvent> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -64,7 +64,7 @@ async function getCIEventByShortId(shortId: string): Promise<CIEvent> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI event for shortId: ${shortId} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get CI event for shortId: ${shortId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -90,7 +90,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
                     user_id
                 )
             )
-        `
+        `,
             )
             .eq("ci_events_users_junction.public_bio.show_profile", true) // Updated filter path
 
@@ -99,18 +99,18 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             if (filterBy.future_events) {
                 query = query.gte(
                     "start_date",
-                    dayjs(filterBy.from_start_date).format("YYYY-MM-DD")
+                    dayjs(filterBy.from_start_date).format("YYYY-MM-DD"),
                 )
                 if (filterBy.to_start_date) {
                     query = query.lte(
                         "start_date",
-                        dayjs(filterBy.to_start_date).format("YYYY-MM-DD")
+                        dayjs(filterBy.to_start_date).format("YYYY-MM-DD"),
                     )
                 }
             } else {
                 query = query.lte(
                     "start_date",
-                    dayjs(filterBy.from_start_date).format("YYYY-MM-DD")
+                    dayjs(filterBy.from_start_date).format("YYYY-MM-DD"),
                 )
             }
         }
@@ -153,7 +153,7 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -166,7 +166,7 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
                 `creator:users (
             user_name,
             id
-        )`
+        )`,
             )
             .gte("start_date", dayjs().startOf("day").toISOString())
         if (error) throw error
@@ -193,13 +193,13 @@ async function getCIEventsCreators(): Promise<SelectOption[]> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to get CI events creators for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
 
 async function createCIEvent(
-    event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">
+    event: Omit<DBCIEvent, "id" | "cancelled_text" | "short_id">,
 ): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
@@ -212,7 +212,7 @@ async function createCIEvent(
             throw new Error(
                 `Failed to create CI event for userId: ${
                     store.getUserId
-                } ERROR: ${JSON.stringify(error, null, 2)}`
+                } ERROR: ${JSON.stringify(error, null, 2)}`,
             )
 
         const cieventId = data.id
@@ -236,7 +236,7 @@ async function createCIEvent(
             throw new Error(
                 `Create new junctionError.message for userId: ${
                     store.getUserId
-                } ERROR: ${JSON.stringify(junctionError, null, 2)}`
+                } ERROR: ${JSON.stringify(junctionError, null, 2)}`,
             )
 
         return data as CIEvent
@@ -246,14 +246,14 @@ async function createCIEvent(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to create CI event for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to create CI event for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
 
 async function updateCIEvent(
     id: string,
-    eventUpdate: Partial<CIEvent>
+    eventUpdate: Partial<CIEvent>,
 ): Promise<CIEvent> {
     try {
         const { data, error } = await supabase
@@ -304,14 +304,14 @@ async function updateCIEvent(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
 
 async function updateMultipleCIEvents(
     ids: string[],
-    eventUpdate: Partial<CIEvent>
+    eventUpdate: Partial<CIEvent>,
 ): Promise<CIEvent[]> {
     try {
         const { data, error } = await supabase
@@ -328,7 +328,7 @@ async function updateMultipleCIEvents(
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to update multiple CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -350,7 +350,7 @@ async function deleteCIEvent(id: string): Promise<string> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to delete CI event for id: ${id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }
@@ -371,7 +371,7 @@ async function deleteMultipleCIEvents(ids: string[]): Promise<string[]> {
                 ? error.message
                 : JSON.stringify(error, null, 2)
         throw new Error(
-            `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`
+            `Failed to delete multiple CI events for userId: ${store.getUserId} ERROR: ${errorMessage}`,
         )
     }
 }

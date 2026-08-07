@@ -9,7 +9,7 @@ function WhatsAppBanner() {
     const whatsappUrl = `https://wa.me/${
         import.meta.env.VITE_WHATSAPP_NUMBER
     }?text=${encodeURIComponent(
-        translations[store.getLanguage].whatsappMessage
+        translations[store.getLanguage].whatsappMessage,
     )}`
 
     const handleWhatsAppClick = (e: React.MouseEvent) => {
@@ -20,7 +20,7 @@ function WhatsAppBanner() {
                 window.location.href = `whatsapp://send?phone=${
                     import.meta.env.VITE_WHATSAPP_NUMBER
                 }&text=${encodeURIComponent(
-                    translations[store.getLanguage].whatsappMessage
+                    translations[store.getLanguage].whatsappMessage,
                 )}`
             } else {
                 window.open(whatsappUrl, "_blank")

@@ -44,7 +44,7 @@ class ManageSupportPageVM {
                 }
 
                 const filteredRequests = requests.filter((request) =>
-                    types.includes(request.type)
+                    types.includes(request.type),
                 )
 
                 this.filteredRequests = [...filteredRequests].sort((a, b) => {
@@ -53,7 +53,7 @@ class ManageSupportPageVM {
                         : -1
                 })
             },
-            { fireImmediately: true }
+            { fireImmediately: true },
         )
     }
 
@@ -102,15 +102,15 @@ class ManageSupportPageVM {
     @action
     handleAction = async (action: string, request: CIRequest) => {
         switch (action) {
-            case "approved":
+            case "approved": {
                 const newUserType =
                     request.type === RequestType.profile
                         ? UserType.profile
                         : request.type === RequestType.creator
-                        ? UserType.creator
-                        : request.type === RequestType.org
-                        ? UserType.org
-                        : null
+                          ? UserType.creator
+                          : request.type === RequestType.org
+                            ? UserType.org
+                            : null
 
                 if (newUserType) {
                     await store.updateUserRole({
@@ -120,10 +120,10 @@ class ManageSupportPageVM {
                             request.type === RequestType.profile
                                 ? 4
                                 : request.type === RequestType.creator
-                                ? 2
-                                : request.type === RequestType.org
-                                ? 3
-                                : 0,
+                                  ? 2
+                                  : request.type === RequestType.org
+                                    ? 3
+                                    : 0,
                     })
                 }
 
@@ -146,6 +146,7 @@ class ManageSupportPageVM {
                 }
                 await store.updateRequest(newRequest)
                 break
+            }
 
             // case "add_response":
             //     await store.updateRequest({
@@ -157,7 +158,7 @@ class ManageSupportPageVM {
             //     })
             //     break
 
-            case "close":
+            case "close": {
                 const newDeclineResponseMessage = [
                     ...request.responses,
                     {
@@ -176,6 +177,7 @@ class ManageSupportPageVM {
                     closed: true,
                 })
                 break
+            }
         }
     }
 
@@ -257,7 +259,7 @@ const ManageSupportPage = () => {
                                 </label>
                                 <time dateTime={request.created_at}>
                                     {dayjs(request.created_at).format(
-                                        "DD/MM/YYYY"
+                                        "DD/MM/YYYY",
                                     )}
                                 </time>
                             </div>
@@ -283,11 +285,11 @@ const ManageSupportPage = () => {
                                             onClick={async (e) => {
                                                 e.stopPropagation()
                                                 await navigator.clipboard.writeText(
-                                                    request.phone || ""
+                                                    request.phone || "",
                                                 )
                                                 // If you're using antd, you can use their message component
                                                 message.success(
-                                                    "Phone number copied to clipboard"
+                                                    "Phone number copied to clipboard",
                                                 )
                                             }}
                                             style={{
@@ -306,7 +308,7 @@ const ManageSupportPage = () => {
 
                                         <span>
                                             {dayjs(request.created_at).format(
-                                                "DD/MM/YYYY HH:mm"
+                                                "DD/MM/YYYY HH:mm",
                                             )}
                                         </span>
                                         <label className="request-message">
@@ -340,7 +342,7 @@ const ManageSupportPage = () => {
                                                 onClick={() =>
                                                     vm.handleAction(
                                                         "approved",
-                                                        request
+                                                        request,
                                                     )
                                                 }
                                             >
@@ -352,7 +354,7 @@ const ManageSupportPage = () => {
                                             onClick={() =>
                                                 vm.handleAction(
                                                     "close",
-                                                    request
+                                                    request,
                                                 )
                                             }
                                         >
@@ -370,7 +372,7 @@ const ManageSupportPage = () => {
                     className="secondary-action-btn"
                     onClick={() => {
                         throw new Error(
-                            "Test error thrown from ManageSupportPage"
+                            "Test error thrown from ManageSupportPage",
                         )
                     }}
                 >
