@@ -1,4 +1,4 @@
-import { UserRole, UserType } from "../util/interfaces"
+import { UserRole } from "../util/interfaces"
 import { store } from "../Store/store"
 import { supabase } from "./client"
 
@@ -70,23 +70,6 @@ async function updateUserRole({
                 `Failed to update public bio for userId: ${store.getUserId} ERROR: ${errorMessage}`
             )
         }
-        if (user_type !== UserType.user) {
-            // if (updateError) {
-            //     const { code } = updateError as PostgrestError
-            //     if (code === "PGRST116" && !updateData) {
-            //         const { error: insertError } = await supabase
-            //             .from("public_bio")
-            //             .insert({
-            //                 user_id: user_id,
-            //                 user_type: user_type,
-            //             })
-            //     } else if (updateError) {
-            //         throw updateError
-            //     }
-            //     // If no rows were updated, do an insert
-            // }
-        }
-
         return roleData
     } catch (error: any) {
         const errorMessage =

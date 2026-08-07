@@ -526,45 +526,6 @@ class Store {
         }
     }
 
-    // private setupPolling = () => {
-    //     const handleVisibilityChange = () => {
-    //         if (document.visibilityState === "visible") {
-    //             // if (this.pollingRef) clearInterval(this.pollingRef)
-    //             this.fetchEvents()
-
-    //             // Notice - currently not employing this polling
-    //             const intervalCallback = async () => {
-    //                 await this.fetchEvents()
-    //                 await this.fetchAppPublicBios()
-    //                 this.callCount++
-    //                 // Clear and set new interval with updated duration
-    //                 if (this.pollingRef) clearInterval(this.pollingRef)
-    //                 this.pollingRef = setInterval(
-    //                     intervalCallback,
-    //                     this.getPollingInterval()
-    //                 )
-    //             }
-
-    //             this.pollingRef = setInterval(
-    //                 intervalCallback,
-    //                 this.getPollingInterval()
-    //             )
-    //         } else {
-    //             if (this.pollingRef) clearInterval(this.pollingRef)
-    //         }
-    //     }
-
-    //     document.addEventListener("visibilitychange", handleVisibilityChange)
-    //     handleVisibilityChange() // Initial call
-
-    //     return () => {
-    //         if (this.pollingRef) clearInterval(this.pollingRef)
-    //         document.removeEventListener(
-    //             "visibilitychange",
-    //             handleVisibilityChange
-    //         )
-    //     }
-    // }
     private fetchOnVisibilityChange = async () => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === "visible") {
