@@ -1,6 +1,6 @@
 import { CIRequest, RequestType } from "../util/interfaces"
 import { supabase } from "./client"
-import { store } from "../Store/store"
+import { wrapServiceError } from "./serviceError"
 
 export type CreateRequest = Partial<CIRequest> & {
     type: RequestType
@@ -43,12 +43,9 @@ async function getUserRequests(userId: string) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get user requests for userId: ${userId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to get user requests for userId: ${userId}`,
+            error,
         )
     }
 }
@@ -63,13 +60,7 @@ async function getAllRequests() {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get all requests for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to get all requests", error)
     }
 }
 
@@ -93,13 +84,7 @@ async function subscribeToAllRequests(
 
         return channel
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to subscribe to all requests for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to subscribe to all requests", error)
     }
 }
 
@@ -114,13 +99,7 @@ async function getOpenRequestsByType(type: RequestType) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get open requests by type ${type} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError(`Failed to get open requests by type ${type}`, error)
     }
 }
 
@@ -135,13 +114,7 @@ async function createRequest(request: CreateRequest) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to create request for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to create request", error)
     }
 }
 
@@ -156,12 +129,9 @@ async function updateRequest(request: UpdateRequest) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to update request for requestId: ${request.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to update request for requestId: ${request.id}`,
+            error,
         )
     }
 }
@@ -176,12 +146,9 @@ async function deleteRequest(requestId: string) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to delete request for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to delete request for requestId: ${requestId}`,
+            error,
         )
     }
 }
@@ -198,12 +165,9 @@ async function markAsViewedRequestByAdmin(requestId: string, userId: string) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to mark request as viewed by admin for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to mark request as viewed by admin for requestId: ${requestId}`,
+            error,
         )
     }
 }
@@ -220,12 +184,9 @@ async function markAsViewedResponseByUser(requestId: string) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to mark request as viewed by user for requestId: ${requestId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to mark request as viewed by user for requestId: ${requestId}`,
+            error,
         )
     }
 }
