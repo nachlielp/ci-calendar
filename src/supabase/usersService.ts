@@ -57,10 +57,14 @@ async function getUserData(id: string): Promise<CIUserData | null> {
                 .eq("ci_events.user_id", id)
                 .single(),
 
-            // Second query - events data
+            // Second query - the public event window (feeds the calendar for
+            // logged-in users). Hidden events must not appear here; the owner's
+            // own hidden events still arrive via the first query above and are
+            // exposed only in the management views. See docs/rls.md.
             supabase
                 .from("ci_events")
                 .select("*")
+                .eq("hide", false)
                 .gte("start_date", dayjs().startOf("day").toISOString())
                 .lte(
                     "start_date",
