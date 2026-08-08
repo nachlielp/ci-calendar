@@ -162,9 +162,18 @@ directly):
 
 \* `users` / `public_bio` owner-write policies let a user edit their own row,
 but a non-admin still cannot grant themselves a role because `user_roles` write
-is admin-only — `user_type` without a matching `user_roles` row confers nothing.
-Verify with the queries below that `user_roles` INSERT/UPDATE/DELETE are
-admin-only before relying on this.
+is admin-only — `user_type` without a matching `user_roles` row confers nothing
+(`has_admin_role()` / `has_creator_role()` read `user_roles`, never the
+`user_type` column).
+
+> **Verified against the live project (`pjgwpivkvsuernmoeebk`) on 2026-08-08.**
+> The migration was applied. `assign_user_role` is `SECURITY DEFINER` with
+> `anon` `EXECUTE` revoked (`authenticated` only). `user_roles` has exactly two
+> policies: `admin_full_crudl` (`cmd = ALL`, `has_admin_role()` on `USING` +
+> `WITH CHECK`) and `select_by_all` (`cmd = SELECT`, `auth.uid() = user_id`) —
+> so INSERT/UPDATE/DELETE are admin-only and non-admins can read only their own
+> role row. AC #2 (non-admin cannot invoke role changes **or** write role data
+> directly) confirmed.
 
 ## Verifying against the live database
 
