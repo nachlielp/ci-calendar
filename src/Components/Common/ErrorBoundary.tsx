@@ -1,6 +1,7 @@
 import { Icon } from "../Common/Icon"
 import React from "react"
 import { NavigateFunction } from "react-router"
+import * as Sentry from "@sentry/react"
 import "../../styles/error-boundary.scss"
 import warning from "../../assets/svgs/warning.svg"
 interface ErrorBoundaryProps {
@@ -20,6 +21,16 @@ class ErrorBoundaryClass extends React.Component<
 
     static getDerivedStateFromError() {
         return { hasError: true }
+    }
+
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        // Report the render crash instead of swallowing it. The component
+        // stack goes into a Sentry context so the maintainer can locate it.
+        Sentry.captureException(error, {
+            contexts: {
+                react: { componentStack: errorInfo.componentStack },
+            },
+        })
     }
 
     render() {

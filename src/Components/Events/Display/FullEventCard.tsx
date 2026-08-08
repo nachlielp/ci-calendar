@@ -8,6 +8,7 @@ import SecondaryButton from "../../Common/SecondaryButton"
 import { store } from "../../../Store/store"
 import "../../../styles/full-event-card.scss"
 import React, { Component, useEffect } from "react"
+import * as Sentry from "@sentry/react"
 import { observer } from "mobx-react-lite"
 import { shortEnglishDays, shortHebrewDays } from "../../../util/options"
 import {
@@ -43,8 +44,11 @@ class EventErrorBoundary extends Component<
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        // You can log the error to an error reporting service here
-        console.error("Event rendering error:", error, errorInfo)
+        Sentry.captureException(error, {
+            contexts: {
+                react: { componentStack: errorInfo.componentStack },
+            },
+        })
     }
 
     render() {
