@@ -38,6 +38,7 @@ import { CACHE_VERSION } from "../App"
 import { AuthChangeEvent } from "@supabase/supabase-js"
 import { getAddressFromGooglePlaceId } from "../Components/Common/GooglePlacesInput"
 import { translateText } from "../util/translate"
+import * as Sentry from "@sentry/react"
 
 class Store {
     @observable session: Session | null = null
@@ -493,6 +494,15 @@ class Store {
     setSession(session: Session | null) {
         const previousSession = this.session
         this.session = session
+
+        // Let Sentry attribute crashes to the signed-in user. Cleared on
+        // sign-out in clearUser(). Runs on every auth change.
+        if (session?.user) {
+            Sentry.setUser({
+                id: session.user.id,
+                email: session.user.email,
+            })
+        }
 
         if (previousSession?.access_token !== session?.access_token) {
             this.isInitializing = false
@@ -1355,6 +1365,21 @@ class Store {
         } as CIUserData)
     }
 
+    // Ends the session with the auth provider, then clears local state. This
+    // is the single sign-out path (the logout button calls it); the store also
+    // reaches clearUser() directly from the `signedOut` auth event.
+    signOut = async () => {
+        try {
+            await supabase.auth.signOut()
+        } catch (error) {
+            // End the local session regardless (e.g. a session_not_found when
+            // the token is already gone server-side).
+            console.error("Sign-out error:", error)
+        } finally {
+            this.clearUser()
+        }
+    }
+
     clearUser = () => {
         this.setStore({
             ci_events: this.app_ci_events,
@@ -1367,8 +1392,10 @@ class Store {
         } as CIUserData)
         this.currentSessionId = null
 
+        // supabase.auth.signOut() clears its own persisted session key, so no
+        // hand-maintained auth key removal is needed here.
         sessionStorage.clear()
-        localStorage.removeItem(import.meta.env.VITE_AUTH_KEY_NAME)
+        Sentry.setUser(null)
     }
 
     @action

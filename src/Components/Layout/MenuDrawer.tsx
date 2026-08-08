@@ -3,7 +3,6 @@ import Drawer from "antd/es/drawer"
 import { Icon } from "../Common/Icon"
 import { useLocation, useNavigate } from "react-router"
 import { useIsMobile } from "../../hooks/useIsMobile"
-import { supabase } from "../../supabase/client"
 import { UserType } from "../../util/interfaces"
 import { observer } from "mobx-react-lite"
 import { store } from "../../Store/store"
@@ -172,16 +171,9 @@ const MenuDrawer = () => {
             icon: logout,
             label: translations[store.getLanguage].logout,
             onClick: async () => {
-                try {
-                    await supabase.auth.signOut()
-                } catch (error) {
-                    // Ignore session_not_found error as we want to logout anyway
-                    console.log("Logout error:", error)
-                } finally {
-                    store.clearUser()
-                    setOpen(false)
-                    navigate("/")
-                }
+                await store.signOut()
+                setOpen(false)
+                navigate("/")
             },
             disabled: !isUser,
         },

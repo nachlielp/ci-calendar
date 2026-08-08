@@ -36,7 +36,17 @@ const initSentry = () => {
                     createRoutesFromChildren,
                     matchRoutes,
                 }),
-                Sentry.replayIntegration(),
+                // Privacy: mask everything in session replays. All text and
+                // input values are masked and all media is blocked, so replays
+                // never record user content. `networkDetailAllowUrls: []` keeps
+                // request/response bodies and headers (auth tokens, API
+                // payloads) out of the replay — only timing/status is kept.
+                Sentry.replayIntegration({
+                    maskAllText: true,
+                    maskAllInputs: true,
+                    blockAllMedia: true,
+                    networkDetailAllowUrls: [],
+                }),
             ],
             beforeSend(event) {
                 return event
