@@ -94,6 +94,10 @@ describe("no billable Google key reaches the Translate REST API", () => {
     }) as Record<string, string>
 
     it("no src file references the Translate endpoint or the old Maps key", () => {
+        // Fail loud if the glob ever stops matching, so the guard can't pass
+        // vacuously.
+        expect(Object.keys(sources).length).toBeGreaterThan(0)
+
         const offenders = Object.entries(sources)
             .filter(([path]) => !path.includes(".test."))
             .filter(
