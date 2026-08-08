@@ -35,3 +35,6 @@ ci-calendar-app
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Supabase CLI local temp/state
+supabase/.temp/

@@ -9,13 +9,15 @@ Client-side filters (e.g. the `hide` filter in `getCIEvents`, the
 `getSortedEvents` computed in the store) are defense in depth only — they make
 the UI correct, they do **not** keep data safe.
 
-> **Verification status.** The policy tables below are the **required** model,
-> derived from the app's access patterns and the `SECURITY DEFINER` role
-> helpers. They have **not** been diffed against the live project
-> (`pjgwpivkvsuernmoeebk`) from this repo — the CLI is unlinked here and no
-> service-role credential is checked in. Confirm the live policies with the
-> queries in [Verifying against the live database](#verifying-against-the-live-database)
-> and reconcile any drift with this document.
+> **Verification status — VERIFIED against the live project
+> (`pjgwpivkvsuernmoeebk`) on 2026-08-08** via the queries in
+> [Verifying against the live database](#verifying-against-the-live-database).
+> RLS is enabled on all 14 public tables. Three drifts from the required model
+> below were found and fixed in that pass — see
+> [Live verification & drift fixed](#live-verification--drift-fixed-2026-08-08).
+> The `wa_*` PII tables have RLS on with **no** client policies, so they are
+> reachable only by the service role (the safest state). Re-run the queries and
+> reconcile if the schema changes.
 
 ## Roles
 
@@ -79,24 +81,28 @@ all now exclude hidden rows by default:
    `hide` rows before the public calendar renders them.
 
 **Database-level enforcement (source of truth).** The app filter is a
-convenience/perf layer; the guarantee must live in RLS. The `ci_events` SELECT
-policy should be equivalent to:
+convenience/perf layer; the guarantee must live in RLS. The live `ci_events`
+SELECT policy (`read_by_all`) enforces:
 
 ```sql
-CREATE POLICY "ci_events read: visible to all, hidden to owner/admin"
-ON public.ci_events
-FOR SELECT
+ALTER POLICY "read_by_all" ON public.ci_events
 USING (
   hide = false
-  OR user_id = auth.uid()
-  OR auth.uid() = ANY (owners)
-  OR check_user_is_admin(auth.uid())
+  OR (SELECT auth.uid()) = user_id
+  OR has_admin_role()
 );
 ```
 
 With this policy in place, an anonymous client physically cannot fetch a hidden
 row, so the app-level filters become redundant safety nets rather than the only
 line of defense.
+
+> The doc originally suggested an `auth.uid() = ANY (owners)` co-owner clause,
+> but `owners` is a `Json[]` of `{value,label}` objects — not a `uuid[]` — so
+> that comparison is a type error. In practice `owners` only ever holds the
+> creator (already matched by `user_id`), so it was dropped. Real co-ownership
+> would need a `jsonb_array_elements(owners) → 'value'` check. The role helper
+> used in the live DB is `has_admin_role()` (not `check_user_is_admin(uid)`).
 
 ## Storage buckets
 
@@ -145,6 +151,36 @@ FROM pg_policies
 WHERE schemaname = 'public' AND tablename = 'ci_events' AND cmd = 'SELECT';
 -- The USING (`qual`) expression must constrain `hide = false` for anon/user.
 ```
+
+## Live verification & drift fixed (2026-08-08)
+
+Verified against project `pjgwpivkvsuernmoeebk` in the SQL editor (service role).
+RLS confirmed enabled on all 14 public tables. `wa_users` / `wa_messages` /
+`wa_twilio_logs` have RLS on with **no** policies → denied to all clients,
+service-role only. `users` (self+admin), `requests` / `templates` /
+`notifications` / `alerts` (owner+admin), `public_bio` (public where
+`show_profile = true`, plus owner/admin), and `config` / `roles` /
+`ci_events_users_junction` (public lookup/join) all matched the model.
+
+Three drifts were found and fixed with `ALTER POLICY` (atomic — no unprotected
+window):
+
+1. **`ci_events` SELECT (`read_by_all`) was `USING (true)`** — 🔴 the hidden-
+   events leak: any anonymous client could read every row, including
+   `hide = true`. Replaced with the `hide = false OR own OR admin` policy above.
+   This is the DB-level guarantee ticket #13 depended on.
+2. **`user_roles` SELECT (`select_by_all`) was `USING (true)`** — 🟠 the whole
+   `user_id → role` map (admin/creator identities) was world-readable. Scoped to
+   `(SELECT auth.uid()) = user_id`; admin reads still covered by
+   `admin_full_crudl`. Verified safe: the only app read is admin `getUsers()`.
+3. **`storage.objects` write policies (`creator_can_insert/update/delete`) were
+   `has_creator_role()` with no path scoping** — 🟠 any creator could
+   overwrite/delete any other creator's uploads. Scoped each to
+   `(storage.foldername(name))[1] = (SELECT auth.uid())::text` (uploads live at
+   `${userId}/…`, see `ProfileForm.tsx`). Applied **without** an admin override,
+   so admins cannot manage other users' files — add `OR has_admin_role()` to the
+   three policies if a moderation UI ever needs it. `storage.objects` has no
+   SELECT policy, so public read depends on the buckets being flagged public.
 
 ## Related security notes (out of scope for #13, tracked separately)
 
