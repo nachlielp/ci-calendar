@@ -6,48 +6,26 @@ export const userRoleService = {
     updateUserRole,
 }
 
+// Role assignment is one atomic, admin-gated operation performed by the
+// `assign_user_role` Postgres function (see
+// supabase/migrations/20260808000000_assign_user_role.sql and docs/rls.md). It
+// replaces the previous three sequential client writes (user_roles, users,
+// public_bio) that had no transaction and leaned on unverified table policies.
 async function updateUserRole({
     user_id,
     user_type,
     role_id,
 }: UserRole): Promise<UserRole> {
     try {
-        // Update user_roles table
-        const { data: roleData, error: roleError } = await supabase
-            .from("user_roles")
-            .upsert(
-                { user_id, role_id: role_id },
-                {
-                    onConflict: "user_id",
-                    ignoreDuplicates: false,
-                },
-            )
-            .select()
-            .single()
+        const { data, error } = await supabase.rpc("assign_user_role", {
+            p_user_id: user_id,
+            p_role_id: role_id,
+            p_user_type: user_type,
+        })
 
-        if (roleError) throw roleError
+        if (error) throw error
 
-        // Update users table
-        const { error: userError } = await supabase
-            .from("users")
-            .update({ user_type: user_type })
-            .eq("id", user_id)
-
-        if (userError) throw userError
-
-        // Update public_bio table
-        const { error: updateError } = await supabase
-            .from("public_bio")
-            .upsert(
-                { user_type: user_type, user_id: user_id },
-                { onConflict: "user_id" },
-            )
-            .select()
-            .single()
-
-        if (updateError) throw updateError
-
-        return roleData
+        return data as UserRole
     } catch (error) {
         wrapServiceError("Failed to update user role", error)
     }
