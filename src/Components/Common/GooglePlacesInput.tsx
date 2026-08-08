@@ -47,7 +47,7 @@ const GooglePlacesInput = ({
                     onChange: handleChange,
                     placeholder: "חפש כתובת",
                 }}
-                apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                apiKey={import.meta.env.VITE_GOOGLE_PLACES_API_KEY}
                 apiOptions={{ language: "he", region: "IL" }}
             />
         </div>

@@ -5,3 +5,7 @@ public
 stats.html
 package-lock.json
 *.min.js
+
+# Supabase Edge Functions run on Deno and follow `deno fmt`, not this repo's
+# Prettier config.
+supabase/functions

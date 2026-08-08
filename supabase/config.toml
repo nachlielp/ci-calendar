@@ -1,0 +1,8 @@
+project_id = "ci-calendar"
+
+# The translate function is called by anonymous public-calendar visitors, so it
+# does not require an end-user JWT. Reaching it still requires the project's
+# anon apikey (sent automatically by supabase-js). The billable Google key is a
+# server-side secret inside the function — see supabase/functions/translate.
+[functions.translate]
+verify_jwt = false
