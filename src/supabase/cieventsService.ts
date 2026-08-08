@@ -12,7 +12,7 @@ export interface FilterOptions {
     user_id?: string
     sort_by?: string
     sort_direction?: "asc" | "desc"
-    hide?: boolean
+    show_hidden?: boolean
     future_events?: boolean
     creator_name?: string
 }
@@ -121,8 +121,14 @@ async function getCIEvents(filterBy: FilterOptions = {}): Promise<CIEvent[]> {
             })
         }
 
-        if (filterBy?.hide) {
-            query = query.eq("hide", filterBy.hide)
+        // Hidden (unpublished/cancelled) events must never leave the database
+        // for viewers who shouldn't see them. RLS is the primary guarantee
+        // (see docs/rls.md); this default filter is the app-level enforcement,
+        // and the client-side `getSortedEvents` filter is defense in depth.
+        // Callers that legitimately need hidden rows (a creator/admin managing
+        // their own events) opt in explicitly with `show_hidden: true`.
+        if (!filterBy?.show_hidden) {
+            query = query.eq("hide", false)
         }
 
         const { data, error } = await query
