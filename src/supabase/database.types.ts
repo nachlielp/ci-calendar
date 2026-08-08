@@ -735,6 +735,16 @@ export type Database = {
             [_ in never]: never
         }
         Functions: {
+            assign_user_role: {
+                Args: {
+                    p_user_id: string
+                    p_role_id: number
+                    p_user_type: string
+                }
+                Returns: Json
+            }
+            // NOTE: hand-added to match supabase/migrations/20260808000000_assign_user_role.sql;
+            // regenerate with `npm run gen:types` once the migration is applied to the live DB.
             check_user_is_admin: { Args: { user_id: string }; Returns: boolean }
             has_admin_role: { Args: never; Returns: boolean }
             has_creator_role: { Args: never; Returns: boolean }

@@ -45,7 +45,7 @@ Legend: ✅ allowed · ⛔ denied · **own** = only rows the caller owns.
 | `users`                    | owner (self), admin                                            | self on signup, admin          | owner (self), admin | admin               |
 | `requests`                 | owner, admin                                                   | user (self), admin             | owner, admin        | owner, admin        |
 | `templates`                | owner, admin                                                   | owner (self), admin            | owner, admin        | owner, admin        |
-| `user_roles`               | owner (self), admin                                            | admin (via `insert_user_role`) | admin               | admin               |
+| `user_roles`               | owner (self), admin                                            | admin (via `assign_user_role`) | admin               | admin               |
 | `roles`                    | ✅ authenticated (lookup table)                                | admin                          | admin               | admin               |
 | `notifications`            | owner (self), admin                                            | system/admin                   | owner (self), admin | owner (self), admin |
 | `alerts`                   | owner (self), admin                                            | system/admin                   | owner (self), admin | admin               |
@@ -120,6 +120,52 @@ what restricts who can write and where. Objects must be scoped by owner
 (typically a `user_id`-prefixed path checked in the storage policy) so one user
 cannot overwrite another's files.
 
+## Role mutation: `assign_user_role` (ticket #16)
+
+Assigning a role touches three tables — `user_roles` (membership), `users`
+(`user_type`), and `public_bio` (`user_type`). Doing that as three separate
+client writes has two problems: there is no transaction (a mid-way failure
+leaves a half-promoted user), and it depends on each table's write policy
+allowing the caller — which was never verified and must **not** be open to
+ordinary users.
+
+Both are fixed by making the mutation one server-side operation:
+
+```sql
+-- supabase/migrations/20260808000000_assign_user_role.sql
+SELECT public.assign_user_role(p_user_id => …, p_role_id => …, p_user_type => …);
+```
+
+- **Atomic.** The function performs all three writes in a single statement
+  body, so they commit or roll back together.
+- **Admin-only, server-enforced.** It is `SECURITY DEFINER` and begins with
+  `IF NOT has_admin_role() THEN RAISE EXCEPTION … USING errcode = '42501'`.
+  Because `auth.uid()` inside a definer function still reflects the _calling_
+  session (it reads the request JWT, not the definer), `has_admin_role()`
+  correctly gates the caller. `anon` has `EXECUTE` revoked; only
+  `authenticated` may call it, and non-admins are rejected by the guard.
+- **The client no longer writes these tables directly.**
+  `userRoleService.updateUserRole` is a single
+  `supabase.rpc("assign_user_role", …)` call
+  (`src/supabase/userRoleService.ts`); the seam test in
+  `userRoleService.test.ts` asserts there is exactly one RPC write path.
+
+**Direct-write policies must deny non-admins** (defense the RPC leans on — a
+non-admin must not be able to bypass the function by writing the tables
+directly):
+
+| Table        | Non-admin direct INSERT/UPDATE/DELETE | Enforced by                             |
+| ------------ | ------------------------------------- | --------------------------------------- |
+| `user_roles` | ⛔ denied (self-read only)            | `admin_full_crudl` + self-scoped SELECT |
+| `users`      | UPDATE own row only; no `user_type`\* | owner/admin UPDATE policy               |
+| `public_bio` | owner may upsert own bio; admin all   | owner/admin write policy                |
+
+\* `users` / `public_bio` owner-write policies let a user edit their own row,
+but a non-admin still cannot grant themselves a role because `user_roles` write
+is admin-only — `user_type` without a matching `user_roles` row confers nothing.
+Verify with the queries below that `user_roles` INSERT/UPDATE/DELETE are
+admin-only before relying on this.
+
 ## Verifying against the live database
 
 Run these with a privileged (service-role / db owner) connection and reconcile
@@ -150,6 +196,27 @@ SELECT policyname, cmd, qual
 FROM pg_policies
 WHERE schemaname = 'public' AND tablename = 'ci_events' AND cmd = 'SELECT';
 -- The USING (`qual`) expression must constrain `hide = false` for anon/user.
+```
+
+Role-mutation rules (ticket #16) — `user_roles` writes must be admin-only, and
+`assign_user_role` must be admin-gated and unreachable by anon:
+
+```sql
+-- user_roles INSERT/UPDATE/DELETE policies must all require admin.
+SELECT policyname, cmd, roles, qual, with_check
+FROM pg_policies
+WHERE schemaname = 'public' AND tablename = 'user_roles'
+ORDER BY cmd;
+
+-- assign_user_role: SECURITY DEFINER, and anon must NOT have EXECUTE.
+SELECT p.proname, p.prosecdef AS security_definer,
+       has_function_privilege('anon', p.oid, 'EXECUTE')          AS anon_can_execute,
+       has_function_privilege('authenticated', p.oid, 'EXECUTE') AS authed_can_execute
+FROM pg_proc p
+WHERE p.pronamespace = 'public'::regnamespace AND p.proname = 'assign_user_role';
+-- Expect: security_definer = true, anon_can_execute = false. The admin check is
+-- inside the function body (has_admin_role()); confirm a non-admin call is
+-- rejected with a not_authorized error.
 ```
 
 ## Live verification & drift fixed (2026-08-08)
