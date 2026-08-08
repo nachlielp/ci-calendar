@@ -1,6 +1,6 @@
 import { UserRole } from "../util/interfaces"
-import { store } from "../Store/store"
 import { supabase } from "./client"
+import { wrapServiceError } from "./serviceError"
 
 export const userRoleService = {
     updateUserRole,
@@ -25,15 +25,7 @@ async function updateUserRole({
             .select()
             .single()
 
-        if (roleError) {
-            const errorMessage =
-                roleError instanceof Error
-                    ? roleError.message
-                    : JSON.stringify(roleError, null, 2)
-            throw new Error(
-                `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-            )
-        }
+        if (roleError) throw roleError
 
         // Update users table
         const { error: userError } = await supabase
@@ -41,15 +33,7 @@ async function updateUserRole({
             .update({ user_type: user_type })
             .eq("id", user_id)
 
-        if (userError) {
-            const errorMessage =
-                userError instanceof Error
-                    ? userError.message
-                    : JSON.stringify(userError, null, 2)
-            throw new Error(
-                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-            )
-        }
+        if (userError) throw userError
 
         // Update public_bio table
         const { error: updateError } = await supabase
@@ -61,23 +45,10 @@ async function updateUserRole({
             .select()
             .single()
 
-        if (updateError) {
-            const errorMessage =
-                updateError instanceof Error
-                    ? updateError.message
-                    : JSON.stringify(updateError, null, 2)
-            throw new Error(
-                `Failed to update public bio for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-            )
-        }
+        if (updateError) throw updateError
+
         return roleData
-    } catch (error: any) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to update user role for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+    } catch (error) {
+        wrapServiceError("Failed to update user role", error)
     }
 }

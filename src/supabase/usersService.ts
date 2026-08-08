@@ -9,7 +9,7 @@ import {
     WeeklyScheduleFilters,
 } from "../util/interfaces"
 import dayjs from "dayjs"
-import { store } from "../Store/store"
+import { wrapServiceError } from "./serviceError"
 
 export const usersService = {
     getUsers,
@@ -118,18 +118,13 @@ async function getUserData(id: string): Promise<CIUserData | null> {
             userBio,
         } as unknown as CIUserData
     } catch (error: any) {
-        console.error("Error in getUser:", error)
         if (
             error.message === "NO_USER_ID" ||
             error.message === "USER_DOES_NOT_EXIST"
         ) {
             throw error
         }
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(`Failed to get user data: ${errorMessage}`)
+        wrapServiceError(`Failed to get user data for userId: ${id}`, error)
     }
     //TODO hanldle errors in getUserData in a way that reports to snetry and does not break the workflow
 }
@@ -145,29 +140,14 @@ async function updateUser(
             .eq("id", id)
             .select()
             .single()
-        if (error) {
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : JSON.stringify(error, null, 2)
-            throw new Error(
-                `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-            )
-        }
+        if (error) throw error
         return data as CIUser
-    } catch (error: any) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to update user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+    } catch (error) {
+        wrapServiceError(`Failed to update user for userId: ${id}`, error)
     }
 }
 
 async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
-    console.log("__A_createUser", user)
     try {
         const { data, error } = await supabase
             .from("users")
@@ -175,25 +155,10 @@ async function createUser(user: DbUserWithoutJoin): Promise<DbUser | null> {
             .select()
             .single()
 
-        if (error) {
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : JSON.stringify(error, null, 2)
-            throw new Error(
-                `_1_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-            )
-        }
-        console.log("__B_createUser", data)
+        if (error) throw error
         return data as DbUser
-    } catch (error: any) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `_2_Failed to create user for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+    } catch (error) {
+        wrapServiceError("Failed to create user", error)
     }
 }
 
@@ -233,14 +198,8 @@ async function getUsers(): Promise<ManageUserOption[]> {
         })
 
         return users as ManageUserOption[]
-    } catch (error: any) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get users for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+    } catch (error) {
+        wrapServiceError("Failed to get users", error)
     }
 }
 
@@ -259,15 +218,12 @@ async function updateUserWeeklyScheduleFilters(
             .eq("id", id)
             .select()
             .single()
-        if (error) {
-            throw new Error(
-                `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`,
-            )
-        }
+        if (error) throw error
         return data
-    } catch (error: any) {
-        throw new Error(
-            `Failed to update user newsletter filter for userId: ${id} ERROR: ${error.message}`,
+    } catch (error) {
+        wrapServiceError(
+            `Failed to update user newsletter filter for userId: ${id}`,
+            error,
         )
     }
 }
@@ -283,15 +239,12 @@ async function toggleUserReceiveWeeklySchedule(
             .eq("id", id)
             .select()
             .single()
-        if (error) {
-            throw new Error(
-                `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`,
-            )
-        }
+        if (error) throw error
         return data
-    } catch (error: any) {
-        throw new Error(
-            `Failed to toggle user receive weekly schedule for userId: ${id} ERROR: ${error.message}`,
+    } catch (error) {
+        wrapServiceError(
+            `Failed to toggle user receive weekly schedule for userId: ${id}`,
+            error,
         )
     }
 }
@@ -304,15 +257,12 @@ async function updateUserPhoneNumber(id: string, phoneNumber: string) {
             .eq("id", id)
             .select()
             .single()
-        if (error) {
-            throw new Error(
-                `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`,
-            )
-        }
+        if (error) throw error
         return data
-    } catch (error: any) {
-        throw new Error(
-            `Failed to update user phone number for userId: ${id} ERROR: ${error.message}`,
+    } catch (error) {
+        wrapServiceError(
+            `Failed to update user phone number for userId: ${id}`,
+            error,
         )
     }
 }

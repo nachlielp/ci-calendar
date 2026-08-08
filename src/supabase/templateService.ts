@@ -1,6 +1,6 @@
-import { store } from "../Store/store"
 import { supabase } from "./client"
 import { CITemplate } from "../util/interfaces"
+import { wrapServiceError } from "./serviceError"
 
 export type CITemplateWithoutId = Omit<CITemplate, "id" | "user_id">
 
@@ -21,12 +21,9 @@ async function getTemplate(templateId: string): Promise<CITemplate> {
         if (error) throw error
         return data[0]
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to get CI template for templateId: ${templateId}`,
+            error,
         )
     }
 }
@@ -43,13 +40,7 @@ async function createTemplate(
         if (error) throw error
         return data[0]
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to create CI template for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to create CI template", error)
     }
 }
 
@@ -64,12 +55,9 @@ async function deleteTemplate(templateId: string): Promise<string> {
         if (error) throw error
         return data[0].id
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to delete CI template for templateId: ${templateId} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to delete CI template for templateId: ${templateId}`,
+            error,
         )
     }
 }
@@ -88,12 +76,9 @@ async function updateTemplate(
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to update CI template for templateId: ${template.id} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to update CI template for templateId: ${template.id}`,
+            error,
         )
     }
 }

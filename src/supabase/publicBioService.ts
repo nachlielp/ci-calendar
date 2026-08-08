@@ -1,6 +1,6 @@
 import { supabase } from "./client"
 import { TaggableUserOptions, UserBio, UserType } from "../util/interfaces"
-import { store } from "../Store/store"
+import { wrapServiceError } from "./serviceError"
 
 export const publicBioService = {
     updateTeacherBio,
@@ -23,13 +23,7 @@ async function updateTeacherBio(bio: Partial<UserBio>): Promise<UserBio> {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to update teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to update teacher bio", error)
     }
 }
 
@@ -42,12 +36,9 @@ async function deleteTeacherBio(userId: string): Promise<void> {
 
         if (error) throw error
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to delete teacher bio for userId: ${store.getUserId} ERROR: ${errorMessage}`,
+        wrapServiceError(
+            `Failed to delete teacher bio for userId: ${userId}`,
+            error,
         )
     }
 }
@@ -69,13 +60,7 @@ async function getPublicBioList(): Promise<UserBio[]> {
         const filteredData = data.filter((user) => user.bio_name !== "")
         return filteredData as UserBio[]
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get public bio list for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to get public bio list", error)
     }
 }
 
@@ -103,12 +88,6 @@ async function getTaggableUsers(): Promise<TaggableUserOptions[]> {
         }))
         return teachers
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to get taggable teachers for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError("Failed to get taggable teachers", error)
     }
 }

@@ -1,5 +1,5 @@
-import { store } from "../Store/store"
 import { supabase } from "./client"
+import { wrapServiceError } from "./serviceError"
 
 export const storageService = {
     uploadFile,
@@ -15,12 +15,6 @@ async function uploadFile(filePath: string, file: Blob) {
         if (error) throw error
         return data
     } catch (error) {
-        const errorMessage =
-            error instanceof Error
-                ? error.message
-                : JSON.stringify(error, null, 2)
-        throw new Error(
-            `Failed to upload file to path: ${filePath} for userId: ${store.getUserId} ERROR: ${errorMessage}`,
-        )
+        wrapServiceError(`Failed to upload file to path: ${filePath}`, error)
     }
 }
