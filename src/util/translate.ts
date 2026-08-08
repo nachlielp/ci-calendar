@@ -4,7 +4,8 @@ import "dayjs/locale/en"
 import "dayjs/locale/ru"
 import "dayjs/locale/he"
 import { utilService } from "./utilService"
-// Add cache interface and cache map at the top of the file
+import { supabase } from "../supabase/client"
+
 interface TranslationCache {
     [key: string]: {
         [targetLang: string]: string
@@ -12,6 +13,11 @@ interface TranslationCache {
 }
 
 const memoryCache: TranslationCache = {}
+
+const rememberInMemory = (text: string, lang: Language, value: string) => {
+    if (!memoryCache[text]) memoryCache[text] = {}
+    memoryCache[text][lang] = value
+}
 
 // Add a type for translation context
 type TranslationContext = "name" | "general" | "month"
@@ -56,95 +62,54 @@ export const translatePage = async (lang: Language) => {
 export const translateText = async (
     text: string,
     targetLang: Language,
-    context: TranslationContext = "general", // Default context
+    context: TranslationContext = "general",
 ): Promise<string> => {
-    // Check memory cache first
+    // 1. In-memory cache (this session).
     if (memoryCache[text]?.[targetLang]) {
         return memoryCache[text][targetLang]
     }
 
-    // Check localStorage cache
-    try {
-        const localStorageKey = `translation_${text}_${targetLang}`
-        const localStorageTranslation = localStorage.getItem(localStorageKey)
-        if (localStorageTranslation) {
-            // Store in memory cache too
-            if (!memoryCache[text]) memoryCache[text] = {}
-            memoryCache[text][targetLang] = localStorageTranslation
-            return localStorageTranslation
-        }
-    } catch (error) {
-        console.warn("localStorage access error:", error)
-    }
-
-    // Check browser cache
+    // 2. Persistent browser Cache API. Replaces the previous unbounded
+    //    one-localStorage-entry-per-string cache (which risked quota errors);
+    //    the Cache API is not bound by the small localStorage quota. Reads and
+    //    writes are wrapped so a cache failure never surfaces into user flows.
     const cacheKey = `translation_${text}_${targetLang}`
-    try {
-        const cache = await caches.open("translations-cache")
-        const cachedResponse = await cache.match(cacheKey)
-        if (cachedResponse) {
-            const cachedTranslation = await cachedResponse.text()
-
-            // Store in memory cache too
-            if (!memoryCache[text]) memoryCache[text] = {}
-            memoryCache[text][targetLang] = cachedTranslation
-
-            return cachedTranslation
-        }
-    } catch (error) {
-        console.warn("Cache access error:", error)
-    }
-
-    // Proceed with API translation if not cached
-    const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-
-    if (!API_KEY) {
-        console.error("No API key found")
-        return text
-    }
-
-    try {
-        const response = await fetch(
-            `https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    q: text,
-                    target: targetLang,
-                    source: "he",
-                    format: "text", // Preserve formatting
-                    model: "nmt", // Use Neural Machine Translation
-                    context: text, // Provide surrounding text as context
-                    glossary: context === "name" ? "preserve-names" : undefined, // Special handling for names
-                }),
-            },
-        )
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-        }
-
-        const data = await response.json()
-        const translatedText = data.data.translations[0].translatedText
-
-        // Cache the successful translation
+    if (typeof caches !== "undefined") {
         try {
-            // Store in memory cache
-            if (!memoryCache[text]) memoryCache[text] = {}
-            memoryCache[text][targetLang] = translatedText
-
-            // Store in localStorage
-            const localStorageKey = `translation_${text}_${targetLang}`
-            localStorage.setItem(localStorageKey, translatedText)
-
-            // Store in browser cache
             const cache = await caches.open("translations-cache")
-            await cache.put(cacheKey, new Response(translatedText))
+            const cachedResponse = await cache.match(cacheKey)
+            if (cachedResponse) {
+                const cachedTranslation = await cachedResponse.text()
+                rememberInMemory(text, targetLang, cachedTranslation)
+                return cachedTranslation
+            }
         } catch (error) {
-            console.warn("Cache storage error:", error)
+            console.warn("Cache access error:", error)
+        }
+    }
+
+    // 3. Translate via the Supabase Edge Function. The billable Google key
+    //    lives only server-side there — the client holds no key that can reach
+    //    the Translate REST API. See supabase/functions/translate.
+    try {
+        const { data, error } = await supabase.functions.invoke("translate", {
+            body: { text, targetLang, source: "he", context },
+        })
+        if (error) throw error
+
+        const translatedText: string | undefined = data?.translatedText
+        if (!translatedText) {
+            return text
+        }
+
+        rememberInMemory(text, targetLang, translatedText)
+        if (typeof caches !== "undefined") {
+            try {
+                const cache = await caches.open("translations-cache")
+                await cache.put(cacheKey, new Response(translatedText))
+            } catch (error) {
+                console.warn("Cache storage error:", error)
+            }
         }
 
         return translatedText
