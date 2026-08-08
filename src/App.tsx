@@ -32,7 +32,8 @@ export enum EventAction {
     recycle,
 }
 
-export const CACHE_VERSION = "1.6.82"
+// Single source of truth: package.json version, injected at build time (#17).
+export const CACHE_VERSION = __APP_VERSION__
 
 export const EMAIL_SUPPORT = "info@ci-events.org"
 export const PAYBOX_URL = "https://payboxapp.page.link/32yzdN1D1gix4AR37"

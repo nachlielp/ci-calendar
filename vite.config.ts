@@ -4,10 +4,15 @@ import react from "@vitejs/plugin-react"
 import { VitePWA, VitePWAOptions } from "vite-plugin-pwa"
 import { visualizer } from "rollup-plugin-visualizer"
 import pkg from "./package.json"
+import { SUPABASE_URL_PATTERN } from "./src/pwa/cachePolicy"
 
-const timestamp = new Date().getTime()
-const buildVersion = `${pkg.version}-${timestamp}`
-//
+// Single source of truth for the app version: package.json. It is injected into
+// the client bundle as `__APP_VERSION__` (see `define` below) — which drives the
+// in-app version display / DB stamp (App.tsx CACHE_VERSION) — and it names every
+// Workbox cache via `cacheId`, so a deploy that bumps the version gets fresh
+// caches and the old ones are cleaned up. (#17)
+const appVersion = pkg.version
+
 const manifestForPlugin: Partial<VitePWAOptions> = {
     disable: false,
     registerType: "autoUpdate",
@@ -52,15 +57,27 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
         },
     },
     workbox: {
+        // Prefix every Workbox cache (precache + runtime) with the app version,
+        // so a version bump rotates cache names and cleanupOutdatedCaches drops
+        // the stale ones. This is the "PWA cache naming" half of the single
+        // version source (#17).
+        cacheId: `ci-calendar-${appVersion}`,
+        // Precache the built, content-hashed static assets. Because they are
+        // revisioned by Workbox, a fresh deploy always serves fresh assets.
+        globPatterns: [
+            "**/*.{js,css,html,ico,png,svg,webp,woff,woff2,jpg,jpeg}",
+        ],
         runtimeCaching: [
             {
-                urlPattern: () => true, // Match all routes
-                handler: "NetworkFirst",
-                options: {
-                    cacheName: `api-cache-${buildVersion}`,
-                },
+                // Supabase traffic must never be cached — see the rationale in
+                // src/pwa/cachePolicy.ts. Always go to the network.
+                urlPattern: SUPABASE_URL_PATTERN,
+                handler: "NetworkOnly",
             },
         ],
+        // Offline SPA fallback: serve the precached app shell for same-origin
+        // navigations. (Supabase requests are cross-origin fetches, never
+        // navigations, so they never reach this fallback.)
         navigateFallback: "index.html",
         cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // Set to 3MB
@@ -71,6 +88,11 @@ const manifestForPlugin: Partial<VitePWAOptions> = {
 }
 
 export default defineConfig(({ mode }) => ({
+    // Inject the package version so the client has a single, build-time version
+    // constant (App.tsx re-exports it as CACHE_VERSION). (#17)
+    define: {
+        __APP_VERSION__: JSON.stringify(appVersion),
+    },
     esbuild: {
         target: "es2022",
         // Strip console/debugger from production bundles only (keeps them in
