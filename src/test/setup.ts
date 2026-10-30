@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom"
+import "@testing-library/jest-dom/vitest"
 import { focusManager, onlineManager } from "@tanstack/react-query"
 import { configure } from "@testing-library/react"
 import { afterEach } from "vitest"

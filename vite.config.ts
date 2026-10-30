@@ -8,7 +8,7 @@ import {
     PRECACHE_GLOBS,
     PRECACHE_IGNORES,
     TELEMETRY_ASSETS,
-} from "./src/sw/swRules"
+} from "./src/sw/swRules.ts"
 
 /**
  * The build version (`BUILD_VERSION` in src/app/buildVersion.ts): the commit
@@ -65,22 +65,27 @@ const TELEMETRY_MODULE =
 
 export default defineConfig(({ command, mode }) => {
     const version = buildVersion(command)
+    // Release builds (CI) upload source maps to Sentry; see the plugin below.
+    const uploadMaps = !!process.env.SENTRY_AUTH_TOKEN
     return {
-        esbuild: {
-            target: "es2022",
-            // Strip console/debugger from production bundles only (keeps
-            // them in dev and test).
-            drop: mode === "production" ? ["console", "debugger"] : [],
-        },
         build: {
             target: "es2022",
             // dist/.vite/manifest.json feeds the bundle size check
             // (scripts/bundle-size.mjs).
             manifest: true,
-            // Generate sourcemaps for Sentry, but keep them off the public CDN.
-            sourcemap: "hidden",
-            rollupOptions: {
+            // Source maps only for Sentry, which deletes them after upload;
+            // other builds (previews, local) make none, so none ever ship
+            // (`check:sw` fails if dist/ holds one).
+            sourcemap: uploadMaps && "hidden",
+            rolldownOptions: {
                 output: {
+                    // Strip console/debugger from production bundles only
+                    // (keeps them in dev and test, which never minify).
+                    ...(mode === "production" && {
+                        minify: {
+                            compress: { dropConsole: true, dropDebugger: true },
+                        },
+                    }),
                     chunkFileNames: (chunk) =>
                         !chunk.isEntry &&
                         chunk.moduleIds.some((id) => TELEMETRY_MODULE.test(id))
@@ -118,7 +123,7 @@ export default defineConfig(({ command, mode }) => {
             // (i.e. CI / release builds), then delete them so they never ship.
             // The release is the build version the app reports
             // (app/telemetry/sentry.ts), and stays out of the JS like it.
-            process.env.SENTRY_AUTH_TOKEN &&
+            uploadMaps &&
                 sentryVitePlugin({
                     org: "nachliel",
                     project: "ci-calendar",

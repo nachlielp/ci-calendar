@@ -34,10 +34,46 @@ const OWN_URLS = [
  */
 export const REPORTED_BY_APP = new Set(["GlobalHandlers", "BrowserApiErrors"])
 
+type StreamedSpan = Parameters<NonNullable<BrowserOptions["beforeSendSpan"]>>[0]
+
+/**
+ * Header names and query parameters that identify a person, filtered out
+ * on top of Sentry's own list of secrets (`auth`, `token`, `session`, …).
+ */
+const IDENTIFYING = ["forwarded", "-ip", "remote-", "via", "-user"]
+
+/**
+ * What Sentry may collect beyond what the app sends it. Sentry 11 collects
+ * everything by default; this is the baseline its migration guide gives
+ * for keeping the earlier defaults (no `sendDefaultPii`): no IP address,
+ * cookies or bodies, and headers (the user agent, the referrer) and query
+ * strings with identifying values filtered. Replays have their own
+ * masking (`sentryReplay.ts`).
+ */
+export const DATA_COLLECTION = {
+    userInfo: false,
+    cookies: false,
+    httpHeaders: {
+        request: { deny: IDENTIFYING },
+        response: { deny: IDENTIFYING },
+    },
+    httpBodies: [],
+    urlQueryParams: { deny: IDENTIFYING },
+    genAI: { inputs: false, outputs: false },
+    databaseQueryData: false,
+    graphQL: { document: false, variables: false },
+} satisfies BrowserOptions["dataCollection"]
+
 /** Auth secrets out of every URL an event carries (`scrubUrl`). */
 function scrubEvent<T extends Event>(event: T): T {
-    if (event.request?.url) {
-        event.request = { ...event.request, url: scrubUrl(event.request.url) }
+    if (event.request) {
+        const { url, headers } = event.request
+        event.request = {
+            ...event.request,
+            ...(url && { url: scrubUrl(url) }),
+            // The referrer can be an auth redirect.
+            ...(headers && { headers: scrubValues(headers) }),
+        }
     }
     // Replay events list the page URLs they cover.
     const urls = (event as { urls?: unknown }).urls
@@ -49,12 +85,29 @@ function scrubEvent<T extends Event>(event: T): T {
         })
     }
     if (event.transaction) event.transaction = scrubUrl(event.transaction)
-    event.spans = event.spans?.map((span) => ({
-        ...span,
-        description: span.description && scrubUrl(span.description),
-        data: span.data && scrubValues(span.data),
-    }))
     return event
+}
+
+/**
+ * Tracing's spans, streamed as they end: the name (a request's
+ * "GET https://…") and attributes (`url.full`, the referrer header).
+ */
+function scrubSpan(span: StreamedSpan): StreamedSpan {
+    return {
+        ...span,
+        name: scrubUrl(span.name),
+        attributes: scrubValues(span.attributes),
+    }
+}
+
+/**
+ * Replay events (the page URLs a replay covers) skip `beforeSend`, which
+ * only sees errors, so an event processor scrubs them.
+ */
+export const SCRUB_REPLAY_EVENTS = {
+    name: "ScrubReplayEvents",
+    processEvent: (event: Event) =>
+        event.type === "replay_event" ? scrubEvent(event) : event,
 }
 
 /** Navigation (`from`, `to`) and request (`url`) breadcrumbs. */
@@ -76,17 +129,20 @@ export function sentryOptions({
         dsn,
         release,
         environment,
-        integrations: (defaults) =>
-            defaults.filter(
+        integrations: (defaults) => [
+            ...defaults.filter(
                 (integration) => !REPORTED_BY_APP.has(integration.name),
             ),
+            SCRUB_REPLAY_EVENTS,
+        ],
         tracesSampleRate: 0.2,
         allowUrls: OWN_URLS,
         tracePropagationTargets: OWN_URLS,
         replaysSessionSampleRate: 0.05,
         replaysOnErrorSampleRate: 0.5,
+        dataCollection: DATA_COLLECTION,
         beforeSend: scrubEvent,
-        beforeSendTransaction: scrubEvent,
+        beforeSendSpan: scrubSpan,
         beforeBreadcrumb: scrubBreadcrumb,
     }
 }
@@ -98,7 +154,6 @@ export function sentryOptions({
  */
 export function startSentry(config: SentryConfig): ErrorSink {
     init(sentryOptions(config))
-    // Replay events and their URLs go through this too.
     config.whenIdle(() => {
         void import("./sentryReplay")
             .then(({ startReplay }) => startReplay())
@@ -112,7 +167,7 @@ export function startSentry(config: SentryConfig): ErrorSink {
                 captureContext: { tags: { source } },
             })
         },
-        setUser,
+        setUser: (user) => setUser(user && { ...user }),
         traceRouter(router: DataRouter) {
             config.whenIdle(() => {
                 void import("./sentryTracing")

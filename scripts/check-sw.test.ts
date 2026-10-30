@@ -5,6 +5,7 @@ import {
     builtProblems,
     precacheProblems,
     precacheUrls,
+    sourceMapProblems,
     sourceProblems,
     telemetryProblems,
 } from "./check-sw.mjs"
@@ -127,6 +128,18 @@ describe("telemetry chunks", () => {
         ])
         expect(telemetryProblems([], [], vercel)).toEqual([
             "no telemetry chunks in assets/telemetry/",
+        ])
+    })
+
+    it("fails when a source map is left in dist/", () => {
+        expect(
+            sourceMapProblems([
+                "index.html",
+                "assets/index-AbC.js",
+                "assets/telemetry/sentry-X.js.map",
+            ]),
+        ).toEqual([
+            "assets/telemetry/sentry-X.js.map is a source map and would be served publicly",
         ])
     })
 })

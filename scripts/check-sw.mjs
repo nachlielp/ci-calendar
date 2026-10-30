@@ -8,7 +8,8 @@
 // `registerRoute` even when nothing calls it), plus what does survive in
 // the build (Supabase URLs, NetworkFirst's options). Prints the precache's
 // size. The telemetry SDKs' chunks (assets/telemetry/) must stay out of the
-// precache and be served immutable.
+// precache and be served immutable, and no source map may be left in dist/
+// (they would be public).
 //
 // Usage (after `vite build`): node scripts/check-sw.mjs
 
@@ -131,6 +132,13 @@ export function builtProblems(built) {
     return problems
 }
 
+/** Problems with the build's files (relative to dist/): source maps left. */
+export function sourceMapProblems(distFiles) {
+    return distFiles
+        .filter((file) => file.endsWith(".map"))
+        .map((file) => `${file} is a source map and would be served publicly`)
+}
+
 function main() {
     const dist = fileURLToPath(new URL("../dist", import.meta.url))
     const built = readFileSync(join(dist, "sw.js"), "utf8")
@@ -163,6 +171,9 @@ function main() {
         ...telemetryProblems(urls, telemetryFiles, vercelConfig),
         ...sourceProblems(source),
         ...builtProblems(built),
+        ...sourceMapProblems(
+            readdirSync(dist, { recursive: true }).map(String),
+        ),
     ]
     for (const problem of problems) console.error(`  ${problem}`)
     if (problems.length > 0) process.exit(1)

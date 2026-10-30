@@ -1193,11 +1193,17 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       (`#access_token=…`, `?code=…`, `?token=…&type=…`). Every URL
       telemetry sends goes through `scrubUrl` (`app/telemetry/scrubUrl.ts`):
       page views, PostHog's `before_send` (`$current_url`, referrers,
-      autocaptured links), Sentry's `beforeSend`/`beforeSendTransaction`/
-      `beforeBreadcrumb` (request URL, navigation and request breadcrumbs,
-      spans, replay events' URLs), replay recordings
-      (`beforeAddRecordingEvent`) and Speed Insights' `beforeSend`. Send a
-      URL some other way and you scrub it too.
+      autocaptured links), Sentry's `beforeSend`/`beforeSendSpan`/
+      `beforeBreadcrumb` (request URL and headers, navigation and request
+      breadcrumbs, streamed spans' names and attributes), its
+      `ScrubReplayEvents` processor (replay events' URLs, which
+      `beforeSend` never sees), replay recordings
+      (`beforeAddRecordingEvent`) and Speed Insights' `beforeSend`. Send
+      a URL some other way and you scrub it too. Sentry 11 streams spans
+      (no transactions, so no `beforeSendTransaction`) and collects
+      everything it can unless told otherwise: `DATA_COLLECTION`
+      (`sentry.ts`) keeps its earlier defaults (no IP address, cookies or
+      bodies).
     - **Reporting errors**: `services.telemetry.captureError` with the error
       and a `source` naming where it was caught (a Sentry tag). Each
       Error object is reported once, so reporting in a catch and again from a
@@ -1232,6 +1238,25 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   by hand by the maintainer; nothing applies them automatically.
 
 ## Maintainer notes
+
+- **Toolchain: Node 22** (`.nvmrc` 22 for CI, `engines` `22.x` for
+  Vercel, which overrides the dashboard's Node.js setting; Vitest 5 needs
+  22.12+). Move both together. `vite.config.ts` is typechecked
+  (`tsconfig.node.json`). Source maps are made only when
+  `SENTRY_AUTH_TOKEN` is set, and the Sentry plugin deletes them after
+  upload; `check:sw` fails if any is left in `dist/`.
+  Vite 8 bundles with Rolldown: build options live under
+  `build.rolldownOptions` (the telemetry `chunkFileNames`), and
+  console/debugger calls are dropped by its minifier
+  (`output.minify.compress`, production builds only; the old `esbuild`
+  option is gone). Modules `/` shares with lazy chunks (React, React
+  Router, some app modules) are their own chunks, all `modulepreload`ed
+  by `index.html`; `check:bundle` sums them. Held back (not trivial):
+  ESLint 10 (eslint-plugin-jsx-a11y doesn't support it),
+  eslint-plugin-react-hooks 7 (React Compiler rules flag six effects),
+  TypeScript 6/7, jsdom 29 (accessible names lose the space between
+  inline spans, which one test matches) and posthog-js 1.444 (its chunk
+  grows from ~52 to ~101 KB gzip).
 
 - **Bio photos: check the bucket, apply the storage migration.** The
   client uploads JPEG as `image/jpg` (legacy's type, the one known to be

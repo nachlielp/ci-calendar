@@ -21,10 +21,6 @@
     },
     "include": ["src/**/*", "scripts/**/*"],
     // The service worker has worker globals, not the DOM: src/sw/tsconfig.json.
-    "exclude": ["src/sw/sw.ts"],
-    "references": [
-        {
-            "path": "./tsconfig.node.json"
-        }
-    ]
+    "exclude": ["src/sw/sw.ts"]
+    // vite.config.ts runs in Node: tsconfig.node.json (`npm run typecheck`).
 }
