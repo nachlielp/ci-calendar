@@ -23,6 +23,8 @@ function setup() {
     const services = {
         data: fake.client,
         auth: fake.auth,
+        functions: fake.functions,
+        places: fake.places.load,
         now: () => new Date("2026-10-30T09:00:00Z"),
         storage: createMemoryStorage(),
         session: createMemoryStorage(),

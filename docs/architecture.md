@@ -11,32 +11,39 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 
 ## Layout
 
-| Folder                | Holds                                                         |
-| --------------------- | ------------------------------------------------------------- |
-| `src/app/`            | Bootstrap, services (the seam), routes, shell layout          |
-| `src/app/auth`        | Session at boot, profile row, sign-out cleanup, role guard    |
-| `src/app/header`      | App header, menu (items keyed by role), WhatsApp link         |
-| `src/app/install`     | Install banner, `beforeinstallprompt` capture, iOS steps      |
-| `src/app/updates`     | Service worker registration, safe reloads, the reload guard   |
-| `src/app/telemetry`   | Crash reports, analytics, Speed Insights; their lazy SDKs     |
-| `src/sw/`             | The service worker (`sw.ts`) and its cache rules              |
-| `src/data/`           | Backend client construction and generated database types      |
-| `src/features/*`      | One folder per feature: its pages, components, queries, tests |
-| `src/features/events` | Managed events and the shared event cache updates (below)     |
-| `src/lib/`            | Pure helpers (dates, formatting); tested directly             |
-| `src/ui/`             | Shared presentational primitives (dialog, buttons, icons)     |
-| `src/ui/form`         | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
-| `src/pages/`          | Simple pages (about, legal, 404) that belong to no feature    |
-| `src/test/`           | The fake backend and `renderApp`                              |
-| `src/assets/`         | Images, logos and the subset font ported from legacy          |
+| Folder                     | Holds                                                         |
+| -------------------------- | ------------------------------------------------------------- |
+| `src/app/`                 | Bootstrap, services (the seam), routes, shell layout          |
+| `src/app/auth`             | Session at boot, profile row, sign-out cleanup, role guard    |
+| `src/app/header`           | App header, menu (items keyed by role), WhatsApp link         |
+| `src/app/install`          | Install banner, `beforeinstallprompt` capture, iOS steps      |
+| `src/app/updates`          | Service worker registration, safe reloads, the reload guard   |
+| `src/app/telemetry`        | Crash reports, analytics, Speed Insights; their lazy SDKs     |
+| `src/sw/`                  | The service worker (`sw.ts`) and its cache rules              |
+| `src/data/`                | Backend client construction and generated database types      |
+| `src/features/*`           | One folder per feature: its pages, components, queries, tests |
+| `src/features/events`      | Managed events and the shared event cache updates (below)     |
+| `src/features/event-forms` | The event forms, their shared parts, saves and drafts         |
+| `src/lib/`                 | Pure helpers (dates, formatting); tested directly             |
+| `src/ui/`                  | Shared presentational primitives (dialog, buttons, icons)     |
+| `src/ui/form`              | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
+| `src/pages/`               | Simple pages (about, legal, 404) that belong to no feature    |
+| `src/test/`                | The fake backend and `renderApp`                              |
+| `src/assets/`              | Images, logos and the subset font ported from legacy          |
 
 ## Rules
 
 - **One seam.** Everything that talks to the backend gets it from
   `AppServices` (`useServices()` in components, an argument in query
-  factories): `services.data` (PostgREST) and `services.auth` (sign-in
-  state and actions). Nothing imports a module-level client. Tests pass the
-  fake at the same point; nothing else is mocked.
+  factories): `services.data` (PostgREST), `services.auth` (sign-in
+  state and actions) and `services.functions` (Edge Functions,
+  `data/functions.ts`: `invoke(name, { body })`, never throws; functions-js
+  is imported on the first call, so `/` doesn't carry it; each call
+  carries the token at hand, as data requests do). Browser capabilities
+  that load third-party code are services too, so tests count them:
+  `services.places` (Google Places, `data/places.ts`, below). Nothing
+  imports a module-level client. Tests pass the fake at the same point;
+  nothing else is mocked.
 - **No realtime.** Never import `@supabase/supabase-js` or
   `@supabase/realtime-js` (lint fails it). Use the sub-clients
   (`postgrest-js`, `auth-js`, `storage-js`, `functions-js`). The test setup
@@ -177,8 +184,11 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       Whenever the user ends or changes (here, another tab, a revoked
       refresh, an auth redirect over a stored session), `forgetUser` runs: every query whose kind is not in
       `PUBLIC_QUERY_KINDS` leaves the cache (so a new kind is personal by
-      default; list a public kind there), `PERSONAL_STORAGE_KEYS` leave
-      device storage (**add any personal key you store, e.g. a form draft**),
+      default; list a public kind there), every device storage key named
+      with `personalKey(name)` (`app/auth/personalStorage.ts`: the
+      `personal:` prefix, swept by prefix with legacy's draft prefixes, so
+      the app layer needn't know the features; **name any personal key you
+      store with it, e.g. a form draft**) is removed,
       sessionStorage is cleared (as legacy), and `telemetry.reset()`. The
       persisted cache holds public kinds only.
     - **Auth pages** (`features/auth`, lazy): `/login` (Google, email and
@@ -426,8 +436,8 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       reach the form.
     - **Unsaved work**: `useForm` calls `useBlockReload(isDirty)` itself, so
       no form is reloaded away under the visitor. `restore(draft)` loads a
-      draft kept on the device as unsaved changes; such a draft's key goes
-      in `PERSONAL_STORAGE_KEYS`.
+      draft kept on the device as unsaved changes; such a draft's key is a
+      `personalKey` (see `useFormDraft` under Event forms).
     - **Validation**: `validate(values)` is pure and returns, per path (a
       field's name, or a dotted path into a nested value:
       `segments.2.end`), a key of the form's own copy; legacy's rules and
@@ -457,6 +467,112 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       (legacy `general-action-btn black-btn large-btn` and `text-btn`), all
       in `Form.scss`. Labels come from the form's copy; `<form noValidate>`
       so the browser's own bubbles don't replace the form's messages.
+- **Event forms** (slice 13; `features/event-forms`, reuse these for the
+  multi-day form and templates, slices 14–16):
+    - **Values** (`eventFormValues.ts`, pure, tested directly): the shared
+      `EventBaseValues` (title, description, district, address
+      `{ label, placeId, enLabel? }`, organisations and teachers as `Tag`s,
+      links, prices with the sum as typed, `hidden`) and
+      `SingleDayValues` (`date`, `segments` with `HH:mm` times; legacy's
+      "first segment" is `segments[0]`). `validateBase`/`validateSingleDay`
+      are legacy's rules as path-keyed `EventFormError`s (`required`,
+      `datePast`: a new day before today, `notANumber`, `invalidUrl`: a
+      link must be http(s); one typed without a scheme gets `https://`,
+      `lib/webUrl.ts`, and is saved so). `baseColumns`,
+      `singleDayColumns` and `singleDayPatch` (changed columns only; a new
+      date rewrites the segments, whose instants carry the day) write
+      legacy's column names and JSON shapes; segment times are instants
+      from `jerusalemInstant(day, time)` (`lib/jerusalemInstant.ts`, kept
+      off `/`). `singleDayValuesOf(event)` reads a `ManagedEvent` back.
+      `isSingleDayValues` checks a draft's shape. `taggedUserIds` is legacy
+      `getCIEventTeachers` (teacher and organisation ids, not typed names).
+    - **Parts** (`EventFormParts.tsx`, words in `EVENT_FORM_COPY`):
+      `SegmentFields` (type, native `type="time"` inputs with a 5-minute
+      step, teachers, audience tags; legacy's course notice),
+      `MoreSegments`, `LinksFields`, `PricesFields`, `AddButton` /
+      `RemoveButton`. Each takes its value, the form's `errors` and a change
+      `(change, path) => form.update(field, change, path)`, so any `useForm`
+      form can use them. Dates are native `type="date"` `TextField`s.
+      `TagPicker` (`ui/form`) is legacy's tags/multiple Select: chips plus
+      an ARIA combobox over a listbox; `allowTyped` adds a typed name as
+      `{ label: name, value: name }` (legacy's untagged teachers).
+      `AddressField` is legacy's GooglePlacesInput (below).
+    - **Who can be tagged**: `taggableBiosQuery` (personal: one request for
+      bios with `allow_tagging` and a name, plus the user's own) and the
+      pure `taggableOptions` (legacy's lists: orgs apart, the user's own bio
+      offered first, an org itself among organisations).
+    - **Saves** (`eventSave.ts`): `useCreateEvent` (id made once per form;
+      a duplicate on resend reads the stored event) and `useUpdateEvent`
+      (`.eq("id").eq("user_id")`, `maybeSingle`; none back is
+      `EventGoneError` and every event list is refetched). First, in
+      parallel, the title's translations (`translateTitle`, en and ru, as
+      `lng_titles`) and, only if the address field couldn't get it when the
+      place was picked, the English address (`en_label`, from
+      `services.places`); an edit asks only for a changed title or a newly
+      picked place. Each falls back to the source text and never fails or
+      holds the save: after `LOOKUP_TIMEOUT_MS` (5 s, `lib/timeout.ts`,
+      `withTimeout`) it goes on without. A language that failed is left out
+      of `lng_titles` (legacy stored the Hebrew title there; every reader,
+      legacy's `getTitleByLanguage` included, falls back to the title
+      anyway); a failed address has no `en_label`. Then the write,
+      selecting `MANAGED_EVENT_COLUMNS`, then junction rows for the tagged
+      users not yet tagged (`ci_events_users_junction`, inserted returning
+      their bios, merged into the event; a failure there is reported and
+      leaves the saved event without them). Legacy never deleted junction
+      rows and neither does this: a removed tag no longer names the bio,
+      so it doesn't show. The result goes to `applyEventChanges`.
+    - **Drafts** (`eventDraft.ts`, keys in `draftKeys.ts`, `personalKey`s):
+      `useFormDraft({ key, userId, eventId, saved, form, isValues })` keeps
+      only the form's `changes` while it is dirty and removes them once it
+      is clean again; when the form mounts, if the draft is the same user's
+      for the same event, it restores (`form.restore`) those fields over
+      `saved` as it is then, so a field the user didn't touch shows the
+      server's newer value. It returns `discard` (after a save, on "clear
+      form"). A new event's draft survives leaving the page (legacy's); an
+      edit's is dropped by the page's back button but survives a reload.
+    - **Pages**: `/create-events` (legacy's chooser; the missing-bio
+      warning; templates come with slice 16), `/create-events/single-day`
+      (back to `/create-events` after a save, as legacy), and
+      `/manage-events/edit-single-day/:eventId` (`myEventQuery`, personal,
+      the user's own event by id, at once from the cached upcoming list;
+      registered as an event list; a multi-day event redirects to its own
+      form; back to `/manage-events`). Layout in `FormPage.scss`.
+- **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
+  JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
+  first call (`data/googlePlaces.ts`, its own chunk; a script tag with
+  `language=he&region=IL`) and returns `session()`: one search billed as
+  one session (an `AutocompleteSessionToken`): `suggest(input)`
+  (`AutocompleteService`, what legacy's react-google-places-autocomplete
+  called) while typing, then `englishAddress(placeId)`
+  (`PlacesService.getDetails`, legacy's) for the picked place, which ends
+  the session; plus a sessionless `englishAddress` (a save's fallback).
+  `AddressField` loads it when focused, never before; typing asks after a
+  300 ms pause; picking sets the address and then its `enLabel` (5 s at
+  most); picking the address already set keeps it, English label and all.
+  So a save, a restored draft's included, normally needs no lookup and
+  never loads the script. Tests get `fake.places` and assert
+  `fake.places.loads` and the sessions in `fake.places.calls`. Future
+  work: Google deprecated these two services for new projects in favour
+  of `AutocompleteSuggestion` and `Place.fetchFields` (Places API (New));
+  moving needs that API enabled on the key.
+- **Machine translation.** Only through the `translate` Edge Function
+  (`data/translate.ts`: `translateText`, `translateTitle`; the Google key
+  is server-side; a test fails if any source names Google's Translate
+  endpoint). It never rejects (`translateOrNull`: `null` on failure or
+  after `LOOKUP_TIMEOUT_MS`; `translateText`: the source text) and
+  remembers each text and language for the session. The event details
+  translate, in English and Russian, what legacy did
+  (`detailsTranslation.ts`: description, link and price titles, names of
+  organisations and multi-day teachers without a bio), one query per text,
+  showing the Hebrew until each arrives. They are kept on the device across
+  visits (`translationStore.ts`, `detailsTranslations` in
+  `services.storage`, read with the details' chunk only): keyed by language
+  and the Hebrew text itself (an edited text is simply a new key, so no
+  `updated_at` is needed in the public payload), bounded to 200 entries and
+  100,000 characters, oldest out first; public data, so kept across users.
+  Links the details render (event links, bio pages) go through `webLinks`:
+  http(s) only, a scheme-less one as https, anything else (a stored
+  `javascript:`) dropped.
 - **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
   Every slice that adds copy follows this:
     - **Copy is per component**, declared with `defineCopy({ he, en, ru })`
@@ -557,7 +673,10 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
   and Back returns to where the visitor was. A route's `handle`
   (`RouteHandle`, `app/routeHandle.ts`) tells the shell about it, e.g.
   `homeButton` on the text pages. `services.reload()` reloads the page
-  (tests count the calls); slice 7's update prompt should use it too. The
+  (tests count the calls); slice 7's update prompt should use it too.
+  While a lazy route's code downloads, the page stays and `PageLoading`
+  shows a thin bar along the top (after 150 ms, so quick loads don't
+  flash it), with "loading" for screen readers. The
   footer's version button is legacy's "reset the app": `resetDevice` clears
   device storage except `KEPT_ON_RESET` (`isInternal`), unregisters service
   workers and deletes Cache Storage, then the page reloads. Add a key to
@@ -701,6 +820,18 @@ feature helpers is tested directly.
   first. Each recorded data request has the `token` it was sent with (`null`
   = anon key), its `method` and, for inserts, the `body`;
   `fake.rows(table)` seeds or reads a table live.
+- **Edge Functions and Places:** `fake.functions` records each `invoke`
+  (`calls`: name, body, token); a function answers through
+  `handle(name, handler)` (`fakeTranslation` makes `"<text> [<lang>]"`)
+  and fails without one (`fail(name)` too); `hold(name)`/`release(name)`
+  delay it. `fake.places` (`services.places`) counts `loads`, suggests
+  seeded `places` whose label contains the input, and records `calls`
+  with their session (a number per `session()`, `null` outside one);
+  `failEnglish()`, `hangEnglish()` (never answers) and `healEnglish()`
+  steer English lookups. Timeouts: fake timers with `shouldAdvanceTime` keep user-event working, and `advanceTimersByTimeAsync(LOOKUP_TIMEOUT_MS)` skips a hung lookup. `insert([...])` adds several rows
+  (recorded as `rows`, not `body`), each given an `id` if it has none.
+  Translations are remembered per session; `setup.ts` forgets them after
+  each test.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
   `fake.answerLate(match)` answers the next matching request with the data
@@ -839,3 +970,21 @@ feature helpers is tested directly.
     `useToday` lets `select` drop passed days after midnight. The fake
     gained `lt`/`gt`/`in`/`or`/`limit`/`range`/`delete`, multiple orders
     and `answerLate` (an answer computed when sent, delivered later).
+13. Single-day event form: `/create-events` (legacy's chooser, the
+    missing-bio warning), `/create-events/single-day` and
+    `/manage-events/edit-single-day/:eventId` (lazy, creator/org/admin; a
+    loading bar while a route's code downloads). Legacy's form on
+    `useForm`: title, description, district, Google Places address (the
+    script loads when the field is focused), native date and time inputs,
+    organisations, segments (type, times, teachers tagged or typed, audience
+    tags), links, prices and a hide (draft) switch, with legacy's rules as
+    path-keyed errors. Saves translate the title (`translate` function,
+    through the new `services.functions`) and look up the English address
+    in parallel, never blocking; create inserts with a client id, edit
+    updates the changed columns of the user's own event; tagged users get
+    junction rows; the stored event updates the calendar, shared links and
+    my events at once (`applyEventChanges`). Unsaved values are kept on the
+    device (personal keys, only the changed fields) and restored. Shared parts (values, segment,
+    link and price fields, `TagPicker`, `AddressField`, saves, drafts) for
+    slices 14–16. The event details now machine-translate what legacy did
+    in English and Russian.

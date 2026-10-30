@@ -32,6 +32,8 @@ import {
 import { EVENT_LOCALES } from "../eventLocales"
 import type { PublicBio, PublicEvent, Tag } from "../publicEvent"
 import { BioCard } from "./BioCard"
+import { useTranslated } from "./detailsTranslation"
+import { webLinks } from "./webLinks"
 import "./EventDetails.scss"
 
 const COPY = defineCopy({
@@ -71,6 +73,8 @@ const COPY = defineCopy({
 export function EventDetails({ event }: { event: PublicEvent }) {
     const copy = useCopy(COPY)
     const locale = useCopy(EVENT_LOCALES)
+    const translated = useTranslated(event, locale.language)
+    const links = webLinks(event.links)
     const timeRange = eventTimeRange(event)
     return (
         <section className="full-event-card">
@@ -84,7 +88,11 @@ export function EventDetails({ event }: { event: PublicEvent }) {
             {event.organisations.length > 0 && (
                 <p className="event-row">
                     <DomainIcon className="event-icon" />
-                    <People event={event} tags={event.organisations} />
+                    <People
+                        event={event}
+                        tags={event.organisations}
+                        translated={translated}
+                    />
                 </p>
             )}
             <p className="event-row">
@@ -110,7 +118,11 @@ export function EventDetails({ event }: { event: PublicEvent }) {
             {event.multiDayTeachers.length > 0 && (
                 <p className="event-row">
                     <PersonIcon className="event-icon" />
-                    <People event={event} tags={event.multiDayTeachers} />
+                    <People
+                        event={event}
+                        tags={event.multiDayTeachers}
+                        translated={translated}
+                    />
                 </p>
             )}
             {event.segments.map((segment, index) => (
@@ -138,9 +150,9 @@ export function EventDetails({ event }: { event: PublicEvent }) {
                     </span>
                 ))}
             </p>
-            {event.links.length > 0 && (
+            {links.length > 0 && (
                 <p className="event-links">
-                    {event.links.map((link) => (
+                    {links.map((link) => (
                         <a
                             key={link.url}
                             className="link-button"
@@ -148,7 +160,7 @@ export function EventDetails({ event }: { event: PublicEvent }) {
                             target="_blank"
                             rel="noreferrer"
                         >
-                            {link.title}
+                            {translated(link.title)}
                             <OpenInNewIcon className="link-icon" />
                         </a>
                     ))}
@@ -158,7 +170,9 @@ export function EventDetails({ event }: { event: PublicEvent }) {
                 <>
                     <hr className="hr" />
                     <h3 className="section-title">{copy.additionalInfo}</h3>
-                    <p className="event-description">{event.description}</p>
+                    <p className="event-description">
+                        {translated(event.description)}
+                    </p>
                 </>
             )}
             {event.prices.length > 0 && (
@@ -166,7 +180,14 @@ export function EventDetails({ event }: { event: PublicEvent }) {
                     <hr className="hr" />
                     <h3 className="section-title">{copy.price}</h3>
                     <p className="event-price">
-                        {event.prices.map(priceLabel).join(", ")}
+                        {event.prices
+                            .map((price) =>
+                                priceLabel({
+                                    ...price,
+                                    title: translated(price.title),
+                                }),
+                            )
+                            .join(", ")}
                     </p>
                 </>
             )}
@@ -175,8 +196,19 @@ export function EventDetails({ event }: { event: PublicEvent }) {
     )
 }
 
-/** Names, comma separated; those with a public bio open it. */
-function People({ event, tags }: { event: PublicEvent; tags: Tag[] }) {
+/**
+ * Names, comma separated; those with a public bio open it. Names without
+ * one go through `translated` where legacy translated them.
+ */
+function People({
+    event,
+    tags,
+    translated = (name) => name,
+}: {
+    event: PublicEvent
+    tags: Tag[]
+    translated?: (name: string) => string
+}) {
     return (
         <span className="event-labels">
             {tags.map((tag, index) => {
@@ -188,7 +220,7 @@ function People({ event, tags }: { event: PublicEvent; tags: Tag[] }) {
                             <BioButton bio={bio} />
                         ) : (
                             <span className="teacher-name-label">
-                                {tag.label}
+                                {translated(tag.label)}
                             </span>
                         )}
                     </Fragment>

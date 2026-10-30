@@ -101,6 +101,44 @@
     }
 }
 
+// A combobox's dropdown (antd Select's): `TagPicker`, the address field.
+.combobox-field {
+    position: relative;
+}
+
+.form-options {
+    position: absolute;
+    z-index: 10;
+    top: 100%;
+    inset-inline: 0;
+    max-height: 256px;
+    margin: 4px 0 0;
+    padding: 4px;
+    overflow-y: auto;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow:
+        0 6px 16px 0 rgb(0 0 0 / 8%),
+        0 3px 6px -4px rgb(0 0 0 / 12%);
+    list-style: none;
+
+    &[hidden] {
+        display: none;
+    }
+}
+
+.form-option {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 20px;
+    cursor: pointer;
+
+    &[aria-selected="true"],
+    &:hover {
+        background: rgb(0 0 0 / 4%);
+    }
+}
+
 // antd's Switch with its words inside.
 .switch-field {
     display: flex;
@@ -178,6 +216,11 @@
     &.form-alert-error {
         border-color: #ffccc7;
         background-color: #fff2f0;
+    }
+
+    &.form-alert-warning {
+        border-color: #ffe58f;
+        background-color: #fffbe6;
     }
 
     &.form-alert-info {

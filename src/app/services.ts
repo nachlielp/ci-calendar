@@ -1,6 +1,8 @@
 import { createContext, useContext } from "react"
 import type { Auth } from "../data/auth"
 import type { DataClient } from "../data/client"
+import type { Functions } from "../data/functions"
+import type { PlacesLoader } from "../data/places"
 import type { DeviceStorage } from "./deviceStorage"
 import type { Telemetry } from "./telemetry/telemetry"
 import type { AppUpdates } from "./updates/updates"
@@ -10,6 +12,13 @@ export interface AppServices {
     data: DataClient
     /** Sign-in state and actions (data/auth.ts); boot never waits on it. */
     auth: Auth
+    /** Edge Functions (data/functions.ts): the `translate` function. */
+    functions: Functions
+    /**
+     * Google Places (data/places.ts), loaded on first use: address
+     * autocomplete and English addresses. Tests count the loads.
+     */
+    places: PlacesLoader
     now: () => Date
     /** Device storage for the persisted query cache (app/persistedCache.ts). */
     storage: DeviceStorage

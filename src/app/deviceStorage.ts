@@ -2,7 +2,9 @@
 export type DeviceStorage = Pick<
     Storage,
     "getItem" | "setItem" | "removeItem" | "clear"
->
+> &
+    /** To list the keys (sign-out's sweep of personal keys). */
+    Partial<Pick<Storage, "key" | "length">>
 
 /**
  * The browser's localStorage (or sessionStorage, which lasts one tab's
@@ -25,6 +27,10 @@ export function browserStorage(
 export function createMemoryStorage(): DeviceStorage {
     const items = new Map<string, string>()
     return {
+        get length() {
+            return items.size
+        },
+        key: (index) => [...items.keys()][index] ?? null,
         getItem: (key) => items.get(key) ?? null,
         setItem: (key, value) => {
             items.set(key, String(value))

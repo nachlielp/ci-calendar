@@ -109,6 +109,27 @@ export const routes: RouteObject[] = [
                             import("../features/manage-events/ManageEventsPage"),
                     ),
                 },
+                {
+                    path: "create-events",
+                    lazy: lazyPage(
+                        () =>
+                            import("../features/event-forms/CreateEventsPage"),
+                    ),
+                },
+                {
+                    path: "create-events/single-day",
+                    lazy: lazyPage(
+                        () =>
+                            import("../features/event-forms/SingleDayFormPage"),
+                    ),
+                },
+                {
+                    path: "manage-events/edit-single-day/:eventId",
+                    lazy: lazyPage(
+                        () =>
+                            import("../features/event-forms/EditSingleDayFormPage"),
+                    ),
+                },
             ]),
             {
                 path: "*",

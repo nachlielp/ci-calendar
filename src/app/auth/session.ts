@@ -3,6 +3,7 @@ import { LINKED_EVENT_KIND } from "../../features/calendar/linkedEvent"
 import { PUBLIC_WINDOW_KIND } from "../../features/calendar/publicWindow"
 import { afterLoadAndIdle } from "../afterLoadAndIdle"
 import type { AppServices } from "../services"
+import { forgetPersonalKeys } from "./personalStorage"
 import { PROFILE_KIND, profileQuery, recordSignIn } from "./profile"
 
 /**
@@ -14,14 +15,6 @@ export const PUBLIC_QUERY_KINDS: readonly string[] = [
     PUBLIC_WINDOW_KIND,
     LINKED_EVENT_KIND,
 ]
-
-/**
- * Device storage keys (`services.storage`) holding a user's own data,
- * removed on sign-out. A later slice that keeps something personal on the
- * device (an event form's draft) adds its key here. The auth session's own
- * keys are removed by `auth.signOut()`.
- */
-export const PERSONAL_STORAGE_KEYS: readonly string[] = []
 
 /**
  * Forgets the user who was signed in: their queries (personal and admin)
@@ -38,13 +31,9 @@ export function forgetUser(
         predicate: (query) =>
             !PUBLIC_QUERY_KINDS.includes(query.queryKey[0] as string),
     })
-    for (const key of PERSONAL_STORAGE_KEYS) {
-        try {
-            storage.removeItem(key)
-        } catch {
-            // Blocked storage holds nothing.
-        }
-    }
+    // Keys named with `personalKey` (./personalStorage.ts); the auth
+    // session's own keys are removed by `auth.signOut()`.
+    forgetPersonalKeys(storage)
     try {
         session.clear()
     } catch {

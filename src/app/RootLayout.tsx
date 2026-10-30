@@ -4,6 +4,7 @@ import {
     Link,
     Outlet,
     ScrollRestoration,
+    useNavigation,
     useRouteError,
     type Location,
     type UIMatch,
@@ -68,9 +69,25 @@ export function RootLayout() {
             <div className="app-content">
                 <InstallBanner />
                 <AppHeader />
+                <PageLoading />
                 <Outlet />
             </div>
             <ScrollRestoration getKey={scrollKey} />
+        </div>
+    )
+}
+
+/**
+ * While the next page's code (a lazy route) downloads, the current page
+ * stays and a bar along the top says the next one is coming (after a short
+ * delay, in CSS, so fast loads don't flash it).
+ */
+function PageLoading() {
+    const common = useCopy(COMMON_COPY)
+    if (useNavigation().state !== "loading") return null
+    return (
+        <div className="page-loading-bar" role="status">
+            <span className="visually-hidden">{common.loading}</span>
         </div>
     )
 }

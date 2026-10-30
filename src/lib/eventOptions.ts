@@ -19,6 +19,16 @@ export const EVENT_TYPES = [
 /** The types a multi-day event can have. */
 export const MULTI_DAY_TYPES = ["workshop", "retreat", "course"] as const
 
+/** Segment audience tags, in the order they are offered. */
+export const TAGS = [
+    "everyone",
+    "beginner",
+    "advanced",
+    "male",
+    "female",
+    "preRegistration",
+] as const
+
 export const DISTRICTS = [
     "center",
     "jerusalem",

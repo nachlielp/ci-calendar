@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom"
 import { focusManager, onlineManager } from "@tanstack/react-query"
 import { afterEach } from "vitest"
+import { clearTranslationMemory } from "../data/translate"
 import { browserConditions, resetBrowserConditions } from "./browser"
 
 // The app has no realtime by design (spec #34). Any code path that opens a
@@ -23,6 +24,8 @@ afterEach(() => {
     // index.html's language, which a test that switched it must not leak.
     document.documentElement.lang = "he"
     document.documentElement.dir = "rtl"
+    // Translations are remembered per session (data/translate.ts).
+    clearTranslationMemory()
 })
 
 // jsdom has <dialog> but not its modal API. This stands in for what the

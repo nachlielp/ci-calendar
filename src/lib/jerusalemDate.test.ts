@@ -9,6 +9,7 @@ import {
     jerusalemToday,
     weekday,
 } from "./jerusalemDate"
+import { jerusalemInstant } from "./jerusalemInstant"
 
 describe("jerusalemToday", () => {
     it("flips at midnight in Jerusalem, not UTC", () => {
@@ -64,5 +65,33 @@ describe("numeric day labels", () => {
         expect(dayRangeLabel("2026-11-01", "2026-11-03")).toBe(
             "01/11/2026 - 03/11/2026",
         )
+    })
+})
+
+describe("jerusalemInstant", () => {
+    it("is the instant Jerusalem's clock shows the time on that day", () => {
+        // Winter (UTC+2) and summer (UTC+3).
+        expect(jerusalemInstant("2026-11-01", "19:00")).toBe(
+            "2026-11-01T17:00:00.000Z",
+        )
+        expect(jerusalemInstant("2026-07-01", "19:00")).toBe(
+            "2026-07-01T16:00:00.000Z",
+        )
+        expect(jerusalemInstant("2026-11-01", "00:30")).toBe(
+            "2026-10-31T22:30:00.000Z",
+        )
+    })
+
+    it("reads back as the same time of day", () => {
+        for (const day of ["2026-03-27", "2026-10-25", "2026-12-31"]) {
+            for (const time of ["00:00", "01:55", "09:05", "23:55"]) {
+                expect(jerusalemTimeOfDay(jerusalemInstant(day, time))).toBe(
+                    time,
+                )
+                expect(
+                    jerusalemToday(new Date(jerusalemInstant(day, time))),
+                ).toBe(day)
+            }
+        }
     })
 })

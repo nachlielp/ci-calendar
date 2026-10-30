@@ -87,3 +87,46 @@
     color: #ffffff;
     cursor: pointer;
 }
+
+// The next page is loading (`PageLoading`): a thin bar along the top,
+// shown only if the load takes a moment.
+.page-loading-bar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 1000;
+    height: 3px;
+    overflow: hidden;
+    opacity: 0;
+    animation: page-loading-show 0s 150ms forwards;
+
+    &::after {
+        content: "";
+        display: block;
+        width: 40%;
+        height: 100%;
+        background: #bc3528;
+        animation: page-loading-slide 1s ease-in-out infinite;
+    }
+}
+
+@keyframes page-loading-show {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes page-loading-slide {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(250%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-loading-bar::after {
+        width: 100%;
+        animation: none;
+    }
+}

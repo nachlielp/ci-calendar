@@ -3,6 +3,7 @@ import { defineCopy } from "../../../lib/copy"
 import { OpenInNewIcon } from "../../../ui/icons/OpenInNewIcon"
 import type { PublicBio } from "../publicEvent"
 import "./BioCard.scss"
+import { webLinks } from "./webLinks"
 
 const COPY = defineCopy({
     he: {
@@ -22,6 +23,7 @@ const COPY = defineCopy({
 /** A teacher's or organisation's public bio (legacy BioCard). */
 export function BioCard({ bio }: { bio: PublicBio }) {
     const copy = useCopy(COPY)
+    const links = webLinks(bio.links)
     return (
         <section className="bio-card">
             <h2 className="bio-card-title">{bio.name}</h2>
@@ -36,9 +38,9 @@ export function BioCard({ bio }: { bio: PublicBio }) {
                     decoding="async"
                 />
             )}
-            {bio.links.length > 0 && (
+            {links.length > 0 && (
                 <p className="bio-card-links">
-                    {bio.links.map((link) => (
+                    {links.map((link) => (
                         <a
                             key={link.url}
                             className="teacher-page-link"

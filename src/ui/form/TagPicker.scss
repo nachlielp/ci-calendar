@@ -1,0 +1,68 @@
+// antd's large multiple/tags Select (legacy `form-input-large`): chips in
+// the box, the matches in a dropdown under it.
+
+.tag-picker-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding-block: 3px;
+    cursor: text;
+
+    &:focus-within {
+        border-color: #4096ff;
+        box-shadow: 0 0 0 2px rgb(5 145 255 / 10%);
+    }
+}
+
+.tag-picker-chips {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tag-picker-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding-inline: 8px 4px;
+    border-radius: 4px;
+    background: rgb(0 0 0 / 6%);
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.tag-picker-remove {
+    display: inline-flex;
+    padding: 0;
+    border: none;
+    background: none;
+    color: rgb(0 0 0 / 45%);
+    cursor: pointer;
+
+    &:hover {
+        color: #000;
+    }
+}
+
+.tag-picker-remove-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.tag-picker-input {
+    flex: 1;
+    min-width: 6ch;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #000;
+    font-size: 20px;
+    font-weight: 500;
+
+    &::placeholder {
+        color: rgb(0 0 0 / 25%);
+    }
+}

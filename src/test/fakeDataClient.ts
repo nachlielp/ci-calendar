@@ -1,5 +1,7 @@
 import type { DataClient } from "../data/client"
 import { createFakeAuth, type FakeAuth } from "./fakeAuth"
+import { createFakeFunctions, type FakeFunctions } from "./fakeFunctions"
+import { createFakePlaces, type FakePlaces } from "./fakePlaces"
 
 // The single test seam: a fake of the data client that behaves like a tiny
 // PostgREST. Seeded rows live per table; each query applies the predicates it
@@ -20,7 +22,10 @@ import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 // sent with. `insert(row).select().single()` adds a row (and returns it as
 // stored, with its serial number, SERIAL_COLUMNS). Requests to a table
 // can be made to fail, or held until the test releases them (a slow
-// network). `auth` is the fake's Supabase auth (./fakeAuth.ts).
+// network). `insert([rows])` adds several (`ci_events_users_junction`).
+// `auth` is the fake's Supabase auth (./fakeAuth.ts), `functions` its Edge
+// Functions (./fakeFunctions.ts) and `places` stands in for Google Places
+// (./fakePlaces.ts).
 
 type Row = Record<string, unknown>
 
@@ -85,6 +90,8 @@ export interface RecordedRequest {
     method: "select" | "insert" | "update" | "delete"
     /** The row an insert sent, or the values an update set. */
     body?: Row
+    /** The rows a multi-row insert (`insert([...])`) sent. */
+    rows?: Row[]
     /**
      * The access token the request carried when it was sent; `null` for the
      * anon key (signed out, or the token at hand had expired).
@@ -106,6 +113,10 @@ export interface FakeDataClient {
     client: DataClient
     /** The fake's Supabase auth (`services.auth`). */
     auth: FakeAuth
+    /** The fake's Edge Functions (`services.functions`). */
+    functions: FakeFunctions
+    /** Google Places as the app sees it (`services.places`). */
+    places: FakePlaces
     requests: RecordedRequest[]
     /** The rows of `table`, live: seed more, or check what was written. */
     rows(table: string): Row[]
@@ -182,10 +193,15 @@ function matchesTree(row: Row, tree: string, logic: "and" | "or"): boolean {
         if (!["eq", "neq", "lt", "lte", "gt", "gte"].includes(op)) {
             throw new Error(`fake: no ${op} in or()`)
         }
+        // PostgREST compares a logic tree's values as text.
+        const value = rest.join(".")
+        if (op === "eq") return String(row[column]) === value
+        if (op === "neq")
+            return row[column] != null && String(row[column]) !== value
         return matches(row, {
             op: op as RecordedFilter["op"],
             column,
-            value: rest.join("."),
+            value,
         })
     })
     return logic === "and" ? results.every(Boolean) : results.some(Boolean)
@@ -231,6 +247,8 @@ export function createFakeDataClient(
     seed: Record<string, Row[]> = {},
 ): FakeDataClient {
     const auth = createFakeAuth()
+    const functions = createFakeFunctions(() => auth.accessToken())
+    const places = createFakePlaces()
     const requests: RecordedRequest[] = []
     const failures = new Map<string, string>()
     const held = new Map<string, (() => void)[]>()
@@ -259,9 +277,10 @@ export function createFakeDataClient(
                 request.select = columns.replace(/\s+/g, "")
                 return builder
             },
-            insert(row: Row) {
+            insert(row: Row | Row[]) {
                 request.method = "insert"
-                request.body = row
+                if (Array.isArray(row)) request.rows = row
+                else request.body = row
                 return builder
             },
             update(values: Row) {
@@ -409,10 +428,18 @@ export function createFakeDataClient(
 
         beforeExecute?.(request)
         const table = (seed[request.table] ??= [])
-        let inserted: Row | undefined
-        if (request.method === "insert" && request.body) {
-            // Every table the app inserts into has a unique `id`.
-            if (table.some((row) => row.id === request.body!.id)) {
+        let inserted: Row[] | undefined
+        if (request.method === "insert") {
+            const body = request.rows ?? (request.body ? [request.body] : [])
+            // Every table the app inserts into has a unique `id` (sent by
+            // the client, or the column's default).
+            if (
+                body.some(
+                    (row) =>
+                        row.id != null &&
+                        table.some((other) => other.id === row.id),
+                )
+            ) {
                 return {
                     data: null,
                     error: {
@@ -422,17 +449,19 @@ export function createFakeDataClient(
                     },
                 }
             }
-            const row = { ...request.body }
-            const serial = SERIAL_COLUMNS[request.table]
-            if (serial && row[serial] == null) {
-                row[serial] =
-                    Math.max(
-                        0,
-                        ...table.map((other) => Number(other[serial])),
-                    ) + 1
-            }
-            table.push(row)
-            inserted = row
+            inserted = body.map((sent) => {
+                const row: Row = { id: crypto.randomUUID(), ...sent }
+                const serial = SERIAL_COLUMNS[request.table]
+                if (serial && row[serial] == null) {
+                    row[serial] =
+                        Math.max(
+                            0,
+                            ...table.map((other) => Number(other[serial])),
+                        ) + 1
+                }
+                table.push(row)
+                return row
+            })
         }
         // An update returns the rows its filters matched before it changed
         // them (`UPDATE … WHERE … RETURNING`).
@@ -450,9 +479,7 @@ export function createFakeDataClient(
 
         let rows =
             request.method === "insert"
-                ? inserted
-                    ? [inserted]
-                    : []
+                ? (inserted ?? [])
                 : (updated ?? deleted ?? where(request.table, ""))
         if (request.order.length > 0) {
             rows = [...rows].sort((a, b) => {
@@ -487,6 +514,8 @@ export function createFakeDataClient(
     return {
         client: { from } as unknown as DataClient,
         auth,
+        functions,
+        places,
         requests,
         rows: (table) => (seed[table] ??= []),
         beforeExecute: (callback) => {

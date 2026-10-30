@@ -268,12 +268,12 @@ export function Switch({
     )
 }
 
-/** Legacy's antd `Alert`: an error, a notice, or a success. */
+/** Legacy's antd `Alert`: an error, a warning, a notice, or a success. */
 export function FormAlert({
     kind,
     children,
 }: {
-    kind: "error" | "info" | "success"
+    kind: "error" | "warning" | "info" | "success"
     children: ReactNode
 }) {
     return (

@@ -1,0 +1,103 @@
+// Legacy single-day-form-page.scss and create-events-page.scss. The window
+// scrolls (not the page, unlike legacy), so its scroller and fade are gone.
+
+.single-day-form-page {
+    position: relative;
+    padding: 0 16px;
+    color: #000;
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin: 8px auto;
+        padding: 8px;
+
+        .title {
+            flex: 1;
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+    }
+
+    .general-action-btn {
+        display: flex;
+        padding: 5px 16px;
+        border: none;
+        border-radius: 6px;
+        background-color: #444;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 21px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #222;
+        }
+    }
+
+    .form-container {
+        margin: 8px auto;
+        padding: 16px;
+        border-radius: 16px;
+        background-color: white;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        padding: 0 2px;
+
+        .form-container {
+            padding: 8px;
+        }
+    }
+}
+
+.create-events-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px;
+
+    .alerts-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .btns-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 50px;
+        width: 350px;
+        max-width: 100%;
+        margin-top: 1rem;
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #bf5340;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    }
+}

@@ -69,6 +69,8 @@ export function renderApp({
     const services: AppServices = {
         data: fake.client,
         auth: fake.auth,
+        functions: fake.functions,
+        places: fake.places.load,
         now: () => now,
         storage,
         session,
