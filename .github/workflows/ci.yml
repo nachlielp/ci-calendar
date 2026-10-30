@@ -32,3 +32,6 @@ jobs:
 
             - name: Build
               run: npm run build
+
+            - name: Bundle size limit
+              run: npm run check:bundle

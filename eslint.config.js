@@ -7,6 +7,8 @@ import jsxA11y from "eslint-plugin-jsx-a11y"
 
 export default tseslint.config(
     {
+        // `legacy/` is the old client, kept read-only as a porting reference
+        // until the rewrite cuts over (spec #34); it is not built or checked.
         // `supabase/functions/**` runs on Deno (its own `Deno` global, remote
         // imports, and `deno lint`), not this Node/browser toolchain.
         ignores: [
@@ -16,6 +18,8 @@ export default tseslint.config(
             "node_modules",
             "public",
             "supabase/functions",
+            "legacy",
+            ".claude",
         ],
     },
     js.configs.recommended,
@@ -61,7 +65,7 @@ export default tseslint.config(
     },
     // Config files and plain-JS entry points run in a mixed Node/browser env.
     {
-        files: ["**/*.js", "*.config.{js,ts}"],
+        files: ["**/*.{js,mjs}", "*.config.{js,ts}"],
         languageOptions: {
             globals: { ...globals.browser, ...globals.node },
         },

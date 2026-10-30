@@ -1,74 +1,10 @@
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
-import { VitePWA, VitePWAOptions } from "vite-plugin-pwa"
 import { visualizer } from "rollup-plugin-visualizer"
-import pkg from "./package.json"
 
-const timestamp = new Date().getTime()
-const buildVersion = `${pkg.version}-${timestamp}`
-//
-const manifestForPlugin: Partial<VitePWAOptions> = {
-    disable: false,
-    registerType: "autoUpdate",
-    includeAssets: ["ci-logo-512-bg.png", "ci-logo-192-bg.png"],
-    manifest: {
-        name: "CI Events Israel",
-        short_name: "CI Events",
-        description:
-            "Contact Improvisation events in Israel - ג'אמים, שיעורים, סדנאות",
-        icons: [
-            {
-                src: "/ci-logo-192-bg.png",
-                sizes: "192x192",
-                type: "image/png",
-                purpose: "any",
-            },
-            {
-                src: "/ci-logo-512-bg.png",
-                sizes: "512x512",
-                type: "image/png",
-                purpose: "any maskable",
-            },
-        ],
-        theme_color: "#171717",
-        background_color: "#e8ebf2",
-        display: "standalone",
-        scope: "/",
-        start_url: "/",
-        orientation: "portrait",
-        related_applications: [],
-        prefer_related_applications: false,
-        shortcuts: [],
-        categories: [],
-        share_target: {
-            action: "/",
-            method: "GET",
-            params: {
-                title: "title",
-                text: "text",
-                url: "url",
-            },
-        },
-    },
-    workbox: {
-        runtimeCaching: [
-            {
-                urlPattern: () => true, // Match all routes
-                handler: "NetworkFirst",
-                options: {
-                    cacheName: `api-cache-${buildVersion}`,
-                },
-            },
-        ],
-        navigateFallback: "index.html",
-        cleanupOutdatedCaches: true,
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // Set to 3MB
-    },
-    // Add notification related strategies
-    strategies: "generateSW",
-    includeManifestIcons: true,
-}
+// The PWA/service-worker setup returns with its own slice (spec #34): shell
+// precache only, never API responses.
 
 export default defineConfig(({ mode }) => ({
     esbuild: {
@@ -79,46 +15,15 @@ export default defineConfig(({ mode }) => ({
     },
     build: {
         target: "es2022",
-        minify: true,
-
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    // UI Framework chunk
-                    "vendor-ui": ["antd"],
-
-                    // Core React chunk
-                    "vendor-react": ["react", "react-dom"],
-
-                    // State Management chunk
-                    "vendor-state": ["mobx"],
-
-                    // Date handling chunk
-                    "vendor-utils": ["dayjs"],
-
-                    // Data layer chunk
-                    "vendor-data": ["@supabase/supabase-js"],
-                },
-            },
-        },
-
+        // dist/.vite/manifest.json feeds the bundle size check
+        // (scripts/bundle-size.mjs).
+        manifest: true,
         // Generate sourcemaps for Sentry, but keep them off the public CDN.
         sourcemap: "hidden",
     },
     base: "/",
     plugins: [
-        react({
-            babel: {
-                plugins: [
-                    ["@babel/plugin-proposal-decorators", { legacy: true }],
-                    [
-                        "@babel/plugin-proposal-class-properties",
-                        { loose: true },
-                    ],
-                ],
-            },
-        }),
-        VitePWA(manifestForPlugin),
+        react(),
         // Bundle analyzer — opt in with `ANALYZE=true npm run build`.
         process.env.ANALYZE === "true" &&
             visualizer({ open: true, filename: "stats.html" }),
