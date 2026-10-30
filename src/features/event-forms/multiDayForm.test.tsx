@@ -179,6 +179,7 @@ describe("the multi-day event form", () => {
             type: "retreat",
             segments: [],
             multi_day_teachers: [],
+            source_template_id: null,
             organisations: [],
             links: [],
             price: [],

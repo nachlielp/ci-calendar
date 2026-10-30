@@ -38,23 +38,26 @@ import { useErrorText } from "./useErrorText"
 // `BaseFormControls` (any `useForm` form of `EventBaseValues` and more).
 
 /**
- * What the shared head and footer use of an event form (`useForm`): its
- * `EventBaseValues` fields. Methods, so a form of more fields is one.
+ * What a form's parts use of a `useForm` form of `V`. Methods, so a form of
+ * more fields is one.
  */
-export interface BaseFormControls {
-    values: EventBaseValues
+export interface FormControls<V> {
+    values: V
     errors: FormErrors<EventFormError>
-    set<K extends keyof EventBaseValues>(
+    set<K extends keyof V>(field: K, value: V[K]): void
+    update<K extends keyof V>(
         field: K,
-        value: EventBaseValues[K],
-    ): void
-    update<K extends keyof EventBaseValues>(
-        field: K,
-        change: (value: EventBaseValues[K]) => EventBaseValues[K],
+        change: (value: V[K]) => V[K],
         path?: string,
     ): void
     touch(path: string): void
 }
+
+/**
+ * What the shared head and footer use of an event form (`useForm`): its
+ * `EventBaseValues` fields.
+ */
+export type BaseFormControls = FormControls<EventBaseValues>
 
 /** Changes a list field: `change` from its current value; `path` touched. */
 export type ListChange<T> = (change: (list: T[]) => T[], path: string) => void
@@ -459,11 +462,22 @@ export function BaseHeadFields({
     )
 }
 
-/** Legacy's "clear form" button (a new event's form only). */
-export function ClearFormButton({ onClear }: { onClear: () => void }) {
+/**
+ * Legacy's "clear form" button (a new event's or template's form only),
+ * with what legacy put beside it (`children`: the template picker, or a
+ * new template's name).
+ */
+export function ClearFormButton({
+    onClear,
+    children,
+}: {
+    onClear: () => void
+    children?: ReactNode
+}) {
     const copy = useCopy(EVENT_FORM_COPY)
     return (
         <div className="clear-row">
+            {children && <div className="clear-row-field">{children}</div>}
             <button type="button" className="clear-button" onClick={onClear}>
                 {copy.clear}
             </button>
@@ -477,7 +491,7 @@ export function ClearFormButton({ onClear }: { onClear: () => void }) {
  * part (`before`: the single-day form's recurrence, as legacy put it just
  * before the button), the form's alerts and the submit button. `invalid`
  * replaces the generic invalid-form alert (legacy showed a span error
- * there).
+ * there). Templates have no hide switch (`canHide={false}`).
  */
 export function EventFormFooter({
     form,
@@ -488,6 +502,8 @@ export function EventFormFooter({
     invalid,
     before,
     disabled = false,
+    canHide = true,
+    goneText,
 }: {
     form: BaseFormControls
     submitLabel: string
@@ -498,6 +514,10 @@ export function EventFormFooter({
     before?: ReactNode
     /** Not ready to save (the button is off). */
     disabled?: boolean
+    /** Offers the hide (draft) switch: events do, templates don't. */
+    canHide?: boolean
+    /** What `gone` says, if not that the event is gone. */
+    goneText?: string
 }) {
     const copy = useCopy(EVENT_FORM_COPY)
     const common = useCopy(COMMON_COPY)
@@ -521,19 +541,23 @@ export function EventFormFooter({
                 }
                 onTouch={touch}
             />
-            <Switch
-                label={copy.hidden}
-                checked={values.hidden}
-                onChange={(hidden) => set("hidden", hidden)}
-                onText={copy.hiddenOn}
-                offText={copy.hiddenOff}
-            />
+            {canHide && (
+                <Switch
+                    label={copy.hidden}
+                    checked={values.hidden}
+                    onChange={(hidden) => set("hidden", hidden)}
+                    onText={copy.hiddenOn}
+                    offText={copy.hiddenOff}
+                />
+            )}
             {before}
             {hasErrors && (
                 <FormAlert kind="error">{invalid ?? copy.invalid}</FormAlert>
             )}
             {failed && <FormAlert kind="error">{copy.saveFailed}</FormAlert>}
-            {gone && <FormAlert kind="error">{copy.gone}</FormAlert>}
+            {gone && (
+                <FormAlert kind="error">{goneText ?? copy.gone}</FormAlert>
+            )}
             <div className="submit-button-container">
                 <button
                     type="submit"

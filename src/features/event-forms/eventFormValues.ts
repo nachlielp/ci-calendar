@@ -82,6 +82,8 @@ export interface SingleDayValues extends EventBaseValues {
     segments: SegmentValues[]
     /** New events only; an edit's is always off. */
     recurrence: RecurrenceValues
+    /** The template a new event started from (`""`: none). */
+    sourceTemplateId: string
 }
 
 /** Not recurring (every saved event, as the form opens it). */
@@ -103,6 +105,8 @@ export interface MultiDayValues extends EventBaseValues {
     type: string
     /** `multi_day_teachers`: tagged (`value` = user id) or typed names. */
     teachers: Tag[]
+    /** The template a new event started from (`""`: none). */
+    sourceTemplateId: string
 }
 
 /** The audience tag a new segment starts with (legacy's initial value). */
@@ -134,6 +138,7 @@ export function emptySingleDay(date: string, hidden = false): SingleDayValues {
         date,
         segments: [emptySegment(DEFAULT_TAGS)],
         recurrence: NO_RECURRENCE,
+        sourceTemplateId: "",
     }
 }
 
@@ -155,6 +160,7 @@ export function emptyMultiDay(hidden = false): MultiDayValues {
         endDate: "",
         type: "",
         teachers: [],
+        sourceTemplateId: "",
     }
 }
 
@@ -341,6 +347,7 @@ export function singleDayColumns(values: SingleDayValues) {
         type: "",
         is_multi_day: false,
         multi_day_teachers: [],
+        source_template_id: values.sourceTemplateId || null,
     } satisfies Partial<EventInsert>
 }
 
@@ -368,7 +375,7 @@ export function newSingleDayColumns(
 }
 
 /** A patch: only the changed columns, the address only if there is one. */
-type Patch<C> = Partial<
+export type Patch<C> = Partial<
     Omit<C, "address"> & {
         address: AddressColumn
     }
@@ -378,7 +385,7 @@ type Patch<C> = Partial<
  * The shared fields' changed columns (a JSON column whole if any part of
  * it changed).
  */
-function basePatch(
+export function basePatch(
     values: EventBaseValues,
     changes: Partial<EventBaseValues>,
 ): Patch<ReturnType<typeof baseColumns>> {
@@ -454,6 +461,7 @@ export function multiDayColumns(values: MultiDayValues) {
         type: values.type,
         is_multi_day: true,
         multi_day_teachers: tagColumn(values.teachers),
+        source_template_id: values.sourceTemplateId || null,
     } satisfies Partial<EventInsert>
 }
 
@@ -539,6 +547,7 @@ export function multiDayValuesOf(event: ManagedEvent): MultiDayValues {
         endDate: event.endDate,
         type: event.type,
         teachers: event.multiDayTeachers,
+        sourceTemplateId: "",
     }
 }
 
@@ -555,6 +564,7 @@ export function singleDayValuesOf(event: ManagedEvent): SingleDayValues {
             tags: segment.tags,
         })),
         recurrence: NO_RECURRENCE,
+        sourceTemplateId: "",
     }
 }
 
@@ -564,23 +574,25 @@ export function singleDayValuesOf(event: ManagedEvent): SingleDayValues {
 const isString = (value: unknown): value is string => typeof value === "string"
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value)
-const isListOf = <T>(value: unknown, item: (value: unknown) => value is T) =>
-    Array.isArray(value) && value.every(item)
-const isTag = (value: unknown): value is Tag =>
+export const isListOf = <T>(
+    value: unknown,
+    item: (value: unknown) => value is T,
+) => Array.isArray(value) && value.every(item)
+export const isTag = (value: unknown): value is Tag =>
     isRecord(value) && isString(value.label) && isString(value.value)
 const isAddress = (value: unknown): value is AddressValue =>
     isRecord(value) &&
     isString(value.label) &&
     isString(value.placeId) &&
     (value.enLabel === undefined || isString(value.enLabel))
-const isSegment = (value: unknown): value is SegmentValues =>
+export const isSegment = (value: unknown): value is SegmentValues =>
     isRecord(value) &&
     isString(value.type) &&
     isString(value.start) &&
     isString(value.end) &&
     isListOf(value.teachers, isTag) &&
     isListOf(value.tags, isString)
-const hasStrings = (value: unknown, keys: string[]) =>
+export const hasStrings = (value: unknown, keys: string[]) =>
     isRecord(value) && keys.every((key) => isString(value[key]))
 
 export function isBaseValues(value: unknown): value is EventBaseValues {
@@ -607,7 +619,7 @@ const isRecurrenceValues = (value: unknown): value is RecurrenceValues =>
 
 export const isSingleDayValues = (value: unknown): value is SingleDayValues =>
     isBaseValues(value) &&
-    isString((value as unknown as Record<string, unknown>).date) &&
+    hasStrings(value, ["date", "sourceTemplateId"]) &&
     isListOf(
         (value as unknown as Record<string, unknown>).segments,
         isSegment,
@@ -616,5 +628,5 @@ export const isSingleDayValues = (value: unknown): value is SingleDayValues =>
 
 export const isMultiDayValues = (value: unknown): value is MultiDayValues =>
     isBaseValues(value) &&
-    hasStrings(value, ["startDate", "endDate", "type"]) &&
+    hasStrings(value, ["startDate", "endDate", "type", "sourceTemplateId"]) &&
     isListOf((value as unknown as Record<string, unknown>).teachers, isTag)

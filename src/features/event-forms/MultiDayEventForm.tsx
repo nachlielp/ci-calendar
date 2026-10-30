@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, type ReactNode } from "react"
 import { useCopy } from "../../app/language"
 import { useForm } from "../../app/useForm"
 import { useToday } from "../../app/useToday"
@@ -10,6 +10,7 @@ import { SelectField, TextField } from "../../ui/form/fields"
 import { TagPicker } from "../../ui/form/TagPicker"
 import { optionLabel } from "../calendar/eventFormat"
 import { EVENT_LOCALES } from "../calendar/eventLocales"
+import type { Tag } from "../calendar/publicEvent"
 import type { ManagedEvent } from "../events/managedEvent"
 import { MULTI_DAY_DRAFT_KEY, MULTI_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 import { useFormDraft } from "./eventDraft"
@@ -18,10 +19,12 @@ import {
     BaseHeadFields,
     ClearFormButton,
     EventFormFooter,
+    type FormControls,
 } from "./EventFormParts"
 import {
     emptyMultiDay,
     isMultiDayValues,
+    type EventBaseValues,
     type EventFormError,
     multiDayColumns,
     multiDayPatch,
@@ -30,7 +33,9 @@ import {
     type MultiDayValues,
 } from "./eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
-import { useTaggable } from "./taggableBios"
+import { useTaggable, type Taggable } from "./taggableBios"
+import { TemplatePicker } from "./TemplatePicker"
+import { withMultiDayTemplate } from "./templateValues"
 import { useEventSubmit } from "./useEventSubmit"
 import { useErrorText } from "./useErrorText"
 
@@ -80,7 +85,8 @@ function spanError(errors: FormErrors<EventFormError>) {
  * EditMultiDayEventForm (`event`), with legacy's MultiDayFormHead: title,
  * description, district, address, first and last day, type, teachers and
  * organisations (both tagged or typed); then links, prices and whether it
- * is hidden. Saved as the single-day form is (translations, drafts,
+ * is hidden. A new event can start from one of the user's multi-day
+ * templates. Saved as the single-day form is (translations, drafts,
  * junction rows, every cached list); then `onDone`.
  */
 export function MultiDayEventForm({
@@ -97,7 +103,6 @@ export function MultiDayEventForm({
 }) {
     const copy = useCopy(EVENT_FORM_COPY)
     const own = useCopy(COPY)
-    const locale = useCopy(EVENT_LOCALES)
     const viewer = useViewer()
     const today = useToday()
 
@@ -153,65 +158,47 @@ export function MultiDayEventForm({
                             discardDraft()
                             onClear()
                         }}
-                    />
+                    >
+                        <TemplatePicker
+                            userId={userId}
+                            multiDay
+                            value={values.sourceTemplateId}
+                            onPick={(template) =>
+                                form.restore(
+                                    withMultiDayTemplate(values, template),
+                                )
+                            }
+                            onClear={() => set("sourceTemplateId", "")}
+                        />
+                    </ClearFormButton>
                 )}
-                <section className="event-card card multi-day-form-head-card">
-                    <BaseHeadFields
-                        form={form}
-                        heading={event ? own.editTitle : own.createTitle}
-                    />
-                    <div className="date-fields">
-                        <TextField
-                            label={copy.startDate}
-                            type="date"
-                            min={today}
-                            value={values.startDate}
-                            onChange={(day) => set("startDate", day)}
-                            onBlur={() => touch("startDate")}
-                            error={errorAt("startDate")}
-                        />
-                        <TextField
-                            label={copy.endDate}
-                            type="date"
-                            min={values.startDate || today}
-                            value={values.endDate}
-                            onChange={(day) => set("endDate", day)}
-                            onBlur={() => touch("endDate")}
-                            error={errorAt("endDate")}
-                        />
-                    </div>
-                    <SelectField
-                        label={copy.eventType}
-                        labelAsPlaceholder
-                        hint={copy.multiDayType}
-                        options={MULTI_DAY_TYPES.map((type) => ({
-                            value: type,
-                            label: optionLabel(type, locale),
-                        }))}
-                        value={values.type}
-                        onChange={(type) => set("type", type)}
-                        onBlur={() => touch("type")}
-                        error={errorAt("type")}
-                    />
-                    <TagPicker
-                        label={copy.teachers}
-                        options={taggable.teachers}
-                        selected={values.teachers}
-                        onChange={(chosen) => set("teachers", chosen)}
-                        allowTyped
-                        typedOption={copy.addTyped}
-                        removeLabel={copy.remove}
-                    />
-                    <TagPicker
-                        label={copy.organisations}
-                        options={taggable.organisations}
-                        selected={values.organisations}
-                        onChange={(chosen) => set("organisations", chosen)}
-                        allowTyped
-                        typedOption={copy.addTyped}
-                        removeLabel={copy.remove}
-                    />
-                </section>
+                <MultiDayHeadFields
+                    form={form}
+                    heading={event ? own.editTitle : own.createTitle}
+                    taggable={taggable}
+                    dates={
+                        <div className="date-fields">
+                            <TextField
+                                label={copy.startDate}
+                                type="date"
+                                min={today}
+                                value={values.startDate}
+                                onChange={(day) => set("startDate", day)}
+                                onBlur={() => touch("startDate")}
+                                error={errorAt("startDate")}
+                            />
+                            <TextField
+                                label={copy.endDate}
+                                type="date"
+                                min={values.startDate || today}
+                                value={values.endDate}
+                                onChange={(day) => set("endDate", day)}
+                                onBlur={() => touch("endDate")}
+                                error={errorAt("endDate")}
+                            />
+                        </div>
+                    }
+                />
                 <EventFormFooter
                     form={form}
                     submitLabel={event ? own.update : own.create}
@@ -222,5 +209,68 @@ export function MultiDayEventForm({
                 />
             </form>
         </div>
+    )
+}
+
+/** What the multi-day forms (events and templates) share. */
+type MultiDayFieldValues = EventBaseValues & { type: string; teachers: Tag[] }
+
+/**
+ * Legacy MultiDayFormHead, for events and templates: title, description,
+ * district, address, the event's `dates` if it has them, type, teachers
+ * and organisations (both tagged or typed).
+ */
+export function MultiDayHeadFields({
+    form,
+    heading,
+    taggable,
+    dates,
+}: {
+    form: FormControls<MultiDayFieldValues>
+    heading: string
+    taggable: Taggable
+    /** The first and last day (events only: templates have no days). */
+    dates?: ReactNode
+}) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    const locale = useCopy(EVENT_LOCALES)
+    const { values, errors, set, touch } = form
+    const errorAt = useErrorText(errors)
+    return (
+        <section className="event-card card multi-day-form-head-card">
+            <BaseHeadFields form={form} heading={heading} />
+            {dates}
+            <SelectField
+                label={copy.eventType}
+                labelAsPlaceholder
+                hint={copy.multiDayType}
+                options={MULTI_DAY_TYPES.map((type) => ({
+                    value: type,
+                    label: optionLabel(type, locale),
+                }))}
+                value={values.type}
+                onChange={(type) => set("type", type)}
+                onBlur={() => touch("type")}
+                error={errorAt("type")}
+            />
+            <TagPicker
+                label={copy.teachers}
+                options={taggable.teachers}
+                selected={values.teachers}
+                onChange={(chosen) => set("teachers", chosen)}
+                allowTyped
+                typedOption={copy.addTyped}
+                removeLabel={copy.remove}
+            />
+            <TagPicker
+                label={copy.organisations}
+                options={taggable.organisations}
+                selected={values.organisations}
+                onChange={(chosen) => set("organisations", chosen)}
+                allowTyped
+                typedOption={copy.addTyped}
+                removeLabel={copy.remove}
+            />
+        </section>
     )
 }

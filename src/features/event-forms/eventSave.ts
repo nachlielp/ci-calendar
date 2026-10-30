@@ -91,6 +91,16 @@ export class EventGoneError extends Error {
 /** Postgres' unique violation: an event with this id is stored already. */
 const DUPLICATE = "23505"
 
+/** Postgres' foreign key violation. */
+const MISSING_REFERENCE = "23503"
+
+/** The event's `source_template_id` names no template (any more). */
+const isMissingTemplate = (
+    error: { code?: string; message: string; details?: string } | null,
+) =>
+    error?.code === MISSING_REFERENCE &&
+    `${error.message} ${error.details ?? ""}`.includes("source_template_id")
+
 /** The junction rows' bios, as the managed columns embed them. */
 const TAGGED_COLUMNS = `ci_event_id, public_bio(${EVENT_BIO_COLUMNS}, show_profile, user_type)`
 
@@ -225,7 +235,7 @@ export function useCreateEvent(userId: string) {
                 title: true,
                 address: true,
             })
-            const rows = events.map(({ id, columns }) => ({
+            let rows = events.map(({ id, columns }) => ({
                 ...columns,
                 ...found,
                 address: found.address ?? columns.address ?? {},
@@ -236,10 +246,18 @@ export function useCreateEvent(userId: string) {
                 created_at: now,
                 updated_at: now,
             }))
-            const inserted = await services.data
-                .from("ci_events")
-                .insert(rows.length === 1 ? rows[0] : rows)
-                .select(MANAGED_EVENT_COLUMNS)
+            const insert = () =>
+                services.data
+                    .from("ci_events")
+                    .insert(rows.length === 1 ? rows[0] : rows)
+                    .select(MANAGED_EVENT_COLUMNS)
+            let inserted = await insert()
+            if (isMissingTemplate(inserted.error)) {
+                // The template it started from was deleted meanwhile (e.g.
+                // a draft from before): the event is saved without it.
+                rows = rows.map((row) => ({ ...row, source_template_id: null }))
+                inserted = await insert()
+            }
             const duplicate = inserted.error?.code === DUPLICATE
             const { data, error } = duplicate
                 ? await storedAndMissing(services, userId, rows)

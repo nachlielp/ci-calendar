@@ -131,6 +131,7 @@ describe("singleDayColumns", () => {
             type: "",
             is_multi_day: false,
             multi_day_teachers: [],
+            source_template_id: null,
         })
     })
 })
@@ -328,6 +329,7 @@ describe("multiDayColumns", () => {
                 { label: "נועה", value: TEACHER_ID },
                 { label: "רותם רם", value: "רותם רם" },
             ],
+            source_template_id: null,
         })
     })
 

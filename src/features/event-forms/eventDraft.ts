@@ -25,7 +25,8 @@ interface StoredDraft {
  * when it is clean again), and restores them over `saved` when it mounts,
  * if the draft is the same user's for the same event and `isValues`
  * accepts the result. Returns `discard`, which removes the draft (after a
- * save, or when the user clears the form).
+ * save, or when the user clears the form). A `null` key keeps no draft
+ * (legacy's template edits had none).
  */
 export function useFormDraft<V extends FormValues>({
     key,
@@ -35,7 +36,7 @@ export function useFormDraft<V extends FormValues>({
     form,
     isValues,
 }: {
-    key: string
+    key: string | null
     userId: string
     eventId?: string | null
     /** The form's saved values, which the changes go over. */
@@ -49,7 +50,7 @@ export function useFormDraft<V extends FormValues>({
     const kept = useRef(false)
 
     useEffect(() => {
-        if (restored.current) return
+        if (restored.current || !key) return
         restored.current = true
         const draft = read(storage.getItem(key))
         if (!draft || draft.userId !== userId || draft.eventId !== eventId) {
@@ -69,6 +70,7 @@ export function useFormDraft<V extends FormValues>({
 
     const discard = useCallback(() => {
         kept.current = false
+        if (!key) return
         try {
             storage.removeItem(key)
         } catch {
@@ -77,7 +79,7 @@ export function useFormDraft<V extends FormValues>({
     }, [storage, key])
 
     useEffect(() => {
-        if (!userId) return
+        if (!userId || !key) return
         if (!isDirty) {
             // Clean again (the edits undone, or saved): no draft. Not at
             // mount, before a draft for another event could be restored.

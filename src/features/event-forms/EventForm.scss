@@ -56,9 +56,22 @@
         gap: 1rem;
     }
 
+    // Legacy's top row: the template picker (or a new template's name) on
+    // two thirds, the clear button on the rest.
     .clear-row {
         display: flex;
+        align-items: flex-start;
         justify-content: flex-end;
+        gap: 8px;
+
+        .clear-row-field {
+            flex: 2;
+            min-width: 0;
+
+            .form-field {
+                margin: 0;
+            }
+        }
     }
 }
 

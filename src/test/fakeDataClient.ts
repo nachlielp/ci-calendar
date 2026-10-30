@@ -56,6 +56,25 @@ const RELATIONS: Record<string, Record<string, Relation>> = {
  */
 const SERIAL_COLUMNS: Record<string, string> = { requests: "number" }
 
+/**
+ * Foreign keys the fake enforces on insert, as Postgres does (`23503`) —
+ * the ones a stale client value can break: `ci_events.source_template_id`
+ * (a draft naming a template deleted since). What a delete of the
+ * referenced row does isn't modelled (the rule isn't known).
+ */
+const FOREIGN_KEYS: Record<
+    string,
+    { column: string; references: string; constraint: string }[]
+> = {
+    ci_events: [
+        {
+            column: "source_template_id",
+            references: "templates",
+            constraint: "ci-events_source_template_id_fkey",
+        },
+    ],
+}
+
 interface Relation {
     column: string
     foreignColumn: string
@@ -447,6 +466,25 @@ export function createFakeDataClient(
                             "duplicate key value violates unique constraint",
                         code: "23505",
                     },
+                }
+            }
+            for (const key of FOREIGN_KEYS[request.table] ?? []) {
+                const missing = body.find(
+                    (row) =>
+                        row[key.column] != null &&
+                        !(seed[key.references] ?? []).some(
+                            (other) => other.id === row[key.column],
+                        ),
+                )
+                if (missing) {
+                    return {
+                        data: null,
+                        error: {
+                            message: `insert or update on table "${request.table}" violates foreign key constraint "${key.constraint}"`,
+                            details: `Key (${key.column})=(${String(missing[key.column])}) is not present in table "${key.references}".`,
+                            code: "23503",
+                        },
+                    }
                 }
             }
             inserted = body.map((sent) => {

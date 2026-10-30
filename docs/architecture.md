@@ -474,8 +474,7 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       (legacy `general-action-btn black-btn large-btn` and `text-btn`), all
       in `Form.scss`. Labels come from the form's copy; `<form noValidate>`
       so the browser's own bubbles don't replace the form's messages.
-- **Event forms** (slices 13 and 14; `features/event-forms`, reuse these
-  for templates, slice 16):
+- **Event forms** (slices 13–16; `features/event-forms`):
     - **Values** (`eventFormValues.ts`, pure, tested directly): the shared
       `EventBaseValues` (title, description, district, address
       `{ label, placeId, enLabel? }`, organisations and teachers as `Tag`s,
@@ -562,8 +561,7 @@ user_name }]`, as legacy's did (nothing reads it). New events' hide
       `segments`, `organisations`; multi-day: `teachers`,
       `organisations`); then the draft goes and `onDone`. It returns
       `failed` and `gone` for `EventFormFooter`, and `question` (below).
-      Templates (slice 16) pass their own `columns`/`patch` (and, writing
-      `templates`, their own mutations behind the same shape).
+      Templates have their own, `useTemplateSubmit` (below).
     - **Recurring events** (slice 15; legacy RecurringEventSection and
       EditRecurringEventDialog; single-day only, as legacy):
         - **Expansion** is pure (`recurrence.ts`, tested directly):
@@ -633,9 +631,12 @@ until }`, off for every saved event, so it's in drafts too) is
       server's newer value. It returns `discard` (after a save, on "clear
       form"). A new event's draft survives leaving the page (legacy's); an
       edit's is dropped by the page's back button but survives a reload.
-    - **Pages**: `/create-events` (legacy's chooser; the missing-bio
-      warning; templates come with slice 16), `/create-events/single-day`
-      and `/create-events/multi-day` (legacy's info notice; both back to
+      A `null` key keeps none (template edits, as legacy).
+    - **Pages**: `/create-events` (legacy's chooser: new template or
+      event, single-day or multi-day; the missing-bio and no-templates
+      warnings; the templates list), `/create-events/single-day`
+      and `/create-events/multi-day` (legacy's info notice; with
+      `?isTemplate=true`, legacy's link, a new template's form; both back to
       `/create-events` after a save, as legacy), and
       `/manage-events/edit-single-day/:eventId` and
       `/manage-events/edit-multi-day/:eventId` (`myEventQuery`, personal,
@@ -650,18 +651,69 @@ until }`, off for every saved event, so it's in drafts too) is
       (`app/routes.tsx`): one dynamic import in `/`'s route table for all
       of them (each `import()` there costs `/` its preload list and file
       names), and moving between the chooser and the forms downloads
-      nothing. Add template pages (slice 16) the same way.
-    - **For templates (slice 16)**: legacy reused these same forms and
-      routes with `?isTemplate=true` (a `name` field; the multi-day one
-      without its days) writing the
-      `templates` table, whose columns mirror `ci_events`' (no dates,
-      `hide`, `cancelled`), so the `*Columns` functions minus the day
-      columns fit; and the new-event forms offered "בחירת תבנית" (the
-      user's templates of that kind) at the top, filling the form, and
-      wrote `source_template_id` on create (not sent yet: add it to the
-      columns). Legacy's template drafts had their own keys
-      (`multi-day-draft-template`): give templates their own
-      `personalKey`s in `draftKeys.ts`.
+      nothing. Add any new form page the same way. Only use react-router
+      hooks `/` already carries (`useLocation`, not `useSearchParams`): the
+      router lives in `/`'s chunk and a newly used export lands there.
+    - **Templates** (slice 16; legacy templateService, ManageTemplatesList
+      and the forms' `isTemplate`): a `templates` row is an event without
+      its days, `hide` and `cancelled`, plus a `name`.
+        - **Data** (`templates.ts`): `myTemplatesQuery` (`my-templates`,
+          personal: the user's own rows by `user_id`, newest first, as
+          legacy listed them; never at boot, never persisted, forgotten on
+          sign-out) is used only by the chooser's list and the new-event
+          forms' picker (`useMyTemplates`). `useCreateTemplate` (id made once
+          per form; a duplicate on resend reads the stored row),
+          `useUpdateTemplate` (changed columns, `.eq("id").eq("user_id")`,
+          `maybeSingle`; none back is `TemplateGoneError` and the list is
+          refetched) and `useDeleteTemplate` (owner-scoped) put the answer
+          in the cached list (`setQueryData` only if cached), no refetch.
+          Legacy's delete confirm says the events made from a template go
+          with it (`ci_events.source_template_id`'s foreign key; its delete
+          rule isn't in the repo: see Maintainer notes), so a delete also
+          runs `refreshEventQueries`. No translation or Places lookup: templates
+          have no `lng_titles`, and the address keeps the `en_label` the
+          field got when picked.
+        - **Values** (`templateValues.ts`, pure, tested directly):
+          `toTemplate` reads a row through `toPublicEvent` (so its JSON
+          columns read as an event's) into `Template` (`id`, `name`,
+          `multiDay`, `createdAt`, `content`). The forms edit
+          `SingleDayTemplateValues` / `MultiDayTemplateValues` (the event's
+          base values plus `name`; `hidden` stays false, unshown and never
+          written); `validate*Template` are the event's rules without days,
+          plus a name; `*TemplateColumns`/`*TemplatePatch` write legacy's
+          shapes (single-day segment instants on the day saved, as legacy;
+          readers use only the time of day; multi-day `segments: []` and,
+          from the form, `owners` naming the creator, as legacy).
+        - **Forms** (`TemplateForms.tsx`): the event forms' cards
+          (`SingleDayFields`, `MultiDayHeadFields`, shared with the event
+          forms) without day fields, recurrence or the hide switch
+          (`EventFormFooter canHide={false}`), the name beside "clear form"
+          for a new template (labelled above for an edit), `useTemplateSubmit`
+          (as `useEventSubmit`). New templates keep drafts under their own
+          keys (`SINGLE_DAY_TEMPLATE_DRAFT_KEY`, …); edits keep none.
+          Editing opens from the chooser's list in a `Dialog` (legacy's
+          FormContainer: drawer on phones, modal above); delete asks first
+          (`ActionDialog`, legacy's warning text).
+        - **Starting an event from one**: the new-event forms' top row has
+          `TemplatePicker` (legacy's "בחירת תבנית": the user's templates of
+          that kind) beside "clear form". Picking one replaces the form's
+          values with the template's (`withSingleDayTemplate` /
+          `withMultiDayTemplate`; the day(s), recurrence and hide stay:
+          legacy's single-day mapping set an `event-dates` value from the
+          first segment, but the form's day field (`event-start-date`)
+          never read it, and its multi-day mapping read the days from a
+          multi-day template's empty segments, so no day came across)
+          through `form.restore`, as legacy's picker overwrote the form, a
+          restored draft included (no confirm). `sourceTemplateId` is a
+          form value (so the draft keeps it across a reload) written as
+          `source_template_id` by the `*Columns` functions (`null` when
+          none, every row of a series). A template deleted since (a draft
+          from before) must not be sent: once the user's templates have
+          loaded, `TemplatePicker` clears an id that isn't among them; and
+          should the insert still fail on that foreign key (`23503` naming
+          `source_template_id`, deleted while the form was open),
+          `useCreateEvent` sends the rows again once with it `null`. The
+          fake enforces that key on insert (`FOREIGN_KEYS`).
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
   JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
   first call (`data/googlePlaces.ts`, its own chunk; a script tag with
@@ -895,6 +947,21 @@ until }`, off for every saved event, so it's in drafts too) is
   fine. Schema changes go in `supabase/migrations/` as files and are applied
   by hand by the maintainer; nothing applies them automatically.
 
+## Maintainer notes
+
+- **Deleting a template may delete its events.** The delete rule of
+  `ci_events.source_template_id`'s foreign key
+  (`ci-events_source_template_id_fkey`) isn't known from the repo. Check it
+  with `SELECT confdeltype FROM pg_constraint WHERE conname =
+'ci-events_source_template_id_fkey'` (`c` cascade, `n` set null, `a`/`r`
+  no action/restrict). If it cascades, deleting a template deletes every
+  event made from it (384 of the 782 visible events reference a template).
+  Legacy relied on that (its confirm says so) and the client keeps its
+  words and refreshes the event lists after a delete. `ON DELETE SET NULL`
+  would keep the events; that is a product decision, and a migration file
+  for the maintainer to apply. With no action, deleting a template still
+  used by an event fails, and the confirm says the action failed.
+
 ## Tests
 
 Behaviour tests render the real app with `renderApp()` from `src/test/` and a
@@ -915,6 +982,8 @@ feature helpers is tested directly.
   `limit`, `range`, `single()` and `maybeSingle()`; a recorded request's
   `order` is the list of them, `limit` and `range` as set. `delete()`
   removes the filtered rows and returns them.
+  An insert naming a missing row through a key in `FOREIGN_KEYS`
+  (`ci_events.source_template_id`) fails with `23503`, as Postgres'.
   An insert returns the row as stored, with the sequence columns in
   `SERIAL_COLUMNS` filled (`requests.number`; send ids from the client,
   `crypto.randomUUID()`); an update returns the rows its filters matched
@@ -1139,3 +1208,12 @@ feature helpers is tested directly.
     their dates, hide or cancellation, segments re-dated per event, owner-
     and series-scoped writes, responses into the cache. The event actions'
     confirm dialog moved to `features/events/ActionDialog.tsx` for reuse.
+16. Templates: `/create-events` lists the user's templates (read when it
+    opens, newest first) with legacy's four choices, the no-templates
+    warning, edit (the template's form in a drawer or modal) and delete
+    (legacy's confirm); `?isTemplate=true` on the new-event pages saves a
+    single-day or multi-day template (name, the event's fields without
+    days or hide; their own drafts). The new-event forms' "בחירת תבנית"
+    fills the form from a template of its kind and the event is saved
+    with `source_template_id`. Template writes update the list from the
+    answer; nothing about templates loads at boot.

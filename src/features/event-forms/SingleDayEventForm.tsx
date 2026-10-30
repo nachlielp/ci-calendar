@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useCallback, useMemo } from "react"
+import { useCallback, useMemo, type ReactNode } from "react"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { useForm } from "../../app/useForm"
@@ -19,6 +19,7 @@ import {
     EventFormFooter,
     MoreSegments,
     SegmentFields,
+    type FormControls,
 } from "./EventFormParts"
 import { useErrorText } from "./useErrorText"
 import {
@@ -29,13 +30,17 @@ import {
     singleDayPatch,
     singleDayValuesOf,
     validateSingleDay,
+    type EventBaseValues,
+    type SegmentValues,
     type SingleDayValues,
 } from "./eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
 import { mySeriesQuery } from "./myEvent"
 import { RecurringEventSection } from "./RecurringEventSection"
 import { SeriesEditDialog } from "./SeriesEditDialog"
-import { useTaggable } from "./taggableBios"
+import { useTaggable, type Taggable } from "./taggableBios"
+import { TemplatePicker } from "./TemplatePicker"
+import { withSingleDayTemplate } from "./templateValues"
 import { useEventSubmit } from "./useEventSubmit"
 
 const COPY = defineCopy({
@@ -74,10 +79,11 @@ const TAG_FIELDS = ["segments", "organisations"] as const
  * district, address, date, organisations), its segments, links and prices,
  * and whether it is hidden; a new event may recur (a row per day of the
  * series), and an edit of a recurring event asks which later events of
- * its series change too. Unsaved values are kept on the device and
- * restored when the form opens again. A save translates the title and
- * looks up the English address (never blocking), stores the event and
- * puts it in every cached list; then `onDone`.
+ * its series change too. A new event can start from one of the user's
+ * single-day templates (legacy's "בחירת תבנית"). Unsaved values are kept
+ * on the device and restored when the form opens again. A save translates
+ * the title and looks up the English address (never blocking), stores the
+ * event and puts it in every cached list; then `onDone`.
  */
 export function SingleDayEventForm({
     userId,
@@ -143,7 +149,7 @@ export function SingleDayEventForm({
     })
     const onSubmit = form.handleSubmit(submit.save)
 
-    const { values, errors, set, update: change, touch } = form
+    const { values, errors, set, touch } = form
     const errorAt = useErrorText(errors)
     return (
         <div className="event-form">
@@ -154,59 +160,35 @@ export function SingleDayEventForm({
                             discardDraft()
                             onClear()
                         }}
-                    />
+                    >
+                        <TemplatePicker
+                            userId={userId}
+                            multiDay={false}
+                            value={values.sourceTemplateId}
+                            onPick={(template) =>
+                                form.restore(
+                                    withSingleDayTemplate(values, template),
+                                )
+                            }
+                            onClear={() => set("sourceTemplateId", "")}
+                        />
+                    </ClearFormButton>
                 )}
-                <section className="event-card card">
-                    <BaseHeadFields
-                        form={form}
-                        heading={event ? own.editTitle : own.createTitle}
-                    />
-                    <TextField
-                        label={copy.date}
-                        type="date"
-                        min={today}
-                        value={values.date}
-                        onChange={(date) => set("date", date)}
-                        onBlur={() => touch("date")}
-                        error={errorAt("date")}
-                    />
-                    <TagPicker
-                        label={copy.organisations}
-                        options={taggable.organisations}
-                        selected={values.organisations}
-                        onChange={(chosen) => set("organisations", chosen)}
-                        removeLabel={copy.remove}
-                    />
-                </section>
-                <section className="event-card card">
-                    <SegmentFields
-                        segment={values.segments[0]}
-                        index={0}
-                        errors={errors}
-                        teachers={taggable.teachers}
-                        onChange={(segmentChange, path) =>
-                            change(
-                                "segments",
-                                (segments) =>
-                                    segments.map((segment, index) =>
-                                        index === 0
-                                            ? segmentChange(segment)
-                                            : segment,
-                                    ),
-                                path,
-                            )
-                        }
-                        onTouch={touch}
-                    />
-                </section>
-                <MoreSegments
-                    segments={values.segments}
-                    errors={errors}
-                    teachers={taggable.teachers}
-                    onChange={(listChange, path) =>
-                        change("segments", listChange, path)
+                <SingleDayFields
+                    form={form}
+                    heading={event ? own.editTitle : own.createTitle}
+                    taggable={taggable}
+                    date={
+                        <TextField
+                            label={copy.date}
+                            type="date"
+                            min={today}
+                            value={values.date}
+                            onChange={(date) => set("date", date)}
+                            onBlur={() => touch("date")}
+                            error={errorAt("date")}
+                        />
                     }
-                    onTouch={touch}
                 />
                 <EventFormFooter
                     form={form}
@@ -230,7 +212,11 @@ export function SingleDayEventForm({
                                 today={today}
                                 errors={errors}
                                 onChange={(recurrenceChange, path) =>
-                                    change("recurrence", recurrenceChange, path)
+                                    form.update(
+                                        "recurrence",
+                                        recurrenceChange,
+                                        path,
+                                    )
                                 }
                                 onTouch={touch}
                             />
@@ -242,6 +228,76 @@ export function SingleDayEventForm({
                 <SeriesEditDialog event={event} question={submit.question} />
             )}
         </div>
+    )
+}
+
+/** What the single-day forms (events and templates) share. */
+type SingleDayFieldValues = EventBaseValues & { segments: SegmentValues[] }
+
+/**
+ * The single-day forms' cards (legacy SingleDayEventFormHead and
+ * EventSegmentsForm), for events and templates: the head (title,
+ * description, district, address, the event's `date` if it has one,
+ * organisations), the first segment, then the others.
+ */
+export function SingleDayFields({
+    form,
+    heading,
+    taggable,
+    date,
+}: {
+    form: FormControls<SingleDayFieldValues>
+    heading: string
+    taggable: Taggable
+    /** The day field (events only: templates have no day). */
+    date?: ReactNode
+}) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    const { values, errors, set, update: change, touch } = form
+    return (
+        <>
+            <section className="event-card card">
+                <BaseHeadFields form={form} heading={heading} />
+                {date}
+                <TagPicker
+                    label={copy.organisations}
+                    options={taggable.organisations}
+                    selected={values.organisations}
+                    onChange={(chosen) => set("organisations", chosen)}
+                    removeLabel={copy.remove}
+                />
+            </section>
+            <section className="event-card card">
+                <SegmentFields
+                    segment={values.segments[0]}
+                    index={0}
+                    errors={errors}
+                    teachers={taggable.teachers}
+                    onChange={(segmentChange, path) =>
+                        change(
+                            "segments",
+                            (segments) =>
+                                segments.map((segment, index) =>
+                                    index === 0
+                                        ? segmentChange(segment)
+                                        : segment,
+                                ),
+                            path,
+                        )
+                    }
+                    onTouch={touch}
+                />
+            </section>
+            <MoreSegments
+                segments={values.segments}
+                errors={errors}
+                teachers={taggable.teachers}
+                onChange={(listChange, path) =>
+                    change("segments", listChange, path)
+                }
+                onTouch={touch}
+            />
+        </>
     )
 }
 
