@@ -1,0 +1,29 @@
+// New (legacy had no refresh): a quiet text button with an icon. A page
+// using `RefreshButton` `@use`s this partial, so the shared chunk has no
+// CSS file of its own (as `features/events/_action-dialog.scss`).
+.refresh-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+        background-color: #e3d7d7;
+    }
+
+    &:disabled {
+        color: #757575;
+        cursor: default;
+    }
+
+    .refresh-button-icon {
+        width: 20px;
+        height: 20px;
+    }
+}

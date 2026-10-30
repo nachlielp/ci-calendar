@@ -26,6 +26,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | `src/features/events`      | Managed events and the shared event cache updates (below)     |
 | `src/features/event-forms` | The event forms, their shared parts, saves and drafts         |
 | `src/features/bio`         | The bio editor (`/bio`): profile form, photo, settings        |
+| `src/features/admin`       | Shared admin parts: freshness, refresh button, one page chunk |
+| `src/features/admin-users` | `/manage-users`: users search, role changes (`useAssignRole`) |
 | `src/lib/`                 | Pure helpers (dates, formatting); tested directly             |
 | `src/ui/`                  | Shared presentational primitives (dialog, buttons, icons)     |
 | `src/ui/form`              | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
@@ -638,7 +640,9 @@ until }`, off for every saved event, so it's in drafts too) is
       is clean again; when the form mounts, if the draft is the same user's
       for the same event, it restores (`form.restore`) those fields over
       `saved` as it is then, so a field the user didn't touch shows the
-      server's newer value. It returns `discard` (after a save, on "clear
+      server's newer value. It restores in a layout effect, before the
+      first paint, so the form never shows without its draft (not even
+      for a frame, or to a test reading the DOM). It returns `discard` (after a save, on "clear
       form"). A new event's draft survives leaving the page (legacy's); an
       edit's is dropped by the page's back button but survives a reload.
       A `null` key keeps none (template edits, as legacy).
@@ -797,6 +801,84 @@ userId, bio | null, { refresh })` (`events/eventCache.ts`; `null`
       sessionStorage, the persisted cache or a draft (legacy's
       `upload-image-temp` did). A test records every device storage write
       during a crop and upload and fails on image data.
+- **Admin pages** (slices 18–20; `features/admin`, spec "admin data is
+  split by route"):
+    - **Routing**: inside `requireRole(ADMIN_ROLES, [...])`, routed with
+      `adminPage("Name")` (`app/routes.tsx`): every admin page is exported
+      from `features/admin/pages.ts`, one chunk and one dynamic import in
+      `/`'s route table for all of them (as the event forms). Add slices
+      19–20's pages there.
+    - **Data**: admin queries are built as personal ones (keyed `[kind,
+adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
+!!adminId`, selecting only the columns shown): loaded when their
+      page opens, never at boot, never persisted (not in
+      `PERSISTED_SHAPES`), forgotten on sign-out (not in
+      `PUBLIC_QUERY_KINDS`). Nothing filters by owner here: RLS lets admins
+      read every row, which is the point.
+    - **Freshness**: a plain admin query uses `PERSONAL_FRESHNESS` (fetched
+      on every mount of its page, and when the app comes back after 5
+      minutes). A paginated one (an infinite query, keyset as under
+      Pagination) uses `PAGED_ADMIN_FRESHNESS` (TanStack never refetches it,
+      which would fetch every loaded page in turn), is removed when its page
+      unmounts, and is refreshed from its first page only
+      (`refreshFirstPage`: later pages are dropped, then one request) when
+      the app comes back stale (`useRefreshWhenBack(key, refresh)`) and
+      from the refresh button.
+    - **Manual refresh**: every admin page has `RefreshButton`
+      (`features/admin`, new: legacy refreshed over realtime) at the top of
+      its card, refreshing all of the page's queries (`refreshFirstPage`
+      for paginated ones, `refetch` for the rest); its page's stylesheet
+      `@use`s `features/admin/_refresh-button.scss`. A failed refresh keeps
+      the data on screen and says so.
+    - **Server-side search**: a list too long to load whole is searched on
+      the server, never filtered in the browser. The text box's value goes
+      through `useDebouncedValue` (`app/`, 300 ms, `SEARCH_DEBOUNCE_MS`),
+      trimmed, into the query key (each search its own query, shown with
+      `placeholderData: keepPreviousData`, the list dimmed, `aria-busy` and
+      a "searching" status while `isPlaceholderData`), and into one
+      PostgREST `or()`
+      logic tree: `searchTerms` (`admin-users/users.ts`) makes `col.ilike."*text*"`
+      terms, the text with LIKE's `%`, `_` and `\` escaped, `*` (which
+      PostgREST makes a wildcard, unescapably) turned into `_`,
+      and the value double-quoted (`quoted`, so `.`, `,`, `:` and
+      parentheses are text: e-mail addresses). A later page's cursor joins
+      it in the same tree (`usersFilter`: `and(or(search),or(cursor))`),
+      never as a second `or` parameter.
+    - **Counts** (legacy's totals) are counting `HEAD` requests
+      (`select("id", { count: "exact", head: true })`), never a read of the
+      rows.
+    - **Writes** update the cached rows from the response (every cached
+      search and page, the same object where nothing changed, fetch times
+      kept), never by refetching a list; a fetch of those queries in flight
+      (sent before the write) is redone, a paginated one with
+      `refreshFirstPage`, as `applyEventChanges` does.
+- **Users and roles** (slice 18; `features/admin-users`, legacy
+  ManageUsersPage, usersService.getUsers, userRoleService and the
+  store's `app_users`):
+    - **List** (`users.ts`): `adminUsersQuery` (`admin-users`, per search)
+      reads `ADMIN_USER_COLUMNS` (name, email, phone, `user_type`,
+      `created_at`, the `user_roles` membership, one-to-one), 20 a page,
+      newest first (`created_at`, then `id`; legacy listed all, unordered),
+      searched by name or email as legacy's search was (not phone).
+      `adminUserStatsQuery` (`admin-user-stats`) counts all accounts and
+      each `user_type`. A row opens legacy's details (name, email, phone
+      to copy, the role from `user_roles`, a plain user without one) and
+      its role buttons (the one equal to `user_type` off, as legacy).
+    - **Role changes** go only through the `assign_user_role` RPC
+      (`roles.ts`: `assignUserRole`, legacy's error wrapping "Failed to
+      update user role ERROR: …"; `ROLE_IDS` admin 1, creator 2, org 3,
+      profile 4, user 5). The client never writes `user_roles`, `users` or
+      `public_bio` for it. `useAssignRole(adminId)` applies the RPC's answer
+      (`applyRoleChange`): the row in every cached search, the counts (the
+      account moved between types; refetched if the user wasn't cached),
+      the admin's own profile if they changed their own role, and the
+      user's bio in cached events (a new admin's leaves them,
+      `applyBioChange(…, null)`; one leaving admin, or whose type wasn't
+      known, may be public now, so the event lists refresh); a users list
+      or count fetch in flight is redone. An admin changing their own role
+      is asked first (`ActionDialog`, new: it locks them out at once);
+      the profile is read again and the guard sends them to `/`. Slice
+      19's request approval calls `useAssignRole` too.
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
   JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
   first call (`data/googlePlaces.ts`, its own chunk; a script tag with
@@ -1140,6 +1222,17 @@ feature helpers is tested directly.
   (recorded as `rows`, not `body`), each given an `id` if it has none.
   Translations are remembered per session; `setup.ts` forgets them after
   each test.
+- **Database functions and counts:** `fake.rpc` (`src/test/fakeRpc.ts`,
+  the client's `rpc(name, args)`) records `calls` (name, args, token);
+  `assign_user_role` behaves as its migration (admin callers only, by
+  `user_roles` role 1 or a `users` row of type admin; writes the three
+  tables; answers `{ user_id, role_id, user_type }`); `handle(name,
+handler)` adds a function, `fail(name, { message, code })` / `heal`
+  steer one, `hold`/`release` delay it. `select(columns, { count, head
+})` answers with `count` (and no rows with `head`), recorded as the
+  request's `count` and `head`. `ilike` (PostgREST's `*` wildcard, LIKE's
+  `\` escape) works at the top level and in `or()`, whose values may be
+  double-quoted.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail
   (the server's error, HTTP 500; `{ network: true }`: no answer, status
@@ -1349,3 +1442,20 @@ feature helpers is tested directly.
     uploaded with storage-js (`services.files`, lazy) to legacy's bucket
     and path. `useFormDraft` moved to `app/`; legacy's base64 photo key is
     removed at boot.
+18. Admin users and roles: `/manage-users` (admins; lazy, guarded; the
+    first page of the one admin chunk, `features/admin/pages.ts`), legacy
+    ManageUsersPage: search by name or email on the server (debounced,
+    escaped `ilike` in one `or()` tree), 20 users a page newest first with
+    "load more" (keyset on `created_at`, `id`), a user's details (phone
+    copied on tap, role from `user_roles`) and legacy's five role buttons,
+    and the account counts (counting `HEAD` requests, not the rows).
+    Nothing of it at boot, persisted or kept after sign-out; refetched on
+    mount, from the first page when the app comes back stale, and by a new
+    refresh button. Roles change only through `assign_user_role`, whose
+    answer updates the row in every cached search and the counts (no list
+    refetch; a fetch in flight is redone); failures say so and are
+    reported; demoting oneself asks first. The fake gained `rpc`, `ilike`,
+    quoted logic-tree values and counts. Admin conventions (one chunk,
+    freshness, refresh, server-side search) for slices 19–20. Drafts are
+    now restored before the first paint (a layout effect): the flash of
+    an empty form, and the templates tests' flake, are gone.

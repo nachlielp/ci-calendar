@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef } from "react"
 import type { FormValues } from "../lib/form"
 import { useServices } from "./services"
 import type { Form } from "./useForm"
@@ -50,7 +50,9 @@ export function useFormDraft<V extends FormValues>({
     const restored = useRef(false)
     const kept = useRef(false)
 
-    useEffect(() => {
+    // Restored before the browser paints (and before anything can read
+    // the DOM), so the form never shows, even for a frame, without it.
+    useLayoutEffect(() => {
         if (restored.current || !key) return
         restored.current = true
         const draft = read(storage.getItem(key))

@@ -4,6 +4,7 @@ import { createFakeFiles, type FakeFiles } from "./fakeFiles"
 import { createFakeFunctions, type FakeFunctions } from "./fakeFunctions"
 import { createFakeImages, type FakeImages } from "./fakeImages"
 import { createFakePlaces, type FakePlaces } from "./fakePlaces"
+import { createFakeRpc, type FakeRpc } from "./fakeRpc"
 
 // The single test seam: a fake of the data client that behaves like a tiny
 // PostgREST. Seeded rows live per table; each query applies the predicates it
@@ -27,8 +28,13 @@ import { createFakePlaces, type FakePlaces } from "./fakePlaces"
 // network). `insert([rows])` adds several (`ci_events_users_junction`).
 // `auth` is the fake's Supabase auth (./fakeAuth.ts), `functions` its Edge
 // Functions (./fakeFunctions.ts), `places` stands in for Google Places
-// (./fakePlaces.ts), `files` for Supabase Storage (./fakeFiles.ts) and
-// `images` for the cropper and the canvas (./fakeImages.ts).
+// (./fakePlaces.ts), `files` for Supabase Storage (./fakeFiles.ts),
+// `images` for the cropper and the canvas (./fakeImages.ts) and `rpc` for
+// the database's functions (`rpc(name, args)`, ./fakeRpc.ts).
+// `ilike` takes PostgREST's `*` wildcard, at the top level and in `or()`,
+// whose values may be double-quoted (`a.ilike."*x, y*"`, `\` escapes).
+// `select(columns, { count: "exact", head })` answers with the `count` of
+// the filtered rows (before `limit`/`range`) and, with `head`, no rows.
 
 type Row = Record<string, unknown>
 
@@ -50,6 +56,10 @@ const RELATIONS: Record<string, Record<string, Relation>> = {
             foreignColumn: "user_id",
             many: false,
         },
+    },
+    // `user_roles.user_id` is unique: a one-to-one embed.
+    users: {
+        user_roles: { column: "id", foreignColumn: "user_id", many: false },
     },
 }
 
@@ -106,6 +116,7 @@ export interface RecordedFilter {
         | "gt"
         | "gte"
         | "in"
+        | "ilike"
         | "is"
         | "not.is"
         | "or"
@@ -127,6 +138,10 @@ export interface RecordedRequest {
      */
     token: string | null
     select: string
+    /** Set by `select(columns, { count })`: the rows matched are counted. */
+    count: "exact" | "planned" | "estimated" | null
+    /** Set by `select(columns, { head: true })`: no rows come back. */
+    head: boolean
     filters: RecordedFilter[]
     /** Each `order()` in turn: later ones break the earlier ones' ties. */
     order: { column: string; ascending: boolean }[]
@@ -150,6 +165,8 @@ export interface FakeDataClient {
     files: FakeFiles
     /** The photo cropper and canvas (`services.images`). */
     images: FakeImages
+    /** The database's functions (`rpc`): calls, handlers, failures. */
+    rpc: FakeRpc
     requests: RecordedRequest[]
     /** The rows of `table`, live: seed more, or check what was written. */
     rows(table: string): Row[]
@@ -190,6 +207,12 @@ function matches(row: Row, filter: RecordedFilter): boolean {
     if (filter.op === "in") {
         return (filter.value as unknown[]).includes(value)
     }
+    if (filter.op === "ilike") {
+        return (
+            value != null &&
+            likePattern(String(filter.value)).test(String(value))
+        )
+    }
     const is = (value ?? null) === filter.value
     if (filter.op === "is") return is
     if (filter.op === "not.is") return !is
@@ -203,12 +226,45 @@ function matches(row: Row, filter: RecordedFilter): boolean {
     return a >= b
 }
 
-/** Splits `a,b(c,d),e` at its top-level commas. */
+/**
+ * A case-insensitive `ilike` pattern: `*` and `%` match any text, `_` one
+ * character, and a backslash escapes the next one (Postgres' LIKE
+ * escape).
+ */
+function likePattern(pattern: string): RegExp {
+    const literal = (char: string) =>
+        char.replace(/[.*+?^${}()|[\]\\/-]/g, "\\$&")
+    let source = ""
+    for (let i = 0; i < pattern.length; i++) {
+        const char = pattern[i]
+        if (char === "\\" && i + 1 < pattern.length) {
+            source += literal(pattern[++i])
+        } else if (char === "*" || char === "%") source += "[\\s\\S]*"
+        else if (char === "_") source += "[\\s\\S]"
+        else source += literal(char)
+    }
+    return new RegExp(`^${source}$`, "i")
+}
+
+/**
+ * Splits `a,b(c,d),e` at its top-level commas; a double-quoted value
+ * (`"x,y"`, a backslash escaping the next character) is one piece of
+ * text.
+ */
 function splitTopLevel(text: string): string[] {
     const parts: string[] = []
     let depth = 0
+    let quoted = false
     let current = ""
-    for (const char of text) {
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i]
+        if (quoted) {
+            current += char
+            if (char === "\\") current += text[++i]
+            else if (char === '"') quoted = false
+            continue
+        }
+        if (char === '"') quoted = true
         if (char === "(") depth++
         if (char === ")") depth--
         if (char === "," && depth === 0) {
@@ -220,9 +276,16 @@ function splitTopLevel(text: string): string[] {
     return parts
 }
 
+/** A logic tree's value: a double-quoted one unquoted and unescaped. */
+function treeValue(text: string): string {
+    if (!text.startsWith('"')) return text
+    return text.slice(1, -1).replace(/\\(.)/g, "$1")
+}
+
 /**
  * PostgREST's logic tree (`or=(…)`): conditions `column.op.value` (eq,
- * neq, lt, lte, gt, gte; values compared as text, as above) and nested
+ * neq, lt, lte, gt, gte, ilike; values compared as text, as above, and
+ * double-quoted when they hold `,.:()`) and nested
  * `and(…)` / `or(…)`.
  */
 function matchesTree(row: Row, tree: string, logic: "and" | "or"): boolean {
@@ -232,11 +295,11 @@ function matchesTree(row: Row, tree: string, logic: "and" | "or"): boolean {
             return matchesTree(row, nested[2], nested[1] as "and" | "or")
         }
         const [column, op, ...rest] = term.split(".")
-        if (!["eq", "neq", "lt", "lte", "gt", "gte"].includes(op)) {
+        if (!["eq", "neq", "lt", "lte", "gt", "gte", "ilike"].includes(op)) {
             throw new Error(`fake: no ${op} in or()`)
         }
         // PostgREST compares a logic tree's values as text.
-        const value = rest.join(".")
+        const value = treeValue(rest.join("."))
         if (op === "eq") return String(row[column]) === value
         if (op === "neq")
             return row[column] != null && String(row[column]) !== value
@@ -293,6 +356,10 @@ export function createFakeDataClient(
     const places = createFakePlaces()
     const files = createFakeFiles(() => auth.accessToken())
     const images = createFakeImages()
+    const rpc = createFakeRpc(
+        () => auth.accessToken(),
+        (table) => (seed[table] ??= []),
+    )
     const requests: RecordedRequest[] = []
     const failures = new Map<string, { message: string; network: boolean }>()
     const held = new Map<string, (() => void)[]>()
@@ -308,6 +375,8 @@ export function createFakeDataClient(
             method: "select",
             token: null,
             select: "*",
+            count: null,
+            head: false,
             filters: [],
             order: [],
             limit: null,
@@ -317,8 +386,16 @@ export function createFakeDataClient(
         requests.push(request)
 
         const builder = {
-            select(columns = "*") {
+            select(
+                columns = "*",
+                options: {
+                    count?: RecordedRequest["count"]
+                    head?: boolean
+                } = {},
+            ) {
                 request.select = columns.replace(/\s+/g, "")
+                request.count = options.count ?? null
+                request.head = options.head ?? false
                 return builder
             },
             insert(row: Row | Row[]) {
@@ -348,6 +425,8 @@ export function createFakeDataClient(
                 addFilter("gt", column, value),
             gte: (column: string, value: unknown) =>
                 addFilter("gte", column, value),
+            ilike: (column: string, pattern: string) =>
+                addFilter("ilike", column, pattern),
             in: (column: string, values: unknown[]) =>
                 addFilter("in", column, [...values]),
             or: (tree: string) => addFilter("or", "", tree),
@@ -388,6 +467,8 @@ export function createFakeDataClient(
                     error: { message: string; code?: string } | null
                     /** The HTTP status; 0 when no answer came (network). */
                     status?: number
+                    /** The rows matched, when the select asked to count. */
+                    count?: number | null
                 }) => T,
                 reject?: (reason: unknown) => T,
             ) {
@@ -577,6 +658,7 @@ export function createFakeDataClient(
                 return 0
             })
         }
+        const count = request.count ? rows.length : null
         if (request.range) {
             rows = rows.slice(request.range.from, request.range.to + 1)
         }
@@ -585,7 +667,10 @@ export function createFakeDataClient(
         const data = rows.map((row) => project(request.table, row, fields, ""))
         // As PostgREST answers (postgrest-js passes the status on).
         const status = request.method === "insert" ? 201 : 200
-        if (request.returns === "rows") return { data, error: null, status }
+        if (request.head) return { data: null, error: null, status, count }
+        if (request.returns === "rows") {
+            return { data, error: null, status, count }
+        }
         if (data.length > 1 || (request.returns === "single" && !data[0])) {
             return {
                 data: null,
@@ -601,12 +686,16 @@ export function createFakeDataClient(
     }
 
     return {
-        client: { from } as unknown as DataClient,
+        client: {
+            from,
+            rpc: (name: string, args: Row = {}) => rpc.call(name, args),
+        } as unknown as DataClient,
         auth,
         functions,
         places,
         files,
         images,
+        rpc,
         requests,
         rows: (table) => (seed[table] ??= []),
         beforeExecute: (callback) => {

@@ -101,6 +101,8 @@ async function myEventTitles() {
 }
 
 describe("creating a recurring event", () => {
+    // Types a whole event and walks every frequency: ~1 s alone, but
+    // near the 5 s default when several test runs share the machine.
     it("offers legacy's frequencies and lists the days it will fall on", async () => {
         const { user, fake } = setup()
         render(user, fake)
@@ -127,7 +129,7 @@ describe("creating a recurring event", () => {
         ])
         await userEvent.selectOptions(select("תדירות"), "bi-weekly")
         expect(within(days).getAllByRole("listitem")).toHaveLength(2)
-    })
+    }, 15_000)
 
     it("inserts a row per week in one request, across the clock change, sharing one ref key, and shows them all without a refetch", async () => {
         const { user, fake } = setup()

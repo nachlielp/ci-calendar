@@ -2,6 +2,7 @@ import type { ComponentType } from "react"
 import type { RouteObject } from "react-router"
 import CalendarPage from "../features/calendar/CalendarPage"
 import {
+    ADMIN_ROLES,
     CREATOR_ROLES,
     PROFILE_ROLES,
     requireRole,
@@ -29,6 +30,13 @@ type EventFormPages = typeof import("../features/event-forms/pages")
 /** An event-form page: all of them are one chunk (event-forms/pages.ts). */
 const eventFormPage = (name: keyof EventFormPages) => async () => ({
     Component: (await import("../features/event-forms/pages"))[name],
+})
+
+type AdminPages = typeof import("../features/admin/pages")
+
+/** An admin page: all of them are one chunk (admin/pages.ts). */
+const adminPage = (name: keyof AdminPages) => async () => ({
+    Component: (await import("../features/admin/pages"))[name],
 })
 
 // The public calendar is the only eager route; every other page is a lazy
@@ -140,6 +148,9 @@ export const routes: RouteObject[] = [
                     path: "manage-events/edit-multi-day/:eventId",
                     lazy: eventFormPage("EditMultiDayFormPage"),
                 },
+            ]),
+            requireRole(ADMIN_ROLES, [
+                { path: "manage-users", lazy: adminPage("ManageUsersPage") },
             ]),
             {
                 path: "*",
