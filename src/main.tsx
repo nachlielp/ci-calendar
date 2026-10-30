@@ -8,6 +8,7 @@ import { captureInstallPrompt } from "./app/install/installPrompt"
 import { applyLanguageToDocument, storedLanguage } from "./app/language"
 import { routes } from "./app/routes"
 import type { AppServices } from "./app/services"
+import { NO_UPDATES, serviceWorkerUpdates } from "./app/updates/updates"
 import { createDataClient } from "./data/client"
 import "./index.css"
 
@@ -18,8 +19,11 @@ const services: AppServices = {
     ),
     now: () => new Date(),
     storage: browserStorage(),
+    session: browserStorage("sessionStorage"),
     buildVersion: BUILD_VERSION,
     reload: () => window.location.reload(),
+    // The service worker exists in production builds only (vite.config.ts).
+    updates: import.meta.env.PROD ? serviceWorkerUpdates() : NO_UPDATES,
 }
 // Direction and language before anything renders; the provider keeps them
 // in step from here on.

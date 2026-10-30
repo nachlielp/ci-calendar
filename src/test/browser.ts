@@ -16,6 +16,20 @@ export function resetBrowserConditions() {
     setUserAgent(JSDOM_USER_AGENT)
 }
 
+/**
+ * The page goes to the background (`hidden`: another app or tab) or comes
+ * back (`visible`). `setup.ts` restores jsdom's `visible` after each test.
+ */
+export function setPageVisibility(state: DocumentVisibilityState) {
+    act(() => {
+        Object.defineProperty(document, "visibilityState", {
+            configurable: true,
+            value: state,
+        })
+        document.dispatchEvent(new Event("visibilitychange", { bubbles: true }))
+    })
+}
+
 /** Renders as on a screen `width` pixels wide (media queries follow). */
 export function setViewportWidth(width: number) {
     window.innerWidth = width

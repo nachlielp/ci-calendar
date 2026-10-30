@@ -4,6 +4,7 @@ import {
     createMemoryStorage,
     type DeviceStorage,
 } from "../../app/deviceStorage"
+import { setPageVisibility } from "../../test/browser"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp, type RenderAppOptions } from "../../test/renderApp"
 import { event, eventTitles } from "./testEvents"
@@ -27,21 +28,11 @@ async function firstVisit(
     view.unmount()
 }
 
-function setVisibility(state: DocumentVisibilityState) {
-    act(() => {
-        Object.defineProperty(document, "visibilityState", {
-            configurable: true,
-            value: state,
-        })
-        document.dispatchEvent(new Event("visibilitychange", { bubbles: true }))
-    })
-}
-
 /** The visitor switches away and comes back `elapsedMs` after the fetch. */
 function leaveAndReturnAfter(elapsedMs: number) {
-    setVisibility("hidden")
+    setPageVisibility("hidden")
     vi.setSystemTime(NOW.getTime() + elapsedMs)
-    setVisibility("visible")
+    setPageVisibility("visible")
 }
 
 function goOffline() {

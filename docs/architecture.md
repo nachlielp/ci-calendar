@@ -16,6 +16,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | `src/app/`        | Bootstrap, services (the seam), routes, shell layout          |
 | `src/app/header`  | App header, menu (items keyed by role), WhatsApp link         |
 | `src/app/install` | Install banner, `beforeinstallprompt` capture, iOS steps      |
+| `src/app/updates` | Service worker registration, safe reloads, the reload guard   |
+| `src/sw/`         | The service worker (`sw.ts`) and its cache rules              |
 | `src/data/`       | Backend client construction and generated database types      |
 | `src/features/*`  | One folder per feature: its pages, components, queries, tests |
 | `src/lib/`        | Pure helpers (dates, formatting); tested directly             |
@@ -55,13 +57,18 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   date in a query key: a query fetched yesterday (or restored from storage)
   must stay the same query. Compute the date range inside `queryFn` and drop
   passed days in `select` (see `publicWindow.ts`).
-- **One build version.** `BUILD_VERSION` (`src/app/buildVersion.ts`) is set
-  at compile time by `define` in `vite.config.ts`: the commit SHA for builds
+- **One build version.** `BUILD_VERSION` (`src/app/buildVersion.ts`) is
+  read from `<meta name="build-version">`, which `buildVersionMeta` in
+  `vite.config.ts` writes into `index.html`: the commit SHA for builds
   (`VERCEL_GIT_COMMIT_SHA`, `GITHUB_SHA` or `git rev-parse`),
-  `dev-<start time>` per dev server start, `"test"` under Vitest. It reaches
-  the app as `services.buildVersion`. Everything that must react to a deploy
-  keys off it: the persisted query cache now, and the service worker cache
-  and update prompt (slice 7).
+  `dev-<start time>` per dev server start. It is kept out of the JS, so a
+  deploy changes only the chunks whose code changed (and the service worker
+  downloads only those). Tests have no `index.html`; `renderApp` passes
+  `"test"` or the `buildVersion` given. It reaches the app as
+  `services.buildVersion`. Everything that must react to a deploy keys off
+  it: the persisted query cache and the footer; and since every deploy
+  changes `index.html`, the service worker's precache list changes, which is
+  how browsers notice the deploy and the app reloads onto it (below).
 - **Persisted cache.** `src/app/persistedCache.ts` saves the query kinds in
   its `PERSISTED_SHAPES` allow-list to `services.storage` after each
   successful fetch or `setQueryData`, and restores them synchronously at boot
@@ -83,6 +90,62 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
     - Use `services.storage` for device storage, never `localStorage`
       directly. The legacy `events`/`bios` keys are removed at boot and never
       read.
+- **Service worker.** `src/sw/sw.ts`, built to `/sw.js` by
+  vite-plugin-pwa (`injectManifest`, production builds only; never in dev or
+  tests), typechecked by its own `src/sw/tsconfig.json` (worker globals, no
+  DOM; the app's tsconfig excludes it). Its decisions are pure functions in
+  `src/sw/swRules.ts`, tested directly. It may cache only the build output
+  listed in `PRECACHE_GLOBS`: `index.html`, the hashed JS/CSS/font/images
+  under `assets/`, the loader logo, the manifest and its icons, in one
+  precache (`ci-calendar-precache-v2-<scope>`) revisioned per file by
+  workbox, so a deploy downloads only what changed. It has **no runtime
+  caching**: Supabase API, auth, functions and storage requests (and
+  anything else not precached) are never intercepted; offline data comes
+  from the persisted query cache. Navigations get the cached `index.html`,
+  except paths whose last segment names a file (`/sitemap.xml`; the query
+  string doesn't count). Never add a runtime route, strategy or
+  `respondWith`; `npm run check:sw` (CI, after the build) fails if the
+  precache misses the shell or a JS/CSS file or lists anything not
+  same-origin, if `sw.ts` imports a workbox module beyond core, precaching
+  and routing, registers any route but the navigation route or writes to
+  Cache Storage, or if `sw.js` mentions Supabase. On activation the worker
+  deletes every cache but its own precache (legacy's `api-cache-*`
+  NetworkFirst caches, workbox's old precache). It keeps legacy's URL and
+  scope (`/sw.js`, `/`) so browsers swap it in as legacy's update; never
+  rename it. Finding legacy caches at install, it takes over at once
+  (legacy pages can't hand over) and, once active, reloads every open page
+  (their legacy chunks are gone); otherwise a new version waits for the
+  page. `vercel.json` answers a missing `/assets/…` with a 404 (no rewrite
+  to `index.html`, so a stale chunk fails visibly) and serves `/assets/*`
+  as `immutable` for a year. The manifest stays `public/site.webmanifest`
+  (the plugin emits none). The footer's reset (`resetDevice`) still
+  unregisters it and clears Cache Storage; the next load registers it again.
+- **Updates and the reload guard.** `services.updates` (`AppUpdates`,
+  `app/updates/updates.ts`) is the service worker seam: production registers
+  it after load and idle with its code imported then
+  (`app/updates/serviceWorker.ts`, ~0.5 KB, off `/`'s initial JS); dev and
+  tests get `NO_UPDATES` unless a test passes `createFakeUpdates()`. It
+  checks for a new version when the page goes to the background (at most
+  every 10 minutes) and hourly; the browser also checks on each load.
+  `useSafeUpdates` (in `AppRoot`) hands the page over to a waiting version
+  when the page goes to the background and reloads onto it, through
+  `services.reload`, the moment it is visible again (if the version arrived
+  while away, both happen on return); never while it stays visible. Legacy
+  had no update prompt, so there is none. **Anything holding unsaved work
+  must block the reload**: call `useBlockReload(isDirty)`
+  (`app/updates/reloadGuard.ts`) in the form (slices 10+); while any block is
+  held there is no handover or reload, and the update waits for a later
+  leave and return. Explicit reloads (the footer's reset, the button below)
+  ignore the guard.
+- **Stale chunks.** A tab still on an old version (another tab handed over,
+  or no service worker) can ask for a lazy file the deploy removed.
+  `app/updates/staleChunks.ts` reloads once onto the current version on
+  Vite's `vite:preloadError` (every failed dynamic import) and in
+  `RouteError` for such errors (`isStaleChunkError`), unless the reload
+  guard is blocked, the device is offline, or it already did so within a
+  minute (`staleChunkReloadAt` in `services.session`, sessionStorage; no
+  reload loops). Otherwise `RouteError` says a new version is available,
+  with a reload button.
 - **Freshness.** Public window: stale after 5 minutes, refetched on
   `visibilitychange` to visible when stale (TanStack's `focusManager`),
   always refetched on reconnect (`refetchOnReconnect: "always"`), and always
@@ -318,6 +381,15 @@ feature helpers is tested directly.
   `vi.stubEnv` (e.g. `VITE_WHATSAPP_NUMBER`) lasts one test.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
+- **Updates:** `renderApp({ updates: sw.updates })` with
+  `sw = createFakeUpdates()` (`src/test/fakeUpdates.ts`); `sw.announce()`
+  reports a new version, `sw.activations` counts handovers, and `reloads`
+  (from `renderApp`) counts reloads. `setPageVisibility("hidden" |
+"visible")` (`src/test/browser.ts`) sends the page away and back.
+  `renderApp({ routes })` swaps in stand-in routes for app-wide behaviour no
+  real page exercises yet (a form blocking reloads, a lazy file that is
+  gone); `session` (like `storage`) carries sessionStorage across two
+  renders, i.e. a reload.
 - **Freshness:** staleness is measured with `Date.now()`, so fake only the
   clock (`vi.useFakeTimers({ toFake: ["Date"] })`) and advance it with
   `vi.setSystemTime`. Dispatch `visibilitychange` (overriding
@@ -357,3 +429,13 @@ feature helpers is tested directly.
    woff2 Assistant, preloaded, `font-display: optional`; one module per
    icon; `index.html`
    cleaned (one viewport/manifest/description, GA after load, no logs).
+7. Service worker and safe updates: `/sw.js` from `src/sw/sw.ts`
+   (injectManifest, own tsconfig), precaching only the shell and build files
+   (revisioned per file), no runtime caching, navigations to the cached
+   `index.html`; replaces legacy's worker in place, deletes its caches and
+   reloads open legacy pages; `BUILD_VERSION` moved to an `index.html` meta
+   tag so unchanged chunks keep their hashes; registered after load and
+   idle; a new version is handed over when the page is left and reloaded in
+   on return, held off by `useBlockReload`; stale-chunk recovery (one guarded
+   reload, else a reload button); assets 404 and immutable on Vercel;
+   `check:sw` in CI.

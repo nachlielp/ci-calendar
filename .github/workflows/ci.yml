@@ -35,3 +35,6 @@ jobs:
 
             - name: Bundle size limit
               run: npm run check:bundle
+
+            - name: Service worker precache
+              run: npm run check:sw

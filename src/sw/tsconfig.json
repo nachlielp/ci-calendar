@@ -1,0 +1,18 @@
+{
+    // The service worker runs in a worker, not a page: worker globals
+    // (`self`, `clients`, `caches`), no DOM. Checked by `npm run typecheck`.
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2022", "WebWorker"],
+        "types": [],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
+    },
+    "include": ["sw.ts", "swRules.ts"]
+}

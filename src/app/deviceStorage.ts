@@ -5,13 +5,16 @@ export type DeviceStorage = Pick<
 >
 
 /**
- * The browser's localStorage, or an in-memory stand-in where it is blocked
- * (some private modes throw on access). Either way the app works; without
- * localStorage it just can't render instantly on the next visit.
+ * The browser's localStorage (or sessionStorage, which lasts one tab's
+ * session), or an in-memory stand-in where it is blocked (some private
+ * modes throw on access). Either way the app works; without localStorage it
+ * just can't render instantly on the next visit.
  */
-export function browserStorage(): DeviceStorage {
+export function browserStorage(
+    kind: "localStorage" | "sessionStorage" = "localStorage",
+): DeviceStorage {
     try {
-        const storage = window.localStorage
+        const storage = window[kind]
         storage.getItem("")
         return storage
     } catch {

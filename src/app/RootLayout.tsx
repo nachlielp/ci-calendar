@@ -1,7 +1,9 @@
+import { useContext, useEffect } from "react"
 import {
     Link,
     Outlet,
     ScrollRestoration,
+    useRouteError,
     type Location,
     type UIMatch,
 } from "react-router"
@@ -10,13 +12,31 @@ import { defineCopy } from "../lib/copy"
 import { AppHeader } from "./header/AppHeader"
 import { InstallBanner } from "./install/InstallBanner"
 import { useCopy } from "./language"
+import { useServices } from "./services"
+import { ReloadGuardContext } from "./updates/reloadGuard"
+import { isStaleChunkError, reloadForStaleChunks } from "./updates/staleChunks"
 import { useRemoveInitialLoader } from "./useRemoveInitialLoader"
 import "./RootLayout.scss"
 
 const ERROR_COPY = defineCopy({
-    he: { title: "משהו השתבש" },
-    en: { title: "Something went wrong" },
-    ru: { title: "Что-то пошло не так" },
+    he: {
+        title: "משהו השתבש",
+        newVersion: "יש גרסה חדשה של האפליקציה",
+        reloadToContinue: "טענו מחדש את הדף כדי להמשיך.",
+        reload: "טעינה מחדש",
+    },
+    en: {
+        title: "Something went wrong",
+        newVersion: "A new version of the app is available",
+        reloadToContinue: "Reload the page to continue.",
+        reload: "Reload",
+    },
+    ru: {
+        title: "Что-то пошло не так",
+        newVersion: "Доступна новая версия приложения",
+        reloadToContinue: "Перезагрузите страницу, чтобы продолжить.",
+        reload: "Перезагрузить",
+    },
 })
 
 /** The route id of the calendar and the events opened over it. */
@@ -74,6 +94,31 @@ export function RouteError() {
     useRemoveInitialLoader()
     const copy = useCopy(ERROR_COPY)
     const common = useCopy(COMMON_COPY)
+    const services = useServices()
+    const guard = useContext(ReloadGuardContext)
+    const staleChunk = isStaleChunkError(useRouteError())
+
+    // A lazy file of an old version is gone: reload onto the current one
+    // (once, and not over unsaved work), else offer the button below.
+    useEffect(() => {
+        if (staleChunk && guard) reloadForStaleChunks(services, guard)
+    }, [staleChunk, services, guard])
+
+    if (staleChunk) {
+        return (
+            <main className="app route-error" role="alert">
+                <h1>{copy.newVersion}</h1>
+                <p>{copy.reloadToContinue}</p>
+                <button
+                    type="button"
+                    className="route-error-reload"
+                    onClick={services.reload}
+                >
+                    {copy.reload}
+                </button>
+            </main>
+        )
+    }
 
     return (
         <main className="app route-error" role="alert">
