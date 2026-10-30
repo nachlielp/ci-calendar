@@ -1,8 +1,14 @@
 import { queryOptions } from "@tanstack/react-query"
 import type { AppServices } from "../../app/services"
 import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
+import {
+    PUBLIC_EVENT_COLUMNS,
+    selectPublicEvents,
+    toPublicEvent,
+    type PublicEvent,
+} from "./publicEvent"
 
-/** How far ahead the public calendar looks. ~25 events, ~6 KB gzipped. */
+/** How far ahead the public calendar looks. ~25 events, ~5 KB gzipped. */
 const WINDOW_DAYS = 90
 
 /**
@@ -10,7 +16,7 @@ const WINDOW_DAYS = 90
  * refetched when the app becomes visible again. Coming back online always
  * refetches: whatever was shown came from before the connection dropped.
  */
-const STALE_MS = 5 * 60 * 1000
+export const STALE_MS = 5 * 60 * 1000
 
 /**
  * First element of the window's query key. The key deliberately has no date:
@@ -19,31 +25,18 @@ const STALE_MS = 5 * 60 * 1000
  */
 export const PUBLIC_WINDOW_KIND = "public-window"
 
-// Only the columns the calendar renders. Later slices (cards, filters,
-// languages) extend this list; keep it lean — it is the first-paint payload.
-const COLUMNS = "id, title, start_date, cancelled"
-
 /**
  * The shape of `PublicEvent[]` for the persisted cache (app/persistedCache.ts):
  * stored data with another shape is never restored. Changing the columns
  * changes it; bump the number when the mapping to `PublicEvent` changes
  * without a column change.
  */
-export const PUBLIC_WINDOW_SHAPE = `1|${COLUMNS}`
-
-export interface PublicEvent {
-    id: string
-    title: string
-    /** Calendar day, `YYYY-MM-DD`. */
-    startDate: string
-    cancelled: boolean
-}
+export const PUBLIC_WINDOW_SHAPE = `1|${PUBLIC_EVENT_COLUMNS}`
 
 /**
  * The public calendar window: visible events from today (Jerusalem) up to
- * WINDOW_DAYS ahead, in one request. RLS already withholds hidden events from
- * anonymous visitors; the explicit `hide = false` keeps a signed-in owner's
- * hidden drafts off the public calendar too.
+ * WINDOW_DAYS ahead, in one request, with the public bios of their teachers
+ * (see `selectPublicEvents` for the explicit public filters).
  *
  * The cached data may hold days that have since passed (a window fetched
  * before midnight, or restored from storage), so `select` drops events dated
@@ -61,10 +54,7 @@ export function publicWindowQuery({ data, now }: AppServices) {
         queryFn: async (): Promise<PublicEvent[]> => {
             const from = jerusalemToday(now())
             const to = addDays(from, WINDOW_DAYS)
-            const { data: rows, error } = await data
-                .from("ci_events")
-                .select(COLUMNS)
-                .eq("hide", false)
+            const { data: rows, error } = await selectPublicEvents(data)
                 .gte("start_date", from)
                 .lte("start_date", to)
                 .order("start_date", { ascending: true })
@@ -72,17 +62,8 @@ export function publicWindowQuery({ data, now }: AppServices) {
 
             // `start_date` is nullable in the schema, but the range filter
             // above already excludes nulls.
-            return rows.flatMap((row) =>
-                row.start_date
-                    ? [
-                          {
-                              id: row.id,
-                              title: row.title,
-                              startDate: row.start_date,
-                              cancelled: row.cancelled ?? false,
-                          },
-                      ]
-                    : [],
+            return rows.flatMap(({ start_date, ...row }) =>
+                start_date ? [toPublicEvent({ ...row, start_date })] : [],
             )
         },
     })

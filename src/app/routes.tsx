@@ -11,7 +11,18 @@ export const routes: RouteObject[] = [
         // While a lazy first route loads, index.html's loader is still up.
         HydrateFallback: () => null,
         children: [
-            { index: true, element: <CalendarPage /> },
+            {
+                // An event's link opens it over the calendar. `/:eventId` is
+                // the legacy short form; a top-level path that names no
+                // visible event renders the 404 page. Static top-level pages
+                // (later slices) outrank it.
+                element: <CalendarPage />,
+                children: [
+                    { index: true, element: null },
+                    { path: "event/:eventId", element: null },
+                    { path: ":eventId", element: null },
+                ],
+            },
             {
                 path: "*",
                 lazy: async () => ({

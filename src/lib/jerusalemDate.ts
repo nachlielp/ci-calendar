@@ -18,3 +18,24 @@ export function addDays(day: string, days: number): string {
     date.setUTCDate(date.getUTCDate() + days)
     return date.toISOString().slice(0, 10)
 }
+
+const jerusalemClock = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Jerusalem",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+})
+
+/**
+ * The Jerusalem wall-clock time (`HH:mm`) of an instant. Segment times are
+ * stored as full timestamps, but only their time of day is meaningful: the
+ * date part may be that of the template the event was made from.
+ */
+export function jerusalemTimeOfDay(instant: string): string {
+    return jerusalemClock.format(new Date(instant))
+}
+
+/** Day of the week of a calendar day, 0 = Sunday … 6 = Saturday. */
+export function weekday(day: string): number {
+    return new Date(`${day}T00:00:00Z`).getUTCDay()
+}

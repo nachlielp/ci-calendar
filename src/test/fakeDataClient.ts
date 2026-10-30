@@ -1,19 +1,50 @@
 import type { DataClient } from "../data/client"
 
 // The single test seam: a fake of the data client that behaves like a tiny
-// PostgREST. Seeded rows live per table; each query applies the top-level
-// predicates it was built with (eq / gte / lte / order) and returns only the
-// selected columns, so tests prove behaviour end to end — e.g. hidden rows
-// seeded here never come back out of the public query, and a page reading a
-// column its query didn't select sees `undefined`. Every request is recorded so
+// PostgREST. Seeded rows live per table; each query applies the predicates it
+// was built with (eq / neq / gte / lte / order) and returns only the selected
+// columns, so tests prove behaviour end to end — e.g. hidden rows seeded here
+// never come back out of the public query, and a page reading a column its
+// query didn't select sees `undefined`. Embedded resources (`a, b(c, d)`)
+// are joined through the foreign keys in RELATIONS, and dotted predicates
+// (`b.c`) filter the embedded rows as PostgREST does: a filtered-out to-one
+// embed is `null`, a to-many embed loses the rows, the parent row stays.
+// `single()` / `maybeSingle()` return one row. Every request is recorded so
 // tests can assert on what was asked of the backend. Requests to a table can
 // be made to fail, or held until the test releases them (a slow network).
-// Nested (dotted) predicates are recorded, not applied.
 
 type Row = Record<string, unknown>
 
+/**
+ * The foreign keys the app embeds through, as in `database.types.ts`:
+ * `RELATIONS[table][embedded]` joins `table.column` to `embedded.foreignColumn`.
+ */
+const RELATIONS: Record<string, Record<string, Relation>> = {
+    ci_events: {
+        ci_events_users_junction: {
+            column: "id",
+            foreignColumn: "ci_event_id",
+            many: true,
+        },
+    },
+    ci_events_users_junction: {
+        public_bio: {
+            column: "user_id",
+            foreignColumn: "user_id",
+            many: false,
+        },
+    },
+}
+
+interface Relation {
+    column: string
+    foreignColumn: string
+    /** To-many embeds are arrays; to-one embeds are a row or `null`. */
+    many: boolean
+}
+
 export interface RecordedFilter {
-    op: "eq" | "gte" | "lte"
+    op: "eq" | "neq" | "gte" | "lte"
     column: string
     value: unknown
 }
@@ -23,6 +54,8 @@ export interface RecordedRequest {
     select: string
     filters: RecordedFilter[]
     order: { column: string; ascending: boolean } | null
+    /** Set by `single()` / `maybeSingle()`. */
+    returns: "rows" | "single" | "maybeSingle"
 }
 
 export interface FakeDataClient {
@@ -39,38 +72,50 @@ export interface FakeDataClient {
 }
 
 function matches(row: Row, filter: RecordedFilter) {
-    if (filter.column.includes(".")) return true
     const value = row[filter.column]
     if (filter.op === "eq") return value === filter.value
+    // SQL comparisons with NULL are never true.
     if (value == null) return false
+    if (filter.op === "neq") return value !== filter.value
     return filter.op === "gte"
         ? String(value) >= String(filter.value)
         : String(value) <= String(filter.value)
 }
 
-/** Top-level names in a PostgREST select list, e.g. `a, b, c(d, e)` → a, b, c. */
-function selectedColumns(select: string): string[] | null {
+/** A selected column (`children === null`) or embedded table. */
+interface Field {
+    /** The key in the result: the alias if there is one. */
+    key: string
+    name: string
+    children: Field[] | null
+}
+
+/** Parses a PostgREST select list, e.g. `a, b:c, d(e, f(g))`; null for `*`. */
+function parseSelect(select: string): Field[] | null {
     if (select === "*") return null
-    const columns: string[] = []
+    const fields: Field[] = []
     let depth = 0
     let current = ""
+    const push = () => {
+        const open = current.indexOf("(")
+        const head = open === -1 ? current : current.slice(0, open)
+        const [alias, name = alias] = head.split(":")
+        fields.push({
+            key: alias,
+            name,
+            children:
+                open === -1 ? null : parseSelect(current.slice(open + 1, -1)),
+        })
+        current = ""
+    }
     for (const char of select) {
         if (char === "(") depth++
         if (char === ")") depth--
-        if (char === "," && depth === 0) {
-            columns.push(current)
-            current = ""
-        } else {
-            current += char
-        }
+        if (char === "," && depth === 0) push()
+        else current += char
     }
-    columns.push(current)
-    return columns.map((column) => column.split("(")[0].split(":").pop()!)
-}
-
-function project(row: Row, columns: string[] | null): Row {
-    if (!columns) return { ...row }
-    return Object.fromEntries(columns.map((column) => [column, row[column]]))
+    push()
+    return fields
 }
 
 export function createFakeDataClient(
@@ -86,6 +131,7 @@ export function createFakeDataClient(
             select: "*",
             filters: [],
             order: null,
+            returns: "rows",
         }
         requests.push(request)
 
@@ -96,6 +142,8 @@ export function createFakeDataClient(
             },
             eq: (column: string, value: unknown) =>
                 addFilter("eq", column, value),
+            neq: (column: string, value: unknown) =>
+                addFilter("neq", column, value),
             gte: (column: string, value: unknown) =>
                 addFilter("gte", column, value),
             lte: (column: string, value: unknown) =>
@@ -107,9 +155,17 @@ export function createFakeDataClient(
                 }
                 return builder
             },
+            single() {
+                request.returns = "single"
+                return builder
+            },
+            maybeSingle() {
+                request.returns = "maybeSingle"
+                return builder
+            },
             then<T>(
                 resolve: (result: {
-                    data: Row[] | null
+                    data: Row[] | Row | null
                     error: { message: string } | null
                 }) => T,
                 reject?: (reason: unknown) => T,
@@ -140,9 +196,50 @@ export function createFakeDataClient(
         const failure = failures.get(request.table)
         if (failure) return { data: null, error: { message: failure } }
 
-        let rows = (seed[request.table] ?? []).filter((row) =>
-            request.filters.every((filter) => matches(row, filter)),
-        )
+        /** The filters on the embed at `path` (`""` for the table itself). */
+        const filtersAt = (path: string) =>
+            request.filters.flatMap((filter) => {
+                const dot = filter.column.lastIndexOf(".")
+                const filterPath = dot === -1 ? "" : filter.column.slice(0, dot)
+                return filterPath === path
+                    ? [{ ...filter, column: filter.column.slice(dot + 1) }]
+                    : []
+            })
+        const where = (table: string, path: string) =>
+            (seed[table] ?? []).filter((row) =>
+                filtersAt(path).every((filter) => matches(row, filter)),
+            )
+
+        function project(
+            table: string,
+            row: Row,
+            fields: Field[] | null,
+            path: string,
+        ): Row {
+            if (!fields) return { ...row }
+            return Object.fromEntries(
+                fields.map(({ key, name, children }) => {
+                    if (!children) return [key, row[name]]
+                    const relation = RELATIONS[table]?.[name]
+                    if (!relation) {
+                        throw new Error(`fake: no relation ${table} → ${name}`)
+                    }
+                    const embedPath = path ? `${path}.${name}` : name
+                    const related = where(name, embedPath)
+                        .filter(
+                            (other) =>
+                                other[relation.foreignColumn] ===
+                                row[relation.column],
+                        )
+                        .map((other) =>
+                            project(name, other, children, embedPath),
+                        )
+                    return [key, relation.many ? related : (related[0] ?? null)]
+                }),
+            )
+        }
+
+        let rows = where(request.table, "")
         if (request.order) {
             const { column, ascending } = request.order
             rows = [...rows].sort((a, b) => {
@@ -152,8 +249,19 @@ export function createFakeDataClient(
                 return ascending ? result : -result
             })
         }
-        const columns = selectedColumns(request.select)
-        return { data: rows.map((row) => project(row, columns)), error: null }
+        const fields = parseSelect(request.select)
+        const data = rows.map((row) => project(request.table, row, fields, ""))
+        if (request.returns === "rows") return { data, error: null }
+        if (data.length > 1 || (request.returns === "single" && !data[0])) {
+            return {
+                data: null,
+                error: {
+                    message:
+                        "JSON object requested, multiple (or no) rows returned",
+                },
+            }
+        }
+        return { data: data[0] ?? null, error: null }
     }
 
     return {

@@ -88,6 +88,44 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   failed). With no data and no connection, the page says it can't load and
   the paused request goes out once back online. `useIsOnline()` reads
   TanStack's `onlineManager`, which boot seeds from `navigator.onLine`.
+- **Public events.** Every public read of `ci_events` starts from
+  `selectPublicEvents` (`features/calendar/publicEvent.ts`): the columns the
+  list and details need, the tagged teachers' public bios embedded through
+  `ci_events_users_junction`, and the explicit public filters (`hide = false`,
+  bios `show_profile = true`). Rows map to `PublicEvent` in one place
+  (`toPublicEvent`). The embed relies on junction rows; legacy events missing
+  them are backfilled by
+  `supabase/migrations/20261030000000_backfill_event_teacher_junction.sql`
+  (applied by hand).
+- **Shared links.** `/event/:eventId` and the legacy `/:eventId` open the
+  event over the calendar (`useLinkedEvent`): from the cached window when it
+  has it, else with one request for that event alone, in parallel with the
+  window. The dialog opens at once, with loading, offline and failed (retry)
+  states; only a definite "no visible event" renders the 404 page. So a
+  mistyped single-segment URL (e.g. `/abuot`) costs one small request before
+  its 404. Static top-level routes (`/about`, `/login`, …) outrank
+  `/:eventId` in React Router's ranking, so later slices just add them; they
+  never reach the event lookup.
+- **Rendering cost.** Derive display data (sort keys, labels, time ranges)
+  once per data change in a pure function, memoised on the query data (see
+  `toEventCards`); keep query options stable (`useMemo`) so `select` doesn't
+  rerun on every render. Long lists put `content-visibility: auto` with a
+  `contain-intrinsic-size` on their items.
+- **Dialogs and icons.** Drawers and modals use `Dialog` (`src/ui/Dialog.tsx`):
+  a native `<dialog>` portalled to `body`, a drawer under 500px and a modal
+  above (CSS only). Mount it to open it. The close button, Escape and a
+  backdrop click (pointer down and up on the backdrop) close the native
+  dialog, and its `close` event calls `onClose`; the owner then unmounts it.
+  Unmounting it directly (e.g. on Back) is fine. Focus returns to the element
+  that had it, and the page behind doesn't scroll while it is open. Its body
+  is the scroller and fills the box. Icons are inline SVG components in
+  `src/ui/icons.tsx` (Material Symbols paths from `legacy/src/assets/svgs`);
+  add new ones there, never load SVG files at runtime.
+- **Copy.** Until the languages slice, Hebrew copy sits in one `COPY` object
+  per component. Event vocabulary (types, tags, the day format, shared copy)
+  is an `EventLocale` in `features/calendar/eventFormat.ts`; the formatters
+  take one, `HEBREW` by default. Slice 5 adds English and Russian locales and
+  passes the UI language's locale to them and to the components.
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
@@ -102,6 +140,14 @@ feature helpers is tested directly.
 
 - **Repeat visits:** pass the same `storage` (`createMemoryStorage()`) to two
   `renderApp` calls, unmounting the first. `buildVersion` simulates a deploy.
+- **Embedded resources:** the fake joins embeds through the foreign keys in
+  its `RELATIONS` map and applies dotted filters to the embedded rows, as
+  PostgREST does; add a relation there when a query embeds a new one. It also
+  supports `neq`, `single()` and `maybeSingle()`. `renderApp` returns the
+  `router`, to assert the URL.
+- **Dialogs:** jsdom lacks `showModal()`/`close()` and Escape-to-close;
+  `src/test/setup.ts` stands in for them, so `userEvent.keyboard("{Escape}")`
+  closes the topmost dialog as in a browser.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
 - **Freshness:** staleness is measured with `Date.now()`, so fake only the
@@ -119,3 +165,7 @@ feature helpers is tested directly.
    (shape-checked, stale after a deploy) and rendered from storage at boot,
    past days are dropped at read, refetch on visible-when-stale and on
    reconnect, offline/stale notice.
+3. Event cards, details and deep links: legacy event cards (sorted by day and
+   time, cancelled marked), full details with teacher bios in a lazy native
+   `<dialog>`, `/event/:id` and `/:shortId` links (window first, else one
+   by-link request; unknown or hidden → 404); junction backfill migration.

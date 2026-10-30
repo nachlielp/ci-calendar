@@ -1,0 +1,202 @@
+// Ported from legacy/src/styles/full-event-card.scss, bio-modal.scss and the
+// `.secondary-action-btn` of generics/buttons.scss (antd Tag → spans).
+.full-event-card {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    gap: 8px;
+
+    p {
+        margin: 0;
+    }
+
+    .event-title {
+        margin: 0 0 16px;
+        font-size: 26px;
+        font-weight: 400;
+        color: #bc3528;
+    }
+
+    .event-cancelled {
+        font-size: 20px;
+        font-weight: 600;
+        color: #913e2f;
+    }
+
+    .event-row {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .event-icon {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        margin-inline-end: 4px;
+        margin-top: 4px;
+    }
+
+    .event-label {
+        font-size: 20px;
+        font-weight: 600;
+        margin-inline-end: 8px;
+    }
+
+    .event-time {
+        white-space: nowrap;
+    }
+
+    .event-labels {
+        font-size: 18px;
+    }
+
+    .teacher-name-label {
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .bio-modal-label {
+        padding: 0;
+        border: none;
+        background: none;
+        color: blue;
+        text-decoration: underline;
+        cursor: pointer;
+        font: inherit;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .sub-event {
+        font-size: 18px;
+        line-height: 1.3;
+    }
+
+    .segment-tag {
+        display: inline-block;
+        margin-inline-start: 4px;
+        padding: 0 7px;
+        border: 1px solid #b7eb8f;
+        border-radius: 4px;
+        background: #f6ffed;
+        color: #389e0d;
+        font-size: 18px;
+    }
+
+    .event-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    .event-tag {
+        background-color: #e5e5ea;
+        color: #000;
+        font-size: 16px;
+        padding: 6px 12px;
+        border-radius: 8px;
+    }
+
+    .event-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .link-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        padding: 0 4px;
+        border: 2px solid #bc3528;
+        border-radius: 6px;
+        color: #000;
+        font-size: 18px;
+        text-decoration: none;
+
+        .link-icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    .hr {
+        width: 90%;
+        margin: 16px 0;
+        border: 1px solid #bc3528;
+        border-bottom: none;
+    }
+
+    .section-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+
+    .event-description {
+        margin: 0 16px;
+        font-size: 18px;
+        white-space: pre-wrap;
+        overflow-wrap: break-word;
+    }
+
+    @media (min-width: 768px) {
+        .event-description {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px 0;
+            scrollbar-width: thin;
+        }
+    }
+
+    .event-price {
+        font-size: 18px;
+    }
+
+    .event-card-footer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .secondary-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin: 16px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 10px;
+        background-color: #e7d1cd;
+        color: #1f2937;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+            background-color: #dcb8b1;
+        }
+
+        .label {
+            font-size: 20px;
+        }
+
+        .action-icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+.event-details-status {
+    margin: 0;
+    font-size: 18px;
+}

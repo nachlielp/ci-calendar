@@ -3,7 +3,14 @@ import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { renderApp } from "../../test/renderApp"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { event, eventTitles } from "./testEvents"
+import {
+    bio,
+    event,
+    eventCard,
+    eventTitles,
+    segment,
+    tagging,
+} from "./testEvents"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem.
 const NOW = new Date("2026-10-30T09:00:00Z")
@@ -97,17 +104,124 @@ describe("public calendar (/)", () => {
         expect(fake.requests).toHaveLength(1)
     })
 
-    it("marks cancelled events", async () => {
+    it("orders events on the same day by start time", async () => {
         const fake = createFakeDataClient({
-            ci_events: [event({ title: "ג'אם", cancelled: true })],
+            ci_events: [
+                event({
+                    title: "ג'אם ערב",
+                    segments: [
+                        segment({
+                            startTime: "2026-11-01T18:00:00Z",
+                            endTime: "2026-11-01T20:00:00Z",
+                        }),
+                    ],
+                }),
+                event({
+                    title: "שיעור בוקר",
+                    segments: [
+                        segment({
+                            startTime: "2026-11-01T07:00:00Z",
+                            endTime: "2026-11-01T08:00:00Z",
+                        }),
+                    ],
+                }),
+            ],
         })
 
         renderApp({ fake, now: NOW })
 
-        const list = await screen.findByRole("list", {
-            name: "אירועים קרובים",
+        expect(await eventTitles()).toEqual(["שיעור בוקר", "ג'אם ערב"])
+    })
+
+    it("shows each event's card: day, time, place, teachers, organisers and types", async () => {
+        const noa = bio({ bio_name: "נועה כהן" })
+        const deepContact = bio({ bio_name: "DeepContact", user_type: "org" })
+        const jam = event({
+            title: "שיעור וג'אם",
+            start_date: "2026-11-07",
+            end_date: "2026-11-07",
+            address: { label: "יער המאכל", place_id: "P1" },
+            organisations: [
+                { label: "DeepContact ", value: deepContact.user_id },
+            ],
+            segments: [
+                segment({
+                    type: "class",
+                    startTime: "2026-11-07T17:00:00Z",
+                    endTime: "2026-11-07T18:30:00Z",
+                    teachers: [
+                        { label: "נועה", value: noa.user_id },
+                        { label: "רותם רם", value: "רותם רם" },
+                    ],
+                }),
+                segment({
+                    type: "jam",
+                    startTime: "2026-11-07T18:30:00Z",
+                    endTime: "2026-11-07T21:00:00Z",
+                }),
+            ],
         })
-        expect(within(list).getByText("בוטל")).toBeInTheDocument()
+        const fake = createFakeDataClient({
+            ci_events: [jam],
+            public_bio: [noa, deepContact],
+            ci_events_users_junction: [
+                tagging(jam, noa),
+                tagging(jam, deepContact),
+            ],
+        })
+
+        renderApp({ fake, now: NOW })
+
+        const card = await eventCard("שיעור וג'אם")
+        expect(card).toHaveTextContent("שבת, יום שבת 7 בנובמבר")
+        expect(card).toHaveTextContent("19:00 - 23:00")
+        expect(card).toHaveTextContent("יער המאכל")
+        // Teachers and organisers by their public bio's name when they have one.
+        expect(card).toHaveTextContent("עם נועה כהן, רותם רם")
+        expect(card).toHaveTextContent("DeepContact")
+        expect(within(card).getByText("שיעור")).toBeVisible()
+        expect(within(card).getByText("ג'אם")).toBeVisible()
+    })
+
+    it("shows a multi-day event's day range", async () => {
+        const fake = createFakeDataClient({
+            ci_events: [
+                event({
+                    title: "ריטריט",
+                    start_date: "2026-11-06",
+                    end_date: "2026-11-08",
+                    type: "retreat",
+                    segments: [],
+                }),
+            ],
+        })
+
+        renderApp({ fake, now: NOW })
+
+        const card = await eventCard("ריטריט")
+        expect(card).toHaveTextContent(
+            "שישי, יום שישי 6 בנובמבר - ראשון, יום ראשון 8 בנובמבר",
+        )
+    })
+
+    it("marks cancelled events with their cancellation text", async () => {
+        const fake = createFakeDataClient({
+            ci_events: [
+                event({
+                    title: "ג'אם",
+                    cancelled: true,
+                    cancelled_text: "נדחה לשבוע הבא",
+                }),
+            ],
+        })
+
+        renderApp({ fake, now: NOW })
+
+        const card = await eventCard("ג'אם")
+        expect(within(card).getByText("האירוע בוטל")).toBeVisible()
+        expect(within(card).getByText("נדחה לשבוע הבא")).toBeVisible()
+        // As in the legacy app, a cancelled event doesn't open.
+        expect(within(card).queryByRole("link")).toBeNull()
     })
 
     it("says so when there are no upcoming events", async () => {

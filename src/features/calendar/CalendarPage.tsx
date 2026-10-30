@@ -1,30 +1,69 @@
 import { useQuery } from "@tanstack/react-query"
+import { lazy, Suspense, useEffect, useMemo } from "react"
+import { useLocation, useNavigate, useParams } from "react-router"
 import { useServices } from "../../app/services"
 import { useIsOnline } from "../../app/useIsOnline"
-import { publicWindowQuery, type PublicEvent } from "./publicWindow"
+import { toEventCards } from "./eventCards"
+import { EventList, type FromListState } from "./EventList"
+import { useLinkedEvent } from "./linkedEvent"
+import { publicWindowQuery } from "./publicWindow"
 import { StaleDataNotice } from "./StaleDataNotice"
 
-// `start_date` is a calendar day, so format it as one (UTC midnight → no
-// timezone shift).
-const dayFormatter = new Intl.DateTimeFormat("he-IL", {
-    timeZone: "UTC",
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-})
+const loadEventDetails = () => import("./details/EventDetailsDialog")
+const EventDetailsDialog = lazy(loadEventDetails)
+const NotFoundPage = lazy(() => import("../../pages/NotFoundPage"))
 
-function formatDay(day: string) {
-    return dayFormatter.format(new Date(`${day}T00:00:00Z`))
+const COPY = {
+    title: "לוח אירועי קונטקט אימפרוביזציה",
+    noEvents: "אין אירועים קרובים",
+    offline: "אין חיבור לאינטרנט – לא ניתן לטעון את האירועים",
+    loadFailed: "לא הצלחנו לטעון את האירועים",
+    retry: "נסו שוב",
+    loading: "טוען אירועים…",
 }
 
+/**
+ * The public calendar at `/`, and with an event open over it at
+ * `/event/:eventId` or the short `/:eventId` (see `useLinkedEvent`).
+ */
 export default function CalendarPage() {
     const services = useServices()
     const isOnline = useIsOnline()
-    const {
-        data: events,
-        isError,
-        refetch,
-    } = useQuery(publicWindowQuery(services))
+    const { eventId } = useParams()
+    const location = useLocation()
+    const navigate = useNavigate()
+
+    // Stable options keep `select`'s result, and the cards below, stable
+    // across renders.
+    const windowQuery = useMemo(() => publicWindowQuery(services), [services])
+    const { data: events, isError, refetch } = useQuery(windowQuery)
+    const cards = useMemo(() => events && toEventCards(events), [events])
+    const linked = useLinkedEvent(eventId, events)
+
+    // Fetch the details' code alongside the linked event's data.
+    useEffect(() => {
+        if (eventId) void loadEventDetails()
+    }, [eventId])
+
+    if (linked?.status === "notFound") {
+        return (
+            <Suspense fallback={null}>
+                <NotFoundPage />
+            </Suspense>
+        )
+    }
+
+    const closeEvent = () => {
+        // Opened from the list: going back closes it and keeps the history
+        // tidy. Opened from a shared link: replace it with the calendar.
+        if ((location.state as FromListState | null)?.fromList) {
+            void navigate(-1)
+        } else {
+            const calendar = { pathname: "/", search: location.search }
+            void navigate(calendar, { replace: true })
+        }
+    }
+
     // Events, once there (fetched or restored from storage), stay on screen;
     // being offline or a failed refresh only adds a notice that they may be
     // out of date.
@@ -39,45 +78,38 @@ export default function CalendarPage() {
     return (
         <main className="calendar-page">
             <header>
-                <h1>לוח אירועי קונטקט אימפרוביזציה</h1>
+                <h1>{COPY.title}</h1>
             </header>
             {staleReason && <StaleDataNotice reason={staleReason} />}
-            {events ? (
-                events.length === 0 ? (
-                    <p>אין אירועים קרובים</p>
+            {cards ? (
+                cards.length === 0 ? (
+                    <p>{COPY.noEvents}</p>
                 ) : (
-                    <ul aria-label="אירועים קרובים" className="event-list">
-                        {events.map((event) => (
-                            <EventItem key={event.id} event={event} />
-                        ))}
-                    </ul>
+                    <EventList cards={cards} />
                 )
             ) : !isOnline ? (
                 // The request waits for the connection and is sent once back
                 // online.
-                <p role="alert">
-                    אין חיבור לאינטרנט – לא ניתן לטעון את האירועים
-                </p>
+                <p role="alert">{COPY.offline}</p>
             ) : isError ? (
                 <div role="alert">
-                    <p>לא הצלחנו לטעון את האירועים</p>
+                    <p>{COPY.loadFailed}</p>
                     <button type="button" onClick={() => refetch()}>
-                        נסו שוב
+                        {COPY.retry}
                     </button>
                 </div>
             ) : (
-                <p role="status">טוען אירועים…</p>
+                <p role="status">{COPY.loading}</p>
+            )}
+            {linked && (
+                <Suspense fallback={null}>
+                    <EventDetailsDialog
+                        key={eventId}
+                        linked={linked}
+                        onClose={closeEvent}
+                    />
+                </Suspense>
             )}
         </main>
-    )
-}
-
-function EventItem({ event }: { event: PublicEvent }) {
-    return (
-        <li className="event-item">
-            <time dateTime={event.startDate}>{formatDay(event.startDate)}</time>
-            <h2>{event.title}</h2>
-            {event.cancelled && <span className="cancelled">בוטל</span>}
-        </li>
     )
 }

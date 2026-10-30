@@ -47,5 +47,5 @@ export function renderApp({
             router={router}
         />,
     )
-    return { ...view, fake, storage }
+    return { ...view, fake, storage, router }
 }

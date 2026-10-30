@@ -20,3 +20,25 @@ afterEach(() => {
     delete (document as { visibilityState?: unknown }).visibilityState
     delete (navigator as { onLine?: unknown }).onLine
 })
+
+// jsdom has <dialog> but not its modal API. This stands in for what the
+// browser does: `showModal()` opens it on top, Escape closes the topmost one,
+// and `close()` fires the `close` event the app listens to.
+const openModals: HTMLDialogElement[] = []
+HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+    this.open = true
+    openModals.push(this)
+}
+HTMLDialogElement.prototype.close ??= function (this: HTMLDialogElement) {
+    if (!this.open) return
+    this.open = false
+    openModals.splice(openModals.indexOf(this), 1)
+    this.dispatchEvent(new Event("close"))
+}
+document.addEventListener("keydown", (event) => {
+    const top = openModals.filter((dialog) => dialog.isConnected).at(-1)
+    if (event.key === "Escape" && top) top.close()
+})
+afterEach(() => {
+    openModals.length = 0
+})
