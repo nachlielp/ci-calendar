@@ -284,7 +284,8 @@ function treeValue(text: string): string {
 
 /**
  * PostgREST's logic tree (`or=(…)`): conditions `column.op.value` (eq,
- * neq, lt, lte, gt, gte, ilike; values compared as text, as above, and
+ * neq, lt, lte, gt, gte, ilike, and `is` null/true/false; values compared
+ * as text, as above, and
  * double-quoted when they hold `,.:()`) and nested
  * `and(…)` / `or(…)`.
  */
@@ -295,11 +296,18 @@ function matchesTree(row: Row, tree: string, logic: "and" | "or"): boolean {
             return matchesTree(row, nested[2], nested[1] as "and" | "or")
         }
         const [column, op, ...rest] = term.split(".")
-        if (!["eq", "neq", "lt", "lte", "gt", "gte", "ilike"].includes(op)) {
+        if (
+            !["eq", "neq", "lt", "lte", "gt", "gte", "ilike", "is"].includes(op)
+        ) {
             throw new Error(`fake: no ${op} in or()`)
         }
         // PostgREST compares a logic tree's values as text.
         const value = treeValue(rest.join("."))
+        if (op === "is") {
+            const is = { null: null, true: true, false: false }[value]
+            if (is === undefined) throw new Error(`fake: no is.${value}`)
+            return (row[column] ?? null) === is
+        }
         if (op === "eq") return String(row[column]) === value
         if (op === "neq")
             return row[column] != null && String(row[column]) !== value

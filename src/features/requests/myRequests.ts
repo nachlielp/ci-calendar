@@ -8,13 +8,19 @@ import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import { useServices, type AppServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
 import type { Database, Json } from "../../data/database.types"
+import {
+    appendToResponses,
+    conditionalUpdate,
+    isClosed,
+    REQUEST_COLUMNS,
+    responsesOf,
+    whereOpen,
+    type RequestCondition,
+    type RequestResponse,
+} from "./requestRows"
 
 /** First element of the user's requests query key: personal, never persisted. */
 export const MY_REQUESTS_KIND = "my-requests"
-
-/** The `requests` columns the requests page shows and edits. */
-export const REQUEST_COLUMNS =
-    "id, number, created_at, type, status, closed, message, phone, responses"
 
 /**
  * What a request asks for (legacy `RequestType`). Only the role requests
@@ -33,13 +39,6 @@ export type RoleRequestType = (typeof ROLE_REQUEST_TYPES)[number]
  */
 export const offeredRequestTypes = (role: SignedInRole): RoleRequestType[] =>
     ROLE_REQUEST_TYPES.filter((type) => type !== role)
-
-/** An admin's (or the user's own) note on a request, as stored. */
-export type RequestResponse = {
-    response: string
-    created_at: string
-    responder_name: string
-}
 
 export interface UserRequest {
     id: string
@@ -65,31 +64,16 @@ interface RequestRow {
     responses: Json[]
 }
 
-function toResponse(value: Json): RequestResponse[] {
-    if (!value || typeof value !== "object" || Array.isArray(value)) return []
-    const text = (key: string) =>
-        typeof value[key] === "string" ? (value[key] as string) : ""
-    return [
-        {
-            response: text("response"),
-            created_at: text("created_at"),
-            responder_name: text("responder_name"),
-        },
-    ]
-}
-
 export function toUserRequest(row: RequestRow): UserRequest {
     return {
         id: row.id,
         number: row.number,
         createdAt: row.created_at,
         type: row.type ?? "",
-        // Admins close requests with `closed`; legacy's `status` stayed
-        // "open" (its status change was commented out), but honour it.
-        closed: row.closed === true || row.status === "closed",
+        closed: isClosed(row),
         message: row.message ?? "",
         phone: row.phone ?? "",
-        responses: (row.responses ?? []).flatMap(toResponse),
+        responses: responsesOf(row.responses),
     }
 }
 
@@ -218,25 +202,14 @@ function savePhoneIfMissing(
 
 /**
  * The open requests' writes go only to the user's own request while it is
- * still open (`closed IS NOT TRUE`): one an admin closed meanwhile is left
- * alone. RLS lets the owner write any column, so keeping a user from
- * changing other columns (`status`, admins' `responses`) would need an RPC.
+ * still open (`whereOpen`): one an admin closed meanwhile is left alone.
+ * RLS lets the owner write any column, so keeping a user from changing
+ * other columns (`status`, admins' `responses`) would need an RPC.
  */
-function openRequestWrite(
-    services: AppServices,
-    userId: string,
-    id: string,
-    patch: Database["public"]["Tables"]["requests"]["Update"],
-) {
-    return services.data
-        .from("requests")
-        .update(patch)
-        .eq("id", id)
-        .eq("user_id", userId)
-        .not("closed", "is", true)
-        .select(REQUEST_COLUMNS)
-        .maybeSingle()
-}
+const ownOpenRequest =
+    (userId: string): RequestCondition =>
+    (query) =>
+        whereOpen(query.eq("user_id", userId))
 
 /**
  * Sends a new role request (legacy `UserRequestVM.createRequest`'s row)
@@ -313,13 +286,13 @@ export function useEditRequest(userId: string) {
             patch: RequestEdit
         }) => {
             await sessionOf(services, userId)
-            const { data, error } = await openRequestWrite(
-                services,
-                userId,
+            const data = await conditionalUpdate(
+                services.data,
                 id,
+                ownOpenRequest(userId),
                 patch,
+                REQUEST_COLUMNS,
             )
-            if (error) throw new Error(error.message)
             if (!data) throw new RequestClosedError()
             return toUserRequest(data)
         },
@@ -342,28 +315,19 @@ export function useCancelRequest(userId: string) {
     return useMutation({
         mutationFn: async ({ id, name }: { id: string; name: string }) => {
             await sessionOf(services, userId)
-            const current = await services.data
-                .from("requests")
-                .select("responses")
-                .eq("id", id)
-                .eq("user_id", userId)
-                .not("closed", "is", true)
-                .maybeSingle()
-            if (current.error) throw new Error(current.error.message)
-            if (!current.data) throw new RequestClosedError()
-            const { data, error } = await openRequestWrite(
-                services,
-                userId,
+            const data = await appendToResponses(
+                services.data,
                 id,
-                {
+                ownOpenRequest(userId),
+                (current) => ({
                     closed: true,
                     responses: [
-                        ...(current.data.responses ?? []),
+                        ...current,
                         cancellationResponse(name, services.now()),
                     ],
-                },
+                }),
+                REQUEST_COLUMNS,
             )
-            if (error) throw new Error(error.message)
             if (!data) throw new RequestClosedError()
             return toUserRequest(data)
         },

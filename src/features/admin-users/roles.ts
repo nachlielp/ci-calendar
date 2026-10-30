@@ -8,7 +8,7 @@ import { sessionOf } from "../../app/auth/personal"
 import { useServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
 import type { DataClient } from "../../data/client"
-import { refreshFirstPage } from "../admin/adminLists"
+import { updatePagedLists } from "../admin/adminLists"
 import { applyBioChange, refreshEventQueries } from "../events/eventCache"
 import {
     ADMIN_USERS_KIND,
@@ -106,21 +106,12 @@ export function applyRoleChange(
     assigned: AssignedRole,
 ) {
     const before = cachedType(queryClient, adminId, assigned.userId)
+    updatePagedLists<UserPages>(
+        queryClient,
+        [ADMIN_USERS_KIND, adminId],
+        (pages) => withRole(pages, assigned),
+    )
     const cache = queryClient.getQueryCache()
-    for (const query of cache.findAll({
-        queryKey: [ADMIN_USERS_KIND, adminId],
-    })) {
-        const pages = query.state.data as UserPages | undefined
-        const next = pages && withRole(pages, assigned)
-        if (next !== pages) {
-            queryClient.setQueryData(query.queryKey, next, {
-                updatedAt: query.state.dataUpdatedAt,
-            })
-        }
-        if (query.state.fetchStatus === "fetching") {
-            void refreshFirstPage(queryClient, query.queryKey)
-        }
-    }
     const stats = cache.find<UserStats>({
         queryKey: adminUserStatsKey(adminId),
         exact: true,

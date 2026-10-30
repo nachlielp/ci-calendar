@@ -7,7 +7,7 @@ import { createMemoryStorage } from "../../app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow } from "../../test/testUsers"
-import { REQUEST_COLUMNS } from "./myRequests"
+import { OPEN_STATUS_TREE, REQUEST_COLUMNS } from "./requestRows"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 const TITLE = "הרשמה כמורה או ארגון"
@@ -63,6 +63,7 @@ const openRequestFilters = (id: string, userId: string) => [
     { op: "eq", column: "id", value: id },
     { op: "eq", column: "user_id", value: userId },
     { op: "not.is", column: "closed", value: true },
+    { op: "or", column: "", value: OPEN_STATUS_TREE },
 ]
 
 /** An admin closes the request (with a response) behind the page's back. */

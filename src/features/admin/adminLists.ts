@@ -47,6 +47,33 @@ export async function refreshFirstPage(
 }
 
 /**
+ * Applies a write's answer to every cached paginated admin list under
+ * `queryKey` (a prefix, e.g. `[kind, adminId]`): `update(data, key)`
+ * returns the list's new data, or the same object when the write doesn't
+ * concern it. No refetch; fetch times are kept (a write doesn't delay a
+ * revalidation); a list whose fetch is in flight (sent before the write,
+ * so its answer may not have it) is fetched again from its first page.
+ */
+export function updatePagedLists<T>(
+    queryClient: QueryClient,
+    queryKey: QueryKey,
+    update: (data: T, queryKey: QueryKey) => T,
+) {
+    for (const query of queryClient.getQueryCache().findAll({ queryKey })) {
+        const data = query.state.data as T | undefined
+        const next = data === undefined ? data : update(data, query.queryKey)
+        if (next !== data) {
+            queryClient.setQueryData(query.queryKey, next, {
+                updatedAt: query.state.dataUpdatedAt,
+            })
+        }
+        if (query.state.fetchStatus === "fetching") {
+            void refreshFirstPage(queryClient, query.queryKey)
+        }
+    }
+}
+
+/**
  * Calls `refresh` when the app comes back (TanStack's focus: the page
  * becoming visible) and the query at `queryKey` is older than `STALE_MS`.
  * Pass a memoised key and callback: it resubscribes when they change.
@@ -65,3 +92,22 @@ export function useRefreshWhenBack(queryKey: QueryKey, refresh: () => void) {
         [queryClient, queryKey, refresh],
     )
 }
+
+/**
+ * A value for PostgREST's logic tree (`or=(…)`), double-quoted so commas,
+ * dots, colons and parentheses in it are text (`\` escapes `"` and `\`).
+ */
+export const quoted = (value: string) => `"${value.replace(/["\\]/g, "\\$&")}"`
+
+/** Where the next page of a newest-first admin list starts. */
+export interface NewestCursor {
+    createdAt: string
+    id: string
+}
+
+/**
+ * Rows after `cursor` in a newest-first list (`created_at` descending,
+ * then `id` descending): keyset pagination's logic tree, for one `or()`.
+ */
+export const afterNewest = ({ createdAt, id }: NewestCursor) =>
+    `created_at.lt.${quoted(createdAt)},and(created_at.eq.${quoted(createdAt)},id.lt.${quoted(id)})`

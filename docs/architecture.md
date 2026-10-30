@@ -11,29 +11,30 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 
 ## Layout
 
-| Folder                     | Holds                                                         |
-| -------------------------- | ------------------------------------------------------------- |
-| `src/app/`                 | Bootstrap, services (the seam), routes, shell layout          |
-| `src/app/auth`             | Session at boot, profile row, sign-out cleanup, role guard    |
-| `src/app/header`           | App header, menu (items keyed by role), WhatsApp link         |
-| `src/app/install`          | Install banner, `beforeinstallprompt` capture, iOS steps      |
-| `src/app/updates`          | Service worker registration, safe reloads, the reload guard   |
-| `src/app/telemetry`        | Crash reports, analytics, Speed Insights; their lazy SDKs     |
-| `src/app/images`           | Photo cropper and canvas resize (`services.images`), lazy     |
-| `src/sw/`                  | The service worker (`sw.ts`) and its cache rules              |
-| `src/data/`                | Backend client construction and generated database types      |
-| `src/features/*`           | One folder per feature: its pages, components, queries, tests |
-| `src/features/events`      | Managed events and the shared event cache updates (below)     |
-| `src/features/event-forms` | The event forms, their shared parts, saves and drafts         |
-| `src/features/bio`         | The bio editor (`/bio`): profile form, photo, settings        |
-| `src/features/admin`       | Shared admin parts: freshness, refresh button, one page chunk |
-| `src/features/admin-users` | `/manage-users`: users search, role changes (`useAssignRole`) |
-| `src/lib/`                 | Pure helpers (dates, formatting); tested directly             |
-| `src/ui/`                  | Shared presentational primitives (dialog, buttons, icons)     |
-| `src/ui/form`              | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
-| `src/pages/`               | Simple pages (about, legal, 404) that belong to no feature    |
-| `src/test/`                | The fake backend and `renderApp`                              |
-| `src/assets/`              | Images, logos and the subset font ported from legacy          |
+| Folder                        | Holds                                                         |
+| ----------------------------- | ------------------------------------------------------------- |
+| `src/app/`                    | Bootstrap, services (the seam), routes, shell layout          |
+| `src/app/auth`                | Session at boot, profile row, sign-out cleanup, role guard    |
+| `src/app/header`              | App header, menu (items keyed by role), WhatsApp link         |
+| `src/app/install`             | Install banner, `beforeinstallprompt` capture, iOS steps      |
+| `src/app/updates`             | Service worker registration, safe reloads, the reload guard   |
+| `src/app/telemetry`           | Crash reports, analytics, Speed Insights; their lazy SDKs     |
+| `src/app/images`              | Photo cropper and canvas resize (`services.images`), lazy     |
+| `src/sw/`                     | The service worker (`sw.ts`) and its cache rules              |
+| `src/data/`                   | Backend client construction and generated database types      |
+| `src/features/*`              | One folder per feature: its pages, components, queries, tests |
+| `src/features/events`         | Managed events and the shared event cache updates (below)     |
+| `src/features/event-forms`    | The event forms, their shared parts, saves and drafts         |
+| `src/features/bio`            | The bio editor (`/bio`): profile form, photo, settings        |
+| `src/features/admin`          | Shared admin parts: freshness, refresh button, one page chunk |
+| `src/features/admin-users`    | `/manage-users`: users search, role changes (`useAssignRole`) |
+| `src/features/admin-requests` | `/manage-support`: open/closed requests, replies, approvals   |
+| `src/lib/`                    | Pure helpers (dates, formatting); tested directly             |
+| `src/ui/`                     | Shared presentational primitives (dialog, buttons, icons)     |
+| `src/ui/form`                 | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
+| `src/pages/`                  | Simple pages (about, legal, 404) that belong to no feature    |
+| `src/test/`                   | The fake backend and `renderApp`                              |
+| `src/assets/`                 | Images, logos and the subset font ported from legacy          |
 
 ## Rules
 
@@ -362,7 +363,7 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   a retry.
     - **Writes that must not race an admin** go only to the row still in
       the state the user saw: the user's own open request is updated with
-      `.eq("id", id).eq("user_id", userId).not("closed", "is", true)` and
+      `.eq("id", id).eq("user_id", userId)` and `whereOpen` and
       `maybeSingle()`; no row back means an admin closed it meanwhile, so
       the list is refetched and the page says so. The client never sends
       columns the user doesn't own (`status`, admins' `responses`), except
@@ -370,6 +371,14 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       the same condition. RLS lets an owner write every column of their
       row, so column-level protection (and an atomic append) would need an
       RPC: a future migration, not written yet.
+    - **The `requests` table's rules** live in
+      `features/requests/requestRows.ts`, which imports no feature, so the
+      user's page and the admins' share them: `REQUEST_COLUMNS`,
+      `responsesOf`, `isClosed` (`closed = true` or `status = 'closed'`;
+      as filters `whereOpen`/`whereClosed`, logic trees `CLOSED_TREE` and
+      `OPEN_STATUS_TREE`), `conditionalUpdate` and `appendToResponses`
+      (read the responses under a condition, then write under it; `null`
+      when either finds no row).
 - **Event writes and the cache.** For create/edit forms (slices 13–15)
   and admin (manage-all-events), not only manage-events:
     - **Reads and responses** select `MANAGED_EVENT_COLUMNS` (built from
@@ -806,8 +815,8 @@ userId, bio | null, { refresh })` (`events/eventCache.ts`; `null`
     - **Routing**: inside `requireRole(ADMIN_ROLES, [...])`, routed with
       `adminPage("Name")` (`app/routes.tsx`): every admin page is exported
       from `features/admin/pages.ts`, one chunk and one dynamic import in
-      `/`'s route table for all of them (as the event forms). Add slices
-      19–20's pages there.
+      `/`'s route table for all of them (as the event forms). Add slice
+      20's pages there.
     - **Data**: admin queries are built as personal ones (keyed `[kind,
 adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
 !!adminId`, selecting only the columns shown): loaded when their
@@ -843,7 +852,10 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       and the value double-quoted (`quoted`, so `.`, `,`, `:` and
       parentheses are text: e-mail addresses). A later page's cursor joins
       it in the same tree (`usersFilter`: `and(or(search),or(cursor))`),
-      never as a second `or` parameter.
+      never as a second `or` parameter. Newest-first admin lists page with
+      `afterNewest` (`created_at`, then `id`; values `quoted`, both in
+      `admin/adminLists.ts`). A filter that picks values (request types) is
+      an `in` filter in the key, in one order, so a choice is one query.
     - **Counts** (legacy's totals) are counting `HEAD` requests
       (`select("id", { count: "exact", head: true })`), never a read of the
       rows.
@@ -851,7 +863,11 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       search and page, the same object where nothing changed, fetch times
       kept), never by refetching a list; a fetch of those queries in flight
       (sent before the write) is redone, a paginated one with
-      `refreshFirstPage`, as `applyEventChanges` does.
+      `refreshFirstPage`, as `applyEventChanges` does. For paginated lists
+      that is `updatePagedLists(queryClient, prefix, update)`
+      (`admin/adminLists.ts`). A row moved into a loaded list goes on the
+      page whose range holds it, up to its `next` cursor (not its last row
+      shown: rows moved away since leave the cursor behind).
 - **Users and roles** (slice 18; `features/admin-users`, legacy
   ManageUsersPage, usersService.getUsers, userRoleService and the
   store's `app_users`):
@@ -879,6 +895,48 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       is asked first (`ActionDialog`, new: it locks them out at once);
       the profile is read again and the guard sends them to `/`. Slice
       19's request approval calls `useAssignRole` too.
+- **Support requests** (slice 19; `features/admin-requests`, legacy
+  ManageSupportPage, requestsService and the store's `app_requests`):
+    - **Lists** (`adminRequests.ts`): `adminRequestsQuery` (`admin-requests`,
+      keyed `[kind, adminId, status, types]`; never `my-requests`, the
+      user's own kind, so the two never share a cache entry and the user
+      sees an admin's answer on their page's next fetch) reads
+      `ADMIN_REQUEST_COLUMNS` (`REQUEST_COLUMNS` and the sender), open or
+      closed by `isClosed` as the user's page tells them (legacy's switch
+      split on `closed` alone; `requestsFilter` joins the status tree and
+      the cursor in one `or()`), optionally `in`
+      legacy's filter types, 20 a page newest first (keyset,
+      `PAGED_ADMIN_FRESHNESS`, removed when the page closes). The open ones
+      load when the page opens, the closed ones when the switch first shows
+      them; a type filter keeps the last list on screen (`placeholderData`
+      only within the same switch position). The refresh button refreshes
+      the list shown and drops the others (they load when shown).
+    - **Writes** go only to the request still open or closed as the admin
+      saw it (`whereOpen` / `whereClosed`, `maybeSingle`): a user's cancel (which closes it) or another
+      admin's close or reopen since is never overwritten; no row back is
+      `RequestChangedError`, the lists are read again and the page says
+      nothing was saved. Replies, declines ("דחיה") and approvals append to
+      `responses` read fresh under the same condition (`appendToResponses`, legacy's
+      `{ response, created_at, responder_name }`, with `viewed: false,
+sent: false, to_send: true`; declines and approvals add legacy's Hebrew
+      notes and close it); reopening (new) sets `closed: false, status:
+"open"`, refused (`OtherOpenRequestError`, the page says why) while the
+      user has another open request: legacy allowed one at a time. Another admin's reply between the read and the write would be
+      lost: an atomic append needs an RPC (as for the user's cancel). The
+      stored row goes into every cached list (`applyRequestChange`: replaced,
+      moved between open and closed, in order; fetch times kept; a fetch in
+      flight redone from its first page).
+    - **Approvals** (`useApproveRequest`, legacy's order): the request is
+      read fresh, still open, and its stored `type` and `user_id` (not the
+      list's copy: the user may have edited it) say which role goes to
+      whom (`requestedRole`: profile, creator, org; support requests have
+      no approve); then the role goes through `useAssignRole`, then the
+      request is closed with legacy's note. A failed role change writes
+      nothing else (the request stays open, the page says so). If the
+      close then finds the request changed, the page says the role was
+      given and the request left as it is (`RoleGivenRequestChangedError`);
+      any other close failure leaves the role given and the request open
+      (`ApprovalCloseError`; approving again is safe).
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
   JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
   first call (`data/googlePlaces.ts`, its own chunk; a script tag with
@@ -1232,7 +1290,7 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
 })` answers with `count` (and no rows with `head`), recorded as the
   request's `count` and `head`. `ilike` (PostgREST's `*` wildcard, LIKE's
   `\` escape) works at the top level and in `or()`, whose values may be
-  double-quoted.
+  double-quoted; `or()` also takes `is.null|true|false`.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail
   (the server's error, HTTP 500; `{ network: true }`: no answer, status
@@ -1459,3 +1517,19 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     freshness, refresh, server-side search) for slices 19–20. Drafts are
     now restored before the first paint (a layout effect): the flash of
     an empty form, and the templates tests' flake, are gone.
+19. Admin support requests: `/manage-support` (admins; lazy, guarded; in
+    the admin chunk), legacy ManageSupportPage: open or closed requests
+    (legacy's switch; the closed ones read only when first shown) filtered
+    by type on the server, 20 a page newest first with "load more", each
+    opening to its number, email, phone (copied on tap), message, the
+    responses (new) and a reply form (new; legacy's was commented out);
+    legacy's approve (the role through `assign_user_role` first, then the
+    request closed with its note; a failed role change leaves it open) and
+    decline, and reopen (new; not while the user has another open
+    request). Open and closed follow the user page's rule (`closed` or
+    `status`, shared in `requests/requestRows.ts`). Writes are conditional on the request being
+    as the admin saw it, so a user's cancel is never overwritten; their
+    answers move the request between the cached lists without a refetch,
+    and a fetch in flight is redone. Nothing at boot, persisted or kept
+    after sign-out; refetched on mount, when the app returns stale, and by
+    the refresh button.

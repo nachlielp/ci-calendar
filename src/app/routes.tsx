@@ -151,6 +151,10 @@ export const routes: RouteObject[] = [
             ]),
             requireRole(ADMIN_ROLES, [
                 { path: "manage-users", lazy: adminPage("ManageUsersPage") },
+                {
+                    path: "manage-support",
+                    lazy: adminPage("ManageSupportPage"),
+                },
             ]),
             {
                 path: "*",

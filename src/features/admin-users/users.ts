@@ -6,7 +6,7 @@ import {
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
-import { PAGED_ADMIN_FRESHNESS } from "../admin/adminLists"
+import { afterNewest, PAGED_ADMIN_FRESHNESS, quoted } from "../admin/adminLists"
 
 // The users list for `/manage-users` (legacy ManageUsersPage and
 // usersService.getUsers): admin data, read only when the page opens, a page
@@ -96,12 +96,6 @@ export function toAdminUser(row: AdminUserRow): AdminUser {
 }
 
 /**
- * A value for PostgREST's logic tree (`or=(…)`), double-quoted so commas,
- * dots, colons and parentheses in it are text (`\` escapes `"` and `\`).
- */
-const quoted = (value: string) => `"${value.replace(/["\\]/g, "\\$&")}"`
-
-/**
  * The text typed as an `ilike` pattern that matches it anywhere: Postgres'
  * LIKE wildcards in it (`%`, `_`) and its escape (`\`) are escaped, and a
  * `*` (PostgREST's wildcard, which can't be escaped) becomes `_`, any one
@@ -122,8 +116,7 @@ export function searchTerms(text: string): string | null {
 }
 
 /** Users after `cursor` in the list's order (newest first, then id). */
-export const afterUser = ({ createdAt, id }: UserCursor) =>
-    `created_at.lt.${quoted(createdAt)},and(created_at.eq.${quoted(createdAt)},id.lt.${quoted(id)})`
+export const afterUser = (cursor: UserCursor) => afterNewest(cursor)
 
 /**
  * The one `or()` filter a page sends: the search, the cursor, or both
