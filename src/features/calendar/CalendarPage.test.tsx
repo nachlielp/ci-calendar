@@ -3,29 +3,10 @@ import { screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { renderApp } from "../../test/renderApp"
 import { createFakeDataClient } from "../../test/fakeDataClient"
+import { event, eventTitles } from "./testEvents"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem.
 const NOW = new Date("2026-10-30T09:00:00Z")
-
-function event(overrides: Record<string, unknown>) {
-    return {
-        id: crypto.randomUUID(),
-        short_id: null,
-        title: "ג'אם",
-        start_date: "2026-11-01",
-        end_date: "2026-11-01",
-        hide: false,
-        cancelled: false,
-        ...overrides,
-    }
-}
-
-async function eventTitles() {
-    const list = await screen.findByRole("list", { name: "אירועים קרובים" })
-    return within(list)
-        .getAllByRole("heading")
-        .map((h) => h.textContent)
-}
 
 describe("public calendar (/)", () => {
     it("lists upcoming visible events in date order", async () => {

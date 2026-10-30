@@ -1,0 +1,17 @@
+// The legacy header showed a 16px black cloud_offline icon when offline
+// (legacy/src/styles/header.scss `.offline-icon`); this keeps that icon and
+// adds a short line saying what it means.
+.stale-data-notice {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 0.5rem;
+    color: #000;
+    font-size: 0.875rem;
+
+    .stale-data-notice-icon {
+        flex-shrink: 0;
+        width: 16px;
+        height: 16px;
+    }
+}

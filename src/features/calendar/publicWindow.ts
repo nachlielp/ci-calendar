@@ -5,12 +5,31 @@ import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
 /** How far ahead the public calendar looks. ~25 events, ~6 KB gzipped. */
 const WINDOW_DAYS = 90
 
-/** Until the freshness slice tunes it: don't refetch what boot just fetched. */
+/**
+ * Event data changes a few times a day, so after 5 minutes the window is
+ * refetched when the app becomes visible again. Coming back online always
+ * refetches: whatever was shown came from before the connection dropped.
+ */
 const STALE_MS = 5 * 60 * 1000
+
+/**
+ * First element of the window's query key. The key deliberately has no date:
+ * a window fetched yesterday (or restored from storage) is still this query,
+ * so it renders at once, minus the days that have passed, and revalidates.
+ */
+export const PUBLIC_WINDOW_KIND = "public-window"
 
 // Only the columns the calendar renders. Later slices (cards, filters,
 // languages) extend this list; keep it lean — it is the first-paint payload.
 const COLUMNS = "id, title, start_date, cancelled"
+
+/**
+ * The shape of `PublicEvent[]` for the persisted cache (app/persistedCache.ts):
+ * stored data with another shape is never restored. Changing the columns
+ * changes it; bump the number when the mapping to `PublicEvent` changes
+ * without a column change.
+ */
+export const PUBLIC_WINDOW_SHAPE = `1|${COLUMNS}`
 
 export interface PublicEvent {
     id: string
@@ -25,15 +44,23 @@ export interface PublicEvent {
  * WINDOW_DAYS ahead, in one request. RLS already withholds hidden events from
  * anonymous visitors; the explicit `hide = false` keeps a signed-in owner's
  * hidden drafts off the public calendar too.
+ *
+ * The cached data may hold days that have since passed (a window fetched
+ * before midnight, or restored from storage), so `select` drops events dated
+ * before today on every read.
  */
 export function publicWindowQuery({ data, now }: AppServices) {
-    const from = jerusalemToday(now())
-    const to = addDays(from, WINDOW_DAYS)
-
     return queryOptions({
-        queryKey: ["public-window", from],
+        queryKey: [PUBLIC_WINDOW_KIND],
         staleTime: STALE_MS,
+        refetchOnReconnect: "always",
+        select: (events) => {
+            const today = jerusalemToday(now())
+            return events.filter((event) => event.startDate >= today)
+        },
         queryFn: async (): Promise<PublicEvent[]> => {
+            const from = jerusalemToday(now())
+            const to = addDays(from, WINDOW_DAYS)
             const { data: rows, error } = await data
                 .from("ci_events")
                 .select(COLUMNS)

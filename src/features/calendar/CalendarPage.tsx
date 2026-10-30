@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
 import { useServices } from "../../app/services"
+import { useIsOnline } from "../../app/useIsOnline"
 import { publicWindowQuery, type PublicEvent } from "./publicWindow"
+import { StaleDataNotice } from "./StaleDataNotice"
 
 // `start_date` is a calendar day, so format it as one (UTC midnight → no
 // timezone shift).
@@ -17,20 +19,45 @@ function formatDay(day: string) {
 
 export default function CalendarPage() {
     const services = useServices()
+    const isOnline = useIsOnline()
     const {
         data: events,
-        isPending,
         isError,
         refetch,
     } = useQuery(publicWindowQuery(services))
+    // Events, once there (fetched or restored from storage), stay on screen;
+    // being offline or a failed refresh only adds a notice that they may be
+    // out of date.
+    const staleReason = !events
+        ? null
+        : !isOnline
+          ? "offline"
+          : isError
+            ? "refreshFailed"
+            : null
 
     return (
         <main className="calendar-page">
             <header>
                 <h1>לוח אירועי קונטקט אימפרוביזציה</h1>
             </header>
-            {isPending ? (
-                <p role="status">טוען אירועים…</p>
+            {staleReason && <StaleDataNotice reason={staleReason} />}
+            {events ? (
+                events.length === 0 ? (
+                    <p>אין אירועים קרובים</p>
+                ) : (
+                    <ul aria-label="אירועים קרובים" className="event-list">
+                        {events.map((event) => (
+                            <EventItem key={event.id} event={event} />
+                        ))}
+                    </ul>
+                )
+            ) : !isOnline ? (
+                // The request waits for the connection and is sent once back
+                // online.
+                <p role="alert">
+                    אין חיבור לאינטרנט – לא ניתן לטעון את האירועים
+                </p>
             ) : isError ? (
                 <div role="alert">
                     <p>לא הצלחנו לטעון את האירועים</p>
@@ -38,14 +65,8 @@ export default function CalendarPage() {
                         נסו שוב
                     </button>
                 </div>
-            ) : events.length === 0 ? (
-                <p>אין אירועים קרובים</p>
             ) : (
-                <ul aria-label="אירועים קרובים" className="event-list">
-                    {events.map((event) => (
-                        <EventItem key={event.id} event={event} />
-                    ))}
-                </ul>
+                <p role="status">טוען אירועים…</p>
             )}
         </main>
     )

@@ -6,8 +6,9 @@ import type { DataClient } from "../data/client"
 // selected columns, so tests prove behaviour end to end — e.g. hidden rows
 // seeded here never come back out of the public query, and a page reading a
 // column its query didn't select sees `undefined`. Every request is recorded so
-// tests can assert on what was asked of the backend. Nested (dotted)
-// predicates are recorded, not applied.
+// tests can assert on what was asked of the backend. Requests to a table can
+// be made to fail, or held until the test releases them (a slow network).
+// Nested (dotted) predicates are recorded, not applied.
 
 type Row = Record<string, unknown>
 
@@ -31,6 +32,10 @@ export interface FakeDataClient {
     failTable(table: string, message: string): void
     /** Let requests to `table` succeed again. */
     healTable(table: string): void
+    /** Hold every following request to `table` until `releaseTable`. */
+    holdTable(table: string): void
+    /** Answer the held requests to `table`, and stop holding new ones. */
+    releaseTable(table: string): void
 }
 
 function matches(row: Row, filter: RecordedFilter) {
@@ -73,6 +78,7 @@ export function createFakeDataClient(
 ): FakeDataClient {
     const requests: RecordedRequest[] = []
     const failures = new Map<string, string>()
+    const held = new Map<string, (() => void)[]>()
 
     function from(table: string) {
         const request: RecordedRequest = {
@@ -108,7 +114,11 @@ export function createFakeDataClient(
                 }) => T,
                 reject?: (reason: unknown) => T,
             ) {
-                return Promise.resolve()
+                const waiting = held.get(table)
+                const answered = waiting
+                    ? new Promise<void>((answer) => waiting.push(answer))
+                    : Promise.resolve()
+                return answered
                     .then(() => execute(request))
                     .then(resolve, reject)
             },
@@ -154,6 +164,14 @@ export function createFakeDataClient(
         },
         healTable: (table) => {
             failures.delete(table)
+        },
+        holdTable: (table) => {
+            held.set(table, held.get(table) ?? [])
+        },
+        releaseTable: (table) => {
+            const waiting = held.get(table) ?? []
+            held.delete(table)
+            for (const answer of waiting) answer()
         },
     }
 }
