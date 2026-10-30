@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom"
 import { focusManager, onlineManager } from "@tanstack/react-query"
 import { afterEach } from "vitest"
+import { browserConditions, resetBrowserConditions } from "./browser"
 
 // The app has no realtime by design (spec #34). Any code path that opens a
 // socket — e.g. someone wiring up `@supabase/supabase-js` realtime — fails the
@@ -45,3 +46,33 @@ document.addEventListener("keydown", (event) => {
 afterEach(() => {
     openModals.length = 0
 })
+
+// jsdom has no layout, so no media queries or scrolling. `matchMedia`
+// answers width queries from `window.innerWidth` (1024 unless a test sets a
+// phone width with `setViewportWidth`) and `display-mode: standalone` from
+// `setStandalone` (a browser tab by default); React Router's scroll
+// restoration calls `scrollTo`.
+window.matchMedia = (query: string) => {
+    const max = /max-width:\s*(\d+)px/.exec(query)
+    const min = /min-width:\s*(\d+)px/.exec(query)
+    const width = window.innerWidth
+    const matches = max
+        ? width <= Number(max[1])
+        : min
+          ? width >= Number(min[1])
+          : query.includes("display-mode: standalone")
+            ? browserConditions.standalone
+            : false
+    return {
+        matches,
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+    }
+}
+window.scrollTo = () => {}
+afterEach(resetBrowserConditions)

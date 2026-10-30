@@ -144,9 +144,9 @@ describe("repeat visits", () => {
         fake.failTable("ci_events", "network down")
         renderApp({ fake, storage, now: NOW })
 
-        expect(
-            await screen.findByText(/לא הצלחנו לרענן/, { selector: "p" }),
-        ).toBeVisible()
+        expect(await screen.findByRole("status")).toHaveTextContent(
+            /לא הצלחנו לרענן/,
+        )
         expect(await eventTitles()).toEqual(["ג'אם"])
     })
 

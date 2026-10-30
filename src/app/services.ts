@@ -10,6 +10,8 @@ export interface AppServices {
     storage: DeviceStorage
     /** `BUILD_VERSION` in the app; tests pass their own to simulate a deploy. */
     buildVersion: string
+    /** Reloads the page (`location.reload()`); tests record the calls. */
+    reload: () => void
 }
 
 export const ServicesContext = createContext<AppServices | null>(null)

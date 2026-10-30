@@ -31,6 +31,7 @@ describe("the stored language", () => {
                 throw new Error("blocked")
             },
             removeItem: () => {},
+            clear: () => {},
         }
 
         expect(storedLanguage(blocked)).toBe("he")

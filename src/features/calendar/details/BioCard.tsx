@@ -1,6 +1,6 @@
 import { useCopy } from "../../../app/language"
 import { defineCopy } from "../../../lib/copy"
-import { OpenInNewIcon } from "../../../ui/icons"
+import { OpenInNewIcon } from "../../../ui/icons/OpenInNewIcon"
 import type { PublicBio } from "../publicEvent"
 import "./BioCard.scss"
 

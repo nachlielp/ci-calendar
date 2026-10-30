@@ -1,5 +1,6 @@
 import { useCopy } from "../../app/language"
 import { defineCopy } from "../../lib/copy"
+import { useStaleReason } from "./useStaleReason"
 import "./StaleDataNotice.scss"
 
 const COPY = defineCopy({
@@ -18,19 +19,19 @@ const COPY = defineCopy({
 })
 
 /**
- * A small sign that the events shown may be out of date: the device is
- * offline, or the shown data is cached and refreshing it failed.
+ * The header's sign that the events may be out of date (legacy AppHeader's
+ * offline cloud): the device is offline, or refreshing the cached events
+ * failed. As in legacy it shows only the icon, which says why on hover and
+ * to screen readers.
  */
-export function StaleDataNotice({
-    reason,
-}: {
-    reason: "offline" | "refreshFailed"
-}) {
+export function StaleDataNotice() {
     const copy = useCopy(COPY)
+    const reason = useStaleReason()
+    if (!reason) return null
     return (
-        <p role="status" className="stale-data-notice">
+        <p role="status" className="stale-data-notice" title={copy[reason]}>
             <CloudOfflineIcon />
-            {copy[reason]}
+            <span className="visually-hidden">{copy[reason]}</span>
         </p>
     )
 }

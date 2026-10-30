@@ -11,7 +11,7 @@ import { event, eventTitles, segment } from "./testEvents"
 const NOW = new Date("2026-10-30T09:00:00Z")
 
 const classInCenter = event({
-    short_id: "Cls1",
+    short_id: "Cl1",
     title: "שיעור במרכז",
     start_date: "2026-11-01",
     district: "center",
@@ -282,7 +282,7 @@ describe("filters", () => {
             fake: seeded(),
             now: NOW,
             storage,
-            path: "/event/Cls1",
+            path: "/event/Cl1",
         })
 
         expect(await screen.findByRole("dialog")).toBeVisible()
@@ -314,7 +314,7 @@ describe("filters", () => {
         const { router } = renderApp({
             fake: seeded(),
             now: NOW,
-            path: "/event/Cls1?f=jam",
+            path: "/event/Cl1?f=jam",
         })
         expect(await screen.findByRole("dialog")).toBeVisible()
 

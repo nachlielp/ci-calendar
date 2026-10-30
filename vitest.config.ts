@@ -9,6 +9,8 @@ export default defineConfig({
         environment: "jsdom",
         globals: true,
         setupFiles: ["./src/test/setup.ts"],
+        // `vi.stubEnv` lasts one test.
+        unstubEnvs: true,
         include: [
             "src/**/*.{test,spec}.{ts,tsx}",
             "scripts/**/*.{test,spec}.ts",

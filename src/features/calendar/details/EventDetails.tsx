@@ -2,20 +2,18 @@ import { Fragment, useEffect, useState } from "react"
 import { useCopy, useLanguage } from "../../../app/language"
 import { defineCopy } from "../../../lib/copy"
 import { Dialog } from "../../../ui/Dialog"
-import {
-    CalendarAddOnIcon,
-    CalendarIcon,
-    CheckIcon,
-    ContentCopyIcon,
-    DomainIcon,
-    IosShareIcon,
-    MapIcon,
-    OpenInNewIcon,
-    PersonIcon,
-    PinDropIcon,
-    ScheduleIcon,
-    ShareIcon,
-} from "../../../ui/icons"
+import { CalendarAddOnIcon } from "../../../ui/icons/CalendarAddOnIcon"
+import { CalendarIcon } from "../../../ui/icons/CalendarIcon"
+import { CheckIcon } from "../../../ui/icons/CheckIcon"
+import { ContentCopyIcon } from "../../../ui/icons/ContentCopyIcon"
+import { DomainIcon } from "../../../ui/icons/DomainIcon"
+import { IosShareIcon } from "../../../ui/icons/IosShareIcon"
+import { MapIcon } from "../../../ui/icons/MapIcon"
+import { OpenInNewIcon } from "../../../ui/icons/OpenInNewIcon"
+import { PersonIcon } from "../../../ui/icons/PersonIcon"
+import { PinDropIcon } from "../../../ui/icons/PinDropIcon"
+import { ScheduleIcon } from "../../../ui/icons/ScheduleIcon"
+import { ShareIcon } from "../../../ui/icons/ShareIcon"
 import {
     bioOf,
     eventDateLabel,

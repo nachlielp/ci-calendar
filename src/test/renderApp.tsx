@@ -4,6 +4,7 @@ import { AppRoot } from "../app/AppRoot"
 import { bootQueryClient, createQueryClient } from "../app/boot"
 import { BUILD_VERSION } from "../app/buildVersion"
 import { createMemoryStorage, type DeviceStorage } from "../app/deviceStorage"
+import { captureInstallPrompt } from "../app/install/installPrompt"
 import { routes } from "../app/routes"
 import type { AppServices } from "../app/services"
 import { createFakeDataClient, type FakeDataClient } from "./fakeDataClient"
@@ -29,15 +30,20 @@ export function renderApp({
     storage = createMemoryStorage(),
     buildVersion = BUILD_VERSION,
 }: RenderAppOptions = {}) {
+    const reloads = { count: 0 }
     const services: AppServices = {
         data: fake.client,
         now: () => now,
         storage,
         buildVersion,
+        reload: () => {
+            reloads.count += 1
+        },
     }
     const queryClient = createQueryClient()
     queryClient.setDefaultOptions({ queries: { retry: false } })
     bootQueryClient(queryClient, services)
+    captureInstallPrompt()
     const router = createMemoryRouter(routes, { initialEntries: [path] })
 
     const view = render(
@@ -47,5 +53,5 @@ export function renderApp({
             router={router}
         />,
     )
-    return { ...view, fake, storage, router }
+    return { ...view, fake, storage, router, reloads }
 }

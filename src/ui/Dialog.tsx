@@ -2,7 +2,8 @@ import { useEffect, useRef, type ReactNode } from "react"
 import { createPortal } from "react-dom"
 import { useCopy } from "../app/language"
 import { COMMON_COPY } from "../lib/commonCopy"
-import { ChevronRightIcon, CloseIcon } from "./icons"
+import { ChevronRightIcon } from "./icons/ChevronRightIcon"
+import { CloseIcon } from "./icons/CloseIcon"
 import "./Dialog.scss"
 
 /**

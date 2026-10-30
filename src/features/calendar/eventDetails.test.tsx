@@ -410,7 +410,32 @@ describe("shared event links", () => {
     })
 
     it("renders the 404 page for a short id that names no event", async () => {
-        renderApp({ fake: backend(), path: "/no-such-event", now: NOW })
+        renderApp({ fake: backend(), path: "/Zz9", now: NOW })
+
+        expect(
+            await screen.findByRole("heading", { name: "הדף לא נמצא" }),
+        ).toBeVisible()
+    })
+
+    it.each(["/login", "/abuot", "/event/no-such-event"])(
+        "renders the 404 page for %s at once, asking the backend nothing about it",
+        async (path) => {
+            const fake = backend()
+            renderApp({ fake, path, now: NOW })
+
+            expect(
+                await screen.findByRole("heading", { name: "הדף לא נמצא" }),
+            ).toBeVisible()
+            expect(linkRequests(fake)).toEqual([])
+        },
+    )
+
+    it("renders the 404 page for a link that can't name an event, even offline", async () => {
+        Object.defineProperty(navigator, "onLine", {
+            configurable: true,
+            value: false,
+        })
+        renderApp({ fake: backend(), path: "/signup", now: NOW })
 
         expect(
             await screen.findByRole("heading", { name: "הדף לא נמצא" }),

@@ -1,8 +1,17 @@
-import { Link, Outlet } from "react-router"
+import {
+    Link,
+    Outlet,
+    ScrollRestoration,
+    type Location,
+    type UIMatch,
+} from "react-router"
 import { COMMON_COPY } from "../lib/commonCopy"
 import { defineCopy } from "../lib/copy"
+import { AppHeader } from "./header/AppHeader"
+import { InstallBanner } from "./install/InstallBanner"
 import { useCopy } from "./language"
 import { useRemoveInitialLoader } from "./useRemoveInitialLoader"
+import "./RootLayout.scss"
 
 const ERROR_COPY = defineCopy({
     he: { title: "משהו השתבש" },
@@ -10,12 +19,53 @@ const ERROR_COPY = defineCopy({
     ru: { title: "Что-то пошло не так" },
 })
 
+/** The route id of the calendar and the events opened over it. */
+export const CALENDAR_ROUTE_ID = "calendar"
+
+/**
+ * Where the window's scroll position is kept. The calendar and an event
+ * opened over it share one, so opening and closing an event never moves the
+ * list; every other page starts at the top and, on Back, returns to where
+ * it was left.
+ */
+function scrollKey(location: Location, matches: UIMatch[]) {
+    return matches.some((match) => match.id === CALENDAR_ROUTE_ID)
+        ? CALENDAR_ROUTE_ID
+        : location.key
+}
+
+/**
+ * The shell around every page (legacy App): the background, the install
+ * banner and the header over a column at most 500px wide.
+ */
 export function RootLayout() {
     useRemoveInitialLoader()
 
     return (
         <div className="app">
-            <Outlet />
+            <Background />
+            <div className="app-content">
+                <InstallBanner />
+                <AppHeader />
+                <Outlet />
+            </div>
+            <ScrollRestoration getKey={scrollKey} />
+        </div>
+    )
+}
+
+/**
+ * Legacy BackgroundTiles: square gradient tiles down the screen, every other
+ * one flipped. Enough tiles for a screen three times taller than wide; the
+ * container clips the rest.
+ */
+function Background() {
+    return (
+        <div className="app-background" aria-hidden="true">
+            <div className="background-tile" />
+            <div className="background-tile" />
+            <div className="background-tile" />
+            <div className="background-tile" />
         </div>
     )
 }
@@ -26,7 +76,7 @@ export function RouteError() {
     const common = useCopy(COMMON_COPY)
 
     return (
-        <main className="app" role="alert">
+        <main className="app route-error" role="alert">
             <h1>{copy.title}</h1>
             <Link to="/">{common.backToCalendar}</Link>
         </main>

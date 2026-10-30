@@ -9,7 +9,7 @@ import {
     monthOf,
     monthWeeks,
 } from "../../lib/monthGrid"
-import { ChevronRightIcon } from "../../ui/icons"
+import { ChevronRightIcon } from "../../ui/icons/ChevronRightIcon"
 import { cardsByDay, type EventCard } from "./eventCards"
 import { EventList } from "./EventList"
 import { dayLabel } from "./eventFormat"

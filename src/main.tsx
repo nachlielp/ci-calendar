@@ -4,6 +4,7 @@ import { AppRoot } from "./app/AppRoot"
 import { bootQueryClient, createQueryClient } from "./app/boot"
 import { BUILD_VERSION } from "./app/buildVersion"
 import { browserStorage } from "./app/deviceStorage"
+import { captureInstallPrompt } from "./app/install/installPrompt"
 import { applyLanguageToDocument, storedLanguage } from "./app/language"
 import { routes } from "./app/routes"
 import type { AppServices } from "./app/services"
@@ -18,12 +19,14 @@ const services: AppServices = {
     now: () => new Date(),
     storage: browserStorage(),
     buildVersion: BUILD_VERSION,
+    reload: () => window.location.reload(),
 }
 // Direction and language before anything renders; the provider keeps them
 // in step from here on.
 applyLanguageToDocument(storedLanguage(services.storage))
 const queryClient = createQueryClient()
 bootQueryClient(queryClient, services)
+captureInstallPrompt()
 
 const container = document.getElementById("root")
 if (!container) throw new Error("Root element not found")

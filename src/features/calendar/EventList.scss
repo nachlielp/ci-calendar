@@ -1,5 +1,5 @@
 // Ported from legacy/src/styles/events-list.scss, event-preview.scss and
-// generics/card.scss (antd Tag → .event-tag).
+// the antd Tag (→ .event-tag); `.card` is global (index.css).
 .events-list {
     list-style: none;
     margin: 0;
@@ -12,13 +12,6 @@
     content-visibility: auto;
     contain-intrinsic-size: auto 220px;
     padding-top: 1rem;
-}
-
-.card {
-    padding: 24px;
-    background-color: #fff;
-    border-radius: 8px;
-    max-width: 100%;
 }
 
 .event-preview {

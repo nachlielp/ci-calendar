@@ -1,5 +1,8 @@
 /** The slice of the Web Storage API the app uses to keep data on the device. */
-export type DeviceStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">
+export type DeviceStorage = Pick<
+    Storage,
+    "getItem" | "setItem" | "removeItem" | "clear"
+>
 
 /**
  * The browser's localStorage, or an in-memory stand-in where it is blocked
@@ -25,6 +28,9 @@ export function createMemoryStorage(): DeviceStorage {
         },
         removeItem: (key) => {
             items.delete(key)
+        },
+        clear: () => {
+            items.clear()
         },
     }
 }

@@ -11,16 +11,18 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 
 ## Layout
 
-| Folder           | Holds                                                         |
-| ---------------- | ------------------------------------------------------------- |
-| `src/app/`       | Bootstrap, services (the seam), routes, shell layout          |
-| `src/data/`      | Backend client construction and generated database types      |
-| `src/features/*` | One folder per feature: its pages, components, queries, tests |
-| `src/lib/`       | Pure helpers (dates, formatting); tested directly             |
-| `src/ui/`        | Shared presentational primitives (dialog, buttons, icons)     |
-| `src/pages/`     | Simple pages that don't belong to a feature                   |
-| `src/test/`      | The fake backend and `renderApp`                              |
-| `src/assets/`    | Images ported from legacy (imported with `?no-inline`)        |
+| Folder            | Holds                                                         |
+| ----------------- | ------------------------------------------------------------- |
+| `src/app/`        | Bootstrap, services (the seam), routes, shell layout          |
+| `src/app/header`  | App header, menu (items keyed by role), WhatsApp link         |
+| `src/app/install` | Install banner, `beforeinstallprompt` capture, iOS steps      |
+| `src/data/`       | Backend client construction and generated database types      |
+| `src/features/*`  | One folder per feature: its pages, components, queries, tests |
+| `src/lib/`        | Pure helpers (dates, formatting); tested directly             |
+| `src/ui/`         | Shared presentational primitives (dialog, buttons, icons)     |
+| `src/pages/`      | Simple pages (about, legal, 404) that belong to no feature    |
+| `src/test/`       | The fake backend and `renderApp`                              |
+| `src/assets/`     | Images, logos and the subset font ported from legacy          |
 
 ## Rules
 
@@ -85,7 +87,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   `visibilitychange` to visible when stale (TanStack's `focusManager`),
   always refetched on reconnect (`refetchOnReconnect: "always"`), and always
   revalidated at a cold start. Data on screen stays on screen when a refresh
-  fails; `StaleDataNotice` says it may be out of date (offline, or refresh
+  fails; `StaleDataNotice` (the header's offline cloud, on every page,
+  read through `useStaleReason`) says it may be out of date (offline, or refresh
   failed). With no data and no connection, the page says it can't load and
   the paused request goes out once back online. `useIsOnline()` reads
   TanStack's `onlineManager`, which boot seeds from `navigator.onLine`.
@@ -102,9 +105,11 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   event over the calendar (`useLinkedEvent`): from the cached window when it
   has it, else with one request for that event alone, in parallel with the
   window. The dialog opens at once, with loading, offline and failed (retry)
-  states; only a definite "no visible event" renders the 404 page. So a
-  mistyped single-segment URL (e.g. `/abuot`) costs one small request before
-  its 404. Static top-level routes (`/about`, `/login`, …) outrank
+  states; only a definite "no visible event" renders the 404 page. A link
+  that can't name an event (`isEventLink`: neither a UUID nor a three-letter
+  or digit `short_id`, as the `set_short_id` trigger makes them) is a 404 at
+  once, with no request and no details code, e.g. `/abuot` or `/login`
+  before its route exists. Static top-level routes (`/about`, `/login`, …) outrank
   `/:eventId` in React Router's ranking, so later slices just add them; they
   never reach the event lookup.
 - **Filters and views.** Filters live in the URL as legacy encoded them,
@@ -133,16 +138,19 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   once per filtered list and bounded at the window's last day. Long lists
   put `content-visibility: auto` with a `contain-intrinsic-size` on their
   items.
-- **Dialogs and icons.** Drawers and modals use `Dialog` (`src/ui/Dialog.tsx`):
+- **Dialogs and icons.** Drawers and modals use `Dialog` (`src/ui/Dialog.tsx`;
+  reshape one through its `className`, as `MenuDrawer.scss` does):
   a native `<dialog>` portalled to `body`, a drawer under 500px and a modal
   above (CSS only). Mount it to open it. The close button, Escape and a
   backdrop click (pointer down and up on the backdrop) close the native
   dialog, and its `close` event calls `onClose`; the owner then unmounts it.
   Unmounting it directly (e.g. on Back) is fine. Focus returns to the element
   that had it, and the page behind doesn't scroll while it is open. Its body
-  is the scroller and fills the box. Icons are inline SVG components in
-  `src/ui/icons.tsx` (Material Symbols paths from `legacy/src/assets/svgs`);
-  add new ones there, never load SVG files at runtime. `ToggleButtons`
+  is the scroller and fills the box. Icons are inline SVG components, one
+  module per icon in `src/ui/icons/` (Material Symbols paths from
+  `legacy/src/assets/svgs`), so an icon used only by a lazy page stays out
+  of `/`'s initial JS; add a new one as its own file the same way, never
+  load SVG files at runtime. `ToggleButtons`
   (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed).
   `.visually-hidden` (`index.css`) hides text from sight, not from screen
   readers.
@@ -162,6 +170,10 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       alt text included). Port the words from legacy `util/translations.ts`
       when they exist there; legacy left much copy in Hebrew only, so write
       the English and Russian.
+    - **Legal texts** (privacy policy, terms) are the one exception: legacy
+      published them in Hebrew only, so they stay word for word in a
+      component marked `lang="he" dir="rtl"`, under a translated title and
+      `HebrewOnlyNote` (English and Russian). Don't machine-translate them.
     - **Shared words** (save, cancel, confirm, delete, close, retry,
       loading, back to the calendar) are in `COMMON_COPY`
       (`src/lib/commonCopy.ts`), read with `useCopy(COMMON_COPY)`; add a word
@@ -210,11 +222,69 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       setting, `he,en,ru` when unset) picks the languages offered
       (`SHOWN_LANGUAGES`); a stored language that isn't offered falls back
       to Hebrew. The switcher (`app/LanguageSwitcher.tsx`, the legacy flag
-      menu) sits at the top of the calendar page until the app header
-      (slice 6) takes it.
+      menu) sits in the app header, as in legacy.
 - **Assets.** Images ported from `legacy/src/assets` live in `src/assets/`
-  and are imported with `?no-inline` (e.g. the flags), so they are hashed
-  files fetched when shown, never base64 in the JS.
+  and are imported with `?no-inline` (e.g. the flags, the WhatsApp logo), so
+  they are hashed files fetched when shown, never base64 in the JS.
+  Multi-colour logos are such images; single-colour icons are inline SVG
+  components (`src/ui/icons/`). An image or gif below the fold gets
+  `loading="lazy"` and explicit `width`/`height` (legacy's `cat-butt.gif`
+  on the manage-events page, slice 11).
+- **Fonts.** One file: legacy's Assistant variable font (weights 200–800;
+  legacy loaded Rubik's file but never used it) subset to Latin and Hebrew
+  as `src/assets/fonts/assistant-hebrew-latin.woff2` (~26 KB), regenerated
+  from `fonts/Assistant-VariableFont_wght.ttf` by `scripts/subset-font.sh`
+  (fonttools). It has no Cyrillic, so Russian uses the system font, as in
+  legacy. `index.html` preloads it and `index.css` declares it with
+  `font-display: optional`: used when it is there by the first paint
+  (preload or cache), else that page view stays on the system font. Text
+  never swaps fonts and reflows, on any platform, with no per-platform
+  fallback metrics to keep. Vite rewrites the preload's `/src/...` href to
+  the hashed file. Don't add another face or weight file; every weight is in
+  this one. `index.css` makes buttons and inputs inherit the font.
+- **Shell and page layout.** `RootLayout` draws legacy's gradient background
+  (CSS only), then a column at most 500px wide: the install banner, the
+  sticky `AppHeader`, the page. A page renders its own `<main>` with
+  `padding: 0 16px`; text pages use `StaticPage` (`src/pages/`, a white
+  `.card` with the title, then `PageFooter`). `.card` is global
+  (`index.css`). Every page except the calendar is a lazy route
+  (`lazyPage(() => import(...))` in `routes.tsx`). The window scrolls (not
+  an inner box, unlike legacy); `ScrollRestoration` keys the calendar and
+  events opened over it as one position, so a new page starts at the top
+  and Back returns to where the visitor was. A route's `handle`
+  (`RouteHandle`, `app/routeHandle.ts`) tells the shell about it, e.g.
+  `homeButton` on the text pages. `services.reload()` reloads the page
+  (tests count the calls); slice 7's update prompt should use it too. The
+  footer's version button is legacy's "reset the app": `resetDevice` clears
+  device storage except `KEPT_ON_RESET` (`isInternal`), unregisters service
+  workers and deletes Cache Storage, then the page reloads. Add a key to
+  `KEPT_ON_RESET` only if losing it would harm the visitor or analytics.
+- **Header and menu.** The header shows a home button (to signed-out
+  visitors on routes with the `homeButton` handle, to signed-in users
+  anywhere but `/`), the language menu, the WhatsApp link
+  (`VITE_WHATSAPP_NUMBER`; hidden when unset), the out-of-date sign and the
+  menu button. The menu (a lazy `MenuDrawer`: a top drawer on phones, a
+  side drawer from the start on wider screens) lists `menuFor(viewer)` from
+  `MENU_ITEMS` (`app/header/menu.ts`): legacy's items, in order, each with
+  the roles that see it. The viewer (`app/viewer.ts`) is `unknown` (session
+  not read yet: only items everyone sees, no login), `anonymous`, or a
+  signed-in role with `signsInWithEmail` and `signOut` (the logout item
+  calls it). **Extension points for slice 9:** make `useViewer()` return
+  those states from the session and profile row; put `handle: { homeButton:
+true }` on the login, signup and password-reset routes; and restore
+  legacy's login link (`AccountIcon` + "התחבר/י"/"Login"/"Войти", to
+  `/login`) before the home button, shown only to `anonymous` viewers,
+  online (`useIsOnline`), on routes without `homeButton`. It is left out
+  until the login page exists. A new page for a role is one `MENU_ITEMS`
+  entry plus its copy key in `MenuDrawer`.
+- **Install banner.** On phones (`PHONE_QUERY`, 500px), on `/`, outside the
+  installed app (`isStandalone()`, `app/device.ts`, with `isIos()`), legacy's purple bar invites adding the
+  app. `captureInstallPrompt()` runs at boot (main.tsx and `renderApp`) to
+  keep Chrome's `beforeinstallprompt`; a tap shows that native dialog when
+  there is one, else the lazy iOS/Android steps. `appinstalled` or an
+  accepted prompt hides it. Closing it is stored under
+  `installBannerDismissed` in `services.storage` (new: legacy had no close
+  button, so no key).
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
@@ -239,6 +309,13 @@ feature helpers is tested directly.
 - **Dialogs:** jsdom lacks `showModal()`/`close()` and Escape-to-close;
   `src/test/setup.ts` stands in for them, so `userEvent.keyboard("{Escape}")`
   closes the topmost dialog as in a browser.
+- **Browser conditions:** `src/test/browser.ts` sets a phone width
+  (`setViewportWidth`; `setup.ts` answers `matchMedia` width queries from
+  `window.innerWidth`), the installed app (`setStandalone`), an iPhone user
+  agent, a service worker with caches (`installServiceWorkerAndCaches`),
+  and fires Chrome's install offer (`offerInstall`). `setup.ts` resets them
+  after each test.
+  `vi.stubEnv` (e.g. `VITE_WHATSAPP_NUMBER`) lasts one test.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
 - **Freshness:** staleness is measured with `Date.now()`, so fake only the
@@ -270,3 +347,13 @@ feature helpers is tested directly.
    following the choice (kept under legacy's `language` key), translated
    titles (`lng_titles`, added to the window) and English addresses, `Intl`
    day formats and plurals per language, LTR mirroring.
+6. Shell, static pages, banners and fonts: legacy's background, header
+   (home, flags, WhatsApp link, offline cloud, menu; login waits for slice 9) and role-keyed menu for signed-out visitors; impossible event links
+   404 without a request; lazy `/about` (now in three languages),
+   `/privacy-policy` and `/terms-and-conditions` (Hebrew text, as legacy),
+   page footer with the reset-the-app button (storage, service workers,
+   caches); PWA install banner
+   (`beforeinstallprompt`, iOS/Android steps, dismissal kept); subset
+   woff2 Assistant, preloaded, `font-display: optional`; one module per
+   icon; `index.html`
+   cleaned (one viewport/manifest/description, GA after load, no logs).

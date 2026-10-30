@@ -1,6 +1,17 @@
+import type { ComponentType } from "react"
 import type { RouteObject } from "react-router"
 import CalendarPage from "../features/calendar/CalendarPage"
-import { RootLayout, RouteError } from "./RootLayout"
+import type { RouteHandle } from "./routeHandle"
+import { CALENDAR_ROUTE_ID, RootLayout, RouteError } from "./RootLayout"
+
+/** Text pages: a signed-out visitor gets the header's home button. */
+const textPage: RouteHandle = { homeButton: true }
+
+/** A route whose page is its own chunk, fetched on first visit. */
+const lazyPage =
+    (load: () => Promise<{ default: ComponentType }>) => async () => ({
+        Component: (await load()).default,
+    })
 
 // The public calendar is the only eager route; every other page is a lazy
 // chunk so it never weighs on the calendar's first paint.
@@ -15,7 +26,8 @@ export const routes: RouteObject[] = [
                 // An event's link opens it over the calendar. `/:eventId` is
                 // the legacy short form; a top-level path that names no
                 // visible event renders the 404 page. Static top-level pages
-                // (later slices) outrank it.
+                // outrank it.
+                id: CALENDAR_ROUTE_ID,
                 element: <CalendarPage />,
                 children: [
                     { index: true, element: null },
@@ -24,10 +36,23 @@ export const routes: RouteObject[] = [
                 ],
             },
             {
+                path: "about",
+                handle: textPage,
+                lazy: lazyPage(() => import("../pages/AboutPage")),
+            },
+            {
+                path: "privacy-policy",
+                handle: textPage,
+                lazy: lazyPage(() => import("../pages/PrivacyPolicyPage")),
+            },
+            {
+                path: "terms-and-conditions",
+                handle: textPage,
+                lazy: lazyPage(() => import("../pages/TermsPage")),
+            },
+            {
                 path: "*",
-                lazy: async () => ({
-                    Component: (await import("../pages/NotFoundPage")).default,
-                }),
+                lazy: lazyPage(() => import("../pages/NotFoundPage")),
             },
         ],
     },

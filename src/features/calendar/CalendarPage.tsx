@@ -2,12 +2,13 @@ import { useQuery } from "@tanstack/react-query"
 import { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router"
 import { useCopy } from "../../app/language"
-import { LanguageSwitcher } from "../../app/LanguageSwitcher"
+import { PageFooter } from "../../app/PageFooter"
 import { useServices } from "../../app/services"
 import { useIsOnline } from "../../app/useIsOnline"
 import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
-import { CalendarIcon, ViewDayIcon } from "../../ui/icons"
+import { CalendarIcon } from "../../ui/icons/CalendarIcon"
+import { ViewDayIcon } from "../../ui/icons/ViewDayIcon"
 import { ToggleButtons } from "../../ui/ToggleButtons"
 import { CalendarView } from "./CalendarView"
 import { toEventCards } from "./eventCards"
@@ -15,9 +16,8 @@ import { FilterButton, SelectedFilters } from "./EventFilters"
 import { EVENT_LOCALES } from "./eventLocales"
 import { EventList, type FromListState } from "./EventList"
 import { eventFilter } from "./filters"
-import { useLinkedEvent } from "./linkedEvent"
+import { isEventLink, useLinkedEvent } from "./linkedEvent"
 import { publicWindowQuery } from "./publicWindow"
-import { StaleDataNotice } from "./StaleDataNotice"
 import { useEventFilters } from "./useEventFilters"
 import "./CalendarPage.scss"
 
@@ -98,7 +98,7 @@ export default function CalendarPage() {
 
     // Fetch the details' code alongside the linked event's data.
     useEffect(() => {
-        if (eventId) void loadEventDetails()
+        if (eventId && isEventLink(eventId)) void loadEventDetails()
     }, [eventId])
 
     if (linked?.status === "notFound") {
@@ -120,25 +120,9 @@ export default function CalendarPage() {
         }
     }
 
-    // Events, once there (fetched or restored from storage), stay on screen;
-    // being offline or a failed refresh only adds a notice that they may be
-    // out of date.
-    const staleReason = !events
-        ? null
-        : !isOnline
-          ? "offline"
-          : isError
-            ? "refreshFailed"
-            : null
-
     return (
         <main className="calendar-page">
             <header className="calendar-header">
-                {/* Legacy's header held the language menu; it sits here
-                    until the app header (slice 6) takes it. */}
-                <div className="calendar-top-bar">
-                    <LanguageSwitcher />
-                </div>
                 <h1 className="calendar-title">{copy.title}</h1>
                 <p className="calendar-subtitle">{copy.subtitle}</p>
                 <div className="calendar-menu">
@@ -167,14 +151,19 @@ export default function CalendarPage() {
                 </div>
                 <SelectedFilters filters={filters} onToggle={setFilter} />
             </header>
-            {staleReason && <StaleDataNotice reason={staleReason} />}
+            {/* Events, once there (fetched or restored from storage), stay on
+                screen; being offline or a failed refresh only adds the
+                header's out-of-date sign (StaleDataNotice). */}
             {shownCards ? (
                 view === "calendar" ? (
                     <CalendarView cards={shownCards} />
                 ) : shownCards.length === 0 ? (
                     <p className="calendar-empty">{copy.noEvents}</p>
                 ) : (
-                    <EventList cards={shownCards} />
+                    <>
+                        <EventList cards={shownCards} />
+                        <PageFooter />
+                    </>
                 )
             ) : !isOnline ? (
                 // The request waits for the connection and is sent once back

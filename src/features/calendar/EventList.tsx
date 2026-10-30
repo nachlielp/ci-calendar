@@ -1,11 +1,9 @@
 import { Link, useLocation } from "react-router"
-import {
-    CalendarIcon,
-    DomainIcon,
-    PersonIcon,
-    PinDropIcon,
-    ScheduleIcon,
-} from "../../ui/icons"
+import { CalendarIcon } from "../../ui/icons/CalendarIcon"
+import { DomainIcon } from "../../ui/icons/DomainIcon"
+import { PersonIcon } from "../../ui/icons/PersonIcon"
+import { PinDropIcon } from "../../ui/icons/PinDropIcon"
+import { ScheduleIcon } from "../../ui/icons/ScheduleIcon"
 import { useCopy } from "../../app/language"
 import { defineCopy } from "../../lib/copy"
 import type { EventCard } from "./eventCards"

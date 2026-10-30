@@ -10,6 +10,20 @@ import {
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
+ * A `short_id`: three letters or digits, as the database's `set_short_id`
+ * trigger makes them (every stored one matched when checked, Oct 2026).
+ * Widen this if the trigger ever changes.
+ */
+const SHORT_ID = /^[0-9A-Za-z]{3}$/
+
+/**
+ * Whether `link` could name an event at all. Anything else (`/login`, a
+ * typo) is a 404 at once, without a request.
+ */
+export const isEventLink = (link: string) =>
+    UUID.test(link) || SHORT_ID.test(link)
+
+/**
  * What a shared link (`/event/:eventId`, `/:eventId`) names: the app shares
  * `short_id`s, and older links carry the full id. Querying `id` with a
  * non-uuid is a database error, so the form picks the column.
@@ -53,7 +67,7 @@ export type LinkedEvent =
 
 /**
  * The event a shared link names, for the calendar to open over the list
- * (undefined without a link). Taken from the cached window when it is there
+ * (undefined without a link; not found at once if it can't be a link). Taken from the cached window when it is there
  * (no request). Otherwise — outside the window, or the window not loaded
  * yet — one request for that event alone, in parallel with the window, never
  * waiting for it.
@@ -66,11 +80,13 @@ export function useLinkedEvent(
     const inWindow = link
         ? windowEvents?.find((event) => isLinkedEvent(event, link))
         : undefined
+    const plausible = !!link && isEventLink(link)
     const query = useQuery({
         ...linkedEventQuery(services, link ?? ""),
-        enabled: !!link && !inWindow,
+        enabled: plausible && !inWindow,
     })
     if (!link) return undefined
+    if (!plausible) return { status: "notFound" }
     if (inWindow) return { status: "found", event: inWindow }
     if (query.data) return { status: "found", event: query.data }
     if (query.data === null) return { status: "notFound" }

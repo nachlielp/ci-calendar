@@ -1,0 +1,97 @@
+// Ported from legacy/src/styles/menu-drawer.scss. Legacy used antd's Drawer
+// from the top on phones (as tall as its items) and from the right on wider
+// screens; these rules reshape the shared Dialog the same way.
+.dialog.menu-drawer {
+    background-color: #d76f5a;
+    color: #000;
+
+    .dialog-body {
+        padding: 8px 0 0;
+    }
+
+    .dialog-close {
+        margin-inline: 16px auto;
+        color: rgba(0, 0, 0, 0.6);
+    }
+
+    @media (max-width: 499px) {
+        // A modal dialog is pinned to both edges; fit-content, not auto,
+        // stops it stretching to the bottom one.
+        height: fit-content;
+        margin: 0 0 auto;
+
+        &[open] {
+            animation: menu-drawer-from-top 0.25s ease-out;
+        }
+
+        // An X, not the side drawer's chevron, as legacy's top drawer had.
+        .dialog-close-modal {
+            display: block;
+        }
+
+        .dialog-close-drawer {
+            display: none;
+        }
+    }
+
+    // Wider screens: full height, from the start (the right in Hebrew).
+    @media (min-width: 500px) {
+        width: 378px;
+        height: 100%;
+        max-height: 100%;
+        margin: 0;
+        margin-inline-end: auto;
+        border-radius: 0;
+
+        .dialog-close {
+            margin: 0 16px;
+        }
+    }
+}
+
+.menu-drawer-items {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.menu-item {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-top: 1px solid #a37272;
+    background: none;
+    color: #000;
+    font: inherit;
+    font-size: 24px;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+
+    &.active {
+        background-color: #d28575;
+        font-weight: bold;
+    }
+
+    .menu-item-icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@keyframes menu-drawer-from-top {
+    from {
+        transform: translateY(-100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dialog.menu-drawer[open] {
+        animation: none;
+    }
+}

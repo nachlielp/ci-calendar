@@ -2,21 +2,38 @@
 <html lang="he" dir="rtl">
     <head>
         <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
+        <title>לוח אירועי קונטקט אימפרוביזציה | CI Calendar</title>
+
+        <!-- The page font (src/index.css), fetched alongside the JS. -->
+        <link
+            rel="preload"
+            href="/src/assets/fonts/assistant-hebrew-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin
+        />
+
+        <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
             rel="icon"
             type="image/png"
             sizes="192x192"
             href="/ci-logo-192-bg.png"
         />
-        <meta
-            itemprop="image"
-            content="https://www.ci-events.org/ci-logo-512-bg.png"
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="512x512"
+            href="/ci-logo-512-bg.png"
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>לוח אירועי קונטקט אימפרוביזציה | CI Calendar</title>
-
+        <link rel="apple-touch-icon" href="/ci-logo-192-bg.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content="#171717" />
+
         <link rel="canonical" href="https://www.ci-events.org/" />
         <meta name="robots" content="index, follow" />
         <meta
@@ -25,15 +42,15 @@
         />
         <meta
             name="description"
-            content="לוח אירועי קונטקט אימפרוביזציה בישראל - ג'אמים, שיעורים, סדנאות. Contact Improvisation events in Israel."
-        />
-        <meta
-            name="description"
             content="לוח אירועי קונטקט אימפרוביזציה בישראל - מצאו ג'אמים, שיעורים, סדנאות וקורסים ברחבי הארץ. הצטרפו לקהילת הקונטקט הישראלית ומצאו את האירועים הקרובים אליכם. Contact Improvisation events in Israel - find jams, classes, workshops and courses."
         />
         <meta
             name="keywords"
             content="קונטקט אימפרוביזציה,contact, contact improvisation,גאם,קונטקט, ג'אם, jam, שיעורי קונטקט, ריקוד, מחול, קונטקט בישראל, CI Israel, גאם קונטקט, ג׳אם קונטקט, שיעור קונטקט, קורס קונטקט, ci jam, ci class, ci workshop, ci course"
+        />
+        <meta
+            itemprop="image"
+            content="https://www.ci-events.org/ci-logo-512-bg.png"
         />
 
         <!-- Open Graph / Facebook -->
@@ -68,104 +85,49 @@
             content="https://www.ci-events.org/og-image.jpg"
         />
 
-        <!-- PWA -->
-        <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#171717" />
-        <link rel="apple-touch-icon" href="/ci-logo-192-bg.png" />
-
-        <!-- Viewport -->
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
-
-        <!-- Google tag (gtag.js) -->
-        <!-- <script
-            async
-            src=`https://www.googletagmanager.com/gtag/js?id=${import.meta.env.VITE_GOOGLE_ANALYTICS_ID}`
-        ></script> -->
-
-        <!-- React Scan -->
-        <!-- <script src="https://unpkg.com/react-scan/dist/auto.global.js"></script> -->
-
         <script>
-            // Initialize dataLayer first
-            window.dataLayer = window.dataLayer || []
-            function gtag() {
-                dataLayer.push(arguments)
-            }
+            // Search engines index the production site only, and every copy
+            // points them at the production URL of the page.
+            ;(function () {
+                var host = window.location.hostname
+                var isProd =
+                    host === "ci-events.org" || host === "www.ci-events.org"
+                document.querySelector('link[rel="canonical"]').href =
+                    "https://www.ci-events.org" + window.location.pathname
+                if (!isProd) {
+                    document.querySelector('meta[name="robots"]').content =
+                        "noindex, nofollow"
+                }
 
-            // Check if internal user before loading GA
-
-            const isProd =
-                window.location.hostname === "ci-events.org" ||
-                window.location.hostname === "www.ci-events.org"
-            console.log("Environment:", isProd ? "production" : "development")
-
-            const disableTracking =
-                localStorage.getItem("isInternal") === "true" || !isProd
-
-            if (!disableTracking) {
-                // Load GA script dynamically only for non-internal users
-                const gaScript = document.createElement("script")
-                gaScript.async = true
-                gaScript.src =
-                    "https://www.googletagmanager.com/gtag/js?id=G-MX441RRM7Q"
-                document.head.appendChild(gaScript)
-
-                // Initialize GA
-                gtag("js", new Date())
-                gtag("config", "G-MX441RRM7Q")
-            } else {
-                // Mock gtag for internal users
+                // Google Analytics: production only, never for internal
+                // users (legacy's `isInternal` flag). gtag() queues calls in
+                // dataLayer at once; the script itself loads after the page
+                // has, so it never competes with the first paint.
+                window.dataLayer = window.dataLayer || []
                 window.gtag = function () {
-                    console.log(
-                        "GA Event (disabled for internal user):",
-                        arguments,
-                    )
+                    window.dataLayer.push(arguments)
                 }
-            }
-        </script>
-
-        <!-- Single robots control script -->
-        <script type="text/javascript">
-            const prodDomain = "www.ci-events.org"
-            const currentDomain = window.location.hostname
-            console.log("currentDomain: ", currentDomain)
-            // Only modify robots tag if NOT on production domain
-            if (
-                currentDomain !== prodDomain &&
-                currentDomain !== `www.${prodDomain}`
-            ) {
-                const robotsTag = document.querySelector('meta[name="robots"]')
-                if (robotsTag) {
-                    robotsTag.content = "noindex, nofollow"
+                var internal = false
+                try {
+                    internal = localStorage.getItem("isInternal") === "true"
+                } catch (e) {
+                    // Storage blocked: not a known internal user.
                 }
-            }
+                if (!isProd || internal) {
+                    window.gtag = function () {}
+                    return
+                }
+                window.gtag("js", new Date())
+                window.gtag("config", "G-MX441RRM7Q")
+                window.addEventListener("load", function () {
+                    var script = document.createElement("script")
+                    script.async = true
+                    script.src =
+                        "https://www.googletagmanager.com/gtag/js?id=G-MX441RRM7Q"
+                    document.head.appendChild(script)
+                })
+            })()
         </script>
-
-        <!-- Canonical URL -->
-        <script type="text/javascript">
-            const canonicalTag = document.querySelector('link[rel="canonical"]')
-            if (canonicalTag && currentDomain !== prodDomain) {
-                // Always point canonical to production domain
-                canonicalTag.href = `https://${prodDomain}${window.location.pathname}`
-            }
-        </script>
-
-        <!-- Add explicit favicon sizes -->
-        <link
-            rel="icon"
-            type="image/png"
-            sizes="192x192"
-            href="/ci-logo-192-bg.png"
-        />
-        <link
-            rel="icon"
-            type="image/png"
-            sizes="512x512"
-            href="/ci-logo-512-bg.png"
-        />
     </head>
 
     <body>
@@ -191,6 +153,12 @@
                 animation: pulse 1.5s infinite;
             }
 
+            #initial-loader h2 {
+                margin: 0;
+                color: #444444;
+                font-size: 1.2rem;
+            }
+
             @keyframes pulse {
                 0% {
                     transform: scale(0.95);
@@ -207,11 +175,11 @@
             }
         </style>
         <div id="root"></div>
+        <!-- Covers the page until the app's first render removes it
+             (useRemoveInitialLoader). -->
         <div id="initial-loader">
-            <img src="/ci-logo.svg" alt="Loading..." />
-            <h2 style="margin: 0; color: #444444; font-size: 1.2rem">
-                קונטקט אימפרוביזציה ישראל
-            </h2>
+            <img src="/ci-logo.svg" alt="" width="80" height="80" />
+            <h2>קונטקט אימפרוביזציה ישראל</h2>
         </div>
         <script type="module" src="/src/main.tsx"></script>
 
