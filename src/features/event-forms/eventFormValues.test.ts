@@ -2,13 +2,20 @@ import { describe, expect, it } from "vitest"
 import { toManagedEvent, type ManagedEventRow } from "../events/managedEvent"
 import { event, segment } from "../calendar/testEvents"
 import {
+    emptyMultiDay,
     emptySingleDay,
+    isMultiDayValues,
     isSingleDayValues,
+    multiDayColumns,
+    multiDayPatch,
+    multiDayValuesOf,
     singleDayColumns,
     singleDayPatch,
     singleDayValuesOf,
     taggedUserIds,
+    validateMultiDay,
     validateSingleDay,
+    type MultiDayValues,
     type SingleDayValues,
 } from "./eventFormValues"
 
@@ -225,5 +232,158 @@ describe("isSingleDayValues", () => {
         expect(isSingleDayValues({ title: "x" })).toBe(false)
         expect(isSingleDayValues({ ...filled(), segments: [{}] })).toBe(false)
         expect(isSingleDayValues(null)).toBe(false)
+    })
+})
+
+function multiDay(overrides: Partial<MultiDayValues> = {}): MultiDayValues {
+    return {
+        ...emptyMultiDay(),
+        title: "ריטריט",
+        district: "galilee",
+        address: { label: "צופר", placeId: "P2", enLabel: "Tzofar" },
+        startDate: "2026-11-19",
+        endDate: "2026-11-21",
+        type: "retreat",
+        teachers: [
+            { label: "נועה", value: TEACHER_ID },
+            { label: "רותם רם", value: "רותם רם" },
+        ],
+        ...overrides,
+    }
+}
+
+describe("validateMultiDay", () => {
+    const TODAY = "2026-10-30"
+
+    it("requires the shared fields, the type and both days", () => {
+        expect(validateMultiDay(emptyMultiDay(), TODAY)).toEqual({
+            title: "required",
+            district: "required",
+            address: "required",
+            type: "required",
+            startDate: "required",
+            endDate: "required",
+        })
+        expect(validateMultiDay(multiDay(), TODAY)).toEqual({})
+    })
+
+    it("keeps legacy's span: after the first day, at most 14 days on", () => {
+        const span = (startDate: string, endDate: string) =>
+            validateMultiDay(multiDay({ startDate, endDate }), TODAY)
+        expect(span("2026-11-19", "2026-11-18")).toEqual({
+            endDate: "endBeforeStart",
+        })
+        expect(span("2026-11-19", "2026-11-19")).toEqual({ endDate: "sameDay" })
+        expect(span("2026-11-19", "2026-12-03")).toEqual({})
+        expect(span("2026-11-19", "2026-12-04")).toEqual({ endDate: "tooLong" })
+    })
+
+    it("refuses a first day that has passed, unless the event already had it", () => {
+        const started = multiDay({
+            startDate: "2026-10-28",
+            endDate: "2026-11-02",
+        })
+        expect(validateMultiDay(started, TODAY)).toEqual({
+            startDate: "datePast",
+        })
+        expect(
+            validateMultiDay(started, TODAY, {
+                startDate: "2026-10-28",
+                endDate: "2026-10-31",
+            }),
+        ).toEqual({})
+    })
+
+    it("lets an edit keep the days it was saved with", () => {
+        const long = multiDay({
+            startDate: "2026-11-01",
+            endDate: "2026-11-30",
+        })
+        expect(validateMultiDay(long, TODAY, long)).toEqual({})
+        expect(
+            validateMultiDay(long, TODAY, { ...long, endDate: "2026-11-29" }),
+        ).toEqual({ endDate: "tooLong" })
+    })
+})
+
+describe("multiDayColumns", () => {
+    it("writes the columns legacy wrote for a multi-day event", () => {
+        expect(multiDayColumns(multiDay())).toEqual({
+            title: "ריטריט",
+            description: "",
+            district: "galilee",
+            address: { label: "צופר", place_id: "P2", en_label: "Tzofar" },
+            organisations: [],
+            links: [],
+            price: [],
+            hide: false,
+            start_date: "2026-11-19",
+            end_date: "2026-11-21",
+            segments: [],
+            type: "retreat",
+            is_multi_day: true,
+            multi_day_teachers: [
+                { label: "נועה", value: TEACHER_ID },
+                { label: "רותם רם", value: "רותם רם" },
+            ],
+        })
+    })
+
+    it("tags the teachers and organisations, not typed names", () => {
+        expect(
+            taggedUserIds(
+                multiDay({
+                    organisations: [{ label: "סטודיו", value: ORG_ID }],
+                }),
+            ),
+        ).toEqual([TEACHER_ID, ORG_ID])
+    })
+})
+
+describe("multiDayPatch", () => {
+    it("has only what changed", () => {
+        const values = multiDay({ endDate: "2026-11-22", type: "workshop" })
+        expect(multiDayPatch(values, { endDate: "2026-11-22" })).toEqual({
+            end_date: "2026-11-22",
+        })
+        expect(multiDayPatch(values, { type: "workshop" })).toEqual({
+            type: "workshop",
+        })
+        expect(multiDayPatch(values, { teachers: [] })).toEqual({
+            multi_day_teachers: values.teachers,
+        })
+        expect(multiDayPatch(values, { title: "ריטריט" })).toEqual({
+            title: "ריטריט",
+        })
+    })
+})
+
+describe("multiDayValuesOf", () => {
+    it("reads a saved multi-day event back into the form", () => {
+        const managed = toManagedEvent({
+            ...event({
+                user_id: "u1",
+                is_multi_day: true,
+                start_date: "2026-11-19",
+                end_date: "2026-11-21",
+                segments: [],
+                type: "ריטריט",
+                multi_day_teachers: [{ label: "נועה", value: TEACHER_ID }],
+            }),
+            hide: false,
+            recurring_ref_key: null,
+            ci_events_users_junction: [],
+        } as unknown as ManagedEventRow)!
+        const values = multiDayValuesOf(managed)
+        expect(values).toMatchObject({
+            startDate: "2026-11-19",
+            endDate: "2026-11-21",
+            // Legacy's Hebrew label, read as its value.
+            type: "retreat",
+            teachers: [{ label: "נועה", value: TEACHER_ID }],
+        })
+        expect(isMultiDayValues(values)).toBe(true)
+        expect(isMultiDayValues(filled())).toBe(false)
+        expect(isMultiDayValues({ ...values, teachers: [{}] })).toBe(false)
     })
 })

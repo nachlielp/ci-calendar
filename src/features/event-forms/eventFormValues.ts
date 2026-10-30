@@ -1,6 +1,6 @@
 import type { Database } from "../../data/database.types"
 import type { FormErrors } from "../../lib/form"
-import { jerusalemTimeOfDay } from "../../lib/jerusalemDate"
+import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
 import { jerusalemInstant } from "../../lib/jerusalemInstant"
 import { isWebUrl, normaliseWebUrl } from "../../lib/webUrl"
 import type { Tag } from "../calendar/publicEvent"
@@ -64,6 +64,20 @@ export interface SingleDayValues extends EventBaseValues {
     segments: SegmentValues[]
 }
 
+/**
+ * A multi-day event (legacy MultiDayFormHead): one span of days, no
+ * segments.
+ */
+export interface MultiDayValues extends EventBaseValues {
+    /** `YYYY-MM-DD` (Jerusalem), first and last day. */
+    startDate: string
+    endDate: string
+    /** One of `MULTI_DAY_TYPES` (`ci_events.type`). */
+    type: string
+    /** `multi_day_teachers`: tagged (`value` = user id) or typed names. */
+    teachers: Tag[]
+}
+
 /** The audience tag a new segment starts with (legacy's initial value). */
 export const DEFAULT_TAGS = ["everyone"]
 
@@ -95,9 +109,39 @@ export function emptySingleDay(date: string, hidden = false): SingleDayValues {
     }
 }
 
+/**
+ * A new multi-day event, empty as legacy started it; `hidden` is the
+ * deployment's flag (`HIDE_NEW_EVENTS`).
+ */
+export function emptyMultiDay(hidden = false): MultiDayValues {
+    return {
+        title: "",
+        description: "",
+        district: "",
+        address: null,
+        organisations: [],
+        links: [],
+        prices: [],
+        hidden,
+        startDate: "",
+        endDate: "",
+        type: "",
+        teachers: [],
+    }
+}
+
 /** The form's error messages (keys of its copy). */
 export type EventFormError =
-    "required" | "datePast" | "notANumber" | "invalidUrl"
+    | "required"
+    | "datePast"
+    | "notANumber"
+    | "invalidUrl"
+    | "endBeforeStart"
+    | "sameDay"
+    | "tooLong"
+
+/** Legacy's longest multi-day event: its last day at most 14 days on. */
+export const MAX_MULTI_DAY_SPAN = 14
 
 const isBlank = (text: string) => !text.trim()
 
@@ -146,6 +190,38 @@ export function validateSingleDay(
         if (!segment.start) errors[`segments.${index}.start`] = "required"
         if (!segment.end) errors[`segments.${index}.end`] = "required"
     })
+    return errors
+}
+
+/**
+ * The multi-day form's rules: the shared ones and a type; both days, the
+ * first not before today (an event already started may keep its day), and
+ * legacy's span: the last day after the first (legacy's message for the
+ * same day: that's a single-day event), at most `MAX_MULTI_DAY_SPAN` days
+ * on. Legacy didn't check an edit's days; an event whose days are as saved
+ * keeps them, whatever its span.
+ */
+export function validateMultiDay(
+    values: MultiDayValues,
+    today: string,
+    saved?: Pick<MultiDayValues, "startDate" | "endDate">,
+): FormErrors<EventFormError> {
+    const errors = validateBase(values)
+    if (!values.type) errors.type = "required"
+    const { startDate, endDate } = values
+    if (!startDate) errors.startDate = "required"
+    else if (startDate < today && startDate !== saved?.startDate) {
+        errors.startDate = "datePast"
+    }
+    if (!endDate) errors.endDate = "required"
+    const asSaved = startDate === saved?.startDate && endDate === saved?.endDate
+    if (startDate && endDate && !asSaved) {
+        if (endDate < startDate) errors.endDate = "endBeforeStart"
+        else if (endDate === startDate) errors.endDate = "sameDay"
+        else if (endDate > addDays(startDate, MAX_MULTI_DAY_SPAN)) {
+            errors.endDate = "tooLong"
+        }
+    }
     return errors
 }
 
@@ -216,6 +292,34 @@ export function singleDayColumns(values: SingleDayValues) {
     } satisfies Partial<EventInsert>
 }
 
+/** A patch: only the changed columns, the address only if there is one. */
+type Patch<C> = Partial<
+    Omit<C, "address"> & {
+        address: AddressColumn
+    }
+>
+
+/**
+ * The shared fields' changed columns (a JSON column whole if any part of
+ * it changed).
+ */
+function basePatch(
+    values: EventBaseValues,
+    changes: Partial<EventBaseValues>,
+): Patch<ReturnType<typeof baseColumns>> {
+    const all = baseColumns(values)
+    const patch: Patch<typeof all> = {}
+    if ("title" in changes) patch.title = all.title
+    if ("description" in changes) patch.description = all.description
+    if ("district" in changes) patch.district = all.district
+    if ("address" in changes && all.address) patch.address = all.address
+    if ("organisations" in changes) patch.organisations = all.organisations
+    if ("links" in changes) patch.links = all.links
+    if ("prices" in changes) patch.price = all.price
+    if ("hidden" in changes) patch.hide = all.hide
+    return patch
+}
+
 /**
  * The columns an edit changes (a JSON column whole if any part of it
  * changed). The day is in every segment's times, so a new date rewrites
@@ -226,25 +330,47 @@ export function singleDayPatch(
     changes: Partial<SingleDayValues>,
 ) {
     const all = singleDayColumns(values)
-    const patch: Partial<
-        Omit<ReturnType<typeof singleDayColumns>, "address"> & {
-            address: AddressColumn
-        }
-    > = {}
-    if ("title" in changes) patch.title = all.title
-    if ("description" in changes) patch.description = all.description
-    if ("district" in changes) patch.district = all.district
-    if ("address" in changes && all.address) patch.address = all.address
-    if ("organisations" in changes) patch.organisations = all.organisations
-    if ("links" in changes) patch.links = all.links
-    if ("prices" in changes) patch.price = all.price
-    if ("hidden" in changes) patch.hide = all.hide
+    const patch: Patch<typeof all> = basePatch(values, changes)
     if ("date" in changes) {
         patch.start_date = all.start_date
         patch.end_date = all.end_date
     }
     if ("date" in changes || "segments" in changes) {
         patch.segments = all.segments
+    }
+    return patch
+}
+
+/**
+ * A new multi-day event's columns (legacy MultiDayEventForm's insert), but
+ * its id, owner and timestamps: no segments, the type on the event, and
+ * the teachers in `multi_day_teachers`. Days are stored as days, as the
+ * `date` columns hold legacy's (it sent 13:00 on each day).
+ */
+export function multiDayColumns(values: MultiDayValues) {
+    return {
+        ...baseColumns(values),
+        start_date: values.startDate,
+        end_date: values.endDate,
+        segments: [],
+        type: values.type,
+        is_multi_day: true,
+        multi_day_teachers: tagColumn(values.teachers),
+    } satisfies Partial<EventInsert>
+}
+
+/** The columns a multi-day edit changes. */
+export function multiDayPatch(
+    values: MultiDayValues,
+    changes: Partial<MultiDayValues>,
+) {
+    const all = multiDayColumns(values)
+    const patch: Patch<typeof all> = basePatch(values, changes)
+    if ("startDate" in changes) patch.start_date = all.start_date
+    if ("endDate" in changes) patch.end_date = all.end_date
+    if ("type" in changes) patch.type = all.type
+    if ("teachers" in changes) {
+        patch.multi_day_teachers = all.multi_day_teachers
     }
     return patch
 }
@@ -302,6 +428,20 @@ export function baseValuesOf(event: ManagedEvent): EventBaseValues {
 const timeOf = (instant: string) => {
     if (!instant || Number.isNaN(Date.parse(instant))) return ""
     return jerusalemTimeOfDay(instant)
+}
+
+/**
+ * A saved multi-day event as form values (legacy `CIEventToFormValues`);
+ * a legacy Hebrew type label reads as its value (`toPublicEvent`).
+ */
+export function multiDayValuesOf(event: ManagedEvent): MultiDayValues {
+    return {
+        ...baseValuesOf(event),
+        startDate: event.startDate,
+        endDate: event.endDate,
+        type: event.type,
+        teachers: event.multiDayTeachers,
+    }
 }
 
 /** A saved single-day event as form values (legacy `CIEventToFormValues`). */
@@ -364,3 +504,8 @@ export const isSingleDayValues = (value: unknown): value is SingleDayValues =>
     isBaseValues(value) &&
     isString((value as unknown as Record<string, unknown>).date) &&
     isListOf((value as unknown as Record<string, unknown>).segments, isSegment)
+
+export const isMultiDayValues = (value: unknown): value is MultiDayValues =>
+    isBaseValues(value) &&
+    hasStrings(value, ["startDate", "endDate", "type"]) &&
+    isListOf((value as unknown as Record<string, unknown>).teachers, isTag)

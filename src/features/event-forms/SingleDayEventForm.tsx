@@ -1,32 +1,19 @@
-import { useQuery } from "@tanstack/react-query"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { useCopy } from "../../app/language"
-import { useServices } from "../../app/services"
 import { useForm } from "../../app/useForm"
 import { useToday } from "../../app/useToday"
-import { useSession, useViewer } from "../../app/viewer"
-import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
-import { DISTRICTS } from "../../lib/eventOptions"
-import {
-    FormAlert,
-    SelectField,
-    Switch,
-    TextAreaField,
-    TextField,
-} from "../../ui/form/fields"
+import { TextField } from "../../ui/form/fields"
 import { TagPicker } from "../../ui/form/TagPicker"
-import { optionLabel } from "../calendar/eventFormat"
-import { EVENT_LOCALES } from "../calendar/eventLocales"
 import type { ManagedEvent } from "../events/managedEvent"
-import { AddressField } from "./AddressField"
 import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 import { useFormDraft } from "./eventDraft"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
 import {
-    LinksFields,
+    BaseHeadFields,
+    ClearFormButton,
+    EventFormFooter,
     MoreSegments,
-    PricesFields,
     SegmentFields,
 } from "./EventFormParts"
 import { useErrorText } from "./useErrorText"
@@ -36,12 +23,12 @@ import {
     singleDayColumns,
     singleDayPatch,
     singleDayValuesOf,
-    taggedUserIds,
     validateSingleDay,
     type SingleDayValues,
 } from "./eventFormValues"
-import { EventGoneError, useCreateEvent, useUpdateEvent } from "./eventSave"
-import { taggableBiosQuery, taggableOptions } from "./taggableBios"
+import { HIDE_NEW_EVENTS } from "./eventSave"
+import { useTaggable } from "./taggableBios"
+import { useEventSubmit } from "./useEventSubmit"
 
 const COPY = defineCopy({
     he: {
@@ -64,8 +51,8 @@ const COPY = defineCopy({
     },
 })
 
-/** New events start hidden where the deployment says so (legacy's flag). */
-const HIDE_NEW_EVENTS = import.meta.env.VITE_HIDE_EVENTS_FLAG === "true"
+/** Fields holding tagged users (teachers on segments, organisations). */
+const TAG_FIELDS = ["segments", "organisations"] as const
 
 /**
  * Legacy SingleDayEventForm (`event` unset: a new event) and
@@ -88,13 +75,8 @@ export function SingleDayEventForm({
     /** Clears a new event's form (it remounts empty). */
     onClear?: () => void
 }) {
-    const services = useServices()
     const copy = useCopy(EVENT_FORM_COPY)
     const own = useCopy(COPY)
-    const common = useCopy(COMMON_COPY)
-    const locale = useCopy(EVENT_LOCALES)
-    const viewer = useViewer()
-    const session = useSession()
     const today = useToday()
 
     const saved = useMemo(
@@ -119,106 +101,35 @@ export function SingleDayEventForm({
         form,
         isValues: isSingleDayValues,
     })
-    const [id] = useState(() => crypto.randomUUID())
-    const create = useCreateEvent(userId)
-    const update = useUpdateEvent(userId)
-
-    const bios = useQuery({
-        ...taggableBiosQuery(services, userId),
-        enabled: !!userId,
+    const taggable = useTaggable(userId)
+    const submit = useEventSubmit({
+        userId,
+        event,
+        columns: singleDayColumns,
+        patch: singleDayPatch,
+        tagFields: TAG_FIELDS,
+        discardDraft,
+        onDone,
     })
-    const taggable = useMemo(
-        () =>
-            taggableOptions(bios.data ?? [], {
-                id: userId,
-                role: viewer.role,
-                email: session?.user.email ?? "",
-            }),
-        [bios.data, userId, viewer, session],
-    )
-
-    const onSubmit = form.handleSubmit(async ({ values, changes, isDirty }) => {
-        if (event) {
-            if (isDirty) {
-                await update.mutateAsync({
-                    event,
-                    patch: singleDayPatch(values, changes),
-                    tagged:
-                        "segments" in changes || "organisations" in changes
-                            ? taggedUserIds(values)
-                            : undefined,
-                })
-            }
-        } else {
-            await create.mutateAsync({
-                id,
-                columns: singleDayColumns(values),
-                tagged: taggedUserIds(values),
-            })
-        }
-        discardDraft()
-        onDone()
-    })
+    const onSubmit = form.handleSubmit(submit.save)
 
     const { values, errors, set, update: change, touch } = form
     const errorAt = useErrorText(errors)
-    const invalid = Object.values(errors).some(Boolean)
-    const gone = update.error instanceof EventGoneError
-    const failed = (create.isError || update.isError) && !gone
-    const saving = form.submitting
     return (
         <div className="event-form">
             <form onSubmit={onSubmit} noValidate>
                 {onClear && (
-                    <div className="clear-row">
-                        <button
-                            type="button"
-                            className="clear-button"
-                            onClick={() => {
-                                discardDraft()
-                                onClear()
-                            }}
-                        >
-                            {copy.clear}
-                        </button>
-                    </div>
+                    <ClearFormButton
+                        onClear={() => {
+                            discardDraft()
+                            onClear()
+                        }}
+                    />
                 )}
                 <section className="event-card card">
-                    <h2 className="segment-title">
-                        {event ? own.editTitle : own.createTitle}
-                    </h2>
-                    <TextField
-                        label={copy.title}
-                        labelAsPlaceholder
-                        value={values.title}
-                        onChange={(title) => set("title", title)}
-                        onBlur={() => touch("title")}
-                        error={errorAt("title")}
-                    />
-                    <TextAreaField
-                        label={copy.description}
-                        labelAsPlaceholder
-                        rows={6}
-                        value={values.description}
-                        onChange={(text) => set("description", text)}
-                    />
-                    <SelectField
-                        label={copy.district}
-                        labelAsPlaceholder
-                        options={DISTRICTS.map((district) => ({
-                            value: district,
-                            label: optionLabel(district, locale),
-                        }))}
-                        value={values.district}
-                        onChange={(district) => set("district", district)}
-                        onBlur={() => touch("district")}
-                        error={errorAt("district")}
-                    />
-                    <AddressField
-                        value={values.address}
-                        onChange={(address) => set("address", address)}
-                        onBlur={() => touch("address")}
-                        error={errorAt("address")}
+                    <BaseHeadFields
+                        form={form}
+                        heading={event ? own.editTitle : own.createTitle}
                     />
                     <TextField
                         label={copy.date}
@@ -267,48 +178,13 @@ export function SingleDayEventForm({
                     }
                     onTouch={touch}
                 />
-                <LinksFields
-                    links={values.links}
-                    errors={errors}
-                    onChange={(listChange, path) =>
-                        change("links", listChange, path)
-                    }
-                    onTouch={touch}
+                <EventFormFooter
+                    form={form}
+                    submitLabel={event ? own.update : own.create}
+                    saving={form.submitting}
+                    failed={submit.failed}
+                    gone={submit.gone}
                 />
-                <PricesFields
-                    prices={values.prices}
-                    errors={errors}
-                    onChange={(listChange, path) =>
-                        change("prices", listChange, path)
-                    }
-                    onTouch={touch}
-                />
-                <Switch
-                    label={copy.hidden}
-                    checked={values.hidden}
-                    onChange={(hidden) => set("hidden", hidden)}
-                    onText={copy.hiddenOn}
-                    offText={copy.hiddenOff}
-                />
-                {invalid && <FormAlert kind="error">{copy.invalid}</FormAlert>}
-                {failed && (
-                    <FormAlert kind="error">{copy.saveFailed}</FormAlert>
-                )}
-                {gone && <FormAlert kind="error">{copy.gone}</FormAlert>}
-                <div className="submit-button-container">
-                    <button
-                        type="submit"
-                        className="action-button"
-                        disabled={saving}
-                        aria-busy={saving || undefined}
-                    >
-                        {saving
-                            ? common.loading
-                            : event
-                              ? own.update
-                              : own.create}
-                    </button>
-                </div>
             </form>
         </div>
     )

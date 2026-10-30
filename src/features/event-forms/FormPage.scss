@@ -39,6 +39,12 @@
         }
     }
 
+    // Legacy MultiDayFormPage's info alert, large and bold.
+    .form-notice .form-alert {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
     .form-container {
         margin: 8px auto;
         padding: 16px;

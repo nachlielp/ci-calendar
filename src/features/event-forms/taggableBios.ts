@@ -1,7 +1,8 @@
-import { queryOptions } from "@tanstack/react-query"
+import { queryOptions, useQuery } from "@tanstack/react-query"
+import { useMemo } from "react"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import type { AppServices } from "../../app/services"
-import type { SignedInRole } from "../../app/viewer"
+import { useServices, type AppServices } from "../../app/services"
+import { useSession, useViewer, type SignedInRole } from "../../app/viewer"
 import type { Tag } from "../calendar/publicEvent"
 
 // Who an event form can tag (legacy `getTaggableUsers` and the store's
@@ -85,4 +86,25 @@ export function taggableBiosQuery(services: AppServices, userId: string) {
             return data
         },
     })
+}
+
+/** Who the user's event form can tag (empty lists until the bios load). */
+export function useTaggable(userId: string): Taggable {
+    const services = useServices()
+    const viewer = useViewer()
+    const session = useSession()
+    const bios = useQuery({
+        ...taggableBiosQuery(services, userId),
+        enabled: !!userId,
+    })
+    const email = session?.user.email ?? ""
+    return useMemo(
+        () =>
+            taggableOptions(bios.data ?? [], {
+                id: userId,
+                role: viewer.role,
+                email,
+            }),
+        [bios.data, userId, viewer.role, email],
+    )
 }

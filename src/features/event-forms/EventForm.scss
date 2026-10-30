@@ -1,5 +1,5 @@
-// Legacy event-form.scss, event-segments-form.scss, add-links-form.scss and
-// add-prices-form.scss (antd's rows and columns dropped), plus the card
+// Legacy event-form.scss, event-segments-form.scss, add-links-form.scss,
+// add-prices-form.scss and multi-day-form-head.scss (antd's rows and columns dropped), plus the card
 // border of generics/card.scss.
 
 .event-form {
@@ -42,8 +42,15 @@
         margin-bottom: 1rem;
     }
 
-    // Legacy: start and end side by side, 1rem apart.
-    .time-fields {
+    // Legacy multi-day-form-head.scss: the head card's thicker border.
+    .multi-day-form-head-card {
+        border-width: 4px;
+    }
+
+    // Legacy: start and end side by side, 1rem apart (times, and the
+    // multi-day form's days).
+    .time-fields,
+    .date-fields {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1rem;

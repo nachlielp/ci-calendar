@@ -24,6 +24,13 @@ const lazyPage =
 
 const requestsPage = lazyPage(() => import("../features/requests/RequestsPage"))
 
+type EventFormPages = typeof import("../features/event-forms/pages")
+
+/** An event-form page: all of them are one chunk (event-forms/pages.ts). */
+const eventFormPage = (name: keyof EventFormPages) => async () => ({
+    Component: (await import("../features/event-forms/pages"))[name],
+})
+
 // The public calendar is the only eager route; every other page is a lazy
 // chunk so it never weighs on the calendar's first paint.
 export const routes: RouteObject[] = [
@@ -111,24 +118,23 @@ export const routes: RouteObject[] = [
                 },
                 {
                     path: "create-events",
-                    lazy: lazyPage(
-                        () =>
-                            import("../features/event-forms/CreateEventsPage"),
-                    ),
+                    lazy: eventFormPage("CreateEventsPage"),
                 },
                 {
                     path: "create-events/single-day",
-                    lazy: lazyPage(
-                        () =>
-                            import("../features/event-forms/SingleDayFormPage"),
-                    ),
+                    lazy: eventFormPage("SingleDayFormPage"),
                 },
                 {
                     path: "manage-events/edit-single-day/:eventId",
-                    lazy: lazyPage(
-                        () =>
-                            import("../features/event-forms/EditSingleDayFormPage"),
-                    ),
+                    lazy: eventFormPage("EditSingleDayFormPage"),
+                },
+                {
+                    path: "create-events/multi-day",
+                    lazy: eventFormPage("MultiDayFormPage"),
+                },
+                {
+                    path: "manage-events/edit-multi-day/:eventId",
+                    lazy: eventFormPage("EditMultiDayFormPage"),
                 },
             ]),
             {

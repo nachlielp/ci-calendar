@@ -415,6 +415,32 @@ describe("the single-day event form", () => {
         expect(inserts(fake)).toHaveLength(0)
     })
 
+    it("takes today from Jerusalem: after midnight there, yesterday has passed", async () => {
+        const { user, fake } = setup()
+        // 00:30 on 31 October in Jerusalem, still the 30th in UTC.
+        renderApp({
+            fake,
+            signedInAs: user,
+            path: "/create-events/single-day",
+            now: new Date("2026-10-30T22:30:00Z"),
+        })
+        await fillEvent()
+        fireEvent.change(screen.getByLabelText("תאריך"), {
+            target: { value: "2026-10-30" },
+        })
+
+        await submit()
+
+        expect(screen.getByLabelText("תאריך")).toHaveAccessibleDescription(
+            "התאריך עבר",
+        )
+        expect(screen.getByLabelText("תאריך")).toHaveAttribute(
+            "min",
+            "2026-10-31",
+        )
+        expect(inserts(fake)).toHaveLength(0)
+    })
+
     it("tags teachers and organisations that allow it, and keeps typed names", async () => {
         const { user, fake } = setup()
         const { router } = render(user, fake)

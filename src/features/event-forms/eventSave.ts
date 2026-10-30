@@ -23,6 +23,12 @@ import type { AddressColumn } from "./eventFormValues"
 // teachers' junction rows. The stored event goes into every cached event
 // list (`applyEventChanges`): no list is refetched.
 
+/**
+ * New events start hidden where the deployment says so (legacy's
+ * `VITE_HIDE_EVENTS_FLAG`); the forms' hide switch starts from it.
+ */
+export const HIDE_NEW_EVENTS = import.meta.env.VITE_HIDE_EVENTS_FLAG === "true"
+
 type EventInsert = Database["public"]["Tables"]["ci_events"]["Insert"]
 type EventUpdate = Database["public"]["Tables"]["ci_events"]["Update"]
 
@@ -32,6 +38,12 @@ export type EventColumns = Omit<
     "address" | "id" | "user_id" | "owners"
 > & {
     address: AddressColumn | null
+    /**
+     * Legacy's `owners` (read by nothing): the multi-day form names its
+     * creator there, as legacy's did; empty by default, as legacy's
+     * single-day form left it.
+     */
+    owners?: EventInsert["owners"]
 }
 
 export interface NewEvent {
@@ -184,7 +196,7 @@ export function useCreateEvent(userId: string) {
                     address: translated.address ?? {},
                     id,
                     user_id: userId,
-                    owners: [],
+                    owners: columns.owners ?? [],
                     cancelled: false,
                     created_at: now,
                     updated_at: now,

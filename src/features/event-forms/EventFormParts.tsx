@@ -1,11 +1,14 @@
 import type { ReactNode } from "react"
 import { useCopy } from "../../app/language"
-import { EVENT_TYPES, TAGS } from "../../lib/eventOptions"
+import { COMMON_COPY } from "../../lib/commonCopy"
+import { DISTRICTS, EVENT_TYPES, TAGS } from "../../lib/eventOptions"
 import type { FormErrors } from "../../lib/form"
 import {
     ChoiceChips,
     FormAlert,
     SelectField,
+    Switch,
+    TextAreaField,
     TextField,
 } from "../../ui/form/fields"
 import { TagPicker, type PickerOption } from "../../ui/form/TagPicker"
@@ -13,9 +16,11 @@ import { AddCircleIcon } from "../../ui/icons/AddCircleIcon"
 import { DoNotDisturbIcon } from "../../ui/icons/DoNotDisturbIcon"
 import { optionLabel, tagLabel } from "../calendar/eventFormat"
 import { EVENT_LOCALES } from "../calendar/eventLocales"
+import { AddressField } from "./AddressField"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
 import {
     emptySegment,
+    type EventBaseValues,
     type EventFormError,
     type LinkValues,
     type PriceValues,
@@ -24,12 +29,32 @@ import {
 import "./EventForm.scss"
 import { useErrorText } from "./useErrorText"
 
-// The event forms' parts (legacy SingleDayEventFormHead's segment card,
-// EventSegmentsForm, AddLinksForm, AddPricesForm), shared by the
-// single-day form and, later, the multi-day form and templates. Each takes
-// its value, the form's errors (by path) and a change function
-// (`form.update(field, change, path)`), so it works in any form on
-// `useForm`.
+// The event forms' parts (legacy's form heads, SingleDayEventFormHead's
+// segment card, EventSegmentsForm, AddLinksForm, AddPricesForm,
+// EventFromFooter), shared by the single-day and multi-day forms and,
+// later, templates. Each takes its value, the form's errors (by path) and
+// a change function (`form.update(field, change, path)`), so it works in
+// any form on `useForm`; the head and the footer take the form itself, as
+// `BaseFormControls` (any `useForm` form of `EventBaseValues` and more).
+
+/**
+ * What the shared head and footer use of an event form (`useForm`): its
+ * `EventBaseValues` fields. Methods, so a form of more fields is one.
+ */
+export interface BaseFormControls {
+    values: EventBaseValues
+    errors: FormErrors<EventFormError>
+    set<K extends keyof EventBaseValues>(
+        field: K,
+        value: EventBaseValues[K],
+    ): void
+    update<K extends keyof EventBaseValues>(
+        field: K,
+        change: (value: EventBaseValues[K]) => EventBaseValues[K],
+        path?: string,
+    ): void
+    touch(path: string): void
+}
 
 /** Changes a list field: `change` from its current value; `path` touched. */
 export type ListChange<T> = (change: (list: T[]) => T[], path: string) => void
@@ -376,5 +401,141 @@ export function PricesFields({
                 {copy.addPrice}
             </AddButton>
         </section>
+    )
+}
+
+/**
+ * The top of every event form's head (legacy's form heads): the card's
+ * title, then the event's title, description, district and address.
+ */
+export function BaseHeadFields({
+    form,
+    heading,
+}: {
+    form: BaseFormControls
+    heading: string
+}) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    const locale = useCopy(EVENT_LOCALES)
+    const { values, errors, set, touch } = form
+    const errorAt = useErrorText(errors)
+    return (
+        <>
+            <h2 className="segment-title">{heading}</h2>
+            <TextField
+                label={copy.title}
+                labelAsPlaceholder
+                value={values.title}
+                onChange={(title) => set("title", title)}
+                onBlur={() => touch("title")}
+                error={errorAt("title")}
+            />
+            <TextAreaField
+                label={copy.description}
+                labelAsPlaceholder
+                rows={6}
+                value={values.description}
+                onChange={(text) => set("description", text)}
+            />
+            <SelectField
+                label={copy.district}
+                labelAsPlaceholder
+                options={DISTRICTS.map((district) => ({
+                    value: district,
+                    label: optionLabel(district, locale),
+                }))}
+                value={values.district}
+                onChange={(district) => set("district", district)}
+                onBlur={() => touch("district")}
+                error={errorAt("district")}
+            />
+            <AddressField
+                value={values.address}
+                onChange={(address) => set("address", address)}
+                onBlur={() => touch("address")}
+                error={errorAt("address")}
+            />
+        </>
+    )
+}
+
+/** Legacy's "clear form" button (a new event's form only). */
+export function ClearFormButton({ onClear }: { onClear: () => void }) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    return (
+        <div className="clear-row">
+            <button type="button" className="clear-button" onClick={onClear}>
+                {copy.clear}
+            </button>
+        </div>
+    )
+}
+
+/**
+ * The end of every event form (legacy EventFromFooter and the submit
+ * button): links, prices, the hide (draft) switch, the form's alerts and
+ * the submit button. `invalid` replaces the generic invalid-form alert
+ * (legacy showed a span error there).
+ */
+export function EventFormFooter({
+    form,
+    submitLabel,
+    saving,
+    failed,
+    gone,
+    invalid,
+}: {
+    form: BaseFormControls
+    submitLabel: string
+    saving: boolean
+    failed: boolean
+    gone: boolean
+    invalid?: string
+}) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    const common = useCopy(COMMON_COPY)
+    const { values, errors, set, update, touch } = form
+    const hasErrors = Object.values(errors).some(Boolean)
+    return (
+        <>
+            <LinksFields
+                links={values.links}
+                errors={errors}
+                onChange={(listChange, path) =>
+                    update("links", listChange, path)
+                }
+                onTouch={touch}
+            />
+            <PricesFields
+                prices={values.prices}
+                errors={errors}
+                onChange={(listChange, path) =>
+                    update("prices", listChange, path)
+                }
+                onTouch={touch}
+            />
+            <Switch
+                label={copy.hidden}
+                checked={values.hidden}
+                onChange={(hidden) => set("hidden", hidden)}
+                onText={copy.hiddenOn}
+                offText={copy.hiddenOff}
+            />
+            {hasErrors && (
+                <FormAlert kind="error">{invalid ?? copy.invalid}</FormAlert>
+            )}
+            {failed && <FormAlert kind="error">{copy.saveFailed}</FormAlert>}
+            {gone && <FormAlert kind="error">{copy.gone}</FormAlert>}
+            <div className="submit-button-container">
+                <button
+                    type="submit"
+                    className="action-button"
+                    disabled={saving}
+                    aria-busy={saving || undefined}
+                >
+                    {saving ? common.loading : submitLabel}
+                </button>
+            </div>
+        </>
     )
 }

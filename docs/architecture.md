@@ -461,14 +461,16 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       (`FormAlert kind="error"`, role alert) and the error is reported
       (`captureError`, `source: "<form>-save"`).
     - **Fields**: `src/ui/form/fields.tsx` (`TextField`, `TextAreaField`,
-      `SelectField` on a native `<select>`, `ChoiceChips` for legacy's tags
+      `SelectField` on a native `<select>` (a value it doesn't offer,
+      e.g. a production row's `conference` type, shows the placeholder and
+      stays the value until another is picked), `ChoiceChips` for legacy's tags
       `Select` (checkboxes drawn as chips), `Switch` (`role="switch"`),
       `FormAlert`) and the `.action-button` / `.text-button` classes
       (legacy `general-action-btn black-btn large-btn` and `text-btn`), all
       in `Form.scss`. Labels come from the form's copy; `<form noValidate>`
       so the browser's own bubbles don't replace the form's messages.
-- **Event forms** (slice 13; `features/event-forms`, reuse these for the
-  multi-day form and templates, slices 14–16):
+- **Event forms** (slices 13 and 14; `features/event-forms`, reuse these
+  for templates, slice 16):
     - **Values** (`eventFormValues.ts`, pure, tested directly): the shared
       `EventBaseValues` (title, description, district, address
       `{ label, placeId, enLabel? }`, organisations and teachers as `Tag`s,
@@ -486,6 +488,18 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       off `/`). `singleDayValuesOf(event)` reads a `ManagedEvent` back.
       `isSingleDayValues` checks a draft's shape. `taggedUserIds` is legacy
       `getCIEventTeachers` (teacher and organisation ids, not typed names).
+      Multi-day (slice 14): `MultiDayValues` (`startDate`, `endDate`,
+      `type` from `MULTI_DAY_TYPES`, `teachers` = `multi_day_teachers`),
+      `emptyMultiDay`, `validateMultiDay` (type and both days required, the
+      first not past unless saved so; legacy's span on `endDate`:
+      `endBeforeStart` (new: legacy let it through), `sameDay` (legacy's
+      "use a single-day event"), `tooLong` (over `MAX_MULTI_DAY_SPAN`, 14
+      days on); an edit whose days are both as saved skips the span, as
+      legacy checked no edit), `multiDayColumns` (`segments: []`,
+      `is_multi_day: true`, days as `YYYY-MM-DD`: the `date` columns hold
+      legacy's 13:00 sends as plain days, checked against production),
+      `multiDayPatch`, `multiDayValuesOf`, `isMultiDayValues`. Both kinds'
+      patches share `basePatch`.
     - **Parts** (`EventFormParts.tsx`, words in `EVENT_FORM_COPY`):
       `SegmentFields` (type, native `type="time"` inputs with a 5-minute
       step, teachers, audience tags; legacy's course notice),
@@ -496,7 +510,15 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       `TagPicker` (`ui/form`) is legacy's tags/multiple Select: chips plus
       an ARIA combobox over a listbox; `allowTyped` adds a typed name as
       `{ label: name, value: name }` (legacy's untagged teachers).
-      `AddressField` is legacy's GooglePlacesInput (below).
+      `AddressField` is legacy's GooglePlacesInput (below). Whole-form
+      parts take the form itself as `BaseFormControls` (any `useForm`
+      form of `EventBaseValues` and more; method signatures, so it is
+      assignable): `BaseHeadFields` (card title, title, description,
+      district, address), `EventFormFooter` (links, prices, hide switch,
+      alerts, submit; `invalid` replaces the generic alert text, as
+      legacy's multi-day span messages did) and `ClearFormButton`.
+      `useTaggable(userId)` gives the tagging lists. A new form is its own
+      head fields between these two, plus `useEventSubmit` (below).
     - **Who can be tagged**: `taggableBiosQuery` (personal: one request for
       bios with `allow_tagging` and a name, plus the user's own) and the
       pure `taggableOptions` (legacy's lists: orgs apart, the user's own bio
@@ -518,9 +540,25 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       selecting `MANAGED_EVENT_COLUMNS`, then junction rows for the tagged
       users not yet tagged (`ci_events_users_junction`, inserted returning
       their bios, merged into the event; a failure there is reported and
-      leaves the saved event without them). Legacy never deleted junction
+      leaves the saved event without them; multi-day teachers are tagged
+      too, as legacy did). `columns.owners` defaults to `[]` (legacy's
+      single-day); the multi-day form sends `[{ value: userId, label:
+user_name }]`, as legacy's did (nothing reads it). New events' hide
+      switch starts from `HIDE_NEW_EVENTS` (`VITE_HIDE_EVENTS_FLAG`).
+      Legacy never deleted junction
       rows and neither does this: a removed tag no longer names the bio,
       so it doesn't show. The result goes to `applyEventChanges`.
+    - **Submitting** (`useEventSubmit.ts`): every form's save is
+      `useEventSubmit(options)` (`userId`, `event`, `columns`, `patch`,
+      `tagFields`, `discardDraft`, `onDone`), then `onSubmit={form.handleSubmit(save)}`:
+      a new event inserts `columns(values)` with an id made once per form;
+      an edit sends `patch(values, changes)` (nothing when clean) and
+      re-tags only if a field in `tagFields` changed (single-day:
+      `segments`, `organisations`; multi-day: `teachers`,
+      `organisations`); then the draft goes and `onDone`. It returns
+      `failed` and `gone` for `EventFormFooter`. Templates (slice 16) pass
+      their own `columns`/`patch` (and, writing `templates`, their own
+      mutations behind the same shape).
     - **Drafts** (`eventDraft.ts`, keys in `draftKeys.ts`, `personalKey`s):
       `useFormDraft({ key, userId, eventId, saved, form, isValues })` keeps
       only the form's `changes` while it is dirty and removes them once it
@@ -532,11 +570,33 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       edit's is dropped by the page's back button but survives a reload.
     - **Pages**: `/create-events` (legacy's chooser; the missing-bio
       warning; templates come with slice 16), `/create-events/single-day`
-      (back to `/create-events` after a save, as legacy), and
-      `/manage-events/edit-single-day/:eventId` (`myEventQuery`, personal,
+      and `/create-events/multi-day` (legacy's info notice; both back to
+      `/create-events` after a save, as legacy), and
+      `/manage-events/edit-single-day/:eventId` and
+      `/manage-events/edit-multi-day/:eventId` (`myEventQuery`, personal,
       the user's own event by id, at once from the cached upcoming list;
-      registered as an event list; a multi-day event redirects to its own
-      form; back to `/manage-events`). Layout in `FormPage.scss`.
+      registered as an event list; an event of the other kind redirects to
+      its own form; back to `/manage-events`). Each page is a few lines
+      over `NewEventFormPage` / `EditEventFormPage`
+      (`EventFormPages.tsx`: header, back button, loading/not-found/error,
+      the draft key the back button drops). Layout in `FormPage.scss`.
+    - **One chunk**: every event-form page is exported from
+      `event-forms/pages.ts` and routed with `eventFormPage("Name")`
+      (`app/routes.tsx`): one dynamic import in `/`'s route table for all
+      of them (each `import()` there costs `/` its preload list and file
+      names), and moving between the chooser and the forms downloads
+      nothing. Add template pages (slice 16) the same way.
+    - **For templates (slice 16)**: legacy reused these same forms and
+      routes with `?isTemplate=true` (a `name` field; the multi-day one
+      without its days) writing the
+      `templates` table, whose columns mirror `ci_events`' (no dates,
+      `hide`, `cancelled`), so the `*Columns` functions minus the day
+      columns fit; and the new-event forms offered "בחירת תבנית" (the
+      user's templates of that kind) at the top, filling the form, and
+      wrote `source_template_id` on create (not sent yet: add it to the
+      columns). Legacy's template drafts had their own keys
+      (`multi-day-draft-template`): give templates their own
+      `personalKey`s in `draftKeys.ts`.
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
   JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
   first call (`data/googlePlaces.ts`, its own chunk; a script tag with
@@ -988,3 +1048,16 @@ feature helpers is tested directly.
     link and price fields, `TagPicker`, `AddressField`, saves, drafts) for
     slices 14–16. The event details now machine-translate what legacy did
     in English and Russian.
+14. Multi-day event form: `/create-events/multi-day` and
+    `/manage-events/edit-multi-day/:eventId` (lazy, creator/org/admin),
+    legacy's MultiDayEventForm on slice 13's parts: title, description,
+    district, address, first and last day, multi-day type, teachers and
+    organisations (tagged or typed), links, prices and the hide switch
+    (new here: legacy's multi-day form always saved visible); legacy's
+    rules plus end-before-start; rows as production's legacy-made ones
+    (`is_multi_day`, empty segments, `multi_day_teachers`, `owners`, junction
+    rows), so the calendar shows them on every day they span. Shared form
+    head/footer/page frames, the submit flow (`useEventSubmit`) and the
+    taggable hook pulled out of the single-day form; a select shows its
+    placeholder for a value it doesn't offer; all event-form pages are one lazy chunk, so `/` got
+    smaller (135.1 KB).

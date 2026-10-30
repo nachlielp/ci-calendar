@@ -129,7 +129,7 @@ type SelectProps = Omit<
 
 /**
  * A native select (legacy's single antd Select). `placeholder` is the
- * empty first option, shown while nothing is chosen.
+ * empty first option, shown while no offered option is chosen.
  */
 export function SelectField<T extends string>({
     label,
@@ -149,17 +149,21 @@ export function SelectField<T extends string>({
         placeholder?: string
     }) {
     const id = useId()
+    // A value it doesn't offer (an old row's type) shows as nothing chosen,
+    // not as whichever option the browser would fall back to; it stays the
+    // value until another is picked.
+    const chosen = options.some((option) => option.value === value)
     return (
         <Frame {...{ id, label, labelAsPlaceholder, hint, error }}>
             <select
                 {...select}
                 id={id}
-                className={`form-input form-select${value ? "" : " empty"}`}
-                value={value}
+                className={`form-input form-select${chosen ? "" : " empty"}`}
+                value={chosen ? value : ""}
                 onChange={(event) => onChange(event.target.value as T)}
                 {...describedBy(id, error)}
             >
-                {!value && (
+                {!chosen && (
                     <option value="" disabled>
                         {placeholder ?? (labelAsPlaceholder ? label : "")}
                     </option>

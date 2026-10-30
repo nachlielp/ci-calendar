@@ -1,9 +1,9 @@
 import { defineCopy } from "../../lib/copy"
 
 // The event forms' words (legacy SingleDayEventFormHead, EventSegmentsForm,
-// AddLinksForm, AddPricesForm, EventFromFooter and the form pages; Hebrew
-// only there), shared by the single-day form and its parts, and by the
-// multi-day form and templates later.
+// AddLinksForm, AddPricesForm, EventFromFooter, MultiDayFormHead,
+// MultiDayEventForm and the form pages; Hebrew only there), shared by the
+// single-day and multi-day forms and their parts, and by templates later.
 export const EVENT_FORM_COPY = defineCopy({
     he: {
         title: "*כותרת האירוע",
@@ -13,6 +13,9 @@ export const EVENT_FORM_COPY = defineCopy({
         noAddresses: "לא נמצאו כתובות",
         addressUnavailable: "חיפוש הכתובות לא זמין כרגע",
         date: "תאריך",
+        startDate: "תאריך התחלה",
+        endDate: "תאריך סיום",
+        multiDayType: "סוג האירוע יכול להיות כל סוג אירוע חד יומי או רב יומי",
         organisations: "ארגונים",
         eventType: "סוג האירוע",
         courseNotice: "נא לא להזין ללוח קורסים שלא פתוחים להרשמה",
@@ -42,6 +45,10 @@ export const EVENT_FORM_COPY = defineCopy({
         clear: "ניקוי טופס",
         required: "שדה חובה",
         datePast: "התאריך עבר",
+        endBeforeStart: "תאריך הסיום לפני תאריך ההתחלה",
+        sameDay:
+            "אירוע רב יומי לא יכול להתחיל ולהסתיים באותו יום, בשביל זה יש אירוע חד יומי",
+        tooLong: "אירוע לא יכול להמשך מעל ל-14 ימים",
         notANumber: "נא להזין מספר",
         invalidUrl: "נא להזין קישור לאתר (https://…)",
         invalid: "ערכים שגויים, נא לבדוק את הטופס",
@@ -56,6 +63,9 @@ export const EVENT_FORM_COPY = defineCopy({
         noAddresses: "No addresses found",
         addressUnavailable: "Address search is unavailable right now",
         date: "Date",
+        startDate: "Start date",
+        endDate: "End date",
+        multiDayType: "The event type can be any single-day or multi-day type",
         organisations: "Organisations",
         eventType: "Event type",
         courseNotice:
@@ -86,6 +96,10 @@ export const EVENT_FORM_COPY = defineCopy({
         clear: "Clear form",
         required: "Required",
         datePast: "This date has passed",
+        endBeforeStart: "The end date is before the start date",
+        sameDay:
+            "A multi-day event can't start and end on the same day: that's a single-day event",
+        tooLong: "An event can't last more than 14 days",
         notANumber: "Please enter a number",
         invalidUrl: "Please enter a web link (https://…)",
         invalid: "Some values are wrong, please check the form",
@@ -100,6 +114,10 @@ export const EVENT_FORM_COPY = defineCopy({
         noAddresses: "Адреса не найдены",
         addressUnavailable: "Поиск адресов сейчас недоступен",
         date: "Дата",
+        startDate: "Дата начала",
+        endDate: "Дата окончания",
+        multiDayType:
+            "Тип события может быть любым типом однодневного или многодневного события",
         organisations: "Организации",
         eventType: "Тип события",
         courseNotice:
@@ -130,6 +148,10 @@ export const EVENT_FORM_COPY = defineCopy({
         clear: "Очистить форму",
         required: "Обязательное поле",
         datePast: "Эта дата уже прошла",
+        endBeforeStart: "Дата окончания раньше даты начала",
+        sameDay:
+            "Многодневное событие не может начаться и закончиться в один день: для этого есть однодневное событие",
+        tooLong: "Событие не может длиться больше 14 дней",
         notANumber: "Пожалуйста, введите число",
         invalidUrl: "Пожалуйста, введите веб-ссылку (https://…)",
         invalid: "Неверные значения, проверьте форму",

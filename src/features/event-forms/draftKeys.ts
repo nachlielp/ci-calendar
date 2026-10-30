@@ -7,3 +7,7 @@ import { personalKey } from "../../app/auth/personalStorage"
 export const SINGLE_DAY_DRAFT_KEY = personalKey("single-day-event-draft")
 /** The single-day edit form's draft (for the one event it names). */
 export const SINGLE_DAY_EDIT_DRAFT_KEY = personalKey("single-day-edit-draft")
+/** The new multi-day event's draft. */
+export const MULTI_DAY_DRAFT_KEY = personalKey("multi-day-event-draft")
+/** The multi-day edit form's draft (for the one event it names). */
+export const MULTI_DAY_EDIT_DRAFT_KEY = personalKey("multi-day-edit-draft")

@@ -1,10 +1,13 @@
 import { defineCopy } from "../../lib/copy"
 
-/** The form pages' headers (legacy SingleDayFormPage, EditSingleDayFormPage). */
+/** The form pages' headers (legacy SingleDayFormPage, MultiDayFormPage and their edit pages). */
 export const FORM_PAGE_COPY = defineCopy({
     he: {
         singleDay: "אירוע חד יומי",
         editSingleDay: "עריכת אירוע חד יומי",
+        multiDay: "אירוע רב יומי",
+        editMultiDay: "עריכת אירוע רב יומי",
+        multiDayNotice: "אירוע רב יומי הוא אירוע רציף שנמשך מספר ימים",
         backToCreate: "חזרה ליצירת אירועים",
         backToMine: "חזרה לאירועים שלי",
         notFound: "האירוע לא נמצא",
@@ -13,6 +16,10 @@ export const FORM_PAGE_COPY = defineCopy({
     en: {
         singleDay: "Single-day event",
         editSingleDay: "Edit single-day event",
+        multiDay: "Multi-day event",
+        editMultiDay: "Edit multi-day event",
+        multiDayNotice:
+            "A multi-day event is one continuous event lasting several days",
         backToCreate: "Back to creating events",
         backToMine: "Back to my events",
         notFound: "The event wasn't found",
@@ -21,6 +28,10 @@ export const FORM_PAGE_COPY = defineCopy({
     ru: {
         singleDay: "Однодневное событие",
         editSingleDay: "Изменить однодневное событие",
+        multiDay: "Многодневное событие",
+        editMultiDay: "Изменить многодневное событие",
+        multiDayNotice:
+            "Многодневное событие — это одно непрерывное событие на несколько дней",
         backToCreate: "Назад к созданию событий",
         backToMine: "Назад к моим событиям",
         notFound: "Событие не найдено",
