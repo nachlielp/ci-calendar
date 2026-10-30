@@ -24,6 +24,7 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | `src/features/*`    | One folder per feature: its pages, components, queries, tests |
 | `src/lib/`          | Pure helpers (dates, formatting); tested directly             |
 | `src/ui/`           | Shared presentational primitives (dialog, buttons, icons)     |
+| `src/ui/form`       | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
 | `src/pages/`        | Simple pages (about, legal, 404) that belong to no feature    |
 | `src/test/`         | The fake backend and `renderApp`                              |
 | `src/assets/`       | Images, logos and the subset font ported from legacy          |
@@ -314,6 +315,57 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed).
   `.visually-hidden` (`index.css`) hides text from sight, not from screen
   readers.
+- **Forms.** Every form is built on `useForm` (`app/useForm.ts`, over
+  the pure reducer in `lib/form.ts`; both tested directly):
+    - **State**: `useForm({ saved, validate, unordered })`. `saved` is the
+      server's values mapped to form values, memoised on the query data
+      (a constant of empty values for a new record). It gives controlled
+      `values`, `set(field, value)`, `update(field, change, path)` (a
+      change from the current value, e.g. one item of a nested list),
+      `touch(path)` (on blur), `changes` (the fields that differ from
+      `saved`), `isDirty`, `errors`, `submitting`, `handleSubmit`,
+      `restore(draft)` and `setErrors`. Values compare deeply, lists in
+      order; list fields named in `unordered` compare as sets (chosen
+      options).
+    - **Saved values change** (a save's response or a refetch put in the
+      cache): fields without unsaved edits take the new values, and so do
+      fields still as the last save sent them (the server's normalised
+      version shows); edits typed since, including during the save, stay.
+      There is no reset: the cache update is the only way saved values
+      reach the form.
+    - **Unsaved work**: `useForm` calls `useBlockReload(isDirty)` itself, so
+      no form is reloaded away under the visitor. `restore(draft)` loads a
+      draft kept on the device as unsaved changes; such a draft's key goes
+      in `PERSONAL_STORAGE_KEYS`.
+    - **Validation**: `validate(values)` is pure and returns, per path (a
+      field's name, or a dotted path into a nested value:
+      `segments.2.end`), a key of the form's own copy; legacy's rules and
+      messages. A path's error shows once it, or a field holding it, is
+      touched, and every error after a save attempt. `setErrors` shows the
+      server's errors by path until that path is edited. The fields mark
+      themselves `aria-invalid` and point `aria-describedby` at the
+      message.
+    - **Saving**: `onSubmit={form.handleSubmit(save)}`. It marks the save
+      attempt, and only if the values are valid and no save is running
+      (double taps, Enter) calls `save({ values, changes, isDirty })` with
+      the latest state; `submitting` is true until `save`'s promise
+      settles, so `save` returns it (`mutateAsync`). The save is a
+      `useMutation` hook next to the query that waits for the session,
+      sends only the changed columns (a JSON column whole if any part
+      changed), selects the columns the query shows, maps the row as the
+      query does, and `setQueryData`s it (no refetch). A record created
+      from the client gets its id once per form instance
+      (`useState(() => crypto.randomUUID())`), so sending it twice can't
+      store it twice. On failure the edits stay, the form says so
+      (`FormAlert kind="error"`, role alert) and the error is reported
+      (`captureError`, `source: "<form>-save"`).
+    - **Fields**: `src/ui/form/fields.tsx` (`TextField`, `TextAreaField`,
+      `SelectField` on a native `<select>`, `ChoiceChips` for legacy's tags
+      `Select` (checkboxes drawn as chips), `Switch` (`role="switch"`),
+      `FormAlert`) and the `.action-button` / `.text-button` classes
+      (legacy `general-action-btn black-btn large-btn` and `text-btn`), all
+      in `Form.scss`. Labels come from the form's copy; `<form noValidate>`
+      so the browser's own bubbles don't replace the form's messages.
 - **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
   Every slice that adds copy follows this:
     - **Copy is per component**, declared with `defineCopy({ he, en, ru })`
@@ -642,3 +694,12 @@ feature helpers is tested directly.
    the URL at boot (`setSession`), expired links explained; signed in
    without a loadable profile still offers sign-out and a retry; the sign-in
    and build recorded on `users` once per boot; lint bans supabase-js.
+10. Shared form foundation: `useForm` over a pure reducer (`lib/form.ts`:
+    deep, ordered comparison with unordered list fields, path-keyed errors
+    and touched paths, server errors, draft restore, the merge of saved
+    values that keeps edits typed during a save) with `handleSubmit`'s
+    re-entry guard and the reload guard built in; form fields, chips,
+    switch, alert and buttons in `src/ui/form`. The weekly-schedule
+    settings (legacy's `/filters-and-notifications`, story 36) were dropped
+    as unused: legacy took the page out of production and the WhatsApp
+    sender isn't running.
