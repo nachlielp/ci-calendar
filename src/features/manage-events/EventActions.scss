@@ -1,6 +1,8 @@
 // Ported from legacy/src/styles/manage-event-actions.scss (the buttons'
-// inline radii included), batch-action-event-modal.scss and confirm.scss.
+// inline radii included); the confirm modal is ../events/_action-dialog.scss.
 // The row mirrors with the language: edit first, rounded at the start.
+@use "../events/action-dialog";
+
 .manage-event-actions {
     display: flex;
     flex-direction: row;
@@ -37,91 +39,8 @@
     }
 }
 
-// Legacy's antd Modal: centred over the page on phones too, not the shared
-// dialog's full-screen drawer.
+// The cancel confirm's note.
 .dialog.action-dialog {
-    @media (max-width: 499px) {
-        width: calc(100% - 32px);
-        height: fit-content;
-        max-height: calc(100% - 32px);
-        margin: auto;
-        border-radius: 8px;
-
-        &[open] {
-            animation: none;
-        }
-
-        .dialog-close-modal {
-            display: block;
-        }
-
-        .dialog-close-drawer {
-            display: none;
-        }
-
-        .dialog-close {
-            margin-inline: auto -16px;
-        }
-    }
-
-    .batch-action-event-modal {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        padding: 0 16px 16px;
-        font-size: 16px;
-
-        p {
-            margin: 0;
-        }
-
-        .font-medium {
-            font-weight: 600;
-        }
-    }
-
-    .action-dialog-title {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin: 0 0 8px;
-        font-size: 1.2rem;
-        font-weight: bold;
-    }
-
-    .action-dialog-icon {
-        width: 24px;
-        height: 24px;
-    }
-
-    .series-choice {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin: 0;
-        padding: 0;
-        border: none;
-
-        legend {
-            margin-bottom: 8px;
-            padding: 0;
-        }
-    }
-
-    .checkbox-group {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding-inline-start: 24px;
-    }
-
-    .series-option {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-    }
-
     .cancel-note {
         margin-top: 8px;
     }
@@ -140,32 +59,5 @@
         font-size: 12px;
         color: #666;
         text-align: end;
-    }
-
-    .action-dialog-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.5rem;
-        margin-top: 16px;
-    }
-
-    .action-dialog-btn {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        background-color: #f0f0f0;
-        color: rgba(0, 0, 0, 0.88);
-        font-size: 16px;
-        cursor: pointer;
-
-        &.danger {
-            background-color: #ff4d4f;
-            color: #fff;
-        }
-
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
     }
 }

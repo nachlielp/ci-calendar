@@ -21,7 +21,9 @@ import type { AddressColumn } from "./eventFormValues"
 // can block the save; then one insert or one owner-scoped
 // update returning the event as management reads it; then the tagged
 // teachers' junction rows. The stored event goes into every cached event
-// list (`applyEventChanges`): no list is refetched.
+// list (`applyEventChanges`): no list is refetched. A recurring series is
+// the same with one row per day: looked up once, inserted in one request,
+// and edited on the later events the user chose too.
 
 /**
  * New events start hidden where the deployment says so (legacy's
@@ -46,21 +48,37 @@ export type EventColumns = Omit<
     owners?: EventInsert["owners"]
 }
 
-export interface NewEvent {
-    /** Made once per form (`crypto.randomUUID()`), so a resend can't store two. */
-    id: string
-    columns: EventColumns
-    /** User ids tagged on it (`taggedUserIds`). */
+export interface NewEvents {
+    /**
+     * One event, or a series' (sharing `recurring_ref_key`, title and
+     * address), each with an id made once per form
+     * (`crypto.randomUUID()`), so a resend can't store them twice.
+     */
+    events: { id: string; columns: EventColumns }[]
+    /** User ids tagged on each (`taggedUserIds`). */
     tagged: string[]
+}
+
+/** The columns an edit sends: only the changed ones. */
+export type EventPatch = Omit<EventUpdate, "address"> & {
+    address?: AddressColumn
 }
 
 export interface EventEdit {
     /** The event as the form opened it. */
     event: ManagedEvent
     /** Only the changed columns. */
-    patch: Omit<EventUpdate, "address"> & { address?: AddressColumn }
+    patch: EventPatch
     /** User ids tagged on it now; `undefined` if no tag changed. */
     tagged?: string[]
+    /**
+     * Later events of its recurring series to change too, each with its
+     * own patch (its date stays its own).
+     */
+    later?: {
+        events: readonly ManagedEvent[]
+        patch: (event: ManagedEvent) => EventPatch
+    }
 }
 
 /** The event is no longer the user's to edit (deleted, or not theirs). */
@@ -74,7 +92,9 @@ export class EventGoneError extends Error {
 const DUPLICATE = "23505"
 
 /** The junction rows' bios, as the managed columns embed them. */
-const TAGGED_COLUMNS = `user_id, public_bio(${EVENT_BIO_COLUMNS}, show_profile, user_type)`
+const TAGGED_COLUMNS = `ci_event_id, public_bio(${EVENT_BIO_COLUMNS}, show_profile, user_type)`
+
+type Junction = ManagedEventRow["ci_events_users_junction"]
 
 /**
  * `place_id`'s English address, or nothing if it can't be had within
@@ -94,18 +114,17 @@ function englishAddress(
 /**
  * The translated title (`lng_titles`) for a new or changed title, and the
  * English address (`en_label`) for a new address the field couldn't label
- * when it was picked, looked up in parallel. Each falls back to the source
- * text within `LOOKUP_TIMEOUT_MS`: a language that failed is left out of
- * `lng_titles` (readers show the Hebrew title), a failed address has no
- * `en_label` (readers show the Hebrew label).
+ * when it was picked, looked up in parallel: the columns to add to the
+ * write. Each falls back to the source text within `LOOKUP_TIMEOUT_MS`: a
+ * language that failed is left out of `lng_titles` (readers show the
+ * Hebrew title), a failed address has no `en_label` (readers show the
+ * Hebrew label).
  */
-async function withTranslations<
-    T extends { title?: string; address?: AddressColumn | null },
->(
+async function lookups(
     services: AppServices,
-    columns: T,
+    columns: { title?: string; address?: AddressColumn | null },
     changed: { title: boolean; address: boolean },
-) {
+): Promise<{ lng_titles?: Record<string, string>; address?: AddressColumn }> {
     const address = changed.address ? columns.address : null
     const [titles, english] = await Promise.all([
         changed.title && columns.title !== undefined
@@ -116,7 +135,6 @@ async function withTranslations<
             : undefined,
     ])
     return {
-        ...columns,
         ...(titles ? { lng_titles: titles } : {}),
         ...(address && english
             ? { address: { ...address, en_label: english } }
@@ -125,46 +143,61 @@ async function withTranslations<
 }
 
 /**
- * Inserts the junction rows of the tagged users not yet tagged, returning
- * their bios; a failure is reported and leaves the event without them (it
- * is saved: its teachers show as names, without their bios).
+ * Inserts the junction rows of the tagged users not yet tagged on each
+ * event, in one request, returning their bios by event; a failure is
+ * reported and leaves the events without them (they are saved: their
+ * teachers show as names, without their bios).
  */
 async function tagUsers(
     services: AppServices,
-    eventId: string,
+    eventIds: readonly string[],
     userIds: readonly string[],
-    alreadyTagged: ReadonlySet<string>,
-): Promise<ManagedEventRow["ci_events_users_junction"]> {
-    const missing = userIds.filter((id) => !alreadyTagged.has(id))
-    if (missing.length === 0) return []
+    alreadyTagged: ReadonlyMap<string, ReadonlySet<string>>,
+): Promise<Map<string, Junction>> {
+    const missing = eventIds.flatMap((ci_event_id) =>
+        userIds
+            .filter((id) => !alreadyTagged.get(ci_event_id)?.has(id))
+            .map((user_id) => ({ ci_event_id, user_id })),
+    )
+    const byEvent = new Map<string, Junction>()
+    if (missing.length === 0) return byEvent
     const { data, error } = await services.data
         .from("ci_events_users_junction")
-        .insert(missing.map((user_id) => ({ ci_event_id: eventId, user_id })))
+        .insert(missing)
         .select(TAGGED_COLUMNS)
     if (error) {
         services.telemetry.captureError(new Error(error.message), {
             source: "event-tagging",
         })
-        return []
+        return byEvent
     }
-    return data.map(({ public_bio }) => ({ public_bio }))
+    for (const { ci_event_id, public_bio } of data) {
+        byEvent.set(ci_event_id, [
+            ...(byEvent.get(ci_event_id) ?? []),
+            { public_bio },
+        ])
+    }
+    return byEvent
 }
 
-/** Who is tagged on the event already (legacy checked each in turn). */
-async function taggedOn(services: AppServices, eventId: string) {
+/** Who is tagged on each event already (legacy checked each in turn). */
+async function taggedOn(services: AppServices, eventIds: readonly string[]) {
     const { data, error } = await services.data
         .from("ci_events_users_junction")
-        .select("user_id")
-        .eq("ci_event_id", eventId)
+        .select("ci_event_id, user_id")
+        .in("ci_event_id", eventIds)
     if (error) throw new Error(error.message)
-    return new Set(data.map((row) => row.user_id))
+    const tagged = new Map<string, Set<string>>()
+    for (const { ci_event_id, user_id } of data) {
+        const users = tagged.get(ci_event_id) ?? new Set<string>()
+        users.add(user_id)
+        tagged.set(ci_event_id, users)
+    }
+    return tagged
 }
 
 /** The stored row with the bios of the users just tagged, mapped. */
-function managed(
-    row: ManagedEventRow,
-    tagged: ManagedEventRow["ci_events_users_junction"],
-): ManagedEvent {
+function managed(row: ManagedEventRow, tagged: Junction = []): ManagedEvent {
     const event = toManagedEvent({
         ...row,
         ci_events_users_junction: [...row.ci_events_users_junction, ...tagged],
@@ -175,103 +208,227 @@ function managed(
 }
 
 /**
- * Creates an event of the user's. Sent again (a retry after a lost
- * answer), the same id finds the stored event instead of a second one.
+ * Creates an event of the user's, or a recurring series of them in one
+ * insert (the title and address looked up once for all). Sent again (a
+ * retry after a lost answer), the same ids find the stored events instead
+ * of a second copy, and a series' days added since are inserted then.
  */
 export function useCreateEvent(userId: string) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async ({ id, columns, tagged }: NewEvent) => {
+        mutationFn: async ({ events, tagged }: NewEvents) => {
             await sessionOf(services, userId)
             const now = services.now().toISOString()
-            const translated = await withTranslations(services, columns, {
+            const ids = events.map(({ id }) => id)
+            const found = await lookups(services, events[0].columns, {
                 title: true,
                 address: true,
             })
+            const rows = events.map(({ id, columns }) => ({
+                ...columns,
+                ...found,
+                address: found.address ?? columns.address ?? {},
+                id,
+                user_id: userId,
+                owners: columns.owners ?? [],
+                cancelled: false,
+                created_at: now,
+                updated_at: now,
+            }))
             const inserted = await services.data
                 .from("ci_events")
-                .insert({
-                    ...translated,
-                    address: translated.address ?? {},
-                    id,
-                    user_id: userId,
-                    owners: columns.owners ?? [],
-                    cancelled: false,
-                    created_at: now,
-                    updated_at: now,
-                })
+                .insert(rows.length === 1 ? rows[0] : rows)
                 .select(MANAGED_EVENT_COLUMNS)
-                .single()
             const duplicate = inserted.error?.code === DUPLICATE
             const { data, error } = duplicate
-                ? await services.data
-                      .from("ci_events")
-                      .select(MANAGED_EVENT_COLUMNS)
-                      .eq("id", id)
-                      .eq("user_id", userId)
-                      .single()
+                ? await storedAndMissing(services, userId, rows)
                 : inserted
             if (error) throw new Error(error.message)
+            if (data.length === 0) throw new Error("No event was stored")
             const already = duplicate
-                ? await taggedOn(services, id)
-                : new Set<string>()
-            return managed(data, await tagUsers(services, id, tagged, already))
+                ? await taggedOn(services, ids)
+                : new Map<string, Set<string>>()
+            const added = await tagUsers(
+                services,
+                data.map(({ id }) => id),
+                tagged,
+                already,
+            )
+            return data.map((row) => managed(row, added.get(row.id)))
         },
-        onSuccess: (event) =>
-            applyEventChanges(queryClient, services.now(), { saved: [event] }),
+        onSuccess: (saved) =>
+            applyEventChanges(queryClient, services.now(), { saved }),
         onError: (error) =>
             services.telemetry.captureError(error, { source: "event-save" }),
     })
 }
 
 /**
+ * After a resend's insert found some of its ids stored (the first send's
+ * answer was lost): the stored rows, plus the others inserted now (days
+ * the series didn't have then).
+ */
+async function storedAndMissing(
+    services: AppServices,
+    userId: string,
+    rows: readonly (EventInsert & { id: string })[],
+): Promise<
+    | { data: ManagedEventRow[]; error: null }
+    | { data: null; error: { message: string } }
+> {
+    const stored = await services.data
+        .from("ci_events")
+        .select(MANAGED_EVENT_COLUMNS)
+        .in(
+            "id",
+            rows.map(({ id }) => id),
+        )
+        .eq("user_id", userId)
+    if (stored.error) return { data: null, error: stored.error }
+    const have = new Set(stored.data.map(({ id }) => id))
+    const missing = rows.filter(({ id }) => !have.has(id))
+    if (missing.length === 0) return { data: stored.data, error: null }
+    const inserted = await services.data
+        .from("ci_events")
+        .insert(missing)
+        .select(MANAGED_EVENT_COLUMNS)
+    if (inserted.error) return { data: null, error: inserted.error }
+    return { data: [...stored.data, ...inserted.data], error: null }
+}
+
+/**
  * Updates one of the user's events with the changed columns, only while it
  * is still theirs (`user_id`); gone (deleted meanwhile), it fails with
  * `EventGoneError` and every event list is refetched. Translations are
- * looked up only for a changed title or a newly picked address (legacy).
+ * looked up only for a changed title or a newly picked address (legacy),
+ * once, and used for the later events of its series the user chose too:
+ * those get their own patches (`later`), still only while theirs and in
+ * the series, in one request per distinct patch (one for all, unless the
+ * segments changed: each event's carry its own day), written only once
+ * the edited event is. What was stored goes into the cache even if a later
+ * write failed.
  */
 export function useUpdateEvent(userId: string) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async ({ event, patch, tagged }: EventEdit) => {
+        mutationFn: async ({ event, patch, tagged, later }: EventEdit) => {
             await sessionOf(services, userId)
-            const [translated, already] = await Promise.all([
-                withTranslations(services, patch, {
+            const laterEvents = later?.events ?? []
+            const [found, already] = await Promise.all([
+                lookups(services, patch, {
                     title: patch.title !== undefined,
                     address:
                         !!patch.address &&
                         patch.address.place_id !== event.address.placeId,
                 }),
-                tagged?.length ? taggedOn(services, event.id) : undefined,
+                tagged?.length
+                    ? taggedOn(services, [
+                          event.id,
+                          ...laterEvents.map(({ id }) => id),
+                      ])
+                    : undefined,
             ])
-            const { data, error } = await services.data
-                .from("ci_events")
-                .update({
-                    ...translated,
-                    updated_at: services.now().toISOString(),
-                })
+            const writes = seriesWrites(laterEvents, later?.patch)
+            const updatedAt = services.now().toISOString()
+            const withLookups = (columns: EventPatch) => ({
+                ...columns,
+                ...(columns.title !== undefined && found.lng_titles
+                    ? { lng_titles: found.lng_titles }
+                    : {}),
+                ...(columns.address && found.address
+                    ? { address: found.address }
+                    : {}),
+                updated_at: updatedAt,
+            })
+            const update = (columns: EventPatch) =>
+                services.data.from("ci_events").update(withLookups(columns))
+            // The edited event first: the later ones change only once it
+            // has (gone, nothing else is written).
+            const edited = await update(patch)
                 .eq("id", event.id)
                 .eq("user_id", userId)
                 .select(MANAGED_EVENT_COLUMNS)
                 .maybeSingle()
-            if (error) throw new Error(error.message)
-            if (!data) throw new EventGoneError()
+            if (edited.error) throw new Error(edited.error.message)
+            if (!edited.data) {
+                refreshEventQueries(queryClient)
+                throw new EventGoneError()
+            }
+            const results = await Promise.allSettled(
+                writes.map(({ ids, columns }) =>
+                    update(columns)
+                        .in("id", ids)
+                        .eq("user_id", userId)
+                        .eq("recurring_ref_key", event.recurringRefKey ?? "")
+                        .select(MANAGED_EVENT_COLUMNS),
+                ),
+            )
+            const rows = [
+                edited.data,
+                ...results.flatMap((result) =>
+                    result.status === "fulfilled"
+                        ? (result.value.data ?? [])
+                        : [],
+                ),
+            ]
             const added =
                 tagged && already
-                    ? await tagUsers(services, event.id, tagged, already)
-                    : []
-            return managed(data, added)
-        },
-        onSuccess: (saved) =>
-            applyEventChanges(queryClient, services.now(), { saved: [saved] }),
-        onError: (error) => {
-            if (error instanceof EventGoneError) {
+                    ? await tagUsers(
+                          services,
+                          rows.map(({ id }) => id),
+                          tagged,
+                          already,
+                      )
+                    : new Map<string, Junction>()
+            const saved = rows.map((row) => managed(row, added.get(row.id)))
+            applyEventChanges(queryClient, services.now(), { saved })
+            const failure = results
+                .map((result) =>
+                    result.status === "rejected"
+                        ? result.reason instanceof Error
+                            ? result.reason
+                            : new Error(String(result.reason))
+                        : result.value.error
+                          ? new Error(result.value.error.message)
+                          : null,
+                )
+                .find(Boolean)
+            const asked = writes.reduce((sum, { ids }) => sum + ids.length, 0)
+            // A later write failed, or a later event was deleted (or left
+            // the series) meanwhile: the lists show what is stored.
+            if (failure || saved.length < asked + 1) {
                 refreshEventQueries(queryClient)
-            } else {
+            }
+            if (failure) throw failure
+            return saved[0]
+        },
+        onError: (error) => {
+            if (!(error instanceof EventGoneError)) {
                 services.telemetry.captureError(error, { source: "event-save" })
             }
         },
     })
+}
+
+/**
+ * The later events' writes: one per distinct patch, each naming its
+ * events; events with nothing to change get none.
+ */
+function seriesWrites(
+    events: readonly ManagedEvent[],
+    patchOf?: (event: ManagedEvent) => EventPatch,
+): { ids: string[]; columns: EventPatch }[] {
+    if (!patchOf) return []
+    const writes = new Map<string, { ids: string[]; columns: EventPatch }>()
+    for (const event of events) {
+        const columns = patchOf(event)
+        if (Object.keys(columns).length === 0) continue
+        const key = JSON.stringify(columns)
+        const write = writes.get(key) ?? { ids: [], columns }
+        write.ids.push(event.id)
+        writes.set(key, write)
+    }
+    return [...writes.values()]
 }

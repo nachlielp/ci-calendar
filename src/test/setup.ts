@@ -1,8 +1,14 @@
 import "@testing-library/jest-dom"
 import { focusManager, onlineManager } from "@tanstack/react-query"
+import { configure } from "@testing-library/react"
 import { afterEach } from "vitest"
 import { clearTranslationMemory } from "../data/translate"
 import { browserConditions, resetBrowserConditions } from "./browser"
+
+// A test's first visit to a lazy route compiles its modules cold, which
+// under load (several runs at once, CI) can take longer than Testing
+// Library's 1 s default for `findBy…`/`waitFor`.
+configure({ asyncUtilTimeout: 3000 })
 
 // The app has no realtime by design (spec #34). Any code path that opens a
 // socket — e.g. someone wiring up `@supabase/supabase-js` realtime — fails the

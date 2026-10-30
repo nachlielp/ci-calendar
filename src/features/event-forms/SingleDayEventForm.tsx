@@ -1,11 +1,15 @@
+import { useQuery } from "@tanstack/react-query"
 import { useCallback, useMemo } from "react"
 import { useCopy } from "../../app/language"
+import { useServices } from "../../app/services"
 import { useForm } from "../../app/useForm"
 import { useToday } from "../../app/useToday"
 import { defineCopy } from "../../lib/copy"
-import { TextField } from "../../ui/form/fields"
+import { COMMON_COPY } from "../../lib/commonCopy"
+import { FormAlert, TextField } from "../../ui/form/fields"
 import { TagPicker } from "../../ui/form/TagPicker"
 import type { ManagedEvent } from "../events/managedEvent"
+import { laterInSeries } from "../manage-events/myEvents"
 import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 import { useFormDraft } from "./eventDraft"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
@@ -20,13 +24,17 @@ import { useErrorText } from "./useErrorText"
 import {
     emptySingleDay,
     isSingleDayValues,
-    singleDayColumns,
+    newSingleDayColumns,
+    seriesPatch,
     singleDayPatch,
     singleDayValuesOf,
     validateSingleDay,
     type SingleDayValues,
 } from "./eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
+import { mySeriesQuery } from "./myEvent"
+import { RecurringEventSection } from "./RecurringEventSection"
+import { SeriesEditDialog } from "./SeriesEditDialog"
 import { useTaggable } from "./taggableBios"
 import { useEventSubmit } from "./useEventSubmit"
 
@@ -36,18 +44,24 @@ const COPY = defineCopy({
         editTitle: "עדכון אירוע - חד יומי",
         create: "יצירת אירוע",
         update: "עדכון אירוע",
+        seriesLoading: "טוען את שאר ארועי הסדרה…",
+        seriesFailed: "לא ניתן לטעון את שאר ארועי הסדרה",
     },
     en: {
         createTitle: "Add a single-day event",
         editTitle: "Update event - single day",
         create: "Create event",
         update: "Update event",
+        seriesLoading: "Loading the rest of the series…",
+        seriesFailed: "Couldn't load the rest of the series",
     },
     ru: {
         createTitle: "Новое однодневное событие",
         editTitle: "Изменение события - один день",
         create: "Создать событие",
         update: "Обновить событие",
+        seriesLoading: "Загружаем остальные события серии…",
+        seriesFailed: "Не удалось загрузить остальные события серии",
     },
 })
 
@@ -58,7 +72,9 @@ const TAG_FIELDS = ["segments", "organisations"] as const
  * Legacy SingleDayEventForm (`event` unset: a new event) and
  * EditSingleDayEventForm (`event`): the event's head (title, description,
  * district, address, date, organisations), its segments, links and prices,
- * and whether it is hidden. Unsaved values are kept on the device and
+ * and whether it is hidden; a new event may recur (a row per day of the
+ * series), and an edit of a recurring event asks which later events of
+ * its series change too. Unsaved values are kept on the device and
  * restored when the form opens again. A save translates the title and
  * looks up the English address (never blocking), stores the event and
  * puts it in every cached list; then `onDone`.
@@ -102,11 +118,25 @@ export function SingleDayEventForm({
         isValues: isSingleDayValues,
     })
     const taggable = useTaggable(userId)
+    const services = useServices()
+    const refKey = event?.recurringRefKey ?? ""
+    const seriesQuery = useQuery({
+        ...mySeriesQuery(services, userId, refKey),
+        enabled: !!userId && !!refKey,
+    })
+    // A recurring event's edit waits for the rest of its series, so the
+    // question of which later events change too is never skipped.
+    const seriesReady = !refKey || seriesQuery.data !== undefined
+    const later = useMemo(
+        () => (event ? laterInSeries(seriesQuery.data ?? [], event) : []),
+        [event, seriesQuery.data],
+    )
     const submit = useEventSubmit({
         userId,
         event,
-        columns: singleDayColumns,
+        columns: newSingleDayColumns,
         patch: singleDayPatch,
+        series: { ready: seriesReady, later, patch: seriesPatch },
         tagFields: TAG_FIELDS,
         discardDraft,
         onDone,
@@ -184,8 +214,60 @@ export function SingleDayEventForm({
                     saving={form.submitting}
                     failed={submit.failed}
                     gone={submit.gone}
+                    disabled={!seriesReady}
+                    before={
+                        event ? (
+                            !seriesReady && (
+                                <SeriesStatus
+                                    failed={seriesQuery.isError}
+                                    onRetry={() => void seriesQuery.refetch()}
+                                />
+                            )
+                        ) : (
+                            <RecurringEventSection
+                                recurrence={values.recurrence}
+                                date={values.date}
+                                today={today}
+                                errors={errors}
+                                onChange={(recurrenceChange, path) =>
+                                    change("recurrence", recurrenceChange, path)
+                                }
+                                onTouch={touch}
+                            />
+                        )
+                    }
                 />
             </form>
+            {event && submit.question && (
+                <SeriesEditDialog event={event} question={submit.question} />
+            )}
+        </div>
+    )
+}
+
+/** While a recurring event's series loads, or after it failed to. */
+function SeriesStatus({
+    failed,
+    onRetry,
+}: {
+    failed: boolean
+    onRetry: () => void
+}) {
+    const own = useCopy(COPY)
+    const common = useCopy(COMMON_COPY)
+    if (!failed) {
+        return (
+            <p role="status" className="series-status">
+                {own.seriesLoading}
+            </p>
+        )
+    }
+    return (
+        <div className="series-status">
+            <FormAlert kind="error">{own.seriesFailed}</FormAlert>
+            <button type="button" className="text-button" onClick={onRetry}>
+                {common.retry}
+            </button>
         </div>
     )
 }

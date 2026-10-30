@@ -49,6 +49,7 @@ export const EVENT_FORM_COPY = defineCopy({
         sameDay:
             "אירוע רב יומי לא יכול להתחיל ולהסתיים באותו יום, בשביל זה יש אירוע חד יומי",
         tooLong: "אירוע לא יכול להמשך מעל ל-14 ימים",
+        tooFar: "תאריך הסיום יכול להיות עד שנה מהיום",
         notANumber: "נא להזין מספר",
         invalidUrl: "נא להזין קישור לאתר (https://…)",
         invalid: "ערכים שגויים, נא לבדוק את הטופס",
@@ -100,6 +101,7 @@ export const EVENT_FORM_COPY = defineCopy({
         sameDay:
             "A multi-day event can't start and end on the same day: that's a single-day event",
         tooLong: "An event can't last more than 14 days",
+        tooFar: "The end date can be at most a year from today",
         notANumber: "Please enter a number",
         invalidUrl: "Please enter a web link (https://…)",
         invalid: "Some values are wrong, please check the form",
@@ -152,6 +154,7 @@ export const EVENT_FORM_COPY = defineCopy({
         sameDay:
             "Многодневное событие не может начаться и закончиться в один день: для этого есть однодневное событие",
         tooLong: "Событие не может длиться больше 14 дней",
+        tooFar: "Дата окончания — не позже чем через год от сегодня",
         notANumber: "Пожалуйста, введите число",
         invalidUrl: "Пожалуйста, введите веб-ссылку (https://…)",
         invalid: "Неверные значения, проверьте форму",

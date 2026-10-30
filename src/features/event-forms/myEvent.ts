@@ -1,12 +1,19 @@
 import { queryOptions } from "@tanstack/react-query"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
-import { registerEventList } from "../events/eventCache"
+import { jerusalemToday } from "../../lib/jerusalemDate"
+import {
+    mergeIntoList,
+    registerEventList,
+    removesFrom,
+} from "../events/eventCache"
 import {
     selectManagedEvents,
     toManagedEvent,
+    toManagedEvents,
     type ManagedEvent,
 } from "../events/managedEvent"
+import { compareUpcoming } from "../manage-events/myEvents"
 
 // The event an edit form opens (legacy `useSetSelectedEventByParams`): one
 // of the user's own events by id, hidden or not. A personal query: read
@@ -44,6 +51,54 @@ export function myEventQuery(
                 .maybeSingle()
             if (error) throw new Error(error.message)
             return data ? toManagedEvent(data) : null
+        },
+    })
+}
+
+// The user's events of one recurring series from today on (legacy's
+// `getFutureRecurringEventsByRefKey` read the calendar's events): what an
+// edit of one of them offers to change too. Personal, read when the edit
+// form of a recurring event opens; saves keep it current.
+
+export const MY_SERIES_KIND = "my-series"
+
+export const mySeriesKey = (userId: string, refKey: string) =>
+    [MY_SERIES_KIND, userId, refKey] as const
+
+registerEventList({
+    kind: MY_SERIES_KIND,
+    apply: (data, change, [, userId, refKey]) => {
+        const events = data as ManagedEvent[]
+        const added = change.saved.filter(
+            (event) =>
+                event.ownerId === userId &&
+                event.recurringRefKey === refKey &&
+                event.startDate >= change.today,
+        )
+        return added.length === 0 && !removesFrom(events, change)
+            ? events
+            : mergeIntoList(events, change, added, compareUpcoming)
+    },
+})
+
+export function mySeriesQuery(
+    services: AppServices,
+    userId: string,
+    refKey: string,
+) {
+    return queryOptions({
+        queryKey: mySeriesKey(userId, refKey),
+        ...PERSONAL_FRESHNESS,
+        queryFn: async (): Promise<ManagedEvent[]> => {
+            await sessionOf(services, userId)
+            const { data, error } = await selectManagedEvents(services.data)
+                .eq("user_id", userId)
+                .eq("recurring_ref_key", refKey)
+                .gte("start_date", jerusalemToday(services.now()))
+                .order("start_date", { ascending: true })
+                .order("id", { ascending: true })
+            if (error) throw new Error(error.message)
+            return toManagedEvents(data)
         },
     })
 }

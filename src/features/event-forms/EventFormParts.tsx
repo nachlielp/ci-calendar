@@ -473,9 +473,11 @@ export function ClearFormButton({ onClear }: { onClear: () => void }) {
 
 /**
  * The end of every event form (legacy EventFromFooter and the submit
- * button): links, prices, the hide (draft) switch, the form's alerts and
- * the submit button. `invalid` replaces the generic invalid-form alert
- * (legacy showed a span error there).
+ * button): links, prices, the hide (draft) switch, the form's own last
+ * part (`before`: the single-day form's recurrence, as legacy put it just
+ * before the button), the form's alerts and the submit button. `invalid`
+ * replaces the generic invalid-form alert (legacy showed a span error
+ * there).
  */
 export function EventFormFooter({
     form,
@@ -484,6 +486,8 @@ export function EventFormFooter({
     failed,
     gone,
     invalid,
+    before,
+    disabled = false,
 }: {
     form: BaseFormControls
     submitLabel: string
@@ -491,6 +495,9 @@ export function EventFormFooter({
     failed: boolean
     gone: boolean
     invalid?: string
+    before?: ReactNode
+    /** Not ready to save (the button is off). */
+    disabled?: boolean
 }) {
     const copy = useCopy(EVENT_FORM_COPY)
     const common = useCopy(COMMON_COPY)
@@ -521,6 +528,7 @@ export function EventFormFooter({
                 onText={copy.hiddenOn}
                 offText={copy.hiddenOff}
             />
+            {before}
             {hasErrors && (
                 <FormAlert kind="error">{invalid ?? copy.invalid}</FormAlert>
             )}
@@ -530,7 +538,7 @@ export function EventFormFooter({
                 <button
                     type="submit"
                     className="action-button"
-                    disabled={saving}
+                    disabled={saving || disabled}
                     aria-busy={saving || undefined}
                 >
                     {saving ? common.loading : submitLabel}

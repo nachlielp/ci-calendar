@@ -9,6 +9,8 @@ import {
     multiDayColumns,
     multiDayPatch,
     multiDayValuesOf,
+    newSingleDayColumns,
+    seriesPatch,
     singleDayColumns,
     singleDayPatch,
     singleDayValuesOf,
@@ -385,5 +387,134 @@ describe("multiDayValuesOf", () => {
         expect(isMultiDayValues(values)).toBe(true)
         expect(isMultiDayValues(filled())).toBe(false)
         expect(isMultiDayValues({ ...values, teachers: [{}] })).toBe(false)
+    })
+})
+
+describe("recurring single-day events", () => {
+    const weekly = (until: string, date = "2026-10-16") =>
+        filled({
+            date,
+            recurrence: { on: true, frequency: "weekly", until },
+        })
+
+    it("requires a frequency and an end day once it recurs", () => {
+        expect(
+            validateSingleDay(
+                filled({
+                    recurrence: { on: true, frequency: "", until: "" },
+                }),
+                "2026-10-15",
+            ),
+        ).toEqual({
+            "recurrence.frequency": "required",
+            "recurrence.until": "required",
+        })
+        // Off, what was chosen doesn't matter.
+        expect(
+            validateSingleDay(
+                filled({
+                    recurrence: {
+                        on: false,
+                        frequency: "",
+                        until: "2020-01-01",
+                    },
+                }),
+                "2026-10-15",
+            ),
+        ).toEqual({})
+    })
+
+    it("wants the end day from the first day to a year from today", () => {
+        expect(validateSingleDay(weekly("2026-10-15"), "2026-10-15")).toEqual({
+            "recurrence.until": "endBeforeStart",
+        })
+        expect(validateSingleDay(weekly("2027-10-15"), "2026-10-15")).toEqual(
+            {},
+        )
+        expect(validateSingleDay(weekly("2027-10-16"), "2026-10-15")).toEqual({
+            "recurrence.until": "tooFar",
+        })
+    })
+
+    it("makes a row per day, its segments on its own day across the clock change", () => {
+        const rows = newSingleDayColumns(weekly("2026-11-06"))
+        expect(Array.isArray(rows)).toBe(true)
+        const series = rows as ReturnType<typeof singleDayColumns>[]
+        expect(series.map((row) => [row.start_date, row.end_date])).toEqual([
+            ["2026-10-16", "2026-10-16"],
+            ["2026-10-23", "2026-10-23"],
+            ["2026-10-30", "2026-10-30"],
+            ["2026-11-06", "2026-11-06"],
+        ])
+        // 19:00–21:00 in Jerusalem: UTC+3 until 25 October, then UTC+2.
+        expect(
+            series.map(({ segments: [first] }) => [
+                first.startTime,
+                first.endTime,
+            ]),
+        ).toEqual([
+            ["2026-10-16T16:00:00.000Z", "2026-10-16T18:00:00.000Z"],
+            ["2026-10-23T16:00:00.000Z", "2026-10-23T18:00:00.000Z"],
+            ["2026-10-30T17:00:00.000Z", "2026-10-30T19:00:00.000Z"],
+            ["2026-11-06T17:00:00.000Z", "2026-11-06T19:00:00.000Z"],
+        ])
+        expect(new Set(series.map((row) => row.title))).toEqual(
+            new Set(["ג'אם"]),
+        )
+    })
+
+    it("is one row when it doesn't recur", () => {
+        expect(newSingleDayColumns(filled())).toEqual(
+            singleDayColumns(filled()),
+        )
+    })
+
+    it("changes a later event's shared columns, keeping its day, hide and cancellation", () => {
+        const values = filled({
+            title: "חדש",
+            date: "2026-10-24",
+            hidden: true,
+            segments: [{ ...filled().segments[0], start: "18:00" }],
+        })
+        const patch = seriesPatch(
+            values,
+            {
+                title: values.title,
+                date: values.date,
+                hidden: true,
+                segments: values.segments,
+            },
+            { startDate: "2026-10-30" },
+        )
+        expect(patch).toEqual({
+            title: "חדש",
+            segments: [
+                expect.objectContaining({
+                    startTime: "2026-10-30T16:00:00.000Z",
+                    endTime: "2026-10-30T19:00:00.000Z",
+                }),
+            ],
+        })
+        // Only a new date or hide: nothing for the later events.
+        expect(
+            seriesPatch(
+                values,
+                { date: values.date, hidden: true },
+                { startDate: "2026-10-30" },
+            ),
+        ).toEqual({})
+    })
+
+    it("checks a draft's recurrence", () => {
+        expect(
+            isSingleDayValues({
+                ...filled(),
+                recurrence: { on: true, frequency: "daily", until: "" },
+            }),
+        ).toBe(false)
+        expect(isSingleDayValues({ ...filled(), recurrence: undefined })).toBe(
+            false,
+        )
+        expect(isSingleDayValues(weekly("2026-11-06"))).toBe(true)
     })
 })

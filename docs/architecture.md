@@ -331,7 +331,11 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed;
   an option without an `Icon` shows its label as text).
   `.visually-hidden` (`index.css`) hides text from sight, not from screen
-  readers.
+  readers. Event action confirms (hide, delete, cancel, the series edit)
+  use `ActionDialog`, `EventLine` and `SeriesChoice`
+  (`features/events/ActionDialog.tsx`); a stylesheet of a page using them
+  `@use`s `features/events/_action-dialog.scss`, so their shared chunk
+  has no CSS file of its own (each file name costs `/`'s preload lists).
 - **Personal pages.** A signed-in page's own data is one query per kind
   (e.g. `myRequestsQuery`, `features/requests/myRequests.ts`) keyed
   `[kind, userId, …]` with the id from `useUserId()`
@@ -386,7 +390,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       `registerEventList({ kind, apply })` in the module that defines its
       query (so it is registered before any of its queries can be cached),
       `apply(data, change, queryKey)` returning the updated data or the
-      same object. `mergeIntoList` (one list) and `mergeIntoPages`
+      same object (`my-event` and `my-series` in `event-forms/myEvent.ts`
+      too). `mergeIntoList` (one list) and `mergeIntoPages`
       (keyset-paginated, `EventPage`) do the work given which saved events
       belong and the list's order; see the `my-events` list in
       `features/manage-events/myEvents.ts`. `features/events` never imports
@@ -515,7 +520,7 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       form of `EventBaseValues` and more; method signatures, so it is
       assignable): `BaseHeadFields` (card title, title, description,
       district, address), `EventFormFooter` (links, prices, hide switch,
-      alerts, submit; `invalid` replaces the generic alert text, as
+      `before` (the recurrence), alerts, submit; `invalid` replaces the generic alert text, as
       legacy's multi-day span messages did) and `ClearFormButton`.
       `useTaggable(userId)` gives the tagging lists. A new form is its own
       head fields between these two, plus `useEventSubmit` (below).
@@ -556,9 +561,69 @@ user_name }]`, as legacy's did (nothing reads it). New events' hide
       re-tags only if a field in `tagFields` changed (single-day:
       `segments`, `organisations`; multi-day: `teachers`,
       `organisations`); then the draft goes and `onDone`. It returns
-      `failed` and `gone` for `EventFormFooter`. Templates (slice 16) pass
-      their own `columns`/`patch` (and, writing `templates`, their own
-      mutations behind the same shape).
+      `failed` and `gone` for `EventFormFooter`, and `question` (below).
+      Templates (slice 16) pass their own `columns`/`patch` (and, writing
+      `templates`, their own mutations behind the same shape).
+    - **Recurring events** (slice 15; legacy RecurringEventSection and
+      EditRecurringEventDialog; single-day only, as legacy):
+        - **Expansion** is pure (`recurrence.ts`, tested directly):
+          `recurringDates(start, end, recurrence)` on Jerusalem days,
+          legacy's frequencies (`weekly`, `bi-weekly`, `monthly` keeping
+          the date or the month's last day as dayjs did, `monthly-pattern`
+          keeping the weekday of the same week) and caps (52 steps, 12
+          months), end inclusive. Legacy carried a missing fifth weekday
+          into the next month; it is skipped, and the skipped month still
+          counts as one of the 12 (a step is a month, not an event: the
+          search looks 12 months ahead, as legacy's loop did). Days carry no clock, so a
+          series crosses a clock change unharmed; each row's segments are
+          `jerusalemInstant`s on its own day. Legacy's series rows all carry
+          the segment instants of the day the series was created (checked
+          in production), not their own day, so **readers of segment times
+          must use only the time of day** (`jerusalemTimeOfDay`), never the
+          instant's date. A time edit rewrites the segments of the rows it
+          writes only (the edited event and the later ones chosen); other
+          legacy rows keep their creation-day instants.
+        - **Creating**: `SingleDayValues.recurrence` (`{ on, frequency,
+until }`, off for every saved event, so it's in drafts too) is
+          checked by `validateSingleDay` (frequency and end required, end
+          from the event's day to `RECURRENCE_MONTHS` = a year from today:
+          legacy's picker limit; `tooFar`). `newSingleDayColumns` returns a
+          list (one row per day) when it recurs; `useEventSubmit` gives the
+          rows ids made once per form and one `recurring_ref_key`, and
+          `useCreateEvent` (`NewEvents`) looks the title and address up
+          once, inserts all rows in one request (atomic), tags every row in
+          one junction insert, and
+          puts them all in the cache. `short_id` comes from the database's
+          trigger, per row, as legacy. Ids are made once per day of the
+          series (per form), so a resend after a lost answer (`23505`)
+          reads the stored rows by id and inserts only the days not stored
+          (e.g. an end day moved later in between); days dropped in between
+          stay stored, as they were saved.
+        - **The edit waits for the series**: while `mySeriesQuery` has no
+          data the submit button is off and the form says it's loading
+          (or, failed, says so with a retry); the save refuses too
+          (`series.ready`), so the question is never skipped.
+        - **Editing**: the form reads the user's events of the series from
+          today on (`mySeriesQuery`, `my-series`, personal, registered as an
+          event list) and passes `series: { later, patch: seriesPatch }`
+          (`laterInSeries`: a later day, hidden and cancelled ones too).
+          With later events, a dirty save first asks (`question`, shown as
+          `SeriesEditDialog` over `ActionDialog`): "all" or some of them, or
+          none (just this one); closing it saves nothing and keeps the
+          edits. The edited event gets the whole patch; each chosen later
+          event gets `seriesPatch`: the changed shared columns, never date,
+          hide or cancellation (legacy's batch kept those), and changed
+          segments re-dated to its own day. `useUpdateEvent` looks up once,
+          writes the edited row as before plus one update per distinct later
+          patch (`.in("id", …).eq("user_id").eq("recurring_ref_key")`: one
+          for all unless segments changed) only once the edited row came
+          back (else `EventGoneError`, nothing else written), re-tags them,
+          applies whatever was stored, and refetches the lists if a later
+          write failed (the form says the save failed) or a later event no
+          longer matched. Legacy updated in place too (no delete
+          and recreate), but sent every column of the form and stripped the
+          edited event's own date and hide; here only changed columns go,
+          and the edited event's date and hide apply to it.
     - **Drafts** (`eventDraft.ts`, keys in `draftKeys.ts`, `personalKey`s):
       `useFormDraft({ key, userId, eventId, saved, form, isValues })` keeps
       only the form's `changes` while it is dirty and removes them once it
@@ -1061,3 +1126,16 @@ feature helpers is tested directly.
     taggable hook pulled out of the single-day form; a select shows its
     placeholder for a value it doesn't offer; all event-form pages are one lazy chunk, so `/` got
     smaller (135.1 KB).
+15. Recurring events: a new single-day event can repeat (legacy's weekly,
+    bi-weekly, monthly and monthly-by-weekday, until an end day up to a
+    year ahead, the days listed as chosen; kept in the draft): pure
+    expansion on Jerusalem days (legacy's caps; a missing fifth weekday
+    skipped instead of spilling into the next month), one row per day with
+    its own id and segments on its own day across clock changes, one
+    shared `recurring_ref_key`, the title and address looked up once, one
+    insert and one junction insert, all into the cache. Editing an event
+    with later events in its series asks which of them change too (legacy's
+    "all" or a pick, or just this one): only the changed columns, never
+    their dates, hide or cancellation, segments re-dated per event, owner-
+    and series-scoped writes, responses into the cache. The event actions'
+    confirm dialog moved to `features/events/ActionDialog.tsx` for reuse.

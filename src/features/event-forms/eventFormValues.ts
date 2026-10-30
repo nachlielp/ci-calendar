@@ -5,6 +5,13 @@ import { jerusalemInstant } from "../../lib/jerusalemInstant"
 import { isWebUrl, normaliseWebUrl } from "../../lib/webUrl"
 import type { Tag } from "../calendar/publicEvent"
 import type { ManagedEvent } from "../events/managedEvent"
+import {
+    addMonths,
+    isRecurrence,
+    RECURRENCE_MONTHS,
+    recurringDates,
+    type Recurrence,
+} from "./recurrence"
 
 // The event forms' values, as pure data and functions (legacy utilService's
 // `CIEventToFormValues`, `formatFormValuesToCreateCIEvent`/`…EditCIEvent`
@@ -58,10 +65,30 @@ export interface EventBaseValues {
     hidden: boolean
 }
 
+/**
+ * A new single-day event repeated (legacy RecurringEventSection): how
+ * often, and the last day a repetition may fall on.
+ */
+export interface RecurrenceValues {
+    on: boolean
+    frequency: Recurrence | ""
+    /** `YYYY-MM-DD` (Jerusalem). */
+    until: string
+}
+
 export interface SingleDayValues extends EventBaseValues {
     /** `YYYY-MM-DD` (Jerusalem). */
     date: string
     segments: SegmentValues[]
+    /** New events only; an edit's is always off. */
+    recurrence: RecurrenceValues
+}
+
+/** Not recurring (every saved event, as the form opens it). */
+export const NO_RECURRENCE: RecurrenceValues = {
+    on: false,
+    frequency: "",
+    until: "",
 }
 
 /**
@@ -106,6 +133,7 @@ export function emptySingleDay(date: string, hidden = false): SingleDayValues {
         hidden,
         date,
         segments: [emptySegment(DEFAULT_TAGS)],
+        recurrence: NO_RECURRENCE,
     }
 }
 
@@ -139,6 +167,7 @@ export type EventFormError =
     | "endBeforeStart"
     | "sameDay"
     | "tooLong"
+    | "tooFar"
 
 /** Legacy's longest multi-day event: its last day at most 14 days on. */
 export const MAX_MULTI_DAY_SPAN = 14
@@ -190,6 +219,29 @@ export function validateSingleDay(
         if (!segment.start) errors[`segments.${index}.start`] = "required"
         if (!segment.end) errors[`segments.${index}.end`] = "required"
     })
+    Object.assign(errors, validateRecurrence(values, today))
+    return errors
+}
+
+/**
+ * A recurring event's frequency and end day, both required (legacy's
+ * section required the end day, and with no frequency saved nothing at
+ * all); the end not before the first day (no repetitions) nor more than
+ * `RECURRENCE_MONTHS` from today (legacy's picker stopped there).
+ */
+function validateRecurrence(
+    { recurrence, date }: SingleDayValues,
+    today: string,
+): Record<string, EventFormError> {
+    if (!recurrence.on) return {}
+    const errors: Record<string, EventFormError> = {}
+    if (!recurrence.frequency) errors["recurrence.frequency"] = "required"
+    if (!recurrence.until) errors["recurrence.until"] = "required"
+    else if (date && recurrence.until < date) {
+        errors["recurrence.until"] = "endBeforeStart"
+    } else if (recurrence.until > addMonths(today, RECURRENCE_MONTHS)) {
+        errors["recurrence.until"] = "tooFar"
+    }
     return errors
 }
 
@@ -292,6 +344,29 @@ export function singleDayColumns(values: SingleDayValues) {
     } satisfies Partial<EventInsert>
 }
 
+/**
+ * The days a new event's series falls on, or `null` if it doesn't recur.
+ */
+export function seriesDates(values: SingleDayValues): string[] | null {
+    const { on, frequency, until } = values.recurrence
+    if (!on || !frequency || !values.date || !until) return null
+    return recurringDates(values.date, until, frequency)
+}
+
+/**
+ * A new single-day event's rows: one, or one per day of its series (legacy
+ * `duplicateEvent`), each with its segments' instants on its own day, so a
+ * 19:00 class is 19:00 on both sides of a clock change. The series' shared
+ * `recurring_ref_key` and each row's id are the save's to add.
+ */
+export function newSingleDayColumns(
+    values: SingleDayValues,
+): ReturnType<typeof singleDayColumns> | ReturnType<typeof singleDayColumns>[] {
+    const dates = seriesDates(values)
+    if (!dates) return singleDayColumns(values)
+    return dates.map((date) => singleDayColumns({ ...values, date }))
+}
+
 /** A patch: only the changed columns, the address only if there is one. */
 type Patch<C> = Partial<
     Omit<C, "address"> & {
@@ -337,6 +412,29 @@ export function singleDayPatch(
     }
     if ("date" in changes || "segments" in changes) {
         patch.segments = all.segments
+    }
+    return patch
+}
+
+/**
+ * What an edit changes on a later event of the same series (legacy
+ * EditSingleDayEventForm's batch update, which kept each event's date,
+ * cancellation and hide): the changed shared columns, and changed segments
+ * with their instants on that event's own day. A new date or hide applies
+ * to the edited event only.
+ */
+export function seriesPatch(
+    values: SingleDayValues,
+    changes: Partial<SingleDayValues>,
+    occurrence: Pick<ManagedEvent, "startDate">,
+) {
+    const { hide, ...shared } = basePatch(values, changes)
+    const patch: Patch<ReturnType<typeof singleDayColumns>> = shared
+    if ("segments" in changes) {
+        patch.segments = segmentsColumn({
+            date: occurrence.startDate,
+            segments: values.segments,
+        })
     }
     return patch
 }
@@ -456,6 +554,7 @@ export function singleDayValuesOf(event: ManagedEvent): SingleDayValues {
             teachers: segment.teachers,
             tags: segment.tags,
         })),
+        recurrence: NO_RECURRENCE,
     }
 }
 
@@ -500,10 +599,20 @@ export function isBaseValues(value: unknown): value is EventBaseValues {
     )
 }
 
+const isRecurrenceValues = (value: unknown): value is RecurrenceValues =>
+    isRecord(value) &&
+    typeof value.on === "boolean" &&
+    (value.frequency === "" || isRecurrence(value.frequency)) &&
+    isString(value.until)
+
 export const isSingleDayValues = (value: unknown): value is SingleDayValues =>
     isBaseValues(value) &&
     isString((value as unknown as Record<string, unknown>).date) &&
-    isListOf((value as unknown as Record<string, unknown>).segments, isSegment)
+    isListOf(
+        (value as unknown as Record<string, unknown>).segments,
+        isSegment,
+    ) &&
+    isRecurrenceValues((value as unknown as Record<string, unknown>).recurrence)
 
 export const isMultiDayValues = (value: unknown): value is MultiDayValues =>
     isBaseValues(value) &&

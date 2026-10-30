@@ -1,19 +1,14 @@
-import { useId, useState, type ReactNode } from "react"
+import { useId, useState } from "react"
 import { Link } from "react-router"
-import { useCopy, useLanguage } from "../../app/language"
-import { COMMON_COPY } from "../../lib/commonCopy"
+import { useCopy } from "../../app/language"
 import { defineCopy } from "../../lib/copy"
-import { numericDayLabel } from "../../lib/jerusalemDate"
-import { Dialog } from "../../ui/Dialog"
-import { FormAlert } from "../../ui/form/fields"
 import { CancelIcon } from "../../ui/icons/CancelIcon"
 import { CheckCircleIcon } from "../../ui/icons/CheckCircleIcon"
 import { DeleteIcon } from "../../ui/icons/DeleteIcon"
 import { EditIcon } from "../../ui/icons/EditIcon"
 import { VisibilityIcon } from "../../ui/icons/VisibilityIcon"
 import { VisibilityOffIcon } from "../../ui/icons/VisibilityOffIcon"
-import { WarningIcon } from "../../ui/icons/WarningIcon"
-import { pickTitle } from "../calendar/eventFormat"
+import { ActionDialog, EventLine, SeriesChoice } from "../events/ActionDialog"
 import { editPath, type ManagedEvent } from "../events/managedEvent"
 import {
     CANCELLED_TEXT_MAX,
@@ -47,9 +42,6 @@ const COPY = defineCopy({
         restoreOk: "הפעלה",
         restoreQuestion: "האם אתם בטוחים שאתם רוצים להפעיל את הארוע?",
         back: "חזרה",
-        series: "ארועים עתידיים באותה סדרה:",
-        all: "הכל",
-        failed: "הפעולה נכשלה, נסו שוב",
     },
     en: {
         actions: "Event actions",
@@ -71,9 +63,6 @@ const COPY = defineCopy({
         restoreOk: "Restore",
         restoreQuestion: "Are you sure you want to restore the event?",
         back: "Back",
-        series: "Later events in the same series:",
-        all: "All",
-        failed: "That didn't work, please try again",
     },
     ru: {
         actions: "Действия с событием",
@@ -96,9 +85,6 @@ const COPY = defineCopy({
         restoreOk: "Возобновить",
         restoreQuestion: "Вы уверены, что хотите возобновить событие?",
         back: "Назад",
-        series: "Следующие события той же серии:",
-        all: "Все",
-        failed: "Не получилось, попробуйте снова",
     },
 })
 
@@ -324,123 +310,5 @@ function CancelDialog({ event, userId, onClose }: DialogProps) {
                 </div>
             )}
         </ActionDialog>
-    )
-}
-
-/** Legacy's `DD/MM/YYYY - title` line. */
-function EventLine({ event }: { event: ManagedEvent }) {
-    const { language } = useLanguage()
-    return (
-        <p className="font-medium">
-            {numericDayLabel(event.startDate)} - {pickTitle(event, language)}
-        </p>
-    )
-}
-
-/** The later events of the series to act on too, with "all". */
-function SeriesChoice({
-    series,
-    chosen,
-    onChange,
-}: {
-    series: ManagedEvent[]
-    chosen: string[]
-    onChange: (ids: string[]) => void
-}) {
-    const copy = useCopy(COPY)
-    const { language } = useLanguage()
-    if (series.length === 0) return null
-    const all = series.every((event) => chosen.includes(event.id))
-    return (
-        <fieldset className="series-choice">
-            <legend>{copy.series}</legend>
-            <label className="series-option">
-                <input
-                    type="checkbox"
-                    checked={all}
-                    onChange={() =>
-                        onChange(all ? [] : series.map(({ id }) => id))
-                    }
-                />
-                {copy.all}
-            </label>
-            <div className="checkbox-group">
-                {series.map((event) => (
-                    <label key={event.id} className="series-option">
-                        <input
-                            type="checkbox"
-                            checked={chosen.includes(event.id)}
-                            onChange={() =>
-                                onChange(
-                                    chosen.includes(event.id)
-                                        ? chosen.filter((id) => id !== event.id)
-                                        : [...chosen, event.id],
-                                )
-                            }
-                        />
-                        {numericDayLabel(event.startDate)} -{" "}
-                        {pickTitle(event, language)}
-                    </label>
-                ))}
-            </div>
-        </fieldset>
-    )
-}
-
-/** Legacy's confirm modal: a title, the question, OK (danger) and back. */
-function ActionDialog({
-    title,
-    ok,
-    back,
-    warning = false,
-    pending,
-    failed,
-    onOk,
-    onClose,
-    children,
-}: {
-    title: string
-    ok: string
-    /** The dismiss button's word; "cancel" by default. */
-    back?: string
-    /** Legacy's warning icon before the title (its cancel confirm). */
-    warning?: boolean
-    pending: boolean
-    failed: boolean
-    onOk: () => void
-    onClose: () => void
-    children: ReactNode
-}) {
-    const copy = useCopy(COPY)
-    const common = useCopy(COMMON_COPY)
-    return (
-        <Dialog label={title} onClose={onClose} className="action-dialog">
-            <div className="batch-action-event-modal">
-                <h2 className="action-dialog-title">
-                    {warning && <WarningIcon className="action-dialog-icon" />}
-                    {title}
-                </h2>
-                {children}
-                {failed && <FormAlert kind="error">{copy.failed}</FormAlert>}
-                <div className="action-dialog-footer">
-                    <button
-                        type="button"
-                        className="action-dialog-btn danger"
-                        disabled={pending}
-                        onClick={onOk}
-                    >
-                        {ok}
-                    </button>
-                    <button
-                        type="button"
-                        className="action-dialog-btn"
-                        disabled={pending}
-                        onClick={onClose}
-                    >
-                        {back ?? common.cancel}
-                    </button>
-                </div>
-            </div>
-        </Dialog>
     )
 }
