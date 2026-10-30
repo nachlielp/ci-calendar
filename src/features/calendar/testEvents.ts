@@ -93,6 +93,7 @@ export function publicEvent(overrides: Partial<PublicEvent> = {}): PublicEvent {
         multiDayTeachers: [],
         organisations: [],
         address: { label: "תל אביב", placeId: "P1" },
+        district: "center",
         links: [],
         prices: [],
         description: "",

@@ -9,7 +9,7 @@ import {
 } from "./publicEvent"
 
 /** How far ahead the public calendar looks. ~25 events, ~5 KB gzipped. */
-const WINDOW_DAYS = 90
+export const WINDOW_DAYS = 90
 
 /**
  * Event data changes a few times a day, so after 5 minutes the window is
@@ -31,7 +31,7 @@ export const PUBLIC_WINDOW_KIND = "public-window"
  * changes it; bump the number when the mapping to `PublicEvent` changes
  * without a column change.
  */
-export const PUBLIC_WINDOW_SHAPE = `1|${PUBLIC_EVENT_COLUMNS}`
+export const PUBLIC_WINDOW_SHAPE = `2|${PUBLIC_EVENT_COLUMNS}`
 
 /**
  * The public calendar window: visible events from today (Jerusalem) up to

@@ -18,11 +18,18 @@ export interface FromListState {
 }
 
 /** The calendar's event cards (legacy EventsList and EventPreview). */
-export function EventList({ cards }: { cards: EventCard[] }) {
+export function EventList({
+    cards,
+    label = COPY.label,
+}: {
+    cards: readonly EventCard[]
+    /** The list's accessible name. */
+    label?: string
+}) {
     // Keep the filters (`f`) when opening an event.
     const { search } = useLocation()
     return (
-        <ul aria-label={COPY.label} className="events-list">
+        <ul aria-label={label} className="events-list">
             {cards.map((card) => (
                 <li key={card.event.id} className="events-list-item">
                     <EventPreview card={card} search={search} />

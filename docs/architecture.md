@@ -106,11 +106,32 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   its 404. Static top-level routes (`/about`, `/login`, …) outrank
   `/:eventId` in React Router's ranking, so later slices just add them; they
   never reach the event lookup.
+- **Filters and views.** Filters live in the URL as legacy encoded them,
+  one `f` param per value (`/?f=jam&f=center`); `useEventFilters` reads and
+  writes them (in place, never a history entry), and `filters.ts` holds the
+  matching rule (any selected type, and any selected district). Every
+  legacy value is read from URLs (`warmup` too), though the UI offers only
+  legacy's set. As in legacy, each tap also records that one value under
+  the `eventType`/`district` keys in `services.storage` (shared-link values
+  are never saved untapped), and only `/` with no query at all restores
+  them; never clear those keys. List/calendar view and the picked day are
+  page state, not URL, as in legacy: they survive opening an event (the page
+  stays mounted) but not a reload. Links inside the calendar keep
+  `location.search`, so filters survive opening and closing an event.
+- **Event options.** Event types, multi-day types and districts (values,
+  `isEventType`/`isDistrict`) are in `src/lib/eventOptions.ts`; reuse them
+  for forms and weekly-schedule filters. Their words are in the
+  `EventLocale` (`optionLabel`). Rows map legacy Hebrew multi-day types
+  (`ריטריט`) to their values in `toPublicEvent`.
 - **Rendering cost.** Derive display data (sort keys, labels, time ranges)
   once per data change in a pure function, memoised on the query data (see
   `toEventCards`); keep query options stable (`useMemo`) so `select` doesn't
-  rerun on every render. Long lists put `content-visibility: auto` with a
-  `contain-intrinsic-size` on their items.
+  rerun on every render. Derived lists are memoised on values that change
+  only with the data or the query (`filters` keeps its identity until `f`
+  values change, not the whole query). Day lookups use `cardsByDay`, built
+  once per filtered list and bounded at the window's last day. Long lists
+  put `content-visibility: auto` with a `contain-intrinsic-size` on their
+  items.
 - **Dialogs and icons.** Drawers and modals use `Dialog` (`src/ui/Dialog.tsx`):
   a native `<dialog>` portalled to `body`, a drawer under 500px and a modal
   above (CSS only). Mount it to open it. The close button, Escape and a
@@ -120,11 +141,17 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   that had it, and the page behind doesn't scroll while it is open. Its body
   is the scroller and fills the box. Icons are inline SVG components in
   `src/ui/icons.tsx` (Material Symbols paths from `legacy/src/assets/svgs`);
-  add new ones there, never load SVG files at runtime.
+  add new ones there, never load SVG files at runtime. `ToggleButtons`
+  (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed).
+  `.visually-hidden` (`index.css`) hides text from sight, not from screen
+  readers.
 - **Copy.** Until the languages slice, Hebrew copy sits in one `COPY` object
   per component. Event vocabulary (types, tags, the day format, shared copy)
-  is an `EventLocale` in `features/calendar/eventFormat.ts`; the formatters
-  take one, `HEBREW` by default. Slice 5 adds English and Russian locales and
+  is an `EventLocale` in `features/calendar/eventFormat.ts` (types, tags,
+  districts, month and weekday names, the day format); the formatters take
+  one, `HEBREW` by default; so do the calendar components (`locale` prop).
+  Counted phrases use `plural()` (`src/lib/plural.ts`, `Intl.PluralRules`),
+  never hand-rolled number checks. Slice 5 adds English and Russian locales and
   passes the UI language's locale to them and to the components.
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
@@ -169,3 +196,7 @@ feature helpers is tested directly.
    time, cancelled marked), full details with teacher bios in a lazy native
    `<dialog>`, `/event/:id` and `/:shortId` links (window first, else one
    by-link request; unknown or hidden → 404); junction backfill migration.
+4. Filters and views: event-type and district filters in the URL (`f`,
+   legacy encoding, last choice restored from storage) through a drawer or
+   modal, chips and clear-all; list/calendar toggle and a native month grid
+   over the window, days marked from a precomputed day → events map.

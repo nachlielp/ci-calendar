@@ -1,4 +1,4 @@
-import { jerusalemTimeOfDay } from "../../lib/jerusalemDate"
+import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
 import {
     HEBREW,
     eventDateLabel,
@@ -49,4 +49,32 @@ export function toEventCards(
             a.sortKey < b.sortKey ? -1 : a.sortKey > b.sortKey ? 1 : 0,
         )
         .map(({ card }) => card)
+}
+
+/**
+ * The cards on each day (`YYYY-MM-DD`) up to `lastDay`, in list order, for
+ * the month calendar: a multi-day event is on every day from its start to
+ * its end. Build it once per data change (memoised on the cards), so
+ * marking a month and picking a day are lookups.
+ */
+export function cardsByDay(
+    cards: readonly EventCard[],
+    lastDay: string,
+): ReadonlyMap<string, readonly EventCard[]> {
+    const byDay = new Map<string, EventCard[]>()
+    for (const card of cards) {
+        const { startDate, endDate } = card.event
+        // Stops at the calendar's end however long the event says it runs
+        // (an end date typo can be years off); an end before the start (a
+        // malformed row) still shows on its start.
+        const last = endDate < lastDay ? endDate : lastDay
+        let day = startDate
+        do {
+            const dayCards = byDay.get(day)
+            if (dayCards) dayCards.push(card)
+            else byDay.set(day, [card])
+            day = addDays(day, 1)
+        } while (day <= last)
+    }
+    return byDay
 }

@@ -1,3 +1,4 @@
+import { isDistrict } from "../../lib/eventOptions"
 import { addDays, jerusalemTimeOfDay, weekday } from "../../lib/jerusalemDate"
 import type { PublicBio, PublicEvent, Segment, Tag } from "./publicEvent"
 
@@ -16,6 +17,12 @@ export interface EventLocale {
     types: Readonly<Record<string, string>>
     /** Segment audience tags (`everyone`, `beginner`, …). */
     tags: Readonly<Record<string, string>>
+    /** Event districts (`center`, `jerusalem`, …). */
+    districts: Readonly<Record<string, string>>
+    /** Month names, January first. */
+    months: readonly string[]
+    /** Weekday headings of the month calendar, Sunday first. */
+    weekdaysShort: readonly string[]
     /** A calendar day; `weekday` 0 = Sunday, `month` 1 = January. */
     day(parts: { weekday: number; date: number; month: number }): string
 }
@@ -65,6 +72,17 @@ export const HEBREW: EventLocale = {
         female: "נשים",
         preRegistration: "הרשמה מראש",
     },
+    districts: {
+        center: "מרכז",
+        jerusalem: "ירושלים",
+        galilee: "גליל",
+        haifa: "חיפה",
+        carmel: "חוף הכרמל",
+        pardesHanna: "פרדס חנה",
+        south: "דרום",
+    },
+    months: HEBREW_MONTHS,
+    weekdaysShort: ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"],
     // `שבת, יום שבת 7 בנובמבר`, the legacy app's day format.
     day: ({ weekday, date, month }) => {
         const name = HEBREW_WEEKDAYS[weekday]
@@ -79,8 +97,14 @@ export const typeLabel = (type: string, locale = HEBREW) =>
     label(locale.types, type)
 export const tagLabel = (tag: string, locale = HEBREW) =>
     label(locale.tags, tag)
+const districtLabel = (district: string, locale = HEBREW) =>
+    label(locale.districts, district)
+/** The label of an event type or a district (lib/eventOptions.ts). */
+export const optionLabel = (value: string, locale = HEBREW) =>
+    isDistrict(value) ? districtLabel(value, locale) : typeLabel(value, locale)
 
-function dayLabel(day: string, locale: EventLocale): string {
+/** A calendar day (`YYYY-MM-DD`) in the locale's day format. */
+export function dayLabel(day: string, locale = HEBREW): string {
     const [, month, date] = day.split("-").map(Number)
     return locale.day({ weekday: weekday(day), date, month })
 }

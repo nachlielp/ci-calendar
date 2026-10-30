@@ -1,4 +1,5 @@
 import type { DataClient } from "../../data/client"
+import { normaliseMultiDayType } from "../../lib/eventOptions"
 
 // A public event: what the calendar list and the event details show, read
 // from `ci_events` with the public bios of its tagged teachers embedded. Both
@@ -45,6 +46,8 @@ export interface PublicEvent {
     multiDayTeachers: Tag[]
     organisations: Tag[]
     address: { label: string; placeId: string | null }
+    /** The region the calendar filters by, e.g. `center` (see filters.ts). */
+    district: string
     links: { title: string; url: string }[]
     prices: { title: string; sum: number }[]
     description: string
@@ -55,9 +58,9 @@ export interface PublicEvent {
 // Every column the list and the details render — the first-paint payload
 // (~5 KB gzipped for 90 days in production, bios included). Bios come
 // through the `ci_events_users_junction` → `public_bio` foreign keys.
-// Language titles (`lng_titles`) and `district` arrive with their slices.
+// Language titles (`lng_titles`) arrive with the languages slice.
 export const PUBLIC_EVENT_COLUMNS =
-    "id, short_id, title, start_date, end_date, cancelled, cancelled_text, type, segments, multi_day_teachers, organisations, address, links, price, description, ci_events_users_junction(public_bio(user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2))"
+    "id, short_id, title, start_date, end_date, cancelled, cancelled_text, type, district, segments, multi_day_teachers, organisations, address, links, price, description, ci_events_users_junction(public_bio(user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2))"
 
 const BIO = "ci_events_users_junction.public_bio"
 
@@ -107,7 +110,7 @@ export function toPublicEvent(row: Row & { start_date: string }): PublicEvent {
         endDate: row.end_date ?? row.start_date,
         cancelled: row.cancelled ?? false,
         cancelledText: row.cancelled_text ?? "",
-        type: row.type,
+        type: normaliseMultiDayType(row.type),
         segments: array(row.segments).map((segment) => ({
             type: text(segment.type),
             startTime: text(segment.startTime),
@@ -125,6 +128,7 @@ export function toPublicEvent(row: Row & { start_date: string }): PublicEvent {
             label: text(address.label),
             placeId: text(address.place_id) || null,
         },
+        district: row.district,
         links: array(row.links).map((link) => ({
             title: text(link.title),
             url: text(link.link),

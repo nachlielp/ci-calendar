@@ -1,0 +1,45 @@
+// Ported from legacy/src/styles/menu-buttons.scss.
+.toggle-buttons {
+    display: flex;
+    direction: ltr;
+
+    .toggle-button {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 4rem;
+        height: 3rem;
+        margin: 0;
+        padding: 0;
+        background: none;
+        color: #000;
+        border: 1px solid #000;
+        cursor: pointer;
+
+        &:first-child {
+            border-radius: 5px 0 0 5px;
+        }
+
+        &:last-child {
+            border-radius: 0 5px 5px 0;
+        }
+
+        & + .toggle-button {
+            border-left: none;
+        }
+
+        &[aria-pressed="true"]::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+    }
+
+    .toggle-button-icon {
+        width: 24px;
+        height: 24px;
+    }
+}

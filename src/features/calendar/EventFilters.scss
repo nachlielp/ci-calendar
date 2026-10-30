@@ -1,0 +1,143 @@
+// Ported from legacy/src/styles/filter-drawer.scss, filter-modal.scss and
+// the selected filters of events-page.scss (antd Tag → buttons).
+.filter-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 8rem;
+    height: 3rem;
+    background: none;
+    color: #000;
+    border: 1px solid #000;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &.active {
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .filter-button-text {
+        font-size: 1.125rem;
+        font-weight: 500;
+    }
+
+    .filter-button-icon {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+// Doubled class: outranks Dialog.scss's own drawer rules whatever the CSS
+// order.
+.dialog.filter-dialog {
+    .filter-group-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 16px;
+    }
+
+    .filter-options {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 0 16px;
+    }
+
+    .filter-option {
+        margin: 5px;
+        padding: 5px 20px;
+        border: 1px solid #000;
+        border-radius: 20px;
+        background: #fff;
+        color: #000;
+        font: inherit;
+        font-size: 16px;
+        cursor: pointer;
+
+        &[aria-pressed="true"] {
+            border-color: #bc3528;
+            background: #bc3528;
+            color: #fff;
+        }
+    }
+
+    .filter-clear {
+        display: block;
+        margin: 0 auto;
+        padding: 4px 0;
+        border: none;
+        border-bottom: 1px solid #000;
+        background: none;
+        color: #000;
+        font: inherit;
+        font-size: 1rem;
+        cursor: pointer;
+
+        &:hover {
+            color: #bc3528;
+            border-bottom-color: #bc3528;
+        }
+    }
+
+    // Phones: a sheet from the bottom, as legacy's drawer was, closed with
+    // an X rather than the side drawer's chevron.
+    @media (max-width: 499px) {
+        height: auto;
+        max-height: min(440px, 100%);
+        margin-top: auto;
+        border-radius: 10px 10px 0 0;
+
+        &[open] {
+            animation-name: filter-sheet-in;
+        }
+
+        .dialog-close {
+            margin-inline: auto -8px;
+        }
+
+        .dialog-close-drawer {
+            display: none;
+        }
+
+        .dialog-close-modal {
+            display: block;
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+@keyframes filter-sheet-in {
+    from {
+        transform: translateY(100%);
+    }
+}
+
+.selected-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    gap: 5px;
+    width: 90%;
+    margin-top: 1rem;
+
+    .selected-filter {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 10px 2px 14px;
+        border: none;
+        border-radius: 20px;
+        background: #913e2f;
+        color: #fff;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .selected-filter-icon {
+        width: 16px;
+        height: 16px;
+    }
+}

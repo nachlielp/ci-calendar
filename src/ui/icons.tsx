@@ -73,3 +73,11 @@ export const ChevronRightIcon = /* @__PURE__ */ icon(
 export const CloseIcon = /* @__PURE__ */ icon(
     "m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z",
 )
+
+export const ViewDayIcon = /* @__PURE__ */ icon(
+    "M200-280q-33 0-56.5-23.5T120-360v-240q0-33 23.5-56.5T200-680h560q33 0 56.5 23.5T840-600v240q0 33-23.5 56.5T760-280H200Zm0-80h560v-240H200v240Zm-80-400v-80h720v80H120Zm0 640v-80h720v80H120Zm80-480v240-240Z",
+)
+
+export const InstantMixIcon = /* @__PURE__ */ icon(
+    "M200-160v-280h-80v-80h240v80h-80v280h-80Zm0-440v-200h80v200h-80Zm160 0v-80h80v-120h80v120h80v80H360Zm80 440v-360h80v360h-80Zm240 0v-120h-80v-80h240v80h-80v120h-80Zm0-280v-360h80v360h-80Z",
+)
