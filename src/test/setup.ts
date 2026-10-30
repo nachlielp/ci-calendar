@@ -85,3 +85,20 @@ window.matchMedia = (query: string) => {
 }
 window.scrollTo = () => {}
 afterEach(resetBrowserConditions)
+
+// jsdom has no object URLs (the bio photo's preview and cropper). This
+// hands out `blob:` URLs and records which are still live, so tests can
+// check each one is revoked when done.
+export const liveObjectUrls = new Map<string, Blob | MediaSource>()
+let objectUrls = 0
+URL.createObjectURL = (object: Blob | MediaSource) => {
+    const url = `blob:test/${++objectUrls}`
+    liveObjectUrls.set(url, object)
+    return url
+}
+URL.revokeObjectURL = (url: string) => {
+    liveObjectUrls.delete(url)
+}
+afterEach(() => {
+    liveObjectUrls.clear()
+})

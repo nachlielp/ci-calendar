@@ -47,7 +47,9 @@ type BioRow = ManagedEventRow["ci_events_users_junction"][number]["public_bio"]
  * Shown publicly, as `selectPublicEvents` filters bios (SQL's
  * `user_type <> 'admin'` is not true for a null type either).
  */
-const isPublicBio = (bio: NonNullable<BioRow>) =>
+export const isPublicBio = (
+    bio: Pick<NonNullable<BioRow>, "show_profile" | "user_type" | "bio_name">,
+) =>
     bio.show_profile === true &&
     bio.user_type != null &&
     bio.user_type !== "admin" &&

@@ -15,8 +15,12 @@ import type { AppServices } from "./services"
 /** Rename (e.g. `:v2`) if `StoredCache` itself ever changes shape. */
 const STORAGE_KEY = "ci-calendar:query-cache:v1"
 
-/** The legacy client's data caches, replaced by this one. */
-const LEGACY_KEYS = ["events", "bios"]
+/**
+ * The legacy client's data caches, replaced by this one; and its bio
+ * editor's keys: the picked photo as base64 (`upload-image-temp`, #23) and
+ * the profile form's draft, which nothing reads any more.
+ */
+const LEGACY_KEYS = ["events", "bios", "upload-image-temp", "profile-form"]
 
 /**
  * The query kinds (first element of the query key) saved to the device, each

@@ -1,4 +1,4 @@
-import { queryOptions, useQuery } from "@tanstack/react-query"
+import { queryOptions, useQuery, type QueryClient } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import { useServices, type AppServices } from "../../app/services"
@@ -85,6 +85,29 @@ export function taggableBiosQuery(services: AppServices, userId: string) {
             if (error) throw new Error(error.message)
             return data
         },
+    })
+}
+
+/**
+ * The user saved their bio (the bio editor): their own row in the cached
+ * list, if cached, takes the stored one (out once it has no name, as the
+ * query's filter has it). Others' rows are untouched.
+ */
+export function cacheOwnBio(
+    queryClient: QueryClient,
+    userId: string,
+    bio: BioRow,
+) {
+    queryClient.setQueryData<BioRow[]>(taggableKey(userId), (rows) => {
+        if (!rows) return rows
+        const others = rows.filter((row) => row.user_id !== userId)
+        const own: BioRow = {
+            user_id: bio.user_id,
+            bio_name: bio.bio_name,
+            user_type: bio.user_type,
+            allow_tagging: bio.allow_tagging,
+        }
+        return bio.bio_name ? [...others, own] : others
     })
 }
 

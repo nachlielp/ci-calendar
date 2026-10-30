@@ -1,9 +1,11 @@
 import { createContext, useContext } from "react"
 import type { Auth } from "../data/auth"
 import type { DataClient } from "../data/client"
+import type { Files } from "../data/files"
 import type { Functions } from "../data/functions"
 import type { PlacesLoader } from "../data/places"
 import type { DeviceStorage } from "./deviceStorage"
+import type { ImageTools } from "./images/images"
 import type { Telemetry } from "./telemetry/telemetry"
 import type { AppUpdates } from "./updates/updates"
 
@@ -19,6 +21,16 @@ export interface AppServices {
      * autocomplete and English addresses. Tests count the loads.
      */
     places: PlacesLoader
+    /**
+     * Supabase Storage (data/files.ts): bio photo uploads, storage-js
+     * imported on first use. Not `storage`, which is device storage.
+     */
+    files: Files
+    /**
+     * The photo cropper and the browser's image resize/encode
+     * (app/images/images.ts), loaded when a photo is picked.
+     */
+    images: ImageTools
     now: () => Date
     /** Device storage for the persisted query cache (app/persistedCache.ts). */
     storage: DeviceStorage

@@ -163,22 +163,33 @@ export function toPublicEvent(row: Row & { start_date: string }): PublicEvent {
         })),
         description: row.description,
         bios: row.ci_events_users_junction.flatMap(({ public_bio: bio }) =>
-            bio
-                ? [
-                      {
-                          userId: bio.user_id,
-                          name: bio.bio_name,
-                          img: bio.img,
-                          about: bio.about ?? "",
-                          links: [
-                              { url: bio.page_url, title: bio.page_title },
-                              { url: bio.page_url_2, title: bio.page_title_2 },
-                          ].flatMap(({ url, title }) =>
-                              url ? [{ url, title }] : [],
-                          ),
-                      },
-                  ]
-                : [],
+            bio ? [toPublicBio(bio)] : [],
         ),
+    }
+}
+
+/** The `EVENT_BIO_COLUMNS` of a `public_bio` row. */
+export interface PublicBioRow {
+    user_id: string
+    bio_name: string
+    img: string | null
+    about: string | null
+    page_url: string | null
+    page_title: string | null
+    page_url_2: string | null
+    page_title_2: string | null
+}
+
+/** A bio row as events embed it (the bio editor's response too). */
+export function toPublicBio(bio: PublicBioRow): PublicBio {
+    return {
+        userId: bio.user_id,
+        name: bio.bio_name,
+        img: bio.img,
+        about: bio.about ?? "",
+        links: [
+            { url: bio.page_url, title: bio.page_title },
+            { url: bio.page_url_2, title: bio.page_title_2 },
+        ].flatMap(({ url, title }) => (url ? [{ url, title }] : [])),
     }
 }

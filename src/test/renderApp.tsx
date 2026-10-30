@@ -71,6 +71,8 @@ export function renderApp({
         auth: fake.auth,
         functions: fake.functions,
         places: fake.places.load,
+        files: fake.files,
+        images: fake.images,
         now: () => now,
         storage,
         session,

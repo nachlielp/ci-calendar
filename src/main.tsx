@@ -6,6 +6,7 @@ import { AppRoot } from "./app/AppRoot"
 import { bootQueryClient, createQueryClient } from "./app/boot"
 import { BUILD_VERSION } from "./app/buildVersion"
 import { browserStorage } from "./app/deviceStorage"
+import { browserImages } from "./app/images/images"
 import { captureInstallPrompt } from "./app/install/installPrompt"
 import { applyLanguageToDocument, storedLanguage } from "./app/language"
 import { routes } from "./app/routes"
@@ -13,6 +14,7 @@ import type { AppServices } from "./app/services"
 import { NO_UPDATES, serviceWorkerUpdates } from "./app/updates/updates"
 import { createAuth } from "./data/auth"
 import { createDataClient } from "./data/client"
+import { createFiles } from "./data/files"
 import { createFunctions } from "./data/functions"
 import { googlePlacesLoader } from "./data/places"
 import "./index.css"
@@ -37,6 +39,13 @@ const services: AppServices = {
         auth,
     ),
     places: googlePlacesLoader(import.meta.env.VITE_GOOGLE_PLACES_API_KEY),
+    files: createFiles(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY,
+        import.meta.env.VITE_SUPABASE_STORAGE_BUCKET,
+        auth,
+    ),
+    images: browserImages(),
     now: () => new Date(),
     storage,
     session: browserStorage("sessionStorage"),

@@ -13,7 +13,7 @@ import { EVENT_LOCALES } from "../calendar/eventLocales"
 import type { Tag } from "../calendar/publicEvent"
 import type { ManagedEvent } from "../events/managedEvent"
 import { MULTI_DAY_DRAFT_KEY, MULTI_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
-import { useFormDraft } from "./eventDraft"
+import { useFormDraft } from "../../app/useFormDraft"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
 import {
     BaseHeadFields,

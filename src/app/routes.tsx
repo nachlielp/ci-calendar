@@ -105,6 +105,10 @@ export const routes: RouteObject[] = [
                 },
             ]),
             requireRole(PROFILE_ROLES, [
+                {
+                    path: "bio",
+                    lazy: lazyPage(() => import("../features/bio/BioPage")),
+                },
                 // The same page under the bio (legacy's routes).
                 { path: "bio/request/:requestId?", lazy: requestsPage },
             ]),

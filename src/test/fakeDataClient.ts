@@ -1,6 +1,8 @@
 import type { DataClient } from "../data/client"
 import { createFakeAuth, type FakeAuth } from "./fakeAuth"
+import { createFakeFiles, type FakeFiles } from "./fakeFiles"
 import { createFakeFunctions, type FakeFunctions } from "./fakeFunctions"
+import { createFakeImages, type FakeImages } from "./fakeImages"
 import { createFakePlaces, type FakePlaces } from "./fakePlaces"
 
 // The single test seam: a fake of the data client that behaves like a tiny
@@ -24,8 +26,9 @@ import { createFakePlaces, type FakePlaces } from "./fakePlaces"
 // can be made to fail, or held until the test releases them (a slow
 // network). `insert([rows])` adds several (`ci_events_users_junction`).
 // `auth` is the fake's Supabase auth (./fakeAuth.ts), `functions` its Edge
-// Functions (./fakeFunctions.ts) and `places` stands in for Google Places
-// (./fakePlaces.ts).
+// Functions (./fakeFunctions.ts), `places` stands in for Google Places
+// (./fakePlaces.ts), `files` for Supabase Storage (./fakeFiles.ts) and
+// `images` for the cropper and the canvas (./fakeImages.ts).
 
 type Row = Record<string, unknown>
 
@@ -74,6 +77,13 @@ const FOREIGN_KEYS: Record<
         },
     ],
 }
+
+/**
+ * Unique columns besides `id`, as the database's constraints: an insert
+ * repeating one fails with `23505` (`public_bio.user_id`: one bio per user,
+ * legacy's upsert `onConflict`).
+ */
+const UNIQUE_COLUMNS: Record<string, string[]> = { public_bio: ["user_id"] }
 
 interface Relation {
     column: string
@@ -136,6 +146,10 @@ export interface FakeDataClient {
     functions: FakeFunctions
     /** Google Places as the app sees it (`services.places`). */
     places: FakePlaces
+    /** Supabase Storage (`services.files`). */
+    files: FakeFiles
+    /** The photo cropper and canvas (`services.images`). */
+    images: FakeImages
     requests: RecordedRequest[]
     /** The rows of `table`, live: seed more, or check what was written. */
     rows(table: string): Row[]
@@ -144,8 +158,17 @@ export interface FakeDataClient {
      * under it (another tab writing first).
      */
     beforeExecute(callback: (request: RecordedRequest) => void): void
-    /** Make every following request to `table` fail with `message`. */
-    failTable(table: string, message: string): void
+    /**
+     * Make every following request to `table` fail with `message`: the
+     * server's error (HTTP 500, a code), or with `network` no answer at
+     * all, as postgrest-js reports a failed fetch (status 0, no code: the
+     * request may or may not have reached the database).
+     */
+    failTable(
+        table: string,
+        message: string,
+        options?: { network?: boolean },
+    ): void
     /** Let requests to `table` succeed again. */
     healTable(table: string): void
     /**
@@ -268,8 +291,10 @@ export function createFakeDataClient(
     const auth = createFakeAuth()
     const functions = createFakeFunctions(() => auth.accessToken())
     const places = createFakePlaces()
+    const files = createFakeFiles(() => auth.accessToken())
+    const images = createFakeImages()
     const requests: RecordedRequest[] = []
-    const failures = new Map<string, string>()
+    const failures = new Map<string, { message: string; network: boolean }>()
     const held = new Map<string, (() => void)[]>()
     const lateAnswers: {
         match: (request: RecordedRequest) => boolean
@@ -360,7 +385,9 @@ export function createFakeDataClient(
             then<T>(
                 resolve: (result: {
                     data: Row[] | Row | null
-                    error: { message: string } | null
+                    error: { message: string; code?: string } | null
+                    /** The HTTP status; 0 when no answer came (network). */
+                    status?: number
                 }) => T,
                 reject?: (reason: unknown) => T,
             ) {
@@ -400,7 +427,20 @@ export function createFakeDataClient(
 
     function execute(request: RecordedRequest) {
         const failure = failures.get(request.table)
-        if (failure) return { data: null, error: { message: failure } }
+        if (failure?.network) {
+            return {
+                data: null,
+                error: { message: `TypeError: ${failure.message}`, code: "" },
+                status: 0,
+            }
+        }
+        if (failure) {
+            return {
+                data: null,
+                error: { message: failure.message, code: "XX000" },
+                status: 500,
+            }
+        }
 
         /** The filters on the embed at `path` (`""` for the table itself). */
         const filtersAt = (path: string) =>
@@ -452,11 +492,16 @@ export function createFakeDataClient(
             const body = request.rows ?? (request.body ? [request.body] : [])
             // Every table the app inserts into has a unique `id` (sent by
             // the client, or the column's default).
+            const unique = ["id", ...(UNIQUE_COLUMNS[request.table] ?? [])]
             if (
-                body.some(
-                    (row) =>
-                        row.id != null &&
-                        table.some((other) => other.id === row.id),
+                body.some((row) =>
+                    unique.some(
+                        (column) =>
+                            row[column] != null &&
+                            table.some(
+                                (other) => other[column] === row[column],
+                            ),
+                    ),
                 )
             ) {
                 return {
@@ -466,6 +511,7 @@ export function createFakeDataClient(
                             "duplicate key value violates unique constraint",
                         code: "23505",
                     },
+                    status: 409,
                 }
             }
             for (const key of FOREIGN_KEYS[request.table] ?? []) {
@@ -484,6 +530,7 @@ export function createFakeDataClient(
                             details: `Key (${key.column})=(${String(missing[key.column])}) is not present in table "${key.references}".`,
                             code: "23503",
                         },
+                        status: 409,
                     }
                 }
             }
@@ -536,17 +583,21 @@ export function createFakeDataClient(
         if (request.limit !== null) rows = rows.slice(0, request.limit)
         const fields = parseSelect(request.select)
         const data = rows.map((row) => project(request.table, row, fields, ""))
-        if (request.returns === "rows") return { data, error: null }
+        // As PostgREST answers (postgrest-js passes the status on).
+        const status = request.method === "insert" ? 201 : 200
+        if (request.returns === "rows") return { data, error: null, status }
         if (data.length > 1 || (request.returns === "single" && !data[0])) {
             return {
                 data: null,
                 error: {
                     message:
                         "JSON object requested, multiple (or no) rows returned",
+                    code: "PGRST116",
                 },
+                status: 406,
             }
         }
-        return { data: data[0] ?? null, error: null }
+        return { data: data[0] ?? null, error: null, status }
     }
 
     return {
@@ -554,13 +605,15 @@ export function createFakeDataClient(
         auth,
         functions,
         places,
+        files,
+        images,
         requests,
         rows: (table) => (seed[table] ??= []),
         beforeExecute: (callback) => {
             beforeExecute = callback
         },
-        failTable: (table, message) => {
-            failures.set(table, message)
+        failTable: (table, message, { network = false } = {}) => {
+            failures.set(table, { message, network })
         },
         healTable: (table) => {
             failures.delete(table)

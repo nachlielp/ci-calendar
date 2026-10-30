@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef } from "react"
-import { useServices } from "../../app/services"
-import type { Form } from "../../app/useForm"
-import type { FormValues } from "../../lib/form"
+import type { FormValues } from "../lib/form"
+import { useServices } from "./services"
+import type { Form } from "./useForm"
 
-// Unsaved event forms kept on the device (legacy `saveDraftEvent`, which
-// kept the create forms' values in localStorage on every change): restored
+// Unsaved forms kept on the device (legacy `saveDraftEvent`, which kept the
+// event and profile forms' values in localStorage on every change): restored
 // as unsaved changes when the form opens again, e.g. after a reload, and
 // removed once the event is saved or the form is clean again. Only the
 // changed fields are kept, and restored over the saved values as they are
 // then: a field the user didn't touch takes the server's newer value. The
-// keys are personal (./draftKeys.ts), so sign-out removes them.
+// keys are personal (`personalKey`, e.g. event-forms/draftKeys.ts), so
+// sign-out removes them. Only form values are kept: text, never images.
 
 /** What a draft key holds. */
 interface StoredDraft {

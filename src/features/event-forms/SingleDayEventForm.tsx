@@ -11,7 +11,7 @@ import { TagPicker } from "../../ui/form/TagPicker"
 import type { ManagedEvent } from "../events/managedEvent"
 import { laterInSeries } from "../manage-events/myEvents"
 import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
-import { useFormDraft } from "./eventDraft"
+import { useFormDraft } from "../../app/useFormDraft"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
 import {
     BaseHeadFields,

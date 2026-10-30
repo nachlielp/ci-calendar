@@ -1,7 +1,7 @@
 import type { InfiniteData, QueryClient, QueryKey } from "@tanstack/react-query"
 import { jerusalemToday } from "../../lib/jerusalemDate"
 import { LINKED_EVENT_KIND } from "../calendar/linkedEvent"
-import type { PublicEvent } from "../calendar/publicEvent"
+import type { PublicBio, PublicEvent } from "../calendar/publicEvent"
 import { PUBLIC_WINDOW_KIND, type PublicWindow } from "../calendar/publicWindow"
 import { toPublicOnly, type ManagedEvent } from "./managedEvent"
 
@@ -72,13 +72,27 @@ export function applyEventChanges(
         ),
         today: jerusalemToday(now),
     }
+    updateLists(queryClient, (list, data, queryKey) =>
+        list.apply(data, applied, queryKey),
+    )
+}
+
+/**
+ * Sets each cached query of every list to what `update` returns for its
+ * data (skipped when it returns the same object), keeping its fetch time,
+ * and refetches anew a query whose refetch is in flight.
+ */
+function updateLists(
+    queryClient: QueryClient,
+    update: (list: EventList, data: unknown, queryKey: QueryKey) => unknown,
+) {
     for (const list of lists.values()) {
         for (const query of queryClient
             .getQueryCache()
             .findAll({ queryKey: [list.kind] })) {
             const data = query.state.data
             if (data === undefined) continue
-            const next = list.apply(data, applied, query.queryKey)
+            const next = update(list, data, query.queryKey)
             if (next === data) continue
             queryClient.setQueryData(query.queryKey, next, {
                 updatedAt: query.state.dataUpdatedAt,
@@ -93,6 +107,60 @@ export function applyEventChanges(
             }
         }
     }
+}
+
+/**
+ * A user's bio changed (the bio editor's response): every cached event
+ * embedding it shows `bio`, or loses it when `bio` is `null` (no longer
+ * public), in every event list, the persisted window included, so a bio
+ * switched off never stays on the device. Same rules as
+ * `applyEventChanges` (no query created, fetch times kept, a refetch in
+ * flight redone). Events embed only public bios, so a bio that just became
+ * public is in none of them: pass `refresh` to refetch every event list,
+ * which brings it to the events tagging it.
+ */
+export function applyBioChange(
+    queryClient: QueryClient,
+    userId: string,
+    bio: PublicBio | null,
+    { refresh = false }: { refresh?: boolean } = {},
+) {
+    updateLists(queryClient, (_list, data) => withBio(data, userId, bio))
+    if (refresh) refreshEventQueries(queryClient)
+}
+
+/**
+ * `value` with the user's bio replaced (or removed) in every event in it:
+ * any object with a `bios` list is an event (`PublicEvent` and
+ * `ManagedEvent`), found through the lists' arrays and objects (a
+ * window's `events`, pages of a paginated list). The same object back when
+ * no event in it embeds the bio.
+ */
+function withBio(
+    value: unknown,
+    userId: string,
+    bio: PublicBio | null,
+): unknown {
+    if (Array.isArray(value)) {
+        const next = value.map((item) => withBio(item, userId, bio))
+        return next.some((item, index) => item !== value[index]) ? next : value
+    }
+    if (!value || typeof value !== "object") return value
+    if ("bios" in value && Array.isArray(value.bios)) {
+        const bios = value.bios as PublicBio[]
+        if (!bios.some((other) => other.userId === userId)) return value
+        return {
+            ...value,
+            bios: bio
+                ? bios.map((other) => (other.userId === userId ? bio : other))
+                : bios.filter((other) => other.userId !== userId),
+        }
+    }
+    const entries = Object.entries(value)
+    const next = entries.map(([key, item]) => [key, withBio(item, userId, bio)])
+    return next.some(([, item], index) => item !== entries[index][1])
+        ? Object.fromEntries(next)
+        : value
 }
 
 /**

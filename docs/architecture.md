@@ -19,11 +19,13 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | `src/app/install`          | Install banner, `beforeinstallprompt` capture, iOS steps      |
 | `src/app/updates`          | Service worker registration, safe reloads, the reload guard   |
 | `src/app/telemetry`        | Crash reports, analytics, Speed Insights; their lazy SDKs     |
+| `src/app/images`           | Photo cropper and canvas resize (`services.images`), lazy     |
 | `src/sw/`                  | The service worker (`sw.ts`) and its cache rules              |
 | `src/data/`                | Backend client construction and generated database types      |
 | `src/features/*`           | One folder per feature: its pages, components, queries, tests |
 | `src/features/events`      | Managed events and the shared event cache updates (below)     |
 | `src/features/event-forms` | The event forms, their shared parts, saves and drafts         |
+| `src/features/bio`         | The bio editor (`/bio`): profile form, photo, settings        |
 | `src/lib/`                 | Pure helpers (dates, formatting); tested directly             |
 | `src/ui/`                  | Shared presentational primitives (dialog, buttons, icons)     |
 | `src/ui/form`              | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
@@ -41,7 +43,11 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   is imported on the first call, so `/` doesn't carry it; each call
   carries the token at hand, as data requests do). Browser capabilities
   that load third-party code are services too, so tests count them:
-  `services.places` (Google Places, `data/places.ts`, below). Nothing
+  `services.places` (Google Places, `data/places.ts`, below) and
+  `services.images` (the photo cropper and canvas, `app/images`, under
+  Bio editor). `services.files` is Supabase Storage (`data/files.ts`,
+  storage-js imported on the first upload; `services.storage` is device
+  storage). Nothing
   imports a module-level client. Tests pass the fake at the same point;
   nothing else is mocked.
 - **No realtime.** Never import `@supabase/supabase-js` or
@@ -104,8 +110,9 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       events, `show_profile = true` for bios), never rely on RLS alone, or a
       user's private rows would be persisted (slices 3 and 9).
     - Use `services.storage` for device storage, never `localStorage`
-      directly. The legacy `events`/`bios` keys are removed at boot and never
-      read.
+      directly. The legacy `events`/`bios` keys, and legacy's bio editor
+      keys (`upload-image-temp`, a picked photo as base64, and the
+      `profile-form` draft), are removed at boot and never read.
 - **Auth and roles.** `services.auth` (`Auth`, `data/auth.ts`) is the
   only way to Supabase auth.
     - **The session at boot** is read from device storage synchronously
@@ -442,7 +449,9 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
     - **Unsaved work**: `useForm` calls `useBlockReload(isDirty)` itself, so
       no form is reloaded away under the visitor. `restore(draft)` loads a
       draft kept on the device as unsaved changes; such a draft's key is a
-      `personalKey` (see `useFormDraft` under Event forms).
+      `personalKey` (`useFormDraft`, `app/useFormDraft.ts`, described under
+      Event forms; the bio form uses it too). Drafts hold form values
+      only: text, never images or other binary data.
     - **Validation**: `validate(values)` is pure and returns, per path (a
       field's name, or a dotted path into a nested value:
       `segments.2.end`), a key of the form's own copy; legacy's rules and
@@ -622,7 +631,8 @@ until }`, off for every saved event, so it's in drafts too) is
           and recreate), but sent every column of the form and stripped the
           edited event's own date and hide; here only changed columns go,
           and the edited event's date and hide apply to it.
-    - **Drafts** (`eventDraft.ts`, keys in `draftKeys.ts`, `personalKey`s):
+    - **Drafts** (`app/useFormDraft.ts`, keys in `draftKeys.ts`,
+      `personalKey`s):
       `useFormDraft({ key, userId, eventId, saved, form, isValues })` keeps
       only the form's `changes` while it is dirty and removes them once it
       is clean again; when the form mounts, if the draft is the same user's
@@ -714,6 +724,79 @@ until }`, off for every saved event, so it's in drafts too) is
           `source_template_id`, deleted while the form was open),
           `useCreateEvent` sends the rows again once with it `null`. The
           fake enforces that key on insert (`FOREIGN_KEYS`).
+- **Bio editor** (slice 17; `features/bio`, legacy BioPage, ProfileForm
+  and UploadImageButton):
+    - **Data** (`myBio.ts`): `myBioQuery` (`my-bio`, personal: the user's
+      own `public_bio` row by `user_id`, `MY_BIO_COLUMNS`, `null` when they
+      have none; read when `/bio` opens, never at boot or persisted).
+      `useSaveBio` waits for the session, uploads a photo if there is one,
+      then writes only the changed columns to the user's own row
+      (`.eq("user_id")`, `maybeSingle`). A user without a row gets one
+      inserted with legacy's upsert columns (every text field, `img`,
+      `user_id`; no `user_type` or switches, as legacy). Such a row has
+      `user_type` null, so it stays out of public data (the public filters
+      need a non-admin `user_type`) until `assign_user_role` sets it, as
+      legacy's rows were; rows of users given a role since that RPC exist
+      already (it creates them). The update goes
+      only to an existing row and the insert only where none exists
+      (unique `user_id`: `23505` means another tab made it, so it updates
+      that one). The switches (`allow_tagging`, `show_profile`) save at
+      once, one column each, and need a row (off until one is saved).
+    - **Caches**: the response goes into `my-bio`, the user's own row in
+      the tagging list (`cacheOwnBio`), and, when its public face changed,
+      every cached event embedding it: `applyBioChange(queryClient,
+userId, bio | null, { refresh })` (`events/eventCache.ts`; `null`
+      once the bio isn't public, `isPublicBio`; same rules as
+      `applyEventChanges`: in place, fetch times kept, refetches in flight
+      redone). So a bio switched off leaves the persisted window at once,
+      offline too; one switched on isn't in any event yet, so `refresh`
+      refetches the event lists. `withBio` finds events as any object with
+      a `bios` list in a list's data, so new event lists need nothing.
+      `toPublicBio` (`calendar/publicEvent.ts`) maps a bio row as events
+      embed it.
+    - **Values** (`bioValues.ts`, pure): fields named as their columns;
+      legacy's rules (name; link titles up to 30 characters and not a
+      link; a link needs its own title, legacy checked the first link's
+      for the second; links http(s), a scheme-less one saved with
+      `https://` as the event forms' links).
+    - **Photos** (spec: "uploaded bio photos are resized"): the user picks
+      a file, `PhotoField` opens a `Dialog` with react-easy-crop (square;
+      `services.images.loadCropper()`, ~7.8 KB gzip with the canvas code,
+      `app/images/photoTools.ts`, loaded only when a photo is picked; its
+      stylesheet ships with the bio page so it injects no `<style>`), and
+      `services.images.renderPhoto(file, area, photoOutputSize(area))`
+      draws the crop at most `PHOTO_MAX_SIDE` (600px: the card shows 250
+      CSS px; legacy used 800) and encodes it with `encodeWithinBudget`
+      (`lib/photo.ts`, `lib/photoEncoding.ts`, pure): JPEG, as legacy,
+      within legacy's 30 KB (`MAX_FILE_SIZE`), the quality stepping from
+      0.8 down by 0.1 to 0.1 as legacy's did (at 600px a photo fits at a
+      higher quality than legacy's 800px).
+      The Blob waits in the form's state (a reload is blocked meanwhile)
+      and is uploaded on save with the user's token to legacy's bucket
+      (`VITE_SUPABASE_STORAGE_BUCKET`) and path scheme
+      (`<user id>/<ms>.jpg`, never over an existing object, cached for a
+      year) with content type `image/jpg` (`PHOTO_CONTENT_TYPE`), legacy's
+      non-standard type, deliberately: the bucket's allowed types aren't
+      known from the repo and it is the one proven accepted (see Maintainer
+      notes); then `img` is the public URL
+      (`<VITE_SUPABASE_URL>/storage/v1/object/public/<bucket>/<path>`).
+      The bucket refusing the user (`FileError.denied`; a `profile` user
+      until the storage migration is applied) gets its own message and the
+      photo is dropped so the rest saves. A new photo the row doesn't
+      point at is removed only when the server answered the row write with
+      an error (an HTTP status; `BioWriteError.answered`), never after a
+      network failure (the write may have committed). It stays an orphan
+      after such a failure, or when the tab closes between upload and
+      write: accepted, as legacy (which uploaded on crop) left every
+      unsaved photo. The replaced photo stays too, as legacy left it
+      (other devices' cached events still show its URL).
+    - **Images never go to storage** (#23): a picked or cropped photo
+      lives only in memory, as a `File`/`Blob`, shown through object URLs
+      that are revoked when no longer shown (`useObjectUrl`). Never read
+      one into a data URL or base64, and never put one in device storage,
+      sessionStorage, the persisted cache or a draft (legacy's
+      `upload-image-temp` did). A test records every device storage write
+      during a crop and upload and fails on image data.
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
   JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
   first call (`data/googlePlaces.ts`, its own chunk; a script tag with
@@ -949,6 +1032,26 @@ until }`, off for every saved event, so it's in drafts too) is
 
 ## Maintainer notes
 
+- **Bio photos: check the bucket, apply the storage migration.** The
+  client uploads JPEG as `image/jpg` (legacy's type, the one known to be
+  accepted), at most ~30 KB. Check the bucket accepts it:
+  `select allowed_mime_types, file_size_limit from storage.buckets where
+id='ci_bio_profiles'` (null means any). `profile` users (teachers
+  without event rights) can't upload yet: storage's write policies
+  require `has_creator_role()`.
+  `supabase/migrations/20261030120000_bio_photos_for_profiles.sql` adds
+  insert and delete policies on that bucket for `has_profile_role()`,
+  own folder only; apply it by hand. Until then the page tells them the
+  photo can't be uploaded and saves the rest.
+- **For the CSP (slice 21): origins so far.** Slice 17 adds: bio photos
+  are uploaded to and served from the Supabase origin
+  (`connect-src` and `img-src` `<VITE_SUPABASE_URL>`, path
+  `/storage/v1/object/…`; older bios' `img` URLs are the same origin
+  with a doubled slash); the photo preview and cropper show `blob:` URLs
+  (`img-src blob:`). react-easy-crop's styles are a CSS file (no inline
+  `<style>`); it positions the image through `element.style`, which CSP
+  doesn't block.
+
 - **Deleting a template may delete its events.** The delete rule of
   `ci_events.source_template_id`'s foreign key
   (`ci-events_source_template_id_fkey`) isn't known from the repo. Check it
@@ -1014,6 +1117,17 @@ feature helpers is tested directly.
   first. Each recorded data request has the `token` it was sent with (`null`
   = anon key), its `method` and, for inserts, the `body`;
   `fake.rows(table)` seeds or reads a table live.
+- **Storage and images:** `fake.files` (`services.files`) records
+  `uploads` (path, the Blob, content type, token) and `removals`, keeps
+  `objects`, and `fail(message, { denied })`s uploads; public URLs use
+  `FAKE_SUPABASE_URL`/`FAKE_BUCKET`.
+  `fake.images` (`services.images`) counts `cropperLoads`, its stand-in
+  cropper reports `cropArea` (jsdom can't lay out react-easy-crop), and
+  records `renders` (image, area, size, the Blob returned:
+  `outputType`/`outputBytes`). `setup.ts` stands in for
+  `URL.createObjectURL`/`revokeObjectURL` (`blob:test/<n>`), with the
+  live ones in `liveObjectUrls`. An insert repeating a column in
+  `UNIQUE_COLUMNS` (`public_bio.user_id`) fails with `23505`.
 - **Edge Functions and Places:** `fake.functions` records each `invoke`
   (`calls`: name, body, token); a function answers through
   `handle(name, handler)` (`fakeTranslation` makes `"<text> [<lang>]"`)
@@ -1027,7 +1141,10 @@ feature helpers is tested directly.
   Translations are remembered per session; `setup.ts` forgets them after
   each test.
 - **Slow network:** `fake.holdTable(table)` holds requests until
-  `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
+  `fake.releaseTable(table)`; `failTable`/`healTable` make them fail
+  (the server's error, HTTP 500; `{ network: true }`: no answer, status
+  0, as postgrest-js reports a failed fetch). Results carry `status`
+  as PostgREST's (200, 201, 406, 409).
   `fake.answerLate(match)` answers the next matching request with the data
   as it is when sent, delivered when the returned function is called (a
   response from before a write that lands after it).
@@ -1217,3 +1334,18 @@ feature helpers is tested directly.
     fills the form from a template of its kind and the event is saved
     with `source_template_id`. Template writes update the list from the
     answer; nothing about templates loads at boot.
+17. Bio editor: `/bio` (profiles, creators, orgs, admins; lazy, guarded),
+    legacy BioPage: the bio as visitors see it, or legacy's ProfileForm
+    (name, about, two links, photo; its rules and draft, text only), and
+    the settings (role, tagging and, new, show-profile switches saved at
+    once). The user's own row loads when the page opens; saves write only
+    the changed columns of it, or create it as legacy's upsert did, and
+    their responses update the bio, the tagging list and every cached
+    event embedding it (a bio switched off leaves the persisted window at
+    once). Photos: react-easy-crop loaded when one is picked, the crop
+    resized on the client (600px JPEG within legacy's 30 KB, sent as
+    legacy's `image/jpg`) and kept in
+    memory as a Blob (never base64 in storage, #23; object URLs revoked),
+    uploaded with storage-js (`services.files`, lazy) to legacy's bucket
+    and path. `useFormDraft` moved to `app/`; legacy's base64 photo key is
+    removed at boot.

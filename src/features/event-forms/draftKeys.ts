@@ -1,6 +1,6 @@
 import { personalKey } from "../../app/auth/personalStorage"
 
-// The event forms' draft keys in device storage (./eventDraft.ts): personal
+// The event forms' draft keys in device storage (app/useFormDraft.ts): personal
 // keys, removed on sign-out by their prefix (app/auth/personalStorage.ts).
 
 /** The new single-day event's draft. */

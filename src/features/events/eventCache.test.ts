@@ -2,13 +2,14 @@ import { QueryClient, type InfiniteData } from "@tanstack/react-query"
 import { describe, expect, it } from "vitest"
 import { LINKED_EVENT_KIND } from "../calendar/linkedEvent"
 import { PUBLIC_WINDOW_KIND, type PublicWindow } from "../calendar/publicWindow"
+import type { PublicBio } from "../calendar/publicEvent"
 import { publicEvent } from "../calendar/testEvents"
 import {
     myPastEventsKey,
     myUpcomingEventsKey,
     type PastPage,
 } from "../manage-events/myEvents"
-import { applyEventChanges } from "./eventCache"
+import { applyBioChange, applyEventChanges } from "./eventCache"
 import type { ManagedEvent } from "./managedEvent"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
@@ -209,5 +210,84 @@ describe("applyEventChanges", () => {
         // A lookup not fetched yet is left to its fetch.
         apply({ saved: [managed({ id: "zzz", startDate: "2027-02-01" })] })
         expect(queryClient.getQueryData(unfetched)).toBeUndefined()
+    })
+})
+
+describe("applyBioChange", () => {
+    const bio = (overrides: Partial<PublicBio> = {}): PublicBio => ({
+        userId: "teacher",
+        name: "דנה",
+        img: null,
+        about: "",
+        links: [],
+        ...overrides,
+    })
+    const other = bio({ userId: "other", name: "אחר" })
+
+    function withBios() {
+        const queryClient = new QueryClient()
+        const windowKey = [PUBLIC_WINDOW_KIND]
+        queryClient.setQueryData<PublicWindow>(
+            windowKey,
+            {
+                from: "2026-10-30",
+                to: "2027-01-28",
+                events: [
+                    publicEvent({ id: "a", bios: [bio(), other] }),
+                    publicEvent({ id: "b", bios: [other] }),
+                ],
+            },
+            { updatedAt: 1000 },
+        )
+        const pastKey = myPastEventsKey(OWNER)
+        queryClient.setQueryData<InfiniteData<PastPage>>(pastKey, {
+            pages: [
+                {
+                    events: [managed({ id: "p", bios: [bio()] })],
+                    next: { startDate: "2026-10-10", id: "p" },
+                },
+            ],
+            pageParams: [null],
+        })
+        const linkKey = [LINKED_EVENT_KIND, "b"]
+        queryClient.setQueryData(linkKey, publicEvent({ id: "b", bios: [] }))
+        return { queryClient, windowKey, pastKey, linkKey }
+    }
+
+    it("shows the new bio wherever an event embeds it, keeping fetch times", () => {
+        const { queryClient, windowKey, pastKey, linkKey } = withBios()
+        const link = queryClient.getQueryData(linkKey)
+        applyBioChange(queryClient, "teacher", bio({ name: "דנה כהן" }))
+
+        const window = queryClient.getQueryData<PublicWindow>(windowKey)!
+        expect(window.events[0].bios.map((b) => b.name)).toEqual([
+            "דנה כהן",
+            "אחר",
+        ])
+        expect(queryClient.getQueryState(windowKey)?.dataUpdatedAt).toBe(1000)
+        const past = queryClient.getQueryData<InfiniteData<PastPage>>(pastKey)!
+        expect(past.pages[0].events[0].bios[0].name).toBe("דנה כהן")
+        expect(past.pages[0].next).toEqual({ startDate: "2026-10-10", id: "p" })
+        // Untouched queries keep their data object.
+        expect(queryClient.getQueryData(linkKey)).toBe(link)
+    })
+
+    it("drops a bio that is no longer public", () => {
+        const { queryClient, windowKey, pastKey } = withBios()
+        applyBioChange(queryClient, "teacher", null)
+
+        const window = queryClient.getQueryData<PublicWindow>(windowKey)!
+        expect(window.events.map((e) => e.bios.map((b) => b.userId))).toEqual([
+            ["other"],
+            ["other"],
+        ])
+        const past = queryClient.getQueryData<InfiniteData<PastPage>>(pastKey)!
+        expect(past.pages[0].events[0].bios).toEqual([])
+    })
+
+    it("refetches the event lists when asked (a bio that became public)", () => {
+        const { queryClient, windowKey } = withBios()
+        applyBioChange(queryClient, "teacher", bio(), { refresh: true })
+        expect(queryClient.getQueryState(windowKey)?.isInvalidated).toBe(true)
     })
 })

@@ -8,7 +8,7 @@ import {
     MULTI_DAY_TEMPLATE_DRAFT_KEY,
     SINGLE_DAY_TEMPLATE_DRAFT_KEY,
 } from "./draftKeys"
-import { useFormDraft } from "./eventDraft"
+import { useFormDraft } from "../../app/useFormDraft"
 import { ClearFormButton, EventFormFooter } from "./EventFormParts"
 import { MultiDayHeadFields } from "./MultiDayEventForm"
 import { SingleDayFields } from "./SingleDayEventForm"
