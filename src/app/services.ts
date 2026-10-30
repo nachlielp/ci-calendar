@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react"
+import type { Auth } from "../data/auth"
 import type { DataClient } from "../data/client"
 import type { DeviceStorage } from "./deviceStorage"
 import type { Telemetry } from "./telemetry/telemetry"
@@ -7,6 +8,8 @@ import type { AppUpdates } from "./updates/updates"
 /** Everything the app needs from the outside world, injected once at boot. */
 export interface AppServices {
     data: DataClient
+    /** Sign-in state and actions (data/auth.ts); boot never waits on it. */
+    auth: Auth
     now: () => Date
     /** Device storage for the persisted query cache (app/persistedCache.ts). */
     storage: DeviceStorage

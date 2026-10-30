@@ -35,6 +35,9 @@ const linkColumn = (link: string) =>
 const isLinkedEvent = (event: PublicEvent, link: string) =>
     event.id === link || event.shortId === link
 
+/** First element of a linked event's query key (public data). */
+export const LINKED_EVENT_KIND = "linked-event"
+
 /**
  * One visible event by its link, for links to events outside the cached
  * window (past, far ahead, or not loaded yet). `null` when there is no such
@@ -42,7 +45,7 @@ const isLinkedEvent = (event: PublicEvent, link: string) =>
  */
 function linkedEventQuery({ data }: AppServices, link: string) {
     return queryOptions({
-        queryKey: ["linked-event", link],
+        queryKey: [LINKED_EVENT_KIND, link],
         staleTime: STALE_MS,
         queryFn: async (): Promise<PublicEvent | null> => {
             const { data: row, error } = await selectPublicEvents(data)

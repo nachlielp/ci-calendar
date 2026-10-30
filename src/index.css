@@ -53,6 +53,18 @@ body {
     max-width: 100%;
 }
 
+/* Typing and pasting need selectable text, whatever the page around. */
+input,
+textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* A page waiting for its data or the viewer (e.g. a role-guarded page). */
+.page-loading {
+    padding: 0 16px;
+}
+
 /* Read by screen readers, not shown. */
 .visually-hidden {
     position: absolute;

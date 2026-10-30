@@ -26,7 +26,7 @@ async function openMenu() {
 }
 
 describe("header", () => {
-    it("offers a signed-out visitor the languages and the menu, and no login until it exists", async () => {
+    it("offers a signed-out visitor login, the languages and the menu", async () => {
         renderApp()
 
         const bar = header()
@@ -36,10 +36,9 @@ describe("header", () => {
         expect(
             within(bar).getByRole("button", { name: "פתח תפריט" }),
         ).toBeInTheDocument()
-        // Legacy's login button returns with the login page (slice 9).
         expect(
-            within(bar).queryByRole("link", { name: "התחבר/י" }),
-        ).not.toBeInTheDocument()
+            within(bar).getByRole("link", { name: "התחבר/י" }),
+        ).toHaveAttribute("href", "/login")
         // Already home.
         expect(
             within(bar).queryByRole("link", { name: "כל הארועים" }),

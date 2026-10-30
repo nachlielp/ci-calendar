@@ -9,6 +9,7 @@ import type { AppServices } from "../app/services"
 import { NO_TELEMETRY, type Telemetry } from "../app/telemetry/telemetry"
 import { NO_UPDATES, type AppUpdates } from "../app/updates/updates"
 import { createFakeDataClient, type FakeDataClient } from "./fakeDataClient"
+import { userRow, type TestUser } from "./testUsers"
 
 export interface RenderAppOptions {
     path?: string
@@ -28,12 +29,21 @@ export interface RenderAppOptions {
     routes?: RouteObject[]
     /** Crash reports and analytics (`createTestTelemetry()`); none by default. */
     telemetry?: Telemetry
+    /**
+     * Boots signed in as this user (`testUser(role)`), as if their session
+     * were in device storage; their `users` row is seeded unless the fake
+     * already has it.
+     */
+    signedInAs?: TestUser
+    /** The stored session's token has expired: it needs a refresh first. */
+    tokenExpired?: boolean
 }
 
 /**
  * Boots and renders the real app (real routes, real queries, the same boot
- * as production: persisted-cache restore and prefetch) against the fake data
- * client — the one seam tests drive the app through.
+ * as production: persisted-cache restore and prefetch, the stored session)
+ * against the fake backend (data and auth) — the one seam tests drive the
+ * app through.
  */
 export function renderApp({
     path = "/",
@@ -45,10 +55,20 @@ export function renderApp({
     updates = NO_UPDATES,
     routes: routeObjects = routes,
     telemetry = NO_TELEMETRY,
+    signedInAs,
+    tokenExpired = false,
 }: RenderAppOptions = {}) {
+    if (signedInAs) {
+        const users = fake.rows("users")
+        if (!users.some((row) => row.id === signedInAs.id)) {
+            users.push(userRow(signedInAs))
+        }
+        fake.auth.signInAs(signedInAs, { expired: tokenExpired })
+    }
     const reloads = { count: 0 }
     const services: AppServices = {
         data: fake.client,
+        auth: fake.auth,
         now: () => now,
         storage,
         session,

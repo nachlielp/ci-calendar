@@ -11,16 +11,26 @@ import { applyLanguageToDocument, storedLanguage } from "./app/language"
 import { routes } from "./app/routes"
 import type { AppServices } from "./app/services"
 import { NO_UPDATES, serviceWorkerUpdates } from "./app/updates/updates"
+import { createAuth } from "./data/auth"
 import { createDataClient } from "./data/client"
 import "./index.css"
 
+const storage = browserStorage()
+// The session comes from storage, synchronously; auth-js loads on demand.
+const auth = createAuth({
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+    anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    storage,
+})
 const services: AppServices = {
     data: createDataClient(
         import.meta.env.VITE_SUPABASE_URL,
         import.meta.env.VITE_SUPABASE_ANON_KEY,
+        auth,
     ),
+    auth,
     now: () => new Date(),
-    storage: browserStorage(),
+    storage,
     session: browserStorage("sessionStorage"),
     buildVersion: BUILD_VERSION,
     reload: () => window.location.reload(),

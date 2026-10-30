@@ -1,5 +1,6 @@
 import { onlineManager, QueryClient } from "@tanstack/react-query"
 import { publicWindowQuery } from "../features/calendar/publicWindow"
+import { bootSession } from "./auth/session"
 import { persistQueryCache } from "./persistedCache"
 import type { AppServices } from "./services"
 
@@ -18,6 +19,8 @@ export function createQueryClient(): QueryClient {
  *    restored data is fresh, because a cold start always revalidates — so
  *    the network and the first render overlap. The page's `useQuery` picks up
  *    this same request instead of sending its own.
+ * 3. For a signed-in user (a session in storage, read without the network),
+ *    requests their profile row in parallel (`bootSession`).
  */
 export function bootQueryClient(
     queryClient: QueryClient,
@@ -31,4 +34,5 @@ export function bootQueryClient(
         ...publicWindowQuery(services),
         staleTime: 0,
     })
+    bootSession(queryClient, services)
 }

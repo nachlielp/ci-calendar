@@ -1,4 +1,5 @@
 import type { DataClient } from "../data/client"
+import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 
 // The single test seam: a fake of the data client that behaves like a tiny
 // PostgREST. Seeded rows live per table; each query applies the predicates it
@@ -10,8 +11,10 @@ import type { DataClient } from "../data/client"
 // (`b.c`) filter the embedded rows as PostgREST does: a filtered-out to-one
 // embed is `null`, a to-many embed loses the rows, the parent row stays.
 // `single()` / `maybeSingle()` return one row. Every request is recorded so
-// tests can assert on what was asked of the backend. Requests to a table can
-// be made to fail, or held until the test releases them (a slow network).
+// tests can assert on what was asked of the backend, with the token it was
+// sent with. `insert(row).select().single()` adds a row. Requests to a table
+// can be made to fail, or held until the test releases them (a slow
+// network). `auth` is the fake's Supabase auth (./fakeAuth.ts).
 
 type Row = Record<string, unknown>
 
@@ -51,6 +54,15 @@ export interface RecordedFilter {
 
 export interface RecordedRequest {
     table: string
+    /** `select` unless the request writes. */
+    method: "select" | "insert" | "update"
+    /** The row an insert sent, or the values an update set. */
+    body?: Row
+    /**
+     * The access token the request carried when it was sent; `null` for the
+     * anon key (signed out, or the token at hand had expired).
+     */
+    token: string | null
     select: string
     filters: RecordedFilter[]
     order: { column: string; ascending: boolean } | null
@@ -60,7 +72,16 @@ export interface RecordedRequest {
 
 export interface FakeDataClient {
     client: DataClient
+    /** The fake's Supabase auth (`services.auth`). */
+    auth: FakeAuth
     requests: RecordedRequest[]
+    /** The rows of `table`, live: seed more, or check what was written. */
+    rows(table: string): Row[]
+    /**
+     * Runs just before each request is answered, e.g. to change the data
+     * under it (another tab writing first).
+     */
+    beforeExecute(callback: (request: RecordedRequest) => void): void
     /** Make every following request to `table` fail with `message`. */
     failTable(table: string, message: string): void
     /** Let requests to `table` succeed again. */
@@ -121,13 +142,17 @@ function parseSelect(select: string): Field[] | null {
 export function createFakeDataClient(
     seed: Record<string, Row[]> = {},
 ): FakeDataClient {
+    const auth = createFakeAuth()
     const requests: RecordedRequest[] = []
     const failures = new Map<string, string>()
     const held = new Map<string, (() => void)[]>()
+    let beforeExecute: ((request: RecordedRequest) => void) | undefined
 
     function from(table: string) {
         const request: RecordedRequest = {
             table,
+            method: "select",
+            token: null,
             select: "*",
             filters: [],
             order: null,
@@ -138,6 +163,16 @@ export function createFakeDataClient(
         const builder = {
             select(columns = "*") {
                 request.select = columns.replace(/\s+/g, "")
+                return builder
+            },
+            insert(row: Row) {
+                request.method = "insert"
+                request.body = row
+                return builder
+            },
+            update(values: Row) {
+                request.method = "update"
+                request.body = values
                 return builder
             },
             eq: (column: string, value: unknown) =>
@@ -170,6 +205,9 @@ export function createFakeDataClient(
                 }) => T,
                 reject?: (reason: unknown) => T,
             ) {
+                // The token goes out with the request, as the real client's
+                // fetch reads it.
+                request.token = auth.accessToken()
                 const waiting = held.get(table)
                 const answered = waiting
                     ? new Promise<void>((answer) => waiting.push(answer))
@@ -239,7 +277,32 @@ export function createFakeDataClient(
             )
         }
 
-        let rows = where(request.table, "")
+        beforeExecute?.(request)
+        const table = (seed[request.table] ??= [])
+        if (request.method === "insert" && request.body) {
+            // Every table the app inserts into has a unique `id`.
+            if (table.some((row) => row.id === request.body!.id)) {
+                return {
+                    data: null,
+                    error: {
+                        message:
+                            "duplicate key value violates unique constraint",
+                        code: "23505",
+                    },
+                }
+            }
+            table.push({ ...request.body })
+        }
+        if (request.method === "update") {
+            for (const row of where(request.table, "")) {
+                Object.assign(row, request.body)
+            }
+        }
+
+        let rows =
+            request.method === "insert"
+                ? [request.body ?? {}]
+                : where(request.table, "")
         if (request.order) {
             const { column, ascending } = request.order
             rows = [...rows].sort((a, b) => {
@@ -266,7 +329,12 @@ export function createFakeDataClient(
 
     return {
         client: { from } as unknown as DataClient,
+        auth,
         requests,
+        rows: (table) => (seed[table] ??= []),
+        beforeExecute: (callback) => {
+            beforeExecute = callback
+        },
         failTable: (table, message) => {
             failures.set(table, message)
         },

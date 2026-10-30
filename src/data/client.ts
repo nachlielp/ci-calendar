@@ -1,8 +1,10 @@
 import { PostgrestClient } from "@supabase/postgrest-js"
+import type { Auth } from "./auth"
 import type { Database } from "./database.types"
 
 /**
- * The app's data client — the single seam between the app and Supabase.
+ * The app's data client — the single seam between the app and Supabase's
+ * database. Auth is the other half of the seam (`services.auth`, ./auth.ts).
  *
  * Built from the PostgREST sub-client instead of `@supabase/supabase-js`, so
  * the realtime module never reaches the bundle: the app has no realtime by
@@ -10,9 +12,28 @@ import type { Database } from "./database.types"
  */
 export type DataClient = PostgrestClient<Database>
 
-export function createDataClient(url: string, anonKey: string): DataClient {
+/**
+ * Each request carries the token at hand when it is sent (as supabase-js
+ * did): the signed-in user's while it is valid, refreshed ones included,
+ * else the anon key. It never waits for auth; personal queries await
+ * `auth.ready()` first so theirs is valid.
+ */
+export function createDataClient(
+    url: string,
+    anonKey: string,
+    auth: Pick<Auth, "accessToken">,
+    send: typeof fetch = (...args) => fetch(...args),
+): DataClient {
     return new PostgrestClient<Database>(`${url}/rest/v1`, {
-        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        headers: { apikey: anonKey },
+        fetch: (input, init) => {
+            const headers = new Headers(init?.headers)
+            headers.set(
+                "Authorization",
+                `Bearer ${auth.accessToken() ?? anonKey}`,
+            )
+            return send(input, { ...init, headers })
+        },
         // The query cache owns retries (app/boot.ts); retrying here as well
         // would multiply them.
         retry: false,

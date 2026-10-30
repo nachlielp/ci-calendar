@@ -4,7 +4,10 @@ import CalendarPage from "../features/calendar/CalendarPage"
 import type { RouteHandle } from "./routeHandle"
 import { CALENDAR_ROUTE_ID, RootLayout, RouteError } from "./RootLayout"
 
-/** Text pages: a signed-out visitor gets the header's home button. */
+/**
+ * Text and auth pages: a signed-out visitor gets the header's home button
+ * (instead of login).
+ */
 const textPage: RouteHandle = { homeButton: true }
 
 /** A route whose page is its own chunk, fetched on first visit. */
@@ -50,6 +53,34 @@ export const routes: RouteObject[] = [
                 handle: textPage,
                 lazy: lazyPage(() => import("../pages/TermsPage")),
             },
+            {
+                path: "login",
+                handle: textPage,
+                lazy: lazyPage(() => import("../features/auth/LoginPage")),
+            },
+            {
+                path: "signup",
+                handle: textPage,
+                lazy: lazyPage(() => import("../features/auth/SignupPage")),
+            },
+            {
+                path: "reset-password-request",
+                handle: textPage,
+                lazy: lazyPage(
+                    () => import("../features/auth/ResetPasswordRequestPage"),
+                ),
+            },
+            {
+                // Open to all, as in legacy: the emailed link's session
+                // arrives in the URL. Signed out, saving says it failed.
+                path: "reset-password",
+                handle: textPage,
+                lazy: lazyPage(
+                    () => import("../features/auth/ResetPasswordPage"),
+                ),
+            },
+            // Pages for signed-in roles go inside `requireRole(roles, [...])`
+            // (app/auth/guard.ts), legacy's PrivateRoutes groups.
             {
                 path: "*",
                 lazy: lazyPage(() => import("../pages/NotFoundPage")),

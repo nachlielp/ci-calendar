@@ -4,7 +4,9 @@ import { ANONYMOUS, type SignedInRole } from "../viewer"
 
 const signOut = async () => {}
 const keys = (role: SignedInRole, signsInWithEmail = false) =>
-    menuFor({ role, signsInWithEmail, signOut }).map((item) => item.key)
+    menuFor({ role, name: "Dana", signsInWithEmail, signOut }).map(
+        (item) => item.key,
+    )
 
 // Legacy MenuDrawer's items per user type.
 describe("menuFor", () => {
@@ -20,6 +22,14 @@ describe("menuFor", () => {
             "home",
             "about",
         ])
+    })
+
+    it("offers sign-out when the profile can't load", () => {
+        expect(
+            menuFor({ role: "unavailable", signOut, retry: () => {} }).map(
+                (item) => item.key,
+            ),
+        ).toEqual(["home", "about", "logout"])
     })
 
     it("offers a plain user the role request and sign-out", () => {

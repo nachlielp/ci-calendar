@@ -61,6 +61,23 @@ export default tseslint.config(
             "jsx-a11y/click-events-have-key-events": "warn",
             "jsx-a11y/no-static-element-interactions": "warn",
             "jsx-a11y/no-noninteractive-element-interactions": "warn",
+            // No realtime (spec #34): the app uses Supabase's sub-clients.
+            "no-restricted-imports": [
+                "error",
+                {
+                    paths: [
+                        {
+                            name: "@supabase/supabase-js",
+                            message:
+                                "Use the sub-clients (postgrest-js, auth-js, …); supabase-js bundles realtime.",
+                        },
+                        {
+                            name: "@supabase/realtime-js",
+                            message: "The app has no realtime (spec #34).",
+                        },
+                    ],
+                },
+            ],
         },
     },
     // Config files and plain-JS entry points run in a mixed Node/browser env.

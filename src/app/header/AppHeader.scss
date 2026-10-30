@@ -39,6 +39,15 @@
         margin-inline-start: auto;
     }
 
+    // Legacy's user-info: the signed-in user's name.
+    .user-name {
+        margin: 0 0.5rem;
+        padding-bottom: 6px;
+        color: #000;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
     .menu-button {
         display: flex;
         margin-inline: 4px 16px;

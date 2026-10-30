@@ -14,6 +14,7 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | Folder              | Holds                                                         |
 | ------------------- | ------------------------------------------------------------- |
 | `src/app/`          | Bootstrap, services (the seam), routes, shell layout          |
+| `src/app/auth`      | Session at boot, profile row, sign-out cleanup, role guard    |
 | `src/app/header`    | App header, menu (items keyed by role), WhatsApp link         |
 | `src/app/install`   | Install banner, `beforeinstallprompt` capture, iOS steps      |
 | `src/app/updates`   | Service worker registration, safe reloads, the reload guard   |
@@ -31,11 +32,13 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 
 - **One seam.** Everything that talks to the backend gets it from
   `AppServices` (`useServices()` in components, an argument in query
-  factories). Nothing imports a module-level client. Tests pass the fake at
-  the same point; nothing else is mocked.
+  factories): `services.data` (PostgREST) and `services.auth` (sign-in
+  state and actions). Nothing imports a module-level client. Tests pass the
+  fake at the same point; nothing else is mocked.
 - **No realtime.** Never import `@supabase/supabase-js` or
-  `@supabase/realtime-js`. Use the sub-clients (`postgrest-js`, `auth-js`,
-  `storage-js`, `functions-js`). The test setup fails any WebSocket.
+  `@supabase/realtime-js` (lint fails it). Use the sub-clients
+  (`postgrest-js`, `auth-js`, `storage-js`, `functions-js`). The test setup
+  fails any WebSocket.
 - **Server state lives in TanStack Query.** Each kind of data has one query
   options factory with an explicit freshness policy. Writes update the
   matching cached queries from the server response (`setQueryData`), not by
@@ -91,6 +94,94 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
     - Use `services.storage` for device storage, never `localStorage`
       directly. The legacy `events`/`bios` keys are removed at boot and never
       read.
+- **Auth and roles.** `services.auth` (`Auth`, `data/auth.ts`) is the
+  only way to Supabase auth.
+    - **The session at boot** is read from device storage synchronously
+      (`auth.session()`: no network, no auth-js) under legacy supabase-js's
+      default key, `sb-<project ref>-auth-token`, in its format, so users
+      stay signed in across the cutover. auth-js (`data/authClient.ts`,
+      ~24 KB gzip, its own chunk; configured as legacy's client: persisted,
+      auto-refresh, implicit flow) loads only when needed: an auth page
+      mounts (`auth.start()`), the URL carries an auth redirect's tokens, a
+      token needs a refresh, an auth action runs, or, for a signed-in user,
+      after load and idle (to keep the token fresh). Never import auth-js
+      anywhere else. Another tab's sign-in, sign-out or refresh reaches this
+      one through the `storage` event on the session key, with or without
+      auth-js loaded.
+    - **Auth redirects** (implicit flow, as legacy: reset links and Google
+      sign-in return `#access_token=…&refresh_token=…`, failures
+      `#error=…&error_code=otp_expired&…`) are read by `createAuth` at boot,
+      before the router or telemetry exist, and the fragment is removed at
+      once with `history.replaceState`, so tokens never stay in the URL or
+      the history. auth-js's own URL detection is off
+      (`detectSessionInUrl: false`); the tokens go to its `setSession`
+      (`adoptSession`: checked with Supabase's `/user`, then stored). Until
+      then the session is `undefined` (unknown); tokens that are no good
+      leave the stored session in place. Errors are kept as
+      `auth.redirectError()` (the reset page says the link expired; nothing
+      is reported). `auth.bootUserId` is the stored session's user even
+      while a redirect is read, so an account arriving over another one is
+      handled as the first one signing out.
+    - **Allowed at boot**: the public window request, and for a stored
+      session only the profile row (`profileQuery`, `app/auth/profile.ts`:
+      `PROFILE_COLUMNS` = role, name, provider, `is_internal`), in parallel,
+      plus telemetry `identify` (`bootSession`, `app/auth/session.ts`). No
+      `getUser()`, nothing else personal; pages load their own data. The
+      profile row sets `telemetry.setInternal`, and is created by the client
+      (legacy `createDbUserFromUser`, a plain `user`) when an account has
+      none: the database has no trigger, and sign-up signs in at once
+      (`mailer_autoconfirm`). If another tab inserted it first, the insert
+      fails as a duplicate (`23505`) and the row is read again; this
+      assumes `users.id` is unique, which `docs/database-schema.md` doesn't
+      show but the foreign keys referencing `users(id)` (`ci_events`,
+      `public_bio`, …, per `database.types.ts`) require. Once per boot and
+      user, after the profile loads and while online, `recordSignIn`
+      updates the row's `version` (`BUILD_VERSION`) and `last_signin`
+      (legacy's `updateUserAppVersion`, how the maintainer sees who is on
+      an old build), fire and forget.
+    - **Tokens**: the data client's fetch puts `auth.accessToken()` on each
+      request as it is sent: the session's token while valid (refreshed ones
+      included), else the anon key. It never waits. So public queries go
+      with whatever token is at hand (filter public-ness explicitly, above),
+      and **every personal query starts with**
+      `const session = await services.auth.ready()` (at once for a token
+      valid 90 s more; else after auth-js refreshes it), checks
+      `session?.user.id === userId`, keys on `[kind, userId, …]`, and is
+      `enabled` only with a session (`useSession()` in `app/viewer.ts`).
+    - **The viewer** (`useViewer()`): `anonymous` at first paint when no
+      session is stored; `unknown` while the profile loads or a redirect is
+      read; `unavailable` when signed in but the profile failed or waits
+      for a connection (the menu offers sign-out, guards say so with a
+      retry and the way home); then the role (`users.user_type`), the
+      name (shown in the header) and `signsInWithEmail` (`provider ===
+"email"`). The header's login link (legacy: account icon + "התחבר/י")
+      shows only to `anonymous` viewers, online, on routes without
+      `homeButton` (text and auth pages get home instead).
+    - **Guarded routes** (legacy `PrivateRoutes`): wrap a later slice's
+      routes in `requireRole(roles, [...])` (`app/auth/guard.ts`, legacy's
+      groups `SIGNED_IN_ROLES`, `PROFILE_ROLES`, `CREATOR_ROLES`,
+      `ADMIN_ROLES`). While the viewer is unknown it shows loading,
+      unavailable an error with a retry; signed out → `/login`, wrong role → `/` (both replacing the entry; legacy
+      kept no return path and login always lands on `/`). RLS stays the
+      real gate; the guard is UX.
+    - **Sign-out**: `viewer.signOut()` (the menu) goes to `/`, then
+      `auth.signOut()`: Supabase's `global` scope as legacy, falling back to
+      `local`; the local session and auth-js's keys always go, offline too.
+      Whenever the user ends or changes (here, another tab, a revoked
+      refresh, an auth redirect over a stored session), `forgetUser` runs: every query whose kind is not in
+      `PUBLIC_QUERY_KINDS` leaves the cache (so a new kind is personal by
+      default; list a public kind there), `PERSONAL_STORAGE_KEYS` leave
+      device storage (**add any personal key you store, e.g. a form draft**),
+      sessionStorage is cleared (as legacy), and `telemetry.reset()`. The
+      persisted cache holds public kinds only.
+    - **Auth pages** (`features/auth`, lazy): `/login` (Google, email and
+      password; success → `/`), `/signup` (→ `/`), `/reset-password-request`
+      (emails a link to `<origin>/reset-password`) and `/reset-password`
+      (open to all: the link's `#access_token=…&type=recovery` arrives in
+      the URL, read and cleared at boot as above; the service worker serves
+      the shell for it, and telemetry scrubs any URL anyway). Supabase's auth settings must
+      list that URL (and each preview origin to test there) as a redirect
+      URL; Google sign-in returns to the Site URL, as legacy.
 - **Service worker.** `src/sw/sw.ts`, built to `/sw.js` by
   vite-plugin-pwa (`injectManifest`, production builds only; never in dev or
   tests), typechecked by its own `src/sw/tsconfig.json` (worker globals, no
@@ -177,8 +268,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   states; only a definite "no visible event" renders the 404 page. A link
   that can't name an event (`isEventLink`: neither a UUID nor a three-letter
   or digit `short_id`, as the `set_short_id` trigger makes them) is a 404 at
-  once, with no request and no details code, e.g. `/abuot` or `/login`
-  before its route exists. Static top-level routes (`/about`, `/login`, …) outrank
+  once, with no request and no details code, e.g. `/abuot` or `/signin`.
+  Static top-level routes (`/about`, `/login`, …) outrank
   `/:eventId` in React Router's ranking, so later slices just add them; they
   never reach the event lookup.
 - **Filters and views.** Filters live in the URL as legacy encoded them,
@@ -332,20 +423,14 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   visitors on routes with the `homeButton` handle, to signed-in users
   anywhere but `/`), the language menu, the WhatsApp link
   (`VITE_WHATSAPP_NUMBER`; hidden when unset), the out-of-date sign and the
-  menu button. The menu (a lazy `MenuDrawer`: a top drawer on phones, a
-  side drawer from the start on wider screens) lists `menuFor(viewer)` from
-  `MENU_ITEMS` (`app/header/menu.ts`): legacy's items, in order, each with
-  the roles that see it. The viewer (`app/viewer.ts`) is `unknown` (session
-  not read yet: only items everyone sees, no login), `anonymous`, or a
-  signed-in role with `signsInWithEmail` and `signOut` (the logout item
-  calls it). **Extension points for slice 9:** make `useViewer()` return
-  those states from the session and profile row; put `handle: { homeButton:
-true }` on the login, signup and password-reset routes; and restore
-  legacy's login link (`AccountIcon` + "התחבר/י"/"Login"/"Войти", to
-  `/login`) before the home button, shown only to `anonymous` viewers,
-  online (`useIsOnline`), on routes without `homeButton`. It is left out
-  until the login page exists. A new page for a role is one `MENU_ITEMS`
-  entry plus its copy key in `MenuDrawer`.
+  menu button; signed out, the login link before them all, and signed in,
+  the user's name before the menu button (rules under Auth and roles). The
+  menu (a lazy `MenuDrawer`: a top drawer on phones, a side drawer from the
+  start on wider screens) lists `menuFor(viewer)` from `MENU_ITEMS`
+  (`app/header/menu.ts`): legacy's items, in order, each with the roles that
+  see it (`unknown`: only items everyone sees). The logout item calls the
+  viewer's `signOut`. A new page for a role is one `MENU_ITEMS` entry plus
+  its copy key in `MenuDrawer`, and its route inside `requireRole`.
 - **Install banner.** On phones (`PHONE_QUERY`, 500px), on `/`, outside the
   installed app (`isStandalone()`, `app/device.ts`, with `isIos()`), legacy's purple bar invites adding the
   app. `captureInstallPrompt()` runs at boot (main.tsx and `renderApp`) to
@@ -401,8 +486,8 @@ true }` on the login, signup and password-reset routes; and restore
       (legacy recorded `$pageview` with `$current_url` on every location
       change, filters included), and Speed Insights reports under the route
       pattern (`/event/[eventId]`, `routePattern`).
-    - **Users (slice 9)**: once the session is known, call
-      `services.telemetry.identify({ id, email })`: Sentry `setUser` (as
+    - **Users**: `bootSession` calls
+      `services.telemetry.identify({ id, email })` once the session is known: Sentry `setUser` (as
       legacy) and PostHog `identify(id)` (new). Legacy left every visitor
       anonymous in PostHog (its `reset()` ran before `init`, a no-op, and it
       identified the visitor with its own anonymous id, which changes
@@ -416,7 +501,8 @@ true }` on the login, signup and password-reset routes; and restore
       `services.telemetry.setInternal(users.is_internal)`. It saves the
       `isInternal` key; marking a device internal stops PostHog
       (`opt_out_capturing`, autocapture included) and Speed Insights at
-      once; unmarking takes effect from the next page load.
+      once; unmarking takes effect from the next page load. (All wired in
+      slice 9: `bootSession`, `forgetUser`, `profileQuery`.)
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
@@ -448,6 +534,21 @@ feature helpers is tested directly.
   and fires Chrome's install offer (`offerInstall`). `setup.ts` resets them
   after each test.
   `vi.stubEnv` (e.g. `VITE_WHATSAPP_NUMBER`) lasts one test.
+- **Auth:** `fake.auth` (`src/test/fakeAuth.ts`) is the fake's Supabase
+  auth: accounts (`fake.auth.accounts`), a session with tokens
+  (`token-<user id>-<n>`), every call that would reach the auth server in
+  `fake.auth.calls` (refresh, sign-in, sign-up, reset, update, sign-out),
+  `fail(method, { message, code })`, `holdRefresh`/`releaseRefresh`,
+  `started` (auth-js asked for), and redirects: `startRedirect()` (session
+  unknown) then `finishRedirect(account | null)`, or `failRedirect(error)`
+  before boot. `fake.beforeExecute(fn)` runs before each request is
+  answered (another tab writing first); inserts of an existing `id` fail
+  with `23505`; `update` applies to the filtered rows. `renderApp({ signedInAs: testUser(role) })`
+  (`src/test/testUsers.ts`) boots with that session stored and seeds the
+  `users` row (`userRow`); add `tokenExpired: true` to need a refresh
+  first. Each recorded data request has the `token` it was sent with (`null`
+  = anon key), its `method` and, for inserts, the `body`;
+  `fake.rows(table)` seeds or reads a table live.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
 - **Updates:** `renderApp({ updates: sw.updates })` with
@@ -527,3 +628,17 @@ feature helpers is tested directly.
    pattern, production host only and never on `isInternal` devices; auth
    secrets scrubbed from every URL sent; SDK chunks in `assets/telemetry/`,
    not precached; `identify`/`reset`/`setInternal` for slice 9.
+9. Auth and roles: `services.auth` on `@supabase/auth-js`, the session read
+   from legacy's storage key at boot with no network and auth-js loaded on
+   demand; data requests carry the token at hand, personal queries await
+   `auth.ready()`; signed-in boot adds only the profile row (created when
+   missing, as legacy), identify and the internal flag; `/login` (Google,
+   password), `/signup`, `/reset-password-request`, `/reset-password`
+   (implicit-flow recovery link); menu and header by role (login link,
+   user name); `requireRole` guard; sign-out ends the session (global, else
+   local) and forgets personal queries, keys, sessionStorage and the
+   telemetry user, here, from another tab (storage event) or when an auth
+   redirect brings another account; redirect tokens read and cleared from
+   the URL at boot (`setSession`), expired links explained; signed in
+   without a loadable profile still offers sign-out and a retry; the sign-in
+   and build recorded on `users` once per boot; lint bans supabase-js.

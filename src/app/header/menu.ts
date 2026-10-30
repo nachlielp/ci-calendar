@@ -122,8 +122,12 @@ export const MENU_ITEMS: readonly MenuItem[] = [
 /** The menu items `viewer` sees, in menu order. */
 export function menuFor(viewer: Viewer): MenuItem[] {
     return MENU_ITEMS.filter((item) => {
-        // Before the session is known, only what everyone sees.
+        // Before the session is known, only what everyone sees; signed in
+        // without a profile, that and sign-out.
         if (viewer.role === "unknown") return item.roles === EVERYONE
+        if (viewer.role === "unavailable") {
+            return item.roles === EVERYONE || item.key === "logout"
+        }
         if (!item.roles.includes(viewer.role)) return false
         return (
             !item.emailOnly ||

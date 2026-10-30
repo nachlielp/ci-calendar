@@ -417,7 +417,7 @@ describe("shared event links", () => {
         ).toBeVisible()
     })
 
-    it.each(["/login", "/abuot", "/event/no-such-event"])(
+    it.each(["/signin", "/abuot", "/event/no-such-event"])(
         "renders the 404 page for %s at once, asking the backend nothing about it",
         async (path) => {
             const fake = backend()
@@ -435,7 +435,7 @@ describe("shared event links", () => {
             configurable: true,
             value: false,
         })
-        renderApp({ fake: backend(), path: "/signup", now: NOW })
+        renderApp({ fake: backend(), path: "/register", now: NOW })
 
         expect(
             await screen.findByRole("heading", { name: "הדף לא נמצא" }),
