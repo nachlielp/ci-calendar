@@ -1,6 +1,7 @@
 import type { ComponentType } from "react"
 import type { RouteObject } from "react-router"
 import CalendarPage from "../features/calendar/CalendarPage"
+import { PROFILE_ROLES, requireRole, SIGNED_IN_ROLES } from "./auth/guard"
 import type { RouteHandle } from "./routeHandle"
 import { CALENDAR_ROUTE_ID, RootLayout, RouteError } from "./RootLayout"
 
@@ -15,6 +16,8 @@ const lazyPage =
     (load: () => Promise<{ default: ComponentType }>) => async () => ({
         Component: (await load()).default,
     })
+
+const requestsPage = lazyPage(() => import("../features/requests/RequestsPage"))
 
 // The public calendar is the only eager route; every other page is a lazy
 // chunk so it never weighs on the calendar's first paint.
@@ -81,6 +84,18 @@ export const routes: RouteObject[] = [
             },
             // Pages for signed-in roles go inside `requireRole(roles, [...])`
             // (app/auth/guard.ts), legacy's PrivateRoutes groups.
+            requireRole(SIGNED_IN_ROLES, [
+                {
+                    // `/request/:requestId` opens one request in the list
+                    // (one route, so opening another keeps the page).
+                    path: "request/:requestId?",
+                    lazy: requestsPage,
+                },
+            ]),
+            requireRole(PROFILE_ROLES, [
+                // The same page under the bio (legacy's routes).
+                { path: "bio/request/:requestId?", lazy: requestsPage },
+            ]),
             {
                 path: "*",
                 lazy: lazyPage(() => import("../pages/NotFoundPage")),

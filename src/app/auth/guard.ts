@@ -1,7 +1,6 @@
 import { createElement } from "react"
 import type { RouteObject } from "react-router"
 import type { SignedInRole } from "../viewer"
-import { RequireRole } from "./RequireRole"
 
 /**
  * A pathless route that guards `children` (route objects, usually lazy
@@ -17,7 +16,15 @@ export function requireRole(
     roles: readonly SignedInRole[],
     children: RouteObject[],
 ): RouteObject {
-    return { element: createElement(RequireRole, { roles }), children }
+    return {
+        // Its own chunk, fetched with the page it guards (React Router
+        // loads a match's lazy routes in parallel), so `/` never carries it.
+        lazy: async () => {
+            const { RequireRole } = await import("./RequireRole")
+            return { element: createElement(RequireRole, { roles }) }
+        },
+        children,
+    }
 }
 
 /** Legacy's role groups for its guarded routes. */

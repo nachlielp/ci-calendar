@@ -164,7 +164,9 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       `ADMIN_ROLES`). While the viewer is unknown it shows loading,
       unavailable an error with a retry; signed out → `/login`, wrong role → `/` (both replacing the entry; legacy
       kept no return path and login always lands on `/`). RLS stays the
-      real gate; the guard is UX.
+      real gate; the guard is UX. The guard is a lazy route
+      (`RequireRole`'s own chunk, fetched in parallel with the page it
+      guards), so it adds nothing to `/`.
     - **Sign-out**: `viewer.signOut()` (the menu) goes to `/`, then
       `auth.signOut()`: Supabase's `global` scope as legacy, falling back to
       `local`; the local session and auth-js's keys always go, offline too.
@@ -315,8 +317,34 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed).
   `.visually-hidden` (`index.css`) hides text from sight, not from screen
   readers.
+- **Personal pages.** A signed-in page's own data is one query per kind
+  (e.g. `myRequestsQuery`, `features/requests/myRequests.ts`) keyed
+  `[kind, userId, …]` with the id from `useUserId()`
+  (`app/auth/personal.ts`), `enabled: !!userId`, and
+  `...PERSONAL_FRESHNESS` (fetched on every mount of its page, and when
+  the app comes back after 5 minutes). Its `queryFn` and every save start
+  with `await sessionOf(services, userId)` (waits for a good token; fails
+  if the user changed), filter by the user explicitly
+  (`.eq("user_id", userId)`: admins' RLS lets them read everyone's rows),
+  and select only the columns the page shows (a `*_COLUMNS` constant). It
+  is personal by default (not in `PUBLIC_QUERY_KINDS`), so sign-out
+  forgets it, and never persisted; writes put the stored row in it only
+  if it is cached (`setQueryData(key, (old) => old && …)`), never
+  re-creating it. The page shows loading, then the data, or an error with
+  a retry.
+    - **Writes that must not race an admin** go only to the row still in
+      the state the user saw: the user's own open request is updated with
+      `.eq("id", id).eq("user_id", userId).not("closed", "is", true)` and
+      `maybeSingle()`; no row back means an admin closed it meanwhile, so
+      the list is refetched and the page says so. The client never sends
+      columns the user doesn't own (`status`, admins' `responses`), except
+      legacy's cancellation note, appended to responses read fresh under
+      the same condition. RLS lets an owner write every column of their
+      row, so column-level protection (and an atomic append) would need an
+      RPC: a future migration, not written yet.
 - **Forms.** Every form is built on `useForm` (`app/useForm.ts`, over
-  the pure reducer in `lib/form.ts`; both tested directly):
+  the pure reducer in `lib/form.ts`; both tested directly); see
+  `features/requests/RequestForm.tsx`:
     - **State**: `useForm({ saved, validate, unordered })`. `saved` is the
       server's values mapped to form values, memoised on the query data
       (a constant of empty values for a new record). It gives controlled
@@ -574,7 +602,12 @@ feature helpers is tested directly.
 - **Embedded resources:** the fake joins embeds through the foreign keys in
   its `RELATIONS` map and applies dotted filters to the embedded rows, as
   PostgREST does; add a relation there when a query embeds a new one. It also
-  supports `neq`, `single()` and `maybeSingle()`. `renderApp` returns the
+  supports `neq`, `is` / `not(column, "is", value)` (SQL's `IS`, so
+  `closed IS NOT TRUE` matches `null`), `single()` and `maybeSingle()`.
+  An insert returns the row as stored, with the sequence columns in
+  `SERIAL_COLUMNS` filled (`requests.number`; send ids from the client,
+  `crypto.randomUUID()`); an update returns the rows its filters matched
+  before it changed them, as `RETURNING` does. `renderApp` returns the
   `router`, to assert the URL.
 - **Dialogs:** jsdom lacks `showModal()`/`close()` and Escape-to-close;
   `src/test/setup.ts` stands in for them, so `userEvent.keyboard("{Escape}")`
@@ -703,3 +736,19 @@ feature helpers is tested directly.
     settings (legacy's `/filters-and-notifications`, story 36) were dropped
     as unused: legacy took the page out of production and the WhatsApp
     sender isn't running.
+11. My requests: `/request` (signed-in roles) and `/bio/request` (profile
+    roles), each with an optional `:requestId` in one route (so opening
+    another request keeps the page), lazy; legacy SupportPage: the user's
+    role and a role-request form (`RequestForm`, the first form on
+    `useForm`) offering creator/org minus their own role (legacy's Israeli
+    phone rule, required message; not while a request is open, legacy's
+    guard), the open request with edit (type, phone and message only) and
+    cancel (closed, with legacy's Hebrew note), both only while it is still
+    open; plus legacy's unused RequestsList (type, status, date; a tap or
+    the URL's id opens the number, message and admins' responses). The
+    list is a personal query; creating and editing put the stored request
+    in it, and an empty `users.phone` takes the request's phone (an update
+    filtered on `phone = ''`, legacy's backfill). A request closed by an
+    admin while the user edits or cancels it is left alone, with a notice.
+    Support requests stay email only, as in legacy. `requireRole` routes
+    are lazy, so the guard is off `/`.

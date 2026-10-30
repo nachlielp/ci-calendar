@@ -39,3 +39,16 @@ export function jerusalemTimeOfDay(instant: string): string {
 export function weekday(day: string): number {
     return new Date(`${day}T00:00:00Z`).getUTCDay()
 }
+
+/**
+ * An instant's Jerusalem date as legacy printed record dates
+ * (`DD/MM/YYYY`, in every language), e.g. a request's.
+ */
+export function jerusalemDateLabel(instant: string): string {
+    const [year, month, day] = jerusalemToday(new Date(instant)).split("-")
+    return `${day}/${month}/${year}`
+}
+
+/** The same with the Jerusalem time after it (`DD/MM/YYYY HH:mm`). */
+export const jerusalemDateTimeLabel = (instant: string) =>
+    `${jerusalemDateLabel(instant)} ${jerusalemTimeOfDay(instant)}`

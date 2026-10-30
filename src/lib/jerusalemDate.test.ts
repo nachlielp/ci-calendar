@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest"
 import {
     addDays,
+    jerusalemDateLabel,
+    jerusalemDateTimeLabel,
     jerusalemTimeOfDay,
     jerusalemToday,
     weekday,
@@ -39,5 +41,16 @@ describe("weekday", () => {
     it("is the day of the week of the calendar day", () => {
         expect(weekday("2026-11-01")).toBe(0) // Sunday
         expect(weekday("2026-11-07")).toBe(6) // Saturday
+    })
+})
+
+describe("jerusalemDateLabel", () => {
+    it("prints the Jerusalem date day first, as legacy did", () => {
+        expect(jerusalemDateLabel("2026-10-30T09:00:00Z")).toBe("30/10/2026")
+        // Already the next day in Jerusalem.
+        expect(jerusalemDateLabel("2026-10-30T22:30:00Z")).toBe("31/10/2026")
+        expect(jerusalemDateTimeLabel("2026-10-30T22:30:00Z")).toBe(
+            "31/10/2026 00:30",
+        )
     })
 })

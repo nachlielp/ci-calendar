@@ -10,9 +10,11 @@ import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 // are joined through the foreign keys in RELATIONS, and dotted predicates
 // (`b.c`) filter the embedded rows as PostgREST does: a filtered-out to-one
 // embed is `null`, a to-many embed loses the rows, the parent row stays.
+// `is` and `not(column, "is", value)` are SQL's IS (`closed IS NOT TRUE`).
 // `single()` / `maybeSingle()` return one row. Every request is recorded so
 // tests can assert on what was asked of the backend, with the token it was
-// sent with. `insert(row).select().single()` adds a row. Requests to a table
+// sent with. `insert(row).select().single()` adds a row (and returns it as
+// stored, with its serial number, SERIAL_COLUMNS). Requests to a table
 // can be made to fail, or held until the test releases them (a slow
 // network). `auth` is the fake's Supabase auth (./fakeAuth.ts).
 
@@ -39,6 +41,12 @@ const RELATIONS: Record<string, Record<string, Relation>> = {
     },
 }
 
+/**
+ * Columns the database fills from a sequence on insert, as
+ * `database.types.ts` shows them optional on Insert (`requests.number`).
+ */
+const SERIAL_COLUMNS: Record<string, string> = { requests: "number" }
+
 interface Relation {
     column: string
     foreignColumn: string
@@ -47,7 +55,8 @@ interface Relation {
 }
 
 export interface RecordedFilter {
-    op: "eq" | "neq" | "gte" | "lte"
+    /** `is` / `not.is`: SQL's `IS` (`IS NOT TRUE` matches null too). */
+    op: "eq" | "neq" | "gte" | "lte" | "is" | "not.is"
     column: string
     value: unknown
 }
@@ -95,6 +104,9 @@ export interface FakeDataClient {
 function matches(row: Row, filter: RecordedFilter) {
     const value = row[filter.column]
     if (filter.op === "eq") return value === filter.value
+    const is = (value ?? null) === filter.value
+    if (filter.op === "is") return is
+    if (filter.op === "not.is") return !is
     // SQL comparisons with NULL are never true.
     if (value == null) return false
     if (filter.op === "neq") return value !== filter.value
@@ -183,6 +195,14 @@ export function createFakeDataClient(
                 addFilter("gte", column, value),
             lte: (column: string, value: unknown) =>
                 addFilter("lte", column, value),
+            is: (column: string, value: unknown) =>
+                addFilter("is", column, value),
+            not(column: string, operator: string, value: unknown) {
+                if (operator !== "is") {
+                    throw new Error(`fake: no not.${operator} filter`)
+                }
+                return addFilter("not.is", column, value)
+            },
             order(column: string, options: { ascending?: boolean } = {}) {
                 request.order = {
                     column,
@@ -279,6 +299,7 @@ export function createFakeDataClient(
 
         beforeExecute?.(request)
         const table = (seed[request.table] ??= [])
+        let inserted: Row | undefined
         if (request.method === "insert" && request.body) {
             // Every table the app inserts into has a unique `id`.
             if (table.some((row) => row.id === request.body!.id)) {
@@ -291,18 +312,32 @@ export function createFakeDataClient(
                     },
                 }
             }
-            table.push({ ...request.body })
-        }
-        if (request.method === "update") {
-            for (const row of where(request.table, "")) {
-                Object.assign(row, request.body)
+            const row = { ...request.body }
+            const serial = SERIAL_COLUMNS[request.table]
+            if (serial && row[serial] == null) {
+                row[serial] =
+                    Math.max(
+                        0,
+                        ...table.map((other) => Number(other[serial])),
+                    ) + 1
             }
+            table.push(row)
+            inserted = row
+        }
+        // An update returns the rows its filters matched before it changed
+        // them (`UPDATE … WHERE … RETURNING`).
+        let updated: Row[] | undefined
+        if (request.method === "update") {
+            updated = where(request.table, "")
+            for (const row of updated) Object.assign(row, request.body)
         }
 
         let rows =
             request.method === "insert"
-                ? [request.body ?? {}]
-                : where(request.table, "")
+                ? inserted
+                    ? [inserted]
+                    : []
+                : (updated ?? where(request.table, ""))
         if (request.order) {
             const { column, ascending } = request.order
             rows = [...rows].sort((a, b) => {
