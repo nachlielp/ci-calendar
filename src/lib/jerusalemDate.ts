@@ -52,3 +52,18 @@ export function jerusalemDateLabel(instant: string): string {
 /** The same with the Jerusalem time after it (`DD/MM/YYYY HH:mm`). */
 export const jerusalemDateTimeLabel = (instant: string) =>
     `${jerusalemDateLabel(instant)} ${jerusalemTimeOfDay(instant)}`
+
+/** A calendar day as legacy printed it (`DD/MM/YYYY`, every language). */
+export function numericDayLabel(day: string): string {
+    const [year, month, date] = day.split("-")
+    return `${date}/${month}/${year}`
+}
+
+/**
+ * A day range as legacy's manage-events list printed it: one day, or
+ * `DD/MM/YYYY - DD/MM/YYYY`.
+ */
+export const dayRangeLabel = (start: string, end: string) =>
+    start === end
+        ? numericDayLabel(start)
+        : `${numericDayLabel(start)} - ${numericDayLabel(end)}`

@@ -11,23 +11,24 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 
 ## Layout
 
-| Folder              | Holds                                                         |
-| ------------------- | ------------------------------------------------------------- |
-| `src/app/`          | Bootstrap, services (the seam), routes, shell layout          |
-| `src/app/auth`      | Session at boot, profile row, sign-out cleanup, role guard    |
-| `src/app/header`    | App header, menu (items keyed by role), WhatsApp link         |
-| `src/app/install`   | Install banner, `beforeinstallprompt` capture, iOS steps      |
-| `src/app/updates`   | Service worker registration, safe reloads, the reload guard   |
-| `src/app/telemetry` | Crash reports, analytics, Speed Insights; their lazy SDKs     |
-| `src/sw/`           | The service worker (`sw.ts`) and its cache rules              |
-| `src/data/`         | Backend client construction and generated database types      |
-| `src/features/*`    | One folder per feature: its pages, components, queries, tests |
-| `src/lib/`          | Pure helpers (dates, formatting); tested directly             |
-| `src/ui/`           | Shared presentational primitives (dialog, buttons, icons)     |
-| `src/ui/form`       | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
-| `src/pages/`        | Simple pages (about, legal, 404) that belong to no feature    |
-| `src/test/`         | The fake backend and `renderApp`                              |
-| `src/assets/`       | Images, logos and the subset font ported from legacy          |
+| Folder                | Holds                                                         |
+| --------------------- | ------------------------------------------------------------- |
+| `src/app/`            | Bootstrap, services (the seam), routes, shell layout          |
+| `src/app/auth`        | Session at boot, profile row, sign-out cleanup, role guard    |
+| `src/app/header`      | App header, menu (items keyed by role), WhatsApp link         |
+| `src/app/install`     | Install banner, `beforeinstallprompt` capture, iOS steps      |
+| `src/app/updates`     | Service worker registration, safe reloads, the reload guard   |
+| `src/app/telemetry`   | Crash reports, analytics, Speed Insights; their lazy SDKs     |
+| `src/sw/`             | The service worker (`sw.ts`) and its cache rules              |
+| `src/data/`           | Backend client construction and generated database types      |
+| `src/features/*`      | One folder per feature: its pages, components, queries, tests |
+| `src/features/events` | Managed events and the shared event cache updates (below)     |
+| `src/lib/`            | Pure helpers (dates, formatting); tested directly             |
+| `src/ui/`             | Shared presentational primitives (dialog, buttons, icons)     |
+| `src/ui/form`         | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
+| `src/pages/`          | Simple pages (about, legal, 404) that belong to no feature    |
+| `src/test/`           | The fake backend and `renderApp`                              |
+| `src/assets/`         | Images, logos and the subset font ported from legacy          |
 
 ## Rules
 
@@ -61,7 +62,10 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   `new Date()` in features, so tests control the clock. Don't put today's
   date in a query key: a query fetched yesterday (or restored from storage)
   must stay the same query. Compute the date range inside `queryFn` and drop
-  passed days in `select` (see `publicWindow.ts`).
+  passed days in `select` (see `publicWindow.ts`), with the day from
+  `useToday()` (`app/useToday.ts`: re-read when the page comes back and
+  every minute) passed to the options factory and in their `useMemo` deps,
+  so `select` runs again after midnight without a request.
 - **One build version.** `BUILD_VERSION` (`src/app/buildVersion.ts`) is
   read from `<meta name="build-version">`, which `buildVersionMeta` in
   `vite.config.ts` writes into `index.html`: the commit SHA for builds
@@ -314,7 +318,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   `legacy/src/assets/svgs`), so an icon used only by a lazy page stays out
   of `/`'s initial JS; add a new one as its own file the same way, never
   load SVG files at runtime. `ToggleButtons`
-  (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed).
+  (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed;
+  an option without an `Icon` shows its label as text).
   `.visually-hidden` (`index.css`) hides text from sight, not from screen
   readers.
 - **Personal pages.** A signed-in page's own data is one query per kind
@@ -342,6 +347,64 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       the same condition. RLS lets an owner write every column of their
       row, so column-level protection (and an atomic append) would need an
       RPC: a future migration, not written yet.
+- **Event writes and the cache.** For create/edit forms (slices 13–15)
+  and admin (manage-all-events), not only manage-events:
+    - **Reads and responses** select `MANAGED_EVENT_COLUMNS` (built from
+      the public `EVENT_COLUMNS` and `EVENT_BIO_COLUMNS`) and map rows with
+      `toManagedEvent` (`features/events/managedEvent.ts`): a `PublicEvent`
+      plus `hidden`, `ownerId` (`user_id`, ownership as RLS has it),
+      `multiDay` (`is_multi_day`; `editPath` picks the edit route) and
+      `recurringRefKey`. Bios carry their own `show_profile`/`user_type`
+      and non-public ones are dropped in the mapping as the public query's
+      filters would (a null `user_type` too), not by embedded filters, so
+      writes can return the same columns.
+    - **After every event write**, call
+      `applyEventChanges(queryClient, services.now(), { saved })` (the
+      returned rows, mapped) or `{ deleted: ids }`
+      (`features/events/eventCache.ts`). It updates every cached query of
+      every event list from the response, with no refetch, never creates a
+      query, leaves a query's data object alone when the change doesn't
+      concern it, and keeps fetch times (a write doesn't delay a
+      revalidation). A query whose refetch is in flight is fetched anew
+      right after (`query.fetch` with `cancelRefetch`), so an answer sent
+      before the write can't bring a deleted or hidden event back, nor
+      persist it. Built in: the public window (visible events dated from
+      today within the range it was fetched for, `PublicWindow.from/to`;
+      only the public part, `toPublicOnly`, since it is persisted) and
+      shared-link lookups (the event, or `null` once hidden or deleted).
+    - **Every other list of events registers itself** with
+      `registerEventList({ kind, apply })` in the module that defines its
+      query (so it is registered before any of its queries can be cached),
+      `apply(data, change, queryKey)` returning the updated data or the
+      same object. `mergeIntoList` (one list) and `mergeIntoPages`
+      (keyset-paginated, `EventPage`) do the work given which saved events
+      belong and the list's order; see the `my-events` list in
+      `features/manage-events/myEvents.ts`. `features/events` never imports
+      a feature's list. Admin's manage-all-events registers its own.
+    - **Hide, cancel and delete** are `useSetHidden`, `useSetCancelled`
+      and `useDeleteEvents` (`features/events/eventWrites.ts`): one
+      conditional write each. Hide and cancel only touch events still in
+      the state the user saw (`.eq("hide", !hide)`, `cancelled IS NOT
+TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
+      default only the user's own (`.eq("user_id", userId)`; RLS lets
+      admins write anyone's, so the client says which it means); admin
+      pages pass `{ ownOnly: false }`. If fewer events come back than were
+      asked for, `refreshEventQueries` invalidates every event list (the
+      window and links too): those on screen refetch, the rest when shown.
+- **Pagination.** Long personal or admin lists load a page at a time with
+  `infiniteQueryOptions` and keyset pagination, never offsets (a delete
+  would shift them): order by a unique key (`start_date`, then `id`), ask
+  for one row more than the page (`limit(PAGE + 1)`) to know whether
+  another follows, and pass the last row as the cursor, filtered with
+  PostgREST's logic tree (`afterCursor`:
+  `start_date.lt.D,and(start_date.eq.D,id.lt.I)`). A page is an
+  `EventPage` (`{ events, next: cursor | null }`); `getNextPageParam`
+  returns `next`. TanStack refetches an infinite query page by page, so
+  don't let focus, reconnect or remounts refetch one: the past events
+  query is fetched when first asked for in a page visit, kept (writes
+  update it) with `staleTime: Infinity` and no refetch triggers, and
+  removed when the page unmounts, so the next visit starts from page one.
+  See `myEvents.ts`.
 - **Forms.** Every form is built on `useForm` (`app/useForm.ts`, over
   the pure reducer in `lib/form.ts`; both tested directly); see
   `features/requests/RequestForm.tsx`:
@@ -602,8 +665,12 @@ feature helpers is tested directly.
 - **Embedded resources:** the fake joins embeds through the foreign keys in
   its `RELATIONS` map and applies dotted filters to the embedded rows, as
   PostgREST does; add a relation there when a query embeds a new one. It also
-  supports `neq`, `is` / `not(column, "is", value)` (SQL's `IS`, so
-  `closed IS NOT TRUE` matches `null`), `single()` and `maybeSingle()`.
+  supports `neq`, `lt`, `gt`, `in`, `is` / `not(column, "is", value)`
+  (SQL's `IS`, so `closed IS NOT TRUE` matches `null`), `or()` with
+  PostgREST's logic tree (`a.lt.1,and(a.eq.1,b.lt.2)`), several `order()`s,
+  `limit`, `range`, `single()` and `maybeSingle()`; a recorded request's
+  `order` is the list of them, `limit` and `range` as set. `delete()`
+  removes the filtered rows and returns them.
   An insert returns the row as stored, with the sequence columns in
   `SERIAL_COLUMNS` filled (`requests.number`; send ids from the client,
   `crypto.randomUUID()`); an update returns the rows its filters matched
@@ -636,6 +703,9 @@ feature helpers is tested directly.
   `fake.rows(table)` seeds or reads a table live.
 - **Slow network:** `fake.holdTable(table)` holds requests until
   `fake.releaseTable(table)`; `failTable`/`healTable` make them fail.
+  `fake.answerLate(match)` answers the next matching request with the data
+  as it is when sent, delivered when the returned function is called (a
+  response from before a write that lands after it).
 - **Updates:** `renderApp({ updates: sw.updates })` with
   `sw = createFakeUpdates()` (`src/test/fakeUpdates.ts`); `sw.announce()`
   reports a new version, `sw.activations` counts handovers, and `reloads`
@@ -752,3 +822,20 @@ feature helpers is tested directly.
     admin while the user edits or cancels it is left alone, with a notice.
     Support requests stay email only, as in legacy. `requireRole` routes
     are lazy, so the guard is off `/`.
+12. Manage my events: `/manage-events` (creators, orgs, admins; lazy,
+    guarded), legacy ManageUserEventsPage: the user's own (`user_id`)
+    upcoming events, hidden ones included, fetched when the page opens;
+    past ones only on "עבר", newest first, 20 per page with "load more"
+    (keyset). Rows show title, days, hidden and cancelled; open, the event's
+    details (`EventDetails`, inline as legacy) and, for upcoming events,
+    legacy's actions: edit (links to the slice 13/14 routes), delete, cancel
+    with a note (80 characters) or restore, hide or show; delete and hide
+    offer the later events of a recurring series (from the user's upcoming
+    events). Writes are owner- and state-conditional, and their responses
+    update the calendar window (persisted), shared links and the lists
+    through `applyEventChanges`, the module every later event write reuses
+    (lists register themselves; refetches in flight are redone). The
+    window now stores the range it was fetched for (persisted shape 3), and
+    `useToday` lets `select` drop passed days after midnight. The fake
+    gained `lt`/`gt`/`in`/`or`/`limit`/`range`/`delete`, multiple orders
+    and `answerLate` (an answer computed when sent, delivered later).

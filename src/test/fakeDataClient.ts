@@ -3,7 +3,8 @@ import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 
 // The single test seam: a fake of the data client that behaves like a tiny
 // PostgREST. Seeded rows live per table; each query applies the predicates it
-// was built with (eq / neq / gte / lte / order) and returns only the selected
+// was built with (eq / neq / lt / lte / gt / gte / in / or, then order,
+// limit and range) and returns only the selected
 // columns, so tests prove behaviour end to end — e.g. hidden rows seeded here
 // never come back out of the public query, and a page reading a column its
 // query didn't select sees `undefined`. Embedded resources (`a, b(c, d)`)
@@ -11,7 +12,10 @@ import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 // (`b.c`) filter the embedded rows as PostgREST does: a filtered-out to-one
 // embed is `null`, a to-many embed loses the rows, the parent row stays.
 // `is` and `not(column, "is", value)` are SQL's IS (`closed IS NOT TRUE`).
-// `single()` / `maybeSingle()` return one row. Every request is recorded so
+// `or("a.lt.1,and(a.eq.1,b.lt.2)")` takes PostgREST's logic-tree syntax
+// (for keyset pagination). `single()` / `maybeSingle()` return one row.
+// `delete()` removes the filtered rows and returns them. Every request is
+// recorded so
 // tests can assert on what was asked of the backend, with the token it was
 // sent with. `insert(row).select().single()` adds a row (and returns it as
 // stored, with its serial number, SERIAL_COLUMNS). Requests to a table
@@ -55,8 +59,22 @@ interface Relation {
 }
 
 export interface RecordedFilter {
-    /** `is` / `not.is`: SQL's `IS` (`IS NOT TRUE` matches null too). */
-    op: "eq" | "neq" | "gte" | "lte" | "is" | "not.is"
+    /**
+     * `is` / `not.is`: SQL's `IS` (`IS NOT TRUE` matches null too). `or`:
+     * `value` is PostgREST's logic tree (`a.lt.1,and(a.eq.1,b.lt.2)`), and
+     * `column` is empty.
+     */
+    op:
+        | "eq"
+        | "neq"
+        | "lt"
+        | "lte"
+        | "gt"
+        | "gte"
+        | "in"
+        | "is"
+        | "not.is"
+        | "or"
     column: string
     value: unknown
 }
@@ -64,7 +82,7 @@ export interface RecordedFilter {
 export interface RecordedRequest {
     table: string
     /** `select` unless the request writes. */
-    method: "select" | "insert" | "update"
+    method: "select" | "insert" | "update" | "delete"
     /** The row an insert sent, or the values an update set. */
     body?: Row
     /**
@@ -74,7 +92,12 @@ export interface RecordedRequest {
     token: string | null
     select: string
     filters: RecordedFilter[]
-    order: { column: string; ascending: boolean } | null
+    /** Each `order()` in turn: later ones break the earlier ones' ties. */
+    order: { column: string; ascending: boolean }[]
+    /** Set by `limit(count)`. */
+    limit: number | null
+    /** Set by `range(from, to)` (both inclusive, as PostgREST's). */
+    range: { from: number; to: number } | null
     /** Set by `single()` / `maybeSingle()`. */
     returns: "rows" | "single" | "maybeSingle"
 }
@@ -95,24 +118,77 @@ export interface FakeDataClient {
     failTable(table: string, message: string): void
     /** Let requests to `table` succeed again. */
     healTable(table: string): void
+    /**
+     * The next request `match` accepts is answered with the data as it is
+     * when sent, but the answer arrives only when the returned function is
+     * called: a response computed before a write that lands after it.
+     */
+    answerLate(match: (request: RecordedRequest) => boolean): () => void
     /** Hold every following request to `table` until `releaseTable`. */
     holdTable(table: string): void
     /** Answer the held requests to `table`, and stop holding new ones. */
     releaseTable(table: string): void
 }
 
-function matches(row: Row, filter: RecordedFilter) {
+function matches(row: Row, filter: RecordedFilter): boolean {
+    if (filter.op === "or") return matchesTree(row, String(filter.value), "or")
     const value = row[filter.column]
     if (filter.op === "eq") return value === filter.value
+    if (filter.op === "in") {
+        return (filter.value as unknown[]).includes(value)
+    }
     const is = (value ?? null) === filter.value
     if (filter.op === "is") return is
     if (filter.op === "not.is") return !is
     // SQL comparisons with NULL are never true.
     if (value == null) return false
     if (filter.op === "neq") return value !== filter.value
-    return filter.op === "gte"
-        ? String(value) >= String(filter.value)
-        : String(value) <= String(filter.value)
+    const [a, b] = [String(value), String(filter.value)]
+    if (filter.op === "lt") return a < b
+    if (filter.op === "lte") return a <= b
+    if (filter.op === "gt") return a > b
+    return a >= b
+}
+
+/** Splits `a,b(c,d),e` at its top-level commas. */
+function splitTopLevel(text: string): string[] {
+    const parts: string[] = []
+    let depth = 0
+    let current = ""
+    for (const char of text) {
+        if (char === "(") depth++
+        if (char === ")") depth--
+        if (char === "," && depth === 0) {
+            parts.push(current)
+            current = ""
+        } else current += char
+    }
+    parts.push(current)
+    return parts
+}
+
+/**
+ * PostgREST's logic tree (`or=(…)`): conditions `column.op.value` (eq,
+ * neq, lt, lte, gt, gte; values compared as text, as above) and nested
+ * `and(…)` / `or(…)`.
+ */
+function matchesTree(row: Row, tree: string, logic: "and" | "or"): boolean {
+    const results = splitTopLevel(tree).map((term) => {
+        const nested = /^(and|or)\((.*)\)$/.exec(term)
+        if (nested) {
+            return matchesTree(row, nested[2], nested[1] as "and" | "or")
+        }
+        const [column, op, ...rest] = term.split(".")
+        if (!["eq", "neq", "lt", "lte", "gt", "gte"].includes(op)) {
+            throw new Error(`fake: no ${op} in or()`)
+        }
+        return matches(row, {
+            op: op as RecordedFilter["op"],
+            column,
+            value: rest.join("."),
+        })
+    })
+    return logic === "and" ? results.every(Boolean) : results.some(Boolean)
 }
 
 /** A selected column (`children === null`) or embedded table. */
@@ -158,6 +234,10 @@ export function createFakeDataClient(
     const requests: RecordedRequest[] = []
     const failures = new Map<string, string>()
     const held = new Map<string, (() => void)[]>()
+    const lateAnswers: {
+        match: (request: RecordedRequest) => boolean
+        delivered: Promise<void>
+    }[] = []
     let beforeExecute: ((request: RecordedRequest) => void) | undefined
 
     function from(table: string) {
@@ -167,7 +247,9 @@ export function createFakeDataClient(
             token: null,
             select: "*",
             filters: [],
-            order: null,
+            order: [],
+            limit: null,
+            range: null,
             returns: "rows",
         }
         requests.push(request)
@@ -187,14 +269,25 @@ export function createFakeDataClient(
                 request.body = values
                 return builder
             },
+            delete() {
+                request.method = "delete"
+                return builder
+            },
             eq: (column: string, value: unknown) =>
                 addFilter("eq", column, value),
             neq: (column: string, value: unknown) =>
                 addFilter("neq", column, value),
-            gte: (column: string, value: unknown) =>
-                addFilter("gte", column, value),
+            lt: (column: string, value: unknown) =>
+                addFilter("lt", column, value),
             lte: (column: string, value: unknown) =>
                 addFilter("lte", column, value),
+            gt: (column: string, value: unknown) =>
+                addFilter("gt", column, value),
+            gte: (column: string, value: unknown) =>
+                addFilter("gte", column, value),
+            in: (column: string, values: unknown[]) =>
+                addFilter("in", column, [...values]),
+            or: (tree: string) => addFilter("or", "", tree),
             is: (column: string, value: unknown) =>
                 addFilter("is", column, value),
             not(column: string, operator: string, value: unknown) {
@@ -204,10 +297,18 @@ export function createFakeDataClient(
                 return addFilter("not.is", column, value)
             },
             order(column: string, options: { ascending?: boolean } = {}) {
-                request.order = {
+                request.order.push({
                     column,
                     ascending: options.ascending ?? true,
-                }
+                })
+                return builder
+            },
+            limit(count: number) {
+                request.limit = count
+                return builder
+            },
+            range(from: number, to: number) {
+                request.range = { from, to }
                 return builder
             },
             single() {
@@ -228,6 +329,15 @@ export function createFakeDataClient(
                 // The token goes out with the request, as the real client's
                 // fetch reads it.
                 request.token = auth.accessToken()
+                const late = lateAnswers.findIndex(({ match }) =>
+                    match(request),
+                )
+                if (late !== -1) {
+                    // Answered as of now, delivered when released.
+                    const [{ delivered }] = lateAnswers.splice(late, 1)
+                    const result = execute(request)
+                    return delivered.then(() => result).then(resolve, reject)
+                }
                 const waiting = held.get(table)
                 const answered = waiting
                     ? new Promise<void>((answer) => waiting.push(answer))
@@ -331,22 +441,34 @@ export function createFakeDataClient(
             updated = where(request.table, "")
             for (const row of updated) Object.assign(row, request.body)
         }
+        // A delete returns the rows it removed (`DELETE … RETURNING`).
+        let deleted: Row[] | undefined
+        if (request.method === "delete") {
+            deleted = where(request.table, "")
+            for (const row of deleted) table.splice(table.indexOf(row), 1)
+        }
 
         let rows =
             request.method === "insert"
                 ? inserted
                     ? [inserted]
                     : []
-                : (updated ?? where(request.table, ""))
-        if (request.order) {
-            const { column, ascending } = request.order
+                : (updated ?? deleted ?? where(request.table, ""))
+        if (request.order.length > 0) {
             rows = [...rows].sort((a, b) => {
-                const result = String(a[column]).localeCompare(
-                    String(b[column]),
-                )
-                return ascending ? result : -result
+                for (const { column, ascending } of request.order) {
+                    const result = String(a[column]).localeCompare(
+                        String(b[column]),
+                    )
+                    if (result !== 0) return ascending ? result : -result
+                }
+                return 0
             })
         }
+        if (request.range) {
+            rows = rows.slice(request.range.from, request.range.to + 1)
+        }
+        if (request.limit !== null) rows = rows.slice(0, request.limit)
         const fields = parseSelect(request.select)
         const data = rows.map((row) => project(request.table, row, fields, ""))
         if (request.returns === "rows") return { data, error: null }
@@ -375,6 +497,14 @@ export function createFakeDataClient(
         },
         healTable: (table) => {
             failures.delete(table)
+        },
+        answerLate: (match) => {
+            let deliver!: () => void
+            const delivered = new Promise<void>((resolve) => {
+                deliver = resolve
+            })
+            lateAnswers.push({ match, delivered })
+            return deliver
         },
         holdTable: (table) => {
             held.set(table, held.get(table) ?? [])

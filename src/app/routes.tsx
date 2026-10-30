@@ -1,7 +1,12 @@
 import type { ComponentType } from "react"
 import type { RouteObject } from "react-router"
 import CalendarPage from "../features/calendar/CalendarPage"
-import { PROFILE_ROLES, requireRole, SIGNED_IN_ROLES } from "./auth/guard"
+import {
+    CREATOR_ROLES,
+    PROFILE_ROLES,
+    requireRole,
+    SIGNED_IN_ROLES,
+} from "./auth/guard"
 import type { RouteHandle } from "./routeHandle"
 import { CALENDAR_ROUTE_ID, RootLayout, RouteError } from "./RootLayout"
 
@@ -95,6 +100,15 @@ export const routes: RouteObject[] = [
             requireRole(PROFILE_ROLES, [
                 // The same page under the bio (legacy's routes).
                 { path: "bio/request/:requestId?", lazy: requestsPage },
+            ]),
+            requireRole(CREATOR_ROLES, [
+                {
+                    path: "manage-events",
+                    lazy: lazyPage(
+                        () =>
+                            import("../features/manage-events/ManageEventsPage"),
+                    ),
+                },
             ]),
             {
                 path: "*",

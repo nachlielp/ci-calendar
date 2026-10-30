@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest"
 import {
     addDays,
+    dayRangeLabel,
     jerusalemDateLabel,
     jerusalemDateTimeLabel,
+    numericDayLabel,
     jerusalemTimeOfDay,
     jerusalemToday,
     weekday,
@@ -51,6 +53,16 @@ describe("jerusalemDateLabel", () => {
         expect(jerusalemDateLabel("2026-10-30T22:30:00Z")).toBe("31/10/2026")
         expect(jerusalemDateTimeLabel("2026-10-30T22:30:00Z")).toBe(
             "31/10/2026 00:30",
+        )
+    })
+})
+
+describe("numeric day labels", () => {
+    it("print days and ranges as legacy's manage-events list did", () => {
+        expect(numericDayLabel("2026-11-01")).toBe("01/11/2026")
+        expect(dayRangeLabel("2026-11-01", "2026-11-01")).toBe("01/11/2026")
+        expect(dayRangeLabel("2026-11-01", "2026-11-03")).toBe(
+            "01/11/2026 - 03/11/2026",
         )
     })
 })

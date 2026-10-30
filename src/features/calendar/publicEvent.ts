@@ -59,12 +59,24 @@ export interface PublicEvent {
     bios: PublicBio[]
 }
 
+/** The event's own columns the list and the details render. */
+export const EVENT_COLUMNS =
+    "id, short_id, title, lng_titles, start_date, end_date, cancelled, cancelled_text, type, district, segments, multi_day_teachers, organisations, address, links, price, description"
+
+/**
+ * The bio columns a public event shows; `features/events/managedEvent.ts`
+ * builds its columns from these too, so an event read for its owner maps
+ * to the same `PublicEvent`.
+ */
+export const EVENT_BIO_COLUMNS =
+    "user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2"
+
 // Every column the list and the details render — the first-paint payload
 // (~6.5 KB gzipped for 90 days in production, bios and title translations
 // included). Bios come through the `ci_events_users_junction` → `public_bio`
 // foreign keys.
 export const PUBLIC_EVENT_COLUMNS =
-    "id, short_id, title, lng_titles, start_date, end_date, cancelled, cancelled_text, type, district, segments, multi_day_teachers, organisations, address, links, price, description, ci_events_users_junction(public_bio(user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2))"
+    `${EVENT_COLUMNS}, ci_events_users_junction(public_bio(${EVENT_BIO_COLUMNS}))` as const
 
 const BIO = "ci_events_users_junction.public_bio"
 

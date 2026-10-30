@@ -15,6 +15,9 @@
         background: none;
         color: #000;
         border: 1px solid #000;
+        // Text buttons (legacy's titled MenuButtons).
+        font-size: 16px;
+        line-height: 21px;
         cursor: pointer;
 
         &:first-child {

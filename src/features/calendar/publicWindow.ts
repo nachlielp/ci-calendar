@@ -26,12 +26,24 @@ export const STALE_MS = 5 * 60 * 1000
 export const PUBLIC_WINDOW_KIND = "public-window"
 
 /**
- * The shape of `PublicEvent[]` for the persisted cache (app/persistedCache.ts):
- * stored data with another shape is never restored. Changing the columns
- * changes it; bump the number when the mapping to `PublicEvent` changes
- * without a column change.
+ * The window as cached: its events and the days it was fetched for, so an
+ * event saved later goes in only if the fetch covered its day
+ * (`applyEventChanges`), whenever that happens.
  */
-export const PUBLIC_WINDOW_SHAPE = `2|${PUBLIC_EVENT_COLUMNS}`
+export interface PublicWindow {
+    /** First and last day fetched, `YYYY-MM-DD`. */
+    from: string
+    to: string
+    events: PublicEvent[]
+}
+
+/**
+ * The shape of `PublicWindow` for the persisted cache (app/persistedCache.ts):
+ * stored data with another shape is never restored. Changing the columns
+ * changes it; bump the number when the mapping changes without a column
+ * change (3: the fetched range stored with the events).
+ */
+export const PUBLIC_WINDOW_SHAPE = `3|${PUBLIC_EVENT_COLUMNS}`
 
 /**
  * The public calendar window: visible events from today (Jerusalem) up to
@@ -40,18 +52,20 @@ export const PUBLIC_WINDOW_SHAPE = `2|${PUBLIC_EVENT_COLUMNS}`
  *
  * The cached data may hold days that have since passed (a window fetched
  * before midnight, or restored from storage), so `select` drops events dated
- * before today on every read.
+ * before `today`. Pass the day from `useToday()` and memoise the options on
+ * it, so `select` runs again when the day changes.
  */
-export function publicWindowQuery({ data, now }: AppServices) {
+export function publicWindowQuery(
+    { data, now }: AppServices,
+    today: string = jerusalemToday(now()),
+) {
     return queryOptions({
         queryKey: [PUBLIC_WINDOW_KIND],
         staleTime: STALE_MS,
         refetchOnReconnect: "always",
-        select: (events) => {
-            const today = jerusalemToday(now())
-            return events.filter((event) => event.startDate >= today)
-        },
-        queryFn: async (): Promise<PublicEvent[]> => {
+        select: (window: PublicWindow) =>
+            window.events.filter((event) => event.startDate >= today),
+        queryFn: async (): Promise<PublicWindow> => {
             const from = jerusalemToday(now())
             const to = addDays(from, WINDOW_DAYS)
             const { data: rows, error } = await selectPublicEvents(data)
@@ -62,9 +76,10 @@ export function publicWindowQuery({ data, now }: AppServices) {
 
             // `start_date` is nullable in the schema, but the range filter
             // above already excludes nulls.
-            return rows.flatMap(({ start_date, ...row }) =>
+            const events = rows.flatMap(({ start_date, ...row }) =>
                 start_date ? [toPublicEvent({ ...row, start_date })] : [],
             )
+            return { from, to, events }
         },
     })
 }

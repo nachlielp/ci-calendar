@@ -127,7 +127,7 @@ describe("my requests (/request)", () => {
         expect(reads[0]).toMatchObject({
             select: REQUEST_COLUMNS.replace(/\s+/g, ""),
             filters: [{ op: "eq", column: "user_id", value: user.id }],
-            order: { column: "created_at", ascending: false },
+            order: [{ column: "created_at", ascending: false }],
             token: fake.auth.accessToken(),
         })
         expect(screen.queryByText(/של מישהו אחר/)).not.toBeInTheDocument()

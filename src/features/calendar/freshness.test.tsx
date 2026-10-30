@@ -279,4 +279,24 @@ describe("freshness", () => {
         expect(fake.requests).toHaveLength(2)
         expect(screen.queryByText(/אין חיבור לאינטרנט/)).not.toBeInTheDocument()
     })
+
+    it("drops today's events once midnight passes, without a request", async () => {
+        const clock = new Date(NOW)
+        const fake = createFakeDataClient({
+            ci_events: [
+                event({ title: "היום", start_date: "2026-10-30" }),
+                event({ title: "מחר", start_date: "2026-10-31" }),
+            ],
+        })
+        renderApp({ fake, now: clock })
+        expect(await eventTitles()).toEqual(["היום", "מחר"])
+        const requests = fake.requests.length
+
+        setPageVisibility("hidden")
+        clock.setTime(new Date("2026-10-31T09:00:00Z").getTime())
+        setPageVisibility("visible")
+
+        expect(await eventTitles()).toEqual(["מחר"])
+        expect(fake.requests).toHaveLength(requests)
+    })
 })

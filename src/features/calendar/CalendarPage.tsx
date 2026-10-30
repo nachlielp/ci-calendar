@@ -5,6 +5,7 @@ import { useCopy } from "../../app/language"
 import { PageFooter } from "../../app/PageFooter"
 import { useServices } from "../../app/services"
 import { useIsOnline } from "../../app/useIsOnline"
+import { useToday } from "../../app/useToday"
 import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
 import { CalendarIcon } from "../../ui/icons/CalendarIcon"
@@ -76,7 +77,12 @@ export default function CalendarPage() {
 
     // Stable options keep `select`'s result, and the cards below, stable
     // across renders.
-    const windowQuery = useMemo(() => publicWindowQuery(services), [services])
+    // …and on the day, so passed events drop out after midnight.
+    const today = useToday()
+    const windowQuery = useMemo(
+        () => publicWindowQuery(services, today),
+        [services, today],
+    )
     const { data: events, isError, refetch } = useQuery(windowQuery)
     const copy = useCopy(COPY)
     const common = useCopy(COMMON_COPY)
