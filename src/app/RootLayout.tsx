@@ -1,5 +1,6 @@
 import { useContext, useEffect } from "react"
 import {
+    isRouteErrorResponse,
     Link,
     Outlet,
     ScrollRestoration,
@@ -96,13 +97,19 @@ export function RouteError() {
     const common = useCopy(COMMON_COPY)
     const services = useServices()
     const guard = useContext(ReloadGuardContext)
-    const staleChunk = isStaleChunkError(useRouteError())
+    const error = useRouteError()
+    const staleChunk = isStaleChunkError(error)
 
     // A lazy file of an old version is gone: reload onto the current one
-    // (once, and not over unsaved work), else offer the button below.
+    // (once, and not over unsaved work), else offer the button below. Any
+    // other error, or a stale file the reload can't fix, is reported.
     useEffect(() => {
-        if (staleChunk && guard) reloadForStaleChunks(services, guard)
-    }, [staleChunk, services, guard])
+        if (staleChunk && guard && reloadForStaleChunks(services, guard)) return
+        if (isRouteErrorResponse(error) && error.status === 404) return
+        services.telemetry.captureError(error, {
+            source: staleChunk ? "stale-chunk" : "route",
+        })
+    }, [error, staleChunk, services, guard])
 
     if (staleChunk) {
         return (

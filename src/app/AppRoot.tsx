@@ -1,11 +1,10 @@
 import { QueryClientProvider, type QueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { RouterProvider, type createBrowserRouter } from "react-router"
 import { LanguageProvider } from "./LanguageProvider"
 import { ServicesContext, type AppServices } from "./services"
 import { createReloadGuard, ReloadGuardContext } from "./updates/reloadGuard"
 import { useSafeUpdates } from "./updates/safeUpdates"
-import { useStaleChunkRecovery } from "./updates/staleChunks"
 
 type Router = ReturnType<typeof createBrowserRouter>
 
@@ -20,7 +19,9 @@ export function AppRoot({
 }) {
     const [reloadGuard] = useState(createReloadGuard)
     useSafeUpdates(services, reloadGuard)
-    useStaleChunkRecovery(services, reloadGuard)
+    // Page views per location, analytics after the first paint, and the
+    // router for Sentry's tracing (Sentry itself loads from main.tsx).
+    useEffect(() => services.telemetry.start(router), [services, router])
 
     return (
         <ServicesContext.Provider value={services}>

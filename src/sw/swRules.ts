@@ -97,3 +97,15 @@ export const PRECACHE_GLOBS = [
     "ci-logo-192-bg.png",
     "ci-logo-512-bg.png",
 ]
+
+/**
+ * Where the build puts the lazy telemetry SDKs (Sentry, its tracing and
+ * replay, PostHog, Speed Insights; `vite.config.ts`). They are never
+ * precached: a device would download ~140 KB gzip of them on every deploy
+ * for nothing, and offline they have nothing to send anyway (a failed
+ * import is ignored). They are still hashed and cached as `immutable`.
+ */
+export const TELEMETRY_ASSETS = "assets/telemetry"
+
+/** Build output matched by `PRECACHE_GLOBS` that is still left out. */
+export const PRECACHE_IGNORES = [`${TELEMETRY_ASSETS}/**`]

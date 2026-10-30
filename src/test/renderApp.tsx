@@ -6,6 +6,7 @@ import { createMemoryStorage, type DeviceStorage } from "../app/deviceStorage"
 import { captureInstallPrompt } from "../app/install/installPrompt"
 import { routes } from "../app/routes"
 import type { AppServices } from "../app/services"
+import { NO_TELEMETRY, type Telemetry } from "../app/telemetry/telemetry"
 import { NO_UPDATES, type AppUpdates } from "../app/updates/updates"
 import { createFakeDataClient, type FakeDataClient } from "./fakeDataClient"
 
@@ -25,6 +26,8 @@ export interface RenderAppOptions {
      * yet (e.g. a form blocking reloads). The real routes by default.
      */
     routes?: RouteObject[]
+    /** Crash reports and analytics (`createTestTelemetry()`); none by default. */
+    telemetry?: Telemetry
 }
 
 /**
@@ -41,6 +44,7 @@ export function renderApp({
     buildVersion = "test",
     updates = NO_UPDATES,
     routes: routeObjects = routes,
+    telemetry = NO_TELEMETRY,
 }: RenderAppOptions = {}) {
     const reloads = { count: 0 }
     const services: AppServices = {
@@ -53,6 +57,7 @@ export function renderApp({
             reloads.count += 1
         },
         updates,
+        telemetry,
     }
     const queryClient = createQueryClient()
     queryClient.setDefaultOptions({ queries: { retry: false } })

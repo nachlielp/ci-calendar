@@ -6,6 +6,7 @@ import {
     precacheProblems,
     precacheUrls,
     sourceProblems,
+    telemetryProblems,
 } from "./check-sw.mjs"
 
 // The list as workbox injects it into dist/sw.js (minified), trimmed.
@@ -90,6 +91,42 @@ describe("service worker check", () => {
         ).toEqual([
             "sw.js mentions Supabase",
             "sw.js contains a NetworkFirst strategy",
+        ])
+    })
+})
+
+describe("telemetry chunks", () => {
+    const vercel = JSON.parse(
+        readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
+    )
+    const files = [
+        "assets/telemetry/sentry-AbC.js",
+        "assets/telemetry/posthog-DeF.js",
+    ]
+
+    it("pass when none is precached and vercel.json serves them immutable", () => {
+        expect(telemetryProblems(["index.html"], files, vercel)).toEqual([])
+    })
+
+    it("fail when one is precached", () => {
+        expect(
+            telemetryProblems(
+                ["index.html", "assets/telemetry/posthog-DeF.js"],
+                files,
+                vercel,
+            ),
+        ).toEqual([
+            "assets/telemetry/posthog-DeF.js is telemetry and must not be precached",
+        ])
+    })
+
+    it("fail when they aren't served immutable, or the build put none there", () => {
+        const noHeaders = { ...vercel, headers: [] }
+        expect(telemetryProblems([], files.slice(0, 1), noHeaders)).toEqual([
+            "assets/telemetry/sentry-AbC.js is not served as immutable (vercel.json)",
+        ])
+        expect(telemetryProblems([], [], vercel)).toEqual([
+            "no telemetry chunks in assets/telemetry/",
         ])
     })
 })

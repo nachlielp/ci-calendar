@@ -4,7 +4,11 @@ import react from "@vitejs/plugin-react"
 import { visualizer } from "rollup-plugin-visualizer"
 import { VitePWA } from "vite-plugin-pwa"
 import { execSync } from "node:child_process"
-import { PRECACHE_GLOBS } from "./src/sw/swRules"
+import {
+    PRECACHE_GLOBS,
+    PRECACHE_IGNORES,
+    TELEMETRY_ASSETS,
+} from "./src/sw/swRules"
 
 /**
  * The build version (`BUILD_VERSION` in src/app/buildVersion.ts): the commit
@@ -51,57 +55,82 @@ function buildVersionMeta(version: string): Plugin {
     }
 }
 
-export default defineConfig(({ command, mode }) => ({
-    esbuild: {
-        target: "es2022",
-        // Strip console/debugger from production bundles only (keeps them in
-        // dev and test).
-        drop: mode === "production" ? ["console", "debugger"] : [],
-    },
-    build: {
-        target: "es2022",
-        // dist/.vite/manifest.json feeds the bundle size check
-        // (scripts/bundle-size.mjs).
-        manifest: true,
-        // Generate sourcemaps for Sentry, but keep them off the public CDN.
-        sourcemap: "hidden",
-    },
-    base: "/",
-    plugins: [
-        react(),
-        buildVersionMeta(buildVersion(command)),
-        // The service worker (src/sw/sw.ts → dist/sw.js), production builds
-        // only: precaches the app shell and static files, never API
-        // responses. The app registers it itself after the first paint
-        // (app/updates), and the manifest stays public/site.webmanifest.
-        VitePWA({
-            strategies: "injectManifest",
-            srcDir: "src/sw",
-            filename: "sw.ts",
-            injectRegister: false,
-            manifest: false,
-            injectManifest: {
-                globPatterns: PRECACHE_GLOBS,
-                // The worker's own sourcemap would ship publicly.
-                sourcemap: false,
+/**
+ * Modules only the lazy telemetry chunks hold: the SDKs and the app's
+ * modules that start them (src/app/telemetry). Their chunks go to
+ * `TELEMETRY_ASSETS`, which the service worker never precaches.
+ */
+const TELEMETRY_MODULE =
+    /\/node_modules\/(@sentry|@sentry-internal|posthog-js|@vercel\/speed-insights)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|speedInsights)\.ts$/
+
+export default defineConfig(({ command, mode }) => {
+    const version = buildVersion(command)
+    return {
+        esbuild: {
+            target: "es2022",
+            // Strip console/debugger from production bundles only (keeps
+            // them in dev and test).
+            drop: mode === "production" ? ["console", "debugger"] : [],
+        },
+        build: {
+            target: "es2022",
+            // dist/.vite/manifest.json feeds the bundle size check
+            // (scripts/bundle-size.mjs).
+            manifest: true,
+            // Generate sourcemaps for Sentry, but keep them off the public CDN.
+            sourcemap: "hidden",
+            rollupOptions: {
+                output: {
+                    chunkFileNames: (chunk) =>
+                        !chunk.isEntry &&
+                        chunk.moduleIds.some((id) => TELEMETRY_MODULE.test(id))
+                            ? `${TELEMETRY_ASSETS}/[name]-[hash].js`
+                            : "assets/[name]-[hash].js",
+                },
             },
-        }),
-        // Bundle analyzer — opt in with `ANALYZE=true npm run build`.
-        process.env.ANALYZE === "true" &&
-            visualizer({ open: true, filename: "stats.html" }),
-        // Upload sourcemaps to Sentry only when an auth token is present
-        // (i.e. CI / release builds), then delete them so they never ship.
-        process.env.SENTRY_AUTH_TOKEN &&
-            sentryVitePlugin({
-                org: "nachliel",
-                project: "ci-calendar",
-                sourcemaps: {
-                    filesToDeleteAfterUpload: ["./dist/**/*.map"],
+        },
+        base: "/",
+        plugins: [
+            react(),
+            buildVersionMeta(version),
+            // The service worker (src/sw/sw.ts → dist/sw.js), production
+            // builds only: precaches the app shell and static files, never
+            // API responses. The app registers it itself after the first
+            // paint (app/updates), and the manifest stays
+            // public/site.webmanifest.
+            VitePWA({
+                strategies: "injectManifest",
+                srcDir: "src/sw",
+                filename: "sw.ts",
+                injectRegister: false,
+                manifest: false,
+                injectManifest: {
+                    globPatterns: PRECACHE_GLOBS,
+                    globIgnores: PRECACHE_IGNORES,
+                    // The worker's own sourcemap would ship publicly.
+                    sourcemap: false,
                 },
             }),
-    ],
+            // Bundle analyzer — opt in with `ANALYZE=true npm run build`.
+            process.env.ANALYZE === "true" &&
+                visualizer({ open: true, filename: "stats.html" }),
+            // Upload sourcemaps to Sentry only when an auth token is present
+            // (i.e. CI / release builds), then delete them so they never ship.
+            // The release is the build version the app reports
+            // (app/telemetry/sentry.ts), and stays out of the JS like it.
+            process.env.SENTRY_AUTH_TOKEN &&
+                sentryVitePlugin({
+                    org: "nachliel",
+                    project: "ci-calendar",
+                    release: { name: version, inject: false },
+                    sourcemaps: {
+                        filesToDeleteAfterUpload: ["./dist/**/*.map"],
+                    },
+                }),
+        ],
 
-    server: {
-        host: "localhost",
-    },
-}))
+        server: {
+            host: "localhost",
+        },
+    }
+})

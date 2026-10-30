@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { lazy, Suspense } from "react"
 import { Outlet, type RouteObject } from "react-router"
 import { describe, expect, it } from "vitest"
+import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
 import { createMemoryStorage } from "../deviceStorage"
 import { RouteError } from "../RootLayout"
@@ -22,8 +23,17 @@ const stalePage: RouteObject[] = [
     { path: "/", errorElement: <RouteError />, lazy: goneChunk },
 ]
 
-const newVersionNotice = () =>
-    screen.findByRole("heading", { name: "יש גרסה חדשה של האפליקציה" })
+/**
+ * The error page has rendered and its effects (the reload decision) have
+ * run: React runs them after the DOM shows the page, so a test checking
+ * `reloads` right after the heading appears would race them.
+ */
+async function settledOn(name: string) {
+    await screen.findByRole("heading", { name })
+    await act(async () => {})
+}
+
+const newVersionNotice = () => settledOn("יש גרסה חדשה של האפליקציה")
 
 describe("pages left open on an old version", () => {
     it("reload once onto the current version when a lazy file is gone", async () => {
@@ -96,14 +106,22 @@ describe("pages left open on an old version", () => {
         expect(reloads.count).toBe(0)
     })
 
-    it("reload when any lazy file fails to load (Vite's preload error)", () => {
-        const { reloads } = renderApp()
-
-        act(() => {
-            window.dispatchEvent(new Event("vite:preloadError"))
+    it("never reload, or report, when a file that isn't a page fails to load (an ad blocker stopping analytics)", async () => {
+        const sinks = createTestTelemetry({
+            blocked: ["posthog", "speed-insights"],
         })
+        const { reloads } = renderApp({ telemetry: sinks.telemetry })
 
-        expect(reloads.count).toBe(1)
+        await sinks.arrive()
+
+        expect(sinks.loaded).toEqual(["sentry", "posthog", "speed-insights"])
+        expect(reloads.count).toBe(0)
+        expect(sinks.errors).toEqual([])
+        expect(
+            screen.queryByRole("heading", {
+                name: "יש גרסה חדשה של האפליקציה",
+            }),
+        ).not.toBeInTheDocument()
     })
 
     it("show the usual error, with no reload, for other failures", async () => {
@@ -117,7 +135,7 @@ describe("pages left open on an old version", () => {
             ],
         })
 
-        await screen.findByRole("heading", { name: "משהו השתבש" })
+        await settledOn("משהו השתבש")
         expect(reloads.count).toBe(0)
     })
 

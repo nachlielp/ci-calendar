@@ -1,5 +1,4 @@
 import { onlineManager } from "@tanstack/react-query"
-import { useEffect } from "react"
 import type { AppServices } from "../services"
 import type { ReloadGuard } from "./reloadGuard"
 
@@ -28,43 +27,29 @@ const LAST_RELOAD_KEY = "staleChunkReloadAt"
 /** A failure again within this long after a reload isn't a stale page. */
 const RELOAD_AGAIN_AFTER_MS = 60 * 1000
 
+/** Pages (by their reload guard) already reloading onto the current version. */
+const reloading = new WeakSet<ReloadGuard>()
+
 /**
  * Reloads once to land on the current version's files, and says whether it
- * did. It doesn't when unsaved work blocks reloads, when offline (the reload
- * would fail too), or when it already reloaded for this a minute ago (the
- * files are missing for another reason; no reload loop). The caller then
- * shows the visitor a reload button instead.
+ * did (or this page already is). It doesn't when unsaved work blocks
+ * reloads, when offline (the reload would fail too), or when it already
+ * reloaded for this a minute ago (the files are missing for another reason;
+ * no reload loop). The caller then reports the error and shows the visitor a
+ * reload button instead. A recovered one is expected after a deploy and
+ * isn't reported.
  */
 export function reloadForStaleChunks(
     { session, reload, now }: Pick<AppServices, "session" | "reload" | "now">,
     guard: ReloadGuard,
 ): boolean {
+    if (reloading.has(guard)) return true
     if (guard.isBlocked() || !onlineManager.isOnline()) return false
     const at = now().getTime()
     const last = Number(session.getItem(LAST_RELOAD_KEY))
     if (last && Math.abs(at - last) < RELOAD_AGAIN_AFTER_MS) return false
     session.setItem(LAST_RELOAD_KEY, String(at))
+    reloading.add(guard)
     reload()
     return true
-}
-
-/**
- * Recovers from a lazy file that fails to load (Vite's `vite:preloadError`,
- * fired for every failed dynamic import) by reloading once, as above. The
- * error still reaches the route's `RouteError`, which offers a reload button
- * when this didn't reload.
- */
-export function useStaleChunkRecovery(
-    services: Pick<AppServices, "session" | "reload" | "now">,
-    guard: ReloadGuard,
-) {
-    const { session, reload, now } = services
-    useEffect(() => {
-        const onPreloadError = () => {
-            reloadForStaleChunks({ session, reload, now }, guard)
-        }
-        window.addEventListener("vite:preloadError", onPreloadError)
-        return () =>
-            window.removeEventListener("vite:preloadError", onPreloadError)
-    }, [session, reload, now, guard])
 }

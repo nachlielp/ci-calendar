@@ -11,20 +11,21 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 
 ## Layout
 
-| Folder            | Holds                                                         |
-| ----------------- | ------------------------------------------------------------- |
-| `src/app/`        | Bootstrap, services (the seam), routes, shell layout          |
-| `src/app/header`  | App header, menu (items keyed by role), WhatsApp link         |
-| `src/app/install` | Install banner, `beforeinstallprompt` capture, iOS steps      |
-| `src/app/updates` | Service worker registration, safe reloads, the reload guard   |
-| `src/sw/`         | The service worker (`sw.ts`) and its cache rules              |
-| `src/data/`       | Backend client construction and generated database types      |
-| `src/features/*`  | One folder per feature: its pages, components, queries, tests |
-| `src/lib/`        | Pure helpers (dates, formatting); tested directly             |
-| `src/ui/`         | Shared presentational primitives (dialog, buttons, icons)     |
-| `src/pages/`      | Simple pages (about, legal, 404) that belong to no feature    |
-| `src/test/`       | The fake backend and `renderApp`                              |
-| `src/assets/`     | Images, logos and the subset font ported from legacy          |
+| Folder              | Holds                                                         |
+| ------------------- | ------------------------------------------------------------- |
+| `src/app/`          | Bootstrap, services (the seam), routes, shell layout          |
+| `src/app/header`    | App header, menu (items keyed by role), WhatsApp link         |
+| `src/app/install`   | Install banner, `beforeinstallprompt` capture, iOS steps      |
+| `src/app/updates`   | Service worker registration, safe reloads, the reload guard   |
+| `src/app/telemetry` | Crash reports, analytics, Speed Insights; their lazy SDKs     |
+| `src/sw/`           | The service worker (`sw.ts`) and its cache rules              |
+| `src/data/`         | Backend client construction and generated database types      |
+| `src/features/*`    | One folder per feature: its pages, components, queries, tests |
+| `src/lib/`          | Pure helpers (dates, formatting); tested directly             |
+| `src/ui/`           | Shared presentational primitives (dialog, buttons, icons)     |
+| `src/pages/`        | Simple pages (about, legal, 404) that belong to no feature    |
+| `src/test/`         | The fake backend and `renderApp`                              |
+| `src/assets/`       | Images, logos and the subset font ported from legacy          |
 
 ## Rules
 
@@ -96,7 +97,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   DOM; the app's tsconfig excludes it). Its decisions are pure functions in
   `src/sw/swRules.ts`, tested directly. It may cache only the build output
   listed in `PRECACHE_GLOBS`: `index.html`, the hashed JS/CSS/font/images
-  under `assets/`, the loader logo, the manifest and its icons, in one
+  under `assets/` (but not the telemetry SDKs in `assets/telemetry/`,
+  `PRECACHE_IGNORES`), the loader logo, the manifest and its icons, in one
   precache (`ci-calendar-precache-v2-<scope>`) revisioned per file by
   workbox, so a deploy downloads only what changed. It has **no runtime
   caching**: Supabase API, auth, functions and storage requests (and
@@ -139,13 +141,17 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   ignore the guard.
 - **Stale chunks.** A tab still on an old version (another tab handed over,
   or no service worker) can ask for a lazy file the deploy removed.
-  `app/updates/staleChunks.ts` reloads once onto the current version on
-  Vite's `vite:preloadError` (every failed dynamic import) and in
-  `RouteError` for such errors (`isStaleChunkError`), unless the reload
+  `RouteError` (`app/updates/staleChunks.ts`) reloads once onto the
+  current version for such errors (`isStaleChunkError`): a route's `lazy`
+  page, or a `React.lazy` part of one, whose file is gone. Not on Vite's
+  global `vite:preloadError`: that fires for every failed dynamic import,
+  telemetry blocked by an ad blocker included, and must never reload the
+  page under the visitor. It reloads unless the reload
   guard is blocked, the device is offline, or it already did so within a
   minute (`staleChunkReloadAt` in `services.session`, sessionStorage; no
   reload loops). Otherwise `RouteError` says a new version is available,
-  with a reload button.
+  with a reload button, and the error is reported (`stale-chunk`) once; a
+  failure the reload recovers is expected after a deploy and isn't.
 - **Freshness.** Public window: stale after 5 minutes, refetched on
   `visibilitychange` to visible when stale (TanStack's `focusManager`),
   always refetched on reconnect (`refetchOnReconnect: "always"`), and always
@@ -348,6 +354,69 @@ true }` on the login, signup and password-reset routes; and restore
   accepted prompt hides it. Closing it is stored under
   `installBannerDismissed` in `services.storage` (new: legacy had no close
   button, so no key).
+- **Telemetry.** `services.telemetry` (`Telemetry`,
+  `app/telemetry/telemetry.ts`) is the one boundary for Sentry, PostHog and
+  Vercel Speed Insights; nothing else imports their SDKs. main.tsx's first
+  import (`appTelemetry.ts`) creates it, so window `error` and
+  `unhandledrejection` are captured from boot (React 19 hands render errors
+  no boundary caught to the window too), and schedules Sentry's load after
+  load and idle (`afterLoadAndIdle`) whether or not the app ever renders,
+  so an error that stops the boot is still reported. `AppRoot` calls
+  `start(router)`: page views, PostHog and Speed Insights (loaded after the
+  first paint), and the router for Sentry's tracing. Until an SDK loads,
+  reports, page views and events are buffered (up to `BUFFER_LIMIT`, 50)
+  and flushed on arrival with the original Error objects. An SDK that fails
+  to load (ad blockers, offline) is dropped silently, buffer and all: it
+  never reloads the page or reports anything. Sentry's tracing (data
+  router, via `wrapCreateBrowserRouterV7` on the existing router) and
+  replay (all text and inputs masked, all media blocked, no network bodies
+  or headers) load at a later idle. Release = `BUILD_VERSION` (the Sentry
+  vite plugin uploads maps under the same name, not injected into the JS);
+  environment `production` on ci-events.org, else `preview`. Who gets
+  what: dev and tests send nothing (`import.meta.env.PROD`); errors go out
+  from every production build with `VITE_SENTRY_DSN`; PostHog
+  (`VITE_PUBLIC_POSTHOG_KEY`, legacy's options and persistence name) and
+  Speed Insights only on the production host, and never on a device whose
+  storage has `isInternal` = `true`. The SDK chunks are built into
+  `assets/telemetry/` (`chunkFileNames` in `vite.config.ts`) and never
+  precached (`PRECACHE_IGNORES`); `check:sw` fails if one is, or if
+  `vercel.json` stops serving them `immutable`.
+    - **No secrets in URLs**: Supabase auth redirects carry tokens
+      (`#access_token=…`, `?code=…`, `?token=…&type=…`). Every URL
+      telemetry sends goes through `scrubUrl` (`app/telemetry/scrubUrl.ts`):
+      page views, PostHog's `before_send` (`$current_url`, referrers,
+      autocaptured links), Sentry's `beforeSend`/`beforeSendTransaction`/
+      `beforeBreadcrumb` (request URL, navigation and request breadcrumbs,
+      spans, replay events' URLs), replay recordings
+      (`beforeAddRecordingEvent`) and Speed Insights' `beforeSend`. Send a
+      URL some other way and you scrub it too.
+    - **Reporting errors**: `services.telemetry.captureError` with the error
+      and a `source` naming where it was caught (a Sentry tag). Each
+      Error object is reported once, so reporting in a catch and again from a
+      boundary is safe. `RouteError` already reports route errors (not 404
+      responses); report errors you catch and swallow (a failed save shown
+      as a message), not ones you rethrow.
+    - **Tracking events**: `services.telemetry.track(name, properties)`
+      (PostHog `capture`). Page views are automatic: one per history entry
+      (legacy recorded `$pageview` with `$current_url` on every location
+      change, filters included), and Speed Insights reports under the route
+      pattern (`/event/[eventId]`, `routePattern`).
+    - **Users (slice 9)**: once the session is known, call
+      `services.telemetry.identify({ id, email })`: Sentry `setUser` (as
+      legacy) and PostHog `identify(id)` (new). Legacy left every visitor
+      anonymous in PostHog (its `reset()` ran before `init`, a no-op, and it
+      identified the visitor with its own anonymous id, which changes
+      nothing), so on the first sign-in PostHog joins this device's
+      anonymous history to the account; that is intended. Call
+      `services.telemetry.reset()` on sign-out: Sentry forgets the user,
+      PostHog starts a new anonymous visitor, so the next person on a
+      shared phone isn't joined to the account. Send only the user id to
+      PostHog, never email or name. Also port legacy's
+      `saveIsInternalToLocalStorage`: after the profile row loads, call
+      `services.telemetry.setInternal(users.is_internal)`. It saves the
+      `isInternal` key; marking a device internal stops PostHog
+      (`opt_out_capturing`, autocapture included) and Speed Insights at
+      once; unmarking takes effect from the next page load.
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
@@ -390,6 +459,16 @@ feature helpers is tested directly.
   real page exercises yet (a form blocking reloads, a lazy file that is
   gone); `session` (like `storage`) carries sessionStorage across two
   renders, i.e. a reload.
+- **Telemetry:** `renderApp({ telemetry: sinks.telemetry })` with
+  `sinks = createTestTelemetry(options)` (`production`, `productionSite`,
+  `storage`, `blocked`)
+  (`src/test/fakeTelemetry.ts`) runs the real `createTelemetry` with
+  in-memory Sentry/PostHog/Speed Insights; they "load" when the test calls
+  `await sinks.arrive()`, then `errors`, `pageViews`, `events`,
+  `speedRoutes`, `tracedRouters` and `loaded` show what was sent;
+  `blocked: ["posthog"]` makes an SDK fail to load as Vite reports it.
+  Without it, tests get
+  `NO_TELEMETRY`. Nothing reaches the network.
 - **Freshness:** staleness is measured with `Date.now()`, so fake only the
   clock (`vi.useFakeTimers({ toFake: ["Date"] })`) and advance it with
   `vi.setSystemTime`. Dispatch `visibilitychange` (overriding
@@ -439,3 +518,12 @@ feature helpers is tested directly.
    on return, held off by `useBlockReload`; stale-chunk recovery (one guarded
    reload, else a reload button); assets 404 and immutable on Vercel;
    `check:sw` in CI.
+8. Observability: `services.telemetry` captures errors from boot and
+   buffers them; Sentry (legacy's config, release = `BUILD_VERSION`) loads
+   after first paint and idle, then data-router tracing and fully masked
+   replay; route and unrecovered stale-chunk errors reported once (stale
+   chunks now recovered in `RouteError` only, so failed SDK loads never
+   reload); PostHog page views per location and Speed Insights by route
+   pattern, production host only and never on `isInternal` devices; auth
+   secrets scrubbed from every URL sent; SDK chunks in `assets/telemetry/`,
+   not precached; `identify`/`reset`/`setInternal` for slice 9.

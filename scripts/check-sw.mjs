@@ -7,7 +7,8 @@
 // function names from dist/sw.js (and workbox's own error strings mention
 // `registerRoute` even when nothing calls it), plus what does survive in
 // the build (Supabase URLs, NetworkFirst's options). Prints the precache's
-// size.
+// size. The telemetry SDKs' chunks (assets/telemetry/) must stay out of the
+// precache and be served immutable.
 //
 // Usage (after `vite build`): node scripts/check-sw.mjs
 
@@ -37,6 +38,50 @@ export function precacheProblems(urls, buildFiles) {
     for (const file of buildFiles) {
         if (!urls.includes(file)) {
             problems.push(`${file} is not precached, so it fails offline`)
+        }
+    }
+    return problems
+}
+
+/** Where the build puts the telemetry SDKs (`TELEMETRY_ASSETS`, swRules.ts). */
+export const TELEMETRY_DIR = "assets/telemetry"
+
+/**
+ * The `vercel.json` header rule source (path-to-regexp, only `(.*)` groups
+ * used) as a regular expression.
+ */
+function sourcePattern(source) {
+    const escape = (part) => part.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")
+    return new RegExp(`^${source.split("(.*)").map(escape).join("(.*)")}$`)
+}
+
+/**
+ * Problems with the telemetry chunks (`telemetryFiles`, relative to dist/):
+ * there must be some (else the build stopped sorting them out), none may be
+ * precached, and each must be served `immutable` by `vercelConfig`.
+ */
+export function telemetryProblems(urls, telemetryFiles, vercelConfig) {
+    const problems = []
+    if (telemetryFiles.length === 0) {
+        problems.push(`no telemetry chunks in ${TELEMETRY_DIR}/`)
+    }
+    const immutable = (vercelConfig.headers ?? []).filter((rule) =>
+        rule.headers.some(
+            ({ key, value }) =>
+                key.toLowerCase() === "cache-control" &&
+                value.includes("immutable"),
+        ),
+    )
+    for (const file of telemetryFiles) {
+        if (urls.includes(file)) {
+            problems.push(`${file} is telemetry and must not be precached`)
+        }
+        if (
+            !immutable.some((rule) =>
+                sourcePattern(rule.source).test(`/${file}`),
+            )
+        ) {
+            problems.push(`${file} is not served as immutable (vercel.json)`)
         }
     }
     return problems
@@ -97,6 +142,15 @@ function main() {
     const buildFiles = readdirSync(join(dist, "assets"))
         .filter((file) => /\.(js|css)$/.test(file))
         .map((file) => `assets/${file}`)
+    const telemetryFiles = readdirSync(join(dist, TELEMETRY_DIR))
+        .filter((file) => file.endsWith(".js"))
+        .map((file) => `${TELEMETRY_DIR}/${file}`)
+    const vercelConfig = JSON.parse(
+        readFileSync(
+            fileURLToPath(new URL("../vercel.json", import.meta.url)),
+            "utf8",
+        ),
+    )
     const bytes = urls.reduce(
         (sum, url) => sum + statSync(join(dist, url)).size,
         0,
@@ -106,6 +160,7 @@ function main() {
     )
     const problems = [
         ...precacheProblems(urls, buildFiles),
+        ...telemetryProblems(urls, telemetryFiles, vercelConfig),
         ...sourceProblems(source),
         ...builtProblems(built),
     ]

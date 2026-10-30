@@ -1,3 +1,5 @@
+// First, so errors are captured before any other module runs.
+import { appTelemetry } from "./app/telemetry/appTelemetry"
 import { createRoot } from "react-dom/client"
 import { createBrowserRouter } from "react-router"
 import { AppRoot } from "./app/AppRoot"
@@ -24,6 +26,7 @@ const services: AppServices = {
     reload: () => window.location.reload(),
     // The service worker exists in production builds only (vite.config.ts).
     updates: import.meta.env.PROD ? serviceWorkerUpdates() : NO_UPDATES,
+    telemetry: appTelemetry,
 }
 // Direction and language before anything renders; the provider keeps them
 // in step from here on.
