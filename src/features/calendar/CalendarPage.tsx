@@ -1,13 +1,18 @@
 import { useQuery } from "@tanstack/react-query"
 import { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate, useParams } from "react-router"
+import { useCopy } from "../../app/language"
+import { LanguageSwitcher } from "../../app/LanguageSwitcher"
 import { useServices } from "../../app/services"
 import { useIsOnline } from "../../app/useIsOnline"
+import { COMMON_COPY } from "../../lib/commonCopy"
+import { defineCopy } from "../../lib/copy"
 import { CalendarIcon, ViewDayIcon } from "../../ui/icons"
-import { ToggleButtons, type ToggleOption } from "../../ui/ToggleButtons"
+import { ToggleButtons } from "../../ui/ToggleButtons"
 import { CalendarView } from "./CalendarView"
 import { toEventCards } from "./eventCards"
 import { FilterButton, SelectedFilters } from "./EventFilters"
+import { EVENT_LOCALES } from "./eventLocales"
 import { EventList, type FromListState } from "./EventList"
 import { eventFilter } from "./filters"
 import { useLinkedEvent } from "./linkedEvent"
@@ -20,25 +25,43 @@ const loadEventDetails = () => import("./details/EventDetailsDialog")
 const EventDetailsDialog = lazy(loadEventDetails)
 const NotFoundPage = lazy(() => import("../../pages/NotFoundPage"))
 
-const COPY = {
-    title: "קונטקט אימפרוביזציה ישראל",
-    subtitle: "כל האירועים במקום אחד",
-    view: "תצוגה",
-    listView: "צפייה ברשימת אירועים",
-    calendarView: "צפייה באירועים לפי לוח שנה",
-    noEvents: "אין אירועים קרובים",
-    offline: "אין חיבור לאינטרנט – לא ניתן לטעון את האירועים",
-    loadFailed: "לא הצלחנו לטעון את האירועים",
-    retry: "נסו שוב",
-    loading: "טוען אירועים…",
-}
+const COPY = defineCopy({
+    he: {
+        title: "קונטקט אימפרוביזציה ישראל",
+        subtitle: "כל האירועים במקום אחד",
+        view: "תצוגה",
+        listView: "צפייה ברשימת אירועים",
+        calendarView: "צפייה באירועים לפי לוח שנה",
+        noEvents: "אין אירועים קרובים",
+        offline: "אין חיבור לאינטרנט – לא ניתן לטעון את האירועים",
+        loadFailed: "לא הצלחנו לטעון את האירועים",
+        loading: "טוען אירועים…",
+    },
+    en: {
+        title: "Israel Contact Improvisation",
+        subtitle: "Everything, everywhere",
+        view: "View",
+        listView: "Show events as a list",
+        calendarView: "Show events on a calendar",
+        noEvents: "No upcoming events",
+        offline: "No internet connection – the events can't be loaded",
+        loadFailed: "We couldn't load the events",
+        loading: "Loading events…",
+    },
+    ru: {
+        title: "Контактная импровизация в Израиле",
+        subtitle: "Всё, везде",
+        view: "Вид",
+        listView: "Показать события списком",
+        calendarView: "Показать события в календаре",
+        noEvents: "Нет ближайших событий",
+        offline: "Нет подключения к интернету – события не загрузить",
+        loadFailed: "Не удалось загрузить события",
+        loading: "Загрузка событий…",
+    },
+})
 
 type View = "list" | "calendar"
-
-const VIEWS: readonly ToggleOption<View>[] = [
-    { key: "list", label: COPY.listView, Icon: ViewDayIcon },
-    { key: "calendar", label: COPY.calendarView, Icon: CalendarIcon },
-]
 
 /**
  * The public calendar at `/`, and with an event open over it at
@@ -55,7 +78,13 @@ export default function CalendarPage() {
     // across renders.
     const windowQuery = useMemo(() => publicWindowQuery(services), [services])
     const { data: events, isError, refetch } = useQuery(windowQuery)
-    const cards = useMemo(() => events && toEventCards(events), [events])
+    const copy = useCopy(COPY)
+    const common = useCopy(COMMON_COPY)
+    const locale = useCopy(EVENT_LOCALES)
+    const cards = useMemo(
+        () => events && toEventCards(events, locale),
+        [events, locale],
+    )
     const { filters, setFilter, clearFilters } = useEventFilters()
     const shownCards = useMemo(() => {
         if (!cards || filters.length === 0) return cards
@@ -105,12 +134,28 @@ export default function CalendarPage() {
     return (
         <main className="calendar-page">
             <header className="calendar-header">
-                <h1 className="calendar-title">{COPY.title}</h1>
-                <p className="calendar-subtitle">{COPY.subtitle}</p>
+                {/* Legacy's header held the language menu; it sits here
+                    until the app header (slice 6) takes it. */}
+                <div className="calendar-top-bar">
+                    <LanguageSwitcher />
+                </div>
+                <h1 className="calendar-title">{copy.title}</h1>
+                <p className="calendar-subtitle">{copy.subtitle}</p>
                 <div className="calendar-menu">
                     <ToggleButtons
-                        label={COPY.view}
-                        options={VIEWS}
+                        label={copy.view}
+                        options={[
+                            {
+                                key: "list",
+                                label: copy.listView,
+                                Icon: ViewDayIcon,
+                            },
+                            {
+                                key: "calendar",
+                                label: copy.calendarView,
+                                Icon: CalendarIcon,
+                            },
+                        ]}
                         selected={view}
                         onSelect={setView}
                     />
@@ -127,23 +172,23 @@ export default function CalendarPage() {
                 view === "calendar" ? (
                     <CalendarView cards={shownCards} />
                 ) : shownCards.length === 0 ? (
-                    <p className="calendar-empty">{COPY.noEvents}</p>
+                    <p className="calendar-empty">{copy.noEvents}</p>
                 ) : (
                     <EventList cards={shownCards} />
                 )
             ) : !isOnline ? (
                 // The request waits for the connection and is sent once back
                 // online.
-                <p role="alert">{COPY.offline}</p>
+                <p role="alert">{copy.offline}</p>
             ) : isError ? (
                 <div role="alert">
-                    <p>{COPY.loadFailed}</p>
+                    <p>{copy.loadFailed}</p>
                     <button type="button" onClick={() => refetch()}>
-                        {COPY.retry}
+                        {common.retry}
                     </button>
                 </div>
             ) : (
-                <p role="status">{COPY.loading}</p>
+                <p role="status">{copy.loading}</p>
             )}
             {linked && (
                 <Suspense fallback={null}>

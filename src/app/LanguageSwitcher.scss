@@ -1,0 +1,44 @@
+// Ported from the language select in legacy/src/styles/header.scss (an antd
+// Select showing only the flag; its menu a dark, narrow column of flags).
+.language-switcher {
+    position: relative;
+    display: inline-flex;
+
+    .language-switcher-toggle,
+    .language-switcher-option {
+        display: flex;
+        padding: 4px;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .language-switcher-flag {
+        display: block;
+        width: 24px;
+        height: 24px;
+    }
+
+    .language-switcher-menu {
+        position: absolute;
+        inset-block-start: 100%;
+        inset-inline-start: 0;
+        z-index: 10;
+        margin: 4px 0 0;
+        padding: 4px;
+        list-style: none;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .language-switcher-option {
+        &[aria-pressed="true"] {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+}

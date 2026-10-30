@@ -20,6 +20,7 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | `src/ui/`        | Shared presentational primitives (dialog, buttons, icons)     |
 | `src/pages/`     | Simple pages that don't belong to a feature                   |
 | `src/test/`      | The fake backend and `renderApp`                              |
+| `src/assets/`    | Images ported from legacy (imported with `?no-inline`)        |
 
 ## Rules
 
@@ -145,14 +146,75 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed).
   `.visually-hidden` (`index.css`) hides text from sight, not from screen
   readers.
-- **Copy.** Until the languages slice, Hebrew copy sits in one `COPY` object
-  per component. Event vocabulary (types, tags, the day format, shared copy)
-  is an `EventLocale` in `features/calendar/eventFormat.ts` (types, tags,
-  districts, month and weekday names, the day format); the formatters take
-  one, `HEBREW` by default; so do the calendar components (`locale` prop).
-  Counted phrases use `plural()` (`src/lib/plural.ts`, `Intl.PluralRules`),
-  never hand-rolled number checks. Slice 5 adds English and Russian locales and
-  passes the UI language's locale to them and to the components.
+- **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
+  Every slice that adds copy follows this:
+    - **Copy is per component**, declared with `defineCopy({ he, en, ru })`
+      (`src/lib/copy.ts`) next to the component and read with
+      `useCopy(COPY)` (`src/app/language.ts`). Hebrew sets the shape; English
+      and Russian must match it key for key, so a missing translation is a
+      type error. Entries are strings; `counted({ one, other, … })` for
+      phrases with a count (it becomes `(count) => string`, with the plural
+      rules of the block it sits in, so never pass a language code; Russian
+      needs `one`/`few`/`many`); or functions of names or values returning a
+      string or React nodes (a sentence with a link in it:
+      `terms: (link: ReactNode) => <>I accept the {link}</>`). Never write
+      a user-facing string outside a `defineCopy` (aria-labels, titles and
+      alt text included). Port the words from legacy `util/translations.ts`
+      when they exist there; legacy left much copy in Hebrew only, so write
+      the English and Russian.
+    - **Shared words** (save, cancel, confirm, delete, close, retry,
+      loading, back to the calendar) are in `COMMON_COPY`
+      (`src/lib/commonCopy.ts`), read with `useCopy(COMMON_COPY)`; add a word
+      there once a second component needs it, rather than translating it
+      twice.
+    - **All three languages ship together**, eager, in the component's chunk:
+      the copy built so far costs ~3 KB gzip on `/`, and lazy routes carry
+      their own. So switching never waits or flashes a key. Don't build a
+      central dictionary or lazy-load languages unless `/` nears its budget.
+    - **Event vocabulary** (types, tags, districts, month and weekday names,
+      the day format, "cancelled"/"with") is an `EventLocale`
+      (`features/calendar/eventLocales.ts`, `EVENT_LOCALES`), read with
+      `useCopy(EVENT_LOCALES)`. The pure formatters in `eventFormat.ts` and
+      `toEventCards` require one (no default), so code that forgets the
+      language fails the typecheck.
+    - **Titles and addresses**: `pickTitle(event, language)` (the
+      `lng_titles` translation, else the Hebrew title; Russian falls back to
+      Hebrew, as legacy) and `pickAddress(address, language)` (Hebrew label,
+      else `en_label` for English and Russian, else Hebrew). External links
+      (maps, Google Calendar) keep the Hebrew originals, as legacy did.
+    - **Formats**: dates through `Intl` with `INTL_LOCALES` (he-IL, en-US as
+      legacy showed month first, ru-RU), formatting Jerusalem `YYYY-MM-DD`
+      days in UTC so the day never shifts; Hebrew keeps legacy's own day
+      format. Times stay 24-hour `HH:mm` in every language. Counted phrases
+      go through `counted` (`Intl.PluralRules`), never hand-rolled number
+      checks.
+    - **Direction**: `main.tsx` sets `<html lang dir>` and the page
+      `<title>` from the stored language before the first render
+      (`applyLanguageToDocument`), and `LanguageProvider` keeps them in step
+      on every switch; `index.html` defaults to `he`/`rtl`. Put elements in
+      reading order in the DOM (so tab order matches) and style with logical
+      properties (`margin-inline`, `padding-inline`, `inset-inline-start`,
+      `justify-content: flex-start`, …) so the layout mirrors by itself.
+      Where an icon points somewhere (chevrons) or legacy kept something on
+      one side in every language (the filter chips, on the right), use a
+      `[dir="rtl"] &` / `[dir="ltr"] &` override. Don't set `direction` in
+      CSS except for a component that is deliberately one-way
+      (`ToggleButtons`).
+    - **Choosing and keeping it**: `useLanguage().setLanguage` is the only
+      way to change it; it saves to `services.storage` under legacy's
+      `language` key (raw `he`/`en`/`ru`), so a visitor's legacy choice
+      carries over. A first visit is Hebrew whatever the browser language,
+      as in legacy. Legacy never stored a language on the account (`users`
+      has no such column); if one is added, signed-in boot (slice 9) calls
+      `setLanguage` with it. `VITE_LANGUAGES_TO_SHOW` (legacy's build-time
+      setting, `he,en,ru` when unset) picks the languages offered
+      (`SHOWN_LANGUAGES`); a stored language that isn't offered falls back
+      to Hebrew. The switcher (`app/LanguageSwitcher.tsx`, the legacy flag
+      menu) sits at the top of the calendar page until the app header
+      (slice 6) takes it.
+- **Assets.** Images ported from `legacy/src/assets` live in `src/assets/`
+  and are imported with `?no-inline` (e.g. the flags), so they are hashed
+  files fetched when shown, never base64 in the JS.
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
@@ -167,6 +229,8 @@ feature helpers is tested directly.
 
 - **Repeat visits:** pass the same `storage` (`createMemoryStorage()`) to two
   `renderApp` calls, unmounting the first. `buildVersion` simulates a deploy.
+  Reset `<html lang dir>` to `he`/`rtl` between them, as a reload starts
+  from `index.html` (`setup.ts` does so after each test).
 - **Embedded resources:** the fake joins embeds through the foreign keys in
   its `RELATIONS` map and applies dotted filters to the embedded rows, as
   PostgREST does; add a relation there when a query embeds a new one. It also
@@ -200,3 +264,9 @@ feature helpers is tested directly.
    legacy encoding, last choice restored from storage) through a drawer or
    modal, chips and clear-all; list/calendar toggle and a native month grid
    over the window, days marked from a precomputed day → events map.
+5. Languages: Hebrew, English and Russian copy for everything so far
+   (`defineCopy`/`useCopy`, `counted`, `COMMON_COPY`), the legacy flag
+   switcher (`VITE_LANGUAGES_TO_SHOW`), `<html lang dir>` and `<title>`
+   following the choice (kept under legacy's `language` key), translated
+   titles (`lng_titles`, added to the window) and English addresses, `Intl`
+   day formats and plurals per language, LTR mirroring.

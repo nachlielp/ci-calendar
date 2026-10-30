@@ -6,11 +6,18 @@ import {
     PinDropIcon,
     ScheduleIcon,
 } from "../../ui/icons"
+import { useCopy } from "../../app/language"
+import { defineCopy } from "../../lib/copy"
 import type { EventCard } from "./eventCards"
-import { HEBREW, eventPath } from "./eventFormat"
+import { eventPath } from "./eventFormat"
+import { EVENT_LOCALES } from "./eventLocales"
 import "./EventList.scss"
 
-const COPY = { label: "אירועים קרובים" }
+const COPY = defineCopy({
+    he: { label: "אירועים קרובים" },
+    en: { label: "Upcoming events" },
+    ru: { label: "Ближайшие события" },
+})
 
 /** Navigation state marking a details page opened from the list. */
 export interface FromListState {
@@ -20,16 +27,17 @@ export interface FromListState {
 /** The calendar's event cards (legacy EventsList and EventPreview). */
 export function EventList({
     cards,
-    label = COPY.label,
+    label,
 }: {
     cards: readonly EventCard[]
-    /** The list's accessible name. */
+    /** The list's accessible name; "Upcoming events" by default. */
     label?: string
 }) {
+    const copy = useCopy(COPY)
     // Keep the filters (`f`) when opening an event.
     const { search } = useLocation()
     return (
-        <ul aria-label={label} className="events-list">
+        <ul aria-label={label ?? copy.label} className="events-list">
             {cards.map((card) => (
                 <li key={card.event.id} className="events-list-item">
                     <EventPreview card={card} search={search} />
@@ -41,14 +49,13 @@ export function EventList({
 
 function EventPreview({ card, search }: { card: EventCard; search: string }) {
     const { event } = card
+    const { copy } = useCopy(EVENT_LOCALES)
     const state: FromListState = { fromList: true }
     return (
         <article className="event-preview card">
             {event.cancelled && (
                 <div className="cancelled-event-cover">
-                    <p className="cancelled-event-title">
-                        {HEBREW.copy.cancelled}
-                    </p>
+                    <p className="cancelled-event-title">{copy.cancelled}</p>
                     {event.cancelledText && (
                         <p className="cancelled-event-text">
                             {event.cancelledText}
@@ -62,14 +69,14 @@ function EventPreview({ card, search }: { card: EventCard; search: string }) {
                 <h2 className="event-title">
                     {/* Cancelled events don't open, as in the legacy app. */}
                     {event.cancelled ? (
-                        event.title
+                        card.title
                     ) : (
                         <Link
                             className="event-preview-link"
                             to={`${eventPath(event)}${search}`}
                             state={state}
                         >
-                            {event.title}
+                            {card.title}
                         </Link>
                     )}
                 </h2>
@@ -95,13 +102,13 @@ function EventPreview({ card, search }: { card: EventCard; search: string }) {
                 </p>
                 <p className="event-row">
                     <PinDropIcon className="event-icon" />
-                    <span className="event-label">{event.address.label}</span>
+                    <span className="event-label">{card.address}</span>
                 </p>
                 {card.teachers.length > 0 && (
                     <p className="event-row">
                         <PersonIcon className="event-icon" />
                         <span className="event-label">
-                            {HEBREW.copy.with} {card.teachers.join(", ")}
+                            {copy.with} {card.teachers.join(", ")}
                         </span>
                     </p>
                 )}

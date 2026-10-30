@@ -1,20 +1,36 @@
+import { useCopy } from "../../app/language"
+import { defineCopy } from "../../lib/copy"
 import "./StaleDataNotice.scss"
 
-// Copy lives here, in one place, for the languages slice to translate.
-const COPY = {
-    offline: "אין חיבור לאינטרנט – ייתכן שהאירועים אינם מעודכנים",
-    refreshFailed: "לא הצלחנו לרענן – ייתכן שהאירועים אינם מעודכנים",
-}
+const COPY = defineCopy({
+    he: {
+        offline: "אין חיבור לאינטרנט – ייתכן שהאירועים אינם מעודכנים",
+        refreshFailed: "לא הצלחנו לרענן – ייתכן שהאירועים אינם מעודכנים",
+    },
+    en: {
+        offline: "No internet connection – the events may be out of date",
+        refreshFailed: "We couldn't refresh – the events may be out of date",
+    },
+    ru: {
+        offline: "Нет подключения к интернету – события могут быть устаревшими",
+        refreshFailed: "Не удалось обновить – события могут быть устаревшими",
+    },
+})
 
 /**
  * A small sign that the events shown may be out of date: the device is
  * offline, or the shown data is cached and refreshing it failed.
  */
-export function StaleDataNotice({ reason }: { reason: keyof typeof COPY }) {
+export function StaleDataNotice({
+    reason,
+}: {
+    reason: "offline" | "refreshFailed"
+}) {
+    const copy = useCopy(COPY)
     return (
         <p role="status" className="stale-data-notice">
             <CloudOfflineIcon />
-            {COPY[reason]}
+            {copy[reason]}
         </p>
     )
 }

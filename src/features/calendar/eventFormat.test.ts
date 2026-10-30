@@ -1,16 +1,20 @@
 import { describe, expect, it } from "vitest"
 import { toEventCards } from "./eventCards"
 import {
+    dayLabel,
     eventDateLabel,
     eventPath,
     eventTimeRange,
     googleCalendarUrl,
     mapsUrl,
+    pickAddress,
+    pickTitle,
     priceLabel,
     segmentTimeRange,
     teacherNames,
     typeLabels,
 } from "./eventFormat"
+import { ENGLISH, HEBREW, RUSSIAN } from "./eventLocales"
 import { publicEvent } from "./testEvents"
 
 const multiDay = publicEvent({
@@ -30,15 +34,74 @@ const segment = (start: string, end: string, type = "class") => ({
 
 describe("eventDateLabel", () => {
     it("names the day as the legacy app did", () => {
-        expect(eventDateLabel(publicEvent({ startDate: "2026-11-07" }))).toBe(
-            "שבת, יום שבת 7 בנובמבר",
-        )
+        expect(
+            eventDateLabel(publicEvent({ startDate: "2026-11-07" }), HEBREW),
+        ).toBe("שבת, יום שבת 7 בנובמבר")
     })
 
     it("gives a multi-day event its day range", () => {
-        expect(eventDateLabel(multiDay)).toBe(
+        expect(eventDateLabel(multiDay, HEBREW)).toBe(
             "שישי, יום שישי 6 בנובמבר - ראשון, יום ראשון 8 בנובמבר",
         )
+    })
+})
+
+describe("day labels in English and Russian", () => {
+    it("writes English days month first, with an ordinal, as legacy did", () => {
+        expect(dayLabel("2026-11-07", ENGLISH)).toBe("Saturday, November 7th")
+        expect(dayLabel("2026-11-01", ENGLISH)).toBe("Sunday, November 1st")
+        expect(dayLabel("2026-11-02", ENGLISH)).toBe("Monday, November 2nd")
+        expect(dayLabel("2026-11-03", ENGLISH)).toBe("Tuesday, November 3rd")
+        expect(dayLabel("2026-11-11", ENGLISH)).toBe("Wednesday, November 11th")
+        expect(dayLabel("2026-11-22", ENGLISH)).toBe("Sunday, November 22nd")
+    })
+
+    it("writes Russian days with the month in the genitive", () => {
+        expect(dayLabel("2026-11-07", RUSSIAN)).toBe("Суббота, 7 ноября")
+    })
+
+    it("gives a multi-day event its day range in the locale", () => {
+        expect(eventDateLabel(multiDay, ENGLISH)).toBe(
+            "Friday, November 6th - Sunday, November 8th",
+        )
+    })
+})
+
+describe("pickTitle", () => {
+    const event = publicEvent({
+        title: "ג'אם",
+        titleTranslations: { en: "Jam", ru: "Джем" },
+    })
+
+    it("shows the title's translation for the language", () => {
+        expect(pickTitle(event, "he")).toBe("ג'אם")
+        expect(pickTitle(event, "en")).toBe("Jam")
+        expect(pickTitle(event, "ru")).toBe("Джем")
+    })
+
+    it("falls back to the Hebrew title, Russian included, as legacy did", () => {
+        const englishOnly = publicEvent({
+            title: "ג'אם",
+            titleTranslations: { en: "Jam" },
+        })
+        expect(pickTitle(englishOnly, "ru")).toBe("ג'אם")
+        expect(pickTitle(publicEvent({ title: "ג'אם" }), "en")).toBe("ג'אם")
+    })
+})
+
+describe("pickAddress", () => {
+    const address = { label: "תל אביב", enLabel: "Tel Aviv", placeId: null }
+
+    it("shows the English label in English and in Russian", () => {
+        expect(pickAddress(address, "he")).toBe("תל אביב")
+        expect(pickAddress(address, "en")).toBe("Tel Aviv")
+        expect(pickAddress(address, "ru")).toBe("Tel Aviv")
+    })
+
+    it("falls back to the Hebrew label", () => {
+        const hebrewOnly = { ...address, enLabel: null }
+        expect(pickAddress(hebrewOnly, "en")).toBe("תל אביב")
+        expect(pickAddress(hebrewOnly, "ru")).toBe("תל אביב")
     })
 })
 
@@ -87,8 +150,8 @@ describe("labels", () => {
             ],
         })
 
-        expect(typeLabels(event)).toEqual(["שיעור", "ג'אם"])
-        expect(typeLabels(multiDay)).toEqual(["ריטריט"])
+        expect(typeLabels(event, HEBREW)).toEqual(["שיעור", "ג'אם"])
+        expect(typeLabels(multiDay, HEBREW)).toEqual(["ריטריט"])
     })
 
     it("names teachers by their public bio, else by their tag", () => {
@@ -159,6 +222,22 @@ describe("links", () => {
 })
 
 describe("toEventCards", () => {
+    it("labels the cards in the locale's language", () => {
+        const event = publicEvent({
+            startDate: "2026-11-07",
+            titleTranslations: { en: "Jam" },
+        })
+
+        const [card] = toEventCards([event], ENGLISH)
+
+        expect(card).toMatchObject({
+            title: "Jam",
+            address: "Tel Aviv",
+            dateLabel: "Saturday, November 7th",
+            types: ["Class"],
+        })
+    })
+
     it("orders by day, then start time, multi-day events first", () => {
         const late = publicEvent({
             id: "late",
@@ -172,7 +251,7 @@ describe("toEventCards", () => {
         })
         const nextDay = publicEvent({ id: "next", startDate: "2026-11-07" })
 
-        const ids = toEventCards([nextDay, late, multiDay, early]).map(
+        const ids = toEventCards([nextDay, late, multiDay, early], HEBREW).map(
             (card) => card.event.id,
         )
 

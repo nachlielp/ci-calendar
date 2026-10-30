@@ -223,12 +223,11 @@ describe("device storage", () => {
         storage.setItem("language", "en")
 
         renderApp({ storage, now: NOW })
-        await screen.findByText("אין אירועים קרובים")
+        // The legacy language choice is kept, and used.
+        await screen.findByText("No upcoming events")
 
         expect(storage.getItem("events")).toBeNull()
         expect(storage.getItem("bios")).toBeNull()
-        // Other legacy keys (language, filters, drafts) are left for the
-        // slices that port them.
         expect(storage.getItem("language")).toBe("en")
     })
 })

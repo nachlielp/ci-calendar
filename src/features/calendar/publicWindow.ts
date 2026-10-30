@@ -8,7 +8,7 @@ import {
     type PublicEvent,
 } from "./publicEvent"
 
-/** How far ahead the public calendar looks. ~25 events, ~5 KB gzipped. */
+/** How far ahead the public calendar looks. ~25 events, ~6.5 KB gzipped. */
 export const WINDOW_DAYS = 90
 
 /**

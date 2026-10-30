@@ -4,6 +4,7 @@ import { AppRoot } from "./app/AppRoot"
 import { bootQueryClient, createQueryClient } from "./app/boot"
 import { BUILD_VERSION } from "./app/buildVersion"
 import { browserStorage } from "./app/deviceStorage"
+import { applyLanguageToDocument, storedLanguage } from "./app/language"
 import { routes } from "./app/routes"
 import type { AppServices } from "./app/services"
 import { createDataClient } from "./data/client"
@@ -18,6 +19,9 @@ const services: AppServices = {
     storage: browserStorage(),
     buildVersion: BUILD_VERSION,
 }
+// Direction and language before anything renders; the provider keeps them
+// in step from here on.
+applyLanguageToDocument(storedLanguage(services.storage))
 const queryClient = createQueryClient()
 bootQueryClient(queryClient, services)
 

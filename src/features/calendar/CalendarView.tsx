@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react"
+import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
-import { plural } from "../../lib/plural"
+import { counted, defineCopy } from "../../lib/copy"
 import {
     addMonths,
     monthNumber,
@@ -11,22 +12,39 @@ import {
 import { ChevronRightIcon } from "../../ui/icons"
 import { cardsByDay, type EventCard } from "./eventCards"
 import { EventList } from "./EventList"
-import { HEBREW, dayLabel, type EventLocale } from "./eventFormat"
+import { dayLabel } from "./eventFormat"
+import { EVENT_LOCALES } from "./eventLocales"
 import { WINDOW_DAYS } from "./publicWindow"
 import "./CalendarView.scss"
 
-const hebrewPlurals = new Intl.PluralRules("he")
-
-const COPY = {
-    calendar: "לוח שנה",
-    nextMonth: "החודש הבא",
-    previousMonth: "החודש הקודם",
-    noEvents: "אין אירועים ביום הזה",
-    events: (count: number) =>
-        count === 0
-            ? ""
-            : `, ${plural(hebrewPlurals, count, { one: "אירוע אחד", other: "# אירועים" })}`,
-}
+const COPY = defineCopy({
+    he: {
+        calendar: "לוח שנה",
+        nextMonth: "החודש הבא",
+        previousMonth: "החודש הקודם",
+        noEvents: "אין אירועים ביום הזה",
+        events: counted({ one: "אירוע אחד", other: "# אירועים" }),
+    },
+    en: {
+        calendar: "Calendar",
+        nextMonth: "Next month",
+        previousMonth: "Previous month",
+        noEvents: "No events on this day",
+        events: counted({ one: "one event", other: "# events" }),
+    },
+    ru: {
+        calendar: "Календарь",
+        nextMonth: "Следующий месяц",
+        previousMonth: "Предыдущий месяц",
+        noEvents: "В этот день нет событий",
+        events: counted({
+            one: "# событие",
+            few: "# события",
+            many: "# событий",
+            other: "# события",
+        }),
+    },
+})
 
 /** Most dots a day shows, however many events it has. */
 const MAX_DOTS = 4
@@ -38,13 +56,13 @@ const MAX_DOTS = 4
  */
 export function CalendarView({
     cards,
-    locale = HEBREW,
 }: {
     /** The filtered list's cards, in list order. */
     cards: readonly EventCard[]
-    locale?: EventLocale
 }) {
     const { now } = useServices()
+    const copy = useCopy(COPY)
+    const locale = useCopy(EVENT_LOCALES)
     const today = jerusalemToday(now())
     const firstMonth = monthOf(today)
     const lastDay = addDays(today, WINDOW_DAYS)
@@ -58,15 +76,17 @@ export function CalendarView({
 
     return (
         <>
-            <section className="calendar-view" aria-label={COPY.calendar}>
-                {/* Next month on the right, as legacy had it in Hebrew. */}
+            <section className="calendar-view" aria-label={copy.calendar}>
+                {/* Previous, month, next in reading order: next month on
+                    the left in Hebrew, on the right in English and Russian,
+                    each chevron pointing outwards (CalendarView.scss). */}
                 <header className="calendar-controller">
                     <button
                         type="button"
-                        className="month-button next"
-                        aria-label={COPY.nextMonth}
-                        disabled={month >= lastMonth}
-                        onClick={() => setMonth(addMonths(month, 1))}
+                        className="month-button previous"
+                        aria-label={copy.previousMonth}
+                        disabled={month <= firstMonth}
+                        onClick={() => setMonth(addMonths(month, -1))}
                     >
                         <ChevronRightIcon />
                     </button>
@@ -75,10 +95,10 @@ export function CalendarView({
                     </h2>
                     <button
                         type="button"
-                        className="month-button previous"
-                        aria-label={COPY.previousMonth}
-                        disabled={month <= firstMonth}
-                        onClick={() => setMonth(addMonths(month, -1))}
+                        className="month-button next"
+                        aria-label={copy.nextMonth}
+                        disabled={month >= lastMonth}
+                        onClick={() => setMonth(addMonths(month, 1))}
                     >
                         <ChevronRightIcon />
                     </button>
@@ -111,7 +131,6 @@ export function CalendarView({
                                                         day === selectedDay
                                                     }
                                                     onSelect={setSelectedDay}
-                                                    locale={locale}
                                                 />
                                             )}
                                         </td>
@@ -128,7 +147,7 @@ export function CalendarView({
                     label={dayLabel(selectedDay, locale)}
                 />
             ) : (
-                <p className="calendar-view-empty">{COPY.noEvents}</p>
+                <p className="calendar-view-empty">{copy.noEvents}</p>
             )}
         </>
     )
@@ -140,21 +159,22 @@ function DayButton({
     isToday,
     isSelected,
     onSelect,
-    locale,
 }: {
     day: string
     count: number
     isToday: boolean
     isSelected: boolean
     onSelect: (day: string) => void
-    locale: EventLocale
 }) {
+    const copy = useCopy(COPY)
+    const locale = useCopy(EVENT_LOCALES)
+    const events = count > 0 ? `, ${copy.events(count)}` : ""
     return (
         <button
             type="button"
             aria-pressed={isSelected}
             aria-current={isToday ? "date" : undefined}
-            aria-label={`${dayLabel(day, locale)}${COPY.events(count)}`}
+            aria-label={`${dayLabel(day, locale)}${events}`}
             className={`day-cell ${count === 0 ? "no-events" : ""}`}
             onClick={() => onSelect(day)}
         >

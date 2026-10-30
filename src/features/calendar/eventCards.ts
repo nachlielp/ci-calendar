@@ -1,17 +1,22 @@
 import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
 import {
-    HEBREW,
     eventDateLabel,
     eventTimeRange,
     organisationNames,
+    pickAddress,
+    pickTitle,
     teacherNames,
     typeLabels,
 } from "./eventFormat"
+import type { EventLocale } from "./eventLocales"
 import type { PublicEvent } from "./publicEvent"
 
 /** An event with everything its list card shows, worked out once. */
 export interface EventCard {
     event: PublicEvent
+    /** Title and address in the locale's language. */
+    title: string
+    address: string
     dateLabel: string
     timeRange: string | null
     teachers: string[]
@@ -23,11 +28,11 @@ export interface EventCard {
  * The list's cards in display order: by day, then by start time (multi-day
  * events, which have no time, first). Every key and label is computed once
  * here, so sorting compares plain strings and rendering formats nothing;
- * call it once per data change (memoised on the events).
+ * call it once per data or language change (memoised on both).
  */
 export function toEventCards(
     events: readonly PublicEvent[],
-    locale = HEBREW,
+    locale: EventLocale,
 ): EventCard[] {
     return events
         .map((event) => ({
@@ -38,6 +43,8 @@ export function toEventCards(
             }`,
             card: {
                 event,
+                title: pickTitle(event, locale.language),
+                address: pickAddress(event.address, locale.language),
                 dateLabel: eventDateLabel(event, locale),
                 timeRange: eventTimeRange(event),
                 teachers: teacherNames(event),

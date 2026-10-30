@@ -1,9 +1,9 @@
 import { useEffect, useRef, type ReactNode } from "react"
 import { createPortal } from "react-dom"
+import { useCopy } from "../app/language"
+import { COMMON_COPY } from "../lib/commonCopy"
 import { ChevronRightIcon, CloseIcon } from "./icons"
 import "./Dialog.scss"
-
-const COPY = { close: "סגירה" }
 
 /**
  * A modal on a native `<dialog>`: a full-screen drawer on phones, a centred
@@ -29,6 +29,7 @@ export function Dialog({
     className?: string
     children: ReactNode
 }) {
+    const common = useCopy(COMMON_COPY)
     const ref = useRef<HTMLDialogElement>(null)
     // A click closes the dialog only if it also started on the backdrop, so
     // a text selection or drag released outside the box doesn't.
@@ -77,7 +78,7 @@ export function Dialog({
                 <button
                     type="button"
                     className="dialog-close"
-                    aria-label={COPY.close}
+                    aria-label={common.close}
                     onClick={requestClose}
                 >
                     <ChevronRightIcon className="dialog-close-drawer" />

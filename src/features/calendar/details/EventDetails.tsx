@@ -1,4 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
+import { useCopy, useLanguage } from "../../../app/language"
+import { defineCopy } from "../../../lib/copy"
 import { Dialog } from "../../../ui/Dialog"
 import {
     CalendarAddOnIcon,
@@ -15,43 +17,69 @@ import {
     ShareIcon,
 } from "../../../ui/icons"
 import {
-    HEBREW,
     bioOf,
     eventDateLabel,
     eventPath,
     eventTimeRange,
     googleCalendarUrl,
     mapsUrl,
+    pickAddress,
+    pickTitle,
     priceLabel,
     segmentTimeRange,
     tagLabel,
     typeLabel,
     typeLabels,
 } from "../eventFormat"
+import { EVENT_LOCALES } from "../eventLocales"
 import type { PublicBio, PublicEvent, Tag } from "../publicEvent"
 import { BioCard } from "./BioCard"
 import "./EventDetails.scss"
 
-const COPY = {
-    additionalInfo: "פרטים נוספים",
-    price: "מחיר",
-    link: "קישור",
-    copied: "הועתק",
-    addToCalendar: "הוספה ליומן גוגל",
-    navigate: "ניווט",
-    share: "שיתוף",
-    shareTitle: "Check out this event!",
-}
+const COPY = defineCopy({
+    he: {
+        additionalInfo: "פרטים נוספים",
+        price: "מחיר",
+        link: "קישור",
+        copied: "הועתק",
+        addToCalendar: "הוספה ליומן גוגל",
+        navigate: "ניווט",
+        share: "שיתוף",
+        shareTitle: "כדאי לבדוק את האירוע הזה!",
+    },
+    en: {
+        additionalInfo: "Additional Information",
+        price: "Price",
+        link: "Link",
+        copied: "Copied",
+        addToCalendar: "Add to Google Calendar",
+        navigate: "Navigate",
+        share: "Share",
+        shareTitle: "Check out this event!",
+    },
+    ru: {
+        additionalInfo: "Дополнительная информация",
+        price: "Цена",
+        link: "Ссылка",
+        copied: "Скопировано",
+        addToCalendar: "Добавить в Google Календарь",
+        navigate: "Маршрут",
+        share: "Поделиться",
+        shareTitle: "Посмотрите это событие!",
+    },
+})
 
 /** An event's full details (legacy FullEventCard). */
 export function EventDetails({ event }: { event: PublicEvent }) {
+    const copy = useCopy(COPY)
+    const locale = useCopy(EVENT_LOCALES)
     const timeRange = eventTimeRange(event)
     return (
         <section className="full-event-card">
-            <h2 className="event-title">{event.title}</h2>
+            <h2 className="event-title">{pickTitle(event, locale.language)}</h2>
             {event.cancelled && (
                 <p className="event-cancelled" role="status">
-                    {HEBREW.copy.cancelled}
+                    {locale.copy.cancelled}
                     {event.cancelledText && ` – ${event.cancelledText}`}
                 </p>
             )}
@@ -63,7 +91,9 @@ export function EventDetails({ event }: { event: PublicEvent }) {
             )}
             <p className="event-row">
                 <CalendarIcon className="event-icon" />
-                <span className="event-label">{eventDateLabel(event)}</span>
+                <span className="event-label">
+                    {eventDateLabel(event, locale)}
+                </span>
                 {timeRange && (
                     <>
                         <ScheduleIcon className="event-icon" />
@@ -75,7 +105,9 @@ export function EventDetails({ event }: { event: PublicEvent }) {
             </p>
             <p className="event-row">
                 <PinDropIcon className="event-icon" />
-                <span className="event-label">{event.address.label}</span>
+                <span className="event-label">
+                    {pickAddress(event.address, locale.language)}
+                </span>
             </p>
             {event.multiDayTeachers.length > 0 && (
                 <p className="event-row">
@@ -85,23 +117,24 @@ export function EventDetails({ event }: { event: PublicEvent }) {
             )}
             {event.segments.map((segment, index) => (
                 <p className="sub-event" key={index}>
-                    {segmentTimeRange(segment)} {typeLabel(segment.type)}
+                    {segmentTimeRange(segment)}{" "}
+                    {typeLabel(segment.type, locale)}
                     {segment.teachers.length > 0 && (
                         <>
                             {" "}
-                            {HEBREW.copy.with}{" "}
+                            {locale.copy.with}{" "}
                             <People event={event} tags={segment.teachers} />
                         </>
                     )}
                     {segment.tags.map((tag) => (
                         <span key={tag} className="segment-tag">
-                            {tagLabel(tag)}
+                            {tagLabel(tag, locale)}
                         </span>
                     ))}
                 </p>
             ))}
             <p className="event-tags">
-                {typeLabels(event).map((type) => (
+                {typeLabels(event, locale).map((type) => (
                     <span key={type} className="event-tag">
                         {type}
                     </span>
@@ -126,14 +159,14 @@ export function EventDetails({ event }: { event: PublicEvent }) {
             {event.description && (
                 <>
                     <hr className="hr" />
-                    <h3 className="section-title">{COPY.additionalInfo}</h3>
+                    <h3 className="section-title">{copy.additionalInfo}</h3>
                     <p className="event-description">{event.description}</p>
                 </>
             )}
             {event.prices.length > 0 && (
                 <>
                     <hr className="hr" />
-                    <h3 className="section-title">{COPY.price}</h3>
+                    <h3 className="section-title">{copy.price}</h3>
                     <p className="event-price">
                         {event.prices.map(priceLabel).join(", ")}
                     </p>
@@ -196,6 +229,8 @@ function BioButton({ bio }: { bio: PublicBio }) {
  * and in the browser, copy the event's link (as the legacy app offered).
  */
 function EventActions({ event }: { event: PublicEvent }) {
+    const copy = useCopy(COPY)
+    const { language } = useLanguage()
     const url = `${window.location.origin}${eventPath(event)}`
     const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
     return (
@@ -205,7 +240,7 @@ function EventActions({ event }: { event: PublicEvent }) {
                 href={googleCalendarUrl(event)}
                 target="_blank"
                 rel="noreferrer"
-                aria-label={COPY.addToCalendar}
+                aria-label={copy.addToCalendar}
             >
                 <CalendarAddOnIcon className="action-icon" />
             </a>
@@ -216,7 +251,7 @@ function EventActions({ event }: { event: PublicEvent }) {
                         href={mapsUrl(event.address, navigator.userAgent)}
                         target="_blank"
                         rel="noreferrer"
-                        aria-label={COPY.navigate}
+                        aria-label={copy.navigate}
                     >
                         <MapIcon className="action-icon" />
                     </a>
@@ -224,12 +259,12 @@ function EventActions({ event }: { event: PublicEvent }) {
                         <button
                             type="button"
                             className="secondary-action-btn"
-                            aria-label={COPY.share}
+                            aria-label={copy.share}
                             onClick={() =>
                                 navigator
                                     .share({
-                                        title: COPY.shareTitle,
-                                        text: event.title,
+                                        title: copy.shareTitle,
+                                        text: pickTitle(event, language),
                                         url,
                                     })
                                     // Dismissing the share sheet rejects.
@@ -252,6 +287,7 @@ function EventActions({ event }: { event: PublicEvent }) {
 }
 
 function CopyLinkButton({ url }: { url: string }) {
+    const copy = useCopy(COPY)
     const [copied, setCopied] = useState(false)
     useEffect(() => {
         if (!copied) return
@@ -269,7 +305,7 @@ function CopyLinkButton({ url }: { url: string }) {
                     .catch(() => {})
             }
         >
-            <span className="label">{copied ? COPY.copied : COPY.link}</span>
+            <span className="label">{copied ? copy.copied : copy.link}</span>
             {copied ? (
                 <CheckIcon className="action-icon" />
             ) : (

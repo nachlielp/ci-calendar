@@ -33,7 +33,10 @@ export interface PublicBio {
 export interface PublicEvent {
     id: string
     shortId: string | null
+    /** The Hebrew title, as written; see `pickTitle` (eventFormat.ts). */
     title: string
+    /** Machine translations of the title, where the save produced them. */
+    titleTranslations: { en?: string; ru?: string }
     /** Calendar day, `YYYY-MM-DD`. */
     startDate: string
     endDate: string
@@ -45,7 +48,8 @@ export interface PublicEvent {
     segments: Segment[]
     multiDayTeachers: Tag[]
     organisations: Tag[]
-    address: { label: string; placeId: string | null }
+    /** The Hebrew label and, when known, the English; see `pickAddress`. */
+    address: { label: string; enLabel: string | null; placeId: string | null }
     /** The region the calendar filters by, e.g. `center` (see filters.ts). */
     district: string
     links: { title: string; url: string }[]
@@ -56,11 +60,11 @@ export interface PublicEvent {
 }
 
 // Every column the list and the details render — the first-paint payload
-// (~5 KB gzipped for 90 days in production, bios included). Bios come
-// through the `ci_events_users_junction` → `public_bio` foreign keys.
-// Language titles (`lng_titles`) arrive with the languages slice.
+// (~6.5 KB gzipped for 90 days in production, bios and title translations
+// included). Bios come through the `ci_events_users_junction` → `public_bio`
+// foreign keys.
 export const PUBLIC_EVENT_COLUMNS =
-    "id, short_id, title, start_date, end_date, cancelled, cancelled_text, type, district, segments, multi_day_teachers, organisations, address, links, price, description, ci_events_users_junction(public_bio(user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2))"
+    "id, short_id, title, lng_titles, start_date, end_date, cancelled, cancelled_text, type, district, segments, multi_day_teachers, organisations, address, links, price, description, ci_events_users_junction(public_bio(user_id, bio_name, img, about, page_url, page_title, page_url_2, page_title_2))"
 
 const BIO = "ci_events_users_junction.public_bio"
 
@@ -92,6 +96,8 @@ const array = (value: unknown): Record<string, unknown>[] =>
         ? value.filter((item) => item && typeof item === "object")
         : []
 const text = (value: unknown) => (typeof value === "string" ? value : "")
+const object = (value: unknown) =>
+    (value && typeof value === "object" ? value : {}) as Record<string, unknown>
 
 const toTags = (value: unknown): Tag[] =>
     array(value).map((tag) => ({
@@ -101,11 +107,16 @@ const toTags = (value: unknown): Tag[] =>
 
 /** Rows with a start date; the queries' date filters guarantee one. */
 export function toPublicEvent(row: Row & { start_date: string }): PublicEvent {
-    const address = (row.address ?? {}) as Record<string, unknown>
+    const address = object(row.address)
+    const titles = object(row.lng_titles)
     return {
         id: row.id,
         shortId: row.short_id,
         title: row.title,
+        titleTranslations: {
+            en: text(titles.en) || undefined,
+            ru: text(titles.ru) || undefined,
+        },
         startDate: row.start_date,
         endDate: row.end_date ?? row.start_date,
         cancelled: row.cancelled ?? false,
@@ -126,6 +137,7 @@ export function toPublicEvent(row: Row & { start_date: string }): PublicEvent {
         organisations: toTags(row.organisations),
         address: {
             label: text(address.label),
+            enLabel: text(address.en_label) || null,
             placeId: text(address.place_id) || null,
         },
         district: row.district,

@@ -19,6 +19,9 @@ afterEach(() => {
     // Drop per-test overrides, restoring jsdom's "visible" and online.
     delete (document as { visibilityState?: unknown }).visibilityState
     delete (navigator as { onLine?: unknown }).onLine
+    // index.html's language, which a test that switched it must not leak.
+    document.documentElement.lang = "he"
+    document.documentElement.dir = "rtl"
 })
 
 // jsdom has <dialog> but not its modal API. This stands in for what the

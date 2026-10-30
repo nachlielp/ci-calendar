@@ -65,7 +65,8 @@
         }
     }
 
-    // Phones: a full-screen drawer sliding in from the right.
+    // Phones: a full-screen drawer sliding in from the start (the right in
+    // Hebrew), its chevron pointing back there.
     @media (max-width: 499px) {
         width: 100%;
         max-width: 100%;
@@ -75,6 +76,14 @@
 
         &[open] {
             animation: dialog-drawer-in 0.25s ease-out;
+        }
+
+        [dir="ltr"] & {
+            --drawer-from: -100%;
+
+            .dialog-close-drawer {
+                transform: rotate(180deg);
+            }
         }
 
         .dialog-close-modal {
@@ -109,7 +118,7 @@
 
 @keyframes dialog-drawer-in {
     from {
-        transform: translateX(100%);
+        transform: translateX(var(--drawer-from, 100%));
     }
 }
 

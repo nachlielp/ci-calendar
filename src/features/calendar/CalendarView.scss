@@ -27,8 +27,10 @@
             cursor: default;
         }
 
-        // The chevron points left: forward, in Hebrew.
-        &.next svg {
+        // The chevron (pointing right) points outwards: the button at the
+        // left edge, next month in Hebrew and previous left to right, turns.
+        [dir="rtl"] &.next svg,
+        [dir="ltr"] &.previous svg {
             transform: rotate(180deg);
         }
     }

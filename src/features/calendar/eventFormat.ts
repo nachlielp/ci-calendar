@@ -1,116 +1,56 @@
 import { isDistrict } from "../../lib/eventOptions"
-import { addDays, jerusalemTimeOfDay, weekday } from "../../lib/jerusalemDate"
+import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
+import type { Language } from "../../lib/language"
+import type { EventLocale } from "./eventLocales"
 import type { PublicBio, PublicEvent, Segment, Tag } from "./publicEvent"
 
 // Pure formatting of public events, shared by the list card and the details.
-//
-// Everything language-specific sits in an `EventLocale`; the formatters take
-// one (Hebrew by default). The languages slice adds English and Russian
-// locales (legacy util/translations.ts and translate.ts `getMonthName`) and
-// passes the UI language's locale through.
+// Everything language-specific comes from an `EventLocale` (eventLocales.ts),
+// which the formatters require: the caller passes the interface language's.
 
-/** The words and formats events are shown with in one language. */
-export interface EventLocale {
-    /** Copy shared by the list card and the details. */
-    copy: { cancelled: string; with: string }
-    /** Event and segment types (`class`, `jam`, …). */
-    types: Readonly<Record<string, string>>
-    /** Segment audience tags (`everyone`, `beginner`, …). */
-    tags: Readonly<Record<string, string>>
-    /** Event districts (`center`, `jerusalem`, …). */
-    districts: Readonly<Record<string, string>>
-    /** Month names, January first. */
-    months: readonly string[]
-    /** Weekday headings of the month calendar, Sunday first. */
-    weekdaysShort: readonly string[]
-    /** A calendar day; `weekday` 0 = Sunday, `month` 1 = January. */
-    day(parts: { weekday: number; date: number; month: number }): string
+/**
+ * The event's title in `language`: its stored translation (`lng_titles`,
+ * written by the translate function on save), else the Hebrew title.
+ * Russian falls back to Hebrew, not English, as in legacy.
+ */
+export function pickTitle(event: PublicEvent, language: Language): string {
+    return language === "he"
+        ? event.title
+        : event.titleTranslations[language] || event.title
 }
 
-const HEBREW_WEEKDAYS = [
-    "ראשון",
-    "שני",
-    "שלישי",
-    "רביעי",
-    "חמישי",
-    "שישי",
-    "שבת",
-]
-
-const HEBREW_MONTHS = [
-    "ינואר",
-    "פברואר",
-    "מרץ",
-    "אפריל",
-    "מאי",
-    "יוני",
-    "יולי",
-    "אוגוסט",
-    "ספטמבר",
-    "אוקטובר",
-    "נובמבר",
-    "דצמבר",
-]
-
-export const HEBREW: EventLocale = {
-    copy: { cancelled: "האירוע בוטל", with: "עם" },
-    types: {
-        class: "שיעור",
-        jam: "ג'אם",
-        underscore: "אנדרסקור",
-        workshop: "סדנה",
-        retreat: "ריטריט",
-        warmup: "חימום",
-        course: "קורס",
-        score: "סקור",
-    },
-    tags: {
-        everyone: "פתוח לכולם",
-        beginner: "מתחילים",
-        advanced: "מתקדמים",
-        male: "גברים",
-        female: "נשים",
-        preRegistration: "הרשמה מראש",
-    },
-    districts: {
-        center: "מרכז",
-        jerusalem: "ירושלים",
-        galilee: "גליל",
-        haifa: "חיפה",
-        carmel: "חוף הכרמל",
-        pardesHanna: "פרדס חנה",
-        south: "דרום",
-    },
-    months: HEBREW_MONTHS,
-    weekdaysShort: ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"],
-    // `שבת, יום שבת 7 בנובמבר`, the legacy app's day format.
-    day: ({ weekday, date, month }) => {
-        const name = HEBREW_WEEKDAYS[weekday]
-        return `${name}, יום ${name} ${date} ב${HEBREW_MONTHS[month - 1]}`
-    },
+/**
+ * The address in `language`: Hebrew gets the Hebrew label; English and
+ * Russian get the English label (there is no Russian one), else the Hebrew.
+ */
+export function pickAddress(
+    address: PublicEvent["address"],
+    language: Language,
+): string {
+    return language === "he" ? address.label : address.enLabel || address.label
 }
 
 const label = (labels: Readonly<Record<string, string>>, key: string) =>
     Object.hasOwn(labels, key) ? labels[key] : key
 
-export const typeLabel = (type: string, locale = HEBREW) =>
+export const typeLabel = (type: string, locale: EventLocale) =>
     label(locale.types, type)
-export const tagLabel = (tag: string, locale = HEBREW) =>
+export const tagLabel = (tag: string, locale: EventLocale) =>
     label(locale.tags, tag)
-const districtLabel = (district: string, locale = HEBREW) =>
+const districtLabel = (district: string, locale: EventLocale) =>
     label(locale.districts, district)
 /** The label of an event type or a district (lib/eventOptions.ts). */
-export const optionLabel = (value: string, locale = HEBREW) =>
+export const optionLabel = (value: string, locale: EventLocale) =>
     isDistrict(value) ? districtLabel(value, locale) : typeLabel(value, locale)
 
 /** A calendar day (`YYYY-MM-DD`) in the locale's day format. */
-export function dayLabel(day: string, locale = HEBREW): string {
-    const [, month, date] = day.split("-").map(Number)
-    return locale.day({ weekday: weekday(day), date, month })
-}
+export const dayLabel = (day: string, locale: EventLocale) => locale.day(day)
 
 /** The day, or the day range of a multi-day event. */
-export function eventDateLabel(event: PublicEvent, locale = HEBREW): string {
+export function eventDateLabel(
+    event: PublicEvent,
+    locale: EventLocale,
+): string {
     return isMultiDay(event)
         ? `${dayLabel(event.startDate, locale)} - ${dayLabel(event.endDate, locale)}`
         : dayLabel(event.startDate, locale)
@@ -136,7 +76,7 @@ export const priceLabel = (price: PublicEvent["prices"][number]) =>
     `${price.title}: ${price.sum}₪`
 
 /** The event's types (its own and its segments'), each once, as labels. */
-export function typeLabels(event: PublicEvent, locale = HEBREW): string[] {
+export function typeLabels(event: PublicEvent, locale: EventLocale): string[] {
     const types = [...event.segments.map((s) => s.type), event.type]
     return [...new Set(types.filter(Boolean))].map((type) =>
         typeLabel(type, locale),
@@ -203,7 +143,7 @@ export function googleCalendarUrl(event: PublicEvent): string {
  * (by place id when the address has one).
  */
 export function mapsUrl(
-    address: PublicEvent["address"],
+    address: Pick<PublicEvent["address"], "label" | "placeId">,
     userAgent: string,
 ): string {
     const query = encodeURIComponent(address.label)

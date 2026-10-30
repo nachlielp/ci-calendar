@@ -5,6 +5,14 @@
     align-items: center;
     margin-top: 1.25rem;
 
+    // The language menu at the start (right in Hebrew), where legacy's
+    // header had it; slice 6 moves it into the app header.
+    .calendar-top-bar {
+        display: flex;
+        align-self: stretch;
+        margin-block-end: 0.5rem;
+    }
+
     .calendar-title {
         width: 70%;
         margin: 0;
