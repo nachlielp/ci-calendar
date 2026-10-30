@@ -29,6 +29,7 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 | `src/features/admin`          | Shared admin parts: freshness, refresh button, one page chunk |
 | `src/features/admin-users`    | `/manage-users`: users search, role changes (`useAssignRole`) |
 | `src/features/admin-requests` | `/manage-support`: open/closed requests, replies, approvals   |
+| `src/features/admin-events`   | `/manage-all-events`: every creator's events, their actions   |
 | `src/lib/`                    | Pure helpers (dates, formatting); tested directly             |
 | `src/ui/`                     | Shared presentational primitives (dialog, buttons, icons)     |
 | `src/ui/form`                 | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
@@ -346,6 +347,11 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   (`features/events/ActionDialog.tsx`); a stylesheet of a page using them
   `@use`s `features/events/_action-dialog.scss`, so their shared chunk
   has no CSS file of its own (each file name costs `/`'s preload lists).
+  The same goes for every component two lazy pages share: `EventRow`
+  (`@include event-rows` from `manage-events/_event-rows.scss` inside the
+  page's class), `EventActions` (`manage-events/_event-actions.scss`) and
+  `TagPicker` (`ui/form/_tag-picker.scss`); the component imports no
+  stylesheet.
 - **Personal pages.** A signed-in page's own data is one query per kind
   (e.g. `myRequestsQuery`, `features/requests/myRequests.ts`) keyed
   `[kind, userId, …]` with the id from `useUserId()`
@@ -413,7 +419,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
       (keyset-paginated, `EventPage`) do the work given which saved events
       belong and the list's order; see the `my-events` list in
       `features/manage-events/myEvents.ts`. `features/events` never imports
-      a feature's list. Admin's manage-all-events registers its own.
+      a feature's list. Admin's manage-all-events registers its own
+      (`admin-events`, `admin-events/adminEvents.ts`).
     - **Hide, cancel and delete** are `useSetHidden`, `useSetCancelled`
       and `useDeleteEvents` (`features/events/eventWrites.ts`): one
       conditional write each. Hide and cancel only touch events still in
@@ -421,9 +428,29 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       default only the user's own (`.eq("user_id", userId)`; RLS lets
       admins write anyone's, so the client says which it means); admin
-      pages pass `{ ownOnly: false }`. If fewer events come back than were
-      asked for, `refreshEventQueries` invalidates every event list (the
-      window and links too): those on screen refetch, the rest when shown.
+      pages pass `{ ownOnly: false }`, which scopes the write to the
+      events' loaded owner (`.eq("user_id", event.ownerId)`, as the edit
+      form does). What comes back is applied; if fewer events come back
+      than were asked for (changed or deleted elsewhere, or refused by
+      RLS), `refreshEventQueries` invalidates every event list (the window
+      and links too: those on screen refetch, the rest when shown) and the
+      write fails with `EventsChangedError`, which the dialog says ("not
+      allowed, or changed meanwhile"): never a silent success. A delete
+      the junction's foreign key refuses (`23503`) removes the events'
+      `ci_events_users_junction` rows and is sent once more, so a tagged
+      event can be deleted whether the key cascades or not (legacy deleted
+      the event alone; see Maintainer notes).
+    - **The rows and actions** of management lists are `EventRow`
+      (`manage-events/EventRow.tsx`: title, days, optional creator, hidden
+      and cancelled; open, the details and its children) and
+      `EventActions` (edit, delete, cancel/restore, hide/show; `later`, the
+      series' later events offered by delete and hide, `LaterEvents`:
+      ready, loading or failed with a retry, OK held until ready;
+      `ownOnly`; `editState`, the edit link's router state), listed by
+      `ManagedEventList` (`manage-events/ManagedEventList.tsx`: one open
+      row at a time, loading, empty, failed with a retry, "load more")
+      with `useFocusAfterDelete` (focus to the page's heading once a
+      deleted row is gone). My events and the admins' list both use them.
 - **Pagination.** Long personal or admin lists load a page at a time with
   `infiniteQueryOptions` and keyset pagination, never offsets (a delete
   would shift them): order by a unique key (`start_date`, then `id`), ask
@@ -665,7 +692,16 @@ until }`, off for every saved event, so it's in drafts too) is
       `/manage-events/edit-multi-day/:eventId` (`myEventQuery`, personal,
       the user's own event by id, at once from the cached upcoming list;
       registered as an event list; an event of the other kind redirects to
-      its own form; back to `/manage-events`). Each page is a few lines
+      its own form; back to `/manage-events`). **Admins edit anyone's
+      event** there, as legacy's manage-all-events let them: for an admin
+      viewer the page reads with scope `"any"` (no owner filter; the key
+      carries the scope); edits are written only while the row still
+      belongs to the owner the form opened it with (`.eq("user_id",
+event.ownerId)`, the user's own for everyone else, since that is all
+      `"own"` reads) and the series offered is that owner's
+      (`mySeriesQuery(…, ownerId)`). Opened from `/manage-all-events`
+      (link state `FROM_ALL_EVENTS`, `events/managedEvent.ts`), the form
+      goes back there. Each page is a few lines
       over `NewEventFormPage` / `EditEventFormPage`
       (`EventFormPages.tsx`: header, back button, loading/not-found/error,
       the draft key the back button drops). Layout in `FormPage.scss`.
@@ -815,8 +851,8 @@ userId, bio | null, { refresh })` (`events/eventCache.ts`; `null`
     - **Routing**: inside `requireRole(ADMIN_ROLES, [...])`, routed with
       `adminPage("Name")` (`app/routes.tsx`): every admin page is exported
       from `features/admin/pages.ts`, one chunk and one dynamic import in
-      `/`'s route table for all of them (as the event forms). Add slice
-      20's pages there.
+      `/`'s route table for all of them (as the event forms). Add any new
+      admin page there.
     - **Data**: admin queries are built as personal ones (keyed `[kind,
 adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
 !!adminId`, selecting only the columns shown): loaded when their
@@ -841,7 +877,8 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       the data on screen and says so.
     - **Server-side search**: a list too long to load whole is searched on
       the server, never filtered in the browser. The text box's value goes
-      through `useDebouncedValue` (`app/`, 300 ms, `SEARCH_DEBOUNCE_MS`),
+      through `useDebouncedValue` (`app/`; 300 ms, `SEARCH_DEBOUNCE_MS` in
+      `admin/adminLists.ts`),
       trimmed, into the query key (each search its own query, shown with
       `placeholderData: keepPreviousData`, the list dimmed, `aria-busy` and
       a "searching" status while `isPlaceholderData`), and into one
@@ -937,6 +974,30 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       given and the request left as it is (`RoleGivenRequestChangedError`);
       any other close failure leaves the role given and the request open
       (`ApprovalCloseError`; approving again is safe).
+- **All events** (slice 20; `features/admin-events`, legacy
+  ManageAllEventsPage, ManageEventsList, `getCIEventsCreators` and the
+  store's `app_ci_events`/`app_creators`):
+    - **List** (`adminEvents.ts`): `adminEventsQuery` (`admin-events`,
+      keyed `[kind, adminId, creatorIds sorted, search]`) reads
+      `MANAGED_EVENT_COLUMNS` of every owner's events from today on,
+      hidden ones included, optionally `in("user_id", creators)` and
+      `ilike("title", containing(search))` (debounced, as the users search;
+      `containing` is in `admin/adminLists.ts`), 30 a page by day then id
+      (keyset, `afterUpcoming`; `PAGED_ADMIN_FRESHNESS`, removed when the
+      page closes, passed days dropped in `select`). Registered as an event
+      list: every event write (here, my events, the forms) puts the saved
+      event in each cached filter it matches (`belongsInList`) and takes
+      out deleted ones and those that no longer match.
+    - **Creators** (`adminEventCreatorsQuery`, `admin-event-creators`,
+      `PERSONAL_FRESHNESS`): `user_id, users(user_name)` of the events from
+      today on, deduplicated in the browser as legacy did (no distinct
+      without an RPC); the `TagPicker` filter's options and the rows'
+      creator names.
+    - **Actions** are `EventActions` with `ownOnly={false}`; delete and
+      hide offer the owner's later events of the series
+      (`mySeriesQuery(services, adminId, refKey, ownerId)`, read when a
+      recurring event's row opens). The refresh button refreshes the list
+      shown and the creators and drops the other filters' lists.
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
   JavaScript API's Places library with `VITE_GOOGLE_PLACES_API_KEY` on
   first call (`data/googlePlaces.ts`, its own chunk; a script tag with
@@ -1192,6 +1253,30 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
   `<style>`); it positions the image through `element.style`, which CSP
   doesn't block.
 
+- **Before the cutover: check the event write policies and the junction's
+  delete rule.** Admins' updates and deletes of others' events (slice 20)
+  are untested against the live database: legacy's admin delete never
+  reached it, and the RLS check of 2026-08-08 verified SELECT only. Run
+
+    ```sql
+    select policyname, cmd, qual, with_check from pg_policies
+    where tablename in ('ci_events','ci_events_users_junction');
+    ```
+
+    and check that UPDATE and DELETE on `ci_events` allow `has_admin_role()`
+    (as well as the owner), and DELETE on `ci_events_users_junction` the
+    event's owner and admins. Then
+
+    ```sql
+    select confdeltype from pg_constraint
+    where conname = 'ci_events_users_junction_ci_event_id_fkey';
+    ```
+
+    (`c` cascade, `a`/`r` no action/restrict): with `c` a delete removes
+    the tags itself; otherwise the client deletes the tags first on the
+    database's refusal (an extra request). Until checked, a refused admin
+    write shows "not allowed, or changed meanwhile" and changes nothing.
+
 - **Deleting a template may delete its events.** The delete rule of
   `ci_events.source_template_id`'s foreign key
   (`ci-events_source_template_id_fkey`) isn't known from the repo. Check it
@@ -1217,7 +1302,7 @@ feature helpers is tested directly.
   Reset `<html lang dir>` to `he`/`rtl` between them, as a reload starts
   from `index.html` (`setup.ts` does so after each test).
 - **Embedded resources:** the fake joins embeds through the foreign keys in
-  its `RELATIONS` map and applies dotted filters to the embedded rows, as
+  its `RELATIONS` map (`ci_events.users` is the creator) and applies dotted filters to the embedded rows, as
   PostgREST does; add a relation there when a query embeds a new one. It also
   supports `neq`, `lt`, `gt`, `in`, `is` / `not(column, "is", value)`
   (SQL's `IS`, so `closed IS NOT TRUE` matches `null`), `or()` with
@@ -1226,7 +1311,10 @@ feature helpers is tested directly.
   `order` is the list of them, `limit` and `range` as set. `delete()`
   removes the filtered rows and returns them.
   An insert naming a missing row through a key in `FOREIGN_KEYS`
-  (`ci_events.source_template_id`) fails with `23503`, as Postgres'.
+  (`ci_events.source_template_id`) fails with `23503`, as Postgres'; so
+  does deleting a row still referenced through `REFERENCED_BY`
+  (`ci_events_users_junction.ci_event_id`: no cascade, the rule the
+  schema dump shows).
   An insert returns the row as stored, with the sequence columns in
   `SERIAL_COLUMNS` filled (`requests.number`; send ids from the client,
   `crypto.randomUUID()`); an update returns the rows its filters matched
@@ -1533,3 +1621,23 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     and a fetch in flight is redone. Nothing at boot, persisted or kept
     after sign-out; refetched on mount, when the app returns stale, and by
     the refresh button.
+20. Admin manage all events: `/manage-all-events` (admins; lazy, guarded; in
+    the admin chunk), legacy ManageEventsList: every creator's events from
+    today on, hidden ones included (legacy's list dropped them), 30 a page
+    with "load more", filtered on the server by creator (legacy's
+    multi-select, as a `TagPicker`; the creators read only on this page,
+    two small columns) and by title (debounced `ilike`); rows show the
+    creator. Legacy's actions on anyone's event: hide or show and delete
+    (with the owner's later events of a series), cancel with a note or
+    restore, and edit, which opens the edit forms for any event for an
+    admin (owner-scoped writes on the row's owner) and comes back here.
+    Rows and actions are my events' (`EventRow`, `EventActions` with
+    `ownOnly`); every write updates the calendar, shared links, my events
+    and these lists from its response. Nothing at boot, persisted or kept
+    after sign-out; refetched on mount, when the app returns stale and by
+    the refresh button. `mergeIntoPages` no longer drops an event it added
+    earlier in the same change to the same page. Every hide, cancel and
+    delete is scoped to the events' loaded owner and fails visibly when
+    fewer events are written than asked; deletes remove the teacher tags
+    first when the junction's foreign key refuses; the list scaffolding
+    is shared (`ManagedEventList`, `useFocusAfterDelete`).

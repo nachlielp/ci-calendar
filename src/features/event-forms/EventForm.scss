@@ -1,6 +1,7 @@
 // Legacy event-form.scss, event-segments-form.scss, add-links-form.scss,
 // add-prices-form.scss and multi-day-form-head.scss (antd's rows and columns dropped), plus the card
 // border of generics/card.scss.
+@use "../../ui/form/tag-picker";
 
 .event-form {
     .event-card {

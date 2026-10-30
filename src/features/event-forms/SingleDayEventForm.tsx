@@ -127,7 +127,8 @@ export function SingleDayEventForm({
     const services = useServices()
     const refKey = event?.recurringRefKey ?? ""
     const seriesQuery = useQuery({
-        ...mySeriesQuery(services, userId, refKey),
+        // The event's owner's series: an admin may edit another's event.
+        ...mySeriesQuery(services, userId, refKey, event?.ownerId),
         enabled: !!userId && !!refKey,
     })
     // A recurring event's edit waits for the rest of its series, so the

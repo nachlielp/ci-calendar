@@ -6,7 +6,12 @@ import {
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
-import { afterNewest, PAGED_ADMIN_FRESHNESS, quoted } from "../admin/adminLists"
+import {
+    afterNewest,
+    containing,
+    PAGED_ADMIN_FRESHNESS,
+    quoted,
+} from "../admin/adminLists"
 
 // The users list for `/manage-users` (legacy ManageUsersPage and
 // usersService.getUsers): admin data, read only when the page opens, a page
@@ -94,15 +99,6 @@ export function toAdminUser(row: AdminUserRow): AdminUser {
         createdAt: row.created_at,
     }
 }
-
-/**
- * The text typed as an `ilike` pattern that matches it anywhere: Postgres'
- * LIKE wildcards in it (`%`, `_`) and its escape (`\`) are escaped, and a
- * `*` (PostgREST's wildcard, which can't be escaped) becomes `_`, any one
- * character, so it still matches a `*`.
- */
-const containing = (text: string) =>
-    `*${text.replace(/[\\%_]/g, "\\$&").replaceAll("*", "_")}*`
 
 /**
  * Legacy's search ("by name or email"): users whose name or email contains

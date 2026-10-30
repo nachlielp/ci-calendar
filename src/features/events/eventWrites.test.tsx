@@ -9,11 +9,17 @@ import { NO_UPDATES } from "../../app/updates/updates"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { testUser } from "../../test/testUsers"
 import { event } from "../calendar/testEvents"
-import { useDeleteEvents, useSetCancelled, useSetHidden } from "./eventWrites"
+import {
+    EventsChangedError,
+    useDeleteEvents,
+    useSetCancelled,
+    useSetHidden,
+} from "./eventWrites"
 import { toManagedEvent, type ManagedEventRow } from "./managedEvent"
 
-// The writes as admin pages reuse them: `ownOnly: false` drops the owner
-// filter (RLS lets admins write any event); the state conditions stay.
+// The writes as admin pages reuse them: `ownOnly: false` scopes them to
+// the event's loaded owner instead of the user (RLS lets admins write any
+// event); the state conditions stay.
 function setup() {
     const admin = testUser("admin")
     const fake = createFakeDataClient()
@@ -54,7 +60,7 @@ const writes = (fake: ReturnType<typeof createFakeDataClient>) =>
     fake.requests.filter((request) => request.method !== "select")
 
 describe("event writes for admins (ownOnly: false)", () => {
-    it("hide, cancel and delete anyone's event, without the owner filter", async () => {
+    it("hide, cancel and delete anyone's event, as owned when loaded", async () => {
         const { admin, fake, wrapper, managed } = setup()
         const { result } = renderHook(
             () => ({
@@ -80,28 +86,52 @@ describe("event writes for admins (ownOnly: false)", () => {
         expect(writes(fake).map((request) => request.filters)).toEqual([
             [
                 { op: "in", column: "id", value: [managed.id] },
+                { op: "eq", column: "user_id", value: "creator" },
                 { op: "eq", column: "hide", value: false },
             ],
             [
                 { op: "eq", column: "id", value: managed.id },
+                { op: "eq", column: "user_id", value: "creator" },
                 { op: "not.is", column: "cancelled", value: true },
             ],
-            [{ op: "in", column: "id", value: [managed.id] }],
+            [
+                { op: "in", column: "id", value: [managed.id] },
+                { op: "eq", column: "user_id", value: "creator" },
+            ],
         ])
         expect(fake.rows("ci_events")).toHaveLength(0)
     })
 
-    it("keep the owner filter by default", async () => {
+    it("keep the user's own filter by default, and fail when nothing is written", async () => {
         const { admin, fake, wrapper, managed } = setup()
         const { result } = renderHook(() => useDeleteEvents(admin.id), {
             wrapper,
         })
-        await act(() => result.current.mutateAsync([managed]))
+        await act(() =>
+            expect(
+                result.current.mutateAsync([managed]),
+            ).rejects.toBeInstanceOf(EventsChangedError),
+        )
         expect(writes(fake)[0].filters).toContainEqual({
             op: "eq",
             column: "user_id",
             value: admin.id,
         })
         expect(fake.rows("ci_events")).toHaveLength(1)
+    })
+
+    it("fail, never succeed silently, when an event's owner changed meanwhile", async () => {
+        const { admin, fake, wrapper, managed } = setup()
+        fake.rows("ci_events")[0].user_id = "someone-else"
+        const { result } = renderHook(
+            () => useSetHidden(admin.id, { ownOnly: false }),
+            { wrapper },
+        )
+        await act(() =>
+            expect(
+                result.current.mutateAsync({ events: [managed], hide: true }),
+            ).rejects.toBeInstanceOf(EventsChangedError),
+        )
+        expect(fake.rows("ci_events")[0].hide).toBe(false)
     })
 })

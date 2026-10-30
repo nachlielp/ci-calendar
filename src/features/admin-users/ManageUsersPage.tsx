@@ -14,7 +14,11 @@ import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
 import { FormAlert, TextField } from "../../ui/form/fields"
 import { ContentCopyIcon } from "../../ui/icons/ContentCopyIcon"
-import { refreshFirstPage, useRefreshWhenBack } from "../admin/adminLists"
+import {
+    refreshFirstPage,
+    SEARCH_DEBOUNCE_MS,
+    useRefreshWhenBack,
+} from "../admin/adminLists"
 import { RefreshButton } from "../admin/RefreshButton"
 import { ActionDialog } from "../events/ActionDialog"
 import { REQUEST_WORDS } from "../requests/requestWords"
@@ -154,9 +158,6 @@ const COUNTS: readonly SignedInRole[] = [
     "profile",
     "user",
 ]
-
-/** A search goes to the server once typing pauses this long. */
-export const SEARCH_DEBOUNCE_MS = 300
 
 /**
  * `/manage-users` (admins): legacy's user search with each user's details

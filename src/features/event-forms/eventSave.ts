@@ -316,11 +316,13 @@ async function storedAndMissing(
 }
 
 /**
- * Updates one of the user's events with the changed columns, only while it
- * is still theirs (`user_id`); gone (deleted meanwhile), it fails with
- * `EventGoneError` and every event list is refetched. Translations are
- * looked up only for a changed title or a newly picked address (legacy),
- * once, and used for the later events of its series the user chose too:
+ * Updates an event with the changed columns, only while it still belongs
+ * to the owner the form opened it with (`user_id` = `event.ownerId`: the
+ * user's own, as `myEventQuery` reads them, or for an admin anyone's);
+ * gone (deleted meanwhile), it fails with `EventGoneError` and every event
+ * list is refetched. Translations are looked up only for a changed title
+ * or a newly picked address (legacy), once, and used for the later events
+ * of its series the user chose too:
  * those get their own patches (`later`), still only while theirs and in
  * the series, in one request per distinct patch (one for all, unless the
  * segments changed: each event's carry its own day), written only once
@@ -366,7 +368,7 @@ export function useUpdateEvent(userId: string) {
             // has (gone, nothing else is written).
             const edited = await update(patch)
                 .eq("id", event.id)
-                .eq("user_id", userId)
+                .eq("user_id", event.ownerId)
                 .select(MANAGED_EVENT_COLUMNS)
                 .maybeSingle()
             if (edited.error) throw new Error(edited.error.message)
@@ -378,7 +380,7 @@ export function useUpdateEvent(userId: string) {
                 writes.map(({ ids, columns }) =>
                     update(columns)
                         .in("id", ids)
-                        .eq("user_id", userId)
+                        .eq("user_id", event.ownerId)
                         .eq("recurring_ref_key", event.recurringRefKey ?? "")
                         .select(MANAGED_EVENT_COLUMNS),
                 ),

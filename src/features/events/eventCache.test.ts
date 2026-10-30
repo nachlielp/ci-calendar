@@ -160,6 +160,51 @@ describe("applyEventChanges", () => {
         expect(past()).toEqual([["p2026-10-20", "p2026-10-15", "p2026-10-10"]])
     })
 
+    it("keeps every event a change puts on one page, across loaded pages", () => {
+        const { queryClient, past, apply } = setup()
+        queryClient.setQueryData<InfiniteData<PastPage>>(
+            myPastEventsKey(OWNER),
+            (old) => ({
+                pages: [
+                    old!.pages[0],
+                    {
+                        events: [
+                            managed({
+                                id: "p2026-10-05",
+                                startDate: "2026-10-05",
+                            }),
+                            managed({
+                                id: "p2026-10-01",
+                                startDate: "2026-10-01",
+                            }),
+                        ],
+                        next: null,
+                    },
+                ],
+                pageParams: [null, old!.pages[0].next],
+            }),
+        )
+        apply({
+            saved: [
+                // Two on the first page, one on the second, one at the end
+                // of the last page (no page follows), one hidden there now.
+                managed({ id: "p2026-10-18", startDate: "2026-10-18" }),
+                managed({ id: "p2026-10-12", startDate: "2026-10-12" }),
+                managed({ id: "p2026-10-03", startDate: "2026-10-03" }),
+                managed({ id: "p2026-09-01", startDate: "2026-09-01" }),
+                managed({
+                    id: "p2026-10-05",
+                    startDate: "2026-10-05",
+                    hidden: true,
+                }),
+            ],
+        })
+        expect(past()).toEqual([
+            ["p2026-10-20", "p2026-10-18", "p2026-10-12", "p2026-10-10"],
+            ["p2026-10-05", "p2026-10-03", "p2026-10-01", "p2026-09-01"],
+        ])
+    })
+
     it("leaves a query's data alone when the change doesn't concern it", () => {
         const { queryClient, windowKey, apply } = setup()
         const before = queryClient.getQueryData(windowKey)

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { sessionOf } from "../../app/auth/personal"
 import { useServices } from "../../app/services"
+import type { DataClient } from "../../data/client"
 import { applyEventChanges, refreshEventQueries } from "./eventCache"
 import {
     MANAGED_EVENT_COLUMNS,
@@ -12,16 +13,21 @@ import {
 // DeleteEventButton), for the user's own events (manage-events) and, with
 // `ownOnly: false`, an admin's moderation. Each is one conditional write:
 // hide and cancel go only to events still in the state the user saw, so a
-// change made elsewhere meanwhile isn't flipped back; with `ownOnly` (the
-// default) only to the user's own (`user_id`, as RLS checks too). The rows
-// the server returns update every cached event query (`applyEventChanges`);
-// if some asked-for event didn't come back (deleted or changed elsewhere),
-// every event query is refetched (`refreshEventQueries`).
+// change made elsewhere meanwhile isn't flipped back; every write goes only
+// to events still owned as they were loaded (`user_id`: the user with
+// `ownOnly`, the default; else the events' own `ownerId`, as the edit form
+// does). The rows the server returns update every cached event query
+// (`applyEventChanges`); if fewer events come back than were asked for
+// (changed or deleted elsewhere, or a write RLS refused: admins' writes on
+// others' events aren't proven against the live policies), every event
+// query is refetched and the write fails with `EventsChangedError`, which
+// the dialog shows: never a silent success.
 
 export interface EventWriteOptions {
     /**
      * Only the signed-in user's own events (`.eq("user_id", userId)`).
-     * True by default; admin pages pass false (RLS lets admins write any).
+     * True by default; admin pages pass false (RLS lets admins write any),
+     * and the write is then scoped to the events' loaded owner.
      */
     ownOnly?: boolean
 }
@@ -42,21 +48,37 @@ export interface CancelChange {
 /** Most a cancellation note may hold (legacy's input). */
 export const CANCELLED_TEXT_MAX = 80
 
+/**
+ * Some of the events asked for weren't written: changed or deleted
+ * meanwhile, or not allowed. What was written is applied, and every event
+ * list is read again.
+ */
+export class EventsChangedError extends Error {
+    constructor() {
+        super("Fewer events written than asked for")
+    }
+}
+
 const ids = (events: readonly ManagedEvent[]) => events.map(({ id }) => id)
+
+type Owned = <Q extends { eq(column: "user_id", value: string): Q }>(
+    query: Q,
+) => Q
 
 /**
  * The shared part of the writes: waits for the session, scopes the write
- * to the user's events (`ownOnly`), applies the response to the cache, and
- * refreshes every event query if fewer events came back than were asked.
+ * to the events' owner (`ownOnly`: the user; else the events' own, which
+ * are one series' or one event, so one owner), applies the response to the
+ * cache, and fails with `EventsChangedError` (after refreshing every event
+ * query) if fewer events came back than were asked.
  */
 function useEventWrite<Variables, Result>(
     userId: string,
     { ownOnly = true }: EventWriteOptions,
     source: string,
+    events: (variables: Variables) => readonly ManagedEvent[],
     write: (
-        own: <Q extends { eq(column: "user_id", value: string): Q }>(
-            query: Q,
-        ) => Q,
+        owned: Owned,
         variables: Variables,
     ) => PromiseLike<{
         data: Result[] | null
@@ -65,25 +87,26 @@ function useEventWrite<Variables, Result>(
     toChange: (
         rows: Result[],
     ) => { saved: ManagedEvent[] } | { deleted: string[] },
-    asked: (variables: Variables) => number,
 ) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
         mutationFn: async (variables: Variables) => {
             await sessionOf(services, userId)
-            const own = <Q extends { eq(column: "user_id", value: string): Q }>(
-                query: Q,
-            ) => (ownOnly ? query.eq("user_id", userId) : query)
-            const { data, error } = await write(own, variables)
+            const asked = events(variables)
+            const owner = ownOnly ? userId : (asked[0]?.ownerId ?? "")
+            const owned: Owned = (query) => query.eq("user_id", owner)
+            const { data, error } = await write(owned, variables)
             if (error) throw new Error(error.message)
-            return toChange(data ?? [])
-        },
-        onSuccess: (change, variables) => {
+            const change = toChange(data ?? [])
             applyEventChanges(queryClient, services.now(), change)
             const got =
                 "saved" in change ? change.saved.length : change.deleted.length
-            if (got < asked(variables)) refreshEventQueries(queryClient)
+            if (got < asked.length) {
+                refreshEventQueries(queryClient)
+                throw new EventsChangedError()
+            }
+            return change
         },
         onError: (error) => services.telemetry.captureError(error, { source }),
     })
@@ -96,12 +119,12 @@ export function useSetHidden(userId: string, options: EventWriteOptions = {}) {
         userId,
         options,
         "event-hide",
-        (own, { events, hide }: HideChange) =>
-            own(data.from("ci_events").update({ hide }).in("id", ids(events)))
+        ({ events }: HideChange) => events,
+        (owned, { events, hide }) =>
+            owned(data.from("ci_events").update({ hide }).in("id", ids(events)))
                 .eq("hide", !hide)
                 .select(MANAGED_EVENT_COLUMNS),
         (rows) => ({ saved: toManagedEvents(rows) }),
-        ({ events }) => events.length,
     )
 }
 
@@ -118,8 +141,9 @@ export function useSetCancelled(
         userId,
         options,
         "event-cancel",
-        (own, { event, cancel, text }: CancelChange) => {
-            const write = own(
+        ({ event }: CancelChange) => [event],
+        (owned, { event, cancel, text }) => {
+            const write = owned(
                 data
                     .from("ci_events")
                     .update({
@@ -138,11 +162,17 @@ export function useSetCancelled(
             ).select(MANAGED_EVENT_COLUMNS)
         },
         (rows) => ({ saved: toManagedEvents(rows) }),
-        () => 1,
     )
 }
 
-/** Deletes events (legacy's series choice included). */
+/**
+ * Deletes events (legacy's series choice included). Legacy deleted the
+ * event alone, relying on the junction's foreign key
+ * (`ci_events_users_junction_ci_event_id_fkey`) to cascade; its delete rule
+ * isn't known from the repo (docs/database-schema.md shows none, i.e. no
+ * action), so a delete the key refuses (`23503`) removes the events'
+ * junction rows (their teacher tags) and is sent once more.
+ */
 export function useDeleteEvents(
     userId: string,
     options: EventWriteOptions = {},
@@ -152,11 +182,25 @@ export function useDeleteEvents(
         userId,
         options,
         "event-delete",
-        (own, events: readonly ManagedEvent[]) =>
-            own(data.from("ci_events").delete().in("id", ids(events))).select(
-                "id",
-            ),
+        (events: readonly ManagedEvent[]) => events,
+        async (owned, events) => {
+            const remove = () =>
+                owned(
+                    data.from("ci_events").delete().in("id", ids(events)),
+                ).select("id")
+            const first = await remove()
+            if (first.error?.code !== "23503") return first
+            const untagged = await untag(data, ids(events))
+            return untagged.error ? untagged : remove()
+        },
         (rows: { id: string }[]) => ({ deleted: rows.map(({ id }) => id) }),
-        (events) => events.length,
     )
 }
+
+/** Removes the teacher tags (junction rows) of the events `eventIds`. */
+const untag = (data: DataClient, eventIds: string[]) =>
+    data
+        .from("ci_events_users_junction")
+        .delete()
+        .in("ci_event_id", eventIds)
+        .then(({ error }) => ({ data: null, error }))

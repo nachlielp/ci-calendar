@@ -19,7 +19,8 @@ import { createFakeRpc, type FakeRpc } from "./fakeRpc"
 // `is` and `not(column, "is", value)` are SQL's IS (`closed IS NOT TRUE`).
 // `or("a.lt.1,and(a.eq.1,b.lt.2)")` takes PostgREST's logic-tree syntax
 // (for keyset pagination). `single()` / `maybeSingle()` return one row.
-// `delete()` removes the filtered rows and returns them. Every request is
+// `delete()` removes the filtered rows and returns them (refused with
+// `23503` while a row in REFERENCED_BY still points at one). Every request is
 // recorded so
 // tests can assert on what was asked of the backend, with the token it was
 // sent with. `insert(row).select().single()` adds a row (and returns it as
@@ -49,6 +50,8 @@ const RELATIONS: Record<string, Record<string, Relation>> = {
             foreignColumn: "ci_event_id",
             many: true,
         },
+        // The event's creator (`ci_events_user_id_fkey`).
+        users: { column: "user_id", foreignColumn: "id", many: false },
     },
     ci_events_users_junction: {
         public_bio: {
@@ -84,6 +87,27 @@ const FOREIGN_KEYS: Record<
             column: "source_template_id",
             references: "templates",
             constraint: "ci-events_source_template_id_fkey",
+        },
+    ],
+}
+
+/**
+ * Foreign keys referencing a table that the fake enforces on delete, as
+ * Postgres' default rule (NO ACTION, as docs/database-schema.md shows the
+ * constraint): deleting a row still referenced fails with `23503` and
+ * deletes nothing. `ci_events_users_junction.ci_event_id`: a tagged event
+ * can't be deleted before its tags (the live rule isn't known; the client
+ * copes with either).
+ */
+const REFERENCED_BY: Record<
+    string,
+    { table: string; column: string; constraint: string }[]
+> = {
+    ci_events: [
+        {
+            table: "ci_events_users_junction",
+            column: "ci_event_id",
+            constraint: "ci_events_users_junction_ci_event_id_fkey",
         },
     ],
 }
@@ -648,6 +672,24 @@ export function createFakeDataClient(
         let deleted: Row[] | undefined
         if (request.method === "delete") {
             deleted = where(request.table, "")
+            for (const key of REFERENCED_BY[request.table] ?? []) {
+                const referenced = deleted.find((row) =>
+                    (seed[key.table] ?? []).some(
+                        (other) => other[key.column] === row.id,
+                    ),
+                )
+                if (referenced) {
+                    return {
+                        data: null,
+                        error: {
+                            message: `update or delete on table "${request.table}" violates foreign key constraint "${key.constraint}" on table "${key.table}"`,
+                            details: `Key (id)=(${String(referenced.id)}) is still referenced from table "${key.table}".`,
+                            code: "23503",
+                        },
+                        status: 409,
+                    }
+                }
+            }
             for (const row of deleted) table.splice(table.indexOf(row), 1)
         }
 

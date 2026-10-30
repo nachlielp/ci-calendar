@@ -104,7 +104,9 @@ export function ActionDialog({
     warning = false,
     primary = false,
     pending,
+    ready = true,
     failed,
+    failure,
     onOk,
     onClose,
     children,
@@ -118,7 +120,11 @@ export function ActionDialog({
     /** OK as antd's primary button, not a danger one. */
     primary?: boolean
     pending: boolean
+    /** OK waits while false (what it acts on is still loading). */
+    ready?: boolean
     failed: boolean
+    /** What `failed` says, if not "that didn't work". */
+    failure?: string
     onOk: () => void
     onClose: () => void
     children: ReactNode
@@ -133,12 +139,14 @@ export function ActionDialog({
                     {title}
                 </h2>
                 {children}
-                {failed && <FormAlert kind="error">{copy.failed}</FormAlert>}
+                {failed && (
+                    <FormAlert kind="error">{failure ?? copy.failed}</FormAlert>
+                )}
                 <div className="action-dialog-footer">
                     <button
                         type="button"
                         className={`action-dialog-btn ${primary ? "primary" : "danger"}`}
-                        disabled={pending}
+                        disabled={pending || !ready}
                         onClick={onOk}
                     >
                         {ok}

@@ -187,11 +187,18 @@ export function mergeIntoList<T extends { id: string }>(
     compare: (a: T, b: T) => number,
 ): T[] {
     const result = events.filter((event) => !change.gone.has(event.id))
-    for (const event of added) {
-        const at = result.findIndex((other) => compare(event, other) < 0)
-        result.splice(at === -1 ? result.length : at, 0, event)
-    }
+    for (const event of added) insertInOrder(result, event, compare)
     return result
+}
+
+/** Puts `event` into `list` (in place) in `compare` order, after equals. */
+function insertInOrder<T>(
+    list: T[],
+    event: T,
+    compare: (a: T, b: T) => number,
+) {
+    const at = list.findIndex((other) => compare(event, other) < 0)
+    list.splice(at === -1 ? list.length : at, 0, event)
 }
 
 /** A page of a keyset-paginated list (see "Pagination" in the docs). */
@@ -227,15 +234,10 @@ export function mergeIntoPages<T extends { id: string }>(
             )
         })
         if (index === -1) continue
-        pages[index] = {
-            ...pages[index],
-            events: mergeIntoList(
-                pages[index].events,
-                change,
-                [event],
-                compare,
-            ),
-        }
+        // Copied, not filtered again: events added before stay.
+        const events = [...pages[index].events]
+        insertInOrder(events, event, compare)
+        pages[index] = { ...pages[index], events }
     }
     return { ...data, pages }
 }

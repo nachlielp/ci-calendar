@@ -26,6 +26,9 @@ export const PAGED_ADMIN_FRESHNESS = {
     refetchOnReconnect: false,
 } as const
 
+/** A server search goes out once typing pauses this long. */
+export const SEARCH_DEBOUNCE_MS = 300
+
 /**
  * Refetches the infinite query at `queryKey` from its first page only: the
  * pages after it are dropped first (they come back through "load more"),
@@ -98,6 +101,15 @@ export function useRefreshWhenBack(queryKey: QueryKey, refresh: () => void) {
  * dots, colons and parentheses in it are text (`\` escapes `"` and `\`).
  */
 export const quoted = (value: string) => `"${value.replace(/["\\]/g, "\\$&")}"`
+
+/**
+ * The text typed as an `ilike` pattern that matches it anywhere: Postgres'
+ * LIKE wildcards in it (`%`, `_`) and its escape (`\`) are escaped, and a
+ * `*` (PostgREST's wildcard, which can't be escaped) becomes `_`, any one
+ * character, so it still matches a `*`. Quote it (`quoted`) inside `or()`.
+ */
+export const containing = (text: string) =>
+    `*${text.replace(/[\\%_]/g, "\\$&").replaceAll("*", "_")}*`
 
 /** Where the next page of a newest-first admin list starts. */
 export interface NewestCursor {

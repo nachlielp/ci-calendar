@@ -1,5 +1,7 @@
 // antd's large multiple/tags Select (legacy `form-input-large`): chips in
-// the box, the matches in a dropdown under it.
+// the box, the matches in a dropdown under it. A partial: a page using
+// `TagPicker` `@use`s it (the event forms, the admins' events list), so the
+// component's shared chunk has no CSS file of its own.
 
 .tag-picker-box {
     display: flex;

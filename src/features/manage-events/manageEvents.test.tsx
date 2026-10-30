@@ -484,12 +484,15 @@ describe("manage my events (/manage-events)", () => {
         // Another tab hid it first: this write matches no row.
         fake.rows("ci_events").find((r) => r.title === "ג'אם שלי")!.hide = true
         await userEvent.click(row.getByRole("button", { name: "הסתרת ארוע" }))
+        const dialog = await screen.findByRole("dialog", { name: "הסתרת ארוע" })
         await userEvent.click(
-            within(
-                await screen.findByRole("dialog", { name: "הסתרת ארוע" }),
-            ).getByRole("button", { name: "הסתרה" }),
+            within(dialog).getByRole("button", { name: "הסתרה" }),
         )
 
+        // Never a silent success: the dialog says nothing was done.
+        expect(await within(dialog).findByRole("alert")).toHaveTextContent(
+            "הפעולה לא בוצעה על כל האירועים",
+        )
         await waitFor(() => expect(myEventReads(fake)).toHaveLength(2))
         expect(await rows()).toEqual(["ג'אם שלי01/11/2026|אירוע מוסתר‹"])
         // The calendar, which still showed it, is refreshed too.

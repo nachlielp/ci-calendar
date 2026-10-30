@@ -94,3 +94,12 @@ export const editPath = (event: ManagedEvent) =>
     event.multiDay
         ? `/manage-events/edit-multi-day/${event.id}`
         : `/manage-events/edit-single-day/${event.id}`
+
+/** The admins' list of every event (slice 20). */
+export const ALL_EVENTS_PATH = "/manage-all-events"
+
+/**
+ * The edit link's `state` from `ALL_EVENTS_PATH`: the edit form goes back
+ * there (legacy's always went to the user's own events).
+ */
+export const FROM_ALL_EVENTS = { from: ALL_EVENTS_PATH } as const

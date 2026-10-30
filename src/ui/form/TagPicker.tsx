@@ -1,6 +1,5 @@
 import { useId, useState, type KeyboardEvent } from "react"
 import { CloseIcon } from "../icons/CloseIcon"
-import "./TagPicker.scss"
 
 /** A chosen or offered option: `value` identifies it, `label` shows. */
 export interface PickerOption {
@@ -14,7 +13,8 @@ export interface PickerOption {
  * a typed name not in the list is added as `{ label: name, value: name }`).
  * The chosen ones show as chips with a remove button; the input is an ARIA
  * combobox over a listbox of matches (arrows, Enter, Escape; Backspace in
- * the empty input removes the last chip).
+ * the empty input removes the last chip). Styled by ./_tag-picker.scss,
+ * which the page's stylesheet `@use`s.
  */
 export function TagPicker({
     label,

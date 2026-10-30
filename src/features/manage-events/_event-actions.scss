@@ -1,6 +1,8 @@
 // Ported from legacy/src/styles/manage-event-actions.scss (the buttons'
 // inline radii included); the confirm modal is ../events/_action-dialog.scss.
 // The row mirrors with the language: edit first, rounded at the start.
+// `EventActions`' styles: a page using it `@use`s this partial (my events,
+// the admins' list), so their shared chunk has no CSS file of its own.
 @use "../events/action-dialog";
 
 .manage-event-actions {
