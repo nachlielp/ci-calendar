@@ -320,24 +320,27 @@ rollback) is in `docs/cloudflare.md`; this is the checklist and its state.
 
 ## Before the switch
 
-- [ ] Test email to `info@` and `nach@` arrives (after DNS settles).
-- [ ] Sign in, and address search in the event form, on the workers.dev URL.
-- [ ] Web Analytics site added (manual snippet); its token in the build's
+- [ ] Test email to `info@` and `nach@` arrives. Not received yet: retest
+      from another account and check Email Routing's activity log.
+- [x] Sign in, and address search in the event form, on the workers.dev URL.
+- [x] Web Analytics site added (manual snippet); its token in the build's
       `VITE_CF_ANALYTICS_TOKEN`.
-- [ ] The zone shows **Active** in Cloudflare.
-- [ ] PR #46 merged to `develop`, then `develop` to `main`, just before the
-      switch (on Vercel the client pays one same-origin round trip before
-      falling back, so it shouldn't sit on production long).
+- [x] The zone shows **Active** in Cloudflare.
+- [x] PR #46 merged to `develop` and `main` just before the switch.
 
-## The switch (`docs/cloudflare.md`, "Moving www.ci-events.org")
+## The switch (done 2026-10-31; `docs/cloudflare.md`, "Moving www.ci-events.org")
 
-- [ ] Delete the `www` CNAME and apex A (Vercel's) in Cloudflare DNS;
-      `routes` with both custom domains in `wrangler.jsonc`; deploy.
-- [ ] Apex → `https://www.ci-events.org` redirect (Redirect Rule, 301).
-- [ ] Check www: production CSP, `X-Edge-Cache: HIT` on a second request,
-      a sign-in, an event save.
-- [ ] Workers Builds connected to the repo (production branch `main`), so
-      deploys stop being manual.
+- [x] Deleted Vercel's `www` CNAME; `www.ci-events.org` is the Worker's
+      custom domain (`routes` in `wrangler.jsonc`); deployed.
+- [x] Apex: proxied placeholder A `192.0.2.1` and a Redirect Rule, 301 to
+      `https://www.ci-events.org` with the path and query kept. Always Use
+      HTTPS on (`http://` → 301 `https://`).
+- [x] Checked www: production CSP (sent once), the certificate, deep links,
+      immutable assets, `X-Edge-Cache: HIT` on a second request, a sign-in,
+      an event save.
+- [x] Workers Builds connected (`nachlielp/ci-calendar`, production branch
+      `main`, `npm run build` then `npx wrangler deploy`, the build
+      variables as in `.env`), so deploys stop being manual.
 
 ## After a few days
 

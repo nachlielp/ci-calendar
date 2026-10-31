@@ -59,11 +59,15 @@ day; static assets are free and unlimited.
 7. **Deploys from GitHub (Workers Builds)**, optional: Workers & Pages →
    `ci-calendar` → Settings → Builds → connect `nachlielp/ci-calendar`.
    Build command `npm run build`; deploy command `npx wrangler deploy`;
-   production branch `main`; for other branches turn on "builds for
-   non-production branches" with `npx wrangler versions upload` (a preview
-   URL per push, nothing deployed). Node comes from `.nvmrc` (22). Add the
-   build variables of step 5. Before the switch, a deploy only updates
-   `ci-calendar.<subdomain>.workers.dev`; visitors are still on Vercel.
+   production branch `main`. Other branches build with the **Previews
+   Base** tab's settings, which are separate: deploy command
+   `npx wrangler versions upload` (a preview URL per push, nothing
+   deployed), not the default `npx wrangler preview` (a beta that needs a
+   `previews` block), and its own copy of the build variables. Node comes
+   from `.nvmrc` (22). Add the build variables of step 5 to both tabs; a
+   Workers Builds build without `VITE_SUPABASE_URL` and
+   `VITE_SUPABASE_ANON_KEY` fails (`scripts/check-headers.mjs`) rather than
+   deploy a site that can't load data.
 8. **Supabase auth redirect URLs**: add
    `https://*-ci-calendar.<subdomain>.workers.dev/**` and
    `https://ci-calendar.<subdomain>.workers.dev/**` (Authentication → URL
