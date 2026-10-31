@@ -1,6 +1,5 @@
 -- Deleting a template keeps the events made from it (spec #34, maintainer
--- decision 2026-10-31). NOT APPLIED: apply by hand (SQL editor) after
--- review; nothing runs migrations.
+-- decision 2026-10-31). APPLIED to production by hand on 2026-10-31.
 --
 -- `ci_events.source_template_id`'s foreign key cascades, so deleting a
 -- template deletes every event made from it (about half of all events

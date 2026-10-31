@@ -93,7 +93,14 @@ speed. Order: **before merging → deploy → after deploy → later**.
 
 ### Supabase: read-only SQL checks (SQL editor)
 
-- [ ] **Bio photo bucket** accepts what the client sends (JPEG as
+Run 2026-10-31: the bucket takes any type and size; admins have
+`admin_full_crudl` (ALL) on both tables; the junction cascades; the
+template key was `c`. Two `assign_user_role` functions exist: ours
+(`public`, security definer, admin-checked, not callable by anon) and an
+unrelated `app_auth.assign_user_role(uuid)` (invoker rights, in a schema
+the API doesn't expose), left alone.
+
+- [x] **Bio photo bucket** accepts what the client sends (JPEG as
       `image/jpg`, at most ~30 KB):
 
     ```sql
@@ -104,7 +111,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
     `null` means anything; otherwise `image/jpg` must be listed (or the
     client's `PHOTO_CONTENT_TYPE` changed to one that is).
 
-- [ ] **Event write policies** let admins update and delete others' events
+- [x] **Event write policies** let admins update and delete others' events
       (manage-all-events), and the junction's delete is allowed to the
       event's owner and admins:
 
@@ -118,7 +125,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
     creator's event says "not allowed, or changed meanwhile" and changes
     nothing (no harm, but the page doesn't work).
 
-- [ ] **The junction's foreign key delete rule:**
+- [x] **The junction's foreign key delete rule:**
 
     ```sql
     select confdeltype from pg_constraint
@@ -129,7 +136,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
     deletes the tags first when the database refuses (one extra request).
     Either works.
 
-- [ ] **The template foreign key delete rule** (decided: deleting a
+- [x] **The template foreign key delete rule** (decided: deleting a
       template keeps its events; the migration below makes it so):
 
     ```sql
@@ -148,17 +155,17 @@ Nothing applies `supabase/migrations/` automatically. Each file's header
 says what it does and how to check it. All are safe for the old client
 too, except the realtime one, which waits until after go-live.
 
-- [ ] (`20260808000000_assign_user_role.sql` was applied with #16; check
+- [x] (`20260808000000_assign_user_role.sql` was applied with #16; check
       `select proname from pg_proc where proname = 'assign_user_role'`.)
-- [ ] **`20261030000000_backfill_event_teacher_junction.sql`**, before the
+- [x] Applied 2026-10-31 (66 → 0). **`20261030000000_backfill_event_teacher_junction.sql`**, before the
       deploy: links older events (66 found on 2026-10-30) to their tagged
       teachers' bios. Without it those events show teachers as plain names.
       Idempotent; run its count check before and after (0 after).
-- [ ] **`20261030120000_bio_photos_for_profiles.sql`**, any time: lets
+- [x] Applied 2026-10-31. **`20261030120000_bio_photos_for_profiles.sql`**, any time: lets
       `profile` users (teachers without event rights) upload a bio photo.
       Until then they're told the photo can't be uploaded and the rest
       saves. Run the bucket check above first.
-- [ ] **`20261031120000_template_delete_keeps_events.sql`**, before the
+- [x] Applied 2026-10-31 (`c` → `n`). **`20261031120000_template_delete_keeps_events.sql`**, before the
       deploy: deleting a template keeps the events made from it (the
       foreign key becomes `on delete set null`). Run its check before and
       after (`c`, then `n`).
