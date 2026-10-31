@@ -83,26 +83,35 @@ export function NewEventFormPage({
     )
 }
 
+/** An edit page's history state. */
+export interface EditPageState {
+    /** Opened from `ALL_EVENTS_PATH`: goes back there. */
+    from?: unknown
+    /** The user switched the event's kind: the form isn't the stored one's. */
+    switched?: boolean
+}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
  * An edit page (`/manage-events/edit-…/:eventId`): one of the user's own
  * events (an admin: anyone's, as legacy's manage-all-events let them), at
  * once from their cached events if there, read fresh as the page opens; an
- * event of the other kind (single-day or multi-day) goes to its own form.
- * Saved, it goes back to `/manage-events`, as legacy did (opened from
+ * event of the other kind (single-day or multi-day) goes to its own form,
+ * unless the user switched it (`switched` in the history state). Saved, it
+ * goes back to `/manage-events`, as legacy did (opened from
  * `/manage-all-events`, there); going back by the button drops the edits
- * (`draftKey`'s draft).
+ * (the `draftKeys`' drafts).
  */
 export function EditEventFormPage({
     title,
     multiDay,
-    draftKey,
+    draftKeys,
     form,
 }: {
     title: string
     multiDay: boolean
-    draftKey: string
+    draftKeys: readonly string[]
     form: (slot: FormSlot & { event: ManagedEvent }) => ReactNode
 }) {
     const copy = useCopy(FORM_PAGE_COPY)
@@ -116,8 +125,8 @@ export function EditEventFormPage({
     const { eventId = "" } = useParams()
     const isId = UUID.test(eventId)
     const scope = viewer.role === "admin" ? "any" : "own"
-    const fromAll =
-        (location.state as { from?: unknown } | null)?.from === ALL_EVENTS_PATH
+    const state = location.state as EditPageState | null
+    const fromAll = state?.from === ALL_EVENTS_PATH
     const upcoming = queryClient.getQueryState(myUpcomingEventsKey(userId))
     const cached = queryClient
         .getQueryData<ManagedEvent[]>(myUpcomingEventsKey(userId))
@@ -134,10 +143,12 @@ export function EditEventFormPage({
     })
     const done = () => navigate(fromAll ? ALL_EVENTS_PATH : "/manage-events")
     const back = () => {
-        try {
-            services.storage.removeItem(draftKey)
-        } catch {
-            // Blocked storage holds no draft.
+        for (const key of draftKeys) {
+            try {
+                services.storage.removeItem(key)
+            } catch {
+                // Blocked storage holds no draft.
+            }
         }
         done()
     }
@@ -161,7 +172,7 @@ export function EditEventFormPage({
                 <Link to="/manage-events">{copy.backToMine}</Link>
             </p>
         )
-    } else if (query.data.multiDay !== multiDay) {
+    } else if (query.data.multiDay !== multiDay && !state?.switched) {
         return <Navigate to={editPath(query.data)} replace />
     } else {
         body = form({ userId, event: query.data, onDone: done })

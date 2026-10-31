@@ -138,7 +138,7 @@ export const routes: RouteObject[] = [
                 },
                 {
                     path: "manage-events/edit-single-day/:eventId",
-                    lazy: eventFormPage("EditSingleDayFormPage"),
+                    lazy: eventFormPage("EditEventPage"),
                 },
                 {
                     path: "create-events/multi-day",
@@ -146,7 +146,7 @@ export const routes: RouteObject[] = [
                 },
                 {
                     path: "manage-events/edit-multi-day/:eventId",
-                    lazy: eventFormPage("EditMultiDayFormPage"),
+                    lazy: eventFormPage("EditEventPage"),
                 },
             ]),
             requireRole(ADMIN_ROLES, [

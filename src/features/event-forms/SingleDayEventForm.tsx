@@ -32,7 +32,9 @@ import {
     seriesPatch,
     singleDayPatch,
     singleDayValuesOf,
+    singleDayValuesOfMultiDay,
     singleToMultiDay,
+    toSingleDayPatch,
     validateSingleDay,
     type EventBaseValues,
     type MultiDayValues,
@@ -87,7 +89,9 @@ const TAG_FIELDS = ["segments", "organisations"] as const
  * its series change too. A new event can start from one of the user's
  * templates (legacy's "בחירת תבנית"), and can be switched to a multi-day
  * event (`onSwitchKind`, given the values to carry over; so does picking a
- * multi-day template). Unsaved values are kept
+ * multi-day template), as can a saved event that doesn't repeat (an
+ * `event` that is multi-day is one switched here: saved, it becomes a
+ * single-day event). Unsaved values are kept
  * on the device and restored when the form opens again. A save translates
  * the title and looks up the English address (never blocking), stores the
  * event and puts it in every cached list; then `onDone`.
@@ -105,19 +109,26 @@ export function SingleDayEventForm({
     onDone: () => void
     /** Clears a new event's form (it remounts empty). */
     onClear?: () => void
-    /** What a new event's form had before the user switched it to this. */
+    /** What the form had before the user switched it to this. */
     carried?: SingleDayValues
-    /** Switches a new event's form to a multi-day one with these values. */
+    /**
+     * Switches the form to a multi-day one with these values (a new event,
+     * or a saved one that doesn't repeat); unset: no switch.
+     */
     onSwitchKind?: (values: MultiDayValues) => void
 }) {
     const copy = useCopy(EVENT_FORM_COPY)
     const own = useCopy(COPY)
     const today = useToday()
 
+    // A multi-day event the user switched to single-day in its edit form.
+    const converting = !!event?.multiDay
     const saved = useMemo(
         () =>
             event
-                ? singleDayValuesOf(event)
+                ? event.multiDay
+                    ? singleDayValuesOfMultiDay(event)
+                    : singleDayValuesOf(event)
                 : emptySingleDay("", HIDE_NEW_EVENTS),
         [event],
     )
@@ -155,8 +166,9 @@ export function SingleDayEventForm({
     const submit = useEventSubmit({
         userId,
         event,
+        kindChanged: converting,
         columns: newSingleDayColumns,
-        patch: singleDayPatch,
+        patch: converting ? toSingleDayPatch : singleDayPatch,
         series: { ready: seriesReady, later, patch: seriesPatch },
         tagFields: TAG_FIELDS,
         discardDraft,

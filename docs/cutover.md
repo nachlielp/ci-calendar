@@ -39,7 +39,6 @@ speed. Order: **before merging → deploy → after deploy → later**.
     | `VITE_SENTRY_DSN`              | crash reports, CSP violation reports         | no crash reports                            |
     | `VITE_PUBLIC_POSTHOG_KEY`      | analytics (production host only)             | no analytics                                |
     | `VITE_PUBLIC_POSTHOG_HOST`     | PostHog host (`https://us.i.posthog.com`)    | defaults to `https://app.posthog.com`       |
-    | `VITE_WHATSAPP_NUMBER`         | the header's WhatsApp link                   | the link is hidden                          |
     | `VITE_LANGUAGES_TO_SHOW`       | optional, default `he,en,ru`                 | all three                                   |
     | `VITE_HIDE_EVENTS_FLAG`        | optional: new events start hidden            | off                                         |
     | `VITE_DISABLE_APP`             | optional: `true` builds the maintenance page | off                                         |
@@ -51,7 +50,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
 - [ ] **Remove what nothing reads any more** (they only clutter, but see the
       secrets note): `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
       `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH`,
-      `VITE_PWA_TEST`, `VITE_GOOGLE_ANALYTICS_ID`, `VITE_UPLOADTHING_TOKEN`,
+      `VITE_PWA_TEST`, `VITE_WHATSAPP_NUMBER` (the WhatsApp link is gone), `VITE_GOOGLE_ANALYTICS_ID`, `VITE_UPLOADTHING_TOKEN`,
       every `VITE_FIREBASE_*` and `VITE_VAPID_PUBLIC_FIREBASE_KEY`, every
       `VITE_CLOUDINARY_*`, `VITE_DEV_DATABASE_AUTH_TOKEN`, `DOMAIN_URL`;
       and `GOOGLE_TRANSLATE_API_KEY` if it is set on Vercel (it belongs to
