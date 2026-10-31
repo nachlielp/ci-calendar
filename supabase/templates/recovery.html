@@ -1,0 +1,41 @@
+<!-- Supabase dashboard → Authentication → Emails → "Reset password".
+     Subject: איפוס סיסמה | Reset your password | Сброс пароля
+     See ./README.md. -->
+<div
+    dir="rtl"
+    lang="he"
+    style="font-family: Arial, sans-serif; text-align: right"
+>
+    <h2>איפוס סיסמה</h2>
+    <p>ביקשתם לאפס את הסיסמה ללוח אירועי הקונטקט. לבחירת סיסמה חדשה:</p>
+    <p><a href="{{ .ConfirmationURL }}">איפוס הסיסמה</a></p>
+    <p>אם לא ביקשתם, אפשר להתעלם מהמייל הזה: הסיסמה לא תשתנה.</p>
+</div>
+<hr />
+<div
+    dir="ltr"
+    lang="en"
+    style="font-family: Arial, sans-serif; text-align: left"
+>
+    <h2>Reset your password</h2>
+    <p>You asked to reset your CI Calendar password. To choose a new one:</p>
+    <p><a href="{{ .ConfirmationURL }}">Reset my password</a></p>
+    <p>
+        If you didn't ask, you can ignore this email: your password won't
+        change.
+    </p>
+</div>
+<hr />
+<div
+    dir="ltr"
+    lang="ru"
+    style="font-family: Arial, sans-serif; text-align: left"
+>
+    <h2>Сброс пароля</h2>
+    <p>Вы запросили сброс пароля в CI Calendar. Чтобы выбрать новый пароль:</p>
+    <p><a href="{{ .ConfirmationURL }}">Сбросить пароль</a></p>
+    <p>
+        Если вы этого не запрашивали, просто проигнорируйте письмо: пароль не
+        изменится.
+    </p>
+</div>

@@ -13,6 +13,7 @@ import {
     conditionalUpdate,
     isClosed,
     REQUEST_COLUMNS,
+    REQUEST_NOTES,
     responsesOf,
     whereOpen,
     type RequestCondition,
@@ -337,13 +338,10 @@ export function useCancelRequest(userId: string) {
     })
 }
 
-/**
- * The note legacy added when a user cancelled their request (stored as
- * data in Hebrew, for the admins, whatever the user's language).
- */
+/** The note legacy added when a user cancelled their request. */
 function cancellationResponse(name: string, now: Date): RequestResponse {
     return {
-        response: "בקשה בטולה על ידי המשתמש",
+        response: REQUEST_NOTES.cancelled,
         created_at: now.toISOString(),
         responder_name: name,
     }

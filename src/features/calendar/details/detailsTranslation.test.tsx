@@ -13,7 +13,7 @@ import {
     tagging,
 } from "../../../test/testEvents"
 import { translatableTexts } from "./detailsTranslation"
-import { TRANSLATIONS_KEY } from "./translationStore"
+import { TRANSLATIONS_KEY } from "../../../app/translationStore"
 
 // Legacy FullEventCard machine-translated, in English and Russian, what the
 // creator wrote with no stored translation (slice 13, through the
@@ -21,7 +21,12 @@ import { TRANSLATIONS_KEY } from "./translationStore"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 
-const TEACHER = bio({ bio_name: "נועה כהן" })
+const TEACHER = bio({
+    bio_name: "נועה כהן",
+    about: "מלמדת קונטקט עשר שנים",
+    page_url: "https://noa.example.com",
+    page_title: "האתר של נועה",
+})
 const theEvent = event({
     title: "שיעור קונטקט",
     lng_titles: { en: "Contact class", ru: "Урок контакта" },
@@ -138,6 +143,59 @@ describe("translated event details", () => {
 
         expect(dialog).toHaveTextContent("מביאים בגדים נוחים [en]")
         expect(fake.functions.calls).toEqual([])
+    })
+
+    it("translates a teacher's bio, but not their name", async () => {
+        const { fake, dialog } = await openDetails("en", "Contact class")
+        await userEvent.click(
+            within(dialog).getByRole("button", { name: "נועה כהן" }),
+        )
+        const card = await screen.findByRole("dialog", { name: "נועה כהן" })
+
+        await waitFor(() =>
+            expect(card).toHaveTextContent("מלמדת קונטקט עשר שנים [en]"),
+        )
+        expect(
+            within(card).getByRole("link", { name: "האתר של נועה [en]" }),
+        ).toHaveAttribute("href", "https://noa.example.com")
+        expect(card).toHaveTextContent("About נועה כהן")
+        expect(
+            fake.functions.calls.map((call) => call.body.text),
+        ).not.toContain("נועה כהן")
+    })
+
+    it("sends only what is written in Hebrew", async () => {
+        const storage = createMemoryStorage()
+        storage.setItem("language", "ru")
+        const fake = createFakeDataClient({
+            ci_events: [
+                event({
+                    title: "Contact jam",
+                    description: "Bring comfortable clothes",
+                    price: [
+                        { title: "Entry", sum: 50 },
+                        { title: "כניסה מוזלת", sum: 30 },
+                    ],
+                }),
+            ],
+        })
+        fake.functions.handle("translate", fakeTranslation)
+        renderApp({ fake, now: NOW, storage })
+        const list = await screen.findByRole("list", {
+            name: "Ближайшие события",
+        })
+        await userEvent.click(within(list).getByRole("link"))
+        const dialog = await screen.findByRole("dialog", {
+            name: "Contact jam",
+        })
+
+        await waitFor(() =>
+            expect(dialog).toHaveTextContent("כניסה מוזלת [ru]"),
+        )
+        expect(dialog).toHaveTextContent("Bring comfortable clothes")
+        expect(fake.functions.calls.map((call) => call.body.text)).toEqual([
+            "כניסה מוזלת",
+        ])
     })
 
     it("asks for nothing in Hebrew", async () => {

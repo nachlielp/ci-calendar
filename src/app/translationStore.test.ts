@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest"
-import { createMemoryStorage } from "../../../app/deviceStorage"
+import { createMemoryStorage } from "./deviceStorage"
 import {
     TRANSLATIONS_KEY,
     storeTranslation,
     storedTranslation,
 } from "./translationStore"
 
-describe("the details' translation store", () => {
+describe("the translation store", () => {
     it("keeps translations per language and text", () => {
         const storage = createMemoryStorage()
         storeTranslation(storage, "en", "שלום", "Hello")

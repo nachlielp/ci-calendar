@@ -5,6 +5,7 @@ import { setPageVisibility } from "../../test/browser"
 import type { SignedInRole } from "../../app/viewer"
 import { createMemoryStorage } from "../../app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
+import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow } from "../../test/testUsers"
 import { OPEN_STATUS_TREE, REQUEST_COLUMNS } from "./requestRows"
@@ -649,6 +650,88 @@ describe("my requests (/request)", () => {
         )
         expect(screen.getByText("בקשה אחרת")).toBeVisible()
         expect(screen.queryByText("אשמח להרשם כמורה")).not.toBeInTheDocument()
+    })
+
+    it("shows the responses in the reader's language: the app's notes in its words, replies machine-translated", async () => {
+        let answeredId = ""
+        const { user, fake } = setup("user", (userId) => {
+            const answered = requestRow({
+                user_id: userId,
+                number: 5,
+                closed: true,
+                responses: [
+                    {
+                        response: "נשמח לפרטים",
+                        created_at: "2026-10-02T10:00:00Z",
+                        responder_name: "Admin",
+                    },
+                    {
+                        response: "Already in English",
+                        created_at: "2026-10-02T11:00:00Z",
+                        responder_name: "Admin",
+                    },
+                    {
+                        response: "הבקשה אושרה",
+                        created_at: "2026-10-03T10:00:00Z",
+                        responder_name: "Admin",
+                    },
+                ],
+            })
+            answeredId = answered.id
+            return [answered]
+        })
+        fake.functions.handle("translate", fakeTranslation)
+        const storage = createMemoryStorage()
+        storage.setItem("language", "en")
+        renderApp({
+            fake,
+            storage,
+            signedInAs: user,
+            path: `/request/${answeredId}`,
+            now: NOW,
+        })
+
+        expect(await screen.findByText("Request approved")).toBeVisible()
+        expect(await screen.findByText("נשמח לפרטים [en]")).toBeVisible()
+        expect(screen.getByText("Already in English")).toBeVisible()
+        // Only the reply in Hebrew was sent; the note and the English
+        // reply weren't, nor the user's own message.
+        expect(fake.functions.calls.map((call) => call.body)).toEqual([
+            expect.objectContaining({
+                text: "נשמח לפרטים",
+                targetLang: "en",
+            }),
+        ])
+    })
+
+    it("shows the responses as stored in Hebrew, asking for no translation", async () => {
+        let answeredId = ""
+        const { user, fake } = setup("user", (userId) => {
+            const answered = requestRow({
+                user_id: userId,
+                closed: true,
+                responses: [
+                    {
+                        response: "בקשה בטולה על ידי המשתמש",
+                        created_at: "2026-10-02T10:00:00Z",
+                        responder_name: "Someone",
+                    },
+                ],
+            })
+            answeredId = answered.id
+            return [answered]
+        })
+        renderApp({
+            fake,
+            signedInAs: user,
+            path: `/request/${answeredId}`,
+            now: NOW,
+        })
+
+        expect(
+            await screen.findByText("בקשה בטולה על ידי המשתמש"),
+        ).toBeVisible()
+        expect(fake.functions.calls).toEqual([])
     })
 
     it("is under the bio too, for teachers, creators, orgs and admins", async () => {

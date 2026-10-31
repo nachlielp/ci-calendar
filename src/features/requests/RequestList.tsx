@@ -6,6 +6,8 @@ import {
     jerusalemDateTimeLabel,
 } from "../../lib/jerusalemDate"
 import type { UserRequest } from "./myRequests"
+import type { RequestResponse } from "./requestRows"
+import { useRequestTexts } from "./requestTexts"
 import { REQUEST_WORDS } from "./requestWords"
 
 // Legacy RequestsList (Hebrew only there; it had no heading).
@@ -114,20 +116,11 @@ export function RequestList({
                                                 <h3 className="request-responses-title">
                                                     {copy.responses}
                                                 </h3>
-                                                <ul className="request-responses">
-                                                    {request.responses.map(
-                                                        (response, index) => (
-                                                            <li
-                                                                key={index}
-                                                                className="request-response"
-                                                            >
-                                                                {
-                                                                    response.response
-                                                                }
-                                                            </li>
-                                                        ),
-                                                    )}
-                                                </ul>
+                                                <ResponseList
+                                                    responses={
+                                                        request.responses
+                                                    }
+                                                />
                                             </article>
                                         )}
                                     </div>
@@ -138,5 +131,26 @@ export function RequestList({
                 </ul>
             )}
         </section>
+    )
+}
+
+/**
+ * A request's responses: the admins' replies and the app's notes, in the
+ * reader's language (`useRequestTexts`).
+ */
+function ResponseList({
+    responses,
+}: {
+    responses: readonly RequestResponse[]
+}) {
+    const text = useRequestTexts(responses.map((r) => r.response))
+    return (
+        <ul className="request-responses">
+            {responses.map((response, index) => (
+                <li key={index} className="request-response">
+                    {text(response.response)}
+                </li>
+            ))}
+        </ul>
     )
 }

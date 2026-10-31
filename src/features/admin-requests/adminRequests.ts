@@ -34,6 +34,7 @@ import {
     isClosed,
     OPEN_STATUS_TREE,
     REQUEST_COLUMNS,
+    REQUEST_NOTES,
     responsesOf,
     whereClosed,
     whereOpen,
@@ -278,13 +279,9 @@ export type RequestAction =
     | { kind: "approve" }
     | { kind: "reopen" }
 
-/**
- * The notes legacy added when an admin approved or declined ("דחיה") a
- * request: data, in Hebrew, whatever the admin's language (the user's page
- * shows them as stored).
- */
-export const APPROVED_NOTE = "הבקשה אושרה"
-export const CLOSED_NOTE = "הבקשה נסגרה"
+/** The notes an approval and a close add (`REQUEST_NOTES`). */
+export const APPROVED_NOTE = REQUEST_NOTES.approved
+export const CLOSED_NOTE = REQUEST_NOTES.closed
 
 /**
  * The columns `action` writes, given the responses as just read

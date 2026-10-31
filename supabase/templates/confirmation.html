@@ -1,0 +1,35 @@
+<!-- Supabase dashboard → Authentication → Emails → "Confirm signup".
+     Subject: אישור הרשמה | Confirm your sign-up | Подтверждение регистрации
+     See ./README.md. -->
+<div
+    dir="rtl"
+    lang="he"
+    style="font-family: Arial, sans-serif; text-align: right"
+>
+    <h2>ברוכים הבאים ללוח אירועי הקונטקט</h2>
+    <p>כדי לסיים את ההרשמה, אשרו את כתובת המייל:</p>
+    <p><a href="{{ .ConfirmationURL }}">אישור כתובת המייל</a></p>
+    <p>אם לא נרשמתם, אפשר להתעלם מהמייל הזה.</p>
+</div>
+<hr />
+<div
+    dir="ltr"
+    lang="en"
+    style="font-family: Arial, sans-serif; text-align: left"
+>
+    <h2>Welcome to CI Calendar</h2>
+    <p>To finish signing up, confirm your email address:</p>
+    <p><a href="{{ .ConfirmationURL }}">Confirm my email</a></p>
+    <p>If you didn't sign up, you can ignore this email.</p>
+</div>
+<hr />
+<div
+    dir="ltr"
+    lang="ru"
+    style="font-family: Arial, sans-serif; text-align: left"
+>
+    <h2>Добро пожаловать в CI Calendar</h2>
+    <p>Чтобы завершить регистрацию, подтвердите адрес электронной почты:</p>
+    <p><a href="{{ .ConfirmationURL }}">Подтвердить адрес</a></p>
+    <p>Если вы не регистрировались, просто проигнорируйте это письмо.</p>
+</div>
