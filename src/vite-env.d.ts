@@ -23,4 +23,9 @@ interface ImportMetaEnv {
     readonly VITE_SUPABASE_STORAGE_BUCKET?: string
     /** PostHog's host; `https://app.posthog.com` when unset. */
     readonly VITE_PUBLIC_POSTHOG_HOST?: string
+    /**
+     * Cloudflare Web Analytics' site token (public, as in its snippet); no
+     * beacon when unset (app/telemetry/cloudflareAnalytics.ts).
+     */
+    readonly VITE_CF_ANALYTICS_TOKEN?: string
 }

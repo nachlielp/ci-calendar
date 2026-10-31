@@ -44,6 +44,7 @@ the switch.
 | `src/pages/`                  | Simple pages (about, legal, 404) that belong to no feature                                                |
 | `src/test/`                   | The fake backend, `renderApp`, test data (`testEvents.ts`), the realtime guard                            |
 | `src/assets/`                 | Images, logos and the subset font ported from legacy                                                      |
+| `worker/`                     | The Cloudflare Worker (`/api/*`): the edge-cached public window (spec #37)                                |
 
 ## Rules
 
@@ -316,8 +317,11 @@ the switch.
   a view runs the same SQL in the same one round trip (PostgREST inlines
   it), so it is no faster, and it would need a production migration, its
   own RLS care (`security_invoker`) and regenerated types. The columns are
-  already trimmed and RLS still applies. The speed-up still to come is
-  caching the window at the edge (spec #37), not the query's shape.
+  already trimmed and RLS still applies. The speed-up is caching the
+  window at the edge (spec #37, "Cloudflare hosting and the edge cache"
+  below), not the query's shape. The window's select itself
+  (`selectPublicWindow`, `features/calendar/publicWindowSelect.ts`) is
+  shared by the client and the Worker, so both send exactly the same one.
 - **Shared links.** `/event/:eventId` and the legacy `/:eventId` open the
   event over the calendar (`useLinkedEvent`): from the cached window when it
   has it, else with one request for that event alone, in parallel with the
@@ -1325,7 +1329,13 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   from every production build with `VITE_SENTRY_DSN`; PostHog
   (`VITE_PUBLIC_POSTHOG_KEY`, legacy's options and persistence name) and
   Speed Insights only on the production host, and never on a device whose
-  storage has `isInternal` = `true`. The SDK chunks are built into
+  storage has `isInternal` = `true`. Cloudflare Web Analytics
+  (`cloudflareAnalytics.ts`, only when `VITE_CF_ANALYTICS_TOKEN` is set)
+  follows PostHog's rules; its beacon can't edit what it sends, so it is
+  not loaded on a page whose URL holds auth secrets, and once loaded it
+  can't be stopped (marking the device internal keeps it off from the
+  next page load). Speed Insights stays until the app leaves Vercel and
+  goes in the DNS switch PR (docs/cloudflare.md). The SDK chunks are built into
   `assets/telemetry/` (`chunkFileNames` in `vite.config.ts`) and never
   precached (`PRECACHE_IGNORES`); `check:sw` fails if one is, or if
   `vercel.json` stops serving them `immutable`.
@@ -1376,7 +1386,9 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
   by hand by the maintainer; nothing applies them automatically.
-- **Security headers and the CSP (#17).** `vercel.json` serves every path
+- **Security headers and the CSP (#17).** (On Cloudflare the same
+  headers come from `public/_headers`: "Cloudflare hosting and the edge
+  cache" below. Everything here holds for both.) `vercel.json` serves every path
   with a Content-Security-Policy, HSTS (two years, `includeSubDomains`, no
   `preload`), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`
   (and `frame-ancestors 'none'`), `Referrer-Policy:
@@ -1470,6 +1482,93 @@ strict-origin-when-cross-origin` and a Permissions-Policy that denies
       gtag and the app could load Maps and PostHog through it), or
       per-request nonces, which need index.html rendered per request (edge
       middleware).
+
+## Cloudflare hosting and the edge cache (spec #37)
+
+The app is ready to move from Vercel to Cloudflare Workers, served from
+Cloudflare's Tel Aviv data centre (about 28 ms to the first byte from
+Israel, against about 220 ms from Vercel's Frankfurt). Until DNS moves,
+Vercel stays production and every change must keep working there: the same
+commit builds and runs on both. The deploy, variables, previews, custom
+domains and rollback are in `docs/cloudflare.md`. Unlike spec #37, the
+repository stays one package for now: the monorepo move waits for the
+mobile app (#36).
+
+- **Hosting.** `wrangler.jsonc`: the Vite build (`dist/`) as static
+  assets, any path that isn't a file falling back to the SPA shell
+  (`not_found_handling: "single-page-application"`), and a Worker
+  (`worker/index.ts`) that runs first only for `/api/*`
+  (`run_worker_first`). Every other request is a static asset: no Worker
+  invocation, no cost. One difference from Vercel: a missing `/assets/…`
+  or `/.well-known/…` file gets the SPA shell (200 HTML, with the
+  `/assets/*` immutable header) instead of a 404. A stale chunk still
+  fails to import (a module served as `text/html` is refused, under
+  `nosniff`), so the app's stale-chunk handling is the same.
+- **Headers.** `public/_headers`, which the build copies to
+  `dist/_headers`, carries vercel.json's headers. Cloudflare's file can
+  only match URLs, but a URL may name a host, so: every path (`/*`) gets
+  the security headers and the CSP reporting to Sentry as `preview` (on
+  every host: `*.workers.dev` previews, `wrangler dev`); the production
+  hosts (`https://www.ci-events.org/*`, `https://ci-events.org/*`)
+  detach those two headers (`! Content-Security-Policy`, or both values
+  would be sent, joined) and set production's policy, which is
+  vercel.json's exactly. No Worker is needed for headers. There are no
+  Vercel toolbar sources on previews (there is no toolbar). `/assets/*`
+  is cached a year, immutable; index.html and sw.js keep Cloudflare's
+  default (`max-age=0, must-revalidate`). Headers in `_headers` apply to
+  static assets only; the Worker sets its own. `check:headers` checks the
+  file (Cloudflare's syntax and limits: 100 rules, 2,000 characters a
+  line) and runs every policy in it through the same checks as
+  vercel.json's; `--write` updates both files; the precached shell's
+  revision covers both (`headers-revision.mjs`), and `check:sw` checks
+  the out-of-precache chunks are immutable on both hosts. While Vercel is
+  kept, edit the CSP in vercel.json and run `--write`; when Vercel is
+  retired, `_headers` becomes the only copy.
+- **The edge-cached public window.** `GET /api/public-window`
+  (`worker/publicWindow.ts`) answers `{ start, end, rows }`: the window's
+  first and last day (today in Asia/Jerusalem through `WINDOW_DAYS`, the
+  client's constants) and the rows in their PostgREST shape, from the
+  client's own select (`selectPublicWindow`: `hide = false`, public bios
+  only). The Worker queries Supabase with the anon key only, through the
+  client's own data client with no token source; it never reads the
+  caller's Authorization header or cookies, so nothing signed-in is ever
+  cached and RLS's hidden-row guarantee holds for the cached copy. It is
+  kept in Cloudflare's Cache API (per data centre) keyed by the window's
+  first day: fresh for 60 s; then served stale for up to 10 minutes while
+  one background refresh runs (`ctx.waitUntil`; concurrent requests in an
+  isolate share it, isolates don't coordinate); a failed refresh keeps the
+  copy, served until it is 10 minutes old (`MAX_SERVE_AGE_MS`); with no
+  usable copy the request waits for Supabase (aborted after 5 s,
+  `UPSTREAM_TIMEOUT_MS`, so a hung read can't block the isolate) and, if
+  that fails, gets a 502. Stale-while-revalidate is a deliberate trade
+  (decision 2026-10-31): the first visitor after a quiet spell gets the
+  old copy at once rather than waiting for Supabase. Browsers get
+  `Cache-Control: no-store`: the client's query and persisted caches own
+  freshness. `X-Edge-Cache` (`HIT`, `STALE`, `MISS`) shows what happened.
+  Cloudflare documents the Cache API for custom domains, but it stores on
+  `*.workers.dev` too (checked 2026-10-31: MISS, then HIT).
+- **Writes don't purge the edge cache.** Only signed-in users write, and
+  they never read the edge: their window is the direct select, so a
+  refetch after their save (or a reload, or another device of theirs)
+  can't bring back a copy from before it. Other visitors see a change
+  within 60 seconds while the site is busy, and within 10 minutes after a
+  quiet spell. Without realtime that is acceptable.
+- **`services.publicFeed`** (`PublicFeed`,
+  `features/calendar/publicFeed.ts`) is where the public window comes
+  from; `publicWindowQuery` reads it, and its mapping, freshness rules and
+  persisted-cache shape are unchanged. On the web (`edgePublicFeed`), for
+  a visitor who isn't signed in (`auth.session()`), it reads the
+  same-origin endpoint (no credentials) and falls back to the
+  direct select (`directPublicFeed`, with the token at hand, as before) on
+  any error: an error status, no network, a body that isn't a window
+  (`parsePublicWindowRows`), or no answer within 3 s (`EDGE_TIMEOUT_MS`).
+  On Vercel there is no Worker: the path is the SPA shell (200 HTML), not
+  a window, so it falls back. That costs a same-origin round trip before
+  the Supabase read on every cold start on Vercel, which is why the switch
+  should follow this soon. Single-event lookups and every personal or
+  admin query still go to Supabase directly. Tests read the fake's data
+  through the same select (`directPublicFeed`), or pass `renderApp({ edge
+})` (Tests).
 
 ## Maintainer notes
 
@@ -1686,6 +1785,17 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
   `blocked: ["posthog"]` makes an SDK fail to load as Vite reports it.
   Without it, tests get
   `NO_TELEMETRY`. Nothing reaches the network.
+- **The edge:** `renderApp({ edge: createFakeEdge(backend, now) })`
+  (`src/test/fakeEdge.ts`) reads the window from a fake
+  `/api/public-window` answered from `backend`, a fake data client of its
+  own (seed it apart from `fake` to tell where the events came from), put
+  through the same select; `edge.answer(…)` makes it fail each way the
+  page must survive (`spa-shell`, `not-found`, `server-error`,
+  `network-error`, `not-a-window`, `hang`), and `edge.requests` records
+  what the page sent. The Worker is tested at its HTTP boundary
+  (`worker/publicWindow.test.ts`): a request in, the response and the
+  fake data client's recorded requests out, with an in-memory cache and
+  clock (plain vitest; Cloudflare's Vitest pool needs Vitest 4).
 - **Freshness:** staleness is measured with `Date.now()`, so fake only the
   clock (`vi.useFakeTimers({ toFake: ["Date"] })`) and advance it with
   `vi.setSystemTime`. Dispatch `visibilitychange` (overriding
@@ -1963,3 +2073,9 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     address lookups moved to `data/placeLookups.ts`; any WebSocket attempt fails
     its test; the edit tests prove the calendar and my events update from
     the save's answer with every read of events held.
+24. Cloudflare hosting (spec #37, not live yet): `wrangler.jsonc` (static
+    assets with the SPA fallback, a Worker for `/api/*`), `public/_headers`
+    checked like vercel.json, the edge-cached public window
+    (`GET /api/public-window`) and `services.publicFeed` with its direct
+    fallback, Cloudflare Web Analytics behind `VITE_CF_ANALYTICS_TOKEN`,
+    and `docs/cloudflare.md`. `/` stays 135.3 KB gzip.

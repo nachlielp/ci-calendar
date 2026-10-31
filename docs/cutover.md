@@ -290,3 +290,57 @@ possible (or re-add the tables; the old client then gets live updates back).
 - **Rolling forward again** is the first cutover once more: the new worker
   finds the old caches, takes over at once, deletes them and reloads open
   pages, and the new client removes the old `events`/`bios` keys at boot.
+
+# Hosting move to Cloudflare (spec #37)
+
+The second cutover: the same client, moved from Vercel to Cloudflare
+Workers with the edge-cached public window. How each step is done (and the
+rollback) is in `docs/cloudflare.md`; this is the checklist and its state.
+
+## Done (2026-10-31)
+
+- [x] Cloudflare account; zone `ci-events.org` (free plan). Imported records
+      checked against the live zone, all **DNS only**: Vercel's apex A and
+      `www` CNAME; Squarespace forwarding's Mailgun MX and SPF and
+      `k1._domainkey`; Resend's `send` MX and SPF and `resend._domainkey`;
+      the Google and Twilio verification TXTs. `_domainconnect` dropped.
+- [x] Nameservers at the registrar (Squarespace, auto-renewing) changed
+      from Google's to `becky`/`yadiel.ns.cloudflare.com`. DNSSEC was off.
+- [x] Email forwarding moved from Squarespace to Cloudflare Email Routing
+      (`info@` → ci.events.israel@gmail.com, `nach@` → nachpok@gmail.com):
+      Mailgun MX and SPF replaced by Cloudflare's.
+- [x] The Worker deployed from a machine (`npm run cf:deploy`, the build's
+      variables from Vercel's production env) to
+      `https://ci-calendar.nachpok.workers.dev`; its secrets
+      `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set. Checked: headers
+      and CSP, deep links, immutable assets, `/api/public-window` MISS then
+      HIT; Lighthouse 94 (LCP 2.6 s, against 4.8 s on Vercel).
+- [x] That origin added to Supabase's redirect URLs and the Places key's
+      referrers.
+
+## Before the switch
+
+- [ ] Test email to `info@` and `nach@` arrives (after DNS settles).
+- [ ] Sign in, and address search in the event form, on the workers.dev URL.
+- [ ] Web Analytics site added (manual snippet); its token in the build's
+      `VITE_CF_ANALYTICS_TOKEN`.
+- [ ] The zone shows **Active** in Cloudflare.
+- [ ] PR #46 merged to `develop`, then `develop` to `main`, just before the
+      switch (on Vercel the client pays one same-origin round trip before
+      falling back, so it shouldn't sit on production long).
+
+## The switch (`docs/cloudflare.md`, "Moving www.ci-events.org")
+
+- [ ] Delete the `www` CNAME and apex A (Vercel's) in Cloudflare DNS;
+      `routes` with both custom domains in `wrangler.jsonc`; deploy.
+- [ ] Apex → `https://www.ci-events.org` redirect (Redirect Rule, 301).
+- [ ] Check www: production CSP, `X-Edge-Cache: HIT` on a second request,
+      a sign-in, an event save.
+- [ ] Workers Builds connected to the repo (production branch `main`), so
+      deploys stop being manual.
+
+## After a few days
+
+- [ ] The follow-up PR: remove Speed Insights and `vercel.json`; `_headers`
+      becomes the only header source. The Vercel project stays as the
+      rollback until then.

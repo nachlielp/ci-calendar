@@ -13,7 +13,7 @@ import { cardsByDay, type EventCard } from "./eventCards"
 import { EventList } from "./EventList"
 import { dayLabel } from "./eventFormat"
 import { EVENT_LOCALES } from "./eventLocales"
-import { WINDOW_DAYS } from "./publicWindow"
+import { WINDOW_DAYS } from "./publicWindowSelect"
 import "./CalendarView.scss"
 
 const COPY = defineCopy({

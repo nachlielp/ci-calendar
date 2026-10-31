@@ -3,6 +3,8 @@ import { join } from "node:path"
 import { describe, expect, it } from "vitest"
 import {
     allows,
+    cloudflareHeaderProblems,
+    cloudflareRulesOf,
     configuredOrigins,
     dataUrlProblems,
     hashProblems,
@@ -10,6 +12,7 @@ import {
     indexScriptOrigins,
     inlineHashes,
     parseCsp,
+    parseHeadersFile,
     policyProblems,
     posthogOrigins,
     previewEndpoints,
@@ -17,6 +20,7 @@ import {
     reportingProblems,
     rulesOf,
     sentryReportUrl,
+    withCloudflarePolicies,
     withPolicies,
 } from "./check-headers.mjs"
 
@@ -264,7 +268,24 @@ describe("security headers check", () => {
             "https://abc.supabase.co",
             "https://o1.ingest.de.sentry.io",
         ])
-        expect(skipped).toEqual(["VITE_PUBLIC_POSTHOG_KEY"])
+        expect(skipped).toEqual([
+            "VITE_PUBLIC_POSTHOG_KEY",
+            "VITE_CF_ANALYTICS_TOKEN",
+        ])
+        expect(
+            configuredOrigins({ VITE_CF_ANALYTICS_TOKEN: "t" }).needs,
+        ).toEqual([
+            {
+                origin: "https://static.cloudflareinsights.com",
+                directives: ["script-src"],
+                what: "Cloudflare Web Analytics beacon",
+            },
+            {
+                origin: "https://cloudflareinsights.com",
+                directives: ["connect-src"],
+                what: "Cloudflare Web Analytics",
+            },
+        ])
     })
 
     it("finds the scripts index.html's inline code loads", () => {
@@ -273,5 +294,184 @@ describe("security headers check", () => {
                 `<script>s.src = "https://www.googletagmanager.com/gtag/js?id=G-1"; c.href = "https://www.ci-events.org"</script>`,
             ),
         ).toEqual(["https://www.googletagmanager.com"])
+    })
+})
+
+const cloudflareText = readFileSync(
+    join(__dirname, "..", "public", "_headers"),
+    "utf8",
+)
+const vercelProduction = {
+    "Content-Security-Policy": policyOf(config),
+    "Reporting-Endpoints": valueOf(
+        rulesOf(config).production,
+        "Reporting-Endpoints",
+    )!,
+}
+const COMMON = config.headers[0].headers
+    .map(
+        ({ key, value }: { key: string; value: string }) =>
+            `  ${key}: ${value}`,
+    )
+    .join("\n")
+/** A `_headers` with production's `policy` and its preview on `/*`. */
+const headersWith = (
+    policy: string,
+    endpoints = `csp="${REPORT("production")}"`,
+) =>
+    withCloudflarePolicies(
+        `/*
+${COMMON}
+  Content-Security-Policy: x
+  Reporting-Endpoints: x
+
+https://www.ci-events.org/*
+  ! Content-Security-Policy
+  ! Reporting-Endpoints
+  Content-Security-Policy: x
+  Reporting-Endpoints: x
+
+https://ci-events.org/*
+  ! Content-Security-Policy
+  ! Reporting-Endpoints
+  Content-Security-Policy: x
+  Reporting-Endpoints: x
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+`,
+        { policy, endpoints },
+    )
+const problemsOf = (text: string, vercel?: object) => {
+    const { rules, problems } = parseHeadersFile(text)
+    return [...problems, ...cloudflareHeaderProblems(rules, vercel)]
+}
+
+describe("Cloudflare's _headers", () => {
+    it("passes public/_headers, with vercel.json's production policy", () => {
+        expect(problemsOf(cloudflareText, vercelProduction)).toEqual([])
+        const { common, production } = cloudflareRulesOf(
+            parseHeadersFile(cloudflareText).rules,
+        )
+        const { directives, problems } = parseCsp(
+            valueOf(production[0]!, "Content-Security-Policy")!,
+        )
+        expect(problems).toEqual([])
+        expect(policyProblems(directives)).toEqual([])
+        expect(valueOf(common!, "Content-Security-Policy")).toBe(
+            previewEndpoints(vercelProduction["Content-Security-Policy"]),
+        )
+    })
+
+    it("parses rules, detached headers and comments, and fails bad lines", () => {
+        const { rules, problems } = parseHeadersFile(
+            `  X-Early: 1
+# a comment
+/a/*
+  X-A: 1
+  ! X-B
+  not a header
+/b
+  X-Long: ${"x".repeat(2000)}`,
+        )
+        expect(rules).toEqual([
+            {
+                pattern: "/a/*",
+                headers: [{ key: "X-A", value: "1" }],
+                detached: ["X-B"],
+            },
+            {
+                pattern: "/b",
+                headers: [{ key: "X-Long", value: "x".repeat(2000) }],
+                detached: [],
+            },
+        ])
+        expect(problems).toEqual([
+            "_headers line 1 has a header outside a rule",
+            `_headers line 6 isn't "Name: value" or "! Name"`,
+            "_headers line 8 is over Cloudflare's 2000 characters",
+        ])
+    })
+
+    it("--write sets production's policy on its hosts and the preview's on every other", () => {
+        const policy = `default-src 'self'; report-uri ${REPORT("production")}; report-to csp`
+        const { common, production } = cloudflareRulesOf(
+            parseHeadersFile(headersWith(policy)).rules,
+        )
+        for (const rule of production) {
+            expect(valueOf(rule!, "Content-Security-Policy")).toBe(policy)
+        }
+        expect(valueOf(common!, "Content-Security-Policy")).toBe(
+            policy.replace("=production", "=preview"),
+        )
+        expect(valueOf(common!, "Reporting-Endpoints")).toBe(
+            `csp="${REPORT("preview")}"`,
+        )
+        expect(problemsOf(headersWith(policy))).toEqual([])
+    })
+
+    it("fails a production host without its own policy, or one not detaching the other", () => {
+        const text = headersWith("default-src 'self'")
+        expect(
+            problemsOf(
+                text.replace(/https:\/\/ci-events\.org\/\*[\s\S]*?\n\n/, ""),
+            ),
+        ).toEqual([
+            "_headers has no rule for https://ci-events.org/* (production's policy)",
+        ])
+        expect(
+            problemsOf(text.replaceAll("  ! Content-Security-Policy\n", "")),
+        ).toEqual([
+            expect.stringContaining(
+                "https://www.ci-events.org/* must detach Content-Security-Policy",
+            ),
+            expect.stringContaining(
+                "https://ci-events.org/* must detach Content-Security-Policy",
+            ),
+        ])
+        expect(problemsOf("/assets/*\n  Cache-Control: immutable")).toEqual([
+            '_headers has no rule for every path ("/*")',
+        ])
+    })
+
+    it("fails a policy that isn't vercel.json's, or a preview policy not made from it", () => {
+        const text = headersWith("default-src 'self'")
+        expect(problemsOf(text, vercelProduction)).toEqual([
+            "_headers: production's Content-Security-Policy isn't vercel.json's (run --write)",
+            "_headers: production's Reporting-Endpoints isn't vercel.json's (run --write)",
+        ])
+        const loose = text.replace(
+            "  Content-Security-Policy: default-src 'self'\n  Reporting-Endpoints",
+            "  Content-Security-Policy: default-src *\n  Reporting-Endpoints",
+        )
+        expect(problemsOf(loose)).toEqual([
+            "_headers: /*'s Content-Security-Policy isn't production's reporting as preview (run --write)",
+        ])
+    })
+
+    it("caches only the hashed build files, a year and immutable", () => {
+        const text = headersWith("default-src 'self'")
+        expect(
+            problemsOf(
+                text.replace("max-age=31536000, immutable", "max-age=3600"),
+            ),
+        ).toEqual([
+            "_headers: /assets/* (hashed names) must be cached a year, immutable",
+        ])
+        expect(
+            problemsOf(`${text}\n/sw.js\n  Cache-Control: max-age=86400\n`),
+        ).toEqual([
+            "_headers: /sw.js sets Cache-Control; only /assets/* may (index.html and sw.js must revalidate)",
+        ])
+    })
+
+    it("needs the security headers on every path", () => {
+        const text = headersWith("default-src 'self'").replace(
+            "  X-Frame-Options: DENY\n",
+            "",
+        )
+        expect(problemsOf(text)).toEqual([
+            "_headers: X-Frame-Options is missing",
+        ])
     })
 })

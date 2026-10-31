@@ -1,16 +1,12 @@
 import { queryOptions } from "@tanstack/react-query"
 import type { AppServices } from "../../app/services"
 import { STALE_MS } from "../../lib/freshness"
-import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
+import { jerusalemToday } from "../../lib/jerusalemDate"
 import {
     PUBLIC_EVENT_COLUMNS,
-    selectPublicEvents,
     toPublicEvent,
     type PublicEvent,
 } from "./publicEvent"
-
-/** How far ahead the public calendar looks. ~25 events, ~6.5 KB gzipped. */
-export const WINDOW_DAYS = 90
 
 /**
  * First element of the window's query key. The key deliberately has no date:
@@ -42,7 +38,9 @@ export const PUBLIC_WINDOW_SHAPE = `3|${PUBLIC_EVENT_COLUMNS}`
 /**
  * The public calendar window: visible events from today (Jerusalem) up to
  * WINDOW_DAYS ahead, in one request, with the public bios of their teachers
- * (see `selectPublicEvents` for the explicit public filters).
+ * (see `selectPublicEvents` for the explicit public filters). It comes
+ * through `services.publicFeed`: on the web the edge-cached endpoint, else
+ * the direct select (features/calendar/publicFeed.ts).
  *
  * The cached data may hold days that have since passed (a window fetched
  * before midnight, or restored from storage), so `select` drops events dated
@@ -50,7 +48,7 @@ export const PUBLIC_WINDOW_SHAPE = `3|${PUBLIC_EVENT_COLUMNS}`
  * it, so `select` runs again when the day changes.
  */
 export function publicWindowQuery(
-    { data, now }: AppServices,
+    { publicFeed, now }: Pick<AppServices, "publicFeed" | "now">,
     today: string = jerusalemToday(now()),
 ) {
     return queryOptions({
@@ -62,20 +60,14 @@ export function publicWindowQuery(
         select: (window: PublicWindow) =>
             window.events.filter((event) => event.startDate >= today),
         queryFn: async (): Promise<PublicWindow> => {
-            const from = jerusalemToday(now())
-            const to = addDays(from, WINDOW_DAYS)
-            const { data: rows, error } = await selectPublicEvents(data)
-                .gte("start_date", from)
-                .lte("start_date", to)
-                .order("start_date", { ascending: true })
-            if (error) throw new Error(error.message)
+            const { start, end, rows } = await publicFeed.window()
 
-            // `start_date` is nullable in the schema, but the range filter
-            // above already excludes nulls.
+            // `start_date` is nullable in the schema, but the window's range
+            // filter already excludes nulls.
             const events = rows.flatMap(({ start_date, ...row }) =>
                 start_date ? [toPublicEvent({ ...row, start_date })] : [],
             )
-            return { from, to, events }
+            return { from: start, to: end, events }
         },
     })
 }

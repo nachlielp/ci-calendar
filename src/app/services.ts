@@ -3,6 +3,7 @@ import type { Auth } from "../data/auth"
 import type { DataClient } from "../data/client"
 import type { Files } from "../data/files"
 import type { Functions } from "../data/functions"
+import type { PublicFeed } from "../features/calendar/publicFeed"
 import type { PlacesLoader } from "../data/places"
 import type { DeviceStorage } from "./deviceStorage"
 import type { ImageTools } from "./images/images"
@@ -12,6 +13,12 @@ import type { AppUpdates } from "./updates/updates"
 /** Everything the app needs from the outside world, injected once at boot. */
 export interface AppServices {
     data: DataClient
+    /**
+     * The public window, the calendar's list (features/calendar/publicFeed.ts):
+     * the Worker's edge-cached endpoint on the web, falling back to the
+     * direct select; tests read the fake's data through the same select.
+     */
+    publicFeed: PublicFeed
     /** Sign-in state and actions (data/auth.ts); boot never waits on it. */
     auth: Auth
     /** Edge Functions (data/functions.ts): the `translate` function. */

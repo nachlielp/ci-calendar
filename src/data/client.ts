@@ -1,5 +1,4 @@
 import { PostgrestClient } from "@supabase/postgrest-js"
-import type { Auth } from "./auth"
 import type { Database } from "./database.types"
 
 /**
@@ -13,6 +12,16 @@ import type { Database } from "./database.types"
 export type DataClient = PostgrestClient<Database>
 
 /**
+ * Where a request's token comes from: `services.auth` (./auth.ts) in the
+ * app; the Worker has none, so it sends the anon key alone. Structural, so
+ * the Worker (worker/app.ts) builds this client without the browser's auth.
+ */
+export interface TokenSource {
+    /** The signed-in user's valid access token, or `null` for anon. */
+    accessToken(): string | null
+}
+
+/**
  * Each request carries the token at hand when it is sent (as supabase-js
  * did): the signed-in user's while it is valid, refreshed ones included,
  * else the anon key. It never waits for auth; personal queries await
@@ -21,7 +30,7 @@ export type DataClient = PostgrestClient<Database>
 export function createDataClient(
     url: string,
     anonKey: string,
-    auth: Pick<Auth, "accessToken">,
+    auth: TokenSource,
     send: typeof fetch = (...args) => fetch(...args),
 ): DataClient {
     return new PostgrestClient<Database>(`${url}/rest/v1`, {

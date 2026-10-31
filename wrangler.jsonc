@@ -1,0 +1,33 @@
+// Cloudflare Workers hosting (spec #37; runbook: docs/cloudflare.md).
+//
+// Cloudflare serves the Vite build (dist/) as static assets; any path that
+// isn't a file falls back to the SPA shell (index.html). The Worker
+// (worker/index.ts) runs first only for /api/*: the edge-cached public
+// window. Every other request is a static asset, with no Worker invocation.
+// The headers (security headers, CSP, caching) are public/_headers, which
+// the build copies to dist/_headers (scripts/check-headers.mjs checks it).
+//
+// The Worker's variables, VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, are
+// not in this file: set them as secrets (`npx wrangler secret put …`, kept
+// across deploys) and, for `wrangler dev`, in .dev.vars (gitignored). The
+// client build reads its own VITE_ variables at build time (.env, or the
+// Workers Builds build variables).
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "ci-calendar",
+    "main": "worker/index.ts",
+    "compatibility_date": "2026-10-30",
+    "assets": {
+        "directory": "dist",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": ["/api/*"],
+    },
+    // ci-calendar.<account>.workers.dev, and a preview URL per uploaded
+    // version (`npm run cf:preview`).
+    "workers_dev": true,
+    "preview_urls": true,
+    // Production. The apex (ci-events.org) isn't attached: a Redirect Rule
+    // sends it to www (docs/cloudflare.md, "Moving www.ci-events.org").
+    "routes": [{ "pattern": "www.ci-events.org", "custom_domain": true }],
+    "observability": { "enabled": true },
+}

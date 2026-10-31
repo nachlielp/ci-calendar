@@ -1,0 +1,21 @@
+{
+    // The Worker runs on Cloudflare's runtime: its globals (`caches.default`,
+    // `ExportedHandler`), no DOM. Checked by `npm run typecheck`; its tests
+    // (plain vitest with fakes) are checked with the app's (tsconfig.json).
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2022"],
+        "types": ["@cloudflare/workers-types"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
+    },
+    "include": ["*.ts"],
+    "exclude": ["*.test.ts"]
+}

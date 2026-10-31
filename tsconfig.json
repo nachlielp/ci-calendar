@@ -19,8 +19,9 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src/**/*", "scripts/**/*"],
+    "include": ["src/**/*", "scripts/**/*", "worker/**/*"],
     // The service worker has worker globals, not the DOM: src/sw/tsconfig.json.
-    "exclude": ["src/sw/sw.ts"]
+    // So has the Cloudflare Worker's entry: worker/tsconfig.json.
+    "exclude": ["src/sw/sw.ts", "worker/index.ts"]
     // vite.config.ts runs in Node: tsconfig.node.json (`npm run typecheck`).
 }

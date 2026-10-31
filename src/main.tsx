@@ -17,6 +17,7 @@ import { createDataClient } from "./data/client"
 import { createFiles } from "./data/files"
 import { createFunctions } from "./data/functions"
 import { googlePlacesLoader } from "./data/places"
+import { edgePublicFeed } from "./features/calendar/publicFeed"
 import "./index.css"
 
 const storage = browserStorage()
@@ -26,12 +27,23 @@ const auth = createAuth({
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     storage,
 })
+const data = createDataClient(
+    import.meta.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
+    auth,
+)
+const now = () => new Date()
 const services: AppServices = {
-    data: createDataClient(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_ANON_KEY,
-        auth,
-    ),
+    data,
+    // The edge-cached window where the Worker serves it (Cloudflare), else
+    // (no Worker, e.g. Vercel) the same select straight from Supabase;
+    // signed-in users always read Supabase (their own saves must show).
+    publicFeed: edgePublicFeed({
+        data,
+        now,
+        signedIn: () => !!auth.session(),
+        fetch: (...args) => fetch(...args),
+    }),
     auth,
     functions: createFunctions(
         import.meta.env.VITE_SUPABASE_URL,
@@ -46,7 +58,7 @@ const services: AppServices = {
         auth,
     ),
     images: browserImages(),
-    now: () => new Date(),
+    now,
     storage,
     session: browserStorage("sessionStorage"),
     buildVersion: BUILD_VERSION,
