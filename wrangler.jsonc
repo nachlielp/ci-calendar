@@ -26,5 +26,8 @@
     // version (`npm run cf:preview`).
     "workers_dev": true,
     "preview_urls": true,
+    // Production. The apex (ci-events.org) isn't attached: a Redirect Rule
+    // sends it to www (docs/cloudflare.md, "Moving www.ci-events.org").
+    "routes": [{ "pattern": "www.ci-events.org", "custom_domain": true }],
     "observability": { "enabled": true },
 }

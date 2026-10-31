@@ -127,22 +127,18 @@ Google's. Do the switch in this order, at a quiet time.
    zone is active.
 3. **Lower the TTL** of the `www` and apex records (e.g. 60 s) a day
    ahead, so the switch and a rollback spread quickly.
-4. **Attach the custom domains.** Add to `wrangler.jsonc`:
-
-    ```jsonc
-    "routes": [
-        { "pattern": "www.ci-events.org", "custom_domain": true },
-        { "pattern": "ci-events.org", "custom_domain": true },
-    ],
-    ```
-
-    A custom domain needs the hostname free: delete the `www` CNAME and the
-    apex A records (Vercel's) in Cloudflare DNS first, then `npm run
-cf:deploy`. Cloudflare creates the records and certificates (a minute
-    or two). Keep the apex redirecting to www as Vercel does: a Redirect
-    Rule (Rules → Redirect Rules: hostname equals `ci-events.org` →
-    `https://www.ci-events.org${path}` with the query, 301), or leave
-    the apex as a custom domain serving the same app.
+4. **Attach www, redirect the apex** (done this way 2026-10-31).
+   `wrangler.jsonc` has
+   `"routes": [{ "pattern": "www.ci-events.org", "custom_domain": true }]`.
+   A custom domain needs the hostname free: delete the `www` CNAME
+   (Vercel's) in Cloudflare DNS, then `npm run cf:deploy` at once;
+   Cloudflare creates the record and certificate (a minute or two).
+   Visitors keep their cached answer (Vercel) meanwhile. The apex keeps
+   redirecting to www as on Vercel: its A record becomes `192.0.2.1`
+   (a placeholder that is never contacted), **proxied**, and a Redirect
+   Rule (Rules → Redirect Rules, template "Redirect from root to WWW":
+   hostname equals `ci-events.org` → `https://www.ci-events.org${path}`,
+   query kept, 301) answers before anything reaches it.
 
 5. **Check** as in "Checking a deploy" on `https://www.ci-events.org`:
    the production CSP (`sentry_environment=production`, one CSP header),
@@ -168,10 +164,11 @@ cf:deploy`. Cloudflare creates the records and certificates (a minute
     or Workers & Pages → `ci-calendar` → Deployments → Rollback. A rollback
     doesn't change secrets.
 
-- **Back to Vercel** (after the switch): in Cloudflare DNS, remove the
-  custom domains from the Worker (delete the `routes`, or Settings →
-  Domains & Routes), then recreate the records from step 1: `www` CNAME
-  `cname.vercel-dns.com` and the apex A record(s) Vercel gave, **DNS only**.
+- **Back to Vercel** (after the switch): remove the custom domain from the
+  Worker (Workers & Pages → `ci-calendar` → Settings → Domains & Routes;
+  then delete `routes` in `wrangler.jsonc`), turn off the Redirect Rule,
+  and recreate the records: `www` CNAME `cname.vercel-dns.com` and the
+  apex A `76.76.21.21`, both **DNS only**.
   Vercel's last deployment is still there and still production; it serves
   the app with the direct Supabase read. Visitors move as the TTL expires.
 - **The edge endpoint misbehaving** but the site fine: no action is needed
