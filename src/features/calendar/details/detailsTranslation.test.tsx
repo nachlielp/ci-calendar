@@ -5,7 +5,13 @@ import { createMemoryStorage } from "../../../app/deviceStorage"
 import { createFakeDataClient } from "../../../test/fakeDataClient"
 import { fakeTranslation } from "../../../test/fakeFunctions"
 import { renderApp } from "../../../test/renderApp"
-import { bio, event, publicEvent, segment, tagging } from "../testEvents"
+import {
+    bio,
+    event,
+    publicEvent,
+    segment,
+    tagging,
+} from "../../../test/testEvents"
 import { translatableTexts } from "./detailsTranslation"
 import { TRANSLATIONS_KEY } from "./translationStore"
 

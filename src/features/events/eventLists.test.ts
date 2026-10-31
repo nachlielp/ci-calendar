@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
-import { publicEvent } from "../calendar/testEvents"
-import type { ManagedEvent } from "../events/managedEvent"
-import { afterCursor, comparePast, laterInSeries } from "./myEvents"
+import { publicEvent } from "../../test/testEvents"
+import { comparePast, eventsAfter, laterInSeries } from "./eventLists"
+import type { ManagedEvent } from "./managedEvent"
 
 const managed = (overrides: Partial<ManagedEvent> = {}): ManagedEvent => ({
     ...publicEvent(),
@@ -29,10 +29,14 @@ describe("laterInSeries", () => {
     })
 })
 
-describe("past pagination", () => {
+describe("event list pagination", () => {
     it("asks for what comes after the cursor in the list's order", () => {
-        expect(afterCursor({ startDate: "2026-09-03", id: "b" })).toBe(
-            "start_date.lt.2026-09-03,and(start_date.eq.2026-09-03,id.lt.b)",
+        const cursor = { startDate: "2026-09-03", id: "b" }
+        expect(eventsAfter(cursor, "descending")).toBe(
+            'start_date.lt."2026-09-03",and(start_date.eq."2026-09-03",id.lt."b")',
+        )
+        expect(eventsAfter(cursor, "ascending")).toBe(
+            'start_date.gt."2026-09-03",and(start_date.eq."2026-09-03",id.gt."b")',
         )
     })
 

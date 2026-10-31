@@ -1,8 +1,14 @@
 import type { InfiniteData, QueryClient, QueryKey } from "@tanstack/react-query"
+import {
+    refetchCachedQueries,
+    updateCachedQueries,
+} from "../../app/cachedQueries"
 import { jerusalemToday } from "../../lib/jerusalemDate"
+import { insertInOrder, pageHolding } from "../../lib/keyset"
 import { LINKED_EVENT_KIND } from "../calendar/linkedEvent"
 import type { PublicBio, PublicEvent } from "../calendar/publicEvent"
 import { PUBLIC_WINDOW_KIND, type PublicWindow } from "../calendar/publicWindow"
+import type { EventCursor, EventKey } from "./eventLists"
 import { toPublicOnly, type ManagedEvent } from "./managedEvent"
 
 // The one place that turns a saved or deleted event into updates of every
@@ -52,10 +58,10 @@ export function registerEventList(list: EventList) {
  * Puts `change` into every cached query of every event list. Queries not
  * in the cache stay out (never created here); a query changes only if the
  * change concerns it, and keeps its fetch time, so a write doesn't postpone
- * its next revalidation. A query whose refetch is in flight is refetched
- * anew after the update (the request in flight, maybe sent before the
- * write, is dropped), so an older answer can't bring back what was just
- * deleted or hidden, nor persist it.
+ * its next revalidation. A query whose fetch is in flight is fetched anew
+ * after the update (the request in flight, maybe sent before the write, is
+ * dropped; a paginated list starts again from its first page), so an older
+ * answer can't bring back what was just deleted or hidden, nor persist it.
  */
 export function applyEventChanges(
     queryClient: QueryClient,
@@ -79,33 +85,18 @@ export function applyEventChanges(
 
 /**
  * Sets each cached query of every list to what `update` returns for its
- * data (skipped when it returns the same object), keeping its fetch time,
- * and refetches anew a query whose refetch is in flight.
+ * data (`updateCachedQueries`: skipped when it returns the same object,
+ * fetch times kept, a fetch in flight redone, a paginated list's from its
+ * first page).
  */
 function updateLists(
     queryClient: QueryClient,
     update: (list: EventList, data: unknown, queryKey: QueryKey) => unknown,
 ) {
     for (const list of lists.values()) {
-        for (const query of queryClient
-            .getQueryCache()
-            .findAll({ queryKey: [list.kind] })) {
-            const data = query.state.data
-            if (data === undefined) continue
-            const next = update(list, data, query.queryKey)
-            if (next === data) continue
-            queryClient.setQueryData(query.queryKey, next, {
-                updatedAt: query.state.dataUpdatedAt,
-            })
-            // Fetched directly: refetchQueries skips a query whose only
-            // observers are disabled (the header's stale sign reads the
-            // window with `enabled: false`).
-            if (query.state.fetchStatus === "fetching") {
-                query.fetch(undefined, { cancelRefetch: true }).catch(() => {
-                    // Its observers show the failure; nothing to add here.
-                })
-            }
-        }
+        updateCachedQueries<unknown>(queryClient, [list.kind], (data, key) =>
+            update(list, data, key),
+        )
     }
 }
 
@@ -164,15 +155,15 @@ function withBio(
 }
 
 /**
- * Refetches every event query (all registered lists): for when a write
+ * Reads every event query again (all registered lists): for when a write
  * didn't come back as asked (some events were deleted or changed elsewhere
- * meanwhile), so its response can't say where they stand. Queries on
- * screen refetch now, the others when next shown.
+ * meanwhile), so its response can't say where they stand
+ * (`refetchCachedQueries`): plain queries on screen refetch now, the others
+ * when next shown; a paginated list on screen from its first page only,
+ * one off screen is dropped.
  */
 export function refreshEventQueries(queryClient: QueryClient) {
-    for (const kind of lists.keys()) {
-        void queryClient.invalidateQueries({ queryKey: [kind] })
-    }
+    for (const kind of lists.keys()) refetchCachedQueries(queryClient, [kind])
 }
 
 /**
@@ -191,48 +182,32 @@ export function mergeIntoList<T extends { id: string }>(
     return result
 }
 
-/** Puts `event` into `list` (in place) in `compare` order, after equals. */
-function insertInOrder<T>(
-    list: T[],
-    event: T,
-    compare: (a: T, b: T) => number,
-) {
-    const at = list.findIndex((other) => compare(event, other) < 0)
-    list.splice(at === -1 ? list.length : at, 0, event)
-}
-
-/** A page of a keyset-paginated list (see "Pagination" in the docs). */
+/** A page of a keyset-paginated list of events (see "Pagination"). */
 export interface EventPage<T> {
     events: T[]
     /** The next page's cursor; `null` on the last page. */
-    next: unknown
+    next: EventCursor | null
 }
 
 /**
- * Loaded pages without `change.gone`, with each of `added` put on the page
- * it belongs to in `compare` order, if the pages loaded so far reach it.
- * One after every loaded event, while more pages follow, is left for its
- * own page to bring (putting it in now would show it twice once that page
- * loads).
+ * Loaded pages without `change.gone`, with each of `added` put in `compare`
+ * order on the page whose range holds it (`pageHolding`: up to the page's
+ * `next` cursor; the last page, with none, holds the rest). One after every
+ * loaded page's cursor is left for its own page to bring (putting it in now
+ * would show it twice once that page loads).
  */
-export function mergeIntoPages<T extends { id: string }>(
+export function mergeIntoPages<T extends EventKey>(
     data: InfiniteData<EventPage<T>>,
     change: AppliedChange,
     added: readonly T[],
-    compare: (a: T, b: T) => number,
+    compare: (a: EventKey, b: EventKey) => number,
 ): InfiniteData<EventPage<T>> {
     const pages = data.pages.map((page) => ({
         ...page,
         events: page.events.filter((event) => !change.gone.has(event.id)),
     }))
     for (const event of added) {
-        const index = pages.findIndex((page, i) => {
-            const last = page.events.at(-1)
-            return (
-                (last && compare(event, last) < 0) ||
-                (i === pages.length - 1 && page.next === null)
-            )
-        })
+        const index = pageHolding(pages, event, compare)
         if (index === -1) continue
         // Copied, not filtered again: events added before stay.
         const events = [...pages[index].events]

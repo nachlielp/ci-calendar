@@ -15,7 +15,7 @@ import {
     typeLabels,
 } from "./eventFormat"
 import { ENGLISH, HEBREW, RUSSIAN } from "./eventLocales"
-import { publicEvent } from "./testEvents"
+import { publicEvent } from "../../test/testEvents"
 
 const multiDay = publicEvent({
     startDate: "2026-11-06",

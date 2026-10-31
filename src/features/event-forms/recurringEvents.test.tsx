@@ -9,7 +9,7 @@ import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, type TestUser } from "../../test/testUsers"
-import { bio, event, eventTitles, segment } from "../calendar/testEvents"
+import { bio, event, eventTitles, segment } from "../../test/testEvents"
 import { SINGLE_DAY_DRAFT_KEY } from "./draftKeys"
 
 // Before the clocks go back on Sunday 25 October 2026 (UTC+3 → UTC+2).
@@ -495,9 +495,11 @@ describe("editing an event of a recurring series", () => {
             otherSeries,
             theirs,
         } = seeded()
-        // From my events, so its list is cached.
+        // From my events and the calendar, so their lists are cached.
         const { router } = render(user, fake, "/manage-events")
         expect(await myEventTitles()).toContain("שיעור שבועי")
+        await act(() => router.navigate("/"))
+        expect(await eventTitles()).toContain("שיעור שבועי")
         await act(() =>
             router.navigate(`/manage-events/edit-single-day/${edited.id}`),
         )
@@ -507,6 +509,15 @@ describe("editing an event of a recurring series", () => {
         await userEvent.clear(title)
         await userEvent.type(title, "שיעור חדש")
         await userEvent.click(screen.getByRole("switch"))
+        // The series has loaded (the save waits for it); from here on every
+        // read of events hangs: what the pages show comes from the answers.
+        await waitFor(() =>
+            expect(
+                screen.getByRole("button", { name: "עדכון אירוע" }),
+            ).toBeEnabled(),
+        )
+        fake.holdReads("ci_events")
+        const readsBefore = eventReads(fake).length
 
         await update()
         const dialog = await screen.findByRole("dialog", {
@@ -570,15 +581,27 @@ describe("editing an event of a recurring series", () => {
         expect(row(fake, otherSeries.id).title).toBe("סדרה אחרת")
         expect(row(fake, theirs.id).title).toBe("של מישהו")
 
-        // My events show them from the responses: any list request hangs.
-        fake.holdTable("ci_events")
-        await act(() => router.navigate("/"))
-        await act(() => router.navigate("/manage-events"))
+        // My events and the calendar show them from the answers.
         expect(await myEventTitles()).toEqual([
             "שיעור חדש",
             "סדרה אחרת",
             "שיעור חדש",
             "שיעור חדש",
+        ])
+        await act(() => router.navigate("/"))
+        const calendar = await eventTitles()
+        // The edited event is hidden now; the later visible one renamed.
+        expect(calendar).toContain("שיעור חדש")
+        expect(calendar).not.toContain("שיעור שבועי")
+        // The save asked for no list of events: the one read since is my
+        // events' own on opening again (held, so its list is the answers').
+        expect(eventReads(fake).slice(readsBefore)).toMatchObject([
+            {
+                filters: [
+                    { op: "eq", column: "user_id", value: user.id },
+                    { op: "gte", column: "start_date" },
+                ],
+            },
         ])
     })
 

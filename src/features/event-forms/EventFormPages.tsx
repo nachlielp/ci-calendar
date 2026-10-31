@@ -18,9 +18,9 @@ import {
     editPath,
     type ManagedEvent,
 } from "../events/managedEvent"
-import { myUpcomingEventsKey } from "../manage-events/myEvents"
+import { myUpcomingEventsKey } from "../events/eventLists"
 import { FORM_PAGE_COPY } from "./formPageCopy"
-import { myEventQuery } from "./myEvent"
+import { eventToEditQuery } from "./eventToEdit"
 import "./FormPage.scss"
 
 // The pages around the event forms (legacy SingleDayFormPage,
@@ -123,7 +123,7 @@ export function EditEventFormPage({
         .getQueryData<ManagedEvent[]>(myUpcomingEventsKey(userId))
         ?.find((event) => event.id === eventId)
     const query = useQuery({
-        ...myEventQuery(services, userId, eventId, scope),
+        ...eventToEditQuery(services, userId, eventId, scope),
         enabled: !!userId && isId,
         ...(cached
             ? {

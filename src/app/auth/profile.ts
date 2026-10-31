@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query"
 import type { AuthUser } from "../../data/auth"
-import { STALE_MS } from "../../features/calendar/publicWindow"
+import { STALE_MS } from "../../lib/freshness"
 import type { AppServices } from "../services"
 import type { SignedInRole } from "../viewer"
 

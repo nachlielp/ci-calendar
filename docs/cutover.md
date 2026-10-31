@@ -167,8 +167,11 @@ client too, except the last, which waits until after go-live.
 
 ## 3. After the deploy (preview first, then production)
 
-- [ ] **CSP:** open `/`, an event, `/login`, the forms and the admin pages
-      with the console open: no `Content Security Policy` errors. Then
+- [ ] **CSP:** with the console open, go through `/`, an event, `/login`
+      (and Google sign-in), the event forms with an address typed (so
+      Google Places loads and suggests), `/bio` (pick and crop a photo, so
+      the cropper loads, then save it, so it uploads and shows) and the
+      admin pages: no `Content Security Policy` errors. Then
       watch Sentry for CSP issues over the first days (tagged `production`
       or `preview`). On a preview, check that Vercel's toolbar
       (`vercel.live`) loads; on production, that responses carry exactly one

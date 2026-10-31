@@ -6,11 +6,13 @@ import {
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
+import { keysetPage, quoted } from "../../lib/keyset"
 import {
     afterNewest,
     containing,
+    newestCursorOf,
     PAGED_ADMIN_FRESHNESS,
-    quoted,
+    type NewestCursor,
 } from "../admin/adminLists"
 
 // The users list for `/manage-users` (legacy ManageUsersPage and
@@ -65,18 +67,13 @@ export interface AdminUser {
     createdAt: string
 }
 
-/** Where the next page starts: after this user in the list's order. */
-export interface UserCursor {
-    createdAt: string
-    id: string
-}
-
 export interface UserPage {
     users: AdminUser[]
-    next: UserCursor | null
+    /** After the last user shown (newest first); `null` on the last page. */
+    next: NewestCursor | null
 }
 
-export type UserPages = InfiniteData<UserPage, UserCursor | null>
+export type UserPages = InfiniteData<UserPage, NewestCursor | null>
 
 interface AdminUserRow {
     id: string
@@ -111,9 +108,6 @@ export function searchTerms(text: string): string | null {
     return `user_name.ilike.${pattern},email.ilike.${pattern}`
 }
 
-/** Users after `cursor` in the list's order (newest first, then id). */
-export const afterUser = (cursor: UserCursor) => afterNewest(cursor)
-
 /**
  * The one `or()` filter a page sends: the search, the cursor, or both
  * (PostgREST ANDs repeated `or` parameters too, but one tree leaves no
@@ -121,10 +115,10 @@ export const afterUser = (cursor: UserCursor) => afterNewest(cursor)
  */
 export function usersFilter(
     search: string,
-    cursor: UserCursor | null,
+    cursor: NewestCursor | null,
 ): string | null {
     const terms = searchTerms(search)
-    const after = cursor && afterUser(cursor)
+    const after = cursor && afterNewest(cursor)
     if (terms && after) return `and(or(${terms}),or(${after}))`
     return terms ?? after
 }
@@ -147,7 +141,7 @@ export function adminUsersQuery(
     return infiniteQueryOptions({
         queryKey: adminUsersKey(adminId, search),
         ...PAGED_ADMIN_FRESHNESS,
-        initialPageParam: null as UserCursor | null,
+        initialPageParam: null as NewestCursor | null,
         getNextPageParam: (page: UserPage) => page.next,
         queryFn: async ({ pageParam }): Promise<UserPage> => {
             await sessionOf(services, adminId)
@@ -159,18 +153,12 @@ export function adminUsersQuery(
                 .order("id", { ascending: false })
                 .limit(USERS_PAGE_SIZE + 1)
             if (error) throw new Error(error.message)
-            const rows = (data as unknown as AdminUserRow[]).slice(
-                0,
+            const { rows, next } = keysetPage(
+                data as unknown as AdminUserRow[],
                 USERS_PAGE_SIZE,
+                newestCursorOf,
             )
-            const last = rows.at(-1)
-            return {
-                users: rows.map(toAdminUser),
-                next:
-                    data.length > USERS_PAGE_SIZE && last
-                        ? { createdAt: last.created_at, id: last.id }
-                        : null,
-            }
+            return { users: rows.map(toAdminUser), next }
         },
     })
 }

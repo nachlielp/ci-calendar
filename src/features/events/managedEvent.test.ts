@@ -3,7 +3,7 @@ import {
     EVENT_BIO_COLUMNS,
     PUBLIC_EVENT_COLUMNS,
 } from "../calendar/publicEvent"
-import { bio, event } from "../calendar/testEvents"
+import { bio, event } from "../../test/testEvents"
 import {
     MANAGED_EVENT_COLUMNS,
     toManagedEvent,

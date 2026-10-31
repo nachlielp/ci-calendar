@@ -2,8 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { sessionOf } from "../../app/auth/personal"
 import { useServices, type AppServices } from "../../app/services"
 import type { Database } from "../../data/database.types"
+import { englishAddressOf } from "../../data/placeLookups"
 import { translateTitle } from "../../data/translate"
-import { withTimeout } from "../../lib/timeout"
 import { EVENT_BIO_COLUMNS } from "../calendar/publicEvent"
 import { applyEventChanges, refreshEventQueries } from "../events/eventCache"
 import {
@@ -107,21 +107,6 @@ const TAGGED_COLUMNS = `ci_event_id, public_bio(${EVENT_BIO_COLUMNS}, show_profi
 type Junction = ManagedEventRow["ci_events_users_junction"]
 
 /**
- * `place_id`'s English address, or nothing if it can't be had within
- * `LOOKUP_TIMEOUT_MS` (loading Google's script included).
- */
-function englishAddress(
-    services: AppServices,
-    placeId: string,
-): Promise<string | undefined> {
-    if (!placeId) return Promise.resolve(undefined)
-    return withTimeout(
-        services.places().then((places) => places.englishAddress(placeId)),
-        undefined,
-    )
-}
-
-/**
  * The translated title (`lng_titles`) for a new or changed title, and the
  * English address (`en_label`) for a new address the field couldn't label
  * when it was picked, looked up in parallel: the columns to add to the
@@ -141,7 +126,7 @@ async function lookups(
             ? translateTitle(services.functions, columns.title)
             : undefined,
         address && !address.en_label
-            ? englishAddress(services, address.place_id)
+            ? englishAddressOf(services.places, address.place_id)
             : undefined,
     ])
     return {
@@ -318,7 +303,7 @@ async function storedAndMissing(
 /**
  * Updates an event with the changed columns, only while it still belongs
  * to the owner the form opened it with (`user_id` = `event.ownerId`: the
- * user's own, as `myEventQuery` reads them, or for an admin anyone's);
+ * user's own, as `eventToEditQuery` reads them, or for an admin anyone's);
  * gone (deleted meanwhile), it fails with `EventGoneError` and every event
  * list is refetched. Translations are looked up only for a changed title
  * or a newly picked address (legacy), once, and used for the later events

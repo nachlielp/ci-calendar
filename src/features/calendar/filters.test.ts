@@ -8,7 +8,7 @@ import {
     storeFilterChange,
     TYPE_FILTERS,
 } from "./filters"
-import { publicEvent } from "./testEvents"
+import { publicEvent } from "../../test/testEvents"
 
 const segment = (type: string) => ({
     type,

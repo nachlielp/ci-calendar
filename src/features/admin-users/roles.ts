@@ -5,10 +5,10 @@ import {
 } from "@tanstack/react-query"
 import { PROFILE_KIND } from "../../app/auth/profile"
 import { sessionOf } from "../../app/auth/personal"
+import { updateCachedQueries } from "../../app/cachedQueries"
 import { useServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
 import type { DataClient } from "../../data/client"
-import { updatePagedLists } from "../admin/adminLists"
 import { applyBioChange, refreshEventQueries } from "../events/eventCache"
 import {
     ADMIN_USERS_KIND,
@@ -106,32 +106,22 @@ export function applyRoleChange(
     assigned: AssignedRole,
 ) {
     const before = cachedType(queryClient, adminId, assigned.userId)
-    updatePagedLists<UserPages>(
+    updateCachedQueries<UserPages>(
         queryClient,
         [ADMIN_USERS_KIND, adminId],
         (pages) => withRole(pages, assigned),
     )
-    const cache = queryClient.getQueryCache()
-    const stats = cache.find<UserStats>({
-        queryKey: adminUserStatsKey(adminId),
-        exact: true,
-    })
-    if (stats && before === undefined) {
+    if (before === undefined) {
         // Which count the user left isn't known: count again.
-        void queryClient.invalidateQueries({ queryKey: stats.queryKey })
-    } else if (stats) {
-        if (stats.state.data) {
-            queryClient.setQueryData(
-                stats.queryKey,
-                movedBetween(stats.state.data, before!, assigned.userType),
-                { updatedAt: stats.state.dataUpdatedAt },
-            )
-        }
-        if (stats.state.fetchStatus === "fetching") {
-            stats.fetch(undefined, { cancelRefetch: true }).catch(() => {
-                // Its observers show the failure.
-            })
-        }
+        void queryClient.invalidateQueries({
+            queryKey: adminUserStatsKey(adminId),
+        })
+    } else {
+        updateCachedQueries<UserStats>(
+            queryClient,
+            adminUserStatsKey(adminId),
+            (stats) => movedBetween(stats, before, assigned.userType),
+        )
     }
     if (assigned.userId === adminId) {
         void queryClient.invalidateQueries({

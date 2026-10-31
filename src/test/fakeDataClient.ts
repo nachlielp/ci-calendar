@@ -220,6 +220,12 @@ export interface FakeDataClient {
     answerLate(match: (request: RecordedRequest) => boolean): () => void
     /** Hold every following request to `table` until `releaseTable`. */
     holdTable(table: string): void
+    /**
+     * Hold every following read (`select`) of `table` until
+     * `releaseTable`, letting writes through: what a page shows after a
+     * write then comes from the write's answer, in the cache.
+     */
+    holdReads(table: string): void
     /** Answer the held requests to `table`, and stop holding new ones. */
     releaseTable(table: string): void
 }
@@ -395,6 +401,7 @@ export function createFakeDataClient(
     const requests: RecordedRequest[] = []
     const failures = new Map<string, { message: string; network: boolean }>()
     const held = new Map<string, (() => void)[]>()
+    const heldReads = new Map<string, (() => void)[]>()
     const lateAnswers: {
         match: (request: RecordedRequest) => boolean
         delivered: Promise<void>
@@ -516,7 +523,11 @@ export function createFakeDataClient(
                     const result = execute(request)
                     return delivered.then(() => result).then(resolve, reject)
                 }
-                const waiting = held.get(table)
+                const waiting =
+                    held.get(table) ??
+                    (request.method === "select"
+                        ? heldReads.get(table)
+                        : undefined)
                 const answered = waiting
                     ? new Promise<void>((answer) => waiting.push(answer))
                     : Promise.resolve()
@@ -768,9 +779,16 @@ export function createFakeDataClient(
         holdTable: (table) => {
             held.set(table, held.get(table) ?? [])
         },
+        holdReads: (table) => {
+            heldReads.set(table, heldReads.get(table) ?? [])
+        },
         releaseTable: (table) => {
-            const waiting = held.get(table) ?? []
+            const waiting = [
+                ...(held.get(table) ?? []),
+                ...(heldReads.get(table) ?? []),
+            ]
             held.delete(table)
+            heldReads.delete(table)
             for (const answer of waiting) answer()
         },
     }

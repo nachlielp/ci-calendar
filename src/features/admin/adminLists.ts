@@ -1,12 +1,15 @@
 import {
     focusManager,
+    hashKey,
+    useInfiniteQuery,
     useQueryClient,
-    type InfiniteData,
-    type QueryClient,
     type QueryKey,
+    type UseInfiniteQueryOptions,
 } from "@tanstack/react-query"
-import { useEffect } from "react"
-import { STALE_MS } from "../calendar/publicWindow"
+import { useCallback, useEffect, useState } from "react"
+import { refreshFirstPage } from "../../app/cachedQueries"
+import { STALE_MS } from "../../lib/freshness"
+import { rowsAfter } from "../../lib/keyset"
 
 // Freshness for admin pages (spec: "admin lists refresh when I come back to
 // the tab and offer a manual refresh"). A plain admin query uses
@@ -14,9 +17,10 @@ import { STALE_MS } from "../calendar/publicWindow"
 // after `STALE_MS`) and its page's refresh button calls `refetch`. A
 // paginated one (an infinite query) must not let TanStack refetch it, which
 // would fetch every loaded page again in turn: it uses
-// `PAGED_ADMIN_FRESHNESS`, the page removes it on unmount (so a visit starts
-// from page one), and `refreshFirstPage` both on return when stale
-// (`useRefreshWhenBack`) and from the refresh button.
+// `PAGED_ADMIN_FRESHNESS` and is shown with `usePagedAdminList`, which
+// removes it when the page unmounts (so a visit starts from page one) and
+// refreshes it from its first page only (`refreshFirstPage`), both on
+// return when stale (`useRefreshWhenBack`) and from the refresh button.
 
 /** An admin infinite query: refreshed only through `refreshFirstPage`. */
 export const PAGED_ADMIN_FRESHNESS = {
@@ -28,53 +32,6 @@ export const PAGED_ADMIN_FRESHNESS = {
 
 /** A server search goes out once typing pauses this long. */
 export const SEARCH_DEBOUNCE_MS = 300
-
-/**
- * Refetches the infinite query at `queryKey` from its first page only: the
- * pages after it are dropped first (they come back through "load more"),
- * as TanStack refetches as many pages as the query holds. A failure leaves
- * the data on screen and the query in error (`isRefetchError`).
- */
-export async function refreshFirstPage(
-    queryClient: QueryClient,
-    queryKey: QueryKey,
-): Promise<void> {
-    const data = queryClient.getQueryData<InfiniteData<unknown>>(queryKey)
-    if (data && data.pages.length > 1) {
-        queryClient.setQueryData<InfiniteData<unknown>>(queryKey, {
-            pages: data.pages.slice(0, 1),
-            pageParams: data.pageParams.slice(0, 1),
-        })
-    }
-    await queryClient.refetchQueries({ queryKey, exact: true })
-}
-
-/**
- * Applies a write's answer to every cached paginated admin list under
- * `queryKey` (a prefix, e.g. `[kind, adminId]`): `update(data, key)`
- * returns the list's new data, or the same object when the write doesn't
- * concern it. No refetch; fetch times are kept (a write doesn't delay a
- * revalidation); a list whose fetch is in flight (sent before the write,
- * so its answer may not have it) is fetched again from its first page.
- */
-export function updatePagedLists<T>(
-    queryClient: QueryClient,
-    queryKey: QueryKey,
-    update: (data: T, queryKey: QueryKey) => T,
-) {
-    for (const query of queryClient.getQueryCache().findAll({ queryKey })) {
-        const data = query.state.data as T | undefined
-        const next = data === undefined ? data : update(data, query.queryKey)
-        if (next !== data) {
-            queryClient.setQueryData(query.queryKey, next, {
-                updatedAt: query.state.dataUpdatedAt,
-            })
-        }
-        if (query.state.fetchStatus === "fetching") {
-            void refreshFirstPage(queryClient, query.queryKey)
-        }
-    }
-}
 
 /**
  * Calls `refresh` when the app comes back (TanStack's focus: the page
@@ -96,11 +53,68 @@ export function useRefreshWhenBack(queryKey: QueryKey, refresh: () => void) {
     )
 }
 
+/** An admin list's key: its kind, the admin, then its filters. */
+type AdminListKey = readonly [string, string, ...unknown[]]
+
 /**
- * A value for PostgREST's logic tree (`or=(…)`), double-quoted so commas,
- * dots, colons and parentheses in it are text (`\` escapes `"` and `\`).
+ * A paginated admin list on its page (`PAGED_ADMIN_FRESHNESS` options,
+ * keyed `[kind, adminId, …filters]`): the infinite query (enabled once the
+ * admin is known), removed with every other filter's list of its kind
+ * when the page unmounts, refreshed from its first page when the app
+ * comes back stale, and `refresh` for the refresh button: the list shown
+ * from its first page, plus `also` (the page's other queries), with
+ * `refreshing` true until both settle. Other filters' lists are dropped
+ * first (they load again when chosen) unless `keepOthers`. Pass options
+ * whose key keeps its identity until a filter changes (memoise the
+ * options factory's result).
  */
-export const quoted = (value: string) => `"${value.replace(/["\\]/g, "\\$&")}"`
+export function usePagedAdminList<
+    TQueryFnData,
+    TData,
+    TQueryKey extends AdminListKey,
+    TPageParam,
+>(
+    options: UseInfiniteQueryOptions<
+        TQueryFnData,
+        Error,
+        TData,
+        TQueryKey,
+        TPageParam
+    >,
+    { keepOthers = false }: { keepOthers?: boolean } = {},
+) {
+    const queryClient = useQueryClient()
+    const { queryKey } = options
+    const [kind, adminId] = queryKey
+    const list = useInfiniteQuery({ ...options, enabled: !!adminId })
+    // The lists last as long as the page: the next visit starts over.
+    useEffect(
+        () => () => queryClient.removeQueries({ queryKey: [kind, adminId] }),
+        [queryClient, kind, adminId],
+    )
+    const refreshShown = useCallback(
+        () => void refreshFirstPage(queryClient, queryKey),
+        [queryClient, queryKey],
+    )
+    useRefreshWhenBack(queryKey, refreshShown)
+
+    const [refreshing, setRefreshing] = useState(false)
+    function refresh(also?: () => Promise<unknown>) {
+        if (!keepOthers) {
+            const shown = hashKey(queryKey)
+            queryClient.removeQueries({
+                queryKey: [kind, adminId],
+                predicate: (query) => query.queryHash !== shown,
+            })
+        }
+        setRefreshing(true)
+        void Promise.all([
+            refreshFirstPage(queryClient, queryKey),
+            also?.(),
+        ]).finally(() => setRefreshing(false))
+    }
+    return { list, refreshing, refresh }
+}
 
 /**
  * The text typed as an `ilike` pattern that matches it anywhere: Postgres'
@@ -117,9 +131,21 @@ export interface NewestCursor {
     id: string
 }
 
+/** The cursor of a row read from a newest-first list. */
+export const newestCursorOf = (row: {
+    created_at: string
+    id: string
+}): NewestCursor => ({ createdAt: row.created_at, id: row.id })
+
 /**
  * Rows after `cursor` in a newest-first list (`created_at` descending,
  * then `id` descending): keyset pagination's logic tree, for one `or()`.
  */
-export const afterNewest = ({ createdAt, id }: NewestCursor) =>
-    `created_at.lt.${quoted(createdAt)},and(created_at.eq.${quoted(createdAt)},id.lt.${quoted(id)})`
+export const afterNewest = (cursor: NewestCursor) =>
+    rowsAfter("created_at", "descending", cursor.createdAt, cursor.id)
+
+/** Newest-first order: `created_at` descending, then `id` descending. */
+export function compareNewest(a: NewestCursor, b: NewestCursor): number {
+    if (a.createdAt !== b.createdAt) return a.createdAt > b.createdAt ? -1 : 1
+    return a.id > b.id ? -1 : a.id < b.id ? 1 : 0
+}

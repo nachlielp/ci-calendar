@@ -8,12 +8,8 @@ import { createFakeDataClient } from "../../test/fakeDataClient"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
 import { testUser } from "../../test/testUsers"
-import {
-    ADMIN_USER_COLUMNS,
-    afterUser,
-    searchTerms,
-    USERS_PAGE_SIZE,
-} from "./users"
+import { afterNewest } from "../admin/adminLists"
+import { ADMIN_USER_COLUMNS, searchTerms, USERS_PAGE_SIZE } from "./users"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 
@@ -212,7 +208,7 @@ describe("manage users (/manage-users)", () => {
             {
                 op: "or",
                 column: "",
-                value: afterUser({
+                value: afterNewest({
                     createdAt: String(last.created_at),
                     id: "user-007",
                 }),

@@ -6,7 +6,7 @@ import { createFakeDataClient } from "../../test/fakeDataClient"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow } from "../../test/testUsers"
-import { event } from "../calendar/testEvents"
+import { event } from "../../test/testEvents"
 
 const backend = () =>
     createFakeDataClient({ ci_events: [event({ title: "ג'אם" })] })

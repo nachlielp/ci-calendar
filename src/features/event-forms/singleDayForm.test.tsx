@@ -16,7 +16,7 @@ import {
     eventCard,
     eventTitles,
     segment,
-} from "../calendar/testEvents"
+} from "../../test/testEvents"
 import { LOOKUP_TIMEOUT_MS } from "../../lib/timeout"
 import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 
@@ -747,14 +747,23 @@ describe("editing a single-day event", () => {
         expect(screen.getByText("נועה המורה")).toBeInTheDocument()
     })
 
-    it("updates only the changed columns of that one event of the user's", async () => {
+    it("updates only the changed columns of that one event of the user's, and the calendar and my events from the answer", async () => {
         const { user, fake, mine, other, theirs } = seeded()
-        const { router } = render(user, fake, editPath(mine.id))
+        // My events and the calendar are cached first.
+        const { router } = render(user, fake, "/manage-events")
+        expect(await myEventTitles()).toContain("שיעור שבועי")
+        await act(() => router.navigate("/"))
+        expect(await eventTitles()).toContain("שיעור שבועי")
+        await act(() => router.navigate(editPath(mine.id)))
         const title = await screen.findByRole("textbox", {
             name: "*כותרת האירוע",
         })
         await userEvent.clear(title)
         await userEvent.type(title, "שיעור חדש")
+        // From here on every read of events hangs: what the pages show
+        // comes from the save's answer, in the cache.
+        fake.holdReads("ci_events")
+        const readsBefore = eventReads(fake).length
 
         await userEvent.click(
             screen.getByRole("button", { name: "עדכון אירוע" }),
@@ -795,6 +804,20 @@ describe("editing a single-day event", () => {
             title: "של מישהו",
         })
         expect(await myEventTitles()).toContain("שיעור חדש")
+        await act(() => router.navigate("/"))
+        const calendar = await eventTitles()
+        expect(calendar).toContain("שיעור חדש")
+        expect(calendar).not.toContain("שיעור שבועי")
+        // The save asked for no list of events: the one read since is my
+        // events' own on opening again (held, so its list is the answer's).
+        expect(eventReads(fake).slice(readsBefore)).toMatchObject([
+            {
+                filters: [
+                    { op: "eq", column: "user_id", value: user.id },
+                    { op: "gte", column: "start_date" },
+                ],
+            },
+        ])
     })
 
     it("moves the segments with a new date, and tags newly added teachers", async () => {

@@ -10,7 +10,7 @@ import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, type TestUser } from "../../test/testUsers"
-import { bio, event, eventCard, eventTitles } from "../calendar/testEvents"
+import { bio, event, eventCard, eventTitles } from "../../test/testEvents"
 import { MULTI_DAY_DRAFT_KEY, MULTI_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
@@ -581,6 +581,47 @@ describe("editing a multi-day event", () => {
         expect(rows.find((row) => row.id === single.id)).toEqual(single)
         expect(rows.find((row) => row.id === theirs.id)).toEqual(theirs)
         expect(await myEventTitles()).toContain("סדנת סתיו")
+    })
+
+    it("updates the calendar and my events from its answer, with no list request", async () => {
+        const { user, fake, mine } = seeded()
+        // My events and the calendar are cached first.
+        const { router } = render(user, fake, "/manage-events")
+        expect(await myEventTitles()).toContain("סדנת סתיו")
+        await act(() => router.navigate("/"))
+        expect(await eventTitles()).toContain("סדנת סתיו")
+        await act(() => router.navigate(editPath(mine.id)))
+        const title = await screen.findByRole("textbox", {
+            name: "*כותרת האירוע",
+        })
+        await userEvent.clear(title)
+        await userEvent.type(title, "סדנת חורף")
+        setDay("תאריך סיום", "2026-11-15")
+        // From here on every read of events hangs: what the pages show
+        // comes from the save's answer, in the cache.
+        fake.holdReads("ci_events")
+        const readsBefore = eventReads(fake).length
+
+        await userEvent.click(updateButton())
+
+        await waitFor(() =>
+            expect(router.state.location.pathname).toBe("/manage-events"),
+        )
+        expect(await myEventTitles()).toContain("סדנת חורף")
+        await act(() => router.navigate("/"))
+        const calendar = await eventTitles()
+        expect(calendar).toContain("סדנת חורף")
+        expect(calendar).not.toContain("סדנת סתיו")
+        // The save asked for no list of events: the one read since is my
+        // events' own on opening again (held, so its list is the answer's).
+        expect(eventReads(fake).slice(readsBefore)).toMatchObject([
+            {
+                filters: [
+                    { op: "eq", column: "user_id", value: user.id },
+                    { op: "gte", column: "start_date" },
+                ],
+            },
+        ])
     })
 
     it("translates a new title and tags newly added teachers", async () => {

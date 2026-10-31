@@ -8,7 +8,7 @@ import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow, type TestUser } from "../../test/testUsers"
-import { event, eventTitles } from "../calendar/testEvents"
+import { event, eventTitles } from "../../test/testEvents"
 import { MANAGED_EVENT_COLUMNS } from "../events/managedEvent"
 import { ADMIN_EVENTS_PAGE_SIZE, CREATOR_COLUMNS } from "./adminEvents"
 
@@ -319,7 +319,7 @@ describe("manage all events (/manage-all-events)", () => {
         expect(listReads(fake)[1].filters).toContainEqual({
             op: "or",
             column: "",
-            value: `start_date.gt.2026-11-15,and(start_date.eq.2026-11-15,id.gt.00000000-0000-4000-8000-0000000000${last})`,
+            value: `start_date.gt."2026-11-15",and(start_date.eq."2026-11-15",id.gt."00000000-0000-4000-8000-0000000000${last}")`,
         })
         expect(
             screen.queryByRole("button", { name: "טעינת אירועים נוספים" }),

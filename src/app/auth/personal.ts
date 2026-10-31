@@ -1,5 +1,5 @@
 import type { AuthSession } from "../../data/auth"
-import { STALE_MS } from "../../features/calendar/publicWindow"
+import { STALE_MS } from "../../lib/freshness"
 import type { AppServices } from "../services"
 import { useSession } from "../viewer"
 

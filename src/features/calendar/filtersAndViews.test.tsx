@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import { createMemoryStorage } from "../../app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp } from "../../test/renderApp"
-import { event, eventTitles, segment } from "./testEvents"
+import { event, eventTitles, segment } from "../../test/testEvents"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem; the window
 // runs to 2027-01-28.

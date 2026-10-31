@@ -6,6 +6,7 @@ import {
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
 import { jerusalemToday } from "../../lib/jerusalemDate"
+import { keysetPage } from "../../lib/keyset"
 import { containing, PAGED_ADMIN_FRESHNESS } from "../admin/adminLists"
 import {
     mergeIntoPages,
@@ -14,11 +15,16 @@ import {
     type EventPage,
 } from "../events/eventCache"
 import {
+    compareUpcoming,
+    eventCursorOf,
+    eventsAfter,
+    type EventCursor,
+} from "../events/eventLists"
+import {
     selectManagedEvents,
     toManagedEvents,
     type ManagedEvent,
 } from "../events/managedEvent"
-import { compareUpcoming } from "../manage-events/myEvents"
 
 // Every event, for `/manage-all-events` (legacy ManageAllEventsPage,
 // ManageEventsList and the store's `app_ci_events`/`app_creators`): admin
@@ -38,20 +44,9 @@ export const ADMIN_EVENT_CREATORS_KIND = "admin-event-creators"
 /** Events per page ("load more"). */
 export const ADMIN_EVENTS_PAGE_SIZE = 30
 
-/** Where the next page starts: after this event in the list's order. */
-export interface UpcomingCursor {
-    startDate: string
-    id: string
-}
+export type AdminEventPage = EventPage<ManagedEvent>
 
-export interface AdminEventPage extends EventPage<ManagedEvent> {
-    next: UpcomingCursor | null
-}
-
-export type AdminEventPages = InfiniteData<
-    AdminEventPage,
-    UpcomingCursor | null
->
+export type AdminEventPages = InfiniteData<AdminEventPage, EventCursor | null>
 
 /**
  * The list's key: the creators chosen (sorted, so a choice is one query
@@ -62,10 +57,6 @@ export const adminEventsKey = (
     creators: readonly string[],
     search: string,
 ) => [ADMIN_EVENTS_KIND, adminId, [...creators].sort(), search.trim()] as const
-
-/** Events after `cursor` in the list's order (day, then id, ascending). */
-export const afterUpcoming = ({ startDate, id }: UpcomingCursor) =>
-    `start_date.gt.${startDate},and(start_date.eq.${startDate},id.gt.${id})`
 
 /**
  * Whether `event` belongs in the list of `creators` (none: everyone's) and
@@ -103,8 +94,9 @@ export function withoutPassed(
 }
 
 // Every event write (here, my events, the forms) puts the saved events in
-// each cached list whose filters they match, in order, where its loaded
-// pages reach, and takes out deleted ones and those that no longer match.
+// each cached list whose filters they match, in order, on the loaded page
+// whose range holds them (`mergeIntoPages`, by the pages' cursors), and
+// takes out deleted ones and those that no longer match.
 registerEventList({
     kind: ADMIN_EVENTS_KIND,
     apply: (data, change, [, , creators, search]) => {
@@ -146,7 +138,7 @@ export function adminEventsQuery(
     return infiniteQueryOptions({
         queryKey: key,
         ...PAGED_ADMIN_FRESHNESS,
-        initialPageParam: null as UpcomingCursor | null,
+        initialPageParam: null as EventCursor | null,
         getNextPageParam: (page: AdminEventPage) => page.next,
         select: (data: AdminEventPages) => withoutPassed(data, today),
         queryFn: async ({ pageParam }): Promise<AdminEventPage> => {
@@ -157,21 +149,20 @@ export function adminEventsQuery(
             )
             if (chosen.length > 0) query = query.in("user_id", chosen)
             if (text) query = query.ilike("title", containing(text))
-            if (pageParam) query = query.or(afterUpcoming(pageParam))
+            if (pageParam) {
+                query = query.or(eventsAfter(pageParam, "ascending"))
+            }
             const { data, error } = await query
                 .order("start_date", { ascending: true })
                 .order("id", { ascending: true })
                 .limit(ADMIN_EVENTS_PAGE_SIZE + 1)
             if (error) throw new Error(error.message)
-            const rows = data.slice(0, ADMIN_EVENTS_PAGE_SIZE)
-            const last = rows.at(-1)
-            return {
-                events: toManagedEvents(rows),
-                next:
-                    data.length > ADMIN_EVENTS_PAGE_SIZE && last?.start_date
-                        ? { startDate: last.start_date, id: last.id }
-                        : null,
-            }
+            const { rows, next } = keysetPage(
+                data,
+                ADMIN_EVENTS_PAGE_SIZE,
+                eventCursorOf,
+            )
+            return { events: toManagedEvents(rows), next }
         },
     })
 }

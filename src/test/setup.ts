@@ -4,6 +4,7 @@ import { configure } from "@testing-library/react"
 import { afterEach } from "vitest"
 import { clearTranslationMemory } from "../data/translate"
 import { browserConditions, resetBrowserConditions } from "./browser"
+import { ForbiddenWebSocket, takeWebSocketAttempts } from "./realtimeGuard"
 
 // A test's first visit to a lazy route compiles its modules cold, which
 // under load (several runs at once, CI) can take longer than Testing
@@ -12,12 +13,16 @@ configure({ asyncUtilTimeout: 3000 })
 
 // The app has no realtime by design (spec #34). Any code path that opens a
 // socket — e.g. someone wiring up `@supabase/supabase-js` realtime — fails the
-// test that triggers it.
-globalThis.WebSocket = class {
-    constructor() {
-        throw new Error("WebSockets/realtime are not allowed (spec #34)")
+// test that triggers it, even if the code catches the error.
+globalThis.WebSocket = ForbiddenWebSocket as unknown as typeof WebSocket
+afterEach(() => {
+    const attempts = takeWebSocketAttempts()
+    if (attempts.length > 0) {
+        throw new Error(
+            `The test opened a WebSocket (no realtime, spec #34): ${attempts.join(", ")}`,
+        )
     }
-} as unknown as typeof WebSocket
+})
 
 // TanStack's online and focus managers are module singletons; a test that
 // goes offline or hides the page must not leak that into the next test.

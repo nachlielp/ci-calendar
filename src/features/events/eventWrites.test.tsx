@@ -8,7 +8,7 @@ import { NO_TELEMETRY } from "../../app/telemetry/telemetry"
 import { NO_UPDATES } from "../../app/updates/updates"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { testUser } from "../../test/testUsers"
-import { event } from "../calendar/testEvents"
+import { event } from "../../test/testEvents"
 import {
     EventsChangedError,
     useDeleteEvents,

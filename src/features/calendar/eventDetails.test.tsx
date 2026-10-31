@@ -11,7 +11,7 @@ import {
     eventTitles,
     segment,
     tagging,
-} from "./testEvents"
+} from "../../test/testEvents"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem.
 const NOW = new Date("2026-10-30T09:00:00Z")

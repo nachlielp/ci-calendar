@@ -1,10 +1,5 @@
-import {
-    keepPreviousData,
-    useInfiniteQuery,
-    useQuery,
-    useQueryClient,
-} from "@tanstack/react-query"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 import { useUserId } from "../../app/auth/personal"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
@@ -13,24 +8,15 @@ import { useToday } from "../../app/useToday"
 import { defineCopy } from "../../lib/copy"
 import { FormAlert, TextField } from "../../ui/form/fields"
 import { TagPicker, type PickerOption } from "../../ui/form/TagPicker"
-import {
-    refreshFirstPage,
-    SEARCH_DEBOUNCE_MS,
-    useRefreshWhenBack,
-} from "../admin/adminLists"
+import { SEARCH_DEBOUNCE_MS, usePagedAdminList } from "../admin/adminLists"
 import { RefreshButton } from "../admin/RefreshButton"
-import { mySeriesQuery } from "../event-forms/myEvent"
+import { laterInSeries } from "../events/eventLists"
 import { FROM_ALL_EVENTS, type ManagedEvent } from "../events/managedEvent"
+import { seriesQuery } from "../events/series"
 import { EventActions, type LaterEvents } from "../manage-events/EventActions"
 import { ManagedEventList } from "../manage-events/ManagedEventList"
 import { useFocusAfterDelete } from "../manage-events/useFocusAfterDelete"
-import { laterInSeries } from "../manage-events/myEvents"
-import {
-    ADMIN_EVENTS_KIND,
-    adminEventCreatorsQuery,
-    adminEventsKey,
-    adminEventsQuery,
-} from "./adminEvents"
+import { adminEventCreatorsQuery, adminEventsQuery } from "./adminEvents"
 import "./ManageAllEventsPage.scss"
 
 // Legacy ManageEventsList (Hebrew only there). The list's states, "load
@@ -86,7 +72,6 @@ export default function ManageAllEventsPage() {
     const copy = useCopy(COPY)
     const services = useServices()
     const adminId = useUserId()
-    const queryClient = useQueryClient()
     const [creators, setCreators] = useState<PickerOption[]>([])
     const [text, setText] = useState("")
     const search = useDebouncedValue(text, SEARCH_DEBOUNCE_MS).trim()
@@ -102,9 +87,14 @@ export default function ManageAllEventsPage() {
         () => adminEventsQuery(services, adminId, creatorIds, search, today),
         [services, adminId, creatorIds, search, today],
     )
-    const events = useInfiniteQuery({
+    // The refresh button: the list shown, from its first page, and the
+    // creators; other filters' lists load again when chosen.
+    const {
+        list: events,
+        refreshing,
+        refresh,
+    } = usePagedAdminList({
         ...eventsOptions,
-        enabled: !!adminId,
         // A new filter shows the last list until its own arrives.
         placeholderData: keepPreviousData,
     })
@@ -112,40 +102,7 @@ export default function ManageAllEventsPage() {
         ...adminEventCreatorsQuery(services, adminId),
         enabled: !!adminId,
     })
-    // The lists last as long as the page: the next visit starts over.
-    useEffect(
-        () => () =>
-            queryClient.removeQueries({
-                queryKey: [ADMIN_EVENTS_KIND, adminId],
-            }),
-        [queryClient, adminId],
-    )
-
-    const key = useMemo(
-        () => adminEventsKey(adminId, creatorIds, search),
-        [adminId, creatorIds, search],
-    )
-    const refreshShown = useCallback(
-        () => void refreshFirstPage(queryClient, key),
-        [queryClient, key],
-    )
-    useRefreshWhenBack(key, refreshShown)
-    // The refresh button: the list shown, from its first page, and the
-    // creators; other filters' lists load again when chosen.
     const { refetch: refetchCreators } = creatorList
-    const [refreshing, setRefreshing] = useState(false)
-    function refresh() {
-        queryClient.removeQueries({
-            queryKey: [ADMIN_EVENTS_KIND, adminId],
-            predicate: (query) =>
-                JSON.stringify(query.queryKey) !== JSON.stringify(key),
-        })
-        setRefreshing(true)
-        void Promise.all([
-            refreshFirstPage(queryClient, key),
-            refetchCreators(),
-        ]).finally(() => setRefreshing(false))
-    }
 
     const shown = useMemo(
         () => events.data?.pages.flatMap((page) => page.events),
@@ -193,7 +150,10 @@ export default function ManageAllEventsPage() {
                 </div>
             </header>
             <div className="manage-all-events-toolbar">
-                <RefreshButton refreshing={refreshing} onRefresh={refresh} />
+                <RefreshButton
+                    refreshing={refreshing}
+                    onRefresh={() => refresh(refetchCreators)}
+                />
             </div>
             {events.isPlaceholderData && (
                 <p className="manage-events-status" role="status">
@@ -242,7 +202,7 @@ function AdminEventActions({
     const services = useServices()
     const refKey = event.recurringRefKey ?? ""
     const series = useQuery({
-        ...mySeriesQuery(services, adminId, refKey, event.ownerId),
+        ...seriesQuery(services, adminId, refKey, event.ownerId),
         enabled: !!adminId && !!refKey,
     })
     // Delete and hide wait for it; failed, they say so and offer a retry.

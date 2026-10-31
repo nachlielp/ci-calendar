@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import { createFakeDataClient } from "../../test/fakeDataClient"
+import { afterNewest } from "../admin/adminLists"
 import { assignUserRole } from "./roles"
 import {
-    afterUser,
     movedBetween,
     searchTerms,
     toAdminUser,
@@ -40,10 +40,10 @@ describe("usersFilter", () => {
     const cursor = { createdAt: "2026-10-01T10:00:00.5+00:00", id: "u-1" }
 
     it("continues after the cursor in the list's order (newest first, then id)", () => {
-        expect(afterUser(cursor)).toBe(
+        expect(afterNewest(cursor)).toBe(
             'created_at.lt."2026-10-01T10:00:00.5+00:00",and(created_at.eq."2026-10-01T10:00:00.5+00:00",id.lt."u-1")',
         )
-        expect(usersFilter("", cursor)).toBe(afterUser(cursor))
+        expect(usersFilter("", cursor)).toBe(afterNewest(cursor))
     })
 
     it("is the search alone on the first page, and nothing without one", () => {
@@ -53,7 +53,7 @@ describe("usersFilter", () => {
 
     it("needs both the search and the cursor on a later page, in one tree", () => {
         expect(usersFilter("dana", cursor)).toBe(
-            `and(or(${searchTerms("dana")}),or(${afterUser(cursor)}))`,
+            `and(or(${searchTerms("dana")}),or(${afterNewest(cursor)}))`,
         )
     })
 })

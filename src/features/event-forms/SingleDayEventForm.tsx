@@ -9,7 +9,8 @@ import { COMMON_COPY } from "../../lib/commonCopy"
 import { FormAlert, TextField } from "../../ui/form/fields"
 import { TagPicker } from "../../ui/form/TagPicker"
 import type { ManagedEvent } from "../events/managedEvent"
-import { laterInSeries } from "../manage-events/myEvents"
+import { laterInSeries } from "../events/eventLists"
+import { seriesQuery } from "../events/series"
 import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 import { useFormDraft } from "../../app/useFormDraft"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
@@ -36,7 +37,6 @@ import {
     type SingleDayValues,
 } from "./eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
-import { mySeriesQuery } from "./myEvent"
 import { RecurringEventSection } from "./RecurringEventSection"
 import { SeriesEditDialog } from "./SeriesEditDialog"
 import { useTaggable, type Taggable } from "./taggableBios"
@@ -127,17 +127,17 @@ export function SingleDayEventForm({
     const taggable = useTaggable(userId)
     const services = useServices()
     const refKey = event?.recurringRefKey ?? ""
-    const seriesQuery = useQuery({
+    const series = useQuery({
         // The event's owner's series: an admin may edit another's event.
-        ...mySeriesQuery(services, userId, refKey, event?.ownerId),
+        ...seriesQuery(services, userId, refKey, event?.ownerId ?? userId),
         enabled: !!userId && !!refKey,
     })
     // A recurring event's edit waits for the rest of its series, so the
     // question of which later events change too is never skipped.
-    const seriesReady = !refKey || seriesQuery.data !== undefined
+    const seriesReady = !refKey || series.data !== undefined
     const later = useMemo(
-        () => (event ? laterInSeries(seriesQuery.data ?? [], event) : []),
-        [event, seriesQuery.data],
+        () => (event ? laterInSeries(series.data ?? [], event) : []),
+        [event, series.data],
     )
     const submit = useEventSubmit({
         userId,
@@ -204,8 +204,8 @@ export function SingleDayEventForm({
                         event ? (
                             !seriesReady && (
                                 <SeriesStatus
-                                    failed={seriesQuery.isError}
-                                    onRetry={() => void seriesQuery.refetch()}
+                                    failed={series.isError}
+                                    onRetry={() => void series.refetch()}
                                 />
                             )
                         ) : (

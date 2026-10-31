@@ -1,12 +1,12 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
+import { pickedPlaceInEnglish } from "../../data/placeLookups"
 import type {
     PlaceSuggestion,
     PlacesApi,
     PlacesSession,
 } from "../../data/places"
-import { withTimeout } from "../../lib/timeout"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
 import type { AddressValue } from "./eventFormValues"
 
@@ -110,19 +110,17 @@ export function AddressField({
         if (!search) return
         // Ends the session; a failure leaves the address without it (the
         // save looks again).
-        void withTimeout(search.englishAddress(place.placeId), null).then(
-            (english) => {
-                const current = latest.current
-                if (
-                    english &&
-                    mounted.current &&
-                    current?.placeId === place.placeId &&
-                    !current.enLabel
-                ) {
-                    onChange({ ...current, enLabel: english })
-                }
-            },
-        )
+        void pickedPlaceInEnglish(search, place.placeId).then((english) => {
+            const current = latest.current
+            if (
+                english &&
+                mounted.current &&
+                current?.placeId === place.placeId &&
+                !current.enLabel
+            ) {
+                onChange({ ...current, enLabel: english })
+            }
+        })
     }
 
     const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

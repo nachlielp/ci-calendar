@@ -1,10 +1,5 @@
-import {
-    keepPreviousData,
-    useInfiniteQuery,
-    useQuery,
-    useQueryClient,
-} from "@tanstack/react-query"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 import { useUserId } from "../../app/auth/personal"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
@@ -13,23 +8,14 @@ import type { SignedInRole } from "../../app/viewer"
 import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
 import { FormAlert, TextField } from "../../ui/form/fields"
-import { ContentCopyIcon } from "../../ui/icons/ContentCopyIcon"
-import {
-    refreshFirstPage,
-    SEARCH_DEBOUNCE_MS,
-    useRefreshWhenBack,
-} from "../admin/adminLists"
+import { QueryList } from "../../ui/QueryList"
+import { SEARCH_DEBOUNCE_MS, usePagedAdminList } from "../admin/adminLists"
+import { CopyPhone } from "../admin/CopyPhone"
 import { RefreshButton } from "../admin/RefreshButton"
 import { ActionDialog } from "../events/ActionDialog"
 import { REQUEST_WORDS } from "../requests/requestWords"
 import { useAssignRole } from "./roles"
-import {
-    ADMIN_USERS_KIND,
-    adminUsersKey,
-    adminUsersQuery,
-    adminUserStatsQuery,
-    type AdminUser,
-} from "./users"
+import { adminUsersQuery, adminUserStatsQuery, type AdminUser } from "./users"
 import "./ManageUsersPage.scss"
 
 // Legacy ManageUsersPage (Hebrew only there, but the toast).
@@ -44,21 +30,12 @@ const COPY = defineCopy({
         loadMore: "טעינת משתמשים נוספים",
         loadFailed: "לא הצלחנו לטעון את המשתמשים",
         refreshFailed: "לא הצלחנו לרענן את המשתמשים",
-        copyPhone: "העתקת מספר הטלפון",
-        phoneCopied: "מספר הטלפון הועתק",
         setRole: "הגדרת תפקיד",
         roleFailed: "שינוי התפקיד נכשל",
         demoteTitle: "להסיר את הרשאות הניהול שלך?",
         demoteText:
             "הגישה שלך לדפי הניהול תיפסק מיד, ורק מנהל אחר יוכל להחזיר אותה.",
         demoteOk: "כן, להסיר",
-        roles: {
-            admin: "מנהל",
-            org: "ארגון",
-            creator: "יוצר",
-            profile: "פרופיל",
-            user: "משתמש",
-        },
         stats: "חשבונות",
         total: "סהכ חשבונות",
         counts: {
@@ -79,21 +56,12 @@ const COPY = defineCopy({
         loadMore: "Load more users",
         loadFailed: "We couldn't load the users",
         refreshFailed: "We couldn't refresh the users",
-        copyPhone: "Copy the phone number",
-        phoneCopied: "Phone number copied to clipboard",
         setRole: "Set role",
         roleFailed: "Changing the role failed",
         demoteTitle: "Remove your own admin rights?",
         demoteText:
             "You will lose access to the admin pages at once, and only another admin can give it back.",
         demoteOk: "Yes, remove",
-        roles: {
-            admin: "Admin",
-            org: "Organisation",
-            creator: "Creator",
-            profile: "Profile",
-            user: "User",
-        },
         stats: "Accounts",
         total: "Total accounts",
         counts: {
@@ -114,21 +82,12 @@ const COPY = defineCopy({
         loadMore: "Загрузить ещё пользователей",
         loadFailed: "Не удалось загрузить пользователей",
         refreshFailed: "Не удалось обновить пользователей",
-        copyPhone: "Скопировать номер телефона",
-        phoneCopied: "Номер телефона скопирован",
         setRole: "Назначить роль",
         roleFailed: "Не удалось изменить роль",
         demoteTitle: "Снять с себя права администратора?",
         demoteText:
             "Вы сразу потеряете доступ к страницам администратора, и вернуть его сможет только другой администратор.",
         demoteOk: "Да, снять",
-        roles: {
-            admin: "Администратор",
-            org: "Организация",
-            creator: "Организатор",
-            profile: "Профиль",
-            user: "Пользователь",
-        },
         stats: "Аккаунты",
         total: "Всего аккаунтов",
         counts: {
@@ -150,6 +109,12 @@ const ROLE_BUTTONS: readonly SignedInRole[] = [
     "user",
 ]
 
+const LIST_CLASSES = {
+    list: "manage-users-list",
+    status: "manage-users-status",
+    more: "manage-users-more",
+}
+
 /** The counts, in legacy's order. */
 const COUNTS: readonly SignedInRole[] = [
     "admin",
@@ -169,49 +134,33 @@ export default function ManageUsersPage() {
     const common = useCopy(COMMON_COPY)
     const services = useServices()
     const adminId = useUserId()
-    const queryClient = useQueryClient()
     const [text, setText] = useState("")
     const search = useDebouncedValue(text, SEARCH_DEBOUNCE_MS).trim()
     const [expandedId, setExpandedId] = useState<string | null>(null)
 
-    const users = useInfiniteQuery({
-        ...adminUsersQuery(services, adminId, search),
-        enabled: !!adminId,
-        // A new search shows the last results until its own arrive.
-        placeholderData: keepPreviousData,
-    })
+    const usersOptions = useMemo(
+        () => adminUsersQuery(services, adminId, search),
+        [services, adminId, search],
+    )
+    const {
+        list: users,
+        refreshing,
+        refresh,
+    } = usePagedAdminList(
+        {
+            ...usersOptions,
+            // A new search shows the last results until its own arrive.
+            placeholderData: keepPreviousData,
+        },
+        // Other searches stay cached, as they were.
+        { keepOthers: true },
+    )
     const stats = useQuery({
         ...adminUserStatsQuery(services, adminId),
         enabled: !!adminId,
     })
-    // The lists last as long as the page: the next visit starts over.
-    useEffect(
-        () => () =>
-            queryClient.removeQueries({
-                queryKey: [ADMIN_USERS_KIND, adminId],
-            }),
-        [queryClient, adminId],
-    )
-
-    const usersKey = useMemo(
-        () => adminUsersKey(adminId, search),
-        [adminId, search],
-    )
-    const refreshUsers = useCallback(
-        () => void refreshFirstPage(queryClient, usersKey),
-        [queryClient, usersKey],
-    )
-    useRefreshWhenBack(usersKey, refreshUsers)
     // The refresh button: the users from their first page, and the counts.
     const { refetch: refetchStats } = stats
-    const [refreshing, setRefreshing] = useState(false)
-    function refresh() {
-        setRefreshing(true)
-        void Promise.all([
-            refreshFirstPage(queryClient, usersKey),
-            refetchStats(),
-        ]).finally(() => setRefreshing(false))
-    }
 
     const shown = useMemo(
         () => users.data?.pages.flatMap((page) => page.users),
@@ -225,7 +174,7 @@ export default function ManageUsersPage() {
                 <div className="manage-users-toolbar">
                     <RefreshButton
                         refreshing={refreshing}
-                        onRefresh={refresh}
+                        onRefresh={() => refresh(refetchStats)}
                     />
                 </div>
                 <TextField
@@ -244,65 +193,33 @@ export default function ManageUsersPage() {
                 {users.isRefetchError && (
                     <FormAlert kind="error">{copy.refreshFailed}</FormAlert>
                 )}
-                {shown ? (
-                    shown.length > 0 ? (
-                        <ul
-                            className={`manage-users-list ${users.isPlaceholderData ? "pending" : ""}`}
-                            aria-busy={users.isPlaceholderData}
-                            aria-label={copy.users}
-                        >
-                            {shown.map((user) => (
-                                <UserRow
-                                    key={user.id}
-                                    user={user}
-                                    adminId={adminId}
-                                    expanded={expandedId === user.id}
-                                    onToggle={() =>
-                                        setExpandedId(
-                                            expandedId === user.id
-                                                ? null
-                                                : user.id,
-                                        )
-                                    }
-                                />
-                            ))}
-                        </ul>
-                    ) : (
+                <QueryList
+                    label={copy.users}
+                    items={shown}
+                    query={users}
+                    paging={users}
+                    busy={users.isPlaceholderData}
+                    empty={
                         <p className="manage-users-status">{copy.noUsers}</p>
-                    )
-                ) : users.isError ? (
-                    <div className="manage-users-status" role="alert">
-                        <p>{copy.loadFailed}</p>
-                        <button
-                            type="button"
-                            className="text-button"
-                            onClick={() => void users.refetch()}
-                        >
-                            {common.retry}
-                        </button>
-                    </div>
-                ) : (
-                    <p className="manage-users-status" role="status">
-                        {common.loading}
-                    </p>
-                )}
-                {users.hasNextPage && (
-                    <div className="manage-users-more">
-                        {users.isFetchNextPageError && (
-                            <p role="alert">{copy.loadFailed}</p>
-                        )}
-                        <button
-                            type="button"
-                            className="text-button"
-                            disabled={users.isFetchingNextPage}
-                            onClick={() => void users.fetchNextPage()}
-                        >
-                            {users.isFetchingNextPage
-                                ? common.loading
-                                : copy.loadMore}
-                        </button>
-                    </div>
-                )}
+                    }
+                    loadFailed={copy.loadFailed}
+                    loadMore={copy.loadMore}
+                    classes={LIST_CLASSES}
+                >
+                    {(user) => (
+                        <UserRow
+                            key={user.id}
+                            user={user}
+                            adminId={adminId}
+                            expanded={expandedId === user.id}
+                            onToggle={() =>
+                                setExpandedId(
+                                    expandedId === user.id ? null : user.id,
+                                )
+                            }
+                        />
+                    )}
+                </QueryList>
             </section>
             <section
                 className="manage-users-stats card"
@@ -375,16 +292,6 @@ function UserDetails({
     const copy = useCopy(COPY)
     const words = useCopy(REQUEST_WORDS)
     const assign = useAssignRole(adminId)
-    const [copied, setCopied] = useState(false)
-
-    async function copyPhone() {
-        try {
-            await navigator.clipboard.writeText(user.phone)
-            setCopied(true)
-        } catch {
-            // No clipboard (permission refused): the number is on screen.
-        }
-    }
 
     // Admins taking their own admin rights away are asked first: it locks
     // them out of this page at once.
@@ -399,23 +306,7 @@ function UserDetails({
         <div className="manage-users-details" id={id}>
             <p>{user.name}</p>
             <p>{user.email}</p>
-            {user.phone && (
-                <p>
-                    <button
-                        type="button"
-                        className="manage-users-phone"
-                        title={copy.copyPhone}
-                        onClick={() => void copyPhone()}
-                    >
-                        <span dir="ltr">{user.phone}</span>
-                        <ContentCopyIcon className="copy-icon" />
-                        <span className="visually-hidden">
-                            {copy.copyPhone}
-                        </span>
-                    </button>
-                </p>
-            )}
-            {copied && <FormAlert kind="success">{copy.phoneCopied}</FormAlert>}
+            {user.phone && <CopyPhone phone={user.phone} />}
             <p>{words.role(user.role)}</p>
             <div
                 className="manage-users-actions"
@@ -430,7 +321,7 @@ function UserDetails({
                         disabled={user.userType === role || assign.isPending}
                         onClick={() => setRole(role)}
                     >
-                        {copy.roles[role]}
+                        {words.roleButton(role)}
                     </button>
                 ))}
             </div>

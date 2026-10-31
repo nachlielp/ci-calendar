@@ -1,15 +1,30 @@
-import { QueryClient, type InfiniteData } from "@tanstack/react-query"
+import {
+    InfiniteQueryObserver,
+    QueryClient,
+    type InfiniteData,
+    type QueryKey,
+} from "@tanstack/react-query"
+import { waitFor } from "@testing-library/react"
 import { describe, expect, it } from "vitest"
+import { adminEventsKey } from "../admin-events/adminEvents"
 import { LINKED_EVENT_KIND } from "../calendar/linkedEvent"
 import { PUBLIC_WINDOW_KIND, type PublicWindow } from "../calendar/publicWindow"
 import type { PublicBio } from "../calendar/publicEvent"
-import { publicEvent } from "../calendar/testEvents"
+import { publicEvent } from "../../test/testEvents"
+// Registers the my-events lists.
+import "../manage-events/myEvents"
+import type { PastPage } from "../manage-events/myEvents"
+import {
+    applyBioChange,
+    applyEventChanges,
+    refreshEventQueries,
+    type EventPage,
+} from "./eventCache"
 import {
     myPastEventsKey,
     myUpcomingEventsKey,
-    type PastPage,
-} from "../manage-events/myEvents"
-import { applyBioChange, applyEventChanges } from "./eventCache"
+    type EventCursor,
+} from "./eventLists"
 import type { ManagedEvent } from "./managedEvent"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
@@ -205,6 +220,49 @@ describe("applyEventChanges", () => {
         ])
     })
 
+    it("puts a past event on the page whose cursor range holds it, not by the last row shown", () => {
+        const { queryClient, past, apply } = setup()
+        // Page one was read down to 10-10 (its cursor), which was deleted
+        // since: its last row shown is 10-20. Page two follows from there.
+        queryClient.setQueryData<InfiniteData<PastPage>>(
+            myPastEventsKey(OWNER),
+            (old) => ({
+                pages: [
+                    {
+                        events: [
+                            managed({
+                                id: "p2026-10-20",
+                                startDate: "2026-10-20",
+                            }),
+                        ],
+                        next: old!.pages[0].next,
+                    },
+                    {
+                        events: [
+                            managed({
+                                id: "p2026-10-05",
+                                startDate: "2026-10-05",
+                            }),
+                        ],
+                        next: { startDate: "2026-10-05", id: "p2026-10-05" },
+                    },
+                ],
+                pageParams: [null, old!.pages[0].next],
+            }),
+        )
+        apply({
+            saved: [
+                managed({ id: "p2026-10-15", startDate: "2026-10-15" }),
+                managed({ id: "p2026-10-08", startDate: "2026-10-08" }),
+                managed({ id: "p2026-09-01", startDate: "2026-09-01" }),
+            ],
+        })
+        expect(past()).toEqual([
+            ["p2026-10-20", "p2026-10-15"],
+            ["p2026-10-08", "p2026-10-05"],
+        ])
+    })
+
     it("leaves a query's data alone when the change doesn't concern it", () => {
         const { queryClient, windowKey, apply } = setup()
         const before = queryClient.getQueryData(windowKey)
@@ -334,5 +392,92 @@ describe("applyBioChange", () => {
         const { queryClient, windowKey } = withBios()
         applyBioChange(queryClient, "teacher", bio(), { refresh: true })
         expect(queryClient.getQueryState(windowKey)?.isInvalidated).toBe(true)
+    })
+})
+
+// TanStack refetches an infinite query page by page, every loaded page in
+// turn: a write must never set that off for a paginated list.
+describe.each([
+    ["my past events", myPastEventsKey(OWNER)],
+    ["the admins' list", adminEventsKey("admin", [], "")],
+])("a write and the paginated %s", (_name, queryKey: QueryKey) => {
+    /** The list with two pages loaded, and the cursors its pages asked for. */
+    async function twoPages() {
+        const queryClient = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+        })
+        const asked: (EventCursor | null)[] = []
+        let gate = Promise.resolve()
+        const observer = new InfiniteQueryObserver(queryClient, {
+            queryKey,
+            staleTime: Infinity,
+            initialPageParam: null as EventCursor | null,
+            getNextPageParam: (page: EventPage<ManagedEvent>) => page.next,
+            queryFn: async ({ pageParam }) => {
+                asked.push(pageParam)
+                await gate
+                const n = asked.length
+                const id = `e${n}`
+                const startDate = `2026-11-${String(n).padStart(2, "0")}`
+                return {
+                    events: [managed({ id, startDate })],
+                    next: { startDate, id },
+                }
+            },
+        })
+        const unsubscribe = observer.subscribe(() => {})
+        await waitFor(() =>
+            expect(observer.getCurrentResult().data).toBeDefined(),
+        )
+        await observer.fetchNextPage()
+        const pages = () =>
+            queryClient.getQueryData<InfiniteData<unknown>>(queryKey)?.pages
+                .length
+        expect(pages()).toBe(2)
+        const hold = () => {
+            let release!: () => void
+            gate = new Promise<void>((resolve) => (release = resolve))
+            return release
+        }
+        const idle = () =>
+            waitFor(() =>
+                expect(queryClient.getQueryState(queryKey)?.fetchStatus).toBe(
+                    "idle",
+                ),
+            )
+        return { queryClient, observer, asked, pages, hold, idle, unsubscribe }
+    }
+
+    it("redoes a fetch in flight from the first page only", async () => {
+        const { queryClient, observer, asked, pages, hold, idle } =
+            await twoPages()
+        const release = hold()
+        // "Load more" is on its way, sent before the write.
+        void observer.fetchNextPage()
+        expect(asked).toHaveLength(3)
+
+        applyEventChanges(queryClient, NOW, { deleted: ["e1"] })
+        release()
+        await idle()
+
+        // Only the first page was asked for again, and the rest dropped.
+        expect(asked.slice(3)).toEqual([null])
+        expect(pages()).toBe(1)
+    })
+
+    it("reads it again from its first page when a write can't say where events stand", async () => {
+        const { queryClient, asked, pages, idle, unsubscribe } =
+            await twoPages()
+
+        refreshEventQueries(queryClient)
+        await idle()
+        expect(asked.slice(2)).toEqual([null])
+        expect(pages()).toBe(1)
+
+        // Off screen, it is dropped: it loads from page one when shown.
+        unsubscribe()
+        refreshEventQueries(queryClient)
+        expect(queryClient.getQueryState(queryKey)).toBeUndefined()
+        expect(asked).toHaveLength(3)
     })
 })

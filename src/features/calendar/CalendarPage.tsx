@@ -167,7 +167,7 @@ export default function CalendarPage() {
                 header's out-of-date sign (StaleDataNotice). */}
             {shownCards ? (
                 view === "calendar" ? (
-                    <CalendarView cards={shownCards} />
+                    <CalendarView cards={shownCards} today={today} />
                 ) : shownCards.length === 0 ? (
                     <p className="calendar-empty">{copy.noEvents}</p>
                 ) : (

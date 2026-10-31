@@ -1,11 +1,10 @@
 import { QueryClient } from "@tanstack/react-query"
 import { describe, expect, it } from "vitest"
-import { publicEvent } from "../calendar/testEvents"
+import { publicEvent } from "../../test/testEvents"
 import { applyEventChanges } from "../events/eventCache"
 import type { ManagedEvent } from "../events/managedEvent"
 import {
     adminEventsKey,
-    afterUpcoming,
     belongsInList,
     toCreators,
     withoutPassed,
@@ -34,12 +33,6 @@ describe("the admins' events list", () => {
     it("keys a creator choice in one order, and the search trimmed", () => {
         expect(adminEventsKey("admin", ["b", "a"], " jam ")).toEqual(
             adminEventsKey("admin", ["a", "b"], "jam"),
-        )
-    })
-
-    it("pages after the last event by day, then id", () => {
-        expect(afterUpcoming({ startDate: "2026-11-01", id: "e9" })).toBe(
-            "start_date.gt.2026-11-01,and(start_date.eq.2026-11-01,id.gt.e9)",
         )
     })
 
@@ -141,5 +134,40 @@ describe("the admins' events list", () => {
 
         applyEventChanges(queryClient, NOW, { deleted: ["c"] })
         expect(ids(queryClient.getQueryData(everyone))).toEqual([["a", "b"]])
+    })
+
+    it("puts a saved event on the page whose cursor range holds it, not by the last row shown", () => {
+        const queryClient = new QueryClient()
+        const key = adminEventsKey("admin", [], "")
+        // Page one was read up to "b" (its cursor); "b" moved away since,
+        // so its last row shown is "a". Page two follows from "b" on.
+        queryClient.setQueryData<AdminEventPages>(key, {
+            pages: [
+                {
+                    events: [managed({ id: "a", startDate: "2026-11-01" })],
+                    next: { startDate: "2026-11-10", id: "b" },
+                },
+                {
+                    events: [managed({ id: "d", startDate: "2026-11-20" })],
+                    next: { startDate: "2026-11-20", id: "d" },
+                },
+            ],
+            pageParams: [null, { startDate: "2026-11-10", id: "b" }],
+        })
+
+        applyEventChanges(queryClient, NOW, {
+            saved: [
+                // Within page one's range (up to its cursor).
+                managed({ id: "x", startDate: "2026-11-05" }),
+                // Page two's range.
+                managed({ id: "y", startDate: "2026-11-15" }),
+                // After every loaded page: its own page brings it.
+                managed({ id: "z", startDate: "2026-12-01" }),
+            ],
+        })
+        expect(ids(queryClient.getQueryData(key))).toEqual([
+            ["a", "x"],
+            ["y", "d"],
+        ])
     })
 })

@@ -9,7 +9,7 @@ import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, type TestUser } from "../../test/testUsers"
-import { bio, event, eventTitles } from "../calendar/testEvents"
+import { bio, event, eventTitles } from "../../test/testEvents"
 import {
     SINGLE_DAY_DRAFT_KEY,
     SINGLE_DAY_TEMPLATE_DRAFT_KEY,

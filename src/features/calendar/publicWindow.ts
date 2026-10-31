@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query"
 import type { AppServices } from "../../app/services"
+import { STALE_MS } from "../../lib/freshness"
 import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
 import {
     PUBLIC_EVENT_COLUMNS,
@@ -10,13 +11,6 @@ import {
 
 /** How far ahead the public calendar looks. ~25 events, ~6.5 KB gzipped. */
 export const WINDOW_DAYS = 90
-
-/**
- * Event data changes a few times a day, so after 5 minutes the window is
- * refetched when the app becomes visible again. Coming back online always
- * refetches: whatever was shown came from before the connection dropped.
- */
-export const STALE_MS = 5 * 60 * 1000
 
 /**
  * First element of the window's query key. The key deliberately has no date:
@@ -62,6 +56,8 @@ export function publicWindowQuery(
     return queryOptions({
         queryKey: [PUBLIC_WINDOW_KIND],
         staleTime: STALE_MS,
+        // Coming back online always refetches: whatever was shown came from
+        // before the connection dropped.
         refetchOnReconnect: "always",
         select: (window: PublicWindow) =>
             window.events.filter((event) => event.startDate >= today),

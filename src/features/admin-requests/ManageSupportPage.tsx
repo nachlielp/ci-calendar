@@ -1,11 +1,9 @@
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useUserId } from "../../app/auth/personal"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { useForm } from "../../app/useForm"
 import { useViewer } from "../../app/viewer"
-import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
 import {
     jerusalemDateLabel,
@@ -17,13 +15,12 @@ import {
     Switch,
     TextAreaField,
 } from "../../ui/form/fields"
-import { ContentCopyIcon } from "../../ui/icons/ContentCopyIcon"
-import { refreshFirstPage, useRefreshWhenBack } from "../admin/adminLists"
+import { QueryList } from "../../ui/QueryList"
+import { usePagedAdminList } from "../admin/adminLists"
+import { CopyPhone } from "../admin/CopyPhone"
 import { RefreshButton } from "../admin/RefreshButton"
 import { REQUEST_WORDS } from "../requests/requestWords"
 import {
-    ADMIN_REQUESTS_KIND,
-    adminRequestsKey,
     adminRequestsQuery,
     ApprovalCloseError,
     ApprovalRoleError,
@@ -58,8 +55,6 @@ const COPY = defineCopy({
         number: (number: number) => `בקשה מס׳ : ${number}`,
         email: (email: string) => `מייל : ${email}`,
         phone: "פלאפון :",
-        copyPhone: "העתקת מספר הטלפון",
-        phoneCopied: "מספר הטלפון הועתק",
         responses: "תגובות",
         reply: "תגובה",
         replyRequired: "נא לכתוב תגובה",
@@ -93,8 +88,6 @@ const COPY = defineCopy({
         number: (number: number) => `Request no. ${number}`,
         email: (email: string) => `Email: ${email}`,
         phone: "Phone: ",
-        copyPhone: "Copy the phone number",
-        phoneCopied: "Phone number copied to clipboard",
         responses: "Responses",
         reply: "Reply",
         replyRequired: "Please write a reply",
@@ -129,8 +122,6 @@ const COPY = defineCopy({
         number: (number: number) => `Заявка № ${number}`,
         email: (email: string) => `Email: ${email}`,
         phone: "Телефон: ",
-        copyPhone: "Скопировать номер телефона",
-        phoneCopied: "Номер телефона скопирован",
         responses: "Ответы",
         reply: "Ответ",
         replyRequired: "Напишите ответ",
@@ -160,60 +151,34 @@ const COPY = defineCopy({
  */
 export default function ManageSupportPage() {
     const copy = useCopy(COPY)
-    const common = useCopy(COMMON_COPY)
     const words = useCopy(REQUEST_WORDS)
     const services = useServices()
     const adminId = useUserId()
     const viewer = useViewer()
     const responder = "name" in viewer ? viewer.name : ""
-    const queryClient = useQueryClient()
     const [status, setStatus] = useState<RequestStatus>("open")
     const [types, setTypes] = useState<string[]>([])
     const [expandedId, setExpandedId] = useState<string | null>(null)
     // What the page says about a write that found the request changed.
     const [notice, setNotice] = useState<Notice | null>(null)
 
-    const requests = useInfiniteQuery({
-        ...adminRequestsQuery(services, adminId, status, types),
-        enabled: !!adminId,
+    const requestsOptions = useMemo(
+        () => adminRequestsQuery(services, adminId, status, types),
+        [services, adminId, status, types],
+    )
+    // The refresh button: the list shown, from its first page; the others
+    // (the other switch position, other filters) load again when shown.
+    const {
+        list: requests,
+        refreshing,
+        refresh,
+    } = usePagedAdminList({
+        ...requestsOptions,
         // A new type filter shows the last list until its own arrives;
         // the other switch position never shows this one's requests.
         placeholderData: (previous, previousQuery) =>
             previousQuery?.queryKey[2] === status ? previous : undefined,
     })
-    // The lists last as long as the page: the next visit starts over.
-    useEffect(
-        () => () =>
-            queryClient.removeQueries({
-                queryKey: [ADMIN_REQUESTS_KIND, adminId],
-            }),
-        [queryClient, adminId],
-    )
-
-    const key = useMemo(
-        () => adminRequestsKey(adminId, status, types),
-        [adminId, status, types],
-    )
-    const refreshShown = useCallback(
-        () => void refreshFirstPage(queryClient, key),
-        [queryClient, key],
-    )
-    useRefreshWhenBack(key, refreshShown)
-    // The refresh button: the list shown, from its first page; the others
-    // (the other switch position, other filters) load again when shown.
-    const [refreshing, setRefreshing] = useState(false)
-    function refresh() {
-        setNotice(null)
-        queryClient.removeQueries({
-            queryKey: [ADMIN_REQUESTS_KIND, adminId],
-            predicate: (query) =>
-                JSON.stringify(query.queryKey) !== JSON.stringify(key),
-        })
-        setRefreshing(true)
-        void refreshFirstPage(queryClient, key).finally(() =>
-            setRefreshing(false),
-        )
-    }
 
     const shown = useMemo(
         () => requests.data?.pages.flatMap((page) => page.requests),
@@ -255,7 +220,10 @@ export default function ManageSupportPage() {
                 <div className="manage-support-toolbar">
                     <RefreshButton
                         refreshing={refreshing}
-                        onRefresh={refresh}
+                        onRefresh={() => {
+                            setNotice(null)
+                            refresh()
+                        }}
                     />
                 </div>
                 {notice && <FormAlert kind="warning">{copy[notice]}</FormAlert>}
@@ -267,70 +235,44 @@ export default function ManageSupportPage() {
                 {requests.isRefetchError && (
                     <FormAlert kind="error">{copy.refreshFailed}</FormAlert>
                 )}
-                {shown ? (
-                    shown.length > 0 ? (
-                        <ul
-                            className={`requests-container ${requests.isPlaceholderData ? "pending" : ""}`}
-                            aria-busy={requests.isPlaceholderData}
-                            aria-label={copy.requests}
-                        >
-                            {shown.map((request) => (
-                                <RequestItem
-                                    key={request.id}
-                                    request={request}
-                                    adminId={adminId}
-                                    responder={responder}
-                                    expanded={expandedId === request.id}
-                                    onToggle={() =>
-                                        setExpandedId(
-                                            expandedId === request.id
-                                                ? null
-                                                : request.id,
-                                        )
-                                    }
-                                    onNotice={setNotice}
-                                />
-                            ))}
-                        </ul>
-                    ) : (
-                        <p className="manage-support-status">{copy.none}</p>
-                    )
-                ) : requests.isError ? (
-                    <div className="manage-support-status" role="alert">
-                        <p>{copy.loadFailed}</p>
-                        <button
-                            type="button"
-                            className="text-button"
-                            onClick={() => void requests.refetch()}
-                        >
-                            {common.retry}
-                        </button>
-                    </div>
-                ) : (
-                    <p className="manage-support-status" role="status">
-                        {common.loading}
-                    </p>
-                )}
-                {requests.hasNextPage && (
-                    <div className="manage-support-more">
-                        {requests.isFetchNextPageError && (
-                            <p role="alert">{copy.loadFailed}</p>
-                        )}
-                        <button
-                            type="button"
-                            className="text-button"
-                            disabled={requests.isFetchingNextPage}
-                            onClick={() => void requests.fetchNextPage()}
-                        >
-                            {requests.isFetchingNextPage
-                                ? common.loading
-                                : copy.loadMore}
-                        </button>
-                    </div>
-                )}
+                <QueryList
+                    label={copy.requests}
+                    items={shown}
+                    query={requests}
+                    paging={requests}
+                    busy={requests.isPlaceholderData}
+                    empty={<p className="manage-support-status">{copy.none}</p>}
+                    loadFailed={copy.loadFailed}
+                    loadMore={copy.loadMore}
+                    classes={LIST_CLASSES}
+                >
+                    {(request) => (
+                        <RequestItem
+                            key={request.id}
+                            request={request}
+                            adminId={adminId}
+                            responder={responder}
+                            expanded={expandedId === request.id}
+                            onToggle={() =>
+                                setExpandedId(
+                                    expandedId === request.id
+                                        ? null
+                                        : request.id,
+                                )
+                            }
+                            onNotice={setNotice}
+                        />
+                    )}
+                </QueryList>
             </section>
         </main>
     )
+}
+
+const LIST_CLASSES = {
+    list: "requests-container",
+    status: "manage-support-status",
+    more: "manage-support-more",
 }
 
 /** What the page says after a write found the request changed. */
@@ -390,18 +332,8 @@ function RequestDetails({
     const act = useRequestAction(adminId)
     const approve = useApproveRequest(adminId)
     const pending = act.isPending || approve.isPending
-    const [copied, setCopied] = useState(false)
     // Each reply sent starts a new, empty reply form.
     const [replies, setReplies] = useState(0)
-
-    async function copyPhone() {
-        try {
-            await navigator.clipboard.writeText(request.phone)
-            setCopied(true)
-        } catch {
-            // No clipboard (permission refused): the number is on screen.
-        }
-    }
 
     function run(action: RequestAction) {
         approve.reset()
@@ -450,22 +382,7 @@ function RequestDetails({
                 <span>{copy.number(request.number)}</span>
                 <span>{copy.email(request.email)}</span>
                 {request.phone && (
-                    <button
-                        type="button"
-                        className="request-phone"
-                        title={copy.copyPhone}
-                        onClick={() => void copyPhone()}
-                    >
-                        {copy.phone}
-                        <span dir="ltr">{request.phone}</span>
-                        <ContentCopyIcon className="copy-icon" />
-                        <span className="visually-hidden">
-                            {copy.copyPhone}
-                        </span>
-                    </button>
-                )}
-                {copied && (
-                    <FormAlert kind="success">{copy.phoneCopied}</FormAlert>
+                    <CopyPhone phone={request.phone} label={copy.phone} />
                 )}
                 <time dateTime={request.createdAt}>
                     {jerusalemDateTimeLabel(request.createdAt)}

@@ -7,7 +7,7 @@ import type { SignedInRole } from "../../app/viewer"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp } from "../../test/renderApp"
 import { testUser } from "../../test/testUsers"
-import { event, eventTitles } from "../calendar/testEvents"
+import { event, eventTitles } from "../../test/testEvents"
 import { MANAGED_EVENT_COLUMNS } from "../events/managedEvent"
 import { PAST_PAGE_SIZE } from "./myEvents"
 
@@ -215,7 +215,7 @@ describe("manage my events (/manage-events)", () => {
         expect(myEventReads(fake)[2].filters).toContainEqual({
             op: "or",
             column: "",
-            value: "start_date.lt.2026-09-03,and(start_date.eq.2026-09-03,id.lt.00000000-0000-4000-8000-000000000005)",
+            value: 'start_date.lt."2026-09-03",and(start_date.eq."2026-09-03",id.lt."00000000-0000-4000-8000-000000000005")',
         })
         expect(
             screen.queryByRole("button", { name: "טעינת אירועים נוספים" }),

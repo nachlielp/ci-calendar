@@ -6,14 +6,24 @@ import {
     type QueryClient,
 } from "@tanstack/react-query"
 import { sessionOf } from "../../app/auth/personal"
+import {
+    refetchCachedQueries,
+    updateCachedQueries,
+} from "../../app/cachedQueries"
 import { useServices, type AppServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
 import type { Json } from "../../data/database.types"
 import {
+    insertInOrder,
+    keysetPage,
+    pageHolding,
+    replacedAt,
+} from "../../lib/keyset"
+import {
     afterNewest,
+    compareNewest,
+    newestCursorOf,
     PAGED_ADMIN_FRESHNESS,
-    refreshFirstPage,
-    updatePagedLists,
     type NewestCursor,
 } from "../admin/adminLists"
 import { useAssignRole } from "../admin-users/roles"
@@ -171,38 +181,23 @@ export function adminRequestsQuery(
                 .order("id", { ascending: false })
                 .limit(REQUESTS_PAGE_SIZE + 1)
             if (error) throw new Error(error.message)
-            const rows = data.slice(0, REQUESTS_PAGE_SIZE)
-            const last = rows.at(-1)
-            return {
-                requests: rows.map(toAdminRequest),
-                next:
-                    data.length > REQUESTS_PAGE_SIZE && last
-                        ? { createdAt: last.created_at, id: last.id }
-                        : null,
-            }
+            const { rows, next } = keysetPage(
+                data,
+                REQUESTS_PAGE_SIZE,
+                newestCursorOf,
+            )
+            return { requests: rows.map(toAdminRequest), next }
         },
     })
 }
 
-/** `a` comes before `b` in a newest-first list. */
-const before = (a: AdminRequest, b: AdminRequest) =>
-    a.createdAt > b.createdAt || (a.createdAt === b.createdAt && a.id > b.id)
-
-/** `request` comes after `cursor` (on a later page) in a newest-first list. */
-const pastCursor = (request: AdminRequest, cursor: NewestCursor) =>
-    request.createdAt < cursor.createdAt ||
-    (request.createdAt === cursor.createdAt && request.id < cursor.id)
-
-const replaced = <T>(list: readonly T[], index: number, item: T) =>
-    list.map((other, i) => (i === index ? item : other))
-
 /**
  * `pages` with `request` as stored: replaced where it is listed, removed if
  * it no longer `belongs`, or put in order on the page whose range holds it
- * (up to and including the page's `next` cursor, as "load more" reads on
- * from there; the last page, with no cursor, holds the rest). One past
- * every loaded page's cursor is left for its own page to bring. The same
- * object when nothing changes.
+ * (`pageHolding`: up to and including the page's `next` cursor; the last
+ * page, with no cursor, holds the rest). One past every loaded page's
+ * cursor is left for its own page to bring. The same object when nothing
+ * changes.
  */
 export function withRequest(
     pages: RequestPages,
@@ -221,21 +216,18 @@ export function withRequest(
             : page.requests.filter((other) => other.id !== request.id)
         return {
             ...pages,
-            pages: replaced(pages.pages, listed, { ...page, requests }),
+            pages: replacedAt(pages.pages, listed, { ...page, requests }),
         }
     }
     if (!belongs) return pages
-    const index = pages.pages.findIndex(
-        (page) => page.next === null || !pastCursor(request, page.next),
-    )
+    const index = pageHolding(pages.pages, request, compareNewest)
     if (index === -1) return pages
     const page = pages.pages[index]
-    const at = page.requests.findIndex((other) => before(request, other))
     const requests = [...page.requests]
-    requests.splice(at === -1 ? requests.length : at, 0, request)
+    insertInOrder(requests, request, compareNewest)
     return {
         ...pages,
-        pages: replaced(pages.pages, index, { ...page, requests }),
+        pages: replacedAt(pages.pages, index, { ...page, requests }),
     }
 }
 
@@ -252,15 +244,15 @@ function belongsIn(key: readonly unknown[], request: AdminRequest) {
 /**
  * Puts a request as the server returned it into every cached list (each
  * status and type filter): replaced, moved between open and closed, or
- * left out where it doesn't belong (`updatePagedLists`: no refetch, fetch
- * times kept, a fetch in flight redone from its first page).
+ * left out where it doesn't belong (`updateCachedQueries`: no refetch,
+ * fetch times kept, a fetch in flight redone from its first page).
  */
 export function applyRequestChange(
     queryClient: QueryClient,
     adminId: string,
     request: AdminRequest,
 ) {
-    updatePagedLists<RequestPages>(
+    updateCachedQueries<RequestPages>(
         queryClient,
         [ADMIN_REQUESTS_KIND, adminId],
         (pages, key) => withRequest(pages, request, belongsIn(key, request)),
@@ -268,25 +260,15 @@ export function applyRequestChange(
 }
 
 /**
- * Reads the lists again after a write found the request changed: those on
- * screen from their first page, the others dropped (they load when shown).
+ * Reads the lists again after a write found the request changed
+ * (`refetchCachedQueries`): those on screen from their first page, the
+ * others dropped (they load when shown).
  */
 export function refreshAdminRequests(
     queryClient: QueryClient,
     adminId: string,
 ) {
-    for (const query of queryClient
-        .getQueryCache()
-        .findAll({ queryKey: [ADMIN_REQUESTS_KIND, adminId] })) {
-        if (query.getObserversCount() > 0) {
-            void refreshFirstPage(queryClient, query.queryKey)
-        } else {
-            queryClient.removeQueries({
-                queryKey: query.queryKey,
-                exact: true,
-            })
-        }
-    }
+    refetchCachedQueries(queryClient, [ADMIN_REQUESTS_KIND, adminId])
 }
 
 /** What an admin does to a request. */

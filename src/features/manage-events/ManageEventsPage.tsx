@@ -15,12 +15,8 @@ import { ToggleButtons } from "../../ui/ToggleButtons"
 import { EventActions } from "./EventActions"
 import { ManagedEventList } from "./ManagedEventList"
 import { useFocusAfterDelete } from "./useFocusAfterDelete"
-import {
-    laterInSeries,
-    myPastEventsKey,
-    myPastEventsQuery,
-    myUpcomingEventsQuery,
-} from "./myEvents"
+import { laterInSeries, myPastEventsKey } from "../events/eventLists"
+import { myPastEventsQuery, myUpcomingEventsQuery } from "./myEvents"
 import "./ManageEventsPage.scss"
 
 // Legacy ManageUserEventsPage (Hebrew only there).

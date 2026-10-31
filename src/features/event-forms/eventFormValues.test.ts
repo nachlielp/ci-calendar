@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { toManagedEvent, type ManagedEventRow } from "../events/managedEvent"
-import { event, segment } from "../calendar/testEvents"
+import { event, segment } from "../../test/testEvents"
 import {
     emptyMultiDay,
     emptySingleDay,

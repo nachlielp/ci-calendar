@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { cardsByDay, toEventCards } from "./eventCards"
 import { HEBREW } from "./eventLocales"
-import { publicEvent } from "./testEvents"
+import { publicEvent } from "../../test/testEvents"
 
 const titlesByDay = (events: Parameters<typeof toEventCards>[0]) =>
     Object.fromEntries(

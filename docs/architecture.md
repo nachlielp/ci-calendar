@@ -15,31 +15,35 @@ the switch.
 
 ## Layout
 
-| Folder                        | Holds                                                         |
-| ----------------------------- | ------------------------------------------------------------- |
-| `src/app/`                    | Bootstrap, services (the seam), routes, shell layout          |
-| `src/app/auth`                | Session at boot, profile row, sign-out cleanup, role guard    |
-| `src/app/header`              | App header, menu (items keyed by role), WhatsApp link         |
-| `src/app/install`             | Install banner, `beforeinstallprompt` capture, iOS steps      |
-| `src/app/updates`             | Service worker registration, safe reloads, the reload guard   |
-| `src/app/telemetry`           | Crash reports, analytics, Speed Insights; their lazy SDKs     |
-| `src/app/images`              | Photo cropper and canvas resize (`services.images`), lazy     |
-| `src/sw/`                     | The service worker (`sw.ts`) and its cache rules              |
-| `src/data/`                   | Backend client construction and generated database types      |
-| `src/features/*`              | One folder per feature: its pages, components, queries, tests |
-| `src/features/events`         | Managed events and the shared event cache updates (below)     |
-| `src/features/event-forms`    | The event forms, their shared parts, saves and drafts         |
-| `src/features/bio`            | The bio editor (`/bio`): profile form, photo, settings        |
-| `src/features/admin`          | Shared admin parts: freshness, refresh button, one page chunk |
-| `src/features/admin-users`    | `/manage-users`: users search, role changes (`useAssignRole`) |
-| `src/features/admin-requests` | `/manage-support`: open/closed requests, replies, approvals   |
-| `src/features/admin-events`   | `/manage-all-events`: every creator's events, their actions   |
-| `src/lib/`                    | Pure helpers (dates, formatting); tested directly             |
-| `src/ui/`                     | Shared presentational primitives (dialog, buttons, icons)     |
-| `src/ui/form`                 | Form fields, chips, switch, alert and buttons (`fields.tsx`)  |
-| `src/pages/`                  | Simple pages (about, legal, 404) that belong to no feature    |
-| `src/test/`                   | The fake backend and `renderApp`                              |
-| `src/assets/`                 | Images, logos and the subset font ported from legacy          |
+| Folder                        | Holds                                                                                                     |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `src/app/`                    | Bootstrap, services (the seam), routes, shell layout, shared hooks, the cache engine (`cachedQueries.ts`) |
+| `src/app/auth`                | Session at boot, profile row, sign-out cleanup, role guard, `sessionOf`/`useUserId`                       |
+| `src/app/header`              | App header, menu (items keyed by role), WhatsApp link                                                     |
+| `src/app/install`             | Install banner, `beforeinstallprompt` capture, iOS steps                                                  |
+| `src/app/updates`             | Service worker registration, safe reloads, the reload guard                                               |
+| `src/app/telemetry`           | Crash reports, analytics, Speed Insights; their lazy SDKs                                                 |
+| `src/app/images`              | Photo cropper and canvas resize (`services.images`), lazy                                                 |
+| `src/sw/`                     | The service worker (`sw.ts`) and its cache rules                                                          |
+| `src/data/`                   | Backend clients, generated database types, Places and translation lookups                                 |
+| `src/features/*`              | One folder per feature: its pages, components, queries, tests                                             |
+| `src/features/calendar`       | `/`: the public window, list and month views, filters, event details, shared links                        |
+| `src/features/auth`           | `/login`, `/signup` and the password reset pages                                                          |
+| `src/features/requests`       | `/request`, `/bio/request`: the user's role requests; the `requests` rules and role words                 |
+| `src/features/bio`            | The bio editor (`/bio`): profile form, photo, settings                                                    |
+| `src/features/manage-events`  | `/manage-events`: the user's events; the management rows, actions and list                                |
+| `src/features/events`         | Managed events, the rules event lists share, series, event writes, the event cache                        |
+| `src/features/event-forms`    | The event and template forms, their shared parts, saves and drafts                                        |
+| `src/features/admin`          | Shared admin parts: paged lists, refresh button, copy-phone, the one page chunk                           |
+| `src/features/admin-users`    | `/manage-users`: users search, role changes (`useAssignRole`)                                             |
+| `src/features/admin-requests` | `/manage-support`: open/closed requests, replies, approvals                                               |
+| `src/features/admin-events`   | `/manage-all-events`: every creator's events, their actions                                               |
+| `src/lib/`                    | Pure helpers (dates, formatting, keyset pagination, freshness); tested directly                           |
+| `src/ui/`                     | Shared presentational primitives (dialog, buttons, icons, the query list shell)                           |
+| `src/ui/form`                 | Form fields, chips, switch, alert and buttons (`fields.tsx`)                                              |
+| `src/pages/`                  | Simple pages (about, legal, 404) that belong to no feature                                                |
+| `src/test/`                   | The fake backend, `renderApp`, test data (`testEvents.ts`), the realtime guard                            |
+| `src/assets/`                 | Images, logos and the subset font ported from legacy                                                      |
 
 ## Rules
 
@@ -61,12 +65,24 @@ the switch.
 - **No realtime.** Never import `@supabase/supabase-js` or
   `@supabase/realtime-js` (lint fails it). Use the sub-clients
   (`postgrest-js`, `auth-js`, `storage-js`, `functions-js`). The test setup
-  fails any WebSocket.
+  fails any test that tries to open a WebSocket, even if the code catches
+  the error (`test/realtimeGuard.ts`).
 - **Server state lives in TanStack Query.** Each kind of data has one query
   options factory with an explicit freshness policy. Writes update the
-  matching cached queries from the server response (`setQueryData`), not by
-  refetching lists. Local UI state stays in components; filters stay in the
-  URL (`f` param).
+  matching cached queries from the server response, not by refetching
+  lists, through one engine (`app/cachedQueries.ts`):
+  `updateCachedQueries(queryClient, keyPrefix, update)` sets every cached
+  query under the prefix to `update(data, key)` (the same object where
+  nothing changed, no query created, fetch times kept) and fetches anew one
+  whose fetch is in flight (sent before the write; a paginated one from
+  its first page); when a write's answer can't say where things stand,
+  `refetchCachedQueries` reads them again (plain queries invalidated;
+  paginated ones on screen from their first page, the rest dropped);
+  `refreshFirstPage` refetches one infinite query from page one. A write
+  that reaches past one known query (every list of a kind, every filter
+  and page) uses it rather than walking the cache itself; a single
+  personal query just `setQueryData`s it (Personal pages). Local UI state
+  stays in components; filters stay in the URL (`f` param).
 - **Lazy by default.** Only the shell and the public calendar route are
   eager. Every other route uses route-level `lazy`. Heavy third-party code
   (cropper, Places, analytics, tracing, replay) is imported dynamically. CI
@@ -86,7 +102,9 @@ the switch.
   passed days in `select` (see `publicWindow.ts`), with the day from
   `useToday()` (`app/useToday.ts`: re-read when the page comes back and
   every minute) passed to the options factory and in their `useMemo` deps,
-  so `select` runs again after midnight without a request.
+  so `select` runs again after midnight without a request. A page reads
+  the day once and passes it down (the month view gets the calendar
+  page's), never computing it per render.
 - **One build version.** `BUILD_VERSION` (`src/app/buildVersion.ts`) is
   read from `<meta name="build-version">`, which `buildVersionMeta` in
   `vite.config.ts` writes into `index.html`: the commit SHA for builds
@@ -169,12 +187,10 @@ the switch.
     - **Tokens**: the data client's fetch puts `auth.accessToken()` on each
       request as it is sent: the session's token while valid (refreshed ones
       included), else the anon key. It never waits. So public queries go
-      with whatever token is at hand (filter public-ness explicitly, above),
-      and **every personal query starts with**
-      `const session = await services.auth.ready()` (at once for a token
-      valid 90 s more; else after auth-js refreshes it), checks
-      `session?.user.id === userId`, keys on `[kind, userId, …]`, and is
-      `enabled` only with a session (`useSession()` in `app/viewer.ts`).
+      with whatever token is at hand (filter public-ness explicitly, above);
+      personal queries wait for a good token first (`sessionOf`, under
+      Personal pages: `auth.ready()` answers at once for a token valid 90 s
+      more, else after auth-js refreshes it).
     - **The viewer** (`useViewer()`): `anonymous` at first paint when no
       session is stored; `unknown` while the profile loads or a redirect is
       read; `unavailable` when signed in but the profile failed or waits
@@ -257,8 +273,9 @@ the switch.
   `services.reload`, the moment it is visible again (if the version arrived
   while away, both happen on return); never while it stays visible. Legacy
   had no update prompt, so there is none. **Anything holding unsaved work
-  must block the reload**: call `useBlockReload(isDirty)`
-  (`app/updates/reloadGuard.ts`) in the form (slices 10+); while any block is
+  must block the reload** with `useBlockReload(isDirty)`
+  (`app/updates/reloadGuard.ts`). Every `useForm` form already does (under
+  Forms), so call it only for unsaved work outside one. While any block is
   held there is no handover or reload, and the update waits for a later
   leave and return. Explicit reloads (the footer's reset, the button below)
   ignore the guard.
@@ -275,7 +292,8 @@ the switch.
   reload loops). Otherwise `RouteError` says a new version is available,
   with a reload button, and the error is reported (`stale-chunk`) once; a
   failure the reload recovers is expected after a deploy and isn't.
-- **Freshness.** Public window: stale after 5 minutes, refetched on
+- **Freshness.** Public window: stale after 5 minutes (`STALE_MS`,
+  `lib/freshness.ts`, the one staleness every query kind uses), refetched on
   `visibilitychange` to visible when stale (TanStack's `focusManager`),
   always refetched on reconnect (`refetchOnReconnect: "always"`), and always
   revalidated at a cold start. Data on screen stays on screen when a refresh
@@ -392,8 +410,15 @@ the switch.
       `OPEN_STATUS_TREE`), `conditionalUpdate` and `appendToResponses`
       (read the responses under a condition, then write under it; `null`
       when either finds no row).
-- **Event writes and the cache.** For create/edit forms (slices 13–15)
-  and admin (manage-all-events), not only manage-events:
+    - **Role and request words** are one shared vocabulary, `REQUEST_WORDS`
+      (`features/requests/requestWords.ts`, which imports no feature):
+      `role` (a role in a sentence or a details line), `roleButton` (the
+      short names on legacy's admin role buttons), request `type`s and the
+      `open`/`closed` statuses. The requests page, the bio page and the
+      admin pages all read them there; never add a map of role names
+      elsewhere.
+- **Event writes and the cache.** Every event write (my events, the
+  create/edit forms, the admin pages):
     - **Reads and responses** select `MANAGED_EVENT_COLUMNS` (built from
       the public `EVENT_COLUMNS` and `EVENT_BIO_COLUMNS`) and map rows with
       `toManagedEvent` (`features/events/managedEvent.ts`): a `PublicEvent`
@@ -410,10 +435,10 @@ the switch.
       every event list from the response, with no refetch, never creates a
       query, leaves a query's data object alone when the change doesn't
       concern it, and keeps fetch times (a write doesn't delay a
-      revalidation). A query whose refetch is in flight is fetched anew
-      right after (`query.fetch` with `cancelRefetch`), so an answer sent
+      revalidation). A query whose fetch is in flight is fetched anew right
+      after (a paginated one from its first page only), so an answer sent
       before the write can't bring a deleted or hidden event back, nor
-      persist it. Built in: the public window (visible events dated from
+      persist it: `updateCachedQueries` (Server state, above) does it all. Built in: the public window (visible events dated from
       today within the range it was fetched for, `PublicWindow.from/to`;
       only the public part, `toPublicOnly`, since it is persisted) and
       shared-link lookups (the event, or `null` once hidden or deleted).
@@ -421,13 +446,21 @@ the switch.
       `registerEventList({ kind, apply })` in the module that defines its
       query (so it is registered before any of its queries can be cached),
       `apply(data, change, queryKey)` returning the updated data or the
-      same object (`my-event` and `my-series` in `event-forms/myEvent.ts`
-      too). `mergeIntoList` (one list) and `mergeIntoPages`
-      (keyset-paginated, `EventPage`) do the work given which saved events
-      belong and the list's order; see the `my-events` list in
-      `features/manage-events/myEvents.ts`. `features/events` never imports
-      a feature's list. Admin's manage-all-events registers its own
-      (`admin-events`, `admin-events/adminEvents.ts`).
+      same object (`event-to-edit` in `event-forms/eventToEdit.ts` and
+      `series` in `events/series.ts` too). `mergeIntoList` (one list) and
+      `mergeIntoPages` (keyset-paginated, `EventPage`; a saved event goes on
+      the page whose cursor range holds it, under Pagination) do the work
+      given which saved events belong and the list's order; see the
+      `my-events` list in `features/manage-events/myEvents.ts`.
+      `features/events` never imports a feature's list. Admin's
+      manage-all-events registers its own (`admin-events`,
+      `admin-events/adminEvents.ts`).
+    - **Rules every event list shares** live in `events/eventLists.ts`:
+      the orders (`compareUpcoming`, `comparePast`), the keyset cursor
+      (`EventCursor`, `eventCursorOf`, `eventsAfter(cursor, direction)`),
+      `laterInSeries` and the user's own lists' keys
+      (`myUpcomingEventsKey`, which the edit forms read too). A feature
+      needing one imports it from there, never from another feature.
     - **Hide, cancel and delete** are `useSetHidden`, `useSetCancelled`
       and `useDeleteEvents` (`features/events/eventWrites.ts`): one
       conditional write each. Hide and cancel only touch events still in
@@ -439,9 +472,10 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       events' loaded owner (`.eq("user_id", event.ownerId)`, as the edit
       form does). What comes back is applied; if fewer events come back
       than were asked for (changed or deleted elsewhere, or refused by
-      RLS), `refreshEventQueries` invalidates every event list (the window
-      and links too: those on screen refetch, the rest when shown) and the
-      write fails with `EventsChangedError`, which the dialog says ("not
+      RLS), `refreshEventQueries` reads every event list again (the window
+      and links too; `refetchCachedQueries`: plain queries on screen
+      refetch, the rest when shown; paginated ones on screen from their
+      first page, the rest dropped) and the write fails with `EventsChangedError`, which the dialog says ("not
       allowed, or changed meanwhile"): never a silent success. A delete
       the junction's foreign key refuses (`23503`) removes the events'
       `ci_events_users_junction` rows and is sent once more, so a tagged
@@ -455,23 +489,37 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       ready, loading or failed with a retry, OK held until ready;
       `ownOnly`; `editState`, the edit link's router state), listed by
       `ManagedEventList` (`manage-events/ManagedEventList.tsx`: one open
-      row at a time, loading, empty, failed with a retry, "load more")
-      with `useFocusAfterDelete` (focus to the page's heading once a
-      deleted row is gone). My events and the admins' list both use them.
+      row at a time) with `useFocusAfterDelete` (focus to the page's
+      heading once a deleted row is gone). My events and the admins' list
+      both use them. Its shell is `QueryList` (`ui/QueryList.tsx`: the
+      items, loading, empty, failed with a retry, dimmed while an earlier
+      filter's items stand in, "load more"; each page passes its own class
+      names), which the admin users and requests lists use too: a new list
+      read by a query uses it.
 - **Pagination.** Long personal or admin lists load a page at a time with
   `infiniteQueryOptions` and keyset pagination, never offsets (a delete
-  would shift them): order by a unique key (`start_date`, then `id`), ask
-  for one row more than the page (`limit(PAGE + 1)`) to know whether
-  another follows, and pass the last row as the cursor, filtered with
-  PostgREST's logic tree (`afterCursor`:
-  `start_date.lt.D,and(start_date.eq.D,id.lt.I)`). A page is an
-  `EventPage` (`{ events, next: cursor | null }`); `getNextPageParam`
-  returns `next`. TanStack refetches an infinite query page by page, so
-  don't let focus, reconnect or remounts refetch one: the past events
-  query is fetched when first asked for in a page visit, kept (writes
-  update it) with `staleTime: Infinity` and no refetch triggers, and
-  removed when the page unmounts, so the next visit starts from page one.
-  See `myEvents.ts`.
+  would shift them), built from `lib/keyset.ts`: order by a unique key (a
+  column, then `id`, both the same way), ask for one row more than the
+  page (`limit(PAGE + 1)`; `keysetPage` cuts the page and makes the next
+  cursor from its last row), and filter a later page with PostgREST's
+  logic tree (`rowsAfter`, values `quoted`:
+  `start_date.lt."D",and(start_date.eq."D",id.lt."I")`; each list's own is
+  a line over it: `eventsAfter` in `events/eventLists.ts`, `afterNewest`
+  in `admin/adminLists.ts`). A page is `{ <items>, next: cursor | null }`
+  (`EventPage` for events); `getNextPageParam` returns `next`. A row a
+  write moves into a loaded list goes on the page whose range holds it,
+  up to and including its `next` cursor (`pageHolding`; never by the last
+  row shown, which rows moved away since leave behind the cursor), the
+  last page taking the rest; one past every loaded page is left for its
+  own page to bring. TanStack refetches an infinite query page by page, so
+  nothing may refetch one whole. Not focus, reconnect or remounts: the
+  past events query is fetched when first asked for in a page visit, kept
+  (writes update it) with `staleTime: Infinity` and no refetch triggers,
+  and removed when the page unmounts, so the next visit starts from page
+  one (see `myEvents.ts`; admin lists under Admin pages). Not writes
+  either: the engine (`app/cachedQueries.ts`) redoes a paginated fetch in
+  flight, or reads a list again, from its first page only
+  (`refreshFirstPage`, which drops the later pages first).
 - **Forms.** Every form is built on `useForm` (`app/useForm.ts`, over
   the pure reducer in `lib/form.ts`; both tested directly); see
   `features/requests/RequestForm.tsx`:
@@ -587,8 +635,8 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
       `EventGoneError` and every event list is refetched). First, in
       parallel, the title's translations (`translateTitle`, en and ru, as
       `lng_titles`) and, only if the address field couldn't get it when the
-      place was picked, the English address (`en_label`, from
-      `services.places`); an edit asks only for a changed title or a newly
+      place was picked, the English address (`en_label`,
+      `englishAddressOf` in `data/placeLookups.ts`); an edit asks only for a changed title or a newly
       picked place. Each falls back to the source text and never fails or
       holds the save: after `LOOKUP_TIMEOUT_MS` (5 s, `lib/timeout.ts`,
       `withTimeout`) it goes on without. A language that failed is left out
@@ -651,13 +699,13 @@ until }`, off for every saved event, so it's in drafts too) is
           reads the stored rows by id and inserts only the days not stored
           (e.g. an end day moved later in between); days dropped in between
           stay stored, as they were saved.
-        - **The edit waits for the series**: while `mySeriesQuery` has no
+        - **The edit waits for the series**: while `seriesQuery` has no
           data the submit button is off and the form says it's loading
           (or, failed, says so with a retry); the save refuses too
           (`series.ready`), so the question is never skipped.
         - **Editing**: the form reads the user's events of the series from
-          today on (`mySeriesQuery`, `my-series`, personal, registered as an
-          event list) and passes `series: { later, patch: seriesPatch }`
+          today on (`seriesQuery`, `events/series.ts`, `series`, personal,
+          registered as an event list) and passes `series: { later, patch: seriesPatch }`
           (`laterInSeries`: a later day, hidden and cancelled ones too).
           With later events, a dirty save first asks (`question`, shown as
           `SeriesEditDialog` over `ActionDialog`): "all" or some of them, or
@@ -696,8 +744,9 @@ until }`, off for every saved event, so it's in drafts too) is
       `?isTemplate=true`, legacy's link, a new template's form; both back to
       `/create-events` after a save, as legacy), and
       `/manage-events/edit-single-day/:eventId` and
-      `/manage-events/edit-multi-day/:eventId` (`myEventQuery`, personal,
-      the user's own event by id, at once from the cached upcoming list;
+      `/manage-events/edit-multi-day/:eventId` (`eventToEditQuery`,
+      `event-forms/eventToEdit.ts`, personal, keyed on the viewer: the
+      viewer's own event by id, at once from the cached upcoming list;
       registered as an event list; an event of the other kind redirects to
       its own form; back to `/manage-events`). **Admins edit anyone's
       event** there, as legacy's manage-all-events let them: for an admin
@@ -706,7 +755,7 @@ until }`, off for every saved event, so it's in drafts too) is
       belongs to the owner the form opened it with (`.eq("user_id",
 event.ownerId)`, the user's own for everyone else, since that is all
       `"own"` reads) and the series offered is that owner's
-      (`mySeriesQuery(…, ownerId)`). Opened from `/manage-all-events`
+      (`seriesQuery(services, viewerId, refKey, ownerId)`). Opened from `/manage-all-events`
       (link state `FROM_ALL_EVENTS`, `events/managedEvent.ts`), the form
       goes back there. Each page is a few lines
       over `NewEventFormPage` / `EditEventFormPage`
@@ -875,7 +924,15 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       unmounts, and is refreshed from its first page only
       (`refreshFirstPage`: later pages are dropped, then one request) when
       the app comes back stale (`useRefreshWhenBack(key, refresh)`) and
-      from the refresh button.
+      from the refresh button. A page shows one with `usePagedAdminList`
+      (`admin/adminLists.ts`), which does all of that: pass the options
+      factory's result memoised (its key keeps its identity until a filter
+      changes) plus `placeholderData`; it returns the list, `refreshing`
+      and `refresh(also?)` for the refresh button (the list shown from its
+      first page plus the page's other queries; other filters' lists are
+      dropped unless `keepOthers`). The list renders in `QueryList`; a
+      phone number to copy is `CopyPhone` (`features/admin`, styled by
+      `_copy-phone.scss`, `@use`d as the refresh button's).
     - **Manual refresh**: every admin page has `RefreshButton`
       (`features/admin`, new: legacy refreshed over realtime) at the top of
       its card, refreshing all of the page's queries (`refreshFirstPage`
@@ -897,8 +954,9 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       parentheses are text: e-mail addresses). A later page's cursor joins
       it in the same tree (`usersFilter`: `and(or(search),or(cursor))`),
       never as a second `or` parameter. Newest-first admin lists page with
-      `afterNewest` (`created_at`, then `id`; values `quoted`, both in
-      `admin/adminLists.ts`). A filter that picks values (request types) is
+      `afterNewest` (`admin/adminLists.ts`: `created_at`, then `id`, over
+      `rowsAfter`; `quoted` is in `lib/keyset.ts`), ordered by
+      `compareNewest`. A filter that picks values (request types) is
       an `in` filter in the key, in one order, so a choice is one query.
     - **Counts** (legacy's totals) are counting `HEAD` requests
       (`select("id", { count: "exact", head: true })`), never a read of the
@@ -906,12 +964,12 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
     - **Writes** update the cached rows from the response (every cached
       search and page, the same object where nothing changed, fetch times
       kept), never by refetching a list; a fetch of those queries in flight
-      (sent before the write) is redone, a paginated one with
-      `refreshFirstPage`, as `applyEventChanges` does. For paginated lists
-      that is `updatePagedLists(queryClient, prefix, update)`
-      (`admin/adminLists.ts`). A row moved into a loaded list goes on the
-      page whose range holds it, up to its `next` cursor (not its last row
-      shown: rows moved away since leave the cursor behind).
+      (sent before the write) is redone, a paginated one from its first
+      page, as `applyEventChanges` does: all through
+      `updateCachedQueries(queryClient, [kind, adminId], update)`
+      (`app/cachedQueries.ts`). A row moved into a loaded list goes on the
+      page whose range holds it, up to its `next` cursor (`pageHolding`,
+      under Pagination), as every paginated list's does.
 - **Users and roles** (slice 18; `features/admin-users`, legacy
   ManageUsersPage, usersService.getUsers, userRoleService and the
   store's `app_users`):
@@ -923,11 +981,12 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       `adminUserStatsQuery` (`admin-user-stats`) counts all accounts and
       each `user_type`. A row opens legacy's details (name, email, phone
       to copy, the role from `user_roles`, a plain user without one) and
-      its role buttons (the one equal to `user_type` off, as legacy).
+      its role buttons (named by `REQUEST_WORDS.roleButton`; the one equal
+      to `user_type` off, as legacy).
     - **Role changes** go only through the `assign_user_role` RPC
       (`roles.ts`: `assignUserRole`, legacy's error wrapping "Failed to
-      update user role ERROR: …"; `ROLE_IDS` admin 1, creator 2, org 3,
-      profile 4, user 5). The client never writes `user_roles`, `users` or
+      update user role ERROR: …"; the role ids it sends are `ROLE_IDS` in
+      `users.ts`: admin 1, creator 2, org 3, profile 4, user 5). The client never writes `user_roles`, `users` or
       `public_bio` for it. `useAssignRole(adminId)` applies the RPC's answer
       (`applyRoleChange`): the row in every cached search, the counts (the
       account moved between types; refetched if the user wasn't cached),
@@ -937,8 +996,8 @@ adminId, …]` with `useUserId()`, `sessionOf` first, `enabled:
       known, may be public now, so the event lists refresh); a users list
       or count fetch in flight is redone. An admin changing their own role
       is asked first (`ActionDialog`, new: it locks them out at once);
-      the profile is read again and the guard sends them to `/`. Slice
-      19's request approval calls `useAssignRole` too.
+      the profile is read again and the guard sends them to `/`. Request
+      approvals (below) call `useAssignRole` too.
 - **Support requests** (slice 19; `features/admin-requests`, legacy
   ManageSupportPage, requestsService and the store's `app_requests`):
     - **Lists** (`adminRequests.ts`): `adminRequestsQuery` (`admin-requests`,
@@ -990,11 +1049,13 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       hidden ones included, optionally `in("user_id", creators)` and
       `ilike("title", containing(search))` (debounced, as the users search;
       `containing` is in `admin/adminLists.ts`), 30 a page by day then id
-      (keyset, `afterUpcoming`; `PAGED_ADMIN_FRESHNESS`, removed when the
-      page closes, passed days dropped in `select`). Registered as an event
-      list: every event write (here, my events, the forms) puts the saved
-      event in each cached filter it matches (`belongsInList`) and takes
-      out deleted ones and those that no longer match.
+      (keyset, `eventsAfter(cursor, "ascending")`; `PAGED_ADMIN_FRESHNESS`,
+      removed when the page closes, passed days dropped in `select`).
+      Registered as an event list: every event write (here, my events, the
+      forms) puts the saved event in each cached filter it matches
+      (`belongsInList`) on the page whose cursor range holds it
+      (`mergeIntoPages`) and takes out deleted ones and those that no
+      longer match.
     - **Creators** (`adminEventCreatorsQuery`, `admin-event-creators`,
       `PERSONAL_FRESHNESS`): `user_id, users(user_name)` of the events from
       today on, deduplicated in the browser as legacy did (no distinct
@@ -1002,7 +1063,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       creator names.
     - **Actions** are `EventActions` with `ownOnly={false}`; delete and
       hide offer the owner's later events of the series
-      (`mySeriesQuery(services, adminId, refKey, ownerId)`, read when a
+      (`seriesQuery(services, adminId, refKey, ownerId)`, read when a
       recurring event's row opens). The refresh button refreshes the list
       shown and the creators and drops the other filters' lists.
 - **Google Places.** `services.places()` (`PlacesLoader`) loads the Maps
@@ -1013,10 +1074,12 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   (`AutocompleteService`, what legacy's react-google-places-autocomplete
   called) while typing, then `englishAddress(placeId)`
   (`PlacesService.getDetails`, legacy's) for the picked place, which ends
-  the session; plus a sessionless `englishAddress` (a save's fallback).
+  the session; plus a sessionless `englishAddress` (a save's fallback,
+  `englishAddressOf`).
   `AddressField` loads it when focused, never before; typing asks after a
-  300 ms pause; picking sets the address and then its `enLabel` (5 s at
-  most); picking the address already set keeps it, English label and all.
+  300 ms pause; picking sets the address and then its `enLabel`
+  (`pickedPlaceInEnglish`, `data/placeLookups.ts`, 5 s at most; the field
+  never looks up Google itself); picking the address already set keeps it, English label and all.
   So a save, a restored draft's included, normally needs no lookup and
   never loads the script. Tests get `fake.places` and assert
   `fake.places.loads` and the sessions in `fake.places.calls`. Future
@@ -1042,7 +1105,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   http(s) only, a scheme-less one as https, anything else (a stored
   `javascript:`) dropped.
 - **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
-  Every slice that adds copy follows this:
+  Everything that adds copy follows this:
     - **Copy is per component**, declared with `defineCopy({ he, en, ru })`
       (`src/lib/copy.ts`) next to the component and read with
       `useCopy(COPY)` (`src/app/language.ts`). Hebrew sets the shape; English
@@ -1242,8 +1305,8 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       `services.telemetry.setInternal(users.is_internal)` is called. It saves the
       `isInternal` key; marking a device internal stops PostHog
       (`opt_out_capturing`, autocapture included) and Speed Insights at
-      once; unmarking takes effect from the next page load. (All wired in
-      slice 9: `bootSession`, `forgetUser`, `profileQuery`.)
+      once; unmarking takes effect from the next page load (wired in
+      `bootSession`, `forgetUser` and `profileQuery`).
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
@@ -1439,7 +1502,14 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
 Behaviour tests render the real app with `renderApp()` from `src/test/` and a
 seeded fake backend. They assert what the user sees and what was requested of
 the backend, never cache keys or hook calls. Pure logic in `src/lib/` and
-feature helpers is tested directly.
+feature helpers is tested directly. Test-only helpers live in `src/test/`
+(e.g. `testEvents.ts`: event and bio rows to seed, and the calendar's
+titles and cards), never in a feature folder.
+
+- **No realtime:** `setup.ts` puts `ForbiddenWebSocket`
+  (`test/realtimeGuard.ts`) in place of `WebSocket`: constructing one
+  throws and is recorded, and an `afterEach` fails the test that did it,
+  even if the code caught the error.
 
 - **Repeat visits:** pass the same `storage` (`createMemoryStorage()`) to two
   `renderApp` calls, unmounting the first. `buildVersion` simulates a deploy.
@@ -1528,6 +1598,10 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
   (the server's error, HTTP 500; `{ network: true }`: no answer, status
   0, as postgrest-js reports a failed fetch). Results carry `status`
   as PostgREST's (200, 201, 406, 409).
+  `fake.holdReads(table)` holds only reads, letting writes through: what
+  the pages show after a write then comes from its answer in the cache
+  (the edit forms' tests hold `ci_events` reads before saving, then check
+  the calendar and my events and count the reads since).
   `fake.answerLate(match)` answers the next matching request with the data
   as it is when sent, delivered when the returned function is called (a
   response from before a write that lands after it).
@@ -1811,3 +1885,16 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     the maintainer's checklist (env, SQL checks, migrations, post-deploy
     checks, rollback); `docs/perf-baseline.md` has the final sizes (135.3 KB
     gzip for `/`, from 568.7 KB).
+23. Final review: every multi-query cache update goes through one engine
+    (`app/cachedQueries.ts`), and paginated lists are never refetched page
+    by page (a write meeting a fetch in flight, or a refresh after a write
+    that couldn't be applied, starts again from page one); every paginated
+    list places a moved row by its pages' cursors (`lib/keyset.ts`, one
+    keyset builder and page cut for all lists); the rules event lists
+    share moved to `features/events` (`eventLists.ts`, `series.ts`), the
+    edit and series queries renamed for admin use (`eventToEditQuery`,
+    `seriesQuery`); admin pages share `usePagedAdminList`, `QueryList` and
+    `CopyPhone`; `STALE_MS` moved to `lib/freshness.ts`; the English
+    address lookups moved to `data/placeLookups.ts`; any WebSocket attempt fails
+    its test; the edit tests prove the calendar and my events update from
+    the save's answer with every read of events held.

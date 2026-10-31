@@ -18,7 +18,7 @@ export function headersRevision(config) {
 }
 
 /** The shell's revision with the headers' hash on: `<content>-h<headers>`. */
-export function shellRevision(contentRevision, config) {
+function shellRevision(contentRevision, config) {
     return `${contentRevision}-h${headersRevision(config)}`
 }
 

@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react"
 import { useCopy } from "../../app/language"
-import { useServices } from "../../app/services"
-import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
+import { addDays } from "../../lib/jerusalemDate"
 import { counted, defineCopy } from "../../lib/copy"
 import {
     addMonths,
@@ -56,14 +55,15 @@ const MAX_DOTS = 4
  */
 export function CalendarView({
     cards,
+    today,
 }: {
     /** The filtered list's cards, in list order. */
     cards: readonly EventCard[]
+    /** The page's day (`useToday()`), `YYYY-MM-DD`. */
+    today: string
 }) {
-    const { now } = useServices()
     const copy = useCopy(COPY)
     const locale = useCopy(EVENT_LOCALES)
-    const today = jerusalemToday(now())
     const firstMonth = monthOf(today)
     const lastDay = addDays(today, WINDOW_DAYS)
     const lastMonth = monthOf(lastDay)

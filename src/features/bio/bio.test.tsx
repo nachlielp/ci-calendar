@@ -12,7 +12,7 @@ import { FAKE_BUCKET, FAKE_SUPABASE_URL } from "../../test/fakeFiles"
 import { renderApp } from "../../test/renderApp"
 import { liveObjectUrls } from "../../test/setup"
 import { testUser } from "../../test/testUsers"
-import { bio, event, tagging } from "../calendar/testEvents"
+import { bio, event, tagging } from "../../test/testEvents"
 import { MY_BIO_COLUMNS } from "./myBio"
 
 const NOW = new Date("2026-10-30T09:00:00Z")

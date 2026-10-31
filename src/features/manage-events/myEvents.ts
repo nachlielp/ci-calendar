@@ -6,6 +6,7 @@ import {
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
 import { jerusalemToday } from "../../lib/jerusalemDate"
+import { keysetPage } from "../../lib/keyset"
 import {
     type EventPage,
     mergeIntoList,
@@ -13,6 +14,16 @@ import {
     registerEventList,
     removesFrom,
 } from "../events/eventCache"
+import {
+    compareUpcoming,
+    comparePast,
+    eventCursorOf,
+    eventsAfter,
+    MY_EVENTS_KIND,
+    myPastEventsKey,
+    myUpcomingEventsKey,
+    type EventCursor,
+} from "../events/eventLists"
 import {
     selectManagedEvents,
     toManagedEvents,
@@ -26,31 +37,10 @@ import {
 // the creator; docs/rls.md). Hidden events are included: management is
 // where they show.
 
-/** First element of the user's events query keys. */
-export const MY_EVENTS_KIND = "my-events"
-
 /** Past events per page ("load more"). */
 export const PAST_PAGE_SIZE = 20
 
-export const myUpcomingEventsKey = (userId: string) =>
-    [MY_EVENTS_KIND, userId, "upcoming"] as const
-
-export const myPastEventsKey = (userId: string) =>
-    [MY_EVENTS_KIND, userId, "past"] as const
-
-/**
- * Where the next page of past events starts: after this event in the past
- * list's order (newest day first, then id descending), so a page boundary
- * never skips or repeats an event of the same day (keyset pagination).
- */
-export interface PastCursor {
-    startDate: string
-    id: string
-}
-
-export interface PastPage extends EventPage<ManagedEvent> {
-    next: PastCursor | null
-}
+export type PastPage = EventPage<ManagedEvent>
 
 // Writes put each event in its owner's lists: upcoming from today on,
 // else the loaded past pages where they reach (applyEventChanges).
@@ -73,16 +63,6 @@ registerEventList({
             : mergeIntoPages(pages, change, added, comparePast)
     },
 })
-
-/** The upcoming list's order: by day, then id (as the query orders). */
-export function compareUpcoming(a: ManagedEvent, b: ManagedEvent): number {
-    if (a.startDate !== b.startDate) return a.startDate < b.startDate ? -1 : 1
-    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0
-}
-
-/** The past list's order: newest day first, then id descending. */
-export const comparePast = (a: ManagedEvent, b: ManagedEvent) =>
-    compareUpcoming(b, a)
 
 /**
  * The user's events from today on (Jerusalem), hidden ones included, in
@@ -114,10 +94,6 @@ export function myUpcomingEventsQuery(
     })
 }
 
-/** PostgREST's filter for "after `cursor`" in the past list's order. */
-export const afterCursor = ({ startDate, id }: PastCursor) =>
-    `start_date.lt.${startDate},and(start_date.eq.${startDate},id.lt.${id})`
-
 /**
  * The user's events before today, newest first, a page at a time
  * (`PAST_PAGE_SIZE`; one row more is asked for, to tell whether another
@@ -134,7 +110,7 @@ export function myPastEventsQuery(services: AppServices, userId: string) {
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
-        initialPageParam: null as PastCursor | null,
+        initialPageParam: null as EventCursor | null,
         getNextPageParam: (page: PastPage) => page.next,
         queryFn: async ({ pageParam }): Promise<PastPage> => {
             await sessionOf(services, userId)
@@ -142,40 +118,20 @@ export function myPastEventsQuery(services: AppServices, userId: string) {
             let query = selectManagedEvents(services.data)
                 .eq("user_id", userId)
                 .lt("start_date", today)
-            if (pageParam) query = query.or(afterCursor(pageParam))
+            if (pageParam) {
+                query = query.or(eventsAfter(pageParam, "descending"))
+            }
             const { data, error } = await query
                 .order("start_date", { ascending: false })
                 .order("id", { ascending: false })
                 .limit(PAST_PAGE_SIZE + 1)
             if (error) throw new Error(error.message)
-            const rows = data.slice(0, PAST_PAGE_SIZE)
-            const last = rows.at(-1)
-            return {
-                events: toManagedEvents(rows),
-                next:
-                    data.length > PAST_PAGE_SIZE && last?.start_date
-                        ? { startDate: last.start_date, id: last.id }
-                        : null,
-            }
+            const { rows, next } = keysetPage(
+                data,
+                PAST_PAGE_SIZE,
+                eventCursorOf,
+            )
+            return { events: toManagedEvents(rows), next }
         },
     })
-}
-
-/**
- * The later events of `event`'s recurring series among `events` (legacy
- * `getFutureRecurringEventsByRefKey`: same `recurring_ref_key`, a later
- * day), in date order: what "this one or the following ones too" offers.
- */
-export function laterInSeries(
-    events: readonly ManagedEvent[],
-    event: ManagedEvent,
-): ManagedEvent[] {
-    if (!event.recurringRefKey) return []
-    return events
-        .filter(
-            (other) =>
-                other.recurringRefKey === event.recurringRefKey &&
-                other.startDate > event.startDate,
-        )
-        .sort(compareUpcoming)
 }
