@@ -2,8 +2,8 @@
 
 What the maintainer does to replace the old client with the new one in
 production, gathered from `docs/architecture.md` (Maintainer notes) and the
-slice commits. Nothing here has been done yet: no migration is applied, no
-env var set, nothing deployed. Production is www.ci-events.org on Vercel;
+slice commits. **Done 2026-10-31** (PR #41): the new client is live; what is left is
+under "Later". Production is www.ci-events.org on Vercel;
 the Supabase project is `pjgwpivkvsuernmoeebk`.
 
 The switch is one deploy of the merged branch. The new client keeps every
@@ -15,20 +15,21 @@ speed. Order: **before merging → deploy → after deploy → later**.
 
 ### Record the baseline
 
-- [ ] Copy the old client's field data from Vercel Speed Insights into
+- [x] Skipped (no recent traffic in Speed Insights); a Lighthouse lab
+      baseline stands in (`docs/perf-baseline.md`). Copy the old client's field data from Vercel Speed Insights into
       `docs/perf-baseline.md` (p75 LCP, FCP, INP, CLS, TTFB for `/` and
       `/event/[eventId]`, mobile and desktop, last 30 days). After the deploy
       it is gone for good.
 
 ### Vercel project settings (production and preview)
 
-- [ ] **Node 22.** `package.json` `engines` is `22.x`, which overrides the
+- [x] **Node 22.** `package.json` `engines` is `22.x`, which overrides the
       dashboard setting; check the build log says Node 22.
-- [ ] **Build** is `npm run build` (the default), output `dist`. It also
+- [x] **Build** is `npm run build` (the default), output `dist`. It also
       runs the security headers check, which **fails the build** if the
       env's Supabase URL, Sentry DSN or PostHog host isn't allowed by the CSP
       in `vercel.json` (give previews the same values, or add the origin).
-- [ ] **Env vars** the new client reads (names as in `.env.example`):
+- [x] **Env vars** the new client reads (names as in `.env.example`):
 
     | Variable                       | Needed for                                   | If missing                                  |
     | ------------------------------ | -------------------------------------------- | ------------------------------------------- |
@@ -54,7 +55,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
 
 ### Google Places key
 
-- [ ] The key in `VITE_GOOGLE_PLACES_API_KEY` is valid (the local `.env`
+- [x] The key in `VITE_GOOGLE_PLACES_API_KEY` is valid (the local `.env`
       one is not: `InvalidKeyMapError`), has the **Maps JavaScript API** and
       **Places API** enabled, and is HTTP-referrer-restricted to the
       production domains plus the `develop` preview's fixed address,
@@ -174,14 +175,18 @@ too, except the realtime one, which waits until after go-live.
 
 ## 2. Deploy
 
-- [ ] Merge the PR (CI green: typecheck, lint, format, tests, build,
+- [x] Merge the PR (CI green: typecheck, lint, format, tests, build,
       bundle limit, precache check). Let Vercel build a preview of it first
       and run the preview checks below there, then promote/merge to
       production.
 
 ## 3. After the deploy (preview first, then production)
 
-- [ ] **CSP:** with the console open, go through `/`, an event, `/login`
+Done 2026-10-31 except Analytics: the public pages, CSP, English and the
+bundle checked headless on the preview and on production; sign-in, address
+suggestions, a photo, admin hide/unhide and the installed app by hand.
+
+- [x] **CSP:** with the console open, go through `/`, an event, `/login`
       (and Google sign-in), the event forms with an address typed (so
       Google Places loads and suggests), `/bio` (pick and crop a photo, so
       the cropper loads, then save it, so it uploads and shows) and the
@@ -190,34 +195,34 @@ too, except the realtime one, which waits until after go-live.
       or `preview`). On a preview, check that Vercel's toolbar
       (`vercel.live`) loads; on production, that responses carry exactly one
       `Content-Security-Policy` header.
-- [ ] **Installed app updates:** on a phone with the old app installed,
+- [x] **Installed app updates:** on a phone with the old app installed,
       open it (online): the new service worker takes over at once, the page
       reloads once onto the new client, and the old caches are gone
       (desktop Chrome: DevTools → Application → Cache Storage lists only
       `ci-calendar-precache-v2-…`; no `api-cache-*`, no
       `workbox-precache-v2-…`). Then open it offline: it shows the events
       last seen with the out-of-date cloud.
-- [ ] **Still signed in:** a user signed in on the old client is still
+- [x] **Still signed in:** a user signed in on the old client is still
       signed in, with their menu.
-- [ ] **Google sign-in** works and returns to the site signed in; an email
+- [x] **Google sign-in** works and returns to the site signed in; an email
       password reset link opens `/reset-password` and sets the password.
-- [ ] **Address suggestions:** type an address in a new event form; the
+- [x] **Address suggestions:** type an address in a new event form; the
       suggestions come from Google, and the console shows no Maps errors
       (never verified with a valid key).
-- [ ] **A real photo upload:** as a creator (and, once its migration is
+- [x] **A real photo upload:** as a creator (and, once its migration is
       applied, a `profile` user), crop and save a bio photo; it shows on
       `/bio` and on an event tagging them.
-- [ ] **Translation:** switch to English; a newly saved event's title is in
+- [x] **Translation:** switch to English; a newly saved event's title is in
       English, and an event's details translate.
-- [ ] **Admin writes:** after the policy check, hide and un-hide another
+- [x] **Admin writes:** after the policy check, hide and un-hide another
       creator's event from `/manage-all-events`.
 - [ ] **Analytics:** PostHog shows page views from production, and Speed
       Insights reports the new deployment (neither runs on previews or
       `isInternal` devices).
-- [ ] **Bundle:** the deploy's `/` loads ~135 KB of gzip JS (DevTools →
+- [x] Measured on production 2026-10-31: 135 KB in 6 files. **Bundle:** the deploy's `/` loads ~135 KB of gzip JS (DevTools →
       Network, JS, first load with cache disabled).
 
-- [ ] **Remove the variables nothing reads any more** (Vercel, all
+- [x] Removed 2026-10-31; 11 remain, the ones in the table above. **Remove the variables nothing reads any more** (Vercel, all
       environments), once the new client is live: `VITE_WHATSAPP_NUMBER`,
       `VITE_GOOGLE_ANALYTICS_ID`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH` (three
       entries), `DOMAIN_URL` (two), `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
