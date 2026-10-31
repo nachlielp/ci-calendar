@@ -7,8 +7,9 @@
 // function names from dist/sw.js (and workbox's own error strings mention
 // `registerRoute` even when nothing calls it), plus what does survive in
 // the build (Supabase URLs, NetworkFirst's options). Prints the precache's
-// size. The telemetry SDKs' chunks (assets/telemetry/) must stay out of the
-// precache and be served immutable, and no source map may be left in dist/
+// size. The telemetry SDKs' chunks (assets/telemetry/) and the HEIC
+// converter's (assets/heic/) must stay out of the precache and be served
+// immutable, and no source map may be left in dist/
 // (they would be public). index.html's revision must cover vercel.json's
 // headers, which the precache stores it with.
 //
@@ -49,6 +50,9 @@ export function precacheProblems(urls, buildFiles) {
 /** Where the build puts the telemetry SDKs (`TELEMETRY_ASSETS`, swRules.ts). */
 export const TELEMETRY_DIR = "assets/telemetry"
 
+/** Where the build puts the HEIC converter (`HEIC_ASSETS`, swRules.ts). */
+export const HEIC_DIR = "assets/heic"
+
 /**
  * The `vercel.json` header rule source (path-to-regexp, only `(.*)` groups
  * used) as a regular expression.
@@ -59,14 +63,15 @@ function sourcePattern(source) {
 }
 
 /**
- * Problems with the telemetry chunks (`telemetryFiles`, relative to dist/):
- * there must be some (else the build stopped sorting them out), none may be
- * precached, and each must be served `immutable` by `vercelConfig`.
+ * Problems with chunks kept out of the precache (`files` in `dir`, relative
+ * to dist/; `what` names them): there must be some (else the build stopped
+ * sorting them out), none may be precached, and each must be served
+ * `immutable` by `vercelConfig`.
  */
-export function telemetryProblems(urls, telemetryFiles, vercelConfig) {
+function notPrecachedProblems(urls, files, vercelConfig, { dir, what }) {
     const problems = []
-    if (telemetryFiles.length === 0) {
-        problems.push(`no telemetry chunks in ${TELEMETRY_DIR}/`)
+    if (files.length === 0) {
+        problems.push(`no ${what} chunks in ${dir}/`)
     }
     const immutable = (vercelConfig.headers ?? []).filter((rule) =>
         rule.headers.some(
@@ -75,9 +80,9 @@ export function telemetryProblems(urls, telemetryFiles, vercelConfig) {
                 value.includes("immutable"),
         ),
     )
-    for (const file of telemetryFiles) {
+    for (const file of files) {
         if (urls.includes(file)) {
-            problems.push(`${file} is telemetry and must not be precached`)
+            problems.push(`${file} is ${what} and must not be precached`)
         }
         if (
             !immutable.some((rule) =>
@@ -88,6 +93,22 @@ export function telemetryProblems(urls, telemetryFiles, vercelConfig) {
         }
     }
     return problems
+}
+
+/** `notPrecachedProblems` for the telemetry SDKs' chunks. */
+export function telemetryProblems(urls, telemetryFiles, vercelConfig) {
+    return notPrecachedProblems(urls, telemetryFiles, vercelConfig, {
+        dir: TELEMETRY_DIR,
+        what: "telemetry",
+    })
+}
+
+/** `notPrecachedProblems` for the HEIC converter's chunks. */
+export function heicProblems(urls, heicFiles, vercelConfig) {
+    return notPrecachedProblems(urls, heicFiles, vercelConfig, {
+        dir: HEIC_DIR,
+        what: "HEIC",
+    })
 }
 
 /**
@@ -168,9 +189,12 @@ function main() {
     const buildFiles = readdirSync(join(dist, "assets"))
         .filter((file) => /\.(js|css)$/.test(file))
         .map((file) => `assets/${file}`)
-    const telemetryFiles = readdirSync(join(dist, TELEMETRY_DIR))
-        .filter((file) => file.endsWith(".js"))
-        .map((file) => `${TELEMETRY_DIR}/${file}`)
+    const jsIn = (dir) =>
+        readdirSync(join(dist, dir))
+            .filter((file) => file.endsWith(".js"))
+            .map((file) => `${dir}/${file}`)
+    const telemetryFiles = jsIn(TELEMETRY_DIR)
+    const heicFiles = jsIn(HEIC_DIR)
     const vercelConfig = JSON.parse(
         readFileSync(
             fileURLToPath(new URL("../vercel.json", import.meta.url)),
@@ -187,6 +211,7 @@ function main() {
     const problems = [
         ...precacheProblems(urls, buildFiles),
         ...telemetryProblems(urls, telemetryFiles, vercelConfig),
+        ...heicProblems(urls, heicFiles, vercelConfig),
         ...shellRevisionProblems(built, vercelConfig),
         ...sourceProblems(source),
         ...builtProblems(built),

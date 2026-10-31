@@ -107,5 +107,13 @@ export const PRECACHE_GLOBS = [
  */
 export const TELEMETRY_ASSETS = "assets/telemetry"
 
+/**
+ * Where the build puts the HEIC converter (heic-to, ~780 KB gzip;
+ * `vite.config.ts`), loaded only when a HEIC photo is picked on a browser
+ * that can't decode it (app/images/preparePhoto.ts). Never precached, so
+ * no device downloads it for a photo it never picks; hashed and immutable.
+ */
+export const HEIC_ASSETS = "assets/heic"
+
 /** Build output matched by `PRECACHE_GLOBS` that is still left out. */
-export const PRECACHE_IGNORES = [`${TELEMETRY_ASSETS}/**`]
+export const PRECACHE_IGNORES = [`${TELEMETRY_ASSETS}/**`, `${HEIC_ASSETS}/**`]

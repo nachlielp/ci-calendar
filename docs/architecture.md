@@ -236,8 +236,8 @@ the switch.
   DOM; the app's tsconfig excludes it). Its decisions are pure functions in
   `src/sw/swRules.ts`, tested directly. It may cache only the build output
   listed in `PRECACHE_GLOBS`: `index.html`, the hashed JS/CSS/font/images
-  under `assets/` (but not the telemetry SDKs in `assets/telemetry/`,
-  `PRECACHE_IGNORES`), the loader logo, the manifest and its icons, in one
+  under `assets/` (but not the telemetry SDKs in `assets/telemetry/` or
+  the HEIC converter in `assets/heic/`, `PRECACHE_IGNORES`), the loader logo, the manifest and its icons, in one
   precache (`ci-calendar-precache-v2-<scope>`) revisioned per file by
   workbox, so a deploy downloads only what changed. It has **no runtime
   caching**: Supabase API, auth, functions and storage requests (and
@@ -908,6 +908,17 @@ userId, bio | null, { refresh })` (`events/eventCache.ts`; `null`
       within legacy's 30 KB (`MAX_FILE_SIZE`), the quality stepping from
       0.8 down by 0.1 to 0.1 as legacy's did (at 600px a photo fits at a
       higher quality than legacy's 800px).
+      **HEIC/HEIF** (iPhones' default) is accepted (`PHOTO_ACCEPT`,
+      `image/*,.heic,.heif`, as Windows doesn't count `.heic` as an image)
+      and goes through `services.images.preparePhoto(file)` first
+      (`app/images/preparePhoto.ts`): a file `isHeic` (`lib/heic.ts`, pure:
+      type, name or the `ftyp` box's HEVC brands) that `createImageBitmap`
+      can't decode (every browser but Safari) is converted to JPEG (0.92)
+      by `heic-to/csp` (libheif in JS: no eval or wasm, a `blob:` worker),
+      imported only then, ~810 KB gzip in its own chunk under `assets/heic/`
+      (`HEIC_ASSETS`, never precached; `check:sw` checks). The cropper shows,
+      and `renderPhoto` draws, the prepared Blob; other files pass as they
+      are. A 12 MP HEIC takes under a second on a desktop.
       The Blob waits in the form's state (a reload is blocked meanwhile)
       and is uploaded on save with the user's token to legacy's bucket
       (`VITE_SUPABASE_STORAGE_BUCKET`) and path scheme
@@ -1377,20 +1388,20 @@ strict-origin-when-cross-origin` and a Permissions-Policy that denies
   the style), the JSON-LD block is data and needs none. What it allows,
   and why:
 
-    | Directive     | Source (beyond `'self'`)                                 | For                                                       |
-    | ------------- | -------------------------------------------------------- | --------------------------------------------------------- |
-    | `script-src`  | `https://www.googletagmanager.com`                       | gtag.js (index.html, production only)                     |
-    |               | `https://maps.googleapis.com`                            | Maps JS API + Places modules and their JSONP calls        |
-    |               | `https://us-assets.i.posthog.com`                        | PostHog's remote config (and recorder/surveys if enabled) |
-    | `connect-src` | `<VITE_SUPABASE_URL>`                                    | REST, auth, functions, storage uploads                    |
-    |               | `<VITE_SENTRY_DSN host>`                                 | Sentry errors, spans, replays                             |
-    |               | `https://us.i.posthog.com`, `https://us-assets…`         | PostHog events, flags, config fallback                    |
-    |               | GA: `www.googletagmanager.com`, `*.google-analytics.com` | GA4 hits (`analytics.google.com` is under `*.google.com`) |
-    |               | `*.google.com`, `*.g.doubleclick.net`                    | GA4 with Google Signals (`stats.g.doubleclick.net`)       |
-    |               | `https://maps.googleapis.com`                            | the Maps loader's `gen_204` pings                         |
-    | `img-src`     | `<VITE_SUPABASE_URL>`, `blob:`                           | bio photos (storage public URLs); cropper previews        |
-    |               | GA's `img-src` list + `*.google.co.il`                   | GA4 Signals pixels (`www.google.co.il/ads/ga-audiences`)  |
-    | `worker-src`  | `blob:`                                                  | Sentry replay's compression worker (`/sw.js` is `'self'`) |
+    | Directive     | Source (beyond `'self'`)                                 | For                                                                          |
+    | ------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------- |
+    | `script-src`  | `https://www.googletagmanager.com`                       | gtag.js (index.html, production only)                                        |
+    |               | `https://maps.googleapis.com`                            | Maps JS API + Places modules and their JSONP calls                           |
+    |               | `https://us-assets.i.posthog.com`                        | PostHog's remote config (and recorder/surveys if enabled)                    |
+    | `connect-src` | `<VITE_SUPABASE_URL>`                                    | REST, auth, functions, storage uploads                                       |
+    |               | `<VITE_SENTRY_DSN host>`                                 | Sentry errors, spans, replays                                                |
+    |               | `https://us.i.posthog.com`, `https://us-assets…`         | PostHog events, flags, config fallback                                       |
+    |               | GA: `www.googletagmanager.com`, `*.google-analytics.com` | GA4 hits (`analytics.google.com` is under `*.google.com`)                    |
+    |               | `*.google.com`, `*.g.doubleclick.net`                    | GA4 with Google Signals (`stats.g.doubleclick.net`)                          |
+    |               | `https://maps.googleapis.com`                            | the Maps loader's `gen_204` pings                                            |
+    | `img-src`     | `<VITE_SUPABASE_URL>`, `blob:`                           | bio photos (storage public URLs); cropper previews                           |
+    |               | GA's `img-src` list + `*.google.co.il`                   | GA4 Signals pixels (`www.google.co.il/ads/ga-audiences`)                     |
+    | `worker-src`  | `blob:`                                                  | Sentry replay's compression worker, heic-to's decoder (`/sw.js` is `'self'`) |
 
     `font-src`, `manifest-src` and `style-src` are `'self'` only, plus the
     loader's hash in `style-src` (fonts are self-hosted; React `style` props are set through the CSSOM, which

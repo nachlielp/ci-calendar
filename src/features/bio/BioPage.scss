@@ -207,6 +207,17 @@
         background: #f0f0f0;
     }
 
+    // While a HEIC is converted (a few seconds on a phone).
+    .photo-crop-status {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        color: #666;
+    }
+
     .photo-crop-zoom {
         display: flex;
         flex-direction: column;

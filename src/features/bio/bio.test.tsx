@@ -95,10 +95,8 @@ async function openEditor() {
     return screen.findByRole("button", { name: "שמירת שינויים" })
 }
 
-async function pickPhoto(name = "me.png") {
-    const file = new File([new Uint8Array(2_000_000)], name, {
-        type: "image/png",
-    })
+async function pickPhoto(name = "me.png", type = "image/png") {
+    const file = new File([new Uint8Array(2_000_000)], name, { type })
     await userEvent.upload(screen.getByLabelText("העלאת תמונה"), file)
     return file
 }
@@ -607,6 +605,56 @@ describe("bio editor (/bio)", () => {
             expect([...fake.files.objects.keys()]).toEqual([
                 `${user.id}/${NOW.getTime()}.jpg`,
             ])
+        })
+
+        it("takes a HEIC (no type, as Chrome gives one): crops and uploads it as prepared", async () => {
+            const { user, fake } = setup()
+            const jpeg = new Blob([new Uint8Array(900_000)], {
+                type: "image/jpeg",
+            })
+            fake.images.convert = () => jpeg
+            renderApp({ fake, signedInAs: user, path: "/bio", now: NOW })
+            await openEditor()
+            expect(screen.getByLabelText("העלאת תמונה")).toHaveAttribute(
+                "accept",
+                "image/*,.heic,.heif",
+            )
+            const file = await pickPhoto("IMG_0001.HEIC", "")
+            await screen.findByTestId("cropper")
+            expect(fake.images.prepared).toEqual([{ file, output: jpeg }])
+
+            await userEvent.click(
+                await screen.findByRole("button", { name: "שמירה" }),
+            )
+            await waitFor(() => expect(fake.images.renders).toHaveLength(1))
+            expect(fake.images.renders[0].image).toBe(jpeg)
+            await userEvent.click(
+                screen.getByRole("button", { name: "שמירת שינויים" }),
+            )
+            await screen.findByRole("heading", { name: "דנה" })
+            expect(fake.files.uploads).toEqual([
+                expect.objectContaining({
+                    file: fake.images.renders[0].output,
+                    contentType: "image/jpg",
+                }),
+            ])
+            expect(liveObjectUrls.size).toBe(0)
+        })
+
+        it("says so when the photo can't be opened, and can't save it", async () => {
+            const { user, fake } = setup()
+            fake.images.failPrepare()
+            renderApp({ fake, signedInAs: user, path: "/bio", now: NOW })
+            await openEditor()
+            await pickPhoto("IMG_0001.heic", "image/heic")
+            expect(
+                await screen.findByText(
+                    "לא הצלחנו לפתוח את התמונה, נסו תמונה אחרת",
+                ),
+            ).toBeInTheDocument()
+            expect(screen.queryByTestId("cropper")).not.toBeInTheDocument()
+            expect(screen.getByRole("button", { name: "שמירה" })).toBeDisabled()
+            expect(fake.images.renders).toHaveLength(0)
         })
 
         it("cancelling the crop keeps the saved photo and lets the image go", async () => {
