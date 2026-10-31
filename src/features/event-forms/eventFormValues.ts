@@ -1,4 +1,5 @@
 import type { Database } from "../../data/database.types"
+import { MULTI_DAY_TYPES } from "../../lib/eventOptions"
 import type { FormErrors } from "../../lib/form"
 import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
 import { jerusalemInstant } from "../../lib/jerusalemInstant"
@@ -160,6 +161,71 @@ export function emptyMultiDay(hidden = false): MultiDayValues {
         endDate: "",
         type: "",
         teachers: [],
+        sourceTemplateId: "",
+    }
+}
+
+/** What only a multi-day event (or template) has. */
+export interface MultiDayPart {
+    type: string
+    teachers: Tag[]
+}
+
+/**
+ * A single-day form's segments as a multi-day one's type and teachers,
+ * when the user turns a new event (or template) into a multi-day one: the
+ * first segment's type if a multi-day event can have it, and every
+ * segment's teachers, each once.
+ */
+export function multiDayPartOf(segments: SegmentValues[]): MultiDayPart {
+    const type = segments[0]?.type ?? ""
+    const teachers = new Map<string, Tag>()
+    for (const segment of segments) {
+        for (const teacher of segment.teachers) {
+            teachers.set(teacher.value || teacher.label, teacher)
+        }
+    }
+    return {
+        type: (MULTI_DAY_TYPES as readonly string[]).includes(type) ? type : "",
+        teachers: [...teachers.values()],
+    }
+}
+
+/**
+ * A multi-day form's type and teachers as a single-day one's segments:
+ * one segment open to everyone, of that type, with those teachers.
+ */
+export const segmentsOf = ({ type, teachers }: MultiDayPart) => [
+    { ...emptySegment(DEFAULT_TAGS), type, teachers },
+]
+
+/**
+ * A new single-day event's values as a multi-day one's, when the user
+ * switches the form: the shared fields stay, the day becomes the first
+ * day, and the segments become a type and teachers (`multiDayPartOf`).
+ * The recurrence is dropped (multi-day events don't repeat), and so is
+ * the template, which was a single-day one.
+ */
+export function singleToMultiDay(values: SingleDayValues): MultiDayValues {
+    const { date, segments, recurrence, sourceTemplateId, ...base } = values
+    return {
+        ...base,
+        ...multiDayPartOf(segments),
+        startDate: date,
+        endDate: "",
+        sourceTemplateId: "",
+    }
+}
+
+/** The other way (`singleToMultiDay`): the first day becomes the day. */
+export function multiToSingleDay(values: MultiDayValues): SingleDayValues {
+    const { startDate, endDate, type, teachers, sourceTemplateId, ...base } =
+        values
+    return {
+        ...base,
+        date: startDate,
+        segments: segmentsOf({ type, teachers }),
+        recurrence: NO_RECURRENCE,
         sourceTemplateId: "",
     }
 }

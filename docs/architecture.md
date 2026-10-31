@@ -737,12 +737,23 @@ until }`, off for every saved event, so it's in drafts too) is
       form"). A new event's draft survives leaving the page (legacy's); an
       edit's is dropped by the page's back button but survives a reload.
       A `null` key keeps none (template edits, as legacy).
-    - **Pages**: `/create-events` (legacy's chooser: new template or
-      event, single-day or multi-day; the missing-bio and no-templates
-      warnings; the templates list), `/create-events/single-day`
-      and `/create-events/multi-day` (legacy's info notice; with
-      `?isTemplate=true`, legacy's link, a new template's form; both back to
-      `/create-events` after a save, as legacy), and
+    - **Pages**: `/create-events` (new event or new template; legacy
+      offered four links, single-day and multi-day of each; the
+      missing-bio and no-templates warnings; the templates list),
+      `/create-events/single-day` and `/create-events/multi-day`
+      (`NewEventPage`: one new-event form, single-day by default, whose
+      "multi-day event" switch (`MultiDaySwitch`) swaps the form and moves
+      to the other path with `replace`, so a reload keeps the kind and its
+      draft. What was filled in carries over (`singleToMultiDay` /
+      `multiToSingleDay` and their template twins, pure, in the values
+      modules: the shared fields, the day as the first day, the segments'
+      teachers and a multi-day type as the event's, and back as one
+      segment); the left form's draft is discarded and the new form
+      restores the carried values over its own draft (`useCarried`).
+      Multi-day shows legacy's info notice. With `?isTemplate=true`,
+      legacy's link, the same for a new template. Both go back to
+      `/create-events` after a save, as legacy. Saved events keep their
+      kind: the edit pages have no switch), and
       `/manage-events/edit-single-day/:eventId` and
       `/manage-events/edit-multi-day/:eventId` (`eventToEditQuery`,
       `event-forms/eventToEdit.ts`, personal, keyed on the viewer: the
@@ -813,7 +824,8 @@ event.ownerId)`, the user's own for everyone else, since that is all
           (`ActionDialog`, legacy's warning text).
         - **Starting an event from one**: the new-event forms' top row has
           `TemplatePicker` (legacy's "בחירת תבנית": the user's templates of
-          that kind) beside "clear form". Picking one replaces the form's
+          both kinds, where legacy offered only the form's; one of the
+          other kind switches the form to it first) beside "clear form". Picking one replaces the form's
           values with the template's (`withSingleDayTemplate` /
           `withMultiDayTemplate`; the day(s), recurrence and hide stay:
           legacy's single-day mapping set an `event-dates` value from the
@@ -1787,7 +1799,9 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     and series-scoped writes, responses into the cache. The event actions'
     confirm dialog moved to `features/events/ActionDialog.tsx` for reuse.
 16. Templates: `/create-events` lists the user's templates (read when it
-    opens, newest first) with legacy's four choices, the no-templates
+    opens, newest first) with the new-event and new-template choices
+    (legacy's four, merged on 2026-10-31: one form switched between
+    single-day and multi-day), the no-templates
     warning, edit (the template's form in a drawer or modal) and delete
     (legacy's confirm); `?isTemplate=true` on the new-event pages saves a
     single-day or multi-day template (name, the event's fields without

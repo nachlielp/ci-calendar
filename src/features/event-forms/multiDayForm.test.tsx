@@ -11,7 +11,11 @@ import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, type TestUser } from "../../test/testUsers"
 import { bio, event, eventCard, eventTitles } from "../../test/testEvents"
-import { MULTI_DAY_DRAFT_KEY, MULTI_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
+import {
+    MULTI_DAY_DRAFT_KEY,
+    MULTI_DAY_EDIT_DRAFT_KEY,
+    SINGLE_DAY_DRAFT_KEY,
+} from "./draftKeys"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 
@@ -124,11 +128,14 @@ describe("the multi-day event form", () => {
         }
     })
 
-    it("opens from /create-events with legacy's notice", async () => {
+    it("opens from /create-events by switching a new event, with legacy's notice", async () => {
         const { user, fake } = setup("org")
         const { router } = render(user, fake, "/create-events")
         await userEvent.click(
-            await screen.findByRole("link", { name: "אירוע רב יומי" }),
+            await screen.findByRole("link", { name: "אירוע חדש" }),
+        )
+        await userEvent.click(
+            await screen.findByRole("switch", { name: "אירוע רב יומי" }),
         )
 
         expect(router.state.location.pathname).toBe(NEW_PATH)
@@ -140,6 +147,104 @@ describe("the multi-day event form", () => {
         expect(
             screen.getByRole("heading", { name: "יצירת אירוע - רב יומי" }),
         ).toBeInTheDocument()
+    })
+
+    it("is a new single-day event switched over, keeping what was filled in both ways", async () => {
+        const { user, fake } = setup()
+        const storage = createMemoryStorage()
+        const { router } = render(
+            user,
+            fake,
+            "/create-events/single-day",
+            storage,
+        )
+        await userEvent.type(
+            await screen.findByRole("textbox", { name: "*כותרת האירוע" }),
+            "סדנת חורף",
+        )
+        await userEvent.selectOptions(select("אזור"), "south")
+        await pickAddress()
+        setDay("תאריך", "2026-11-19")
+        await userEvent.selectOptions(select("סוג האירוע"), "workshop")
+        expect(storage.getItem(SINGLE_DAY_DRAFT_KEY)).not.toBeNull()
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+
+        expect(router.state.location.pathname).toBe(NEW_PATH)
+        expect(
+            await screen.findByRole("heading", {
+                name: "יצירת אירוע - רב יומי",
+            }),
+        ).toBeInTheDocument()
+        expect(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        ).toBeChecked()
+        expect(field("*כותרת האירוע")).toHaveValue("סדנת חורף")
+        expect(select("אזור")).toHaveValue("south")
+        expect(screen.getByLabelText("תאריך התחלה")).toHaveValue("2026-11-19")
+        expect(screen.getByLabelText("תאריך סיום")).toHaveValue("")
+        expect(select("סוג האירוע")).toHaveValue("workshop")
+        // The values moved to this form's draft.
+        expect(storage.getItem(SINGLE_DAY_DRAFT_KEY)).toBeNull()
+        expect(storage.getItem(MULTI_DAY_DRAFT_KEY)).toContain("סדנת חורף")
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+        expect(router.state.location.pathname).toBe("/create-events/single-day")
+        expect(
+            await screen.findByRole("textbox", { name: "*כותרת האירוע" }),
+        ).toHaveValue("סדנת חורף")
+        expect(screen.getByLabelText("תאריך")).toHaveValue("2026-11-19")
+        expect(select("סוג האירוע")).toHaveValue("workshop")
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+        setDay("תאריך סיום", "2026-11-21")
+        await submit()
+
+        await waitFor(() =>
+            expect(router.state.location.pathname).toBe("/create-events"),
+        )
+        const [insert] = inserts(fake)
+        expect(insert.body).toMatchObject({
+            title: "סדנת חורף",
+            is_multi_day: true,
+            type: "workshop",
+            start_date: "2026-11-19",
+            end_date: "2026-11-21",
+        })
+    })
+
+    it("stays multi-day across a reload, and clears to an empty multi-day form", async () => {
+        const { user, fake } = setup()
+        const storage = createMemoryStorage()
+        const first = render(user, fake, "/create-events/single-day", storage)
+        await userEvent.type(
+            await screen.findByRole("textbox", { name: "*כותרת האירוע" }),
+            "ריטריט",
+        )
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+        await screen.findByLabelText("תאריך התחלה")
+        const path = first.router.state.location.pathname
+        first.unmount()
+
+        render(user, fake, path, storage)
+        expect(
+            await screen.findByRole("textbox", { name: "*כותרת האירוע" }),
+        ).toHaveValue("ריטריט")
+        await userEvent.click(
+            screen.getByRole("button", { name: "ניקוי טופס" }),
+        )
+        expect(
+            await screen.findByRole("textbox", { name: "*כותרת האירוע" }),
+        ).toHaveValue("")
+        expect(screen.getByLabelText("תאריך התחלה")).toBeInTheDocument()
     })
 
     it("creates an event shown on every day it spans and in my events at once, with no list refetch", async () => {
@@ -538,6 +643,10 @@ describe("editing a multi-day event", () => {
         expect(screen.getByText("נועה המורה")).toBeInTheDocument()
         expect(
             screen.queryByRole("button", { name: "ניקוי טופס" }),
+        ).not.toBeInTheDocument()
+        // A saved event keeps its kind.
+        expect(
+            screen.queryByRole("switch", { name: "אירוע רב יומי" }),
         ).not.toBeInTheDocument()
     })
 

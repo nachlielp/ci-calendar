@@ -7,7 +7,8 @@ import type { Template } from "./templateValues"
 
 /**
  * Legacy's "בחירת תבנית" at the top of the new-event forms: the user's
- * templates of the form's kind (read as the form opens), by name. Picking
+ * templates (read as the form opens), by name: all of them, or only those
+ * of `multiDay`'s kind. Picking
  * one fills the form (`onPick`); picking none again forgets which template
  * the event came from (`onClear`) and leaves the form as it is, as legacy's
  * clear did. A template no longer among the user's (deleted since a draft
@@ -22,7 +23,8 @@ export function TemplatePicker({
     onClear,
 }: {
     userId: string
-    multiDay: boolean
+    /** Only single-day (`false`) or multi-day (`true`) templates. */
+    multiDay?: boolean
     /** The chosen template's id (`""`: none). */
     value: string
     onPick: (template: Template) => void
@@ -36,7 +38,7 @@ export function TemplatePicker({
             onClear()
     }, [known, value, onClear])
     const offered = (templates.data ?? []).filter(
-        (template) => template.multiDay === multiDay,
+        (template) => multiDay === undefined || template.multiDay === multiDay,
     )
     return (
         <SelectField

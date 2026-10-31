@@ -986,16 +986,16 @@ describe("editing a single-day event", () => {
 })
 
 describe("/create-events", () => {
-    it("offers the single-day and multi-day forms", async () => {
+    it("offers a new event and a new template, both single-day at first", async () => {
         const { user, fake } = setup()
         render(user, fake, "/create-events")
 
         expect(
-            await screen.findByRole("link", { name: "אירוע חד יומי" }),
+            await screen.findByRole("link", { name: "אירוע חדש" }),
         ).toHaveAttribute("href", "/create-events/single-day")
         expect(
-            screen.getByRole("link", { name: "אירוע רב יומי" }),
-        ).toHaveAttribute("href", "/create-events/multi-day")
+            screen.getByRole("link", { name: "תבנית חדשה" }),
+        ).toHaveAttribute("href", "/create-events/single-day?isTemplate=true")
     })
 
     it("tells a user without a bio to make one before tagging themselves", async () => {
@@ -1014,7 +1014,7 @@ describe("/create-events", () => {
             bio({ user_id: user.id, bio_name: "אני", allow_tagging: false }),
         )
         render(user, fake, "/create-events")
-        await screen.findByRole("link", { name: "אירוע חד יומי" })
+        await screen.findByRole("link", { name: "אירוע חדש" })
         await waitFor(() =>
             expect(
                 fake.requests.some((request) => request.table === "public_bio"),

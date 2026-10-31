@@ -9,9 +9,11 @@ import {
     multiDayTemplateColumns,
     multiDayTemplatePatch,
     multiDayTemplateValuesOf,
+    multiToSingleDayTemplate,
     singleDayTemplateColumns,
     singleDayTemplatePatch,
     singleDayTemplateValuesOf,
+    singleToMultiDayTemplate,
     toTemplate,
     validateMultiDayTemplate,
     validateSingleDayTemplate,
@@ -302,5 +304,32 @@ describe("starting an event from a template", () => {
             sourceTemplateId: "t2",
         })
         expect(after).not.toHaveProperty("segments")
+    })
+})
+
+describe("switching a new template between single-day and multi-day", () => {
+    it("keeps the name and the shared fields both ways", () => {
+        const single = {
+            ...emptySingleDayTemplate(),
+            name: "סדנת קיץ",
+            title: "סדנה",
+            district: "north",
+        }
+        single.segments = [{ ...single.segments[0], type: "workshop" }]
+
+        const multi = singleToMultiDayTemplate(single)
+        expect(multi).toMatchObject({
+            name: "סדנת קיץ",
+            title: "סדנה",
+            district: "north",
+            type: "workshop",
+            teachers: [],
+        })
+        expect(isMultiDayTemplateValues(multi)).toBe(true)
+
+        const back = multiToSingleDayTemplate(multi)
+        expect(back).toMatchObject({ name: "סדנת קיץ", title: "סדנה" })
+        expect(back.segments[0].type).toBe("workshop")
+        expect(isSingleDayTemplateValues(back)).toBe(true)
     })
 })

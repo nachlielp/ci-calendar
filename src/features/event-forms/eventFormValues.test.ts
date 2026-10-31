@@ -9,11 +9,13 @@ import {
     multiDayColumns,
     multiDayPatch,
     multiDayValuesOf,
+    multiToSingleDay,
     newSingleDayColumns,
     seriesPatch,
     singleDayColumns,
     singleDayPatch,
     singleDayValuesOf,
+    singleToMultiDay,
     taggedUserIds,
     validateMultiDay,
     validateSingleDay,
@@ -518,5 +520,85 @@ describe("recurring single-day events", () => {
             false,
         )
         expect(isSingleDayValues(weekly("2026-11-06"))).toBe(true)
+    })
+})
+
+describe("switching a new event between single-day and multi-day", () => {
+    const teacher = { label: "נועה", value: TEACHER_ID }
+    const typed = { label: "אורח", value: "" }
+
+    it("keeps the shared fields and the day, and turns segments into a type and teachers", () => {
+        const values = filled({
+            hidden: true,
+            sourceTemplateId: "t1",
+            recurrence: { on: true, frequency: "weekly", until: "2026-12-01" },
+            segments: [
+                {
+                    type: "workshop",
+                    start: "10:00",
+                    end: "12:00",
+                    teachers: [teacher],
+                    tags: ["everyone"],
+                },
+                {
+                    type: "jam",
+                    start: "12:00",
+                    end: "14:00",
+                    teachers: [teacher, typed],
+                    tags: [],
+                },
+            ],
+        })
+
+        expect(singleToMultiDay(values)).toEqual({
+            title: values.title,
+            description: values.description,
+            district: values.district,
+            address: values.address,
+            organisations: values.organisations,
+            links: values.links,
+            prices: values.prices,
+            hidden: true,
+            startDate: "2026-11-06",
+            endDate: "",
+            type: "workshop",
+            teachers: [teacher, typed],
+            sourceTemplateId: "",
+        })
+    })
+
+    it("drops a segment type a multi-day event can't have", () => {
+        expect(singleToMultiDay(filled()).type).toBe("")
+    })
+
+    it("turns back into one segment open to everyone, on the first day", () => {
+        const multi = singleToMultiDay(
+            filled({
+                segments: [
+                    {
+                        type: "retreat",
+                        start: "10:00",
+                        end: "12:00",
+                        teachers: [teacher],
+                        tags: [],
+                    },
+                ],
+            }),
+        )
+        const single = multiToSingleDay({ ...multi, endDate: "2026-11-08" })
+
+        expect(single.date).toBe("2026-11-06")
+        expect(single.segments).toEqual([
+            {
+                type: "retreat",
+                start: "",
+                end: "",
+                teachers: [teacher],
+                tags: ["everyone"],
+            },
+        ])
+        expect(single.recurrence.on).toBe(false)
+        expect(isSingleDayValues(single)).toBe(true)
+        expect(isMultiDayValues(multi)).toBe(true)
     })
 })

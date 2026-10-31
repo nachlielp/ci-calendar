@@ -19,6 +19,7 @@ import {
     ClearFormButton,
     EventFormFooter,
     MoreSegments,
+    MultiDaySwitch,
     SegmentFields,
     type FormControls,
 } from "./EventFormParts"
@@ -31,8 +32,10 @@ import {
     seriesPatch,
     singleDayPatch,
     singleDayValuesOf,
+    singleToMultiDay,
     validateSingleDay,
     type EventBaseValues,
+    type MultiDayValues,
     type SegmentValues,
     type SingleDayValues,
 } from "./eventFormValues"
@@ -41,7 +44,8 @@ import { RecurringEventSection } from "./RecurringEventSection"
 import { SeriesEditDialog } from "./SeriesEditDialog"
 import { useTaggable, type Taggable } from "./taggableBios"
 import { TemplatePicker } from "./TemplatePicker"
-import { withSingleDayTemplate } from "./templateValues"
+import { withMultiDayTemplate, withSingleDayTemplate } from "./templateValues"
+import { useCarried } from "./useCarried"
 import { useEventSubmit } from "./useEventSubmit"
 
 const COPY = defineCopy({
@@ -81,7 +85,9 @@ const TAG_FIELDS = ["segments", "organisations"] as const
  * and whether it is hidden; a new event may recur (a row per day of the
  * series), and an edit of a recurring event asks which later events of
  * its series change too. A new event can start from one of the user's
- * single-day templates (legacy's "בחירת תבנית"). Unsaved values are kept
+ * templates (legacy's "בחירת תבנית"), and can be switched to a multi-day
+ * event (`onSwitchKind`, given the values to carry over; so does picking a
+ * multi-day template). Unsaved values are kept
  * on the device and restored when the form opens again. A save translates
  * the title and looks up the English address (never blocking), stores the
  * event and puts it in every cached list; then `onDone`.
@@ -91,12 +97,18 @@ export function SingleDayEventForm({
     event,
     onDone,
     onClear,
+    carried,
+    onSwitchKind,
 }: {
     userId: string
     event?: ManagedEvent
     onDone: () => void
     /** Clears a new event's form (it remounts empty). */
     onClear?: () => void
+    /** What a new event's form had before the user switched it to this. */
+    carried?: SingleDayValues
+    /** Switches a new event's form to a multi-day one with these values. */
+    onSwitchKind?: (values: MultiDayValues) => void
 }) {
     const copy = useCopy(EVENT_FORM_COPY)
     const own = useCopy(COPY)
@@ -124,6 +136,7 @@ export function SingleDayEventForm({
         form,
         isValues: isSingleDayValues,
     })
+    useCarried(form.restore, carried)
     const taggable = useTaggable(userId)
     const services = useServices()
     const refKey = event?.recurringRefKey ?? ""
@@ -153,6 +166,10 @@ export function SingleDayEventForm({
 
     const { values, errors, set, touch } = form
     const errorAt = useErrorText(errors)
+    const switchTo = (multiDay: MultiDayValues) => {
+        discardDraft()
+        onSwitchKind?.(multiDay)
+    }
     return (
         <div className="event-form">
             <form onSubmit={onSubmit} noValidate>
@@ -165,16 +182,32 @@ export function SingleDayEventForm({
                     >
                         <TemplatePicker
                             userId={userId}
-                            multiDay={false}
+                            multiDay={onSwitchKind ? undefined : false}
                             value={values.sourceTemplateId}
                             onPick={(template) =>
-                                form.restore(
-                                    withSingleDayTemplate(values, template),
-                                )
+                                template.multiDay
+                                    ? switchTo(
+                                          withMultiDayTemplate(
+                                              singleToMultiDay(values),
+                                              template,
+                                          ),
+                                      )
+                                    : form.restore(
+                                          withSingleDayTemplate(
+                                              values,
+                                              template,
+                                          ),
+                                      )
                             }
                             onClear={() => set("sourceTemplateId", "")}
                         />
                     </ClearFormButton>
+                )}
+                {onSwitchKind && (
+                    <MultiDaySwitch
+                        checked={false}
+                        onSwitch={() => switchTo(singleToMultiDay(values))}
+                    />
                 )}
                 <SingleDayFields
                     form={form}
