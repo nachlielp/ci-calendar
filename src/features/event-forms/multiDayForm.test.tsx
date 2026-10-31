@@ -644,10 +644,128 @@ describe("editing a multi-day event", () => {
         expect(
             screen.queryByRole("button", { name: "ניקוי טופס" }),
         ).not.toBeInTheDocument()
-        // A saved event keeps its kind.
+        // It can be switched to a single-day event.
         expect(
-            screen.queryByRole("switch", { name: "אירוע רב יומי" }),
-        ).not.toBeInTheDocument()
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        ).toBeChecked()
+    })
+
+    it("switches a saved single-day event to multi-day, saving it as one", async () => {
+        const { user, fake, single } = seeded()
+        const { router } = render(
+            user,
+            fake,
+            `/manage-events/edit-single-day/${single.id}`,
+        )
+        await screen.findByRole("textbox", { name: "*כותרת האירוע" })
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+
+        expect(router.state.location.pathname).toBe(editPath(single.id))
+        expect(router.state.location.state).toMatchObject({ switched: true })
+        expect(
+            await screen.findByRole("heading", {
+                name: "עדכון אירוע - רב יומי",
+            }),
+        ).toBeInTheDocument()
+        expect(field("*כותרת האירוע")).toHaveValue("שיעור שלי")
+        expect(screen.getByLabelText("תאריך התחלה")).toHaveValue("2026-11-01")
+        setDay("תאריך סיום", "2026-11-03")
+        await userEvent.selectOptions(select("סוג האירוע"), "retreat")
+        await userEvent.click(updateButton())
+
+        await waitFor(() =>
+            expect(router.state.location.pathname).toBe("/manage-events"),
+        )
+        const [write] = fake.requests.filter(
+            (request) =>
+                request.method === "update" && request.table === "ci_events",
+        )
+        expect(write.filters).toEqual([
+            { op: "eq", column: "id", value: single.id },
+            { op: "eq", column: "user_id", value: user.id },
+        ])
+        expect(write.body).toEqual({
+            start_date: "2026-11-01",
+            end_date: "2026-11-03",
+            segments: [],
+            type: "retreat",
+            is_multi_day: true,
+            multi_day_teachers: [],
+            updated_at: NOW.toISOString(),
+        })
+        // The title didn't change: no translation.
+        expect(fake.functions.calls).toEqual([])
+        expect(
+            fake.rows("ci_events").find((row) => row.id === single.id),
+        ).toMatchObject({ is_multi_day: true, title: "שיעור שלי" })
+    })
+
+    it("switches a saved multi-day event to single-day, saving it as one", async () => {
+        const { user, fake, mine } = seeded()
+        const { router } = render(user, fake, editPath(mine.id))
+        await screen.findByRole("textbox", { name: "*כותרת האירוע" })
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+
+        expect(router.state.location.pathname).toBe(
+            `/manage-events/edit-single-day/${mine.id}`,
+        )
+        expect(
+            await screen.findByRole("heading", {
+                name: "עדכון אירוע - חד יומי",
+            }),
+        ).toBeInTheDocument()
+        expect(screen.getByLabelText("תאריך")).toHaveValue("2026-11-12")
+        expect(select("סוג האירוע")).toHaveValue("workshop")
+        expect(screen.getByText("נועה המורה")).toBeInTheDocument()
+        fireEvent.change(screen.getByLabelText("שעת התחלה"), {
+            target: { value: "10:00" },
+        })
+        fireEvent.change(screen.getByLabelText("שעת סיום"), {
+            target: { value: "13:00" },
+        })
+        await userEvent.click(updateButton())
+
+        await waitFor(() =>
+            expect(router.state.location.pathname).toBe("/manage-events"),
+        )
+        const [write] = fake.requests.filter(
+            (request) =>
+                request.method === "update" && request.table === "ci_events",
+        )
+        expect(write.body).toMatchObject({
+            start_date: "2026-11-12",
+            end_date: "2026-11-12",
+            type: "",
+            is_multi_day: false,
+            multi_day_teachers: [],
+            segments: [
+                {
+                    type: "workshop",
+                    // 10:00 and 13:00 in Jerusalem (UTC+2 in November).
+                    startTime: "2026-11-12T08:00:00.000Z",
+                    endTime: "2026-11-12T11:00:00.000Z",
+                    teachers: [{ label: "נועה המורה", value: TEACHER.user_id }],
+                },
+            ],
+        })
+        expect(write.body).not.toHaveProperty("title")
+    })
+
+    it("still sends a wrong-kind link to the event's own form", async () => {
+        const { user, fake, single } = seeded()
+        const { router } = render(user, fake, editPath(single.id))
+
+        await waitFor(() =>
+            expect(router.state.location.pathname).toBe(
+                `/manage-events/edit-single-day/${single.id}`,
+            ),
+        )
     })
 
     it("updates only the changed columns of that one event of the user's", async () => {

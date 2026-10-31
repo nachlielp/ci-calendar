@@ -19,7 +19,7 @@ the switch.
 | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `src/app/`                    | Bootstrap, services (the seam), routes, shell layout, shared hooks, the cache engine (`cachedQueries.ts`) |
 | `src/app/auth`                | Session at boot, profile row, sign-out cleanup, role guard, `sessionOf`/`useUserId`                       |
-| `src/app/header`              | App header, menu (items keyed by role), WhatsApp link                                                     |
+| `src/app/header`              | App header, menu (items keyed by role)                                                                    |
 | `src/app/install`             | Install banner, `beforeinstallprompt` capture, iOS steps                                                  |
 | `src/app/updates`             | Service worker registration, safe reloads, the reload guard                                               |
 | `src/app/telemetry`           | Crash reports, analytics, Speed Insights; their lazy SDKs                                                 |
@@ -311,6 +311,13 @@ the switch.
   them are backfilled by
   `supabase/migrations/20261030000000_backfill_event_teacher_junction.sql`
   (applied by hand).
+  A plain PostgREST select, not the database view or RPC the spec
+  suggested (maintainer: "whatever has better perf"; decided 2026-10-31):
+  a view runs the same SQL in the same one round trip (PostgREST inlines
+  it), so it is no faster, and it would need a production migration, its
+  own RLS care (`security_invoker`) and regenerated types. The columns are
+  already trimmed and RLS still applies. The speed-up still to come is
+  caching the window at the edge (spec #37), not the query's shape.
 - **Shared links.** `/event/:eventId` and the legacy `/:eventId` open the
   event over the calendar (`useLinkedEvent`): from the cached window when it
   has it, else with one request for that event alone, in parallel with the
@@ -752,14 +759,25 @@ until }`, off for every saved event, so it's in drafts too) is
       restores the carried values over its own draft (`useCarried`).
       Multi-day shows legacy's info notice. With `?isTemplate=true`,
       legacy's link, the same for a new template. Both go back to
-      `/create-events` after a save, as legacy. Saved events keep their
-      kind: the edit pages have no switch), and
+      `/create-events` after a save, as legacy. The switching itself is
+      `SwitchingForms`, shared with the edit pages), and
       `/manage-events/edit-single-day/:eventId` and
-      `/manage-events/edit-multi-day/:eventId` (`eventToEditQuery`,
-      `event-forms/eventToEdit.ts`, personal, keyed on the viewer: the
-      viewer's own event by id, at once from the cached upcoming list;
-      registered as an event list; an event of the other kind redirects to
-      its own form; back to `/manage-events`). **Admins edit anyone's
+      `/manage-events/edit-multi-day/:eventId` (`EditEventPage`;
+      `eventToEditQuery`, `event-forms/eventToEdit.ts`, personal, keyed on
+      the viewer: the viewer's own event by id, at once from the cached
+      upcoming list; registered as an event list; an event of the other
+      kind redirects to its own form; back to `/manage-events`). An event
+      that doesn't repeat (no `recurring_ref_key`) has the same switch
+      (maintainer decision 2026-10-31): it moves to the other edit path
+      with `replace` and `switched: true` in the history state (which
+      lets the form differ from the stored kind, and survives a reload,
+      with the new kind's draft). Saved, the event becomes the other kind:
+      the save sends the changed shared columns plus every column of the
+      new kind whole (`toMultiDayPatch` / `toSingleDayPatch`: days,
+      segments, type, `is_multi_day`, `multi_day_teachers`; the template
+      link stays), even with no field changed, and re-tags it
+      (`useEventSubmit`'s `kindChanged`). An event of a recurring series
+      stays single-day: it has no switch. **Admins edit anyone's
       event** there, as legacy's manage-all-events let them: for an admin
       viewer the page reads with scope `"any"` (no owner filter; the key
       carries the scope); edits are written only while the row still
@@ -771,7 +789,7 @@ event.ownerId)`, the user's own for everyone else, since that is all
       goes back there. Each page is a few lines
       over `NewEventFormPage` / `EditEventFormPage`
       (`EventFormPages.tsx`: header, back button, loading/not-found/error,
-      the draft key the back button drops). Layout in `FormPage.scss`.
+      the draft keys the back button drops). Layout in `FormPage.scss`.
     - **One chunk**: every event-form page is exported from
       `event-forms/pages.ts` and routed with `eventFormPage("Name")`
       (`app/routes.tsx`): one dynamic import in `/`'s route table for all
@@ -1204,7 +1222,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       to Hebrew. The switcher (`app/LanguageSwitcher.tsx`, the legacy flag
       menu) sits in the app header, as in legacy.
 - **Assets.** Images ported from the old client live in `src/assets/`
-  and are imported with `?no-inline` (e.g. the flags, the WhatsApp logo), so
+  and are imported with `?no-inline` (e.g. the flags, the Google logo), so
   they are hashed files fetched when shown, never base64 in the JS.
   Multi-colour logos are such images; single-colour icons are inline SVG
   components (`src/ui/icons/`). An image or gif below the fold gets
@@ -1255,9 +1273,9 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   its code from `/` (its copy is `/* @__PURE__ */`).
 - **Header and menu.** The header shows a home button (to signed-out
   visitors on routes with the `homeButton` handle, to signed-in users
-  anywhere but `/`), the language menu, the WhatsApp link
-  (`VITE_WHATSAPP_NUMBER`; hidden when unset), the out-of-date sign and the
-  menu button; signed out, the login link before them all, and signed in,
+  anywhere but `/`), the language menu, the out-of-date sign and the menu
+  button (no WhatsApp link: removed with the weekly summary, maintainer
+  decision 2026-10-31); signed out, the login link before them all, and signed in,
   the user's name before the menu button (rules under Auth and roles). The
   menu (a lazy `MenuDrawer`: a top drawer on phones, a side drawer from the
   start on wider screens) lists `menuFor(viewer)` from `MENU_ITEMS`
@@ -1576,7 +1594,7 @@ titles and cards), never in a feature folder.
   agent, a service worker with caches (`installServiceWorkerAndCaches`),
   and fires Chrome's install offer (`offerInstall`). `setup.ts` resets them
   after each test.
-  `vi.stubEnv` (e.g. `VITE_WHATSAPP_NUMBER`) lasts one test.
+  `vi.stubEnv` (e.g. `VITE_HIDE_EVENTS_FLAG`) lasts one test.
 - **Auth:** `fake.auth` (`src/test/fakeAuth.ts`) is the fake's Supabase
   auth: accounts (`fake.auth.accounts`), a session with tokens
   (`token-<user id>-<n>`), every call that would reach the auth server in
@@ -1737,7 +1755,8 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     switch, alert and buttons in `src/ui/form`. The weekly-schedule
     settings (legacy's `/filters-and-notifications`, story 36) were dropped
     as unused: legacy took the page out of production and the WhatsApp
-    sender isn't running.
+    sender isn't running (confirmed by the maintainer 2026-10-31, who also
+    had the header's WhatsApp link removed).
 11. My requests: `/request` (signed-in roles) and `/bio/request` (profile
     roles), each with an optional `:requestId` in one route (so opening
     another request keeps the page), lazy; legacy SupportPage: the user's

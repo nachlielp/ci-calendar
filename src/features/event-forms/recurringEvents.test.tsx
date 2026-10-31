@@ -438,6 +438,10 @@ describe("editing an event of a recurring series", () => {
         expect(
             screen.queryByRole("checkbox", { name: /אירוע חוזר/ }),
         ).toBeNull()
+        // An event of a series stays single-day.
+        expect(
+            screen.queryByRole("switch", { name: "אירוע רב יומי" }),
+        ).toBeNull()
         await userEvent.type(title, "!")
 
         await update()

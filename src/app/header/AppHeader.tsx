@@ -10,7 +10,6 @@ import { LanguageSwitcher } from "../LanguageSwitcher"
 import { routeFlag } from "../routeHandle"
 import { useIsOnline } from "../useIsOnline"
 import { useViewer } from "../viewer"
-import { WhatsAppButton } from "./WhatsAppButton"
 import "./AppHeader.scss"
 
 const loadMenu = () => import("./MenuDrawer")
@@ -24,9 +23,9 @@ const COPY = defineCopy({
 
 /**
  * The bar at the top of every page (legacy AppHeader): login or home (where
- * legacy had them) and the language menu at the start; the WhatsApp chat,
- * the out-of-date sign, the signed-in user's name and the menu button at the
- * end.
+ * legacy had them) and the language menu at the start; the out-of-date
+ * sign, the signed-in user's name and the menu button at the end (legacy's
+ * WhatsApp chat link is gone: the WhatsApp service isn't running).
  *
  * Login shows only to signed-out visitors (never while the viewer is
  * unknown, so a signed-in user never sees it flash), online, on routes
@@ -61,7 +60,6 @@ export function AppHeader() {
             )}
             <LanguageSwitcher />
             <div className="header-actions">
-                <WhatsAppButton />
                 <StaleDataNotice />
                 {"name" in viewer && <p className="user-name">{viewer.name}</p>}
                 <button
