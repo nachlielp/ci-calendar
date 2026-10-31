@@ -425,6 +425,22 @@ export function posthogOrigins(host) {
 const present = (value) =>
     value && value !== "null" && value !== "undefined" ? value : undefined
 
+/** What the client can't work without: no events, no sign-in. */
+const REQUIRED_FOR_DEPLOY = ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY"]
+
+/**
+ * Workers Builds (`WORKERS_CI`) deploys whatever builds, so a build missing
+ * its variables would ship a site that can't load any data. Fail it instead.
+ * Local and CI builds may leave them unset.
+ */
+export function deployVariableProblems(env) {
+    if (!env.WORKERS_CI) return []
+    return REQUIRED_FOR_DEPLOY.filter((name) => !present(env[name])).map(
+        (name) =>
+            `${name} is unset: add it to the Workers Builds build variables`,
+    )
+}
+
 /**
  * The origins the build's configuration makes the app use, each with the
  * directives that must allow it. Variables that aren't set are skipped
@@ -838,7 +854,7 @@ function main() {
         env,
         needs,
     }
-    const problems = [...inline.problems]
+    const problems = [...inline.problems, ...deployVariableProblems(env)]
 
     // Vercel, until it is retired.
     const config = JSON.parse(readFileSync(configPath, "utf8"))

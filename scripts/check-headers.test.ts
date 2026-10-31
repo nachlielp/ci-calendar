@@ -6,6 +6,7 @@ import {
     cloudflareHeaderProblems,
     cloudflareRulesOf,
     configuredOrigins,
+    deployVariableProblems,
     dataUrlProblems,
     hashProblems,
     headerProblems,
@@ -286,6 +287,27 @@ describe("security headers check", () => {
                 what: "Cloudflare Web Analytics",
             },
         ])
+    })
+
+    it("fails a Workers Builds build without the Supabase variables, since it deploys whatever builds", () => {
+        const supabase = {
+            VITE_SUPABASE_URL: "https://abc.supabase.co",
+            VITE_SUPABASE_ANON_KEY: "anon",
+        }
+        expect(
+            deployVariableProblems({ WORKERS_CI: "1", ...supabase }),
+        ).toEqual([])
+        expect(
+            deployVariableProblems({
+                WORKERS_CI: "1",
+                VITE_SUPABASE_URL: "undefined",
+            }),
+        ).toEqual([
+            "VITE_SUPABASE_URL is unset: add it to the Workers Builds build variables",
+            "VITE_SUPABASE_ANON_KEY is unset: add it to the Workers Builds build variables",
+        ])
+        // Local and CI builds (no WORKERS_CI) may leave them unset.
+        expect(deployVariableProblems({})).toEqual([])
     })
 
     it("finds the scripts index.html's inline code loads", () => {
