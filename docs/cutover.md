@@ -74,7 +74,10 @@ speed. Order: **before merging → deploy → after deploy → later**.
 
 ### Supabase: auth URLs
 
-- [ ] Authentication → URL Configuration: the **Site URL** is the
+- [x] Done 2026-10-31: Site URL `https://www.ci-events.org` (it was
+      `https://ci-events.org/*`), and `www`'s `/reset-password` and the
+      `develop` preview added to the Redirect URLs. Authentication → URL
+      Configuration: the **Site URL** is the
       production origin (Google sign-in returns there, as before), and the
       **Redirect URLs** include `https://www.ci-events.org/reset-password`
       (and `https://ci-events.org/reset-password` if that host serves the
