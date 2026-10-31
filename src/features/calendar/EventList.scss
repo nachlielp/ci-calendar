@@ -1,0 +1,125 @@
+// Ported from the old client's styles/events-list.scss, event-preview.scss and
+// the antd Tag (→ .event-tag); `.card` is global (index.css).
+.events-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 20px;
+}
+
+.events-list-item {
+    // Cards below the fold skip layout and paint until scrolled near; the
+    // intrinsic size (about one card) keeps the scrollbar steady.
+    content-visibility: auto;
+    contain-intrinsic-size: auto 220px;
+    padding-top: 1rem;
+}
+
+.event-preview {
+    position: relative;
+
+    .cancelled-event-cover {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        width: 100%;
+        padding: 1rem 0;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.8);
+
+        p {
+            margin: 0;
+        }
+
+        .cancelled-event-title {
+            font-size: 50px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .cancelled-event-text {
+            font-size: 30px;
+            font-weight: 500;
+            padding: 0 1rem;
+        }
+    }
+
+    .event-preview-content {
+        min-width: 0;
+
+        &.cancelled {
+            opacity: 0.3;
+        }
+    }
+
+    .event-title {
+        margin: 0 0 16px;
+        font-size: 26px;
+        font-weight: 500;
+        color: #bc3528;
+    }
+
+    .event-preview-link {
+        color: inherit;
+        text-decoration: none;
+
+        // The whole card opens the event; the link keeps its title as the
+        // accessible name.
+        &::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+        }
+
+        &:focus-visible {
+            outline: none;
+
+            &::after {
+                outline: 2px solid #bc3528;
+                outline-offset: 2px;
+            }
+        }
+    }
+
+    .event-row {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        margin: 0 0 4px;
+    }
+
+    .event-icon {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        margin-inline-end: 4px;
+        margin-top: 4px;
+    }
+
+    .event-label {
+        font-size: 18px;
+        font-weight: 400;
+        margin-inline-end: 8px;
+    }
+
+    .event-time {
+        white-space: nowrap;
+    }
+
+    .event-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin: 12px 0 0;
+    }
+
+    .event-tag {
+        background-color: #e5e5ea;
+        color: #000;
+        font-size: 14px;
+        padding: 6px 12px;
+        border-radius: 8px;
+    }
+}

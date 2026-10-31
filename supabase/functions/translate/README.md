@@ -2,9 +2,9 @@
 
 Server-side proxy for Google Cloud Translation v2. It exists so the **billable
 Google Translate key never ships to the browser** (ticket #14). The web client
-calls it through `supabase.functions.invoke("translate", …)` in
-[`src/util/translate.ts`](../../../src/util/translate.ts); the client no longer
-holds any key that can reach the Translate REST API.
+calls it through `services.functions.invoke("translate", …)` in
+[`src/data/translate.ts`](../../../src/data/translate.ts); the client holds no
+key that can reach the Translate REST API.
 
 ## Request / response
 
@@ -48,5 +48,6 @@ public. That is strictly better than shipping the raw Google key (calls are now
 funnelled through a function we control), but it does not stop a determined
 caller from spending Translate quota. Recommended follow-ups: per-IP rate
 limiting, restricting `targetLang` to the supported set, and a max `text`
-length. The client already caches aggressively (memory + Cache API) to minimise
-calls.
+length. The client already caches to minimise calls: every text and language
+once per session in memory, and the event details' translations on the device
+across visits (`src/features/calendar/details/translationStore.ts`).

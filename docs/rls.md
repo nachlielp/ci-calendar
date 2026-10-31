@@ -68,17 +68,16 @@ database for viewers who shouldn't see them:
 - the **owner** (`user_id = auth.uid()`, or listed in `owners`) and **admins**
   may read their own hidden rows (the management views rely on this).
 
-**App-level enforcement (this repo).** Three fetch paths select `ci_events`;
-all now exclude hidden rows by default:
-
-1. `cieventsService.getCIEvents()` — filters `hide = false` unless the caller
-   passes `show_hidden: true` (`src/supabase/cieventsService.ts`).
-2. `usersService.getUserData()` second (public-window) query — filters
-   `hide = false` (`src/supabase/usersService.ts`). The first (owner) query is
-   left unfiltered so creators still receive their own hidden events, which are
-   then surfaced only in the management lists.
-3. Client-side defense in depth: the store's `getSortedEvents` computed drops
-   `hide` rows before the public calendar renders them.
+**App-level enforcement (this repo).** Every public read of `ci_events`
+starts from `selectPublicEvents` (`src/features/calendar/publicEvent.ts`),
+which filters `hide = false` (and embeds only bios with `show_profile =
+true`) explicitly, whatever the token: the calendar window, shared-link
+lookups and the persisted cache never hold a hidden row, even for a signed-in
+owner or admin. Only the management lists read hidden rows: my events
+(`src/features/manage-events/myEvents.ts`, filtered to the user's own
+`user_id`) and the admins' all-events list
+(`src/features/admin-events/adminEvents.ts`); there they are marked hidden and
+never reach the calendar.
 
 **Database-level enforcement (source of truth).** The app filter is a
 convenience/perf layer; the guarantee must live in RLS. The live `ci_events`
@@ -144,11 +143,11 @@ SELECT public.assign_user_role(p_user_id => …, p_role_id => …, p_user_type =
   session (it reads the request JWT, not the definer), `has_admin_role()`
   correctly gates the caller. `anon` has `EXECUTE` revoked; only
   `authenticated` may call it, and non-admins are rejected by the guard.
-- **The client no longer writes these tables directly.**
-  `userRoleService.updateUserRole` is a single
-  `supabase.rpc("assign_user_role", …)` call
-  (`src/supabase/userRoleService.ts`); the seam test in
-  `userRoleService.test.ts` asserts there is exactly one RPC write path.
+- **The client no longer writes these tables directly.** `assignUserRole`
+  is a single `rpc("assign_user_role", …)` call
+  (`src/features/admin-users/roles.ts`); `manageUsers.test.tsx` and
+  `manageSupport.test.tsx` assert that a role change (or a request's
+  approval) goes through that RPC alone.
 
 **Direct-write policies must deny non-admins** (defense the RPC leans on — a
 non-admin must not be able to bypass the function by writing the tables

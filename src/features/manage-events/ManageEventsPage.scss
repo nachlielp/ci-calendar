@@ -1,0 +1,76 @@
+// Ported from the old client's styles/user-event-list-page.scss (and the
+// `general-action-btn` of generics/buttons.scss), antd and MUI dropped. The
+// list rows are buttons now; legacy's right-aligned RTL rows mirror with the
+// language. The rows are `EventRow`'s (./_event-rows.scss, shared with the
+// admins' list), the actions `EventActions`' (./_event-actions.scss).
+@use "./event-rows" as rows;
+@use "./event-actions";
+
+.user-events-list-page {
+    padding: 0 16px;
+
+    .manage-events-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+
+        .header-buttons-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+    }
+
+    .general-action-btn {
+        display: flex;
+        padding: 5px 16px;
+        border: none;
+        border-radius: 6px;
+        background-color: #444;
+        color: #fff;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 21px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #222;
+        }
+    }
+
+    @include rows.event-rows;
+
+    .no-events-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 50px 0;
+        padding: 20px 0;
+        border-radius: 6px;
+        background-color: #fffdfe;
+
+        .no-events-message-gif {
+            width: 300px;
+            max-width: 100%;
+            height: auto;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+
+        .no-events-message-label {
+            width: 100%;
+            margin: 0;
+            font-size: 24px;
+            line-height: 1.2;
+            text-align: center;
+        }
+    }
+}

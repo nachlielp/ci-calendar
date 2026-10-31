@@ -1,0 +1,217 @@
+// Ported from the old client's styles/manage-support-page.scss (antd's Select and
+// Switch dropped for the form chips and switch; `direction: rtl` dropped
+// for logical properties) and generics/buttons.scss' `.secondary-action-btn
+// .low-margin`. New: the responses' signature line, the reply form and the
+// toolbar.
+@use "../admin/copy-phone";
+@use "../admin/refresh-button";
+
+.manage-support-page {
+    margin: 0 16px;
+    color: #000;
+
+    .manage-support-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        margin: 0 auto 10px;
+
+        .manage-support-header-title {
+            margin: 0.83em 0;
+            font-size: 1.5em;
+        }
+
+        .filters-container {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+    }
+
+    .manage-support-card {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        padding: 8px 0;
+    }
+
+    .manage-support-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 8px;
+    }
+
+    .manage-support-status {
+        text-align: center;
+    }
+
+    .manage-support-more {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .requests-container,
+    .request-responses {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .requests-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        background-color: #fff;
+        border-radius: 6px;
+
+        // The last filter's requests, while the new one's are on the way.
+        &.pending {
+            opacity: 0.6;
+        }
+    }
+
+    .request-item {
+        border-bottom: 1px solid #e0e0e0;
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .request-summary {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 0 10px;
+        border: none;
+        background: none;
+        color: inherit;
+        font-size: 16px;
+        text-align: start;
+        cursor: pointer;
+
+        .active & {
+            background-color: #f0f0f0;
+        }
+
+        .request-title {
+            margin: 1em 0;
+            font-size: 1.17em;
+            font-weight: 700;
+        }
+
+        .request-status {
+            margin-inline-start: auto;
+        }
+    }
+
+    .request-details {
+        border-top: 1px solid #e0e0e0;
+
+        .request-details-content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 1em 0;
+            padding: 0 10px;
+        }
+
+        .request-message {
+            margin: 0;
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #f0f0f0;
+            white-space: pre-wrap;
+        }
+
+        .request-responses-container {
+            padding: 0 10px 4px;
+        }
+
+        .request-responses-title {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .request-responses {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .request-response {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: #f0f0f0;
+
+            p {
+                margin: 0;
+                white-space: pre-wrap;
+            }
+
+            .request-response-meta {
+                margin-top: 4px;
+                color: #757575;
+                font-size: 14px;
+            }
+        }
+
+        .request-reply {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 0 10px;
+        }
+
+        .manage-support-actions {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            gap: 4px;
+        }
+
+        .form-alert {
+            margin: 4px 10px;
+        }
+    }
+
+    .secondary-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 4px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 10px;
+        background-color: #e7d1cd;
+        color: #1f2937;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover:not(:disabled) {
+            background-color: #dcb8b1;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}

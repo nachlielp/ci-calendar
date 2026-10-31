@@ -1,0 +1,15 @@
+// Ported from the old client's styles/whatsapp-banner.scss.
+.whatsapp-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-inline-end: 4px;
+
+    img {
+        display: block;
+        width: 40px;
+        height: 40px;
+    }
+}

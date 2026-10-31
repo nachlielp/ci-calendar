@@ -9,3 +9,6 @@ package-lock.json
 # Supabase Edge Functions run on Deno and follow `deno fmt`, not this repo's
 # Prettier config.
 supabase/functions
+
+# Local agent tooling (worktrees, settings); never committed.
+.claude

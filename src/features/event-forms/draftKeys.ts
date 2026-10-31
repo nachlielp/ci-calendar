@@ -1,0 +1,21 @@
+import { personalKey } from "../../app/auth/personalStorage"
+
+// The event forms' draft keys in device storage (app/useFormDraft.ts): personal
+// keys, removed on sign-out by their prefix (app/auth/personalStorage.ts).
+
+/** The new single-day event's draft. */
+export const SINGLE_DAY_DRAFT_KEY = personalKey("single-day-event-draft")
+/** The single-day edit form's draft (for the one event it names). */
+export const SINGLE_DAY_EDIT_DRAFT_KEY = personalKey("single-day-edit-draft")
+/** The new multi-day event's draft. */
+export const MULTI_DAY_DRAFT_KEY = personalKey("multi-day-event-draft")
+/** The multi-day edit form's draft (for the one event it names). */
+export const MULTI_DAY_EDIT_DRAFT_KEY = personalKey("multi-day-edit-draft")
+/** A new single-day template's draft (legacy `single-day-draft-template`). */
+export const SINGLE_DAY_TEMPLATE_DRAFT_KEY = personalKey(
+    "single-day-template-draft",
+)
+/** A new multi-day template's draft (legacy `multi-day-draft-template`). */
+export const MULTI_DAY_TEMPLATE_DRAFT_KEY = personalKey(
+    "multi-day-template-draft",
+)

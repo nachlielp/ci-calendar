@@ -1,140 +1,163 @@
 import { sentryVitePlugin } from "@sentry/vite-plugin"
-import { defineConfig } from "vite"
+import { defineConfig, type Plugin } from "vite"
 import react from "@vitejs/plugin-react"
-import { VitePWA, VitePWAOptions } from "vite-plugin-pwa"
 import { visualizer } from "rollup-plugin-visualizer"
-import pkg from "./package.json"
+import { VitePWA } from "vite-plugin-pwa"
+import { execSync } from "node:child_process"
+import { readFileSync } from "node:fs"
+import { withHeadersRevision } from "./scripts/headers-revision.mjs"
+import {
+    PRECACHE_GLOBS,
+    PRECACHE_IGNORES,
+    TELEMETRY_ASSETS,
+} from "./src/sw/swRules.ts"
 
-const timestamp = new Date().getTime()
-const buildVersion = `${pkg.version}-${timestamp}`
-//
-const manifestForPlugin: Partial<VitePWAOptions> = {
-    disable: false,
-    registerType: "autoUpdate",
-    includeAssets: ["ci-logo-512-bg.png", "ci-logo-192-bg.png"],
-    manifest: {
-        name: "CI Events Israel",
-        short_name: "CI Events",
-        description:
-            "Contact Improvisation events in Israel - ג'אמים, שיעורים, סדנאות",
-        icons: [
-            {
-                src: "/ci-logo-192-bg.png",
-                sizes: "192x192",
-                type: "image/png",
-                purpose: "any",
-            },
-            {
-                src: "/ci-logo-512-bg.png",
-                sizes: "512x512",
-                type: "image/png",
-                purpose: "any maskable",
-            },
-        ],
-        theme_color: "#171717",
-        background_color: "#e8ebf2",
-        display: "standalone",
-        scope: "/",
-        start_url: "/",
-        orientation: "portrait",
-        related_applications: [],
-        prefer_related_applications: false,
-        shortcuts: [],
-        categories: [],
-        share_target: {
-            action: "/",
-            method: "GET",
-            params: {
-                title: "title",
-                text: "text",
-                url: "url",
-            },
-        },
-    },
-    workbox: {
-        runtimeCaching: [
-            {
-                urlPattern: () => true, // Match all routes
-                handler: "NetworkFirst",
-                options: {
-                    cacheName: `api-cache-${buildVersion}`,
-                },
-            },
-        ],
-        navigateFallback: "index.html",
-        cleanupOutdatedCaches: true,
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // Set to 3MB
-    },
-    // Add notification related strategies
-    strategies: "generateSW",
-    includeManifestIcons: true,
+/**
+ * The build version (`BUILD_VERSION` in src/app/buildVersion.ts): the commit
+ * SHA for builds, `dev-<start time>` for the dev server. A new value marks
+ * the persisted query cache stale, and changes index.html and so the service
+ * worker's precache list, which is how browsers notice a deploy.
+ */
+function buildVersion(command: "build" | "serve"): string {
+    // Each dev server start counts as a new build.
+    if (command === "serve") return `dev-${Date.now()}`
+    const sha =
+        process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA ?? gitSha()
+    // Without git (e.g. a source tarball), every build counts as new.
+    return sha ? sha.slice(0, 12) : `build-${Date.now()}`
 }
 
-export default defineConfig(({ mode }) => ({
-    esbuild: {
-        target: "es2022",
-        // Strip console/debugger from production bundles only (keeps them in
-        // dev and test).
-        drop: mode === "production" ? ["console", "debugger"] : [],
-    },
-    build: {
-        target: "es2022",
-        minify: true,
+function gitSha(): string | undefined {
+    try {
+        return execSync("git rev-parse HEAD", {
+            stdio: ["ignore", "pipe", "ignore"],
+        })
+            .toString()
+            .trim()
+    } catch {
+        return undefined
+    }
+}
 
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    // UI Framework chunk
-                    "vendor-ui": ["antd"],
+/**
+ * Puts the build version in index.html (`<meta name="build-version">`), not
+ * in the JS, so a deploy changes only the chunks whose code changed and the
+ * service worker downloads only those.
+ */
+function buildVersionMeta(version: string): Plugin {
+    return {
+        name: "build-version-meta",
+        transformIndexHtml: () => [
+            {
+                tag: "meta",
+                attrs: { name: "build-version", content: version },
+                injectTo: "head-prepend",
+            },
+        ],
+    }
+}
 
-                    // Core React chunk
-                    "vendor-react": ["react", "react-dom"],
+/**
+ * Modules only the lazy telemetry chunks hold: the SDKs and the app's
+ * modules that start them (src/app/telemetry). Their chunks go to
+ * `TELEMETRY_ASSETS`, which the service worker never precaches.
+ */
+const TELEMETRY_MODULE =
+    /\/node_modules\/(@sentry|@sentry-internal|posthog-js|@vercel\/speed-insights)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|speedInsights)\.ts$/
 
-                    // State Management chunk
-                    "vendor-state": ["mobx"],
-
-                    // Date handling chunk
-                    "vendor-utils": ["dayjs"],
-
-                    // Data layer chunk
-                    "vendor-data": ["@supabase/supabase-js"],
+export default defineConfig(({ command, mode }) => {
+    const version = buildVersion(command)
+    // Release builds (CI) upload source maps to Sentry; see the plugin below.
+    const uploadMaps = !!process.env.SENTRY_AUTH_TOKEN
+    return {
+        build: {
+            target: "es2022",
+            // dist/.vite/manifest.json feeds the bundle size check
+            // (scripts/bundle-size.mjs).
+            manifest: true,
+            // Source maps only for Sentry, which deletes them after upload;
+            // other builds (previews, local) make none, so none ever ship
+            // (`check:sw` fails if dist/ holds one).
+            sourcemap: uploadMaps && "hidden",
+            rolldownOptions: {
+                output: {
+                    // Strip console/debugger from production bundles only
+                    // (keeps them in dev and test, which never minify).
+                    ...(mode === "production" && {
+                        minify: {
+                            compress: { dropConsole: true, dropDebugger: true },
+                        },
+                    }),
+                    chunkFileNames: (chunk) =>
+                        !chunk.isEntry &&
+                        chunk.moduleIds.some((id) => TELEMETRY_MODULE.test(id))
+                            ? `${TELEMETRY_ASSETS}/[name]-[hash].js`
+                            : "assets/[name]-[hash].js",
                 },
             },
         },
-
-        // Generate sourcemaps for Sentry, but keep them off the public CDN.
-        sourcemap: "hidden",
-    },
-    base: "/",
-    plugins: [
-        react({
-            babel: {
-                plugins: [
-                    ["@babel/plugin-proposal-decorators", { legacy: true }],
-                    [
-                        "@babel/plugin-proposal-class-properties",
-                        { loose: true },
+        base: "/",
+        plugins: [
+            react(),
+            buildVersionMeta(version),
+            // The service worker (src/sw/sw.ts → dist/sw.js), production
+            // builds only: precaches the app shell and static files, never
+            // API responses. The app registers it itself after the first
+            // paint (app/updates), and the manifest stays
+            // public/site.webmanifest.
+            VitePWA({
+                strategies: "injectManifest",
+                srcDir: "src/sw",
+                filename: "sw.ts",
+                injectRegister: false,
+                manifest: false,
+                injectManifest: {
+                    globPatterns: PRECACHE_GLOBS,
+                    globIgnores: PRECACHE_IGNORES,
+                    // index.html is cached with its headers (the CSP), so
+                    // a change to vercel.json's headers must update it too
+                    // (scripts/headers-revision.mjs; `check:sw` checks).
+                    manifestTransforms: [
+                        (entries) => ({
+                            manifest: withHeadersRevision(
+                                entries,
+                                JSON.parse(
+                                    readFileSync(
+                                        new URL(
+                                            "./vercel.json",
+                                            import.meta.url,
+                                        ),
+                                        "utf8",
+                                    ),
+                                ),
+                            ),
+                            warnings: [],
+                        }),
                     ],
-                ],
-            },
-        }),
-        VitePWA(manifestForPlugin),
-        // Bundle analyzer — opt in with `ANALYZE=true npm run build`.
-        process.env.ANALYZE === "true" &&
-            visualizer({ open: true, filename: "stats.html" }),
-        // Upload sourcemaps to Sentry only when an auth token is present
-        // (i.e. CI / release builds), then delete them so they never ship.
-        process.env.SENTRY_AUTH_TOKEN &&
-            sentryVitePlugin({
-                org: "nachliel",
-                project: "ci-calendar",
-                sourcemaps: {
-                    filesToDeleteAfterUpload: ["./dist/**/*.map"],
+                    // The worker's own sourcemap would ship publicly.
+                    sourcemap: false,
                 },
             }),
-    ],
+            // Bundle analyzer — opt in with `ANALYZE=true npm run build`.
+            process.env.ANALYZE === "true" &&
+                visualizer({ open: true, filename: "stats.html" }),
+            // Upload sourcemaps to Sentry only when an auth token is present
+            // (i.e. CI / release builds), then delete them so they never ship.
+            // The release is the build version the app reports
+            // (app/telemetry/sentry.ts), and stays out of the JS like it.
+            uploadMaps &&
+                sentryVitePlugin({
+                    org: "nachliel",
+                    project: "ci-calendar",
+                    release: { name: version, inject: false },
+                    sourcemaps: {
+                        filesToDeleteAfterUpload: ["./dist/**/*.map"],
+                    },
+                }),
+        ],
 
-    server: {
-        host: "localhost",
-    },
-}))
+        server: {
+            host: "localhost",
+        },
+    }
+})

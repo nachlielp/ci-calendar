@@ -1,0 +1,39 @@
+// Ported from the old client's styles/events-page.scss.
+.calendar-page {
+    padding: 0 16px;
+    color: #000;
+}
+
+.calendar-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 1.25rem;
+
+    .calendar-title {
+        width: 70%;
+        margin: 0;
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .calendar-subtitle {
+        width: 70%;
+        margin: 0 0 2rem;
+        font-size: 1.25rem;
+        text-align: center;
+    }
+
+    .calendar-menu {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        width: 100%;
+    }
+}
+
+.calendar-empty {
+    text-align: center;
+    margin: 2rem 0;
+}
