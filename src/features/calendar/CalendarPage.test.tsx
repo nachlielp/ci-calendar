@@ -173,7 +173,7 @@ describe("public calendar (/)", () => {
         renderApp({ fake, now: NOW })
 
         const card = await eventCard("שיעור וג'אם")
-        expect(card).toHaveTextContent("שבת, יום שבת 7 בנובמבר")
+        expect(card).toHaveTextContent("שבת, 7 בנובמבר")
         expect(card).toHaveTextContent("19:00 - 23:00")
         expect(card).toHaveTextContent("יער המאכל")
         // Teachers and organisers by their public bio's name when they have one.
@@ -199,9 +199,7 @@ describe("public calendar (/)", () => {
         renderApp({ fake, now: NOW })
 
         const card = await eventCard("ריטריט")
-        expect(card).toHaveTextContent(
-            "שישי, יום שישי 6 בנובמבר - ראשון, יום ראשון 8 בנובמבר",
-        )
+        expect(card).toHaveTextContent("שישי, 6 בנובמבר - ראשון, 8 בנובמבר")
     })
 
     it("marks cancelled events with their cancellation text", async () => {

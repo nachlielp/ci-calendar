@@ -82,7 +82,7 @@ describe("event details", () => {
         )
 
         const dialog = await details()
-        expect(dialog).toHaveTextContent("שבת, יום שבת 7 בנובמבר")
+        expect(dialog).toHaveTextContent("שבת, 7 בנובמבר")
         expect(dialog).toHaveTextContent("19:00 - 23:00")
         expect(dialog).toHaveTextContent("יער המאכל")
         expect(dialog).toHaveTextContent("19:00 - 20:30 שיעור עם נועה כהן")

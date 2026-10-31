@@ -1,7 +1,13 @@
 // Ported from the old client's styles/header.scss and menu-drawer.scss (the menu
-// button). Legacy scrolled the page inside a box under the header; here the
-// window scrolls, so the sticky header gets a light translucent backing to
-// keep it readable over the cards passing beneath.
+// button). Legacy's header was clear over the page gradient, and pages
+// scrolled in a box under it, fading out over their top 16px. Here the window
+// scrolls, so the header's backing (`::before`) is a strip along the top of
+// the screen that copies the fixed background exactly: unseen over the
+// gradient, it hides the cards passing beneath and fades them out the same.
+@use "../background";
+
+$fade: 16px;
+
 .app-header {
     position: sticky;
     top: 0;
@@ -13,7 +19,29 @@
     height: 3.5rem;
     width: 100%;
     padding-inline-start: 0.5rem;
-    background-color: rgb(255 255 255 / 55%);
+
+    &::before {
+        content: "";
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: -1;
+        height: calc(3.5rem + #{$fade});
+        @include background.gradient;
+        // The first tile of `.app-background`: 100vw square at the top left.
+        background-size: 100vw 100vw;
+        background-repeat: no-repeat;
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            #000 calc(100% - #{$fade}),
+            transparent
+        );
+        mask-image: linear-gradient(
+            to bottom,
+            #000 calc(100% - #{$fade}),
+            transparent
+        );
+        pointer-events: none;
+    }
 
     .header-btn {
         display: flex;

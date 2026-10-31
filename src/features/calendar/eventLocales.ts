@@ -83,11 +83,13 @@ export const HEBREW: EventLocale = {
     },
     months: HEBREW_MONTHS,
     weekdaysShort: ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"],
-    // `שבת, יום שבת 7 בנובמבר`, the legacy app's day format.
+    // `שבת, 7 בנובמבר`, as the legacy app showed it. (Its code also put
+    // `יום שבת` before the date, but its Hebrew dayjs locale made that come
+    // out empty, so users never saw it.)
     day: (day) => {
         const [, month, date] = day.split("-").map(Number)
         const name = HEBREW_WEEKDAYS[weekday(day)]
-        return `${name}, יום ${name} ${date} ב${HEBREW_MONTHS[month - 1]}`
+        return `${name}, ${date} ב${HEBREW_MONTHS[month - 1]}`
     },
 }
 

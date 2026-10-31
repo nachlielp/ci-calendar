@@ -1198,7 +1198,12 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   `.card` with the title, then `PageFooter`). `.card` is global
   (`index.css`). Every page except the calendar is a lazy route
   (`lazyPage(() => import(...))` in `routes.tsx`). The window scrolls (not
-  an inner box, unlike legacy); `ScrollRestoration` keys the calendar and
+  an inner box, unlike legacy), so the header's backing is a fixed strip
+  along the top of the screen that copies the background (the gradient is
+  one mixin, `app/_background.scss`): unseen over it, it hides what scrolls
+  beneath and fades it out over 16px, as legacy's box did. Anything that
+  must show above it at the top (the install banner) sits above the
+  header's `z-index`. `ScrollRestoration` keys the calendar and
   events opened over it as one position, so a new page starts at the top
   and Back returns to where the visitor was. A route's `handle`
   (`RouteHandle`, `app/routeHandle.ts`) tells the shell about it, e.g.

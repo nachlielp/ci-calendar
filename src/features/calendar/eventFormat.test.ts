@@ -36,12 +36,12 @@ describe("eventDateLabel", () => {
     it("names the day as the legacy app did", () => {
         expect(
             eventDateLabel(publicEvent({ startDate: "2026-11-07" }), HEBREW),
-        ).toBe("שבת, יום שבת 7 בנובמבר")
+        ).toBe("שבת, 7 בנובמבר")
     })
 
     it("gives a multi-day event its day range", () => {
         expect(eventDateLabel(multiDay, HEBREW)).toBe(
-            "שישי, יום שישי 6 בנובמבר - ראשון, יום ראשון 8 בנובמבר",
+            "שישי, 6 בנובמבר - ראשון, 8 בנובמבר",
         )
     })
 })
