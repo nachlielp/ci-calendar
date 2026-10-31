@@ -24,6 +24,7 @@ import {
 import {
     emptyMultiDay,
     isMultiDayValues,
+    latestEventDay,
     type EventBaseValues,
     type EventFormError,
     multiDayColumns,
@@ -182,6 +183,7 @@ export function MultiDayEventForm({
                                 label={copy.startDate}
                                 type="date"
                                 min={today}
+                                max={latestEventDay(today)}
                                 value={values.startDate}
                                 onChange={(day) => set("startDate", day)}
                                 onBlur={() => touch("startDate")}
@@ -191,6 +193,7 @@ export function MultiDayEventForm({
                                 label={copy.endDate}
                                 type="date"
                                 min={values.startDate || today}
+                                max={latestEventDay(today)}
                                 value={values.endDate}
                                 onChange={(day) => set("endDate", day)}
                                 onBlur={() => touch("endDate")}

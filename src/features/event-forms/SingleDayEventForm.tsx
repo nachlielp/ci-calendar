@@ -25,6 +25,7 @@ import { useErrorText } from "./useErrorText"
 import {
     emptySingleDay,
     isSingleDayValues,
+    latestEventDay,
     newSingleDayColumns,
     seriesPatch,
     singleDayPatch,
@@ -184,6 +185,7 @@ export function SingleDayEventForm({
                             label={copy.date}
                             type="date"
                             min={today}
+                            max={latestEventDay(today)}
                             value={values.date}
                             onChange={(date) => set("date", date)}
                             onBlur={() => touch("date")}

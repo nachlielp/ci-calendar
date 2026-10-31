@@ -1,5 +1,5 @@
 /*
- * Global styles, ported from legacy/src/index.scss and styles/generics.
+ * Global styles, ported from the old client's index.scss and styles/generics.
  *
  * The font is legacy's Assistant (variable, weights 200-800), subset to
  * Latin and Hebrew as woff2 (scripts/subset-font.sh). It has no Cyrillic, so

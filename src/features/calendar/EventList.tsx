@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import { Link, useLocation } from "react-router"
 import { CalendarIcon } from "../../ui/icons/CalendarIcon"
 import { DomainIcon } from "../../ui/icons/DomainIcon"
@@ -26,18 +27,37 @@ export interface FromListState {
 export function EventList({
     cards,
     label,
+    revealId,
 }: {
     cards: readonly EventCard[]
     /** The list's accessible name; "Upcoming events" by default. */
     label?: string
+    /**
+     * An event whose card is scrolled to the middle of the screen when the
+     * list first shows with it (legacy useScroolToEventById: a shared link's
+     * event, behind its details, so closing them shows it in the list). Only
+     * then: a card that shows later (a filter cleared) isn't scrolled to.
+     */
+    revealId?: string
 }) {
     const copy = useCopy(COPY)
     // Keep the filters (`f`) when opening an event.
     const { search } = useLocation()
+    const revealItem = useRef<HTMLLIElement>(null)
+    const revealed = useRef<string | undefined>(undefined)
+    useEffect(() => {
+        if (!revealId || revealed.current === revealId) return
+        revealed.current = revealId
+        revealItem.current?.scrollIntoView?.({ block: "center" })
+    }, [revealId])
     return (
         <ul aria-label={label ?? copy.label} className="events-list">
             {cards.map((card) => (
-                <li key={card.event.id} className="events-list-item">
+                <li
+                    key={card.event.id}
+                    ref={card.event.id === revealId ? revealItem : undefined}
+                    className="events-list-item"
+                >
                     <EventPreview card={card} search={search} />
                 </li>
             ))}

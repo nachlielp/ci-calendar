@@ -36,7 +36,7 @@ export function StaleDataNotice() {
     )
 }
 
-// legacy/src/assets/svgs/cloud_offline.svg, the legacy offline icon.
+// The old client's assets/svgs/cloud_offline.svg, the legacy offline icon.
 function CloudOfflineIcon() {
     return (
         <svg

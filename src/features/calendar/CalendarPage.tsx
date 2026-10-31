@@ -101,6 +101,11 @@ export default function CalendarPage() {
     // event keeps this page mounted, so the view and picked day stay.
     const [view, setView] = useState<View>("list")
     const linked = useLinkedEvent(eventId, events)
+    // A shared link's event is shown in the list behind its details, as
+    // legacy did; one opened from the list is there already.
+    const fromList = !!(location.state as FromListState | null)?.fromList
+    const revealId =
+        !fromList && linked?.status === "found" ? linked.event.id : undefined
 
     // Fetch the details' code alongside the linked event's data.
     useEffect(() => {
@@ -118,7 +123,7 @@ export default function CalendarPage() {
     const closeEvent = () => {
         // Opened from the list: going back closes it and keeps the history
         // tidy. Opened from a shared link: replace it with the calendar.
-        if ((location.state as FromListState | null)?.fromList) {
+        if (fromList) {
             void navigate(-1)
         } else {
             const calendar = { pathname: "/", search: location.search }
@@ -166,10 +171,7 @@ export default function CalendarPage() {
                 ) : shownCards.length === 0 ? (
                     <p className="calendar-empty">{copy.noEvents}</p>
                 ) : (
-                    <>
-                        <EventList cards={shownCards} />
-                        <PageFooter />
-                    </>
+                    <EventList cards={shownCards} revealId={revealId} />
                 )
             ) : !isOnline ? (
                 // The request waits for the connection and is sent once back
@@ -185,6 +187,8 @@ export default function CalendarPage() {
             ) : (
                 <p role="status">{copy.loading}</p>
             )}
+            {/* Under the events in either view, or the empty list, as legacy. */}
+            {shownCards && <PageFooter />}
             {linked && (
                 <Suspense fallback={null}>
                     <EventDetailsDialog

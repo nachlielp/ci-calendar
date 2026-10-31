@@ -141,7 +141,7 @@ export default function AboutPage() {
     )
 }
 
-// legacy/src/assets/svgs/paybox.svg
+// The old client's assets/svgs/paybox.svg
 function PayboxIcon() {
     return (
         <svg aria-hidden="true" viewBox="0 0 16 15" fill="none">

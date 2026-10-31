@@ -1,4 +1,4 @@
-// Ported from legacy/src/index.scss (.app, .background-container and
+// Ported from the old client's index.scss (.app, .background-container and
 // .background-tile, which BackgroundTiles repeated down the screen).
 .app {
     display: flex;
@@ -128,5 +128,34 @@
     .page-loading-bar::after {
         width: 100%;
         animation: none;
+    }
+}
+
+// The maintenance page (`AppDisabled`, `VITE_DISABLE_APP`), legacy's
+// app-disabled.scss.
+.app-disabled {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 100vh;
+    padding: 0 16px;
+    text-align: center;
+    color: #444444;
+
+    .app-disabled-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .app-disabled-title {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .app-disabled-subtitle {
+        margin: 0;
+        font-size: 1rem;
     }
 }

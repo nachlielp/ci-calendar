@@ -2,8 +2,8 @@
 //
 // Proxies Google Cloud Translation v2 so the billable Google key lives ONLY
 // here (server side) and never ships to the browser. The web client calls this
-// via `supabase.functions.invoke("translate", { body })` — see
-// src/util/translate.ts. Deploy + secret instructions in ./README.md.
+// via `functions.invoke("translate", { body })` — see src/data/translate.ts.
+// Deploy + secret instructions in ./README.md.
 //
 // This runs on Deno (Supabase Edge runtime), not on this repo's Node/TS
 // toolchain, which is why it's excluded from tsconfig `include` and ESLint.

@@ -399,6 +399,15 @@ describe("the single-day event form", () => {
         expect(fake.functions.calls).toHaveLength(0)
     })
 
+    it("offers days from today up to a year ahead, as legacy's picker did", async () => {
+        const { user, fake } = setup()
+        render(user, fake)
+
+        const date = await screen.findByLabelText("תאריך")
+        expect(date).toHaveAttribute("min", "2026-10-30")
+        expect(date).toHaveAttribute("max", "2027-10-30")
+    })
+
     it("refuses a day that has passed", async () => {
         const { user, fake } = setup()
         render(user, fake)

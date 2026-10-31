@@ -175,6 +175,14 @@ export type EventFormError =
     | "tooLong"
     | "tooFar"
 
+/**
+ * The last day the forms' date pickers offer: a year from today, where
+ * legacy's pickers stopped (its `DATE_LIMIT`). Only the picker; legacy
+ * validated no upper bound for an event's own days.
+ */
+export const latestEventDay = (today: string) =>
+    addMonths(today, RECURRENCE_MONTHS)
+
 /** Legacy's longest multi-day event: its last day at most 14 days on. */
 export const MAX_MULTI_DAY_SPAN = 14
 

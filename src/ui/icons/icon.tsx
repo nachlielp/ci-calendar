@@ -1,4 +1,4 @@
-// Inline SVG icons (Material Symbols, as in legacy/src/assets/svgs), sized by
+// Inline SVG icons (Material Symbols, as in the old client's assets/svgs), sized by
 // CSS and coloured by `currentColor`. One module per icon, so an icon only
 // used by a lazy page ships in that page's chunk, never in the initial JS.
 // Add a new icon as its own file the same way; don't load SVG files at

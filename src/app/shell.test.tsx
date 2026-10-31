@@ -1,5 +1,6 @@
 import { act, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { Link } from "react-router"
 import { describe, expect, it, vi } from "vitest"
 import { event } from "../features/calendar/testEvents"
 import { createFakeDataClient } from "../test/fakeDataClient"
@@ -11,6 +12,7 @@ import {
 } from "../test/browser"
 import { renderApp } from "../test/renderApp"
 import { createMemoryStorage } from "./deviceStorage"
+import { RootLayout } from "./RootLayout"
 
 /** The app header: the bar holding the menu button. */
 const header = () =>
@@ -213,6 +215,25 @@ describe("footer", () => {
         )
     })
 
+    it("closes the month calendar and an empty list too, as legacy", async () => {
+        const { unmount } = renderApp({
+            fake: createFakeDataClient({ ci_events: [] }),
+        })
+        await screen.findByText("אין אירועים קרובים")
+        expect(screen.getByRole("contentinfo")).toBeInTheDocument()
+        unmount()
+
+        renderApp({ fake: createFakeDataClient({ ci_events: [event()] }) })
+        await screen.findByText("ג'אם")
+        await userEvent.click(
+            screen.getByRole("button", { name: "צפייה באירועים לפי לוח שנה" }),
+        )
+        expect(
+            screen.queryByRole("list", { name: "אירועים קרובים" }),
+        ).toBeNull()
+        expect(screen.getByRole("contentinfo")).toBeInTheDocument()
+    })
+
     it("resets the app after asking: storage, service workers and caches wiped, page reloaded", async () => {
         const removed = installServiceWorkerAndCaches(["workbox-precache"])
         const storage = createMemoryStorage()
@@ -292,5 +313,93 @@ describe("WhatsApp", () => {
         expect(
             within(header()).queryByRole("link", { name: /וואטסאפ/ }),
         ).not.toBeInTheDocument()
+    })
+})
+
+describe("page loading", () => {
+    it("keeps the page and shows a loading bar while the next page's code downloads", async () => {
+        let arrive: () => void = () => {}
+        const download = new Promise<void>((resolve) => (arrive = resolve))
+        function Slow() {
+            return <h1>עמוד איטי</h1>
+        }
+        const { router } = renderApp({
+            routes: [
+                {
+                    element: <RootLayout />,
+                    children: [
+                        {
+                            index: true,
+                            element: <Link to="/slow">לעמוד</Link>,
+                        },
+                        {
+                            path: "slow",
+                            lazy: async () => {
+                                await download
+                                return { Component: Slow }
+                            },
+                        },
+                    ],
+                },
+            ],
+        })
+
+        await userEvent.click(
+            await screen.findByRole("link", { name: "לעמוד" }),
+        )
+
+        const loading = () =>
+            screen
+                .queryAllByRole("status")
+                .find((status) => status.textContent === "טוען…")
+        await waitFor(() => expect(loading()).toBeDefined())
+        expect(screen.getByRole("link", { name: "לעמוד" })).toBeInTheDocument()
+
+        await act(async () => arrive())
+
+        expect(
+            await screen.findByRole("heading", { name: "עמוד איטי" }),
+        ).toBeInTheDocument()
+        expect(loading()).toBeUndefined()
+        expect(router.state.location.pathname).toBe("/slow")
+    })
+})
+
+describe("maintenance (VITE_DISABLE_APP)", () => {
+    it("shows every page closed for maintenance, in the chosen language", async () => {
+        vi.stubEnv("VITE_DISABLE_APP", "true")
+        const fake = createFakeDataClient({
+            ci_events: [event({ title: "ג'אם" })],
+        })
+        const { unmount } = renderApp({ fake })
+
+        expect(
+            await screen.findByRole("heading", {
+                name: "קונטקט אימפרוביזציה ישראל",
+            }),
+        ).toBeInTheDocument()
+        expect(screen.getByText("סגור לרגל שיפוצים")).toBeInTheDocument()
+        expect(screen.queryByText("ג'אם")).not.toBeInTheDocument()
+        expect(screen.queryByRole("banner")).not.toBeInTheDocument()
+        unmount()
+
+        const storage = createMemoryStorage()
+        storage.setItem("language", "en")
+        renderApp({ path: "/about", storage })
+        expect(
+            await screen.findByText("Closed for maintenance"),
+        ).toBeInTheDocument()
+    })
+
+    it("is off unless set to true", async () => {
+        vi.stubEnv("VITE_DISABLE_APP", "false")
+        renderApp({
+            fake: createFakeDataClient({
+                ci_events: [event({ title: "ג'אם" })],
+            }),
+        })
+
+        expect(await screen.findByText("ג'אם")).toBeInTheDocument()
+        expect(screen.queryByText("סגור לרגל שיפוצים")).not.toBeInTheDocument()
     })
 })

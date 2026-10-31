@@ -119,7 +119,7 @@ function scrubBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb {
     }
 }
 
-/** Legacy's settings (`legacy/src/instrument.js`), with URLs scrubbed. */
+/** Legacy's settings (the old client's `instrument.js`), with URLs scrubbed. */
 export function sentryOptions({
     dsn,
     release,

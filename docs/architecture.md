@@ -1,13 +1,17 @@
-# Client architecture (rewrite, spec #34)
+# Client architecture (spec #34)
 
 The client is a Vite + React 19 + TypeScript SPA on the same Supabase backend.
 There is no realtime: freshness comes from the query cache's rules. This file
-is the shared map for everyone working on the rewrite. Keep it current when
-you add a convention that other slices should follow.
+is the shared map for everyone working on the client. Keep it current when
+you add a convention that other work should follow.
 
-`legacy/src/` is the old client, kept read-only as the reference for parity
-(behaviour, copy, styles, translations). Nothing builds, lints or tests it,
-and the cutover deletes it. Port behaviour from it; don't import from it.
+It replaced the old client (antd, MobX, supabase-js with realtime) at the
+cutover (spec #34). "Legacy" below means that old client: its behaviour,
+copy and data shapes, which this one kept on purpose. Its code is gone from
+the tree (it lives in git history before the cutover commit);
+`docs/parity.md` maps every user story to where it is built and tested, and
+lists what was dropped. `docs/cutover.md` is the maintainer's checklist for
+the switch.
 
 ## Layout
 
@@ -71,9 +75,9 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   uuid. Use native elements (`<dialog>`, `<input type="date|time">`,
   `<details>`), small primitives in `src/ui/`, `Intl` and the helpers in
   `src/lib/`. `crypto.randomUUID()` for ids.
-- **Same look.** Port the legacy SCSS for the component you're building
-  (`legacy/src/styles/`) into a `.scss` file next to it, dropping antd
-  overrides. Same copy, same three languages.
+- **Same look.** Each component's styles are a `.scss` file next to it,
+  ported from the old client's SCSS without its antd overrides. Same copy,
+  same three languages.
 - **Dates.** Calendar days are `YYYY-MM-DD` strings in Asia/Jerusalem
   (`src/lib/jerusalemDate.ts`). Read "now" from `services.now()`, never
   `new Date()` in features, so tests control the clock. Don't put today's
@@ -180,7 +184,7 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
 "email"`). The header's login link (legacy: account icon + "התחבר/י")
       shows only to `anonymous` viewers, online, on routes without
       `homeButton` (text and auth pages get home instead).
-    - **Guarded routes** (legacy `PrivateRoutes`): wrap a later slice's
+    - **Guarded routes** (legacy `PrivateRoutes`): wrap a new page's
       routes in `requireRole(roles, [...])` (`app/auth/guard.ts`, legacy's
       groups `SIGNED_IN_ROLES`, `PROFILE_ROLES`, `CREATOR_ROLES`,
       `ADMIN_ROLES`). While the viewer is unknown it shows loading,
@@ -298,8 +302,11 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   or digit `short_id`, as the `set_short_id` trigger makes them) is a 404 at
   once, with no request and no details code, e.g. `/abuot` or `/signin`.
   Static top-level routes (`/about`, `/login`, …) outrank
-  `/:eventId` in React Router's ranking, so later slices just add them; they
-  never reach the event lookup.
+  `/:eventId` in React Router's ranking, so new pages just add them; they
+  never reach the event lookup. Opened from a shared link (not from the
+  list), the event's card is scrolled to the middle of the list behind the
+  dialog once listed (`EventList`'s `revealId`, legacy's
+  `useScroolToEventById`), so closing it shows the event in context.
 - **Filters and views.** Filters live in the URL as legacy encoded them,
   one `f` param per value (`/?f=jam&f=center`); `useEventFilters` reads and
   writes them (in place, never a history entry), and `filters.ts` holds the
@@ -335,8 +342,8 @@ and the cutover deletes it. Port behaviour from it; don't import from it.
   Unmounting it directly (e.g. on Back) is fine. Focus returns to the element
   that had it, and the page behind doesn't scroll while it is open. Its body
   is the scroller and fills the box. Icons are inline SVG components, one
-  module per icon in `src/ui/icons/` (Material Symbols paths from
-  `legacy/src/assets/svgs`), so an icon used only by a lazy page stays out
+  module per icon in `src/ui/icons/` (Material Symbols paths, as the old client's
+  SVG files had them), so an icon used only by a lazy page stays out
   of `/`'s initial JS; add a new one as its own file the same way, never
   load SVG files at runtime. `ToggleButtons`
   (`src/ui`) is legacy's `MenuButtons` (joined icon buttons, one pressed;
@@ -1047,9 +1054,8 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       string or React nodes (a sentence with a link in it:
       `terms: (link: ReactNode) => <>I accept the {link}</>`). Never write
       a user-facing string outside a `defineCopy` (aria-labels, titles and
-      alt text included). Port the words from legacy `util/translations.ts`
-      when they exist there; legacy left much copy in Hebrew only, so write
-      the English and Russian.
+      alt text included). Write all three languages: legacy's words were
+      ported where it had them, and much of its copy was Hebrew only.
     - **Legal texts** (privacy policy, terms) are the one exception: legacy
       published them in Hebrew only, so they stay word for word in a
       component marked `lang="he" dir="rtl"`, under a translated title and
@@ -1103,7 +1109,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       (`SHOWN_LANGUAGES`); a stored language that isn't offered falls back
       to Hebrew. The switcher (`app/LanguageSwitcher.tsx`, the legacy flag
       menu) sits in the app header, as in legacy.
-- **Assets.** Images ported from `legacy/src/assets` live in `src/assets/`
+- **Assets.** Images ported from the old client live in `src/assets/`
   and are imported with `?no-inline` (e.g. the flags, the WhatsApp logo), so
   they are hashed files fetched when shown, never base64 in the JS.
   Multi-colour logos are such images; single-colour icons are inline SVG
@@ -1134,7 +1140,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   and Back returns to where the visitor was. A route's `handle`
   (`RouteHandle`, `app/routeHandle.ts`) tells the shell about it, e.g.
   `homeButton` on the text pages. `services.reload()` reloads the page
-  (tests count the calls); slice 7's update prompt should use it too.
+  (tests count the calls); the update handover reloads through it too.
   While a lazy route's code downloads, the page stays and `PageLoading`
   shows a thin bar along the top (after 150 ms, so quick loads don't
   flash it), with "loading" for screen readers. The
@@ -1142,6 +1148,12 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   device storage except `KEPT_ON_RESET` (`isInternal`), unregisters service
   workers and deletes Cache Storage, then the page reloads. Add a key to
   `KEPT_ON_RESET` only if losing it would harm the visitor or analytics.
+  The footer closes the calendar in both views and the empty list too.
+  Legacy's kill switch: a build with `VITE_DISABLE_APP=true` renders
+  `AppDisabled` ("closed for maintenance") in `RootLayout` on every path,
+  with no header; the service worker and updates still run, so the next
+  deploy without it reaches installed apps. When unset, the build drops
+  its code from `/` (its copy is `/* @__PURE__ */`).
 - **Header and menu.** The header shows a home button (to signed-out
   visitors on routes with the `homeButton` handle, to signed-in users
   anywhere but `/`), the language menu, the WhatsApp link
@@ -1225,9 +1237,9 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       `services.telemetry.reset()` on sign-out: Sentry forgets the user,
       PostHog starts a new anonymous visitor, so the next person on a
       shared phone isn't joined to the account. Send only the user id to
-      PostHog, never email or name. Also port legacy's
-      `saveIsInternalToLocalStorage`: after the profile row loads, call
-      `services.telemetry.setInternal(users.is_internal)`. It saves the
+      PostHog, never email or name. As legacy's
+      `saveIsInternalToLocalStorage` did, after the profile row loads
+      `services.telemetry.setInternal(users.is_internal)` is called. It saves the
       `isInternal` key; marking a device internal stops PostHog
       (`opt_out_capturing`, autocapture included) and Speed Insights at
       once; unmarking takes effect from the next page load. (All wired in
@@ -1385,8 +1397,8 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
   hstspreload.org (and adding `preload`) commits every subdomain to
   HTTPS for good, so it is the owner's call.
 
-- **Before the cutover: check the event write policies and the junction's
-  delete rule.** Admins' updates and deletes of others' events (slice 20)
+- **Check the event write policies and the junction's delete rule**
+  (`docs/cutover.md`). Admins' updates and deletes of others' events (slice 20)
   are untested against the live database: legacy's admin delete never
   reached it, and the RLS check of 2026-08-08 verified SELECT only. Run
 
@@ -1787,3 +1799,15 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     production build served with these headers: public pages, sign-in,
     telemetry on the production host, previews, report delivery, and the
     signed-in pages against a mocked backend.
+22. Cutover: the old client deleted (with its lint/format exclusions, the
+    decorator `.babelrc` and a stray tracked `.vite/`); every user story
+    checked against the code and tests (`docs/parity.md`: 64 done, story 36
+    a recorded deviation), and the old client swept for unlisted behaviour:
+    its maintenance kill switch (`VITE_DISABLE_APP`), scrolling a shared
+    event's card into view, the footer under the month view and the empty
+    list, and the date pickers' one-year limit were ported, with a test for
+    the page-loading bar. A migration file (not applied) takes the app's
+    tables out of `supabase_realtime` after go-live. `docs/cutover.md` is
+    the maintainer's checklist (env, SQL checks, migrations, post-deploy
+    checks, rollback); `docs/perf-baseline.md` has the final sizes (135.3 KB
+    gzip for `/`, from 568.7 KB).

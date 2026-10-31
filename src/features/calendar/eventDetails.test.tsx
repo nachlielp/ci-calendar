@@ -372,6 +372,41 @@ describe("shared event links", () => {
         expect(await eventTitles()).toEqual(["שיעור וג'אם"])
     })
 
+    it("scrolls a shared event's card into view behind it, as legacy did; never one opened from the list", async () => {
+        // jsdom has no layout, so record what would be scrolled to.
+        const scrolled: string[] = []
+        Element.prototype.scrollIntoView = function (this: Element) {
+            scrolled.push(this.querySelector("h2")?.textContent ?? "")
+        }
+        try {
+            const earlier = event({
+                id: "0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d",
+                short_id: "Zz9",
+                title: "ג'אם בוקר",
+                start_date: "2026-11-01",
+                end_date: "2026-11-01",
+            })
+            const { unmount } = renderApp({
+                fake: backend([earlier, jam]),
+                path: "/Ab1",
+                now: NOW,
+            })
+            await details()
+            await waitFor(() => expect(scrolled).toEqual(["שיעור וג'אם"]))
+            unmount()
+
+            scrolled.length = 0
+            renderApp({ fake: backend([earlier, jam]), now: NOW })
+            await userEvent.click(
+                within(await eventCard("שיעור וג'אם")).getByRole("link"),
+            )
+            await details()
+            expect(scrolled).toEqual([])
+        } finally {
+            delete (Element.prototype as Partial<Element>).scrollIntoView
+        }
+    })
+
     it("says so in the dialog when the event fails to load, and retries", async () => {
         const fake = backend()
         fake.failTable("ci_events", "network down")

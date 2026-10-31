@@ -19,7 +19,7 @@ export function scrubPostHogEvent(
 }
 
 /**
- * PostHog with legacy's settings (`legacy/src/Providers/PHProvider.tsx`):
+ * PostHog with legacy's settings (the old client's `Providers/PHProvider.tsx`):
  * autocapture on, page views recorded by the app (one per location), and
  * the same persistence name, so returning visitors keep their PostHog id.
  */

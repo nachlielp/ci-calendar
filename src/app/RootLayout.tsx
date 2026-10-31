@@ -11,6 +11,7 @@ import {
 } from "react-router"
 import { COMMON_COPY } from "../lib/commonCopy"
 import { defineCopy } from "../lib/copy"
+import { AppDisabled } from "./AppDisabled"
 import { AppHeader } from "./header/AppHeader"
 import { InstallBanner } from "./install/InstallBanner"
 import { useCopy } from "./language"
@@ -62,6 +63,16 @@ function scrollKey(location: Location, matches: UIMatch[]) {
  */
 export function RootLayout() {
     useRemoveInitialLoader()
+
+    // Legacy's kill switch: a maintenance build (`VITE_DISABLE_APP`).
+    if (import.meta.env.VITE_DISABLE_APP === "true") {
+        return (
+            <div className="app">
+                <Background />
+                <AppDisabled />
+            </div>
+        )
+    }
 
     return (
         <div className="app">

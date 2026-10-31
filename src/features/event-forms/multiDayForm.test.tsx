@@ -322,6 +322,18 @@ describe("the multi-day event form", () => {
         expect(inserts(fake)).toHaveLength(0)
     })
 
+    it("offers days up to a year ahead, as legacy's pickers did", async () => {
+        const { user, fake } = setup()
+        render(user, fake)
+
+        for (const name of ["תאריך התחלה", "תאריך סיום"]) {
+            expect(await screen.findByLabelText(name)).toHaveAttribute(
+                "max",
+                "2027-10-30",
+            )
+        }
+    })
+
     it("refuses a first day that has passed", async () => {
         const { user, fake } = setup()
         render(user, fake)
