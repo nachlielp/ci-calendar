@@ -20,7 +20,7 @@
 -- again. `id` and `created_at` take their column defaults, as in the legacy
 -- inserts. Nothing is deleted.
 --
--- Apply by hand (SQL editor); this repo has no migration runner.
+-- Applied to production by hand (SQL editor) on 2026-10-31.
 --
 -- Check before and after (0 after):
 --   select count(*) from (<the select below>) as missing;

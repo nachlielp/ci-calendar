@@ -85,9 +85,28 @@ included, NetworkFirst).
 
 ## Field data (Vercel Speed Insights)
 
-Not yet recorded: this needs the Vercel dashboard (the maintainer).
+No field data for the old client: Speed Insights showed no traffic in the
+window the dashboard offers (checked 2026-10-31). The lab numbers below
+stand in as its baseline.
 
-- **Before the cutover deploy:** copy the old client's p75 LCP, INP, CLS,
+### Lab baseline (Lighthouse 12, mobile, production)
+
+The old client on www.ci-events.org, `/`, 2026-10-31, three runs
+(simulated mobile throttling, headless Chrome):
+
+| Run    | Score | LCP   | FCP   | TBT    | CLS | Speed Index |
+| ------ | ----- | ----- | ----- | ------ | --- | ----------- |
+| 1      | 55    | 9.2 s | 4.5 s | 340 ms | 0   | 4.9 s       |
+| 2      | 61    | 8.9 s | 4.4 s | 180 ms | 0   | 4.8 s       |
+| 3      | 62    | 8.9 s | 4.4 s | 170 ms | 0   | 4.7 s       |
+| Median | 61    | 8.9 s | 4.4 s | 180 ms | 0   | 4.8 s       |
+
+Re-run the same way after the deploy:
+`npx lighthouse@12 https://www.ci-events.org/ --only-categories=performance --form-factor=mobile`.
+
+### Field data, once there is traffic
+
+- **Before the cutover deploy** (skipped, see above): copy the old client's p75 LCP, INP, CLS,
   FCP and TTFB for `/` and `/event/[eventId]` on production
   (www.ci-events.org), mobile and desktop separately, last 30 days, into the
   table below.

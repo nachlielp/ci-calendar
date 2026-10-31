@@ -47,30 +47,26 @@ speed. Order: **before merging → deploy → after deploy → later**.
     Speed Insights needs no variable (enabled in the dashboard). Google
     Analytics' id is in `index.html`.
 
-- [ ] **Remove what nothing reads any more** (they only clutter, but see the
-      secrets note): `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
-      `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH`,
-      `VITE_PWA_TEST`, `VITE_WHATSAPP_NUMBER` (the WhatsApp link is gone), `VITE_GOOGLE_ANALYTICS_ID`, `VITE_UPLOADTHING_TOKEN`,
-      every `VITE_FIREBASE_*` and `VITE_VAPID_PUBLIC_FIREBASE_KEY`, every
-      `VITE_CLOUDINARY_*`, `VITE_DEV_DATABASE_AUTH_TOKEN`, `DOMAIN_URL`;
-      and `GOOGLE_TRANSLATE_API_KEY` if it is set on Vercel (it belongs to
-      the Supabase function, below). **Secrets under `VITE_` names**
-      (`VITE_CLOUDINARY_API_SECRET`, `VITE_DEV_DATABASE_AUTH_TOKEN`,
-      `VITE_UPLOADTHING_TOKEN`) are inlined into any bundle that references
-      them; neither client does now, but if an older build ever did, treat
-      them as public and rotate or revoke them.
+- [x] Checked 2026-10-31: every variable above is set (PostHog on
+      production only, as intended). The old ones nothing reads any more are
+      removed after the deploy (see "After the deploy"), so a rebuild of the
+      old client meanwhile still finds them.
 
 ### Google Places key
 
 - [ ] The key in `VITE_GOOGLE_PLACES_API_KEY` is valid (the local `.env`
       one is not: `InvalidKeyMapError`), has the **Maps JavaScript API** and
       **Places API** enabled, and is HTTP-referrer-restricted to the
-      production domains (plus preview domains, to test there). It must not
+      production domains plus the `develop` preview's fixed address,
+      `https://ci-calendar-git-develop-nachpoks-projects.vercel.app/*`
+      (never `*.vercel.app`: that is every Vercel site). It must not
       have the Translate API.
 
 ### Supabase: the `translate` Edge Function
 
-- [ ] Deployed with its secret (`supabase/functions/translate/README.md`):
+- [x] Already live with its secret (checked 2026-10-31: a test call
+      returns a translation; the old client uses it too, and only a comment
+      changed since). For reference, deployed with its secret (`supabase/functions/translate/README.md`):
       `supabase secrets set GOOGLE_TRANSLATE_API_KEY=…` (a server-side key,
       Translation API only), then `supabase functions deploy translate`.
       Without it saves still work (titles fall back to Hebrew, never
@@ -78,7 +74,10 @@ speed. Order: **before merging → deploy → after deploy → later**.
 
 ### Supabase: auth URLs
 
-- [ ] Authentication → URL Configuration: the **Site URL** is the
+- [x] Done 2026-10-31: Site URL `https://www.ci-events.org` (it was
+      `https://ci-events.org/*`), and `www`'s `/reset-password` and the
+      `develop` preview added to the Redirect URLs. Authentication → URL
+      Configuration: the **Site URL** is the
       production origin (Google sign-in returns there, as before), and the
       **Redirect URLs** include `https://www.ci-events.org/reset-password`
       (and `https://ci-events.org/reset-password` if that host serves the
@@ -86,17 +85,22 @@ speed. Order: **before merging → deploy → after deploy → later**.
       there. The old client used the same URL, so it is likely there
       already.
 
-### Supabase: auth emails in three languages (optional)
+### Supabase: auth emails
 
-- [ ] Authentication → Emails: paste `supabase/templates/confirmation.html`
-      into **Confirm signup** and `recovery.html` into **Reset password**,
-      with the subjects in `supabase/templates/README.md`. Each email is in
-      Hebrew, English and Russian together (Supabase picks no language).
-      Independent of the deploy: the old client sends the same emails.
+- [x] Decided 2026-10-31: the sign-up and password-reset emails stay
+      Supabase's default English ones (their `{{ .ConfirmationURL }}` link
+      works with the new client as it did with the old).
 
 ### Supabase: read-only SQL checks (SQL editor)
 
-- [ ] **Bio photo bucket** accepts what the client sends (JPEG as
+Run 2026-10-31: the bucket takes any type and size; admins have
+`admin_full_crudl` (ALL) on both tables; the junction cascades; the
+template key was `c`. Two `assign_user_role` functions exist: ours
+(`public`, security definer, admin-checked, not callable by anon) and an
+unrelated `app_auth.assign_user_role(uuid)` (invoker rights, in a schema
+the API doesn't expose), left alone.
+
+- [x] **Bio photo bucket** accepts what the client sends (JPEG as
       `image/jpg`, at most ~30 KB):
 
     ```sql
@@ -107,7 +111,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
     `null` means anything; otherwise `image/jpg` must be listed (or the
     client's `PHOTO_CONTENT_TYPE` changed to one that is).
 
-- [ ] **Event write policies** let admins update and delete others' events
+- [x] **Event write policies** let admins update and delete others' events
       (manage-all-events), and the junction's delete is allowed to the
       event's owner and admins:
 
@@ -121,7 +125,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
     creator's event says "not allowed, or changed meanwhile" and changes
     nothing (no harm, but the page doesn't work).
 
-- [ ] **The junction's foreign key delete rule:**
+- [x] **The junction's foreign key delete rule:**
 
     ```sql
     select confdeltype from pg_constraint
@@ -132,7 +136,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
     deletes the tags first when the database refuses (one extra request).
     Either works.
 
-- [ ] **The template foreign key delete rule** (decided: deleting a
+- [x] **The template foreign key delete rule** (decided: deleting a
       template keeps its events; the migration below makes it so):
 
     ```sql
@@ -151,17 +155,17 @@ Nothing applies `supabase/migrations/` automatically. Each file's header
 says what it does and how to check it. All are safe for the old client
 too, except the realtime one, which waits until after go-live.
 
-- [ ] (`20260808000000_assign_user_role.sql` was applied with #16; check
+- [x] (`20260808000000_assign_user_role.sql` was applied with #16; check
       `select proname from pg_proc where proname = 'assign_user_role'`.)
-- [ ] **`20261030000000_backfill_event_teacher_junction.sql`**, before the
+- [x] Applied 2026-10-31 (66 → 0). **`20261030000000_backfill_event_teacher_junction.sql`**, before the
       deploy: links older events (66 found on 2026-10-30) to their tagged
       teachers' bios. Without it those events show teachers as plain names.
       Idempotent; run its count check before and after (0 after).
-- [ ] **`20261030120000_bio_photos_for_profiles.sql`**, any time: lets
+- [x] Applied 2026-10-31. **`20261030120000_bio_photos_for_profiles.sql`**, any time: lets
       `profile` users (teachers without event rights) upload a bio photo.
       Until then they're told the photo can't be uploaded and the rest
       saves. Run the bucket check above first.
-- [ ] **`20261031120000_template_delete_keeps_events.sql`**, before the
+- [x] Applied 2026-10-31 (`c` → `n`). **`20261031120000_template_delete_keeps_events.sql`**, before the
       deploy: deleting a template keeps the events made from it (the
       foreign key becomes `on delete set null`). Run its check before and
       after (`c`, then `n`).
@@ -212,6 +216,20 @@ too, except the realtime one, which waits until after go-live.
       `isInternal` devices).
 - [ ] **Bundle:** the deploy's `/` loads ~135 KB of gzip JS (DevTools →
       Network, JS, first load with cache disabled).
+
+- [ ] **Remove the variables nothing reads any more** (Vercel, all
+      environments), once the new client is live: `VITE_WHATSAPP_NUMBER`,
+      `VITE_GOOGLE_ANALYTICS_ID`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH` (three
+      entries), `DOMAIN_URL` (two), `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
+      `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_UPLOADTHING_TOKEN`, every `VITE_FIREBASE_*` and
+      `VITE_VAPID_PUBLIC_FIREBASE_KEY`. (`VITE_CLOUDINARY_*` and
+      `VITE_DEV_DATABASE_AUTH_TOKEN` were removed on 2026-10-31: Cloudinary
+      and the Turso database aren't used.) A rollback is unaffected: an old
+      deployment has its values built in. **Leaked secrets:**
+      `VITE_CLOUDINARY_API_SECRET` (2024 bio uploads) and
+      `VITE_DEV_DATABASE_AUTH_TOKEN` (a 2024 Turso dev database) were read by
+      client code once, so they shipped to visitors; revoke them at the
+      provider if the accounts still exist.
 
 ## 4. Later
 

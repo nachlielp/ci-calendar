@@ -1,5 +1,4 @@
--- Bio photos for every role with a bio (spec #34, slice 17). NOT APPLIED:
--- apply by hand (SQL editor) after review; nothing runs migrations.
+-- Bio photos for every role with a bio (spec #34, slice 17). APPLIED to production by hand on 2026-10-31.
 --
 -- The bio page is open to profile, creator, org and admin users (legacy's
 -- PROFILE_ROLES), but storage.objects' write policies

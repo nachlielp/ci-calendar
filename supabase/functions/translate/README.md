@@ -50,4 +50,4 @@ caller from spending Translate quota. Recommended follow-ups: per-IP rate
 limiting, restricting `targetLang` to the supported set, and a max `text`
 length. The client already caches to minimise calls: every text and language
 once per session in memory, and the event details' translations on the device
-across visits (`src/features/calendar/details/translationStore.ts`).
+across visits (`src/app/translationStore.ts`).
