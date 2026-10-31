@@ -104,6 +104,22 @@ The old client on www.ci-events.org, `/`, 2026-10-31, three runs
 Re-run the same way after the deploy:
 `npx lighthouse@12 https://www.ci-events.org/ --only-categories=performance --form-factor=mobile`.
 
+The new client on production, same test, 2026-10-31 (right after the
+cutover deploy):
+
+| Run    | Score | LCP   | FCP   | TBT    | CLS | Speed Index |
+| ------ | ----- | ----- | ----- | ------ | --- | ----------- |
+| 1      | 79    | 4.8 s | 1.6 s | 40 ms  | 0   | 4.5 s       |
+| 2      | 78    | 4.8 s | 1.6 s | 120 ms | 0   | 4.6 s       |
+| 3      | 82    | 4.8 s | 1.6 s | 40 ms  | 0   | 3.0 s       |
+| Median | 79    | 4.8 s | 1.6 s | 40 ms  | 0   | 4.5 s       |
+
+Against the old client's medians: FCP −64% (4.4 → 1.6 s), LCP −46%
+(8.9 → 4.8 s), TBT −78% (180 → 40 ms). The LCP element is the first
+event's title; 86% of its time is render delay, waiting for the public
+window's request after the JS has run, so that request (the edge cache
+in spec #37) is the next lever, not the bundle.
+
 ### Field data, once there is traffic
 
 - **Before the cutover deploy** (skipped, see above): copy the old client's p75 LCP, INP, CLS,
