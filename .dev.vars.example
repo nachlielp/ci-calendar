@@ -1,0 +1,5 @@
+# The Worker's variables for `wrangler dev` (copy to .dev.vars, gitignored).
+# In production they are Worker secrets: `npx wrangler secret put <NAME>`.
+# The same values as the client build's .env.
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key

@@ -12,6 +12,7 @@ export default defineConfig({
         include: [
             "src/**/*.{test,spec}.{ts,tsx}",
             "scripts/**/*.{test,spec}.ts",
+            "worker/**/*.{test,spec}.ts",
         ],
     },
 })

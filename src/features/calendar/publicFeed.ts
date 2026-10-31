@@ -1,5 +1,6 @@
 import type { DataClient } from "../../data/client"
 import {
+    PUBLIC_WINDOW_ENDPOINT,
     publicWindowRange,
     readPublicWindow,
     type PublicWindowRows,
@@ -14,9 +15,6 @@ export interface PublicFeed {
     /** Today (Jerusalem) through `WINDOW_DAYS` ahead, rows as PostgREST's. */
     window(): Promise<PublicWindowRows>
 }
-
-/** The Worker's edge-cached window (worker/publicWindow.ts), same origin. */
-export const PUBLIC_WINDOW_ENDPOINT = "/api/public-window"
 
 /**
  * How long the edge gets before the direct read takes over. The edge

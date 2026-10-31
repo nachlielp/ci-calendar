@@ -7,6 +7,9 @@ import { selectPublicEvents } from "./publicEvent"
 // (worker/publicWindow.ts), so both send exactly the same select. Plain
 // data and functions: no React, no TanStack, nothing of the page.
 
+/** The Worker's edge-cached window (worker/publicWindow.ts), same origin. */
+export const PUBLIC_WINDOW_ENDPOINT = "/api/public-window"
+
 /** How far ahead the public calendar looks. ~25 events, ~6.5 KB gzipped. */
 export const WINDOW_DAYS = 90
 

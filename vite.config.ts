@@ -15,7 +15,8 @@ import {
 
 /**
  * The build version (`BUILD_VERSION` in src/app/buildVersion.ts): the commit
- * SHA for builds, `dev-<start time>` for the dev server. A new value marks
+ * SHA for builds (as Vercel, Cloudflare Workers Builds, GitHub Actions or
+ * git give it), `dev-<start time>` for the dev server. A new value marks
  * the persisted query cache stale, and changes index.html and so the service
  * worker's precache list, which is how browsers notice a deploy.
  */
@@ -23,7 +24,10 @@ function buildVersion(command: "build" | "serve"): string {
     // Each dev server start counts as a new build.
     if (command === "serve") return `dev-${Date.now()}`
     const sha =
-        process.env.VERCEL_GIT_COMMIT_SHA ?? process.env.GITHUB_SHA ?? gitSha()
+        process.env.VERCEL_GIT_COMMIT_SHA ??
+        process.env.WORKERS_CI_COMMIT_SHA ??
+        process.env.GITHUB_SHA ??
+        gitSha()
     // Without git (e.g. a source tarball), every build counts as new.
     return sha ? sha.slice(0, 12) : `build-${Date.now()}`
 }

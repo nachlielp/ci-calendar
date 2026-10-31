@@ -1,5 +1,5 @@
-import { PUBLIC_WINDOW_ENDPOINT } from "../features/calendar/publicFeed"
 import {
+    PUBLIC_WINDOW_ENDPOINT,
     publicWindowRange,
     readPublicWindow,
 } from "../features/calendar/publicWindowSelect"

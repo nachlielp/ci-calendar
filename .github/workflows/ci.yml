@@ -39,3 +39,8 @@ jobs:
 
             - name: Service worker precache
               run: npm run check:sw
+
+            # The Cloudflare Worker and its config bundle (no credentials,
+            # nothing deployed).
+            - name: Worker dry run
+              run: npm run cf:check
