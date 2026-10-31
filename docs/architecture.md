@@ -782,10 +782,12 @@ event.ownerId)`, the user's own for everyone else, since that is all
           `maybeSingle`; none back is `TemplateGoneError` and the list is
           refetched) and `useDeleteTemplate` (owner-scoped) put the answer
           in the cached list (`setQueryData` only if cached), no refetch.
-          Legacy's delete confirm says the events made from a template go
-          with it (`ci_events.source_template_id`'s foreign key; its delete
-          rule isn't in the repo: see Maintainer notes), so a delete also
-          runs `refreshEventQueries`. No translation or Places lookup: templates
+          A delete keeps the events made from the template: it unlinks
+          them first (`source_template_id = null`), so they stay whatever
+          the foreign key's delete rule (see Maintainer notes). If the user
+          ticks it in the confirm, it first deletes their upcoming events
+          made from it (`deleteEventRows`, as manage-events deletes); past
+          ones always stay. It then runs `refreshEventQueries`. No translation or Places lookup: templates
           have no `lng_titles`, and the address keeps the `en_label` the
           field got when picked.
         - **Values** (`templateValues.ts`, pure, tested directly):
@@ -1489,18 +1491,15 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
     database's refusal (an extra request). Until checked, a refused admin
     write shows "not allowed, or changed meanwhile" and changes nothing.
 
-- **Deleting a template may delete its events.** The delete rule of
-  `ci_events.source_template_id`'s foreign key
-  (`ci-events_source_template_id_fkey`) isn't known from the repo. Check it
-  with `SELECT confdeltype FROM pg_constraint WHERE conname =
-'ci-events_source_template_id_fkey'` (`c` cascade, `n` set null, `a`/`r`
-  no action/restrict). If it cascades, deleting a template deletes every
-  event made from it (384 of the 782 visible events reference a template).
-  Legacy relied on that (its confirm says so) and the client keeps its
-  words and refreshes the event lists after a delete. `ON DELETE SET NULL`
-  would keep the events; that is a product decision, and a migration file
-  for the maintainer to apply. With no action, deleting a template still
-  used by an event fails, and the confirm says the action failed.
+- **Deleting a template keeps its events** (maintainer decision,
+  2026-10-31). Legacy's foreign key (`ci-events_source_template_id_fkey`)
+  is believed to cascade, deleting every event made from the template (384
+  of the 782 visible events reference one). The client now unlinks the
+  events before deleting the template, so they stay whatever the rule, and
+  deletes the upcoming ones only when the user ticks it in the confirm.
+  `supabase/migrations/20261031120000_template_delete_keeps_events.sql`
+  makes the key `ON DELETE SET NULL`, so a delete from anywhere else keeps
+  them too.
 
 ## Tests
 

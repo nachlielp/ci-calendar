@@ -27,7 +27,8 @@ export const TEMPLATE_COPY = defineCopy({
         delete: (name: string) => `מחיקת ${name}`,
         deleteTitle: "מחיקת תבנית",
         deleteQuestion:
-            "האם אתם בטוחים שאתם רוצים למחוק את התבנית ? מחיקת התבנית תמחק את כל הארועים שנוצרו מתוך התבנית.",
+            "האם אתם בטוחים שאתם רוצים למחוק את התבנית? הארועים שנוצרו מתוך התבנית יישארו.",
+        deleteEventsToo: "למחוק גם את הארועים העתידיים שנוצרו מתוך התבנית",
         deleteOk: "מחיקה",
     },
     en: {
@@ -51,7 +52,8 @@ export const TEMPLATE_COPY = defineCopy({
         delete: (name: string) => `Delete ${name}`,
         deleteTitle: "Delete template",
         deleteQuestion:
-            "Are you sure you want to delete the template? Deleting the template deletes all the events created from it.",
+            "Are you sure you want to delete the template? The events created from it are kept.",
+        deleteEventsToo: "Also delete the upcoming events created from it",
         deleteOk: "Delete",
     },
     ru: {
@@ -75,7 +77,8 @@ export const TEMPLATE_COPY = defineCopy({
         delete: (name: string) => `Удалить ${name}`,
         deleteTitle: "Удаление шаблона",
         deleteQuestion:
-            "Вы уверены, что хотите удалить шаблон? Удаление шаблона удалит все события, созданные из него.",
+            "Вы уверены, что хотите удалить шаблон? События, созданные из него, останутся.",
+        deleteEventsToo: "Удалить также будущие события, созданные из него",
         deleteOk: "Удалить",
     },
 })

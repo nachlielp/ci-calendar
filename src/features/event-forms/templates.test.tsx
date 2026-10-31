@@ -487,7 +487,7 @@ describe("templates", () => {
         )
         let dialog = await screen.findByRole("dialog", { name: "מחיקת תבנית" })
         expect(dialog).toHaveTextContent(
-            "האם אתם בטוחים שאתם רוצים למחוק את התבנית ? מחיקת התבנית תמחק את כל הארועים שנוצרו מתוך התבנית.",
+            "האם אתם בטוחים שאתם רוצים למחוק את התבנית? הארועים שנוצרו מתוך התבנית יישארו.",
         )
         await userEvent.click(
             within(dialog).getByRole("button", { name: "ביטול" }),
@@ -515,6 +515,101 @@ describe("templates", () => {
         )
         expect(await listedNames()).toEqual(["ג'אם שישי"])
         expect(templateRequests(fake)).toHaveLength(reads)
+    })
+
+    it("leave their events when deleted, unlinked from the template", async () => {
+        const { user, fake, multi } = setup()
+        const made = event({
+            title: "ריטריט מהתבנית",
+            user_id: user.id,
+            source_template_id: multi.id,
+        })
+        fake.rows("ci_events").push(made)
+        render(user, fake)
+        await listedNames()
+
+        await userEvent.click(
+            screen.getByRole("button", { name: "מחיקת ריטריט קיץ" }),
+        )
+        const dialog = await screen.findByRole("dialog", {
+            name: "מחיקת תבנית",
+        })
+        expect(
+            within(dialog).getByRole("checkbox", {
+                name: "למחוק גם את הארועים העתידיים שנוצרו מתוך התבנית",
+            }),
+        ).not.toBeChecked()
+        await userEvent.click(
+            within(dialog).getByRole("button", { name: "מחיקה" }),
+        )
+
+        await waitFor(() =>
+            expect(fake.rows("templates").map(({ id }) => id)).not.toContain(
+                multi.id,
+            ),
+        )
+        const kept = fake.rows("ci_events").find(({ id }) => id === made.id)
+        expect(kept).toMatchObject({ source_template_id: null })
+        expect(
+            fake.requests.filter(
+                (request) =>
+                    request.table === "ci_events" &&
+                    request.method === "delete",
+            ),
+        ).toEqual([])
+    })
+
+    it("delete their upcoming events too when chosen, and keep past ones", async () => {
+        const { user, fake, multi } = setup()
+        const upcoming = event({
+            start_date: "2026-11-05",
+            end_date: "2026-11-05",
+            user_id: user.id,
+            source_template_id: multi.id,
+        })
+        const past = event({
+            start_date: "2026-10-01",
+            end_date: "2026-10-01",
+            user_id: user.id,
+            source_template_id: multi.id,
+        })
+        const otherTemplate = event({
+            start_date: "2026-11-05",
+            end_date: "2026-11-05",
+            user_id: user.id,
+            source_template_id: "another-template",
+        })
+        fake.rows("ci_events").push(upcoming, past, otherTemplate)
+        render(user, fake)
+        await listedNames()
+
+        await userEvent.click(
+            screen.getByRole("button", { name: "מחיקת ריטריט קיץ" }),
+        )
+        const dialog = await screen.findByRole("dialog", {
+            name: "מחיקת תבנית",
+        })
+        await userEvent.click(
+            within(dialog).getByRole("checkbox", {
+                name: "למחוק גם את הארועים העתידיים שנוצרו מתוך התבנית",
+            }),
+        )
+        await userEvent.click(
+            within(dialog).getByRole("button", { name: "מחיקה" }),
+        )
+
+        await waitFor(() =>
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+        )
+        const ids = fake.rows("ci_events").map(({ id }) => id)
+        expect(ids).not.toContain(upcoming.id)
+        expect(ids).toEqual(expect.arrayContaining([past.id, otherTemplate.id]))
+        expect(
+            fake.rows("ci_events").find(({ id }) => id === past.id),
+        ).toMatchObject({ source_template_id: null })
+        expect(fake.rows("templates").map(({ id }) => id)).not.toContain(
+            multi.id,
+        )
     })
 
     it("keep a failed save's edits and say so", async () => {
@@ -622,7 +717,7 @@ describe("templates", () => {
         expect(storage.getItem(SINGLE_DAY_TEMPLATE_DRAFT_KEY)).not.toBeNull()
     })
 
-    it("refresh the event lists when one is deleted, as its events may go with it", async () => {
+    it("refresh the event lists when one is deleted, as its events may change with it", async () => {
         const { user, fake, multi } = setup()
         const { router } = render(user, fake, "/")
         expect(await eventTitles()).toContain("ג'אם ותיק")
@@ -651,7 +746,7 @@ describe("templates", () => {
             ),
         )
         // Back on the calendar within its fresh window: refetched all the
-        // same (with the cascade legacy warned of, its events are gone).
+        // same (its events were unlinked from the template, or deleted).
         await act(() => router.navigate("/"))
         await waitFor(() => expect(eventReads()).toBe(before + 1))
     })

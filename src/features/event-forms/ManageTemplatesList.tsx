@@ -119,7 +119,10 @@ function EditTemplateDialog({
     )
 }
 
-/** Legacy DeleteTemplateButton's confirm. */
+/**
+ * Legacy DeleteTemplateButton's confirm, which now keeps the template's
+ * events unless the user ticks deleting the upcoming ones too.
+ */
 function DeleteTemplateDialog({
     userId,
     template,
@@ -131,6 +134,7 @@ function DeleteTemplateDialog({
 }) {
     const copy = useCopy(TEMPLATE_COPY)
     const remove = useDeleteTemplate(userId)
+    const [withUpcomingEvents, setWithUpcomingEvents] = useState(false)
     return (
         <ActionDialog
             title={copy.deleteTitle}
@@ -138,10 +142,23 @@ function DeleteTemplateDialog({
             warning
             pending={remove.isPending}
             failed={remove.isError}
-            onOk={() => remove.mutate(template.id, { onSuccess: onClose })}
+            onOk={() =>
+                remove.mutate(
+                    { id: template.id, withUpcomingEvents },
+                    { onSuccess: onClose },
+                )
+            }
             onClose={onClose}
         >
             <p>{copy.deleteQuestion}</p>
+            <label className="series-option">
+                <input
+                    type="checkbox"
+                    checked={withUpcomingEvents}
+                    onChange={() => setWithUpcomingEvents((value) => !value)}
+                />
+                {copy.deleteEventsToo}
+            </label>
         </ActionDialog>
     )
 }

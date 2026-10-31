@@ -12,7 +12,9 @@ import { useServices, type AppServices } from "../../app/services"
 import type { Submission } from "../../app/useForm"
 import type { Database } from "../../data/database.types"
 import type { FormValues } from "../../lib/form"
+import { jerusalemToday } from "../../lib/jerusalemDate"
 import { refreshEventQueries } from "../events/eventCache"
+import { deleteEventRows } from "../events/eventWrites"
 import {
     byNewest,
     TEMPLATE_COLUMNS,
@@ -193,20 +195,54 @@ export function useUpdateTemplate(userId: string) {
     })
 }
 
+export interface TemplateDelete {
+    id: string
+    /** Also delete the user's upcoming events made from it (past ones stay). */
+    withUpcomingEvents: boolean
+}
+
 /**
  * Deletes one of the user's templates (legacy `deleteTemplate`) and takes
- * it out of the cached list. Legacy warned that deleting a template
- * deletes the events made from it (`ci_events.source_template_id`'s
- * foreign key), so every event list is refreshed too: those on screen
- * refetch, the rest when next shown.
+ * it out of the cached list. Legacy's foreign key
+ * (`ci_events.source_template_id`) deleted every event made from the
+ * template with it; now the events are kept unless the user chooses to
+ * delete the upcoming ones. The kept events are unlinked from the template
+ * first, so they stay whatever the key's delete rule (cascade until the
+ * migration making it `set null` is applied). Every event list is
+ * refreshed: those on screen refetch, the rest when next shown.
  */
 export function useDeleteTemplate(userId: string) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async (id: string) => {
+        mutationFn: async ({ id, withUpcomingEvents }: TemplateDelete) => {
             await sessionOf(services, userId)
-            const { error } = await services.data
+            const { data } = services
+            if (withUpcomingEvents) {
+                const upcoming = await data
+                    .from("ci_events")
+                    .select("id")
+                    .eq("source_template_id", id)
+                    .eq("user_id", userId)
+                    .gte("start_date", jerusalemToday(services.now()))
+                if (upcoming.error) throw new Error(upcoming.error.message)
+                if (upcoming.data.length > 0) {
+                    const deleted = await deleteEventRows(
+                        data,
+                        upcoming.data.map((row) => row.id),
+                        (query) => query.eq("user_id", userId),
+                    )
+                    if (deleted.error) throw new Error(deleted.error.message)
+                }
+            }
+            // Not scoped to the user: RLS lets them unlink only their own
+            // events (an admin any), and no event is left for the key.
+            const unlinked = await data
+                .from("ci_events")
+                .update({ source_template_id: null })
+                .eq("source_template_id", id)
+            if (unlinked.error) throw new Error(unlinked.error.message)
+            const { error } = await data
                 .from("templates")
                 .delete()
                 .eq("id", id)
