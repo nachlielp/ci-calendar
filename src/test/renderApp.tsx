@@ -86,6 +86,7 @@ export function renderApp({
             ? edgePublicFeed({
                   data: fake.client,
                   now: clock,
+                  signedIn: () => !!fake.auth.session(),
                   fetch: edge.fetch,
                   timeoutMs: edge.timeoutMs,
               })

@@ -110,7 +110,9 @@ describe("login (/login)", () => {
         ).toBeVisible()
         expect(screen.getByLabelText("Email")).toBeVisible()
         expect(screen.getByRole("button", { name: "Sign In" })).toBeVisible()
-        expect(fake.auth.started).toBe(true)
+        // The page starts auth in an effect, which may run just after the
+        // heading appears.
+        await waitFor(() => expect(fake.auth.started).toBe(true))
     })
 })
 

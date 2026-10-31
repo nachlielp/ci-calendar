@@ -35,13 +35,21 @@ export interface EdgePublicFeedOptions {
     /** The data client the fallback reads with (the caller's token, as today). */
     data: DataClient
     now: () => Date
+    /**
+     * Whether a user is signed in now (`auth.session()`): they read
+     * Supabase directly. Only signed-in users write, and the edge's copy
+     * (served up to ten minutes old) may predate their own save; read from
+     * the edge, a refetch after it would bring back what they just changed.
+     */
+    signedIn: () => boolean
     /** The page's `fetch`; tests pass a fake edge. */
     fetch: typeof fetch
     timeoutMs?: number
 }
 
 /**
- * The web's feed: the same-origin edge endpoint, falling back to the direct
+ * The web's feed for visitors who aren't signed in (signed-in users read
+ * the direct select): the same-origin edge endpoint, falling back to the direct
  * select on any error — an error status (no Worker, as on Vercel: there the
  * path is the SPA shell, 200 HTML), no network, an answer that isn't the
  * window, or no answer within `timeoutMs` — so a caching problem never
@@ -51,12 +59,14 @@ export interface EdgePublicFeedOptions {
 export function edgePublicFeed({
     data,
     now,
+    signedIn,
     fetch: send,
     timeoutMs = EDGE_TIMEOUT_MS,
 }: EdgePublicFeedOptions): PublicFeed {
     const direct = directPublicFeed(data, now)
     return {
         async window() {
+            if (signedIn()) return direct.window()
             const fromEdge = await readEdge(send, timeoutMs).catch(() => null)
             return fromEdge ?? direct.window()
         },

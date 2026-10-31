@@ -95,10 +95,8 @@ key: read-only, which is fine (never point it at writes).
 
 On every host but the production ones, the CSP reports to Sentry as
 `preview` and the app's errors are tagged `preview`; PostHog, Google
-Analytics, Speed Insights and Web Analytics don't run. The edge cache may
-not store anything on `workers.dev` (Cloudflare documents the Cache API
-for custom domains), so a preview may read Supabase on every request: look
-at `X-Edge-Cache`.
+Analytics, Speed Insights and Web Analytics don't run. The edge cache works
+on `workers.dev` too (MISS, then HIT): look at `X-Edge-Cache`.
 
 ## Checking a deploy
 
@@ -182,9 +180,11 @@ cf:deploy`. Cloudflare creates the records and certificates (a minute
 
 ## Notes
 
-- Writes don't purge the edge cache: other visitors see a change within a
-  minute (up to 10 minutes only while Supabase is failing). The writer
-  sees it at once.
+- Writes don't purge the edge cache. Signed-in users (the only writers)
+  read Supabase directly, so they always see their own changes; other
+  visitors see a change within a minute while the site is busy, and
+  within 10 minutes after a quiet spell (stale-while-revalidate, a
+  deliberate trade for speed).
 - `wrangler.jsonc`'s `compatibility_date` should be at most what the
   installed Wrangler's local runtime supports (`wrangler dev` refuses
   newer dates). Bump it with Wrangler.

@@ -1537,22 +1537,28 @@ mobile app (#36).
   first day: fresh for 60 s; then served stale for up to 10 minutes while
   one background refresh runs (`ctx.waitUntil`; concurrent requests in an
   isolate share it, isolates don't coordinate); a failed refresh keeps the
-  copy, served until it is 10 minutes old; with no usable copy the request
-  waits for Supabase and, if that fails, gets a 502. Browsers get
+  copy, served until it is 10 minutes old (`MAX_SERVE_AGE_MS`); with no
+  usable copy the request waits for Supabase (aborted after 5 s,
+  `UPSTREAM_TIMEOUT_MS`, so a hung read can't block the isolate) and, if
+  that fails, gets a 502. Stale-while-revalidate is a deliberate trade
+  (decision 2026-10-31): the first visitor after a quiet spell gets the
+  old copy at once rather than waiting for Supabase. Browsers get
   `Cache-Control: no-store`: the client's query and persisted caches own
   freshness. `X-Edge-Cache` (`HIT`, `STALE`, `MISS`) shows what happened.
-  Cloudflare documents the Cache API as working on custom domains;
-  on `*.workers.dev` it may store nothing, so previews may read Supabase
-  on every request (`X-Edge-Cache: MISS` each time). Correct either way.
-- **Writes don't purge the edge cache.** The writer's own cache is updated
-  from the server's answer, as before (`applyEventChanges`); other
-  visitors converge within 60 seconds (up to 10 minutes only while
-  Supabase is failing). Without realtime that is acceptable.
+  Cloudflare documents the Cache API for custom domains, but it stores on
+  `*.workers.dev` too (checked 2026-10-31: MISS, then HIT).
+- **Writes don't purge the edge cache.** Only signed-in users write, and
+  they never read the edge: their window is the direct select, so a
+  refetch after their save (or a reload, or another device of theirs)
+  can't bring back a copy from before it. Other visitors see a change
+  within 60 seconds while the site is busy, and within 10 minutes after a
+  quiet spell. Without realtime that is acceptable.
 - **`services.publicFeed`** (`PublicFeed`,
   `features/calendar/publicFeed.ts`) is where the public window comes
   from; `publicWindowQuery` reads it, and its mapping, freshness rules and
-  persisted-cache shape are unchanged. On the web (`edgePublicFeed`) it
-  reads the same-origin endpoint (no credentials) and falls back to the
+  persisted-cache shape are unchanged. On the web (`edgePublicFeed`), for
+  a visitor who isn't signed in (`auth.session()`), it reads the
+  same-origin endpoint (no credentials) and falls back to the
   direct select (`directPublicFeed`, with the token at hand, as before) on
   any error: an error status, no network, a body that isn't a window
   (`parsePublicWindowRows`), or no answer within 3 s (`EDGE_TIMEOUT_MS`).

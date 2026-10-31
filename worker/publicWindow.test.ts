@@ -7,7 +7,7 @@ import {
     CACHE_STATUS,
     createPublicWindowEndpoint,
     FRESH_MS,
-    STALE_MS,
+    MAX_SERVE_AGE_MS,
     type EdgeCache,
 } from "./publicWindow"
 
@@ -181,7 +181,7 @@ describe("GET /api/public-window", () => {
         edge.later(FRESH_MS + SECOND)
         const first = await edge.request()
         await edge.settle()
-        edge.later(STALE_MS - FRESH_MS - 2 * SECOND)
+        edge.later(MAX_SERVE_AGE_MS - FRESH_MS - 2 * SECOND)
         const last = await edge.request()
         await edge.settle()
 
@@ -197,7 +197,7 @@ describe("GET /api/public-window", () => {
         const edge = setup()
         await edge.request()
         edge.fake.failTable("ci_events", "upstream down")
-        edge.later(STALE_MS + SECOND)
+        edge.later(MAX_SERVE_AGE_MS + SECOND)
 
         const tooOld = await edge.request()
 
@@ -213,7 +213,7 @@ describe("GET /api/public-window", () => {
         const edge = setup()
         await edge.request()
         edge.fake.rows("ci_events").push(event({ title: "חדש" }))
-        edge.later(STALE_MS + SECOND)
+        edge.later(MAX_SERVE_AGE_MS + SECOND)
 
         const response = await edge.request()
 
@@ -305,6 +305,38 @@ describe("the Worker", () => {
             "https://project.supabase.co/rest/v1/ci_events",
         )
         expect(url.searchParams.get("hide")).toBe("eq.false")
+    })
+
+    it("gives up on a Supabase read that hangs, and tries again next time", async () => {
+        let calls = 0
+        const hanging = createWorker({
+            cache: fakeCache().cache,
+            now: () => new Date(START),
+            upstreamTimeoutMs: 20,
+            fetch: (_input, init) => {
+                calls += 1
+                if (calls > 1) {
+                    return Promise.resolve(
+                        new Response("[]", {
+                            headers: { "Content-Type": "application/json" },
+                        }),
+                    )
+                }
+                return new Promise((_, reject) => {
+                    init?.signal?.addEventListener("abort", () =>
+                        reject(new DOMException("timed out", "TimeoutError")),
+                    )
+                })
+            },
+        })
+        const get = () =>
+            hanging(new Request(`${ORIGIN}/api/public-window`), ENV, () => {})
+
+        expect((await get()).status).toBe(502)
+        const next = await get()
+        expect(next.status).toBe(200)
+        expect(next.headers.get(CACHE_STATUS)).toBe("MISS")
+        expect(calls).toBe(2)
     })
 
     it("answers other API paths with a 404", async () => {

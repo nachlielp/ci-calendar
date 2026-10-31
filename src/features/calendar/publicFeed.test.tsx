@@ -46,10 +46,10 @@ describe("the public window from the edge (publicFeed)", () => {
         expect(fake.requests).toEqual([])
     })
 
-    it("sends nothing of a signed-in visitor to the edge", async () => {
+    it("sends nothing of the visitor to the edge", async () => {
         const { fake, edge } = backends()
 
-        renderApp({ fake, edge, now: NOW, signedInAs: testUser("creator") })
+        renderApp({ fake, edge, now: NOW })
 
         expect(await eventTitles()).toEqual(["מהקצה"])
         expect(edge.requests).toEqual([
@@ -59,6 +59,18 @@ describe("the public window from the edge (publicFeed)", () => {
                 authorization: null,
             },
         ])
+    })
+
+    it("reads a signed-in visitor's window straight from Supabase, so their own saves show", async () => {
+        // The edge's copy may predate a save of theirs (it is served up to
+        // ten minutes old): it must never replace what they just changed.
+        const { fake, edge } = backends()
+
+        renderApp({ fake, edge, now: NOW, signedInAs: testUser("creator") })
+
+        expect(await eventTitles()).toEqual(["מהמסד"])
+        expect(edge.requests).toEqual([])
+        expect(windowReads(fake)).toHaveLength(1)
     })
 
     it.each<[EdgeAnswer, string]>([

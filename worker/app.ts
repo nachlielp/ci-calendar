@@ -25,7 +25,17 @@ export interface WorkerOptions {
     now: () => Date
     /** The upstream `fetch` (Supabase); tests pass a fake. */
     fetch: typeof fetch
+    /** How long a Supabase read may take; tests pass a short one. */
+    upstreamTimeoutMs?: number
 }
+
+/**
+ * A Supabase read that takes longer is aborted: a hung read would otherwise
+ * stay the isolate's one in-flight refresh, and every request without a
+ * usable copy would wait on it. The client gives up on the edge after 3 s
+ * (`EDGE_TIMEOUT_MS`) and reads Supabase itself.
+ */
+export const UPSTREAM_TIMEOUT_MS = 5000
 
 const json = (body: unknown, status: number) =>
     new Response(JSON.stringify(body), {
@@ -41,7 +51,21 @@ const json = (body: unknown, status: number) =>
  * The Worker's request handler. The endpoint is built once per isolate (its
  * in-flight refreshes are shared), on the first request, from the env.
  */
-export function createWorker({ cache, now, fetch: send }: WorkerOptions) {
+export function createWorker({
+    cache,
+    now,
+    fetch: send,
+    upstreamTimeoutMs = UPSTREAM_TIMEOUT_MS,
+}: WorkerOptions) {
+    const sendWithTimeout: typeof fetch = (input, init) => {
+        const timeout = AbortSignal.timeout(upstreamTimeoutMs)
+        return send(input, {
+            ...init,
+            signal: init?.signal
+                ? AbortSignal.any([init.signal, timeout])
+                : timeout,
+        })
+    }
     let endpoint: ReturnType<typeof createPublicWindowEndpoint> | undefined
 
     return async function handle(
@@ -66,7 +90,7 @@ export function createWorker({ cache, now, fetch: send }: WorkerOptions) {
                 url,
                 anonKey,
                 { accessToken: () => null },
-                send,
+                sendWithTimeout,
             ),
             cache,
             now,

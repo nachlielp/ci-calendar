@@ -2,6 +2,7 @@ import type { DataClient } from "../src/data/client"
 import {
     publicWindowRange,
     readPublicWindow,
+    type WindowRange,
 } from "../src/features/calendar/publicWindowSelect"
 
 // `GET /api/public-window` (spec #37, "The edge-cached public window"): the
@@ -17,26 +18,36 @@ import {
 // - The window is computed here (today in Asia/Jerusalem through
 //   WINDOW_DAYS ahead) and the endpoint takes no parameters: one cache entry
 //   per window start day serves everyone.
-// - Fresh for FRESH_MS. After that, a copy up to STALE_MS old is served
-//   while one background refresh runs (per isolate: concurrent requests
-//   share it); a failed refresh leaves the copy in place to be served again
-//   until it is too old. With no usable copy the request waits for
-//   Supabase, and if that fails it gets a 502 the client falls back from.
+// - Fresh for FRESH_MS. After that, a copy up to MAX_SERVE_AGE_MS old is
+//   served at once while one background refresh runs (per isolate:
+//   concurrent requests share it): stale-while-revalidate, so the first
+//   visitor after a quiet spell may get a copy up to MAX_SERVE_AGE_MS old
+//   (a deliberate trade for speed; signed-in visitors, who write, read
+//   Supabase directly). A failed refresh leaves the copy in place to be
+//   served again until it is too old. With no usable copy the request waits
+//   for Supabase (at most `UPSTREAM_TIMEOUT_MS`, worker/app.ts), and if that
+//   fails it gets a 502 the client falls back from.
 // - Browsers get `no-store`: the client's query cache and persisted cache
 //   own freshness.
-// - Writes don't purge it; other visitors converge within FRESH_MS.
+// - Writes don't purge it: other visitors see a change within FRESH_MS
+//   while the endpoint is busy, within MAX_SERVE_AGE_MS after a quiet spell.
 
 /** How long a cached window is served without a refresh. */
 export const FRESH_MS = 60 * 1000
 
-/** How old a cached window may be and still be served (while refreshing). */
-export const STALE_MS = 10 * 60 * 1000
+/**
+ * How old a cached window may be and still be served (while refreshing).
+ * Not `lib/freshness.ts`'s `STALE_MS` (the client's query staleness).
+ */
+export const MAX_SERVE_AGE_MS = 10 * 60 * 1000
 
 /** When the cached copy was read from Supabase (epoch ms). */
 const FETCHED_AT = "X-Fetched-At"
 
 /** Debugging aid: HIT (fresh copy), STALE (copy, refreshing) or MISS. */
 export const CACHE_STATUS = "X-Edge-Cache"
+
+type CacheStatus = "HIT" | "STALE" | "MISS"
 
 /** The part of Cloudflare's Cache API the endpoint uses (`caches.default`). */
 export interface EdgeCache {
@@ -60,7 +71,7 @@ function reply(
     request: Request,
     body: string,
     status: number,
-    cacheStatus?: string,
+    cacheStatus?: CacheStatus,
 ): Response {
     const headers = new Headers({
         "Content-Type": JSON_TYPE,
@@ -86,10 +97,7 @@ export function createPublicWindowEndpoint({
     const refreshing = new Map<string, Promise<string>>()
 
     /** Reads the window from Supabase and caches it; resolves to its JSON. */
-    const refresh = (
-        key: string,
-        range: ReturnType<typeof publicWindowRange>,
-    ) => {
+    const refresh = (key: string, range: WindowRange) => {
         const running = refreshing.get(key)
         if (running) return running
         const next = (async () => {
@@ -98,7 +106,7 @@ export function createPublicWindowEndpoint({
                 headers: {
                     "Content-Type": JSON_TYPE,
                     // The cache drops it once it is too old to serve.
-                    "Cache-Control": `public, max-age=${STALE_MS / 1000}`,
+                    "Cache-Control": `public, max-age=${MAX_SERVE_AGE_MS / 1000}`,
                     [FETCHED_AT]: String(now().getTime()),
                 },
             })
@@ -138,7 +146,7 @@ export function createPublicWindowEndpoint({
         if (cached && age < FRESH_MS) {
             return reply(request, await cached.text(), 200, "HIT")
         }
-        if (cached && age < STALE_MS) {
+        if (cached && age < MAX_SERVE_AGE_MS) {
             waitUntil(refresh(key, range).catch(() => {}))
             return reply(request, await cached.text(), 200, "STALE")
         }

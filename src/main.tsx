@@ -36,10 +36,12 @@ const now = () => new Date()
 const services: AppServices = {
     data,
     // The edge-cached window where the Worker serves it (Cloudflare), else
-    // (no Worker, e.g. Vercel) the same select straight from Supabase.
+    // (no Worker, e.g. Vercel) the same select straight from Supabase;
+    // signed-in users always read Supabase (their own saves must show).
     publicFeed: edgePublicFeed({
         data,
         now,
+        signedIn: () => !!auth.session(),
         fetch: (...args) => fetch(...args),
     }),
     auth,
