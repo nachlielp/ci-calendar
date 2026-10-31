@@ -4,6 +4,8 @@ import react from "@vitejs/plugin-react"
 import { visualizer } from "rollup-plugin-visualizer"
 import { VitePWA } from "vite-plugin-pwa"
 import { execSync } from "node:child_process"
+import { readFileSync } from "node:fs"
+import { withHeadersRevision } from "./scripts/headers-revision.mjs"
 import {
     PRECACHE_GLOBS,
     PRECACHE_IGNORES,
@@ -112,6 +114,26 @@ export default defineConfig(({ command, mode }) => {
                 injectManifest: {
                     globPatterns: PRECACHE_GLOBS,
                     globIgnores: PRECACHE_IGNORES,
+                    // index.html is cached with its headers (the CSP), so
+                    // a change to vercel.json's headers must update it too
+                    // (scripts/headers-revision.mjs; `check:sw` checks).
+                    manifestTransforms: [
+                        (entries) => ({
+                            manifest: withHeadersRevision(
+                                entries,
+                                JSON.parse(
+                                    readFileSync(
+                                        new URL(
+                                            "./vercel.json",
+                                            import.meta.url,
+                                        ),
+                                        "utf8",
+                                    ),
+                                ),
+                            ),
+                            warnings: [],
+                        }),
+                    ],
                     // The worker's own sourcemap would ship publicly.
                     sourcemap: false,
                 },

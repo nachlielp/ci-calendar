@@ -30,6 +30,7 @@ jobs:
             - name: Test
               run: npm test
 
+            # Also checks the security headers and CSP (check:headers).
             - name: Build
               run: npm run build
 

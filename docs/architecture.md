@@ -1236,6 +1236,100 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
   by hand by the maintainer; nothing applies them automatically.
+- **Security headers and the CSP (#17).** `vercel.json` serves every path
+  with a Content-Security-Policy, HSTS (two years, `includeSubDomains`, no
+  `preload`), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`
+  (and `frame-ancestors 'none'`), `Referrer-Policy:
+strict-origin-when-cross-origin` and a Permissions-Policy that denies
+  every powerful feature but `clipboard-write` and `web-share` (the event's
+  copy-link and share buttons). The CSP has no `'unsafe-inline'` and no
+  `'unsafe-eval'`: index.html's inline script and loader `<style>` are
+  allowed by `sha256-` hashes of the **built** index.html (Vite minifies
+  the style), the JSON-LD block is data and needs none. What it allows,
+  and why:
+
+    | Directive     | Source (beyond `'self'`)                                 | For                                                       |
+    | ------------- | -------------------------------------------------------- | --------------------------------------------------------- |
+    | `script-src`  | `https://www.googletagmanager.com`                       | gtag.js (index.html, production only)                     |
+    |               | `https://maps.googleapis.com`                            | Maps JS API + Places modules and their JSONP calls        |
+    |               | `https://us-assets.i.posthog.com`                        | PostHog's remote config (and recorder/surveys if enabled) |
+    | `connect-src` | `<VITE_SUPABASE_URL>`                                    | REST, auth, functions, storage uploads                    |
+    |               | `<VITE_SENTRY_DSN host>`                                 | Sentry errors, spans, replays                             |
+    |               | `https://us.i.posthog.com`, `https://us-assets…`         | PostHog events, flags, config fallback                    |
+    |               | GA: `www.googletagmanager.com`, `*.google-analytics.com` | GA4 hits (`analytics.google.com` is under `*.google.com`) |
+    |               | `*.google.com`, `*.g.doubleclick.net`                    | GA4 with Google Signals (`stats.g.doubleclick.net`)       |
+    |               | `https://maps.googleapis.com`                            | the Maps loader's `gen_204` pings                         |
+    | `img-src`     | `<VITE_SUPABASE_URL>`, `blob:`                           | bio photos (storage public URLs); cropper previews        |
+    |               | GA's `img-src` list + `*.google.co.il`                   | GA4 Signals pixels (`www.google.co.il/ads/ga-audiences`)  |
+    | `worker-src`  | `blob:`                                                  | Sentry replay's compression worker (`/sw.js` is `'self'`) |
+
+    `font-src`, `manifest-src` and `style-src` are `'self'` only, plus the
+    loader's hash in `style-src` (fonts are self-hosted; React `style` props are set through the CSSOM, which
+    CSP doesn't block, so they are fine; a `style="…"` in HTML, an `on…=`
+    handler or a `<style>` injected by a library is not). `frame-src` and
+    `object-src` are `'none'`. Navigations (Google OAuth's redirect, wa.me,
+    maps and calendar links, `target=_blank` links) aren't CSP's business.
+    Violations are reported (enforced, not report-only) to Sentry's
+    security endpoint for the DSN's project (`report-uri` plus `report-to`
+    and its `Reporting-Endpoints` header), tagged `production` or
+    `preview`; they show up in Sentry as CSP issues.
+    - **Production and previews**: the common headers go to every host;
+      the policy rule for production matches every host but
+      `*.vercel.app` (`missing` host `{ suf: ".vercel.app" }`), the
+      preview rule only those (`has`), so exactly one CSP is ever sent.
+      The preview policy is production's plus what Vercel's toolbar needs
+      (`vercel.live`, `vercel.com`, `assets.vercel.com`,
+      `wss://ws-us3.pusher.com`, `data:` images, `'unsafe-inline'` styles
+      instead of the style hash); `--write` makes it from production's and
+      the check fails on any other difference. Edit only the production
+      rule.
+    - **Installed apps get header changes**: the service worker precaches
+      index.html with the headers it was served with, so its precache
+      revision carries a hash of vercel.json's header rules
+      (`scripts/headers-revision.mjs`, a `manifestTransforms` in
+      vite.config.ts); `check:sw` fails if it doesn't. A deploy that
+      changes only vercel.json's headers still updates every PWA.
+    - **Adding an origin** (a script, a request, an image host, a frame, a
+      worker): add it to the narrowest directive in `vercel.json`, in the
+      table above, and, if it comes from the env, to
+      `configuredOrigins` in `scripts/check-headers.mjs`. Never add
+      `'unsafe-inline'`/`'unsafe-eval'`, a bare `*`/`https:` or `data:` in
+      `script-src` (the check fails). Prefer exact hosts; use a `*.`
+      wildcard only where the vendor documents one.
+    - **Changing index.html's inline script or `<style>`**: build, then
+      `node scripts/check-headers.mjs --write` updates the hashes (and the
+      preview policy); build again so the precache revision follows.
+    - **The check** (`npm run check:headers`, run by `npm run build`, so
+      by Vercel builds and CI's build step): the headers exist with sane
+      values, the CSP parses and stays strict, its hashes are exactly the
+      built index.html's, the preview policy is production's plus the
+      toolbar's, reports go to the DSN's Sentry security endpoint, the
+      scripts index.html loads are allowed, any asset the build inlined as
+      a `data:` URL (telemetry chunks included) is allowed (`img-src` has
+      no `data:`), and the Supabase, Sentry and PostHog origins of the
+      build's env are allowed (skipped when unset, as in CI).
+    - **Verifying**: serve `dist/` with vercel.json's headers and the SPA
+      rewrite (Vercel serves files first, then rewrites everything but
+      `/assets/`), and watch the console for `Content Security Policy`
+      errors. PostHog, GA and Speed Insights run only on
+      `www.ci-events.org`: map that host to the local server
+      (`--host-resolver-rules`), and answer the ingest requests locally so
+      no test data reaches them.
+      Previews (`*.vercel.app`, HSTS-preloaded) need local HTTPS (a
+      self-signed certificate, `--ignore-certificate-errors`). Point the
+      report URLs at the local server too: Chrome delivers reports about a
+      minute after the violation.
+    - **Limits**: an allowlist policy is only as strong as its hosts. On
+      an HTML injection, `https://www.googletagmanager.com` in
+      `script-src` lets an attacker load any GTM container (theirs, with
+      their own tags); `maps.googleapis.com` serves JSONP endpoints,
+      which run attacker-chosen callbacks; `*.google.com` in `connect-src`
+      lets injected script send data out through `script.google.com` (Apps
+      Script). The hardening to come is a policy that trusts no hosts for
+      scripts: `'strict-dynamic'` with the inline script's hash (it loads
+      gtag and the app could load Maps and PostHog through it), or
+      per-request nonces, which need index.html rendered per request (edge
+      middleware).
 
 ## Maintainer notes
 
@@ -1269,14 +1363,27 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
   insert and delete policies on that bucket for `has_profile_role()`,
   own folder only; apply it by hand. Until then the page tells them the
   photo can't be uploaded and saves the rest.
-- **For the CSP (slice 21): origins so far.** Slice 17 adds: bio photos
-  are uploaded to and served from the Supabase origin
-  (`connect-src` and `img-src` `<VITE_SUPABASE_URL>`, path
-  `/storage/v1/object/…`; older bios' `img` URLs are the same origin
-  with a doubled slash); the photo preview and cropper show `blob:` URLs
-  (`img-src blob:`). react-easy-crop's styles are a CSS file (no inline
-  `<style>`); it positions the image through `element.style`, which CSP
-  doesn't block.
+- **The CSP (Rules, "Security headers and the CSP"): what to check.**
+  The builds' env must match `vercel.json`: `npm run build` fails on
+  Vercel if a preview or production env points at another Supabase
+  project, Sentry DSN or PostHog host than the CSP allows (add it, or
+  give previews the same values). Address suggestions were never seen
+  under the CSP: the local `.env` Places key is invalid
+  (`InvalidKeyMapError`), so Google's scripts loaded but no prediction
+  came back; after the first deploy, type an address in a form and check
+  the console. The GA property has Google Signals on (its
+  `ga-audiences`/doubleclick pixels are allowed for google.com and
+  google.co.il only; visitors on other Google domains get a blocked
+  pixel); turning Signals off would let those sources go. PostHog's
+  session recording and surveys are off; turning surveys on may need
+  `style-src` for its injected styles (check the console; Sentry's CSP
+  issues will show it too). The host conditions (`has`/`missing` host
+  `suf`) were checked against a local imitation of Vercel's rules: on the
+  first preview, check that `vercel.live` loads and that production's
+  response carries one `Content-Security-Policy`. Previews on a custom
+  alias domain get production's policy (no toolbar). HSTS has no `preload`: submitting ci-events.org to
+  hstspreload.org (and adding `preload`) commits every subdomain to
+  HTTPS for good, so it is the owner's call.
 
 - **Before the cutover: check the event write policies and the junction's
   delete rule.** Admins' updates and deletes of others' events (slice 20)
@@ -1666,3 +1773,17 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     fewer events are written than asked; deletes remove the teacher tags
     first when the junction's foreign key refuses; the list scaffolding
     is shared (`ManagedEventList`, `useFocusAfterDelete`).
+21. Security headers and CSP (#17): `vercel.json` serves every path with a
+    hash-based Content-Security-Policy (no `'unsafe-inline'` or
+    `'unsafe-eval'`; exactly the origins the app uses), HSTS, nosniff,
+    `X-Frame-Options: DENY`, `Referrer-Policy` and a deny-by-default
+    Permissions-Policy; violations reported to Sentry; previews
+    (`*.vercel.app`) get the same policy plus Vercel's toolbar; the shell's
+    precache revision covers the headers, so installed apps get header
+    changes. `scripts/check-headers.mjs` (run by the build) checks the
+    headers, the policy's strictness, its hashes against the built
+    index.html (`--write` updates them and the preview policy), reporting
+    and the env's origins. Verified in headless Chrome against the
+    production build served with these headers: public pages, sign-in,
+    telemetry on the production host, previews, report delivery, and the
+    signed-in pages against a mocked backend.

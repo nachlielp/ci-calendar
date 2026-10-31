@@ -5,10 +5,12 @@ import {
     builtProblems,
     precacheProblems,
     precacheUrls,
+    shellRevisionProblems,
     sourceMapProblems,
     sourceProblems,
     telemetryProblems,
 } from "./check-sw.mjs"
+import { withHeadersRevision } from "./headers-revision.mjs"
 
 // The list as workbox injects it into dist/sw.js (minified), trimmed.
 const SW_SOURCE =
@@ -141,5 +143,26 @@ describe("telemetry chunks", () => {
         ).toEqual([
             "assets/telemetry/sentry-X.js.map is a source map and would be served publicly",
         ])
+    })
+
+    it("fails unless the shell's revision covers vercel.json's headers", () => {
+        const headers = { headers: [{ source: "/(.*)", headers: [] }] }
+        const changed = {
+            headers: [{ source: "/(.*)", headers: [{ key: "X", value: "1" }] }],
+        }
+        const entries = withHeadersRevision(
+            [
+                { url: "index.html", revision: "a1" },
+                { url: "assets/x.js", revision: null },
+            ],
+            headers,
+        )
+        expect(entries[1]).toEqual({ url: "assets/x.js", revision: null })
+        const built = `Ce(${JSON.stringify(entries)});`
+        expect(shellRevisionProblems(built, headers)).toEqual([])
+        expect(shellRevisionProblems(built, changed)).toEqual([
+            "index.html's precache revision doesn't cover vercel.json's headers",
+        ])
+        expect(shellRevisionProblems(SW_SOURCE, headers)).toHaveLength(1)
     })
 })

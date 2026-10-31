@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "tsc && tsc -p src/sw && vite build",
+        "build": "tsc && tsc -p src/sw && vite build && node scripts/check-headers.mjs",
         "lint": "eslint . --report-unused-disable-directives",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
@@ -15,7 +15,8 @@
         "gen:types": "supabase gen types typescript --project-id pjgwpivkvsuernmoeebk > src/data/database.types.ts && prettier --write src/data/database.types.ts",
         "preview": "vite preview",
         "check:bundle": "node scripts/bundle-size.mjs",
-        "check:sw": "node scripts/check-sw.mjs"
+        "check:sw": "node scripts/check-sw.mjs",
+        "check:headers": "node scripts/check-headers.mjs"
     },
     "engines": {
         "node": "22.x"

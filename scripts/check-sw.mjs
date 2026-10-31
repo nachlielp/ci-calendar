@@ -9,13 +9,15 @@
 // the build (Supabase URLs, NetworkFirst's options). Prints the precache's
 // size. The telemetry SDKs' chunks (assets/telemetry/) must stay out of the
 // precache and be served immutable, and no source map may be left in dist/
-// (they would be public).
+// (they would be public). index.html's revision must cover vercel.json's
+// headers, which the precache stores it with.
 //
 // Usage (after `vite build`): node scripts/check-sw.mjs
 
 import { readdirSync, readFileSync, statSync } from "node:fs"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
+import { headersRevision, SHELL } from "./headers-revision.mjs"
 
 /** The URLs in the precache list workbox injected into the worker. */
 export function precacheUrls(swSource) {
@@ -86,6 +88,22 @@ export function telemetryProblems(urls, telemetryFiles, vercelConfig) {
         }
     }
     return problems
+}
+
+/**
+ * Problems with the shell's precache revision: it must carry the hash of
+ * `vercelConfig`'s header rules (scripts/headers-revision.mjs), or a deploy
+ * that changes only the headers (the CSP) keeps installed apps on the old
+ * ones, which the precached index.html was stored with.
+ */
+export function shellRevisionProblems(swSource, vercelConfig) {
+    const entry = [...swSource.matchAll(/\{[^{}]*\}/g)]
+        .map(([object]) => object)
+        .find((object) => object.includes(`"url":"${SHELL}"`))
+    const revision = entry && /"revision":"([^"]+)"/.exec(entry)?.[1]
+    return revision?.endsWith(`-h${headersRevision(vercelConfig)}`)
+        ? []
+        : [`${SHELL}'s precache revision doesn't cover vercel.json's headers`]
 }
 
 /** Workbox modules the worker may use: precaching and its navigation route. */
@@ -169,6 +187,7 @@ function main() {
     const problems = [
         ...precacheProblems(urls, buildFiles),
         ...telemetryProblems(urls, telemetryFiles, vercelConfig),
+        ...shellRevisionProblems(built, vercelConfig),
         ...sourceProblems(source),
         ...builtProblems(built),
         ...sourceMapProblems(

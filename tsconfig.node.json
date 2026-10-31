@@ -11,7 +11,13 @@
         "allowSyntheticDefaultImports": true,
         "allowImportingTsExtensions": true,
         "noEmit": true,
-        "strict": true
+        "strict": true,
+        // scripts/headers-revision.mjs, shared with check:sw.
+        "allowJs": true
     },
-    "include": ["vite.config.ts", "src/sw/swRules.ts"]
+    "include": [
+        "vite.config.ts",
+        "src/sw/swRules.ts",
+        "scripts/headers-revision.mjs"
+    ]
 }
