@@ -125,25 +125,24 @@ speed. Order: **before merging → deploy → after deploy → later**.
     deletes the tags first when the database refuses (one extra request).
     Either works.
 
-- [ ] **The template foreign key delete rule** (deleting a template may
-      delete its events):
+- [ ] **The template foreign key delete rule** (decided: deleting a
+      template keeps its events; the migration below makes it so):
 
     ```sql
     select confdeltype from pg_constraint
     where conname = 'ci-events_source_template_id_fkey';
     ```
 
-    `c` (cascade): deleting a template deletes every event made from it
-    (about half of all events reference one). The old client relied on it
-    and so does the new one (its confirm says so). `n` (set null) would keep
-    the events: a product decision and a migration if wanted. `a`/`r`: the
-    delete fails while an event uses the template, and the page says so.
+    `c` (cascade) before the migration, `n` (set null) after. The new
+    client keeps the events either way (it unlinks them first), but the
+    **old** client, while it still runs, deletes them with a template:
+    apply the migration before the deploy.
 
 ### Supabase: migrations (by hand, SQL editor, in this order)
 
 Nothing applies `supabase/migrations/` automatically. Each file's header
-says what it does and how to check it. All three are safe for the old
-client too, except the last, which waits until after go-live.
+says what it does and how to check it. All are safe for the old client
+too, except the realtime one, which waits until after go-live.
 
 - [ ] (`20260808000000_assign_user_role.sql` was applied with #16; check
       `select proname from pg_proc where proname = 'assign_user_role'`.)
@@ -155,6 +154,10 @@ client too, except the last, which waits until after go-live.
       `profile` users (teachers without event rights) upload a bio photo.
       Until then they're told the photo can't be uploaded and the rest
       saves. Run the bucket check above first.
+- [ ] **`20261031120000_template_delete_keeps_events.sql`**, before the
+      deploy: deleting a template keeps the events made from it (the
+      foreign key becomes `on delete set null`). Run its check before and
+      after (`c`, then `n`).
 - [ ] **`20261031000000_drop_realtime_publication_tables.sql`: not yet.**
       See "Later".
 
