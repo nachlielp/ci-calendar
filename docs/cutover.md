@@ -47,18 +47,10 @@ speed. Order: **before merging → deploy → after deploy → later**.
     Speed Insights needs no variable (enabled in the dashboard). Google
     Analytics' id is in `index.html`.
 
-- [ ] **Remove what nothing reads any more** (they only clutter, but see the
-      secrets note): `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
-      `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH`,
-      `VITE_PWA_TEST`, `VITE_WHATSAPP_NUMBER` (the WhatsApp link is gone), `VITE_GOOGLE_ANALYTICS_ID`, `VITE_UPLOADTHING_TOKEN`,
-      every `VITE_FIREBASE_*` and `VITE_VAPID_PUBLIC_FIREBASE_KEY`, every
-      `VITE_CLOUDINARY_*`, `VITE_DEV_DATABASE_AUTH_TOKEN`, `DOMAIN_URL`;
-      and `GOOGLE_TRANSLATE_API_KEY` if it is set on Vercel (it belongs to
-      the Supabase function, below). **Secrets under `VITE_` names**
-      (`VITE_CLOUDINARY_API_SECRET`, `VITE_DEV_DATABASE_AUTH_TOKEN`,
-      `VITE_UPLOADTHING_TOKEN`) are inlined into any bundle that references
-      them; neither client does now, but if an older build ever did, treat
-      them as public and rotate or revoke them.
+- [x] Checked 2026-10-31: every variable above is set (PostHog on
+      production only, as intended). The old ones nothing reads any more are
+      removed after the deploy (see "After the deploy"), so a rebuild of the
+      old client meanwhile still finds them.
 
 ### Google Places key
 
@@ -212,6 +204,20 @@ too, except the realtime one, which waits until after go-live.
       `isInternal` devices).
 - [ ] **Bundle:** the deploy's `/` loads ~135 KB of gzip JS (DevTools →
       Network, JS, first load with cache disabled).
+
+- [ ] **Remove the variables nothing reads any more** (Vercel, all
+      environments), once the new client is live: `VITE_WHATSAPP_NUMBER`,
+      `VITE_GOOGLE_ANALYTICS_ID`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH` (three
+      entries), `DOMAIN_URL` (two), `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
+      `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_UPLOADTHING_TOKEN`,
+      `VITE_DEV_DATABASE_AUTH_TOKEN`, every `VITE_FIREBASE_*` and
+      `VITE_VAPID_PUBLIC_FIREBASE_KEY`. (`VITE_CLOUDINARY_*` were removed on
+      2026-10-31: Cloudinary isn't used.) A rollback is unaffected: an old
+      deployment has its values built in. **Leaked secrets:**
+      `VITE_CLOUDINARY_API_SECRET` (2024 bio uploads) and
+      `VITE_DEV_DATABASE_AUTH_TOKEN` (a 2024 Turso dev database) were read by
+      client code once, so they shipped to visitors; revoke them at the
+      provider if the accounts still exist.
 
 ## 4. Later
 
