@@ -11,7 +11,9 @@ import type { PixelArea, Size } from "../lib/photo"
 // stand-in that reports `cropArea` (the crop in the picked image's pixels)
 // as react-easy-crop does once it has measured, and `renderPhoto` records
 // what it was asked to draw and returns a Blob of `outputBytes` in
-// `outputType`. `cropperLoads` counts how often the cropper's code was
+// `outputType`. `preparePhoto` passes the picked file on, or what
+// `convert` makes of it (a HEIC as JPEG), recording each in `prepared`;
+// `failPrepare()` makes it reject. `cropperLoads` counts how often the cropper's code was
 // asked for, so tests can prove it isn't loaded before a photo is picked.
 
 export interface RenderCall {
@@ -21,8 +23,17 @@ export interface RenderCall {
     output: Blob
 }
 
+export interface PrepareCall {
+    file: File
+    output: Blob
+}
+
 export interface FakeImages extends ImageTools {
     cropperLoads: number
+    prepared: PrepareCall[]
+    /** What `preparePhoto` returns for a file (the file itself by default). */
+    convert: (file: File) => Blob
+    failPrepare(): void
     /** What the stand-in cropper reports (a 3000px square by default). */
     cropArea: PixelArea
     renders: RenderCall[]
@@ -31,8 +42,14 @@ export interface FakeImages extends ImageTools {
 }
 
 export function createFakeImages(): FakeImages {
+    let prepareFails = false
     const fake: FakeImages = {
         cropperLoads: 0,
+        prepared: [],
+        convert: (file) => file,
+        failPrepare: () => {
+            prepareFails = true
+        },
         cropArea: { x: 500, y: 0, width: 3000, height: 3000 },
         renders: [],
         outputType: "image/jpeg",
@@ -40,6 +57,12 @@ export function createFakeImages(): FakeImages {
         loadCropper: async () => {
             fake.cropperLoads += 1
             return FakeCropper
+        },
+        preparePhoto: async (file) => {
+            if (prepareFails) throw new Error("Couldn't decode the photo")
+            const output = fake.convert(file)
+            fake.prepared.push({ file, output })
+            return output
         },
         renderPhoto: async (image, area, size) => {
             const output = new Blob([new Uint8Array(fake.outputBytes)], {

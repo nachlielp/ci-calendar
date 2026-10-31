@@ -7,6 +7,7 @@ import { execSync } from "node:child_process"
 import { readFileSync } from "node:fs"
 import { withHeadersRevision } from "./scripts/headers-revision.mjs"
 import {
+    HEIC_ASSETS,
     PRECACHE_GLOBS,
     PRECACHE_IGNORES,
     TELEMETRY_ASSETS,
@@ -65,6 +66,9 @@ function buildVersionMeta(version: string): Plugin {
 const TELEMETRY_MODULE =
     /\/node_modules\/(@sentry|@sentry-internal|posthog-js|@vercel\/speed-insights)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|speedInsights)\.ts$/
 
+/** The HEIC converter, whose chunk goes to `HEIC_ASSETS` (never precached). */
+const HEIC_MODULE = /\/node_modules\/heic-to\//
+
 export default defineConfig(({ command, mode }) => {
     const version = buildVersion(command)
     // Release builds (CI) upload source maps to Sentry; see the plugin below.
@@ -88,11 +92,18 @@ export default defineConfig(({ command, mode }) => {
                             compress: { dropConsole: true, dropDebugger: true },
                         },
                     }),
-                    chunkFileNames: (chunk) =>
-                        !chunk.isEntry &&
-                        chunk.moduleIds.some((id) => TELEMETRY_MODULE.test(id))
-                            ? `${TELEMETRY_ASSETS}/[name]-[hash].js`
-                            : "assets/[name]-[hash].js",
+                    chunkFileNames: (chunk) => {
+                        const has = (module: RegExp) =>
+                            !chunk.isEntry &&
+                            chunk.moduleIds.some((id) => module.test(id))
+                        if (has(TELEMETRY_MODULE)) {
+                            return `${TELEMETRY_ASSETS}/[name]-[hash].js`
+                        }
+                        if (has(HEIC_MODULE)) {
+                            return `${HEIC_ASSETS}/[name]-[hash].js`
+                        }
+                        return "assets/[name]-[hash].js"
+                    },
                 },
             },
         },
