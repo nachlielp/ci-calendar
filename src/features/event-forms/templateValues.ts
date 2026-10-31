@@ -13,7 +13,9 @@ import {
     isListOf,
     isSegment,
     isTag,
+    multiDayPartOf,
     segmentsColumn,
+    segmentsOf,
     singleDayValuesOf,
     validateBase,
     type EventBaseValues,
@@ -171,6 +173,25 @@ export const emptyMultiDayTemplate = (): MultiDayTemplateValues => ({
     type: "",
     teachers: [],
 })
+
+/**
+ * A new single-day template's values as a multi-day one's, when the user
+ * switches the form (as `singleToMultiDay` does for events).
+ */
+export function singleToMultiDayTemplate(
+    values: SingleDayTemplateValues,
+): MultiDayTemplateValues {
+    const { segments, ...base } = values
+    return { ...base, ...multiDayPartOf(segments) }
+}
+
+/** The other way (`singleToMultiDayTemplate`). */
+export function multiToSingleDayTemplate(
+    values: MultiDayTemplateValues,
+): SingleDayTemplateValues {
+    const { type, teachers, ...base } = values
+    return { ...base, segments: segmentsOf({ type, teachers }) }
+}
 
 const baseOf = (template: Template): TemplateBaseValues => {
     const { segments, type, teachers, ...base } = template.content

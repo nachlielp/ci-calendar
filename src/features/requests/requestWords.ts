@@ -1,12 +1,15 @@
 import { defineCopy } from "../../lib/copy"
+import { REQUEST_NOTES } from "./requestRows"
 
 // The app's shared vocabulary of roles, request types and request
 // statuses (legacy interfaces.ts `UserTypeHebrew`, `RequestTypeHebrew`,
 // `RequestStatusHebrew`): the requests page, the bio page and the admin
 // pages all read them from here, never a map of their own. `role` names a
 // role in a sentence or a details line; `roleButton` is the short name on
-// legacy's admin role buttons. Unknown values show as stored. It imports
-// no feature, so any page can use it.
+// legacy's admin role buttons. `note` shows the notes the app stores in
+// Hebrew (`REQUEST_NOTES`) in the reader's language; any other response is
+// a person's words and comes back as given. Unknown values show as stored.
+// It imports no feature, so any page can use it.
 
 const words =
     (names: Readonly<Record<string, string>>) =>
@@ -37,6 +40,11 @@ export const REQUEST_WORDS = defineCopy({
         }),
         open: "פתוח",
         closed: "סגור",
+        note: words({
+            [REQUEST_NOTES.approved]: "הבקשה אושרה",
+            [REQUEST_NOTES.closed]: "הבקשה נסגרה",
+            [REQUEST_NOTES.cancelled]: "בקשה בטולה על ידי המשתמש",
+        }),
     },
     en: {
         role: words({
@@ -61,6 +69,11 @@ export const REQUEST_WORDS = defineCopy({
         }),
         open: "Open",
         closed: "Closed",
+        note: words({
+            [REQUEST_NOTES.approved]: "Request approved",
+            [REQUEST_NOTES.closed]: "Request closed",
+            [REQUEST_NOTES.cancelled]: "Request cancelled by the user",
+        }),
     },
     ru: {
         role: words({
@@ -85,5 +98,10 @@ export const REQUEST_WORDS = defineCopy({
         }),
         open: "Открыта",
         closed: "Закрыта",
+        note: words({
+            [REQUEST_NOTES.approved]: "Заявка одобрена",
+            [REQUEST_NOTES.closed]: "Заявка закрыта",
+            [REQUEST_NOTES.cancelled]: "Заявка отменена пользователем",
+        }),
     },
 })

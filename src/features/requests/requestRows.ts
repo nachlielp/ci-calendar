@@ -17,6 +17,24 @@ export type RequestResponse = {
     responder_name: string
 }
 
+/**
+ * The notes the app itself adds to a request's responses, stored as legacy
+ * stored them: in Hebrew, whatever the writer's language. Pages show them
+ * in the reader's language (`REQUEST_WORDS.note`), never as stored.
+ */
+export const REQUEST_NOTES = {
+    /** An admin approved the request. */
+    approved: "הבקשה אושרה",
+    /** An admin closed (declined, legacy's "דחיה") the request. */
+    closed: "הבקשה נסגרה",
+    /** The user cancelled their request. */
+    cancelled: "בקשה בטולה על ידי המשתמש",
+} as const
+
+/** Whether a response is one of `REQUEST_NOTES` (not a person's words). */
+export const isRequestNote = (text: string) =>
+    Object.values<string>(REQUEST_NOTES).includes(text)
+
 export type RequestUpdate = Database["public"]["Tables"]["requests"]["Update"]
 
 function toResponse(value: Json): RequestResponse[] {

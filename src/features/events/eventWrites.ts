@@ -61,7 +61,7 @@ export class EventsChangedError extends Error {
 
 const ids = (events: readonly ManagedEvent[]) => events.map(({ id }) => id)
 
-type Owned = <Q extends { eq(column: "user_id", value: string): Q }>(
+export type Owned = <Q extends { eq(column: "user_id", value: string): Q }>(
     query: Q,
 ) => Q
 
@@ -183,18 +183,27 @@ export function useDeleteEvents(
         options,
         "event-delete",
         (events: readonly ManagedEvent[]) => events,
-        async (owned, events) => {
-            const remove = () =>
-                owned(
-                    data.from("ci_events").delete().in("id", ids(events)),
-                ).select("id")
-            const first = await remove()
-            if (first.error?.code !== "23503") return first
-            const untagged = await untag(data, ids(events))
-            return untagged.error ? untagged : remove()
-        },
+        (owned, events) => deleteEventRows(data, ids(events), owned),
         (rows: { id: string }[]) => ({ deleted: rows.map(({ id }) => id) }),
     )
+}
+
+/**
+ * Deletes the events `eventIds` within `scope` (their owner), removing
+ * their teacher tags first if the junction's foreign key refuses (see
+ * `useDeleteEvents`). Answers the deleted rows' ids.
+ */
+export async function deleteEventRows(
+    data: DataClient,
+    eventIds: string[],
+    scope: Owned,
+) {
+    const remove = () =>
+        scope(data.from("ci_events").delete().in("id", eventIds)).select("id")
+    const first = await remove()
+    if (first.error?.code !== "23503") return first
+    const untagged = await untag(data, eventIds)
+    return untagged.error ? untagged : remove()
 }
 
 /** Removes the teacher tags (junction rows) of the events `eventIds`. */

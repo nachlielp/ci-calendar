@@ -39,7 +39,6 @@ speed. Order: **before merging → deploy → after deploy → later**.
     | `VITE_SENTRY_DSN`              | crash reports, CSP violation reports         | no crash reports                            |
     | `VITE_PUBLIC_POSTHOG_KEY`      | analytics (production host only)             | no analytics                                |
     | `VITE_PUBLIC_POSTHOG_HOST`     | PostHog host (`https://us.i.posthog.com`)    | defaults to `https://app.posthog.com`       |
-    | `VITE_WHATSAPP_NUMBER`         | the header's WhatsApp link                   | the link is hidden                          |
     | `VITE_LANGUAGES_TO_SHOW`       | optional, default `he,en,ru`                 | all three                                   |
     | `VITE_HIDE_EVENTS_FLAG`        | optional: new events start hidden            | off                                         |
     | `VITE_DISABLE_APP`             | optional: `true` builds the maintenance page | off                                         |
@@ -51,7 +50,7 @@ speed. Order: **before merging → deploy → after deploy → later**.
 - [ ] **Remove what nothing reads any more** (they only clutter, but see the
       secrets note): `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
       `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH`,
-      `VITE_PWA_TEST`, `VITE_GOOGLE_ANALYTICS_ID`, `VITE_UPLOADTHING_TOKEN`,
+      `VITE_PWA_TEST`, `VITE_WHATSAPP_NUMBER` (the WhatsApp link is gone), `VITE_GOOGLE_ANALYTICS_ID`, `VITE_UPLOADTHING_TOKEN`,
       every `VITE_FIREBASE_*` and `VITE_VAPID_PUBLIC_FIREBASE_KEY`, every
       `VITE_CLOUDINARY_*`, `VITE_DEV_DATABASE_AUTH_TOKEN`, `DOMAIN_URL`;
       and `GOOGLE_TRANSLATE_API_KEY` if it is set on Vercel (it belongs to
@@ -86,6 +85,14 @@ speed. Order: **before merging → deploy → after deploy → later**.
       app), plus each preview origin's `/reset-password` to test resets
       there. The old client used the same URL, so it is likely there
       already.
+
+### Supabase: auth emails in three languages (optional)
+
+- [ ] Authentication → Emails: paste `supabase/templates/confirmation.html`
+      into **Confirm signup** and `recovery.html` into **Reset password**,
+      with the subjects in `supabase/templates/README.md`. Each email is in
+      Hebrew, English and Russian together (Supabase picks no language).
+      Independent of the deploy: the old client sends the same emails.
 
 ### Supabase: read-only SQL checks (SQL editor)
 
@@ -125,25 +132,24 @@ speed. Order: **before merging → deploy → after deploy → later**.
     deletes the tags first when the database refuses (one extra request).
     Either works.
 
-- [ ] **The template foreign key delete rule** (deleting a template may
-      delete its events):
+- [ ] **The template foreign key delete rule** (decided: deleting a
+      template keeps its events; the migration below makes it so):
 
     ```sql
     select confdeltype from pg_constraint
     where conname = 'ci-events_source_template_id_fkey';
     ```
 
-    `c` (cascade): deleting a template deletes every event made from it
-    (about half of all events reference one). The old client relied on it
-    and so does the new one (its confirm says so). `n` (set null) would keep
-    the events: a product decision and a migration if wanted. `a`/`r`: the
-    delete fails while an event uses the template, and the page says so.
+    `c` (cascade) before the migration, `n` (set null) after. The new
+    client keeps the events either way (it unlinks them first), but the
+    **old** client, while it still runs, deletes them with a template:
+    apply the migration before the deploy.
 
 ### Supabase: migrations (by hand, SQL editor, in this order)
 
 Nothing applies `supabase/migrations/` automatically. Each file's header
-says what it does and how to check it. All three are safe for the old
-client too, except the last, which waits until after go-live.
+says what it does and how to check it. All are safe for the old client
+too, except the realtime one, which waits until after go-live.
 
 - [ ] (`20260808000000_assign_user_role.sql` was applied with #16; check
       `select proname from pg_proc where proname = 'assign_user_role'`.)
@@ -155,6 +161,10 @@ client too, except the last, which waits until after go-live.
       `profile` users (teachers without event rights) upload a bio photo.
       Until then they're told the photo can't be uploaded and the rest
       saves. Run the bucket check above first.
+- [ ] **`20261031120000_template_delete_keeps_events.sql`**, before the
+      deploy: deleting a template keeps the events made from it (the
+      foreign key becomes `on delete set null`). Run its check before and
+      after (`c`, then `n`).
 - [ ] **`20261031000000_drop_realtime_publication_tables.sql`: not yet.**
       See "Later".
 

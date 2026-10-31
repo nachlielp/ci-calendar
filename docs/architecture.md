@@ -19,7 +19,7 @@ the switch.
 | ----------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `src/app/`                    | Bootstrap, services (the seam), routes, shell layout, shared hooks, the cache engine (`cachedQueries.ts`) |
 | `src/app/auth`                | Session at boot, profile row, sign-out cleanup, role guard, `sessionOf`/`useUserId`                       |
-| `src/app/header`              | App header, menu (items keyed by role), WhatsApp link                                                     |
+| `src/app/header`              | App header, menu (items keyed by role)                                                                    |
 | `src/app/install`             | Install banner, `beforeinstallprompt` capture, iOS steps                                                  |
 | `src/app/updates`             | Service worker registration, safe reloads, the reload guard                                               |
 | `src/app/telemetry`           | Crash reports, analytics, Speed Insights; their lazy SDKs                                                 |
@@ -311,6 +311,13 @@ the switch.
   them are backfilled by
   `supabase/migrations/20261030000000_backfill_event_teacher_junction.sql`
   (applied by hand).
+  A plain PostgREST select, not the database view or RPC the spec
+  suggested (maintainer: "whatever has better perf"; decided 2026-10-31):
+  a view runs the same SQL in the same one round trip (PostgREST inlines
+  it), so it is no faster, and it would need a production migration, its
+  own RLS care (`security_invoker`) and regenerated types. The columns are
+  already trimmed and RLS still applies. The speed-up still to come is
+  caching the window at the edge (spec #37), not the query's shape.
 - **Shared links.** `/event/:eventId` and the legacy `/:eventId` open the
   event over the calendar (`useLinkedEvent`): from the cached window when it
   has it, else with one request for that event alone, in parallel with the
@@ -737,18 +744,40 @@ until }`, off for every saved event, so it's in drafts too) is
       form"). A new event's draft survives leaving the page (legacy's); an
       edit's is dropped by the page's back button but survives a reload.
       A `null` key keeps none (template edits, as legacy).
-    - **Pages**: `/create-events` (legacy's chooser: new template or
-      event, single-day or multi-day; the missing-bio and no-templates
-      warnings; the templates list), `/create-events/single-day`
-      and `/create-events/multi-day` (legacy's info notice; with
-      `?isTemplate=true`, legacy's link, a new template's form; both back to
-      `/create-events` after a save, as legacy), and
+    - **Pages**: `/create-events` (new event or new template; legacy
+      offered four links, single-day and multi-day of each; the
+      missing-bio and no-templates warnings; the templates list),
+      `/create-events/single-day` and `/create-events/multi-day`
+      (`NewEventPage`: one new-event form, single-day by default, whose
+      "multi-day event" switch (`MultiDaySwitch`) swaps the form and moves
+      to the other path with `replace`, so a reload keeps the kind and its
+      draft. What was filled in carries over (`singleToMultiDay` /
+      `multiToSingleDay` and their template twins, pure, in the values
+      modules: the shared fields, the day as the first day, the segments'
+      teachers and a multi-day type as the event's, and back as one
+      segment); the left form's draft is discarded and the new form
+      restores the carried values over its own draft (`useCarried`).
+      Multi-day shows legacy's info notice. With `?isTemplate=true`,
+      legacy's link, the same for a new template. Both go back to
+      `/create-events` after a save, as legacy. The switching itself is
+      `SwitchingForms`, shared with the edit pages), and
       `/manage-events/edit-single-day/:eventId` and
-      `/manage-events/edit-multi-day/:eventId` (`eventToEditQuery`,
-      `event-forms/eventToEdit.ts`, personal, keyed on the viewer: the
-      viewer's own event by id, at once from the cached upcoming list;
-      registered as an event list; an event of the other kind redirects to
-      its own form; back to `/manage-events`). **Admins edit anyone's
+      `/manage-events/edit-multi-day/:eventId` (`EditEventPage`;
+      `eventToEditQuery`, `event-forms/eventToEdit.ts`, personal, keyed on
+      the viewer: the viewer's own event by id, at once from the cached
+      upcoming list; registered as an event list; an event of the other
+      kind redirects to its own form; back to `/manage-events`). An event
+      that doesn't repeat (no `recurring_ref_key`) has the same switch
+      (maintainer decision 2026-10-31): it moves to the other edit path
+      with `replace` and `switched: true` in the history state (which
+      lets the form differ from the stored kind, and survives a reload,
+      with the new kind's draft). Saved, the event becomes the other kind:
+      the save sends the changed shared columns plus every column of the
+      new kind whole (`toMultiDayPatch` / `toSingleDayPatch`: days,
+      segments, type, `is_multi_day`, `multi_day_teachers`; the template
+      link stays), even with no field changed, and re-tags it
+      (`useEventSubmit`'s `kindChanged`). An event of a recurring series
+      stays single-day: it has no switch. **Admins edit anyone's
       event** there, as legacy's manage-all-events let them: for an admin
       viewer the page reads with scope `"any"` (no owner filter; the key
       carries the scope); edits are written only while the row still
@@ -760,7 +789,7 @@ event.ownerId)`, the user's own for everyone else, since that is all
       goes back there. Each page is a few lines
       over `NewEventFormPage` / `EditEventFormPage`
       (`EventFormPages.tsx`: header, back button, loading/not-found/error,
-      the draft key the back button drops). Layout in `FormPage.scss`.
+      the draft keys the back button drops). Layout in `FormPage.scss`.
     - **One chunk**: every event-form page is exported from
       `event-forms/pages.ts` and routed with `eventFormPage("Name")`
       (`app/routes.tsx`): one dynamic import in `/`'s route table for all
@@ -782,10 +811,12 @@ event.ownerId)`, the user's own for everyone else, since that is all
           `maybeSingle`; none back is `TemplateGoneError` and the list is
           refetched) and `useDeleteTemplate` (owner-scoped) put the answer
           in the cached list (`setQueryData` only if cached), no refetch.
-          Legacy's delete confirm says the events made from a template go
-          with it (`ci_events.source_template_id`'s foreign key; its delete
-          rule isn't in the repo: see Maintainer notes), so a delete also
-          runs `refreshEventQueries`. No translation or Places lookup: templates
+          A delete keeps the events made from the template: it unlinks
+          them first (`source_template_id = null`), so they stay whatever
+          the foreign key's delete rule (see Maintainer notes). If the user
+          ticks it in the confirm, it first deletes their upcoming events
+          made from it (`deleteEventRows`, as manage-events deletes); past
+          ones always stay. It then runs `refreshEventQueries`. No translation or Places lookup: templates
           have no `lng_titles`, and the address keeps the `en_label` the
           field got when picked.
         - **Values** (`templateValues.ts`, pure, tested directly):
@@ -811,7 +842,8 @@ event.ownerId)`, the user's own for everyone else, since that is all
           (`ActionDialog`, legacy's warning text).
         - **Starting an event from one**: the new-event forms' top row has
           `TemplatePicker` (legacy's "בחירת תבנית": the user's templates of
-          that kind) beside "clear form". Picking one replaces the form's
+          both kinds, where legacy offered only the form's; one of the
+          other kind switches the form to it first) beside "clear form". Picking one replaces the form's
           values with the template's (`withSingleDayTemplate` /
           `withMultiDayTemplate`; the day(s), recurrence and hide stay:
           legacy's single-day mapping set an `event-dates` value from the
@@ -1091,19 +1123,36 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   is server-side; a test fails if any source names Google's Translate
   endpoint). It never rejects (`translateOrNull`: `null` on failure or
   after `LOOKUP_TIMEOUT_MS`; `translateText`: the source text) and
-  remembers each text and language for the session. The event details
-  translate, in English and Russian, what legacy did
-  (`detailsTranslation.ts`: description, link and price titles, names of
-  organisations and multi-day teachers without a bio), one query per text,
-  showing the Hebrew until each arrives. They are kept on the device across
-  visits (`translationStore.ts`, `detailsTranslations` in
-  `services.storage`, read with the details' chunk only): keyed by language
-  and the Hebrew text itself (an edited text is simply a new key, so no
-  `updated_at` is needed in the public payload), bounded to 200 entries and
-  100,000 characters, oldest out first; public data, so kept across users.
-  Links the details render (event links, bio pages) go through `webLinks`:
-  http(s) only, a scheme-less one as https, anything else (a stored
-  `javascript:`) dropped.
+  remembers each text and language for the session. What people wrote is
+  shown in English and Russian through one hook,
+  `useMachineTranslation(texts, language, { onDevice })`
+  (`app/useMachineTranslation.ts`): one query per text, showing the text
+  as written until its translation arrives (or if it fails). Hebrew asks
+  for nothing, and neither does a text without Hebrew letters (the
+  function's only source). Its users:
+    - **Event details** (`detailsTranslation.ts`): what legacy translated
+      (description, link and price titles, names of organisations and
+      multi-day teachers without a bio).
+    - **Bio card** (`BioCard.tsx`): the "about" text and link titles (new;
+      the name stays as written).
+    - **Requests** (`features/requests/requestTexts.ts`,
+      `useRequestTexts`): the admins' replies on the user's page, and the
+      message and responses on `/manage-support`. The notes the app stores
+      in Hebrew (`REQUEST_NOTES` in `requestRows.ts`: approved, closed,
+      cancelled by the user) are never sent: `REQUEST_WORDS.note` shows them
+      in the reader's language. They are still written in Hebrew, as legacy
+      wrote them.
+      Public texts (details, bios) are kept on the device across visits
+      (`onDevice`; `app/translationStore.ts`, `detailsTranslations` in
+      `services.storage`, read by lazy chunks only): keyed by language and the
+      Hebrew text itself (an edited text is simply a new key, so no
+      `updated_at` is needed in the public payload), bounded to 200 entries and
+      100,000 characters, oldest out first; kept across users. Request texts
+      are private, so they stay in memory. The queries aren't a public kind,
+      so signing out removes them.
+      Links the details render (event links, bio pages) go through `webLinks`:
+      http(s) only, a scheme-less one as https, anything else (a stored
+      `javascript:`) dropped.
 - **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
   Everything that adds copy follows this:
     - **Copy is per component**, declared with `defineCopy({ he, en, ru })`
@@ -1173,7 +1222,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       to Hebrew. The switcher (`app/LanguageSwitcher.tsx`, the legacy flag
       menu) sits in the app header, as in legacy.
 - **Assets.** Images ported from the old client live in `src/assets/`
-  and are imported with `?no-inline` (e.g. the flags, the WhatsApp logo), so
+  and are imported with `?no-inline` (e.g. the flags, the Google logo), so
   they are hashed files fetched when shown, never base64 in the JS.
   Multi-colour logos are such images; single-colour icons are inline SVG
   components (`src/ui/icons/`). An image or gif below the fold gets
@@ -1224,9 +1273,9 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   its code from `/` (its copy is `/* @__PURE__ */`).
 - **Header and menu.** The header shows a home button (to signed-out
   visitors on routes with the `homeButton` handle, to signed-in users
-  anywhere but `/`), the language menu, the WhatsApp link
-  (`VITE_WHATSAPP_NUMBER`; hidden when unset), the out-of-date sign and the
-  menu button; signed out, the login link before them all, and signed in,
+  anywhere but `/`), the language menu, the out-of-date sign and the menu
+  button (no WhatsApp link: removed with the weekly summary, maintainer
+  decision 2026-10-31); signed out, the login link before them all, and signed in,
   the user's name before the menu button (rules under Auth and roles). The
   menu (a lazy `MenuDrawer`: a top drawer on phones, a side drawer from the
   start on wider screens) lists `menuFor(viewer)` from `MENU_ITEMS`
@@ -1489,18 +1538,15 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
     database's refusal (an extra request). Until checked, a refused admin
     write shows "not allowed, or changed meanwhile" and changes nothing.
 
-- **Deleting a template may delete its events.** The delete rule of
-  `ci_events.source_template_id`'s foreign key
-  (`ci-events_source_template_id_fkey`) isn't known from the repo. Check it
-  with `SELECT confdeltype FROM pg_constraint WHERE conname =
-'ci-events_source_template_id_fkey'` (`c` cascade, `n` set null, `a`/`r`
-  no action/restrict). If it cascades, deleting a template deletes every
-  event made from it (384 of the 782 visible events reference a template).
-  Legacy relied on that (its confirm says so) and the client keeps its
-  words and refreshes the event lists after a delete. `ON DELETE SET NULL`
-  would keep the events; that is a product decision, and a migration file
-  for the maintainer to apply. With no action, deleting a template still
-  used by an event fails, and the confirm says the action failed.
+- **Deleting a template keeps its events** (maintainer decision,
+  2026-10-31). Legacy's foreign key (`ci-events_source_template_id_fkey`)
+  is believed to cascade, deleting every event made from the template (384
+  of the 782 visible events reference one). The client now unlinks the
+  events before deleting the template, so they stay whatever the rule, and
+  deletes the upcoming ones only when the user ticks it in the confirm.
+  `supabase/migrations/20261031120000_template_delete_keeps_events.sql`
+  makes the key `ON DELETE SET NULL`, so a delete from anywhere else keeps
+  them too.
 
 ## Tests
 
@@ -1548,7 +1594,7 @@ titles and cards), never in a feature folder.
   agent, a service worker with caches (`installServiceWorkerAndCaches`),
   and fires Chrome's install offer (`offerInstall`). `setup.ts` resets them
   after each test.
-  `vi.stubEnv` (e.g. `VITE_WHATSAPP_NUMBER`) lasts one test.
+  `vi.stubEnv` (e.g. `VITE_HIDE_EVENTS_FLAG`) lasts one test.
 - **Auth:** `fake.auth` (`src/test/fakeAuth.ts`) is the fake's Supabase
   auth: accounts (`fake.auth.accounts`), a session with tokens
   (`token-<user id>-<n>`), every call that would reach the auth server in
@@ -1709,7 +1755,8 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     switch, alert and buttons in `src/ui/form`. The weekly-schedule
     settings (legacy's `/filters-and-notifications`, story 36) were dropped
     as unused: legacy took the page out of production and the WhatsApp
-    sender isn't running.
+    sender isn't running (confirmed by the maintainer 2026-10-31, who also
+    had the header's WhatsApp link removed).
 11. My requests: `/request` (signed-in roles) and `/bio/request` (profile
     roles), each with an optional `:requestId` in one route (so opening
     another request keeps the page), lazy; legacy SupportPage: the user's
@@ -1788,7 +1835,9 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     and series-scoped writes, responses into the cache. The event actions'
     confirm dialog moved to `features/events/ActionDialog.tsx` for reuse.
 16. Templates: `/create-events` lists the user's templates (read when it
-    opens, newest first) with legacy's four choices, the no-templates
+    opens, newest first) with the new-event and new-template choices
+    (legacy's four, merged on 2026-10-31: one form switched between
+    single-day and multi-day), the no-templates
     warning, edit (the template's form in a drawer or modal) and delete
     (legacy's confirm); `?isTemplate=true` on the new-event pages saves a
     single-day or multi-day template (name, the event's fields without

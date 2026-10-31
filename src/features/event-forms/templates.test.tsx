@@ -176,17 +176,15 @@ describe("templates", () => {
             value: user.id,
         })
         expect(read.token).toBe(fake.auth.accessToken())
-        // Legacy's four choices, templates first.
+        // An event or a template, each single-day until switched.
         const choices = screen.getByRole("navigation", { name: "יצירת אירוע" })
         expect(
             within(choices)
                 .getAllByRole("link")
                 .map((link) => [link.textContent, link.getAttribute("href")]),
         ).toEqual([
-            ["תבנית חד יומית", "/create-events/single-day?isTemplate=true"],
-            ["אירוע חד יומי", "/create-events/single-day"],
-            ["תבנית רב יומית", "/create-events/multi-day?isTemplate=true"],
-            ["אירוע רב יומי", "/create-events/multi-day"],
+            ["אירוע חדש", "/create-events/single-day"],
+            ["תבנית חדשה", "/create-events/single-day?isTemplate=true"],
         ])
         expect(
             screen.queryByText("כדאי ליצור תבניות עבור אירועים חוזרים"),
@@ -217,7 +215,9 @@ describe("templates", () => {
         ).toBeInTheDocument()
         // No day, no recurrence, no hide switch: a template has none.
         expect(screen.queryByLabelText("תאריך")).not.toBeInTheDocument()
-        expect(screen.queryByRole("switch")).not.toBeInTheDocument()
+        expect(
+            screen.queryByRole("switch", { name: "הסתרת האירוע (טיוטה)" }),
+        ).not.toBeInTheDocument()
         expect(
             screen.queryByRole("checkbox", { name: /אירוע חוזר/ }),
         ).not.toBeInTheDocument()
@@ -334,13 +334,13 @@ describe("templates", () => {
         const picker = await screen.findByRole("combobox", {
             name: "בחירת תבנית",
         })
-        // Only single-day templates are offered.
+        // Both kinds are offered: a multi-day one switches the form.
         await waitFor(() =>
             expect(
                 within(picker)
                     .getAllByRole("option")
                     .map((option) => option.textContent),
-            ).toEqual(["בחירת תבנית", "ג'אם שישי"]),
+            ).toEqual(["בחירת תבנית", "ג'אם שישי", "ריטריט קיץ"]),
         )
         await userEvent.selectOptions(picker, single.id)
 
@@ -403,7 +403,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, multi.id)
         expect(select("סוג האירוע")).toHaveValue("retreat")
@@ -433,6 +433,53 @@ describe("templates", () => {
                 { label: TEACHER.bio_name, value: TEACHER.user_id },
             ],
         })
+    })
+
+    it("of the other kind switch a new event's form when picked", async () => {
+        const { user, fake, multi } = setup()
+        const { router } = render(user, fake, "/create-events/single-day")
+        const picker = await screen.findByRole("combobox", {
+            name: "בחירת תבנית",
+        })
+        await waitFor(() =>
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
+        )
+
+        await userEvent.selectOptions(picker, multi.id)
+
+        expect(router.state.location.pathname).toBe("/create-events/multi-day")
+        expect(await screen.findByLabelText("תאריך התחלה")).toHaveValue("")
+        expect(select("סוג האירוע")).toHaveValue("retreat")
+        expect(
+            screen.getByRole("textbox", { name: "*כותרת האירוע" }),
+        ).toHaveValue("ריטריט במדבר")
+        expect(select("בחירת תבנית")).toHaveValue(multi.id)
+    })
+
+    it("can be switched to multi-day while new, keeping the name", async () => {
+        const { user, fake } = setup()
+        const { router } = render(
+            user,
+            fake,
+            "/create-events/single-day?isTemplate=true",
+        )
+        await userEvent.type(
+            await screen.findByRole("textbox", { name: "שם התבנית" }),
+            "סדנת קיץ",
+        )
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+
+        expect(router.state.location.pathname).toBe("/create-events/multi-day")
+        expect(router.state.location.search).toBe("?isTemplate=true")
+        expect(
+            await screen.findByRole("heading", { name: "תבנית רב יומית" }),
+        ).toBeInTheDocument()
+        expect(screen.getByRole("textbox", { name: "שם התבנית" })).toHaveValue(
+            "סדנת קיץ",
+        )
     })
 
     it("are edited from the list, sending only what changed", async () => {
@@ -487,7 +534,7 @@ describe("templates", () => {
         )
         let dialog = await screen.findByRole("dialog", { name: "מחיקת תבנית" })
         expect(dialog).toHaveTextContent(
-            "האם אתם בטוחים שאתם רוצים למחוק את התבנית ? מחיקת התבנית תמחק את כל הארועים שנוצרו מתוך התבנית.",
+            "האם אתם בטוחים שאתם רוצים למחוק את התבנית? הארועים שנוצרו מתוך התבנית יישארו.",
         )
         await userEvent.click(
             within(dialog).getByRole("button", { name: "ביטול" }),
@@ -515,6 +562,101 @@ describe("templates", () => {
         )
         expect(await listedNames()).toEqual(["ג'אם שישי"])
         expect(templateRequests(fake)).toHaveLength(reads)
+    })
+
+    it("leave their events when deleted, unlinked from the template", async () => {
+        const { user, fake, multi } = setup()
+        const made = event({
+            title: "ריטריט מהתבנית",
+            user_id: user.id,
+            source_template_id: multi.id,
+        })
+        fake.rows("ci_events").push(made)
+        render(user, fake)
+        await listedNames()
+
+        await userEvent.click(
+            screen.getByRole("button", { name: "מחיקת ריטריט קיץ" }),
+        )
+        const dialog = await screen.findByRole("dialog", {
+            name: "מחיקת תבנית",
+        })
+        expect(
+            within(dialog).getByRole("checkbox", {
+                name: "למחוק גם את הארועים העתידיים שנוצרו מתוך התבנית",
+            }),
+        ).not.toBeChecked()
+        await userEvent.click(
+            within(dialog).getByRole("button", { name: "מחיקה" }),
+        )
+
+        await waitFor(() =>
+            expect(fake.rows("templates").map(({ id }) => id)).not.toContain(
+                multi.id,
+            ),
+        )
+        const kept = fake.rows("ci_events").find(({ id }) => id === made.id)
+        expect(kept).toMatchObject({ source_template_id: null })
+        expect(
+            fake.requests.filter(
+                (request) =>
+                    request.table === "ci_events" &&
+                    request.method === "delete",
+            ),
+        ).toEqual([])
+    })
+
+    it("delete their upcoming events too when chosen, and keep past ones", async () => {
+        const { user, fake, multi } = setup()
+        const upcoming = event({
+            start_date: "2026-11-05",
+            end_date: "2026-11-05",
+            user_id: user.id,
+            source_template_id: multi.id,
+        })
+        const past = event({
+            start_date: "2026-10-01",
+            end_date: "2026-10-01",
+            user_id: user.id,
+            source_template_id: multi.id,
+        })
+        const otherTemplate = event({
+            start_date: "2026-11-05",
+            end_date: "2026-11-05",
+            user_id: user.id,
+            source_template_id: "another-template",
+        })
+        fake.rows("ci_events").push(upcoming, past, otherTemplate)
+        render(user, fake)
+        await listedNames()
+
+        await userEvent.click(
+            screen.getByRole("button", { name: "מחיקת ריטריט קיץ" }),
+        )
+        const dialog = await screen.findByRole("dialog", {
+            name: "מחיקת תבנית",
+        })
+        await userEvent.click(
+            within(dialog).getByRole("checkbox", {
+                name: "למחוק גם את הארועים העתידיים שנוצרו מתוך התבנית",
+            }),
+        )
+        await userEvent.click(
+            within(dialog).getByRole("button", { name: "מחיקה" }),
+        )
+
+        await waitFor(() =>
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+        )
+        const ids = fake.rows("ci_events").map(({ id }) => id)
+        expect(ids).not.toContain(upcoming.id)
+        expect(ids).toEqual(expect.arrayContaining([past.id, otherTemplate.id]))
+        expect(
+            fake.rows("ci_events").find(({ id }) => id === past.id),
+        ).toMatchObject({ source_template_id: null })
+        expect(fake.rows("templates").map(({ id }) => id)).not.toContain(
+            multi.id,
+        )
     })
 
     it("keep a failed save's edits and say so", async () => {
@@ -585,7 +727,7 @@ describe("templates", () => {
         expect(title).toHaveValue("טיוטה שלי")
         const picker = select("בחירת תבנית")
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         expect(title).toHaveValue("ג'אם שישי בבוקר")
@@ -622,7 +764,7 @@ describe("templates", () => {
         expect(storage.getItem(SINGLE_DAY_TEMPLATE_DRAFT_KEY)).not.toBeNull()
     })
 
-    it("refresh the event lists when one is deleted, as its events may go with it", async () => {
+    it("refresh the event lists when one is deleted, as its events may change with it", async () => {
         const { user, fake, multi } = setup()
         const { router } = render(user, fake, "/")
         expect(await eventTitles()).toContain("ג'אם ותיק")
@@ -651,7 +793,7 @@ describe("templates", () => {
             ),
         )
         // Back on the calendar within its fresh window: refetched all the
-        // same (with the cascade legacy warned of, its events are gone).
+        // same (its events were unlinked from the template, or deleted).
         await act(() => router.navigate("/"))
         await waitFor(() => expect(eventReads()).toBe(before + 1))
     })
@@ -663,7 +805,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         fireEvent.change(screen.getByLabelText("תאריך"), {
@@ -701,7 +843,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         first.unmount()
@@ -749,7 +891,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         fireEvent.change(screen.getByLabelText("תאריך"), {

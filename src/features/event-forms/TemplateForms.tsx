@@ -9,7 +9,11 @@ import {
     SINGLE_DAY_TEMPLATE_DRAFT_KEY,
 } from "./draftKeys"
 import { useFormDraft } from "../../app/useFormDraft"
-import { ClearFormButton, EventFormFooter } from "./EventFormParts"
+import {
+    ClearFormButton,
+    EventFormFooter,
+    MultiDaySwitch,
+} from "./EventFormParts"
 import { MultiDayHeadFields } from "./MultiDayEventForm"
 import { SingleDayFields } from "./SingleDayEventForm"
 import { useTaggable } from "./taggableBios"
@@ -23,15 +27,18 @@ import {
     multiDayTemplateColumns,
     multiDayTemplatePatch,
     multiDayTemplateValuesOf,
+    multiToSingleDayTemplate,
     singleDayTemplateColumns,
     singleDayTemplatePatch,
     singleDayTemplateValuesOf,
+    singleToMultiDayTemplate,
     validateMultiDayTemplate,
     validateSingleDayTemplate,
     type MultiDayTemplateValues,
     type SingleDayTemplateValues,
     type Template,
 } from "./templateValues"
+import { useCarried } from "./useCarried"
 import { useErrorText } from "./useErrorText"
 
 // The template forms (legacy SingleDayEventForm / MultiDayEventForm with
@@ -39,15 +46,20 @@ import { useErrorText } from "./useErrorText"
 // cards without the days, recurrence and hide switch, plus the template's
 // name, saved to `templates`. A new template's form keeps a draft on the
 // device (its own key, legacy's `…-draft-template`); an edit's doesn't, as
-// legacy's didn't.
+// legacy's didn't. A new template can be switched between single-day and
+// multi-day, keeping what was filled in.
 
-interface TemplateFormProps {
+interface TemplateFormProps<V, Other> {
     userId: string
     /** The template being edited; unset for a new one. */
     template?: Template
     onDone: () => void
     /** Clears a new template's form (it remounts empty). */
     onClear?: () => void
+    /** What a new template's form had before the user switched it to this. */
+    carried?: V
+    /** Switches a new template's form to the other kind, with these values. */
+    onSwitchKind?: (values: Other) => void
 }
 
 /** The name: beside "clear form" for a new template, labelled for an edit. */
@@ -83,7 +95,9 @@ export function SingleDayTemplateForm({
     template,
     onDone,
     onClear,
-}: TemplateFormProps) {
+    carried,
+    onSwitchKind,
+}: TemplateFormProps<SingleDayTemplateValues, MultiDayTemplateValues>) {
     const copy = useCopy(TEMPLATE_COPY)
     const today = useToday()
     const saved = useMemo(
@@ -101,6 +115,7 @@ export function SingleDayTemplateForm({
         form,
         isValues: isSingleDayTemplateValues,
     })
+    useCarried(form.restore, carried)
     const taggable = useTaggable(userId)
     const submit = useTemplateSubmit({
         userId,
@@ -146,6 +161,15 @@ export function SingleDayTemplateForm({
                 ) : (
                     name
                 )}
+                {onSwitchKind && (
+                    <MultiDaySwitch
+                        checked={false}
+                        onSwitch={() => {
+                            discardDraft()
+                            onSwitchKind(singleToMultiDayTemplate(values))
+                        }}
+                    />
+                )}
                 <SingleDayFields
                     form={form}
                     heading={
@@ -175,7 +199,9 @@ export function MultiDayTemplateForm({
     template,
     onDone,
     onClear,
-}: TemplateFormProps) {
+    carried,
+    onSwitchKind,
+}: TemplateFormProps<MultiDayTemplateValues, SingleDayTemplateValues>) {
     const copy = useCopy(TEMPLATE_COPY)
     const viewer = useViewer()
     const saved = useMemo(
@@ -193,6 +219,7 @@ export function MultiDayTemplateForm({
         form,
         isValues: isMultiDayTemplateValues,
     })
+    useCarried(form.restore, carried)
     const taggable = useTaggable(userId)
     const creatorName = "name" in viewer ? viewer.name : ""
     const submit = useTemplateSubmit({
@@ -236,6 +263,15 @@ export function MultiDayTemplateForm({
                     </ClearFormButton>
                 ) : (
                     name
+                )}
+                {onSwitchKind && (
+                    <MultiDaySwitch
+                        checked
+                        onSwitch={() => {
+                            discardDraft()
+                            onSwitchKind(multiToSingleDayTemplate(values))
+                        }}
+                    />
                 )}
                 <MultiDayHeadFields
                     form={form}

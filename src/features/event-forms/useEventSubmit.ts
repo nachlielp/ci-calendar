@@ -15,7 +15,8 @@ import {
 // series: a row per day, ids and a `recurring_ref_key` made once per
 // form); an edit sends only the changed columns (nothing at all when
 // nothing changed) and re-tags the event only when a field holding tags
-// changed. An event with later events in its recurring series first asks
+// changed (an edit switching the event's kind: the kind's columns whole,
+// and always re-tagged). An event with later events in its recurring series first asks
 // which of them change too (legacy EditRecurringEventDialog). Then the
 // draft goes and the form is done. The forms differ only in their columns,
 // patch and tag fields.
@@ -27,6 +28,12 @@ export interface EventSubmitOptions<V extends TaggableValues> {
     userId: string
     /** The event being edited; unset for a new one. */
     event?: ManagedEvent
+    /**
+     * The edited event is saved as the other kind (single-day or
+     * multi-day) than it was: it saves even with no field changed, and
+     * re-tags it.
+     */
+    kindChanged?: boolean
     /** A new event's columns; a list for a recurring series, one per day. */
     columns: (values: V) => EventColumns | EventColumns[]
     /** An edit's changed columns. */
@@ -83,6 +90,7 @@ export interface SeriesQuestion {
 export function useEventSubmit<V extends TaggableValues>({
     userId,
     event,
+    kindChanged = false,
     columns,
     patch,
     series,
@@ -124,15 +132,17 @@ export function useEventSubmit<V extends TaggableValues>({
 
     const save = async ({ values, changes, isDirty }: Submission<V>) => {
         if (event) {
-            if (isDirty) {
+            if (isDirty || kindChanged) {
                 if (series && !series.ready) throw new SaveCancelled()
                 const later = await chooseLater()
                 await update.mutateAsync({
                     event,
                     patch: patch(values, changes),
-                    tagged: tagFields.some((field) => field in changes)
-                        ? taggedUserIds(values)
-                        : undefined,
+                    tagged:
+                        kindChanged ||
+                        tagFields.some((field) => field in changes)
+                            ? taggedUserIds(values)
+                            : undefined,
                     ...(series && later.length > 0
                         ? {
                               later: {

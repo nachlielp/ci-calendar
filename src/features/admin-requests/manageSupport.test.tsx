@@ -3,7 +3,9 @@ import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import type { SignedInRole } from "../../app/viewer"
 import { setPageVisibility } from "../../test/browser"
+import { createMemoryStorage } from "../../app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
+import { fakeTranslation } from "../../test/fakeFunctions"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow } from "../../test/testUsers"
@@ -319,6 +321,47 @@ describe("manage support (/manage-support)", () => {
         )
         expect(await navigator.clipboard.readText()).toBe("0521234567")
         expect(item.getByText("מספר הטלפון הועתק")).toBeVisible()
+    })
+
+    it("shows the message and responses in the admin's language", async () => {
+        const { admin, fake } = setup([
+            requestRow(7, {
+                responses: [
+                    {
+                        response: "בבדיקה",
+                        created_at: "2026-10-20T10:00:00Z",
+                        responder_name: "Admin",
+                    },
+                    {
+                        // Reopened since.
+                        response: "הבקשה נסגרה",
+                        created_at: "2026-10-21T10:00:00Z",
+                        responder_name: "Admin",
+                    },
+                ],
+            }),
+        ])
+        fake.functions.handle("translate", fakeTranslation)
+        const storage = createMemoryStorage()
+        storage.setItem("language", "ru")
+        renderApp({
+            fake,
+            storage,
+            signedInAs: admin,
+            path: "/manage-support",
+            now: NOW,
+        })
+        const list = await screen.findByRole("list", { name: "Заявки" })
+        await userEvent.click(
+            within(list).getByRole("button", { name: /פונה 7/ }),
+        )
+
+        expect(await screen.findByText("הודעה 7 [ru]")).toBeVisible()
+        expect(await screen.findByText("בבדיקה [ru]")).toBeVisible()
+        expect(screen.getByText("Заявка закрыта")).toBeVisible()
+        expect(
+            fake.functions.calls.map((call) => call.body.text).sort(),
+        ).toEqual(["בבדיקה", "הודעה 7"])
     })
 
     it("appends a reply to the responses and shows it without a refetch", async () => {

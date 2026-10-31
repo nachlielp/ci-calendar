@@ -4,12 +4,7 @@ import { Link } from "react-router"
 import { describe, expect, it, vi } from "vitest"
 import { event } from "../test/testEvents"
 import { createFakeDataClient } from "../test/fakeDataClient"
-import {
-    installServiceWorkerAndCaches,
-    IPHONE_USER_AGENT,
-    setStandalone,
-    setUserAgent,
-} from "../test/browser"
+import { installServiceWorkerAndCaches } from "../test/browser"
 import { renderApp } from "../test/renderApp"
 import { createMemoryStorage } from "./deviceStorage"
 import { RootLayout } from "./RootLayout"
@@ -275,44 +270,16 @@ describe("footer", () => {
 })
 
 describe("WhatsApp", () => {
-    it("opens a chat with the community number, greeting in the chosen language", async () => {
-        vi.stubEnv("VITE_WHATSAPP_NUMBER", "972500000000")
-        const storage = createMemoryStorage()
-        storage.setItem("language", "en")
-        renderApp({ storage })
-
-        const link = within(header()).getByRole("link", {
-            name: "Message us on WhatsApp",
-        })
-        expect(link).toHaveAttribute(
-            "href",
-            `https://wa.me/972500000000?text=${encodeURIComponent("Hey let's chat🙃")}`,
-        )
-        expect(link).toHaveAttribute("target", "_blank")
-    })
-
-    it("opens the WhatsApp app directly from the installed app on an iPhone", () => {
-        vi.stubEnv("VITE_WHATSAPP_NUMBER", "972500000000")
-        setUserAgent(IPHONE_USER_AGENT)
-        setStandalone(true)
-        renderApp()
-
-        const link = within(header()).getByRole("link", {
-            name: "שלחו לנו הודעה בוואטסאפ",
-        })
-        expect(link.getAttribute("href")).toMatch(
-            /^whatsapp:\/\/send\?phone=972500000000&text=/,
-        )
-        expect(link).not.toHaveAttribute("target")
-    })
-
-    it("is hidden when no number is configured", () => {
-        vi.stubEnv("VITE_WHATSAPP_NUMBER", "")
+    it("has no WhatsApp link (the service isn't running)", () => {
         renderApp()
 
         expect(
-            within(header()).queryByRole("link", { name: /וואטסאפ/ }),
-        ).not.toBeInTheDocument()
+            within(header())
+                .queryAllByRole("link")
+                .filter((link) =>
+                    /wa\.me|whatsapp:/.test(link.getAttribute("href") ?? ""),
+                ),
+        ).toEqual([])
     })
 })
 

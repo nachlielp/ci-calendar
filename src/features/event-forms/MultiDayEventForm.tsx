@@ -19,6 +19,7 @@ import {
     BaseHeadFields,
     ClearFormButton,
     EventFormFooter,
+    MultiDaySwitch,
     type FormControls,
 } from "./EventFormParts"
 import {
@@ -30,13 +31,18 @@ import {
     multiDayColumns,
     multiDayPatch,
     multiDayValuesOf,
+    multiDayValuesOfSingleDay,
+    multiToSingleDay,
+    toMultiDayPatch,
     validateMultiDay,
     type MultiDayValues,
+    type SingleDayValues,
 } from "./eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
 import { useTaggable, type Taggable } from "./taggableBios"
 import { TemplatePicker } from "./TemplatePicker"
-import { withMultiDayTemplate } from "./templateValues"
+import { withMultiDayTemplate, withSingleDayTemplate } from "./templateValues"
+import { useCarried } from "./useCarried"
 import { useEventSubmit } from "./useEventSubmit"
 import { useErrorText } from "./useErrorText"
 
@@ -86,8 +92,12 @@ function spanError(errors: FormErrors<EventFormError>) {
  * EditMultiDayEventForm (`event`), with legacy's MultiDayFormHead: title,
  * description, district, address, first and last day, type, teachers and
  * organisations (both tagged or typed); then links, prices and whether it
- * is hidden. A new event can start from one of the user's multi-day
- * templates. Saved as the single-day form is (translations, drafts,
+ * is hidden. A new event can start from one of the user's templates, and
+ * can be switched back to a single-day event (`onSwitchKind`, given the
+ * values to carry over; so does picking a single-day template), as can a
+ * saved event (an `event` that is single-day is one switched here: saved,
+ * it becomes a multi-day event). Saved as
+ * the single-day form is (translations, drafts,
  * junction rows, every cached list); then `onDone`.
  */
 export function MultiDayEventForm({
@@ -95,21 +105,36 @@ export function MultiDayEventForm({
     event,
     onDone,
     onClear,
+    carried,
+    onSwitchKind,
 }: {
     userId: string
     event?: ManagedEvent
     onDone: () => void
     /** Clears a new event's form (it remounts empty). */
     onClear?: () => void
+    /** What the form had before the user switched it to this. */
+    carried?: MultiDayValues
+    /**
+     * Switches the form to a single-day one with these values (a new
+     * event, or a saved one); unset: no switch.
+     */
+    onSwitchKind?: (values: SingleDayValues) => void
 }) {
     const copy = useCopy(EVENT_FORM_COPY)
     const own = useCopy(COPY)
     const viewer = useViewer()
     const today = useToday()
 
+    // A single-day event the user switched to multi-day in its edit form.
+    const converting = !!event && !event.multiDay
     const saved = useMemo(
         () =>
-            event ? multiDayValuesOf(event) : emptyMultiDay(HIDE_NEW_EVENTS),
+            event
+                ? event.multiDay
+                    ? multiDayValuesOf(event)
+                    : multiDayValuesOfSingleDay(event)
+                : emptyMultiDay(HIDE_NEW_EVENTS),
         [event],
     )
     const validate = useCallback(
@@ -126,6 +151,7 @@ export function MultiDayEventForm({
         form,
         isValues: isMultiDayValues,
     })
+    useCarried(form.restore, carried)
     const taggable = useTaggable(userId)
     const creatorName = "name" in viewer ? viewer.name : ""
     const columns = useCallback(
@@ -139,8 +165,9 @@ export function MultiDayEventForm({
     const submit = useEventSubmit({
         userId,
         event,
+        kindChanged: converting,
         columns,
-        patch: multiDayPatch,
+        patch: converting ? toMultiDayPatch : multiDayPatch,
         tagFields: TAG_FIELDS,
         discardDraft,
         onDone,
@@ -150,6 +177,10 @@ export function MultiDayEventForm({
     const { values, errors, set, touch } = form
     const errorAt = useErrorText(errors)
     const span = spanError(errors)
+    const switchTo = (singleDay: SingleDayValues) => {
+        discardDraft()
+        onSwitchKind?.(singleDay)
+    }
     return (
         <div className="event-form">
             <form onSubmit={onSubmit} noValidate>
@@ -162,16 +193,32 @@ export function MultiDayEventForm({
                     >
                         <TemplatePicker
                             userId={userId}
-                            multiDay
+                            multiDay={onSwitchKind ? undefined : true}
                             value={values.sourceTemplateId}
                             onPick={(template) =>
-                                form.restore(
-                                    withMultiDayTemplate(values, template),
-                                )
+                                template.multiDay
+                                    ? form.restore(
+                                          withMultiDayTemplate(
+                                              values,
+                                              template,
+                                          ),
+                                      )
+                                    : switchTo(
+                                          withSingleDayTemplate(
+                                              multiToSingleDay(values),
+                                              template,
+                                          ),
+                                      )
                             }
                             onClear={() => set("sourceTemplateId", "")}
                         />
                     </ClearFormButton>
+                )}
+                {onSwitchKind && (
+                    <MultiDaySwitch
+                        checked
+                        onSwitch={() => switchTo(multiToSingleDay(values))}
+                    />
                 )}
                 <MultiDayHeadFields
                     form={form}

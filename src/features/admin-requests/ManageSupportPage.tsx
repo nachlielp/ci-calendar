@@ -19,6 +19,7 @@ import { QueryList } from "../../ui/QueryList"
 import { usePagedAdminList } from "../admin/adminLists"
 import { CopyPhone } from "../admin/CopyPhone"
 import { RefreshButton } from "../admin/RefreshButton"
+import { useRequestTexts } from "../requests/requestTexts"
 import { REQUEST_WORDS } from "../requests/requestWords"
 import {
     adminRequestsQuery,
@@ -329,6 +330,10 @@ function RequestDetails({
     onNotice,
 }: Omit<ItemProps, "expanded" | "onToggle"> & { id: string }) {
     const copy = useCopy(COPY)
+    const text = useRequestTexts([
+        request.message,
+        ...request.responses.map((response) => response.response),
+    ])
     const act = useRequestAction(adminId)
     const approve = useApproveRequest(adminId)
     const pending = act.isPending || approve.isPending
@@ -387,7 +392,7 @@ function RequestDetails({
                 <time dateTime={request.createdAt}>
                     {jerusalemDateTimeLabel(request.createdAt)}
                 </time>
-                <p className="request-message">{request.message}</p>
+                <p className="request-message">{text(request.message)}</p>
             </div>
             {request.responses.length > 0 && (
                 <article className="request-responses-container">
@@ -397,7 +402,7 @@ function RequestDetails({
                     <ul className="request-responses">
                         {request.responses.map((response, index) => (
                             <li key={index} className="request-response">
-                                <p>{response.response}</p>
+                                <p>{text(response.response)}</p>
                                 <p className="request-response-meta">
                                     {response.responder_name}
                                     {response.created_at && (

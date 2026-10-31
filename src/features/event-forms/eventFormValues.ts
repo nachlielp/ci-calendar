@@ -1,4 +1,5 @@
 import type { Database } from "../../data/database.types"
+import { MULTI_DAY_TYPES } from "../../lib/eventOptions"
 import type { FormErrors } from "../../lib/form"
 import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
 import { jerusalemInstant } from "../../lib/jerusalemInstant"
@@ -160,6 +161,71 @@ export function emptyMultiDay(hidden = false): MultiDayValues {
         endDate: "",
         type: "",
         teachers: [],
+        sourceTemplateId: "",
+    }
+}
+
+/** What only a multi-day event (or template) has. */
+export interface MultiDayPart {
+    type: string
+    teachers: Tag[]
+}
+
+/**
+ * A single-day form's segments as a multi-day one's type and teachers,
+ * when the user turns a new event (or template) into a multi-day one: the
+ * first segment's type if a multi-day event can have it, and every
+ * segment's teachers, each once.
+ */
+export function multiDayPartOf(segments: SegmentValues[]): MultiDayPart {
+    const type = segments[0]?.type ?? ""
+    const teachers = new Map<string, Tag>()
+    for (const segment of segments) {
+        for (const teacher of segment.teachers) {
+            teachers.set(teacher.value || teacher.label, teacher)
+        }
+    }
+    return {
+        type: (MULTI_DAY_TYPES as readonly string[]).includes(type) ? type : "",
+        teachers: [...teachers.values()],
+    }
+}
+
+/**
+ * A multi-day form's type and teachers as a single-day one's segments:
+ * one segment open to everyone, of that type, with those teachers.
+ */
+export const segmentsOf = ({ type, teachers }: MultiDayPart) => [
+    { ...emptySegment(DEFAULT_TAGS), type, teachers },
+]
+
+/**
+ * A single-day event's values as a multi-day one's, when the user
+ * switches the form (a new event's, or a saved one's that doesn't repeat): the shared fields stay, the day becomes the first
+ * day, and the segments become a type and teachers (`multiDayPartOf`).
+ * The recurrence is dropped (multi-day events don't repeat), and so is
+ * the template, which was a single-day one.
+ */
+export function singleToMultiDay(values: SingleDayValues): MultiDayValues {
+    const { date, segments, recurrence, sourceTemplateId, ...base } = values
+    return {
+        ...base,
+        ...multiDayPartOf(segments),
+        startDate: date,
+        endDate: "",
+        sourceTemplateId: "",
+    }
+}
+
+/** The other way (`singleToMultiDay`): the first day becomes the day. */
+export function multiToSingleDay(values: MultiDayValues): SingleDayValues {
+    const { startDate, endDate, type, teachers, sourceTemplateId, ...base } =
+        values
+    return {
+        ...base,
+        date: startDate,
+        segments: segmentsOf({ type, teachers }),
+        recurrence: NO_RECURRENCE,
         sourceTemplateId: "",
     }
 }
@@ -489,6 +555,45 @@ export function multiDayPatch(
     return patch
 }
 
+/**
+ * A saved multi-day event switched to a single-day one in its edit form:
+ * the changed shared columns (as `singleDayPatch`), and every column that
+ * says what kind of event it is, whole: its day, segments, no type, no
+ * multi-day teachers. Its template link stays.
+ */
+export function toSingleDayPatch(
+    values: SingleDayValues,
+    changes: Partial<SingleDayValues>,
+) {
+    const all = singleDayColumns(values)
+    return {
+        ...basePatch(values, changes),
+        start_date: all.start_date,
+        end_date: all.end_date,
+        segments: all.segments,
+        type: all.type,
+        is_multi_day: all.is_multi_day,
+        multi_day_teachers: all.multi_day_teachers,
+    }
+}
+
+/** The other way (`toSingleDayPatch`): a single-day event made multi-day. */
+export function toMultiDayPatch(
+    values: MultiDayValues,
+    changes: Partial<MultiDayValues>,
+) {
+    const all = multiDayColumns(values)
+    return {
+        ...basePatch(values, changes),
+        start_date: all.start_date,
+        end_date: all.end_date,
+        segments: all.segments,
+        type: all.type,
+        is_multi_day: all.is_multi_day,
+        multi_day_teachers: all.multi_day_teachers,
+    }
+}
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
@@ -575,6 +680,18 @@ export function singleDayValuesOf(event: ManagedEvent): SingleDayValues {
         sourceTemplateId: "",
     }
 }
+
+/**
+ * A saved event's values in the form of the other kind, as its edit form
+ * opens when the user switched it (and as a reload reopens it): the values
+ * the switch's changes and draft go over.
+ */
+export const multiDayValuesOfSingleDay = (event: ManagedEvent) =>
+    singleToMultiDay(singleDayValuesOf(event))
+
+/** The other way (`multiDayValuesOfSingleDay`). */
+export const singleDayValuesOfMultiDay = (event: ManagedEvent) =>
+    multiToSingleDay(multiDayValuesOf(event))
 
 // Drafts come back from device storage: check their shape before use, so
 // a draft from another version can't break the form.
