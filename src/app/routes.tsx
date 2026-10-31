@@ -134,7 +134,7 @@ export const routes: RouteObject[] = [
                 },
                 {
                     path: "create-events/single-day",
-                    lazy: eventFormPage("SingleDayFormPage"),
+                    lazy: eventFormPage("NewEventPage"),
                 },
                 {
                     path: "manage-events/edit-single-day/:eventId",
@@ -142,7 +142,7 @@ export const routes: RouteObject[] = [
                 },
                 {
                     path: "create-events/multi-day",
-                    lazy: eventFormPage("MultiDayFormPage"),
+                    lazy: eventFormPage("NewEventPage"),
                 },
                 {
                     path: "manage-events/edit-multi-day/:eventId",

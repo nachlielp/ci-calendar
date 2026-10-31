@@ -176,17 +176,15 @@ describe("templates", () => {
             value: user.id,
         })
         expect(read.token).toBe(fake.auth.accessToken())
-        // Legacy's four choices, templates first.
+        // An event or a template, each single-day until switched.
         const choices = screen.getByRole("navigation", { name: "יצירת אירוע" })
         expect(
             within(choices)
                 .getAllByRole("link")
                 .map((link) => [link.textContent, link.getAttribute("href")]),
         ).toEqual([
-            ["תבנית חד יומית", "/create-events/single-day?isTemplate=true"],
-            ["אירוע חד יומי", "/create-events/single-day"],
-            ["תבנית רב יומית", "/create-events/multi-day?isTemplate=true"],
-            ["אירוע רב יומי", "/create-events/multi-day"],
+            ["אירוע חדש", "/create-events/single-day"],
+            ["תבנית חדשה", "/create-events/single-day?isTemplate=true"],
         ])
         expect(
             screen.queryByText("כדאי ליצור תבניות עבור אירועים חוזרים"),
@@ -217,7 +215,9 @@ describe("templates", () => {
         ).toBeInTheDocument()
         // No day, no recurrence, no hide switch: a template has none.
         expect(screen.queryByLabelText("תאריך")).not.toBeInTheDocument()
-        expect(screen.queryByRole("switch")).not.toBeInTheDocument()
+        expect(
+            screen.queryByRole("switch", { name: "הסתרת האירוע (טיוטה)" }),
+        ).not.toBeInTheDocument()
         expect(
             screen.queryByRole("checkbox", { name: /אירוע חוזר/ }),
         ).not.toBeInTheDocument()
@@ -334,13 +334,13 @@ describe("templates", () => {
         const picker = await screen.findByRole("combobox", {
             name: "בחירת תבנית",
         })
-        // Only single-day templates are offered.
+        // Both kinds are offered: a multi-day one switches the form.
         await waitFor(() =>
             expect(
                 within(picker)
                     .getAllByRole("option")
                     .map((option) => option.textContent),
-            ).toEqual(["בחירת תבנית", "ג'אם שישי"]),
+            ).toEqual(["בחירת תבנית", "ג'אם שישי", "ריטריט קיץ"]),
         )
         await userEvent.selectOptions(picker, single.id)
 
@@ -403,7 +403,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, multi.id)
         expect(select("סוג האירוע")).toHaveValue("retreat")
@@ -433,6 +433,53 @@ describe("templates", () => {
                 { label: TEACHER.bio_name, value: TEACHER.user_id },
             ],
         })
+    })
+
+    it("of the other kind switch a new event's form when picked", async () => {
+        const { user, fake, multi } = setup()
+        const { router } = render(user, fake, "/create-events/single-day")
+        const picker = await screen.findByRole("combobox", {
+            name: "בחירת תבנית",
+        })
+        await waitFor(() =>
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
+        )
+
+        await userEvent.selectOptions(picker, multi.id)
+
+        expect(router.state.location.pathname).toBe("/create-events/multi-day")
+        expect(await screen.findByLabelText("תאריך התחלה")).toHaveValue("")
+        expect(select("סוג האירוע")).toHaveValue("retreat")
+        expect(
+            screen.getByRole("textbox", { name: "*כותרת האירוע" }),
+        ).toHaveValue("ריטריט במדבר")
+        expect(select("בחירת תבנית")).toHaveValue(multi.id)
+    })
+
+    it("can be switched to multi-day while new, keeping the name", async () => {
+        const { user, fake } = setup()
+        const { router } = render(
+            user,
+            fake,
+            "/create-events/single-day?isTemplate=true",
+        )
+        await userEvent.type(
+            await screen.findByRole("textbox", { name: "שם התבנית" }),
+            "סדנת קיץ",
+        )
+
+        await userEvent.click(
+            screen.getByRole("switch", { name: "אירוע רב יומי" }),
+        )
+
+        expect(router.state.location.pathname).toBe("/create-events/multi-day")
+        expect(router.state.location.search).toBe("?isTemplate=true")
+        expect(
+            await screen.findByRole("heading", { name: "תבנית רב יומית" }),
+        ).toBeInTheDocument()
+        expect(screen.getByRole("textbox", { name: "שם התבנית" })).toHaveValue(
+            "סדנת קיץ",
+        )
     })
 
     it("are edited from the list, sending only what changed", async () => {
@@ -680,7 +727,7 @@ describe("templates", () => {
         expect(title).toHaveValue("טיוטה שלי")
         const picker = select("בחירת תבנית")
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         expect(title).toHaveValue("ג'אם שישי בבוקר")
@@ -758,7 +805,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         fireEvent.change(screen.getByLabelText("תאריך"), {
@@ -796,7 +843,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         first.unmount()
@@ -844,7 +891,7 @@ describe("templates", () => {
             name: "בחירת תבנית",
         })
         await waitFor(() =>
-            expect(within(picker).getAllByRole("option")).toHaveLength(2),
+            expect(within(picker).getAllByRole("option")).toHaveLength(3),
         )
         await userEvent.selectOptions(picker, single.id)
         fireEvent.change(screen.getByLabelText("תאריך"), {

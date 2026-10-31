@@ -15,27 +15,28 @@ const COPY = defineCopy({
     he: {
         title: "יצירת אירוע",
         missingBio: "על מנת לתייג את עצמכם בארועים צריך ליצור קודם פרופיל",
-        singleDay: "אירוע חד יומי",
-        multiDay: "אירוע רב יומי",
+        newEvent: "אירוע חדש",
+        newTemplate: "תבנית חדשה",
     },
     en: {
         title: "Create Events",
         missingBio: "To tag yourself on events, create a profile first",
-        singleDay: "Single-day event",
-        multiDay: "Multi-day event",
+        newEvent: "New event",
+        newTemplate: "New template",
     },
     ru: {
         title: "Создать событие",
         missingBio: "Чтобы отмечать себя в событиях, сначала создайте профиль",
-        singleDay: "Однодневное событие",
-        multiDay: "Многодневное событие",
+        newEvent: "Новое событие",
+        newTemplate: "Новый шаблон",
     },
 })
 
 /**
- * Legacy CreateEventsPage (`/create-events`): what to create (a template
- * or an event, single-day or multi-day, in legacy's order and links), then
- * the user's templates (`ManageTemplatesList`), read as the page opens. A
+ * Legacy CreateEventsPage (`/create-events`): what to create, an event or
+ * a template (each single-day at first, switched to multi-day in its form;
+ * legacy offered the four as separate links), then the user's templates
+ * (`ManageTemplatesList`), read as the page opens. A
  * user without a public bio is told to make one before they can tag
  * themselves, and one without templates that they are worth making.
  */
@@ -55,16 +56,11 @@ export default function CreateEventsPage() {
     const missingBio = bios.isSuccess && !hasBio
     const noTemplates = templates.isSuccess && templates.data.length === 0
     const choices = [
+        { label: copy.newEvent, path: "/create-events/single-day" },
         {
-            label: templateCopy.singleDay,
+            label: copy.newTemplate,
             path: "/create-events/single-day?isTemplate=true",
         },
-        { label: copy.singleDay, path: "/create-events/single-day" },
-        {
-            label: templateCopy.multiDay,
-            path: "/create-events/multi-day?isTemplate=true",
-        },
-        { label: copy.multiDay, path: "/create-events/multi-day" },
     ]
     return (
         <main className="create-events-page">

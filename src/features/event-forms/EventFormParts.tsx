@@ -486,6 +486,30 @@ export function ClearFormButton({
 }
 
 /**
+ * A new event's (or template's) switch between single-day and multi-day,
+ * under "clear form". The page swaps the form (`onSwitch`), carrying over
+ * what the user has filled in.
+ */
+export function MultiDaySwitch({
+    checked,
+    onSwitch,
+}: {
+    checked: boolean
+    onSwitch: () => void
+}) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    return (
+        <Switch
+            label={copy.multiDay}
+            checked={checked}
+            onChange={onSwitch}
+            onText={copy.multiDayOn}
+            offText={copy.multiDayOff}
+        />
+    )
+}
+
+/**
  * The end of every event form (legacy EventFromFooter and the submit
  * button): links, prices, the hide (draft) switch, the form's own last
  * part (`before`: the single-day form's recurrence, as legacy put it just
