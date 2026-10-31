@@ -555,11 +555,11 @@ TRUE` / `= true`), so a change made elsewhere isn't flipped back. By
     - **Validation**: `validate(values)` is pure and returns, per path (a
       field's name, or a dotted path into a nested value:
       `segments.2.end`), a key of the form's own copy; legacy's rules and
-      messages. A path's error shows once it, or a field holding it, is
-      touched, and every error after a save attempt. `setErrors` shows the
-      server's errors by path until that path is edited. The fields mark
-      themselves `aria-invalid` and point `aria-describedby` at the
-      message.
+      messages. No error shows while the visitor fills the form in: they
+      all show after a save attempt, and then update as fields change.
+      `setErrors` shows the server's errors by path until that path is
+      edited. The fields mark themselves `aria-invalid` and point
+      `aria-describedby` at the message.
     - **Saving**: `onSubmit={form.handleSubmit(save)}`. It marks the save
       attempt, and only if the values are valid and no save is running
       (double taps, Enter) calls `save({ values, changes, isDirty })` with

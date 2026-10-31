@@ -2,7 +2,8 @@
 // runs them in a reducer). A form edits a copy of the saved values — what
 // the server last returned — so it always knows which fields changed (what
 // a save sends), whether there is unsaved work (the reload guard), and
-// which fields the visitor has touched (where errors show).
+// which fields the visitor has touched. Its own errors show only once a
+// save was attempted.
 //
 // Errors and touched fields are keyed by path: a field's name, or a dotted
 // path into a nested value (`segments.2.end`).
@@ -19,7 +20,7 @@ export interface FormState<V extends FormValues> {
     /** The values as last saved (the server's), which `values` edits. */
     saved: V
     values: V
-    /** Paths the visitor has changed (or left): their errors show. */
+    /** Paths the visitor has changed (or left). */
     touched: ReadonlySet<string>
     /** A save was attempted: every error shows. */
     submitted: boolean
@@ -223,28 +224,18 @@ export function changedFields<V extends FormValues>(
 }
 
 /**
- * The errors to show: a path's error once it (or a path holding it) was
- * touched, or all after a save attempt; then the server's errors where
- * the form has none of its own.
+ * The errors to show: the form's own only after a save attempt (none while
+ * the visitor is still filling it in), then the server's errors where the
+ * form has none of its own.
  */
 export function shownErrors<E extends string>(
-    state: Pick<
-        FormState<FormValues>,
-        "submitted" | "touched" | "serverErrors"
-    >,
+    state: Pick<FormState<FormValues>, "submitted" | "serverErrors">,
     errors: FormErrors<E>,
 ): FormErrors<E> {
-    const touched = [...state.touched]
     const shown: Record<string, E | undefined> = {}
-    for (const [path, error] of Object.entries(errors)) {
-        if (!error) continue
-        if (
-            state.submitted ||
-            touched.some(
-                (other) => path === other || path.startsWith(`${other}.`),
-            )
-        ) {
-            shown[path] = error
+    if (state.submitted) {
+        for (const [path, error] of Object.entries(errors)) {
+            if (error) shown[path] = error
         }
     }
     for (const [path, error] of Object.entries(state.serverErrors)) {

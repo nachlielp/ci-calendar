@@ -23,7 +23,9 @@
     .language-switcher-menu {
         position: absolute;
         inset-block-start: 100%;
-        inset-inline-start: 0;
+        // The switcher sits at the header's left in every language
+        // (AppHeader.scss), so its menu opens rightwards, onto the screen.
+        left: 0;
         z-index: 10;
         margin: 4px 0 0;
         padding: 4px;
