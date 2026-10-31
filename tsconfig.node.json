@@ -1,11 +1,23 @@
 {
+    // vite.config.ts and the service worker rules it imports, in Node.
+    // Checked by `npm run typecheck`.
     "compilerOptions": {
-        "composite": true,
+        "target": "ES2022",
+        "lib": ["ES2022"],
+        "types": ["node"],
         "skipLibCheck": true,
         "module": "ESNext",
         "moduleResolution": "bundler",
         "allowSyntheticDefaultImports": true,
-        "strict": true
+        "allowImportingTsExtensions": true,
+        "noEmit": true,
+        "strict": true,
+        // scripts/headers-revision.mjs, shared with check:sw.
+        "allowJs": true
     },
-    "include": ["vite.config.ts"]
+    "include": [
+        "vite.config.ts",
+        "src/sw/swRules.ts",
+        "scripts/headers-revision.mjs"
+    ]
 }

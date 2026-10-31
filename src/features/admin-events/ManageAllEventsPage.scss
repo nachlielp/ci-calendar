@@ -1,0 +1,47 @@
+// Ported from the old client's styles/manage-events-list.scss (antd's Select and
+// Input dropped for TagPicker and a text field). The page scrolls with the
+// window, as every page here. Rows and actions are my events' (shared
+// partials); the refresh button is new.
+@use "../admin/refresh-button";
+@use "../manage-events/event-rows" as rows;
+@use "../manage-events/event-actions";
+@use "../../ui/form/tag-picker";
+
+.manage-all-events {
+    padding: 0 16px;
+
+    .manage-events-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+
+        .manage-events-header-title {
+            width: 100%;
+            margin: 0;
+            font-size: 1.5em;
+            text-align: center;
+        }
+    }
+
+    .filters-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+
+        .form-field {
+            margin: 0;
+        }
+    }
+
+    .manage-all-events-toolbar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    @include rows.event-rows;
+}

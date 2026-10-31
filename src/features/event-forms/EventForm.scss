@@ -1,0 +1,136 @@
+// Legacy event-form.scss, event-segments-form.scss, add-links-form.scss,
+// add-prices-form.scss and multi-day-form-head.scss (antd's rows and columns dropped), plus the card
+// border of generics/card.scss.
+@use "../../ui/form/tag-picker";
+
+.event-form {
+    .event-card {
+        max-width: 500px;
+        margin: 1rem auto;
+        padding: 24px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .boardered-card {
+        border: 1px solid #e0e0e0;
+    }
+
+    .segment-title {
+        margin: 0 0 1rem;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .segment-description {
+        font-size: 20px;
+        font-weight: 500;
+    }
+
+    .submit-button-container {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .divider {
+        width: 100%;
+        height: 1px;
+        background-color: #dd5239;
+        margin-top: 1rem;
+        border: none;
+        outline: none;
+        box-shadow: none;
+        margin-bottom: 1rem;
+    }
+
+    // Legacy multi-day-form-head.scss: the head card's thicker border.
+    .multi-day-form-head-card {
+        border-width: 4px;
+    }
+
+    // Legacy: start and end side by side, 1rem apart (times, and the
+    // multi-day form's days).
+    .time-fields,
+    .date-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    // Legacy's top row: the template picker (or a new template's name) on
+    // two thirds, the clear button on the rest.
+    .clear-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        gap: 8px;
+
+        .clear-row-field {
+            flex: 2;
+            min-width: 0;
+
+            .form-field {
+                margin: 0;
+            }
+        }
+    }
+}
+
+.segment-card,
+.link-card,
+.price-card {
+    margin: 1rem 0 0;
+    border-width: 2px;
+    min-width: 0;
+}
+
+.add-button-container,
+.remove-button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-button-container {
+    margin-top: 1rem;
+}
+
+.add-button,
+.remove-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.list-button-icon {
+    width: 24px;
+    height: 24px;
+}
+
+// Legacy `general-clear-btn large-btn`.
+.clear-button {
+    padding: 9px 24px 10px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #000;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 20.93px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #daa49a;
+    }
+}

@@ -1,0 +1,116 @@
+// Ported from the old client's styles/calendar-view.scss (antd Calendar → a table).
+.calendar-view {
+    margin: 1rem auto 0;
+
+    .calendar-controller {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .month-button {
+        display: flex;
+        padding: 0;
+        border: none;
+        background: none;
+        color: #000;
+        cursor: pointer;
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        &:disabled {
+            color: #d2bcbc;
+            cursor: default;
+        }
+
+        // The chevron (pointing right) points outwards: the button at the
+        // left edge, next month in Hebrew and previous left to right, turns.
+        [dir="rtl"] &.next svg,
+        [dir="ltr"] &.previous svg {
+            transform: rotate(180deg);
+        }
+    }
+
+    .month-label {
+        width: 90px;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .calendar-view-card {
+        margin-top: 1rem;
+        padding: 16px 16px 8px;
+    }
+
+    .month-grid {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+
+        th {
+            padding-bottom: 4px;
+            font-weight: 400;
+        }
+
+        td {
+            padding: 0;
+        }
+    }
+
+    .day-cell {
+        width: 100%;
+        padding: 0.5rem 0;
+        border: none;
+        border-radius: 4px;
+        background: none;
+        color: inherit;
+        font: inherit;
+        text-align: center;
+        cursor: pointer;
+
+        &.no-events {
+            color: lightgray;
+        }
+
+        &[aria-current="date"] {
+            outline: 1px solid #bc3528;
+            outline-offset: -1px;
+        }
+
+        &[aria-pressed="true"] {
+            background-color: #bc3528;
+            color: #fff;
+
+            .event-dot {
+                background-color: #fff;
+            }
+        }
+    }
+
+    .event-dots {
+        display: flex;
+        justify-content: center;
+        gap: 2px;
+        // Room for one row of dots, so marked and empty days align.
+        height: 5px;
+        margin-top: 0.25rem;
+    }
+
+    .event-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: red;
+    }
+}
+
+.calendar-view-empty {
+    text-align: center;
+    margin: 2rem 0;
+}

@@ -1,0 +1,46 @@
+// Ported from the modal half of the old client's styles/install-pwa-banner.scss.
+.install-dialog {
+    .install-dialog-title {
+        margin: 0;
+    }
+
+    .install-dialog-steps {
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 20px;
+        line-height: 28px;
+    }
+
+    .install-dialog-key,
+    .install-dialog-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin: 3px;
+        padding: 0 2px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        background-color: #fbf9f9;
+        vertical-align: middle;
+    }
+
+    .install-dialog-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .install-dialog-rule {
+        width: 100%;
+        margin: 10px 0;
+        border: none;
+        border-bottom: 1px solid #af52de;
+    }
+
+    .install-dialog-footer {
+        margin: 10px 0 0;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 28px;
+    }
+}

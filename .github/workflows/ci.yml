@@ -30,5 +30,12 @@ jobs:
             - name: Test
               run: npm test
 
+            # Also checks the security headers and CSP (check:headers).
             - name: Build
               run: npm run build
+
+            - name: Bundle size limit
+              run: npm run check:bundle
+
+            - name: Service worker precache
+              run: npm run check:sw

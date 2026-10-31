@@ -1,0 +1,76 @@
+/*
+ * Global styles, ported from the old client's index.scss and styles/generics.
+ *
+ * The font is legacy's Assistant (variable, weights 200-800), subset to
+ * Latin and Hebrew as woff2 (scripts/subset-font.sh). It has no Cyrillic, so
+ * Russian text uses the system font, as it did in legacy. index.html
+ * preloads it, and `font-display: optional` means it is used only if it is
+ * there by the first paint (from the preload or the cache); otherwise that
+ * page view keeps the system font, so text never swaps fonts and reflows,
+ * on any platform. The file is cached for the next visit.
+ */
+@font-face {
+    font-family: "Assistant";
+    src: url("./assets/fonts/assistant-hebrew-latin.woff2") format("woff2");
+    font-weight: 200 800;
+    font-display: optional;
+}
+
+:root {
+    font-family: "Assistant", system-ui, sans-serif;
+    color: #171717;
+    /* The manifest's background_color, under the gradient tiles. */
+    background: #e8ebf2;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+/* Legacy behaved like an app: no pinch zoom, no text selection. */
+html,
+body {
+    touch-action: pan-x pan-y;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* A white card (legacy generics/card.scss). */
+.card {
+    padding: 24px;
+    background-color: #fff;
+    border-radius: 8px;
+    max-width: 100%;
+}
+
+/* Typing and pasting need selectable text, whatever the page around. */
+input,
+textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* A page waiting for its data or the viewer (e.g. a role-guarded page). */
+.page-loading {
+    padding: 0 16px;
+}
+
+/* Read by screen readers, not shown. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}

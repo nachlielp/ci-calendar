@@ -1,0 +1,90 @@
+// Ported from the old client's styles/about-page.scss and the dark action button
+// of generics/buttons.scss (`general-action-btn`).
+.static-page {
+    padding: 0 16px;
+    color: #000;
+
+    .static-page-card {
+        margin: 16px auto;
+    }
+
+    .static-page-title {
+        margin: 0 0 16px;
+    }
+
+    .info-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        border: 1px solid #34c759;
+        border-radius: 10px;
+        background-color: #34c7591a;
+        text-align: center;
+    }
+
+    .text-box {
+        margin: 10px 0 0;
+        max-width: 100%;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.15px;
+        overflow-wrap: break-word;
+    }
+
+    .hr {
+        margin: 10px 0;
+        border: none;
+        border-bottom: 1px solid #888;
+    }
+
+    .section-title,
+    .section-sub-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.15px;
+    }
+
+    .section-title {
+        font-weight: 700;
+    }
+
+    .section-sub-title {
+        font-weight: 600;
+    }
+
+    .list-item {
+        display: block;
+        margin: 0;
+    }
+
+    .hebrew-only {
+        margin: 0 0 16px;
+        font-style: italic;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        width: fit-content;
+        margin-top: 6px;
+        padding: 5px 16px;
+        border-radius: 6px;
+        background-color: #444444;
+        color: #fff;
+        font-size: 16px;
+        text-decoration: none;
+
+        &:hover {
+            background-color: #222222;
+        }
+
+        svg {
+            width: 13px;
+            height: 13px;
+        }
+    }
+}

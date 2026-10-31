@@ -1,0 +1,13 @@
+import { useCopy } from "../../app/language"
+import type { FormErrors } from "../../lib/form"
+import { EVENT_FORM_COPY } from "./eventFormCopy"
+import type { EventFormError } from "./eventFormValues"
+
+/** The error to show at `path`, in the event forms' words. */
+export function useErrorText(errors: FormErrors<EventFormError>) {
+    const copy = useCopy(EVENT_FORM_COPY)
+    return (path: string) => {
+        const error = errors[path]
+        return error ? copy[error] : undefined
+    }
+}

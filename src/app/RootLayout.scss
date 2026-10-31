@@ -1,0 +1,120 @@
+// Ported from the old client's index.scss (.app, .background-container and
+// .background-tile, which BackgroundTiles repeated down the screen).
+@use "./background";
+
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.app-content {
+    width: 100%;
+    max-width: 500px;
+}
+
+.app-background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    // Its own layer: scrolling the page never repaints the gradients.
+    contain: strict;
+}
+
+.background-tile {
+    width: 100vw;
+    height: 100vw;
+    margin-bottom: -1px;
+    @include background.gradient;
+    background-size: cover;
+
+    &:nth-child(even) {
+        transform: rotate(180deg) scaleX(-1);
+    }
+}
+
+.route-error {
+    padding: 1rem;
+}
+
+.route-error-reload {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #171717;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+// The next page is loading (`PageLoading`): a thin bar along the top,
+// shown only if the load takes a moment.
+.page-loading-bar {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 1000;
+    height: 3px;
+    overflow: hidden;
+    opacity: 0;
+    animation: page-loading-show 0s 150ms forwards;
+
+    &::after {
+        content: "";
+        display: block;
+        width: 40%;
+        height: 100%;
+        background: #bc3528;
+        animation: page-loading-slide 1s ease-in-out infinite;
+    }
+}
+
+@keyframes page-loading-show {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes page-loading-slide {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(250%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page-loading-bar::after {
+        width: 100%;
+        animation: none;
+    }
+}
+
+// The maintenance page (`AppDisabled`, `VITE_DISABLE_APP`), legacy's
+// app-disabled.scss.
+.app-disabled {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 100vh;
+    padding: 0 16px;
+    text-align: center;
+    color: #444444;
+
+    .app-disabled-icon {
+        width: 80px;
+        height: 80px;
+    }
+
+    .app-disabled-title {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .app-disabled-subtitle {
+        margin: 0;
+        font-size: 1rem;
+    }
+}

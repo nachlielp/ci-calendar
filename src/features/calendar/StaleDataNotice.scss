@@ -1,0 +1,12 @@
+// The legacy header's 16px black cloud_offline icon (the old client's styles/
+// header.scss `.offline-icon`).
+.stale-data-notice {
+    display: flex;
+    margin: 0 4px;
+    color: #000;
+
+    .stale-data-notice-icon {
+        width: 16px;
+        height: 16px;
+    }
+}

@@ -1,0 +1,278 @@
+// Ported from the old client's styles/login.scss, signup.scss,
+// reset-password-request.scss, reset-password-page.scss and the generics
+// they used (buttons.scss, form-inputs.scss), with antd's large Input,
+// Input.Password and Alert drawn by hand.
+
+.auth-page {
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+}
+
+.auth-card {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 1rem;
+    margin-top: 3rem;
+
+    &.login-card {
+        max-width: 400px;
+    }
+
+    &.signup-card {
+        width: 300px;
+        max-width: 24rem;
+        margin: 1rem auto;
+    }
+
+    &.reset-request-card {
+        max-width: 300px;
+    }
+
+    &.reset-card {
+        width: 300px;
+        margin: 32px auto;
+    }
+}
+
+.auth-title {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 39.24px;
+}
+
+.auth-subtitle {
+    padding: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20.93px;
+}
+
+// The reset page's red prompt.
+.auth-prompt {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #dd5239;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-field-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+// antd's large input: a bordered box with the icon inside.
+.auth-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 40px;
+    padding: 4px 11px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    background: #fff;
+    transition: border-color 0.2s;
+
+    &:hover,
+    &:focus-within {
+        border-color: #4096ff;
+    }
+
+    &:focus-within {
+        box-shadow: 0 0 0 2px rgb(5 145 255 / 10%);
+    }
+
+    &.invalid {
+        border-color: #ff4d4f;
+    }
+}
+
+.auth-field-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    color: #000;
+}
+
+.auth-field-input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #000;
+    font-size: 20px;
+    font-weight: 500;
+
+    &::placeholder {
+        color: rgb(0 0 0 / 25%);
+        font-size: 20px;
+        font-weight: 500;
+    }
+
+    &:disabled {
+        color: rgb(0 0 0 / 25%);
+    }
+}
+
+.auth-field-eye {
+    display: flex;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: rgb(0 0 0 / 45%);
+    cursor: pointer;
+
+    .auth-field-icon {
+        width: 20px;
+        height: 20px;
+        color: inherit;
+    }
+}
+
+.auth-field-error {
+    margin: 4px 0 0;
+    color: #ff4d4f;
+    font-size: 14px;
+}
+
+// antd's Alert with a description only.
+.auth-alert {
+    margin: 0;
+    padding: 15px 24px;
+    border: 1px solid;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.57;
+
+    &.auth-alert-error {
+        border-color: #ffccc7;
+        background-color: #fff2f0;
+    }
+
+    &.auth-alert-info {
+        border-color: #91caff;
+        background-color: #e6f4ff;
+    }
+
+    &.auth-alert-success {
+        border-color: #b7eb8f;
+        background-color: #f6ffed;
+    }
+}
+
+// Legacy generics/buttons.scss `.general-action-btn.black-btn.large-btn`.
+.auth-submit {
+    align-self: flex-start;
+    padding: 9px 24px 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #444;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 20.93px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #222;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    // The reset page's plain `.general-action-btn`.
+    &.small {
+        padding: 5px 16px;
+        font-size: 16px;
+    }
+}
+
+.google-button {
+    display: flex;
+    align-items: center;
+    padding: 5px 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #efefef;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #e3d7d7;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    .google-button-label {
+        margin-inline: 0.5rem;
+        margin-bottom: 2px;
+        color: #444;
+        font-size: 24px;
+        font-weight: 500;
+        line-height: 29px;
+    }
+
+    .google-icon {
+        width: 24px;
+        height: 24px;
+        margin-top: 0.25rem;
+    }
+}
+
+// Legacy's `.link-container` under the login form.
+.auth-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding-top: 1rem;
+    font-size: 16px;
+    line-height: 20.93px;
+
+    p {
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
+}
+
+// Legacy `.text-btn`.
+.auth-text-link {
+    padding: 5px 8px;
+    color: #000;
+    font-size: 16px;
+    text-decoration: underline;
+
+    &:hover {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
+}
+
+// Sign-up's two buttons side by side.
+.auth-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 8px;
+}
