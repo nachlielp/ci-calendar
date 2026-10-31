@@ -64,7 +64,9 @@ speed. Order: **before merging → deploy → after deploy → later**.
 
 ### Supabase: the `translate` Edge Function
 
-- [ ] Deployed with its secret (`supabase/functions/translate/README.md`):
+- [x] Already live with its secret (checked 2026-10-31: a test call
+      returns a translation; the old client uses it too, and only a comment
+      changed since). For reference, deployed with its secret (`supabase/functions/translate/README.md`):
       `supabase secrets set GOOGLE_TRANSLATE_API_KEY=…` (a server-side key,
       Translation API only), then `supabase functions deploy translate`.
       Without it saves still work (titles fall back to Hebrew, never
