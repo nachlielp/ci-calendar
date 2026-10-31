@@ -31,6 +31,12 @@ export interface ImageTools {
     /** react-easy-crop, imported on first call (./photoTools.ts). */
     loadCropper(): Promise<CropperComponent>
     /**
+     * The picked photo in a form the browser can draw: itself, or a HEIC
+     * the browser can't decode converted to JPEG (./preparePhoto.ts). The
+     * cropper shows, and `renderPhoto` draws, what this returns.
+     */
+    preparePhoto(file: File): Promise<Blob>
+    /**
      * Draws `area` of `image` (its decoded pixels, as the cropper reports
      * them) at `size` and encodes it within the photo budget
      * (`encodeWithinBudget`): the Blob to upload.
@@ -49,6 +55,8 @@ export function browserImages(): ImageTools {
         }))
     return {
         loadCropper: () => load().then((module) => module.PhotoCropper),
+        preparePhoto: (file) =>
+            load().then((module) => module.preparePhoto(file)),
         renderPhoto: (image, area, size) =>
             load().then((module) => module.renderPhoto(image, area, size)),
     }

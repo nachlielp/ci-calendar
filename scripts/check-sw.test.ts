@@ -9,6 +9,7 @@ import {
     sourceMapProblems,
     sourceProblems,
     telemetryProblems,
+    heicProblems,
 } from "./check-sw.mjs"
 import { withHeadersRevision } from "./headers-revision.mjs"
 
@@ -94,6 +95,29 @@ describe("service worker check", () => {
         ).toEqual([
             "sw.js mentions Supabase",
             "sw.js contains a NetworkFirst strategy",
+        ])
+    })
+})
+
+describe("HEIC converter chunks", () => {
+    const vercel = JSON.parse(
+        readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
+    )
+    const files = ["assets/heic/heic-to-AbC.js"]
+
+    it("pass when none is precached and vercel.json serves them immutable", () => {
+        expect(heicProblems(["index.html"], files, vercel)).toEqual([])
+    })
+
+    it("fail when one is precached, isn't immutable, or the build put none there", () => {
+        expect(heicProblems([...files], files, vercel)).toEqual([
+            "assets/heic/heic-to-AbC.js is HEIC and must not be precached",
+        ])
+        expect(heicProblems([], files, { ...vercel, headers: [] })).toEqual([
+            "assets/heic/heic-to-AbC.js is not served as immutable (vercel.json)",
+        ])
+        expect(heicProblems([], [], vercel)).toEqual([
+            "no HEIC chunks in assets/heic/",
         ])
     })
 })

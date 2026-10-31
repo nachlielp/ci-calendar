@@ -4,6 +4,7 @@ import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { COMMON_COPY } from "../../lib/commonCopy"
 import { defineCopy } from "../../lib/copy"
+import { PHOTO_ACCEPT } from "../../lib/heic"
 import { photoOutputSize, type PixelArea } from "../../lib/photo"
 import { Dialog } from "../../ui/Dialog"
 import { FormAlert } from "../../ui/form/fields"
@@ -23,6 +24,8 @@ const COPY = defineCopy({
         crop: "חיתוך תמונה",
         zoom: "זום",
         cropperFailed: "לא הצלחנו לפתוח את חיתוך התמונה",
+        preparing: "פותחים את התמונה…",
+        openFailed: "לא הצלחנו לפתוח את התמונה, נסו תמונה אחרת",
         renderFailed: "לא הצלחנו לעבד את התמונה, נסו תמונה אחרת",
     },
     en: {
@@ -32,6 +35,8 @@ const COPY = defineCopy({
         crop: "Crop the photo",
         zoom: "Zoom",
         cropperFailed: "We couldn't open the photo cropper",
+        preparing: "Opening the photo…",
+        openFailed: "We couldn't open the photo, try another one",
         renderFailed: "We couldn't process the photo, try another one",
     },
     ru: {
@@ -41,6 +46,8 @@ const COPY = defineCopy({
         crop: "Обрезать фото",
         zoom: "Масштаб",
         cropperFailed: "Не удалось открыть обрезку фото",
+        preparing: "Открываем фото…",
+        openFailed: "Не удалось открыть фото, попробуйте другое",
         renderFailed: "Не удалось обработать фото, попробуйте другое",
     },
 })
@@ -95,7 +102,7 @@ export function PhotoField({
             <input
                 id={id}
                 type="file"
-                accept="image/*"
+                accept={PHOTO_ACCEPT}
                 className="visually-hidden"
                 disabled={disabled}
                 onChange={(event) => {
@@ -126,6 +133,8 @@ export function PhotoField({
 /**
  * Legacy's crop modal: the photo in a square frame, a zoom slider, cancel
  * and save. Save draws the crop at its upload size (`photoOutputSize`).
+ * The cropper shows the photo as `images.preparePhoto` gives it (a HEIC
+ * the browser can't decode, converted to JPEG), and save draws that.
  */
 function PhotoCropDialog({
     file,
@@ -142,7 +151,9 @@ function PhotoCropDialog({
     const [Cropper, setCropper] = useState<CropperComponent | null>(null)
     const [loadFailed, setLoadFailed] = useState(false)
     const [attempt, setAttempt] = useState(0)
-    const image = useObjectUrl(file)
+    const [source, setSource] = useState<Blob | null>(null)
+    const [openFailed, setOpenFailed] = useState(false)
+    const image = useObjectUrl(source)
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const area = useRef<PixelArea | null>(null)
@@ -164,6 +175,21 @@ function PhotoCropDialog({
         }
     }, [images, telemetry, attempt])
 
+    useEffect(() => {
+        let live = true
+        images.preparePhoto(file).then(
+            (prepared) => live && setSource(prepared),
+            (error: unknown) => {
+                if (!live) return
+                telemetry.captureError(error, { source: "bio-photo-open" })
+                setOpenFailed(true)
+            },
+        )
+        return () => {
+            live = false
+        }
+    }, [images, telemetry, file])
+
     const onCropComplete = useCallback(
         (_area: PixelArea, pixels: PixelArea) => {
             area.current = pixels
@@ -173,12 +199,16 @@ function PhotoCropDialog({
 
     async function save() {
         const chosen = area.current
-        if (!chosen || busy) return
+        if (!chosen || !source || busy) return
         setBusy(true)
         setRenderFailed(false)
         try {
             onCropped(
-                await images.renderPhoto(file, chosen, photoOutputSize(chosen)),
+                await images.renderPhoto(
+                    source,
+                    chosen,
+                    photoOutputSize(chosen),
+                ),
             )
         } catch (error) {
             telemetry.captureError(error, { source: "bio-photo" })
@@ -202,7 +232,15 @@ function PhotoCropDialog({
                             onCropComplete={onCropComplete}
                         />
                     )}
+                    {!source && !openFailed && (
+                        <p className="photo-crop-status" role="status">
+                            {copy.preparing}
+                        </p>
+                    )}
                 </div>
+                {openFailed && (
+                    <FormAlert kind="error">{copy.openFailed}</FormAlert>
+                )}
                 {loadFailed && (
                     <FormAlert kind="error">
                         {copy.cropperFailed}{" "}
@@ -245,7 +283,7 @@ function PhotoCropDialog({
                     <button
                         type="button"
                         className="modal-button save"
-                        disabled={!Cropper || busy}
+                        disabled={!Cropper || !source || busy}
                         aria-busy={busy || undefined}
                         onClick={() => void save()}
                     >
