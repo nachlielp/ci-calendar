@@ -108,13 +108,18 @@ describe("pages left open on an old version", () => {
 
     it("never reload, or report, when a file that isn't a page fails to load (an ad blocker stopping analytics)", async () => {
         const sinks = createTestTelemetry({
-            blocked: ["posthog", "speed-insights"],
+            blocked: ["posthog", "speed-insights", "cloudflare-analytics"],
         })
         const { reloads } = renderApp({ telemetry: sinks.telemetry })
 
         await sinks.arrive()
 
-        expect(sinks.loaded).toEqual(["sentry", "posthog", "speed-insights"])
+        expect(sinks.loaded).toEqual([
+            "sentry",
+            "posthog",
+            "cloudflare-analytics",
+            "speed-insights",
+        ])
         expect(reloads.count).toBe(0)
         expect(sinks.errors).toEqual([])
         expect(

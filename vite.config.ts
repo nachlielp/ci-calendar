@@ -72,7 +72,7 @@ function buildVersionMeta(version: string): Plugin {
  * `TELEMETRY_ASSETS`, which the service worker never precaches.
  */
 const TELEMETRY_MODULE =
-    /\/node_modules\/(@sentry|@sentry-internal|posthog-js|@vercel\/speed-insights)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|speedInsights)\.ts$/
+    /\/node_modules\/(@sentry|@sentry-internal|posthog-js|@vercel\/speed-insights)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|speedInsights|cloudflareAnalytics)\.ts$/
 
 /** The HEIC converter, whose chunk goes to `HEIC_ASSETS` (never precached). */
 const HEIC_MODULE = /\/node_modules\/heic-to\//

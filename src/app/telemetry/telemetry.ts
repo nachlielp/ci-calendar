@@ -4,7 +4,8 @@ import { scrubUrl } from "./scrubUrl"
 
 /**
  * Crash reports (Sentry), product analytics (PostHog) and real-user speed
- * (Vercel Speed Insights), behind one small boundary on `AppServices`. The
+ * (Vercel Speed Insights, and Cloudflare Web Analytics where the build has
+ * its token), behind one small boundary on `AppServices`. The
  * app only ever talks to this; the vendors' SDKs are sinks loaded after the
  * first paint, so none of them is in `/`'s initial JS. Until a sink loads,
  * what it should receive is buffered; when it may not run at all (dev,
@@ -105,6 +106,12 @@ export interface TelemetryOptions {
     loadAnalytics?: () => Promise<AnalyticsSink>
     /** Loads Speed Insights, reporting under `route` at first. */
     loadSpeed?: (route: string) => Promise<SpeedSink>
+    /**
+     * Loads Cloudflare Web Analytics (./cloudflareAnalytics.ts), with
+     * PostHog's rules. Unset when there is no token. It follows the page
+     * by itself and can't be stopped once loaded.
+     */
+    loadWebAnalytics?: () => Promise<unknown>
     /** Runs `run` after the first paint, when the page is idle. */
     whenIdle: (run: () => void) => () => void
     /** Where uncaught errors surface; `window`. */
@@ -138,7 +145,7 @@ export const NO_TELEMETRY: Telemetry = {
 
 export function createTelemetry(options: TelemetryOptions): Telemetry {
     const { production, storage, whenIdle, target = window } = options
-    const { loadAnalytics, loadSpeed } = options
+    const { loadAnalytics, loadSpeed, loadWebAnalytics } = options
     const loadErrors = production ? options.loadErrors : undefined
 
     // Errors: buffered from boot until Sentry loads.
@@ -229,6 +236,7 @@ export function createTelemetry(options: TelemetryOptions): Telemetry {
             .catch(() => {
                 pendingAnalytics = []
             })
+        loadWebAnalytics?.().catch(() => {})
         if (route) {
             loadSpeed?.(route)
                 .then((sink) => {

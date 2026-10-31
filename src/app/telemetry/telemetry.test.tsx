@@ -280,6 +280,28 @@ describe("analytics", () => {
         expect(sinks.speedRoutes).toEqual(["/about", "/event/[eventId]", "/"])
     })
 
+    it("load Cloudflare Web Analytics after the first paint on the production site", async () => {
+        const sinks = createTestTelemetry()
+        renderApp({ telemetry: sinks.telemetry })
+
+        await sinks.arrive()
+
+        expect(sinks.loaded).toEqual(
+            expect.arrayContaining(["posthog", "cloudflare-analytics"]),
+        )
+    })
+
+    it("carry on without Cloudflare Web Analytics when it is blocked", async () => {
+        const sinks = createTestTelemetry({ blocked: ["cloudflare-analytics"] })
+        renderApp({ telemetry: sinks.telemetry })
+
+        await sinks.arrive()
+
+        expect(sinks.loaded).toContain("cloudflare-analytics")
+        expect(sinks.pageViews).toEqual([`${ORIGIN}/`])
+        expect(sinks.errors).toEqual([])
+    })
+
     it("keep product events until PostHog loads", async () => {
         const sinks = createTestTelemetry()
         renderApp({ telemetry: sinks.telemetry })
