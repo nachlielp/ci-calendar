@@ -1,5 +1,9 @@
 # Client architecture (spec #34)
 
+> **Monorepo (#48):** the web client lives in `apps/web`. Paths in this
+> file (`src/…`, `worker/…`, `scripts/…`, `public/…`, `vite.config.ts`)
+> are relative to `apps/web`, except `docs/` and `supabase/` at the root.
+
 The client is a Vite + React 19 + TypeScript SPA on the same Supabase backend.
 There is no realtime: freshness comes from the query cache's rules. This file
 is the shared map for everyone working on the client. Keep it current when

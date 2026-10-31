@@ -13,7 +13,7 @@
 // client build reads its own VITE_ variables at build time (.env, or the
 // Workers Builds build variables).
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
+    "$schema": "../../node_modules/wrangler/config-schema.json",
     "name": "ci-calendar",
     "main": "worker/index.ts",
     "compatibility_date": "2026-10-30",

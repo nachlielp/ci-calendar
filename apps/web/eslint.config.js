@@ -7,15 +7,12 @@ import jsxA11y from "eslint-plugin-jsx-a11y"
 
 export default tseslint.config(
     {
-        // `supabase/functions/**` runs on Deno (its own `Deno` global, remote
-        // imports, and `deno lint`), not this Node/browser toolchain.
         ignores: [
             "dist",
             "dev-dist",
             "stats.html",
             "node_modules",
             "public",
-            "supabase/functions",
             ".claude",
         ],
     },
