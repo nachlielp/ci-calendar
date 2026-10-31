@@ -85,13 +85,11 @@ speed. Order: **before merging → deploy → after deploy → later**.
       there. The old client used the same URL, so it is likely there
       already.
 
-### Supabase: auth emails in three languages (optional)
+### Supabase: auth emails
 
-- [ ] Authentication → Emails: paste `supabase/templates/confirmation.html`
-      into **Confirm signup** and `recovery.html` into **Reset password**,
-      with the subjects in `supabase/templates/README.md`. Each email is in
-      Hebrew, English and Russian together (Supabase picks no language).
-      Independent of the deploy: the old client sends the same emails.
+- [x] Decided 2026-10-31: the sign-up and password-reset emails stay
+      Supabase's default English ones (their `{{ .ConfirmationURL }}` link
+      works with the new client as it did with the old).
 
 ### Supabase: read-only SQL checks (SQL editor)
 
