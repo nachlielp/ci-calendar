@@ -7,6 +7,7 @@ import { ServicesContext, type AppServices } from "../../app/services"
 import { NO_TELEMETRY } from "../../app/telemetry/telemetry"
 import { NO_UPDATES } from "../../app/updates/updates"
 import { createFakeDataClient } from "../../test/fakeDataClient"
+import { directPublicFeed } from "../calendar/publicFeed"
 import { testUser } from "../../test/testUsers"
 import { event } from "../../test/testEvents"
 import {
@@ -26,14 +27,16 @@ function setup() {
     const row = event({ title: "של יוצרת", user_id: "creator" })
     fake.rows("ci_events").push(row)
     fake.auth.signInAs(admin)
+    const now = () => new Date("2026-10-30T09:00:00Z")
     const services = {
         data: fake.client,
+        publicFeed: directPublicFeed(fake.client, now),
         auth: fake.auth,
         functions: fake.functions,
         places: fake.places.load,
         files: fake.files,
         images: fake.images,
-        now: () => new Date("2026-10-30T09:00:00Z"),
+        now,
         storage: createMemoryStorage(),
         session: createMemoryStorage(),
         buildVersion: "test",

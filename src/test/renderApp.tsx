@@ -8,12 +8,24 @@ import { routes } from "../app/routes"
 import type { AppServices } from "../app/services"
 import { NO_TELEMETRY, type Telemetry } from "../app/telemetry/telemetry"
 import { NO_UPDATES, type AppUpdates } from "../app/updates/updates"
+import {
+    directPublicFeed,
+    edgePublicFeed,
+} from "../features/calendar/publicFeed"
 import { createFakeDataClient, type FakeDataClient } from "./fakeDataClient"
+import type { FakeEdge } from "./fakeEdge"
 import { userRow, type TestUser } from "./testUsers"
 
 export interface RenderAppOptions {
     path?: string
     fake?: FakeDataClient
+    /**
+     * The Worker's edge-cached window (`createFakeEdge()`), read first as on
+     * the web, with the fake's direct select as its fallback. Without one,
+     * the window is read straight from the fake (`publicFeed`'s direct
+     * read, through the same select).
+     */
+    edge?: FakeEdge
     now?: Date
     /** Pass the same storage to two renders to simulate a repeat visit. */
     storage?: DeviceStorage
@@ -48,6 +60,7 @@ export interface RenderAppOptions {
 export function renderApp({
     path = "/",
     fake = createFakeDataClient(),
+    edge,
     now = new Date("2026-10-30T09:00:00Z"),
     storage = createMemoryStorage(),
     session = createMemoryStorage(),
@@ -66,14 +79,23 @@ export function renderApp({
         fake.auth.signInAs(signedInAs, { expired: tokenExpired })
     }
     const reloads = { count: 0 }
+    const clock = () => now
     const services: AppServices = {
         data: fake.client,
+        publicFeed: edge
+            ? edgePublicFeed({
+                  data: fake.client,
+                  now: clock,
+                  fetch: edge.fetch,
+                  timeoutMs: edge.timeoutMs,
+              })
+            : directPublicFeed(fake.client, clock),
         auth: fake.auth,
         functions: fake.functions,
         places: fake.places.load,
         files: fake.files,
         images: fake.images,
-        now: () => now,
+        now: clock,
         storage,
         session,
         buildVersion,
