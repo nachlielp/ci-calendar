@@ -6,6 +6,7 @@ import {
     precacheProblems,
     precacheUrls,
     shellRevisionProblems,
+    cloudflareImmutable,
     sourceMapProblems,
     sourceProblems,
     telemetryProblems,
@@ -99,40 +100,66 @@ describe("service worker check", () => {
     })
 })
 
+const vercel = JSON.parse(
+    readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
+)
+const cloudflare = readFileSync(
+    join(process.cwd(), "public", "_headers"),
+    "utf8",
+)
+/** `_headers` without its `/assets/*` caching rule. */
+const cloudflareUncached = cloudflare.replace(/^\/assets\/\*\n.*\n/m, "")
+
 describe("HEIC converter chunks", () => {
-    const vercel = JSON.parse(
-        readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
-    )
     const files = ["assets/heic/heic-to-AbC.js"]
 
-    it("pass when none is precached and vercel.json serves them immutable", () => {
-        expect(heicProblems(["index.html"], files, vercel)).toEqual([])
+    it("pass when none is precached and both hosts serve them immutable", () => {
+        expect(heicProblems(["index.html"], files, vercel, cloudflare)).toEqual(
+            [],
+        )
     })
 
     it("fail when one is precached, isn't immutable, or the build put none there", () => {
-        expect(heicProblems([...files], files, vercel)).toEqual([
+        expect(heicProblems([...files], files, vercel, cloudflare)).toEqual([
             "assets/heic/heic-to-AbC.js is HEIC and must not be precached",
         ])
-        expect(heicProblems([], files, { ...vercel, headers: [] })).toEqual([
+        expect(
+            heicProblems([], files, { ...vercel, headers: [] }, cloudflare),
+        ).toEqual([
             "assets/heic/heic-to-AbC.js is not served as immutable (vercel.json)",
         ])
-        expect(heicProblems([], [], vercel)).toEqual([
+        expect(heicProblems([], files, vercel, cloudflareUncached)).toEqual([
+            "assets/heic/heic-to-AbC.js is not served as immutable (_headers)",
+        ])
+        expect(heicProblems([], [], vercel, cloudflare)).toEqual([
             "no HEIC chunks in assets/heic/",
         ])
     })
 })
 
+describe("Cloudflare's immutable caching", () => {
+    it("covers hashed build files, nested too, and nothing else", () => {
+        expect(cloudflareImmutable(cloudflare, "/assets/index-AbC.js")).toBe(
+            true,
+        )
+        expect(
+            cloudflareImmutable(cloudflare, "/assets/telemetry/sentry-AbC.js"),
+        ).toBe(true)
+        expect(cloudflareImmutable(cloudflare, "/index.html")).toBe(false)
+        expect(cloudflareImmutable(cloudflare, "/sw.js")).toBe(false)
+    })
+})
+
 describe("telemetry chunks", () => {
-    const vercel = JSON.parse(
-        readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
-    )
     const files = [
         "assets/telemetry/sentry-AbC.js",
         "assets/telemetry/posthog-DeF.js",
     ]
 
-    it("pass when none is precached and vercel.json serves them immutable", () => {
-        expect(telemetryProblems(["index.html"], files, vercel)).toEqual([])
+    it("pass when none is precached and both hosts serve them immutable", () => {
+        expect(
+            telemetryProblems(["index.html"], files, vercel, cloudflare),
+        ).toEqual([])
     })
 
     it("fail when one is precached", () => {
@@ -141,6 +168,7 @@ describe("telemetry chunks", () => {
                 ["index.html", "assets/telemetry/posthog-DeF.js"],
                 files,
                 vercel,
+                cloudflare,
             ),
         ).toEqual([
             "assets/telemetry/posthog-DeF.js is telemetry and must not be precached",
@@ -149,10 +177,22 @@ describe("telemetry chunks", () => {
 
     it("fail when they aren't served immutable, or the build put none there", () => {
         const noHeaders = { ...vercel, headers: [] }
-        expect(telemetryProblems([], files.slice(0, 1), noHeaders)).toEqual([
+        expect(
+            telemetryProblems([], files.slice(0, 1), noHeaders, cloudflare),
+        ).toEqual([
             "assets/telemetry/sentry-AbC.js is not served as immutable (vercel.json)",
         ])
-        expect(telemetryProblems([], [], vercel)).toEqual([
+        expect(
+            telemetryProblems(
+                [],
+                files.slice(0, 1),
+                vercel,
+                cloudflareUncached,
+            ),
+        ).toEqual([
+            "assets/telemetry/sentry-AbC.js is not served as immutable (_headers)",
+        ])
+        expect(telemetryProblems([], [], vercel, cloudflare)).toEqual([
             "no telemetry chunks in assets/telemetry/",
         ])
     })
@@ -169,7 +209,7 @@ describe("telemetry chunks", () => {
         ])
     })
 
-    it("fails unless the shell's revision covers vercel.json's headers", () => {
+    it("fails unless the shell's revision covers both hosts' headers", () => {
         const headers = { headers: [{ source: "/(.*)", headers: [] }] }
         const changed = {
             headers: [{ source: "/(.*)", headers: [{ key: "X", value: "1" }] }],
@@ -180,13 +220,19 @@ describe("telemetry chunks", () => {
                 { url: "assets/x.js", revision: null },
             ],
             headers,
+            "/*\n  X: 1\n",
         )
         expect(entries[1]).toEqual({ url: "assets/x.js", revision: null })
         const built = `Ce(${JSON.stringify(entries)});`
-        expect(shellRevisionProblems(built, headers)).toEqual([])
-        expect(shellRevisionProblems(built, changed)).toEqual([
-            "index.html's precache revision doesn't cover vercel.json's headers",
+        expect(shellRevisionProblems(built, headers, "/*\n  X: 1\n")).toEqual(
+            [],
+        )
+        expect(shellRevisionProblems(built, changed, "/*\n  X: 1\n")).toEqual([
+            "index.html's precache revision doesn't cover the headers",
         ])
-        expect(shellRevisionProblems(SW_SOURCE, headers)).toHaveLength(1)
+        expect(shellRevisionProblems(built, headers, "/*\n  X: 2\n")).toEqual([
+            "index.html's precache revision doesn't cover the headers",
+        ])
+        expect(shellRevisionProblems(SW_SOURCE, headers, "")).toHaveLength(1)
     })
 })

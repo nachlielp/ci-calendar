@@ -44,6 +44,10 @@ function gitSha(): string | undefined {
     }
 }
 
+/** A file of the repository, as text. */
+const readRootFile = (path: string) =>
+    readFileSync(new URL(`./${path}`, import.meta.url), "utf8")
+
 /**
  * Puts the build version in index.html (`<meta name="build-version">`), not
  * in the JS, so a deploy changes only the chunks whose code changed and the
@@ -130,21 +134,15 @@ export default defineConfig(({ command, mode }) => {
                     globPatterns: PRECACHE_GLOBS,
                     globIgnores: PRECACHE_IGNORES,
                     // index.html is cached with its headers (the CSP), so
-                    // a change to vercel.json's headers must update it too
+                    // a change to the headers (vercel.json's or
+                    // public/_headers) must update it too
                     // (scripts/headers-revision.mjs; `check:sw` checks).
                     manifestTransforms: [
                         (entries) => ({
                             manifest: withHeadersRevision(
                                 entries,
-                                JSON.parse(
-                                    readFileSync(
-                                        new URL(
-                                            "./vercel.json",
-                                            import.meta.url,
-                                        ),
-                                        "utf8",
-                                    ),
-                                ),
+                                JSON.parse(readRootFile("vercel.json")),
+                                readRootFile("public/_headers"),
                             ),
                             warnings: [],
                         }),
