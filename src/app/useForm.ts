@@ -27,7 +27,7 @@ export interface Submission<V extends FormValues> {
 
 export interface Form<V extends FormValues, E extends string> {
     values: V
-    /** Sets one field (and marks it touched, so its error shows). */
+    /** Sets one field (and marks it touched). */
     set: <K extends keyof V>(field: K, value: V[K]) => void
     /**
      * Changes one field from its current value, e.g. one item of a list:
@@ -42,8 +42,8 @@ export interface Form<V extends FormValues, E extends string> {
     /** Marks a path touched without changing it (on blur). */
     touch: (path: string) => void
     /**
-     * The errors to show now, by path: touched paths', or all after a save
-     * attempt; then the server's (`setErrors`).
+     * The errors to show now, by path: none of the form's own until a save
+     * is attempted, then all of them; and the server's (`setErrors`).
      */
     errors: FormErrors<E>
     /** The fields that differ from `saved`: what a save sends. */

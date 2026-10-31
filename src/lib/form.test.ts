@@ -162,19 +162,13 @@ describe("errors", () => {
         "segments.0.start": "missing",
     }
 
-    it("shows a path's error once it or a field holding it is touched", () => {
-        let state = run(initialFormState(saved), {
-            type: "touch",
-            path: "segments.1.end",
-        })
-        expect(shownErrors(state, errors)).toEqual({
-            "segments.1.end": "endBeforeStart",
-        })
-        state = run(state, { type: "set", field: "segments", value: [] })
-        expect(shownErrors(state, errors)).toEqual({
-            "segments.1.end": "endBeforeStart",
-            "segments.0.start": "missing",
-        })
+    it("shows none of them before a save attempt, however much is touched", () => {
+        const state = run(
+            initialFormState(saved),
+            { type: "touch", path: "segments.1.end" },
+            { type: "set", field: "segments", value: [] },
+        )
+        expect(shownErrors(state, errors)).toEqual({})
     })
 
     it("shows all of them after a save attempt", () => {

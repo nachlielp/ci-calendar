@@ -147,24 +147,30 @@ describe("useForm", () => {
         expect(screen.getByRole("button", { name: "save" })).toBeVisible()
     })
 
-    it("sends nothing while a value is invalid, and shows every error", async () => {
+    it("shows no error until a save is attempted, then sends nothing while invalid", async () => {
         const calls: unknown[] = []
         renderForm(async (submission) => void calls.push(submission))
 
         await userEvent.clear(screen.getByLabelText("name"))
-        expect(errorsShown()).toEqual(["name: required"])
+        expect(errorsShown()).toEqual([])
         await userEvent.click(screen.getByRole("button", { name: "save" }))
 
+        expect(errorsShown()).toEqual(["name: required"])
         expect(calls).toEqual([])
     })
 
-    it("keys errors by path, showing only the touched item's", async () => {
+    it("keys errors by path, and updates them as fields change after a save attempt", async () => {
         renderForm(async () => {})
 
         await userEvent.clear(screen.getByLabelText("end 1"))
         await userEvent.type(screen.getByLabelText("end 1"), "0")
+        expect(errorsShown()).toEqual([])
+        await userEvent.click(screen.getByRole("button", { name: "save" }))
 
         expect(errorsShown()).toEqual(["items.1.end: endFirst"])
+        await userEvent.clear(screen.getByLabelText("end 1"))
+        await userEvent.type(screen.getByLabelText("end 1"), "15")
+        expect(errorsShown()).toEqual([])
         expect(screen.getByText("dirty")).toBeVisible()
     })
 

@@ -1,6 +1,8 @@
 // Ported from the old client's styles/menu-drawer.scss. Legacy used antd's Drawer
 // from the top on phones (as tall as its items) and from the right on wider
-// screens; these rules reshape the shared Dialog the same way.
+// screens; these rules reshape the shared Dialog the same way. As the menu
+// button is at the right in every language (AppHeader.scss), so are the
+// side drawer and the close button.
 .dialog.menu-drawer {
     background-color: #d76f5a;
     color: #000;
@@ -10,7 +12,7 @@
     }
 
     .dialog-close {
-        margin-inline: 16px auto;
+        margin: 0 16px 0 auto;
         color: rgba(0, 0, 0, 0.6);
     }
 
@@ -34,18 +36,13 @@
         }
     }
 
-    // Wider screens: full height, from the start (the right in Hebrew).
+    // Wider screens: full height, from the right.
     @media (min-width: 500px) {
         width: 378px;
         height: 100%;
         max-height: 100%;
-        margin: 0;
-        margin-inline-end: auto;
+        margin: 0 0 0 auto;
         border-radius: 0;
-
-        .dialog-close {
-            margin: 0 16px;
-        }
     }
 }
 

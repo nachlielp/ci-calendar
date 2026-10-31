@@ -405,6 +405,25 @@ describe("the multi-day event form", () => {
         expect(end()).not.toHaveAttribute("aria-invalid")
     })
 
+    it("shows no error before the first save attempt, however fields are left", async () => {
+        const { user, fake } = setup()
+        render(user, fake)
+        const title = await screen.findByRole("textbox", {
+            name: "*כותרת האירוע",
+        })
+        await userEvent.type(title, "סדנה")
+        await userEvent.clear(title)
+        await userEvent.click(select("סוג האירוע"))
+        await userEvent.tab()
+
+        expect(title).not.toHaveAttribute("aria-invalid")
+        expect(select("סוג האירוע")).not.toHaveAttribute("aria-invalid")
+        expect(screen.queryByText("שדה חובה")).not.toBeInTheDocument()
+        expect(
+            screen.queryByText("ערכים שגויים, נא לבדוק את הטופס"),
+        ).not.toBeInTheDocument()
+    })
+
     it("shows legacy's required fields and sends nothing while invalid", async () => {
         const { user, fake } = setup()
         render(user, fake)
