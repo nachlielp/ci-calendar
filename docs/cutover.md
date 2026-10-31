@@ -209,10 +209,10 @@ too, except the realtime one, which waits until after go-live.
       environments), once the new client is live: `VITE_WHATSAPP_NUMBER`,
       `VITE_GOOGLE_ANALYTICS_ID`, `VITE_AUTH_KEY_NAME`, `VITE_BRANCH` (three
       entries), `DOMAIN_URL` (two), `VITE_SUPABASE_BIO_STORAGE_PUBLIC_URL`,
-      `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_UPLOADTHING_TOKEN`,
-      `VITE_DEV_DATABASE_AUTH_TOKEN`, every `VITE_FIREBASE_*` and
-      `VITE_VAPID_PUBLIC_FIREBASE_KEY`. (`VITE_CLOUDINARY_*` were removed on
-      2026-10-31: Cloudinary isn't used.) A rollback is unaffected: an old
+      `VITE_SUPABASE_BIO_STORAGE_PATH`, `VITE_UPLOADTHING_TOKEN`, every `VITE_FIREBASE_*` and
+      `VITE_VAPID_PUBLIC_FIREBASE_KEY`. (`VITE_CLOUDINARY_*` and
+      `VITE_DEV_DATABASE_AUTH_TOKEN` were removed on 2026-10-31: Cloudinary
+      and the Turso database aren't used.) A rollback is unaffected: an old
       deployment has its values built in. **Leaked secrets:**
       `VITE_CLOUDINARY_API_SECRET` (2024 bio uploads) and
       `VITE_DEV_DATABASE_AUTH_TOKEN` (a 2024 Turso dev database) were read by
