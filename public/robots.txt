@@ -3,6 +3,7 @@ User-agent: *
 Allow: /$
 Allow: /about$
 Allow: /sitemap.xml
+Allow: /llms.txt$
 Disallow: /*
 
 # Add sitemap only for production

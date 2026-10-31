@@ -1,0 +1,17 @@
+# CI Calendar — Contact Improvisation Events in Israel
+
+> CI Calendar (ci-events.org) is a free, volunteer-run calendar of Contact Improvisation events in Israel: jams, classes, workshops, courses and festivals. Event organizers and teachers publish their own events, and a volunteer team moderates them. The interface is in Hebrew, with English and Russian translations.
+
+The calendar is a single-page web app that renders in the browser. Event listings are loaded client-side, so a plain HTTP fetch of the home page returns only the app shell.
+
+## Pages
+
+- [Event calendar](https://www.ci-events.org/): Upcoming Contact Improvisation events across Israel, as a list or a calendar view, filterable by region and event type
+- [About](https://www.ci-events.org/about): Who runs the project, how it is funded, and how to support it
+- [Privacy policy](https://www.ci-events.org/privacy-policy)
+- [Terms and conditions](https://www.ci-events.org/terms-and-conditions)
+
+## Optional
+
+- [Sitemap](https://www.ci-events.org/sitemap.xml)
+- [Contact](mailto:info@ci-events.org): info@ci-events.org
