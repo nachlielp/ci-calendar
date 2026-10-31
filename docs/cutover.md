@@ -57,7 +57,9 @@ speed. Order: **before merging → deploy → after deploy → later**.
 - [ ] The key in `VITE_GOOGLE_PLACES_API_KEY` is valid (the local `.env`
       one is not: `InvalidKeyMapError`), has the **Maps JavaScript API** and
       **Places API** enabled, and is HTTP-referrer-restricted to the
-      production domains (plus preview domains, to test there). It must not
+      production domains plus the `develop` preview's fixed address,
+      `https://ci-calendar-git-develop-nachpoks-projects.vercel.app/*`
+      (never `*.vercel.app`: that is every Vercel site). It must not
       have the Translate API.
 
 ### Supabase: the `translate` Edge Function
