@@ -1105,19 +1105,36 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   is server-side; a test fails if any source names Google's Translate
   endpoint). It never rejects (`translateOrNull`: `null` on failure or
   after `LOOKUP_TIMEOUT_MS`; `translateText`: the source text) and
-  remembers each text and language for the session. The event details
-  translate, in English and Russian, what legacy did
-  (`detailsTranslation.ts`: description, link and price titles, names of
-  organisations and multi-day teachers without a bio), one query per text,
-  showing the Hebrew until each arrives. They are kept on the device across
-  visits (`translationStore.ts`, `detailsTranslations` in
-  `services.storage`, read with the details' chunk only): keyed by language
-  and the Hebrew text itself (an edited text is simply a new key, so no
-  `updated_at` is needed in the public payload), bounded to 200 entries and
-  100,000 characters, oldest out first; public data, so kept across users.
-  Links the details render (event links, bio pages) go through `webLinks`:
-  http(s) only, a scheme-less one as https, anything else (a stored
-  `javascript:`) dropped.
+  remembers each text and language for the session. What people wrote is
+  shown in English and Russian through one hook,
+  `useMachineTranslation(texts, language, { onDevice })`
+  (`app/useMachineTranslation.ts`): one query per text, showing the text
+  as written until its translation arrives (or if it fails). Hebrew asks
+  for nothing, and neither does a text without Hebrew letters (the
+  function's only source). Its users:
+    - **Event details** (`detailsTranslation.ts`): what legacy translated
+      (description, link and price titles, names of organisations and
+      multi-day teachers without a bio).
+    - **Bio card** (`BioCard.tsx`): the "about" text and link titles (new;
+      the name stays as written).
+    - **Requests** (`features/requests/requestTexts.ts`,
+      `useRequestTexts`): the admins' replies on the user's page, and the
+      message and responses on `/manage-support`. The notes the app stores
+      in Hebrew (`REQUEST_NOTES` in `requestRows.ts`: approved, closed,
+      cancelled by the user) are never sent: `REQUEST_WORDS.note` shows them
+      in the reader's language. They are still written in Hebrew, as legacy
+      wrote them.
+      Public texts (details, bios) are kept on the device across visits
+      (`onDevice`; `app/translationStore.ts`, `detailsTranslations` in
+      `services.storage`, read by lazy chunks only): keyed by language and the
+      Hebrew text itself (an edited text is simply a new key, so no
+      `updated_at` is needed in the public payload), bounded to 200 entries and
+      100,000 characters, oldest out first; kept across users. Request texts
+      are private, so they stay in memory. The queries aren't a public kind,
+      so signing out removes them.
+      Links the details render (event links, bio pages) go through `webLinks`:
+      http(s) only, a scheme-less one as https, anything else (a stored
+      `javascript:`) dropped.
 - **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
   Everything that adds copy follows this:
     - **Copy is per component**, declared with `defineCopy({ he, en, ru })`

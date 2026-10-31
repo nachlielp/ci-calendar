@@ -87,6 +87,14 @@ speed. Order: **before merging → deploy → after deploy → later**.
       there. The old client used the same URL, so it is likely there
       already.
 
+### Supabase: auth emails in three languages (optional)
+
+- [ ] Authentication → Emails: paste `supabase/templates/confirmation.html`
+      into **Confirm signup** and `recovery.html` into **Reset password**,
+      with the subjects in `supabase/templates/README.md`. Each email is in
+      Hebrew, English and Russian together (Supabase picks no language).
+      Independent of the deploy: the old client sends the same emails.
+
 ### Supabase: read-only SQL checks (SQL editor)
 
 - [ ] **Bio photo bucket** accepts what the client sends (JPEG as

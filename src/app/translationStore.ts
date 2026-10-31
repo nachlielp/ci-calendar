@@ -1,14 +1,16 @@
-import type { DeviceStorage } from "../../../app/deviceStorage"
-import type { Language } from "../../../lib/language"
+import type { DeviceStorage } from "./deviceStorage"
+import type { Language } from "../lib/language"
 
-// The details' machine translations kept on the device across visits
-// (legacy kept them in the Cache API), so an event read again in English
-// or Russian doesn't ask the translate function again. Keyed by language
-// and the Hebrew text itself, so an edited text is a new key (and the old
-// one ages out). Public data (what any visitor sees), so it isn't removed
-// on sign-out. Bounded: the oldest entries go past `MAX_ENTRIES` or
-// `MAX_CHARS`. Only the details' chunk loads this, never `/`.
+// Machine translations kept on the device across visits (legacy kept the
+// details' ones in the Cache API), so a text read again in English or
+// Russian doesn't ask the translate function again (`useMachineTranslation`,
+// ./useMachineTranslation.ts). Keyed by language and the Hebrew text
+// itself, so an edited text is a new key (and the old one ages out). Not
+// removed on sign-out: a translation is the same for anyone, and most are
+// of public texts. Bounded: the oldest entries go past `MAX_ENTRIES` or
+// `MAX_CHARS`. Only lazy pages' chunks load this, never `/`.
 
+/** Named when only the details translated; kept, so earlier ones stay. */
 export const TRANSLATIONS_KEY = "detailsTranslations"
 const MAX_ENTRIES = 200
 const MAX_CHARS = 100_000
