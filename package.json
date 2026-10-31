@@ -1,0 +1,31 @@
+{
+    "name": "ci-calendar",
+    "private": true,
+    "type": "module",
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "dev": "npm run dev -w apps/web",
+        "build": "npm run build -w apps/web",
+        "typecheck": "npm run typecheck --workspaces --if-present",
+        "lint": "npm run lint --workspaces --if-present",
+        "test": "npm run test --workspaces --if-present",
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "gen:types": "npm run gen:types -w apps/web",
+        "check:bundle": "npm run check:bundle -w apps/web",
+        "check:sw": "npm run check:sw -w apps/web",
+        "check:headers": "npm run check:headers -w apps/web",
+        "cf:dev": "npm run cf:dev -w apps/web",
+        "cf:preview": "npm run cf:preview -w apps/web",
+        "cf:deploy": "npm run cf:deploy -w apps/web",
+        "cf:check": "npm run cf:check -w apps/web"
+    },
+    "engines": {
+        "node": "22.x"
+    },
+    "devDependencies": {
+        "prettier": "^3.9.6"
+    }
+}

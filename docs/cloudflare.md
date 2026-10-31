@@ -7,6 +7,13 @@ Until the DNS switch, **Vercel is production** and nothing here changes it.
 The same commit builds and works on both hosts: on Vercel the client finds
 no edge endpoint and reads Supabase directly, as before.
 
+**Monorepo (#48):** the web app and its Worker live in `apps/web`, so the
+paths below (`wrangler.jsonc`, `worker/`, `public/_headers`, `dist/`,
+`.env`, `.dev.vars`) are relative to `apps/web`. The `npm run …` commands
+work from the repository root, which passes them to the web workspace. Run
+`npx wrangler …` inside `apps/web`, or from the root with
+`-c apps/web/wrangler.jsonc`.
+
 ## What runs where
 
 | Piece                     | Where                                    | Config                                         |
@@ -58,16 +65,18 @@ day; static assets are free and unlimited.
    CSP already allows it.
 7. **Deploys from GitHub (Workers Builds)**, optional: Workers & Pages →
    `ci-calendar` → Settings → Builds → connect `nachlielp/ci-calendar`.
-   Build command `npm run build`; deploy command `npx wrangler deploy`;
-   production branch `main`. Other branches build with the **Previews
-   Base** tab's settings, which are separate: deploy command
-   `npx wrangler versions upload` (a preview URL per push, nothing
-   deployed), not the default `npx wrangler preview` (a beta that needs a
-   `previews` block), and its own copy of the build variables. Node comes
-   from `.nvmrc` (22). Add the build variables of step 5 to both tabs; a
-   Workers Builds build without `VITE_SUPABASE_URL` and
-   `VITE_SUPABASE_ANON_KEY` fails (`scripts/check-headers.mjs`) rather than
-   deploy a site that can't load data.
+   Root directory `/` (the repository root, where the lockfile is); build
+   command `npm run build`; deploy command
+   `npx wrangler deploy -c apps/web/wrangler.jsonc`; production branch
+   `main`. Other branches build with the **Previews Base** tab's settings,
+   which are separate: deploy command
+   `npx wrangler versions upload -c apps/web/wrangler.jsonc` (a preview URL
+   per push, nothing deployed), not the default `npx wrangler preview` (a
+   beta that needs a `previews` block), and its own copy of the build
+   variables. Node comes from `.nvmrc` (22). Add the build variables of
+   step 5 to both tabs; a Workers Builds build without `VITE_SUPABASE_URL`
+   and `VITE_SUPABASE_ANON_KEY` fails (`scripts/check-headers.mjs`) rather
+   than deploy a site that can't load data.
 8. **Supabase auth redirect URLs**: add
    `https://*-ci-calendar.<subdomain>.workers.dev/**` and
    `https://ci-calendar.<subdomain>.workers.dev/**` (Authentication → URL
