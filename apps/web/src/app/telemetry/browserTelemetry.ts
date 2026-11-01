@@ -14,8 +14,8 @@ const present = (value: string | undefined) =>
 
 /**
  * The app's telemetry: errors are captured from the moment this runs (it is
- * main.tsx's first import), and Sentry, PostHog, Speed Insights and
- * Cloudflare Web Analytics (when `VITE_CF_ANALYTICS_TOKEN` is set) load
+ * main.tsx's first import), and Sentry, PostHog and Cloudflare Web
+ * Analytics (when `VITE_CF_ANALYTICS_TOKEN` is set) load
  * after the first paint, each from its own chunk.
  */
 export function createBrowserTelemetry(
@@ -59,9 +59,5 @@ export function createBrowserTelemetry(
                   return startCloudflareAnalytics(webAnalyticsToken)
               }
             : undefined,
-        loadSpeed: async (route) => {
-            const { startSpeedInsights } = await import("./speedInsights")
-            return startSpeedInsights(route)
-        },
     })
 }

@@ -59,6 +59,9 @@ Plus `/`'s CSS (`index-*.css`, 3.0 KB gzip) and the preloaded subset font
 | After load and idle (production)                         | Sentry 36.8, + tracing 63.0, + replay 80.1 | —          |
 | After the first paint (production host only)             | PostHog 52.3, Speed Insights 0.8           | —          |
 
+Speed Insights was removed on 2026-11-01, after the move to Cloudflare;
+Cloudflare Web Analytics (a beacon, not in the build) took its place.
+
 The telemetry SDKs live in `assets/telemetry/`, are never precached, and
 never block the first paint.
 
@@ -83,7 +86,7 @@ re-downloads only the files whose content changed. No API responses are
 cached (the old client's worker cached every response, API calls
 included, NetworkFirst).
 
-## Field data (Vercel Speed Insights)
+## Field data (Vercel Speed Insights, then Cloudflare Web Analytics)
 
 No field data for the old client: Speed Insights showed no traffic in the
 window the dashboard offers (checked 2026-10-31). The lab numbers below
@@ -126,9 +129,10 @@ in spec #37) is the next lever, not the bundle.
   FCP and TTFB for `/` and `/event/[eventId]` on production
   (www.ci-events.org), mobile and desktop separately, last 30 days, into the
   table below.
-- **After it:** let a week of traffic accumulate (Speed Insights reports per
-  deployment; filter on the cutover deployment and later), then copy the
-  same metrics. Expect LCP and FCP to drop most on first visits on mobile,
+- **After it:** let a week of traffic accumulate, then copy the same
+  metrics. Speed Insights went with Vercel; on Cloudflare the Web Vitals
+  come from Web Analytics (Core Web Vitals, filtered to the production
+  host). Expect LCP and FCP to drop most on first visits on mobile,
   INP to drop on the calendar (no antd), and CLS to stay low (the font no
   longer swaps). A regression worth a look is anything worse than the old
   client at p75.

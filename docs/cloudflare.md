@@ -3,9 +3,10 @@
 How the app is deployed to Cloudflare Workers, tested on a `*.workers.dev`
 URL, moved onto `www.ci-events.org` and rolled back. The design is in
 `docs/architecture.md`, under "Cloudflare hosting and the edge cache".
-Until the DNS switch, **Vercel is production** and nothing here changes it.
-The same commit builds and works on both hosts: on Vercel the client finds
-no edge endpoint and reads Supabase directly, as before.
+Cloudflare has been production since 2026-10-31. Vercel's Git integration
+is off; its last deployment is kept as a manual rollback target (see
+"Rollback"). The repository no longer has any Vercel config: `vercel.json`
+and Speed Insights were removed after the switch (step 6 below).
 
 **Monorepo (#48):** the web app and its Worker live in `apps/web`, so the
 paths below (`wrangler.jsonc`, `worker/`, `public/_headers`, `dist/`,
@@ -50,15 +51,14 @@ day; static assets are free and unlimited.
     Supabase directly (nothing breaks).
 
 5. **The client build's variables.** The build inlines the `VITE_`
-   variables, as on Vercel: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
+   variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
    `VITE_SUPABASE_STORAGE_BUCKET`, `VITE_GOOGLE_PLACES_API_KEY`,
    `VITE_SENTRY_DSN`, `VITE_PUBLIC_POSTHOG_KEY`,
    `VITE_PUBLIC_POSTHOG_HOST`, `VITE_LANGUAGES_TO_SHOW` and, for Web
    Analytics, `VITE_CF_ANALYTICS_TOKEN`; `SENTRY_AUTH_TOKEN` (build only)
    uploads the source maps. For deploys from a machine they come from
    `.env`; for Workers Builds (below) set them as **build variables**.
-6. **Web Analytics** (optional, replaces Vercel Speed Insights after the
-   switch): Analytics & Logs → Web Analytics → Add a site → `ci-events.org`,
+6. **Web Analytics** (optional; it replaced Vercel Speed Insights): Analytics & Logs → Web Analytics → Add a site → `ci-events.org`,
    manual JS snippet. Copy the token from the snippet's `data-cf-beacon`
    into `VITE_CF_ANALYTICS_TOKEN`. Like PostHog, it runs only on the
    production hosts (not on previews) and never on internal devices. The
@@ -108,7 +108,7 @@ key: read-only, which is fine (never point it at writes).
 
 On every host but the production ones, the CSP reports to Sentry as
 `preview` and the app's errors are tagged `preview`; PostHog, Google
-Analytics, Speed Insights and Web Analytics don't run. The edge cache works
+Analytics and Web Analytics don't run. The edge cache works
 on `workers.dev` too (MISS, then HIT): look at `X-Edge-Cache`.
 
 ## Checking a deploy
@@ -127,9 +127,10 @@ no `ci_events` request to Supabase), and the console shows no CSP errors.
 
 ## Moving www.ci-events.org to Cloudflare (the switch)
 
-Today: `www.ci-events.org` is a CNAME to Vercel and the apex answers 308 to
-`https://www.ci-events.org/` (both on Vercel); the zone's nameservers are
-Google's. Do the switch in this order, at a quiet time.
+Before the switch (done 2026-10-31): `www.ci-events.org` was a CNAME to Vercel and the apex answered 308 to
+`https://www.ci-events.org/` (both on Vercel); the zone's nameservers were
+Google's. The switch was done in this order, at a quiet time; it is kept
+here as the record of how.
 
 1. **Copy every DNS record** of the zone (mail included) somewhere safe:
    it is also the rollback plan.
@@ -156,13 +157,11 @@ Google's. Do the switch in this order, at a quiet time.
 5. **Check** as in "Checking a deploy" on `https://www.ci-events.org`:
    the production CSP (`sentry_environment=production`, one CSP header),
    `X-Edge-Cache: HIT` on a second request, a sign-in, an event save.
-6. **The follow-up PR** (after a few days on Cloudflare): remove
-   `@vercel/speed-insights` with its sink (`app/telemetry/speedInsights.ts`,
-   `loadSpeed`), its `TELEMETRY_MODULE` entry in `vite.config.ts` and its
-   mentions in the docs; delete `vercel.json` and make `public/_headers`
-   the only header source (`check-headers.mjs`, `check-sw.mjs`,
-   `headers-revision.mjs`). Keep the Vercel project itself, untouched, as
-   the rollback target until you are sure.
+6. **The follow-up PR** (done 2026-11-01): removed `@vercel/speed-insights`
+   with its sink and deleted `vercel.json`, so `public/_headers` is the only
+   header source (`check-headers.mjs`, `check-sw.mjs`,
+   `headers-revision.mjs`). The Vercel project itself is kept, untouched,
+   as the rollback target.
 
 ## Rollback
 
@@ -184,6 +183,11 @@ Google's. Do the switch in this order, at a quiet time.
   apex A `76.76.21.21`, both **DNS only**.
   Vercel's last deployment is still there and still production; it serves
   the app with the direct Supabase read. Visitors move as the TTL expires.
+  That deployment predates the removal of `vercel.json` and Speed
+  Insights, so it still has both: it serves its own headers and CSP, and
+  Speed Insights runs there. Redeploying a newer commit to Vercel would
+  serve no security headers at all (there is no `vercel.json`); restore
+  that file from git first if you ever need to.
 - **The edge endpoint misbehaving** but the site fine: no action is needed
   for visitors (the app falls back to Supabase on any error or after 3 s).
   Fix forward, or roll back the Worker version.

@@ -1,11 +1,11 @@
 import { scrubUrl } from "./scrubUrl"
 
-/** Cloudflare Web Analytics' beacon (its CSP origins are in both configs). */
+/** Cloudflare Web Analytics' beacon (its CSP origins are in public/_headers). */
 export const BEACON_URL = "https://static.cloudflareinsights.com/beacon.min.js"
 
 /**
- * Cloudflare Web Analytics (spec #37, replacing Vercel Speed Insights once
- * the app is off Vercel): cookie-less page views and Web Vitals, its beacon
+ * Cloudflare Web Analytics (spec #37, which replaced Vercel Speed Insights):
+ * cookie-less page views and Web Vitals, its beacon
  * added after the first paint. It follows the router's history changes
  * itself (`spa`). It has no hook to edit what it sends, so it isn't loaded
  * on a page whose URL holds auth secrets (`scrubUrl`): auth redirects arrive

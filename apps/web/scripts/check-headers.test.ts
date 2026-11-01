@@ -9,7 +9,6 @@ import {
     deployVariableProblems,
     dataUrlProblems,
     hashProblems,
-    headerProblems,
     indexScriptOrigins,
     inlineHashes,
     parseCsp,
@@ -17,60 +16,19 @@ import {
     policyProblems,
     posthogOrigins,
     previewEndpoints,
-    previewPolicy,
     reportingProblems,
-    rulesOf,
     sentryReportUrl,
     withCloudflarePolicies,
-    withPolicies,
+    withHashes,
 } from "./check-headers.mjs"
 
-const config = JSON.parse(
-    readFileSync(join(__dirname, "..", "vercel.json"), "utf8"),
-)
 type Rule = { headers: { key: string; value: string }[] }
 const valueOf = (rule: Rule, key: string) =>
     rule.headers.find((header) => header.key === key)?.value
-const policyOf = (
-    vercelConfig: typeof config,
-    which: "production" | "preview" = "production",
-): string => valueOf(rulesOf(vercelConfig)[which], "Content-Security-Policy")!
 
-const PREVIEW_HOST = [{ type: "host", value: { suf: ".vercel.app" } }]
 const DSN = "https://ab12@o1.ingest.de.sentry.io/22"
 const REPORT = (environment: string) =>
     `https://o1.ingest.de.sentry.io/api/22/security/?sentry_key=ab12&sentry_environment=${environment}`
-/** vercel.json with `policy` for production and the preview made from it. */
-const configWith = (policy: string, common: Rule["headers"] = []) => ({
-    headers: [
-        { source: "/(.*)", headers: common },
-        {
-            source: "/(.*)",
-            missing: PREVIEW_HOST,
-            headers: [
-                { key: "Content-Security-Policy", value: policy },
-                {
-                    key: "Reporting-Endpoints",
-                    value: `csp="${REPORT("production")}"`,
-                },
-            ],
-        },
-        {
-            source: "/(.*)",
-            has: PREVIEW_HOST,
-            headers: [
-                {
-                    key: "Content-Security-Policy",
-                    value: previewPolicy(policy),
-                },
-                {
-                    key: "Reporting-Endpoints",
-                    value: `csp="${REPORT("preview")}"`,
-                },
-            ],
-        },
-    ],
-})
 
 // sha256 of "a()" and of "b{}".
 const SCRIPT_A = "'sha256-qVpDBgj7bpq5hMAcGp3AOc79J3Y1Z4HvySTwKrWDoy4='"
@@ -79,51 +37,7 @@ const PAGE = `<head><script>a()</script><script type="module" src="/x.js"></scri
 <body><style>b{}</style><script type="application/ld+json">{}</script></body>`
 
 describe("security headers check", () => {
-    it("passes the headers in vercel.json", () => {
-        expect(headerProblems(config)).toEqual([])
-        const { directives, problems } = parseCsp(policyOf(config))
-        expect(problems).toEqual([])
-        expect(policyProblems(directives)).toEqual([])
-    })
-
-    it("fails a missing header or a weak value", () => {
-        const weak = configWith("default-src 'self'", [
-            { key: "Strict-Transport-Security", value: "max-age=60" },
-            { key: "X-Frame-Options", value: "SAMEORIGIN" },
-        ])
-        expect(headerProblems(weak)).toEqual([
-            "Strict-Transport-Security max-age must be at least a year",
-            "X-Content-Type-Options is missing",
-            "X-Frame-Options must be DENY",
-            "Referrer-Policy is missing",
-            "Permissions-Policy is missing",
-        ])
-        expect(headerProblems({ headers: [] })).toHaveLength(1)
-    })
-
-    it("needs a production and a preview policy, the preview's made from production's", () => {
-        const common = config.headers[0].headers
-        const both = configWith("default-src 'self'; frame-src 'none'", common)
-        expect(headerProblems(both)).toEqual([])
-        expect(headerProblems({ headers: [both.headers[0]] })).toEqual([
-            expect.stringContaining("needs a policy rule for production"),
-        ])
-        both.headers[2].headers[0].value += "; img-src https://evil.example"
-        both.headers[2].headers[1].value = `csp="${REPORT("production")}"`
-        expect(headerProblems(both)).toEqual([
-            "the preview policy isn't production's plus the toolbar's (run --write)",
-            "the preview Reporting-Endpoints isn't production's (run --write)",
-        ])
-    })
-
-    it("gives previews the toolbar's sources and nothing else", () => {
-        expect(
-            previewPolicy(
-                `script-src 'self' ${SCRIPT_A}; style-src 'self' ${STYLE_B}; frame-src 'none'; object-src 'none'; report-uri ${REPORT("production")}`,
-            ),
-        ).toBe(
-            `script-src 'self' ${SCRIPT_A} https://vercel.live; style-src 'self' https://vercel.live 'unsafe-inline'; frame-src https://vercel.live; object-src 'none'; report-uri ${REPORT("preview")}`,
-        )
+    it("reports previews as preview", () => {
         expect(previewEndpoints(`csp="${REPORT("production")}"`)).toBe(
             `csp="${REPORT("preview")}"`,
         )
@@ -204,11 +118,9 @@ describe("security headers check", () => {
         ])
         expect(hashProblems(directives, "style-src", [STYLE_B])).toEqual([])
 
-        const text = JSON.stringify(configWith(stale))
-        const written = JSON.parse(withPolicies(text, inlineHashes(PAGE)))
-        const fresh = `default-src 'self'; script-src 'self' ${SCRIPT_A} https://a.com; style-src 'self' ${STYLE_B}`
-        expect(policyOf(written)).toBe(fresh)
-        expect(policyOf(written, "preview")).toBe(previewPolicy(fresh))
+        expect(withHashes(stale, inlineHashes(PAGE))).toBe(
+            `default-src 'self'; script-src 'self' ${SCRIPT_A} https://a.com; style-src 'self' ${STYLE_B}`,
+        )
     })
 
     it("matches origins exactly or under a *. wildcard", () => {
@@ -323,18 +235,16 @@ const cloudflareText = readFileSync(
     join(__dirname, "..", "public", "_headers"),
     "utf8",
 )
-const vercelProduction = {
-    "Content-Security-Policy": policyOf(config),
-    "Reporting-Endpoints": valueOf(
-        rulesOf(config).production,
-        "Reporting-Endpoints",
-    )!,
-}
-const COMMON = config.headers[0].headers
-    .map(
-        ({ key, value }: { key: string; value: string }) =>
-            `  ${key}: ${value}`,
+const cloudflareRules = cloudflareRulesOf(
+    parseHeadersFile(cloudflareText).rules,
+)
+/** public/_headers' security headers, every path's (the policy aside). */
+const COMMON = (cloudflareRules.common as Rule).headers
+    .filter(
+        ({ key }) =>
+            key !== "Content-Security-Policy" && key !== "Reporting-Endpoints",
     )
+    .map(({ key, value }) => `  ${key}: ${value}`)
     .join("\n")
 /** A `_headers` with production's `policy` and its preview on `/*`. */
 const headersWith = (
@@ -364,24 +274,21 @@ https://ci-events.org/*
 `,
         { policy, endpoints },
     )
-const problemsOf = (text: string, vercel?: object) => {
+const problemsOf = (text: string) => {
     const { rules, problems } = parseHeadersFile(text)
-    return [...problems, ...cloudflareHeaderProblems(rules, vercel)]
+    return [...problems, ...cloudflareHeaderProblems(rules)]
 }
 
 describe("Cloudflare's _headers", () => {
-    it("passes public/_headers, with vercel.json's production policy", () => {
-        expect(problemsOf(cloudflareText, vercelProduction)).toEqual([])
-        const { common, production } = cloudflareRulesOf(
-            parseHeadersFile(cloudflareText).rules,
-        )
-        const { directives, problems } = parseCsp(
-            valueOf(production[0]!, "Content-Security-Policy")!,
-        )
+    it("passes public/_headers", () => {
+        expect(problemsOf(cloudflareText)).toEqual([])
+        const { common, production } = cloudflareRules
+        const policy = valueOf(production[0]!, "Content-Security-Policy")!
+        const { directives, problems } = parseCsp(policy)
         expect(problems).toEqual([])
         expect(policyProblems(directives)).toEqual([])
         expect(valueOf(common!, "Content-Security-Policy")).toBe(
-            previewEndpoints(vercelProduction["Content-Security-Policy"]),
+            previewEndpoints(policy),
         )
     })
 
@@ -456,12 +363,8 @@ describe("Cloudflare's _headers", () => {
         ])
     })
 
-    it("fails a policy that isn't vercel.json's, or a preview policy not made from it", () => {
+    it("fails a preview policy not made from production's", () => {
         const text = headersWith("default-src 'self'")
-        expect(problemsOf(text, vercelProduction)).toEqual([
-            "_headers: production's Content-Security-Policy isn't vercel.json's (run --write)",
-            "_headers: production's Reporting-Endpoints isn't vercel.json's (run --write)",
-        ])
         const loose = text.replace(
             "  Content-Security-Policy: default-src 'self'\n  Reporting-Endpoints",
             "  Content-Security-Policy: default-src *\n  Reporting-Endpoints",
@@ -487,13 +390,28 @@ describe("Cloudflare's _headers", () => {
         ])
     })
 
-    it("needs the security headers on every path", () => {
-        const text = headersWith("default-src 'self'").replace(
-            "  X-Frame-Options: DENY\n",
-            "",
-        )
-        expect(problemsOf(text)).toEqual([
-            "_headers: X-Frame-Options is missing",
+    it("needs the security headers on every path, with strong values", () => {
+        const text = headersWith("default-src 'self'")
+        expect(
+            problemsOf(text.replace("  X-Frame-Options: DENY\n", "")),
+        ).toEqual(["_headers: X-Frame-Options is missing"])
+        expect(
+            problemsOf(
+                text
+                    .replace(
+                        /max-age=63072000; includeSubDomains/,
+                        "max-age=60",
+                    )
+                    .replace(
+                        "X-Frame-Options: DENY",
+                        "X-Frame-Options: SAMEORIGIN",
+                    )
+                    .replace(/ {2}Referrer-Policy: .*\n/, ""),
+            ),
+        ).toEqual([
+            "_headers: Strict-Transport-Security max-age must be at least a year",
+            "_headers: X-Frame-Options must be DENY",
+            "_headers: Referrer-Policy is missing",
         ])
     })
 })
