@@ -2,7 +2,7 @@ import type { QueryClient, QueryKey } from "@tanstack/react-query"
 import {
     PUBLIC_WINDOW_KIND,
     PUBLIC_WINDOW_SHAPE,
-} from "../features/calendar/publicWindow"
+} from "@ci-calendar/core/features/calendar/publicWindow"
 import type { AppServices } from "./services"
 
 // Saves chosen queries to device storage so a repeat visit (or an offline

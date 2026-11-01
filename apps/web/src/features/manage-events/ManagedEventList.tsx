@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react"
 import { QueryList, type ListQuery, type Paging } from "../../ui/QueryList"
-import type { ManagedEvent } from "../events/managedEvent"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
 import { EventRow } from "./EventRow"
 
 // The list part of the management pages (my events, the admins' list):

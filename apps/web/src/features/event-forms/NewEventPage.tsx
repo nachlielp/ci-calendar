@@ -1,18 +1,21 @@
 import { useLocation, useNavigate } from "react-router"
 import { useCopy } from "../../app/language"
 import { NewEventFormPage } from "./EventFormPages"
-import type { MultiDayValues, SingleDayValues } from "./eventFormValues"
-import { FORM_PAGE_COPY } from "./formPageCopy"
+import type {
+    MultiDayValues,
+    SingleDayValues,
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
+import { FORM_PAGE_COPY } from "@ci-calendar/core/features/event-forms/formPageCopy"
 import { MultiDayEventForm } from "./MultiDayEventForm"
 import { SingleDayEventForm } from "./SingleDayEventForm"
 import { SwitchingForms } from "./SwitchingForms"
-import { TEMPLATE_COPY } from "./templateCopy"
+import { TEMPLATE_COPY } from "@ci-calendar/core/features/event-forms/templateCopy"
 import { MultiDayTemplateForm, SingleDayTemplateForm } from "./TemplateForms"
 import { useIsTemplate } from "./templates"
 import type {
     MultiDayTemplateValues,
     SingleDayTemplateValues,
-} from "./templateValues"
+} from "@ci-calendar/core/features/event-forms/templateValues"
 
 const SINGLE_DAY_PATH = "/create-events/single-day"
 const MULTI_DAY_PATH = "/create-events/multi-day"

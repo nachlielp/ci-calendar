@@ -3,7 +3,7 @@ import { type RouteObject } from "react-router"
 import { describe, expect, it } from "vitest"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
-import { createMemoryStorage } from "../deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { RouteError } from "../RootLayout"
 import { BUFFER_LIMIT, routePattern } from "./telemetry"
 

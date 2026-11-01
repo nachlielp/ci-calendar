@@ -11,15 +11,20 @@ import { EditIcon } from "../../ui/icons/EditIcon"
 import { VisibilityIcon } from "../../ui/icons/VisibilityIcon"
 import { VisibilityOffIcon } from "../../ui/icons/VisibilityOffIcon"
 import { ActionDialog, EventLine, SeriesChoice } from "../events/ActionDialog"
-import { editPath, type ManagedEvent } from "../events/managedEvent"
 import {
-    CANCELLED_TEXT_MAX,
-    EventsChangedError,
+    editPath,
+    type ManagedEvent,
+} from "@ci-calendar/core/features/events/managedEvent"
+import {
     useDeleteEvents,
     useSetCancelled,
     useSetHidden,
-    type EventWriteOptions,
 } from "../events/eventWrites"
+import {
+    CANCELLED_TEXT_MAX,
+    EventsChangedError,
+    type EventWriteOptions,
+} from "@ci-calendar/core/features/events/eventWrites"
 
 // Legacy ManageEventActions, HideEventButton, CancelledEventButton and
 // DeleteEventButton (Hebrew only there; their typos fixed). Styled by

@@ -1,6 +1,6 @@
 import { createElement } from "react"
 import type { RouteObject } from "react-router"
-import type { SignedInRole } from "../viewer"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 
 /**
  * A pathless route that guards `children` (route objects, usually lazy

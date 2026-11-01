@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
-import type { SignedInRole } from "../../app/viewer"
+} from "@ci-calendar/core/app/deviceStorage"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
@@ -18,7 +18,10 @@ import {
     segment,
 } from "../../test/testEvents"
 import { LOOKUP_TIMEOUT_MS } from "@ci-calendar/core/lib/timeout"
-import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
+import {
+    SINGLE_DAY_DRAFT_KEY,
+    SINGLE_DAY_EDIT_DRAFT_KEY,
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 

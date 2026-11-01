@@ -1,4 +1,4 @@
-import { publicFileUrl, type Files } from "../data/files"
+import { publicFileUrl, type Files } from "@ci-calendar/core/data/files"
 
 // The fake's Supabase Storage (`createFakeDataClient().files`, passed as
 // `services.files`): every upload and removal is recorded with the token

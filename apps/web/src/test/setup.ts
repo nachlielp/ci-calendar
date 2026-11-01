@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest"
 import { focusManager, onlineManager } from "@tanstack/react-query"
 import { configure } from "@testing-library/react"
 import { afterEach } from "vitest"
-import { clearTranslationMemory } from "../data/translate"
+import { clearTranslationMemory } from "@ci-calendar/core/data/translate"
 import { browserConditions, resetBrowserConditions } from "./browser"
 import { ForbiddenWebSocket, takeWebSocketAttempts } from "./realtimeGuard"
 

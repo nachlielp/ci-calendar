@@ -1,4 +1,4 @@
-import type { DataClient } from "../data/client"
+import type { DataClient } from "@ci-calendar/core/data/client"
 import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 import { createFakeFiles, type FakeFiles } from "./fakeFiles"
 import { createFakeFunctions, type FakeFunctions } from "./fakeFunctions"

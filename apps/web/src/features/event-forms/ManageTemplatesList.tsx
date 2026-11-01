@@ -5,10 +5,10 @@ import { Dialog } from "../../ui/Dialog"
 import { DeleteIcon } from "../../ui/icons/DeleteIcon"
 import { EditIcon } from "../../ui/icons/EditIcon"
 import { ActionDialog } from "../events/ActionDialog"
-import { TEMPLATE_COPY } from "./templateCopy"
+import { TEMPLATE_COPY } from "@ci-calendar/core/features/event-forms/templateCopy"
 import { MultiDayTemplateForm, SingleDayTemplateForm } from "./TemplateForms"
 import { useDeleteTemplate, useMyTemplates } from "./templates"
-import type { Template } from "./templateValues"
+import type { Template } from "@ci-calendar/core/features/event-forms/templateValues"
 import "./ManageTemplatesList.scss"
 
 /**

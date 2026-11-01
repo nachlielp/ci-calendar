@@ -1,14 +1,14 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
-import { pickedPlaceInEnglish } from "../../data/placeLookups"
+import { pickedPlaceInEnglish } from "@ci-calendar/core/data/placeLookups"
 import type {
     PlaceSuggestion,
     PlacesApi,
     PlacesSession,
-} from "../../data/places"
-import { EVENT_FORM_COPY } from "./eventFormCopy"
-import type { AddressValue } from "./eventFormValues"
+} from "@ci-calendar/core/data/places"
+import { EVENT_FORM_COPY } from "@ci-calendar/core/features/event-forms/eventFormCopy"
+import type { AddressValue } from "@ci-calendar/core/features/event-forms/eventFormValues"
 
 /** How long typing pauses before Google is asked (legacy's library: 300ms). */
 const DEBOUNCE_MS = 300

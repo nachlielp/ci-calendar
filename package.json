@@ -14,7 +14,7 @@
         "test": "npm run test --workspaces --if-present",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "gen:types": "npm run gen:types -w apps/web",
+        "gen:types": "npm run gen:types -w packages/core",
         "check:bundle": "npm run check:bundle -w apps/web",
         "check:sw": "npm run check:sw -w apps/web",
         "check:headers": "npm run check:headers -w apps/web",

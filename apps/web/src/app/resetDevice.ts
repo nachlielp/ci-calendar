@@ -1,4 +1,4 @@
-import type { DeviceStorage } from "./deviceStorage"
+import type { DeviceStorage } from "@ci-calendar/core/app/deviceStorage"
 
 /**
  * Device storage keys a reset keeps: legacy's `isInternal`, which marks the

@@ -2,7 +2,10 @@ import { render } from "@testing-library/react"
 import { createMemoryRouter, type RouteObject } from "react-router"
 import { AppRoot } from "../app/AppRoot"
 import { bootQueryClient, createQueryClient } from "../app/boot"
-import { createMemoryStorage, type DeviceStorage } from "../app/deviceStorage"
+import {
+    createMemoryStorage,
+    type DeviceStorage,
+} from "@ci-calendar/core/app/deviceStorage"
 import { captureInstallPrompt } from "../app/install/installPrompt"
 import { routes } from "../app/routes"
 import type { AppServices } from "../app/services"
@@ -11,7 +14,7 @@ import { NO_UPDATES, type AppUpdates } from "../app/updates/updates"
 import {
     directPublicFeed,
     edgePublicFeed,
-} from "../features/calendar/publicFeed"
+} from "@ci-calendar/core/features/calendar/publicFeed"
 import { createFakeDataClient, type FakeDataClient } from "./fakeDataClient"
 import type { FakeEdge } from "./fakeEdge"
 import { userRow, type TestUser } from "./testUsers"

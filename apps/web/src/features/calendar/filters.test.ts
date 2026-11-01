@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { createMemoryStorage } from "../../app/deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import {
     eventFilter,
     filtersFromSearch,
@@ -7,7 +7,7 @@ import {
     searchWithFilters,
     storeFilterChange,
     TYPE_FILTERS,
-} from "./filters"
+} from "@ci-calendar/core/features/calendar/filters"
 import { publicEvent } from "../../test/testEvents"
 
 const segment = (type: string) => ({

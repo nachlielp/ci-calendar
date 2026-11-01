@@ -11,18 +11,17 @@ import {
     TextAreaField,
     TextField,
 } from "../../ui/form/fields"
-import type { SignedInRole } from "../../app/viewer"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
+import { useCreateRequest, useEditRequest } from "./myRequests"
 import {
     OpenRequestExistsError,
     RequestClosedError,
     offeredRequestTypes,
-    useCreateRequest,
-    useEditRequest,
     type RequestType,
     type RequestValues,
     type UserRequest,
-} from "./myRequests"
-import { REQUEST_WORDS } from "./requestWords"
+} from "@ci-calendar/core/features/requests/myRequests"
+import { REQUEST_WORDS } from "@ci-calendar/core/features/requests/requestWords"
 
 // Legacy RequestForm (Hebrew only there; its "Please select a request
 // type" was English only).

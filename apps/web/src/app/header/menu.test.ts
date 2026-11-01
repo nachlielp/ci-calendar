@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { menuFor } from "./menu"
-import { ANONYMOUS, type SignedInRole } from "../viewer"
+import { ANONYMOUS } from "../viewer"
+import { type SignedInRole } from "@ci-calendar/core/app/auth/roles"
 
 const signOut = async () => {}
 const keys = (role: SignedInRole, signsInWithEmail = false) =>

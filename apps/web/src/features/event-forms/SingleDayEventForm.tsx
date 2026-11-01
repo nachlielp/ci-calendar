@@ -8,12 +8,15 @@ import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 import { FormAlert, TextField } from "../../ui/form/fields"
 import { TagPicker } from "../../ui/form/TagPicker"
-import type { ManagedEvent } from "../events/managedEvent"
-import { laterInSeries } from "../events/eventLists"
-import { seriesQuery } from "../events/series"
-import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
+import { laterInSeries } from "@ci-calendar/core/features/events/eventLists"
+import { seriesQuery } from "@ci-calendar/core/features/events/series"
+import {
+    SINGLE_DAY_DRAFT_KEY,
+    SINGLE_DAY_EDIT_DRAFT_KEY,
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 import { useFormDraft } from "../../app/useFormDraft"
-import { EVENT_FORM_COPY } from "./eventFormCopy"
+import { EVENT_FORM_COPY } from "@ci-calendar/core/features/event-forms/eventFormCopy"
 import {
     BaseHeadFields,
     ClearFormButton,
@@ -40,13 +43,17 @@ import {
     type MultiDayValues,
     type SegmentValues,
     type SingleDayValues,
-} from "./eventFormValues"
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
 import { RecurringEventSection } from "./RecurringEventSection"
 import { SeriesEditDialog } from "./SeriesEditDialog"
-import { useTaggable, type Taggable } from "./taggableBios"
+import { useTaggable } from "./taggableBios"
+import { type Taggable } from "@ci-calendar/core/features/event-forms/taggableBios"
 import { TemplatePicker } from "./TemplatePicker"
-import { withMultiDayTemplate, withSingleDayTemplate } from "./templateValues"
+import {
+    withMultiDayTemplate,
+    withSingleDayTemplate,
+} from "@ci-calendar/core/features/event-forms/templateValues"
 import { useCarried } from "./useCarried"
 import { useEventSubmit } from "./useEventSubmit"
 

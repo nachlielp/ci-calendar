@@ -57,7 +57,8 @@ An npm-workspaces monorepo (one lockfile at the root; plan in
 
 The Expo app (`apps/mobile`) comes later (#48). Install from the root; the
 scripts below run from the root too. `typecheck`, `lint` and `test` run in
-every workspace; the rest pass on to the web workspace.
+every workspace; `gen:types` runs in the core; the rest pass on to the web
+workspace.
 
 ## Getting started
 
@@ -83,7 +84,7 @@ npm run dev
 | `npm run check:bundle`            | After a build: fails if `/`'s initial JS is over the gzip limit; per-route report |
 | `npm run check:sw`                | After a build: checks what the service worker precaches                           |
 | `npm run check:headers`           | After a build: checks the headers and CSP against the build                       |
-| `npm run gen:types`               | Regenerate `apps/web/src/data/database.types.ts` from Supabase                    |
+| `npm run gen:types`               | Regenerate `packages/core/src/data/database.types.ts` from Supabase               |
 | `npm run cf:check` / `cf:deploy`  | Cloudflare: Worker dry run / build and deploy (`docs/cloudflare.md`)              |
 
 CI (`.github/workflows/ci.yml`) runs typecheck, lint, format check, tests,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { afterNewest } from "../admin/adminLists"
+import { afterNewest } from "@ci-calendar/core/features/admin/adminLists"
 import {
     actionPatch,
     APPROVED_NOTE,
@@ -11,7 +11,7 @@ import {
     withRequest,
     type AdminRequest,
     type RequestPages,
-} from "./adminRequests"
+} from "@ci-calendar/core/features/admin-requests/adminRequests"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 

@@ -3,8 +3,11 @@
 > **Monorepo (#48):** the web client lives in `apps/web`. Paths in this
 > file (`src/…`, `worker/…`, `scripts/…`, `public/…`, `vite.config.ts`)
 > are relative to `apps/web`, except `docs/` and `supabase/` at the root.
-> `lib/…` is in the shared core: `packages/core/src/lib/`, imported as
-> `@ci-calendar/core/lib/<module>` (see "The core package" below).
+> Platform-free modules (`lib/`, most of `data/`, the query factories and
+> saves under `features/`, a few in `app/`) are in the shared core, at the
+> same path under `packages/core/src/`, imported as
+> `@ci-calendar/core/<path>` (see "The core package" below). A path here
+> means whichever of the two has it.
 
 The client is a Vite + React 19 + TypeScript SPA on the same Supabase backend.
 There is no realtime: freshness comes from the query cache's rules. This file
@@ -57,17 +60,50 @@ the switch.
 and (later) the mobile app share. It holds no React, no DOM, no React
 Native, so every platform can run it.
 
-- **Imports:** one module per path, `@ci-calendar/core/lib/keyset`, with no
-  barrel file. The package's `exports` map `./*` to `./src/*.ts`.
+- **Same paths as the web.** The core's folders mirror the web's (`app/`,
+  `data/`, `features/…`, `lib/`), so a module keeps its path when it moves
+  and its relative imports still work. Import one module per path,
+  `@ci-calendar/core/features/calendar/publicWindow`, with no barrel file;
+  the package's `exports` map `./*` to `./src/*.ts`.
+- **What's here:** the backend clients (`data/`: PostgREST, auth, Edge
+  Functions, Storage, translation, the Places interface), the generated
+  database types (`npm run gen:types` writes them here), the calendar's
+  public window and feed, event lists and the cache rules
+  (`features/events/eventCache.ts`), every query factory, and the saves:
+  `createEvents`, `updateEvent`, `saveBio`, the template and request
+  writes, the event hide/cancel/delete. The Worker imports the window's
+  select from here too.
+- **`CoreServices`** (`app/services.ts`) is the platform-neutral half of
+  the seam: data, the public feed, auth, functions, files, Places, device
+  storage, the clock, the build version and `CoreTelemetry`. The web's
+  `AppServices` extends it with images, the session storage, reload,
+  updates and its router-aware `Telemetry`. Core code takes
+  `CoreServices`, or a `Pick` of what it uses.
+- **Saves are plain functions; hooks stay in the apps.** A save takes
+  `services` (and the `QueryClient` when it reads or updates the cache)
+  and returns what was stored. The app wraps it in `useMutation` with its
+  `onSuccess` (usually a core cache function, e.g. `cacheSavedBio`) and
+  `onError` (its telemetry source). Query factories return options that
+  the app's `useQuery` takes as they are; build them with the core's
+  `queryOptions` / `infiniteQueryOptions` (`app/queryOptions.ts`:
+  query-core has none, so these are react-query's identity functions,
+  typed from query-core).
+- **Browser inputs are options.** `createAuth` takes the URL's fragment,
+  how to clear it and where storage events arrive; it defaults to none,
+  and the web passes `browserAuthOptions()` (`data/browserAuth.ts`).
 - **Source, not a build.** The core ships TypeScript; Vite, Vitest and
   Wrangler compile it like the app's own files. `"sideEffects": false`, so
   a page carries only what it imports (`check:bundle` holds `/` to its
   limit).
 - **The boundary is checked, not reviewed.** `tsconfig.json` has
   `lib: ["ES2023"]` and no `types`: a `window`, `document` or `process`
-  fails to typecheck. The few web-platform globals every platform has
-  (timers, `URL`) are declared in `src/platform.d.ts`; add one there only
-  if the browser, Workers, React Native and Node all have it. ESLint bans
+  fails to typecheck. The web-platform globals every platform has
+  (timers, `URL`, `URLSearchParams`, `fetch` with `Headers` and
+  `AbortController`, a minimal `Blob`) are declared in
+  `src/platform.d.ts`, each a subset of the real one, so code that checks
+  here checks in every app (each compiles the core with its own types).
+  Add a member only if the browser, Workers, React Native and Node all
+  have it. ESLint bans
   React, React Native, Expo, react-query (use `@tanstack/query-core`) and
   importing an app. The source may not import Vitest either (the mobile
   app will run it under Jest); tests may.
@@ -82,8 +118,8 @@ Native, so every platform can run it.
 ## Rules
 
 - **One seam.** Everything that talks to the backend gets it from
-  `AppServices` (`useServices()` in components, an argument in query
-  factories): `services.data` (PostgREST), `services.auth` (sign-in
+  `AppServices` (`useServices()` in components; query factories and saves
+  in the core take its `CoreServices` half): `services.data` (PostgREST), `services.auth` (sign-in
   state and actions) and `services.functions` (Edge Functions,
   `data/functions.ts`: `invoke(name, { body })`, never throws; functions-js
   is imported on the first call, so `/` doesn't carry it; each call

@@ -8,7 +8,7 @@ import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { setPageVisibility } from "../../test/browser"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow } from "../../test/testUsers"
-import { createMemoryStorage } from "../deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { routes } from "../routes"
 import { ADMIN_ROLES, requireRole } from "./guard"
 

@@ -12,17 +12,20 @@ import { applyLanguageToDocument, storedLanguage } from "./app/language"
 import { routes } from "./app/routes"
 import type { AppServices } from "./app/services"
 import { NO_UPDATES, serviceWorkerUpdates } from "./app/updates/updates"
-import { createAuth } from "./data/auth"
-import { createDataClient } from "./data/client"
-import { createFiles } from "./data/files"
-import { createFunctions } from "./data/functions"
+import { createAuth } from "@ci-calendar/core/data/auth"
+import { browserAuthOptions } from "./data/browserAuth"
+import { createDataClient } from "@ci-calendar/core/data/client"
+import { createFiles } from "@ci-calendar/core/data/files"
+import { createFunctions } from "@ci-calendar/core/data/functions"
 import { googlePlacesLoader } from "./data/places"
-import { edgePublicFeed } from "./features/calendar/publicFeed"
+import { edgePublicFeed } from "@ci-calendar/core/features/calendar/publicFeed"
 import "./index.css"
 
 const storage = browserStorage()
 // The session comes from storage, synchronously; auth-js loads on demand.
 const auth = createAuth({
+    // The URL's auth redirect, and other tabs' sign-ins and sign-outs.
+    ...browserAuthOptions(),
     supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
     anonKey: import.meta.env.VITE_SUPABASE_ANON_KEY,
     storage,

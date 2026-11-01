@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
-import type { SignedInRole } from "../../app/viewer"
+} from "@ci-calendar/core/app/deviceStorage"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { PHOTO_MAX_SIDE } from "@ci-calendar/core/lib/photo"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { FAKE_BUCKET, FAKE_SUPABASE_URL } from "../../test/fakeFiles"
@@ -13,7 +13,7 @@ import { renderApp } from "../../test/renderApp"
 import { liveObjectUrls } from "../../test/setup"
 import { testUser } from "../../test/testUsers"
 import { bio, event, tagging } from "../../test/testEvents"
-import { MY_BIO_COLUMNS } from "./myBio"
+import { MY_BIO_COLUMNS } from "@ci-calendar/core/features/bio/myBio"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 const COLUMNS = MY_BIO_COLUMNS.replace(/\s+/g, "")

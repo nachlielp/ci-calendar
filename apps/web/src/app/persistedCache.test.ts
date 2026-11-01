@@ -1,7 +1,10 @@
 import { QueryClient } from "@tanstack/react-query"
 import { describe, expect, it, vi } from "vitest"
-import { PUBLIC_WINDOW_KIND } from "../features/calendar/publicWindow"
-import { createMemoryStorage, type DeviceStorage } from "./deviceStorage"
+import { PUBLIC_WINDOW_KIND } from "@ci-calendar/core/features/calendar/publicWindow"
+import {
+    createMemoryStorage,
+    type DeviceStorage,
+} from "@ci-calendar/core/app/deviceStorage"
 import { persistQueryCache } from "./persistedCache"
 
 /** A fresh app start: a new query client restored from `storage`. */

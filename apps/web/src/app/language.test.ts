@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { createMemoryStorage } from "./deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { storedLanguage, storeLanguage } from "./language"
 
 describe("the stored language", () => {

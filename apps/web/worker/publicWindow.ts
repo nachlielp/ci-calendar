@@ -1,9 +1,9 @@
-import type { DataClient } from "../src/data/client"
+import type { DataClient } from "@ci-calendar/core/data/client"
 import {
     publicWindowRange,
     readPublicWindow,
     type WindowRange,
-} from "../src/features/calendar/publicWindowSelect"
+} from "@ci-calendar/core/features/calendar/publicWindowSelect"
 
 // `GET /api/public-window` (spec #37, "The edge-cached public window"): the
 // public window every visitor loads, served from Cloudflare's cache in the

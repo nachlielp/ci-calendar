@@ -1,14 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 import { useCallback, useMemo, useSyncExternalStore } from "react"
 import { useNavigate } from "react-router"
-import { profileQuery } from "./auth/profile"
+import { profileQuery } from "@ci-calendar/core/app/auth/profile"
 import { useServices } from "./services"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 
 /** The `users.user_type` values legacy used. */
-export type SignedInRole = "user" | "profile" | "creator" | "org" | "admin"
-
-/** Who sees a menu item: signed out (`anonymous`) or a signed-in role. */
-export type Role = "anonymous" | SignedInRole
 
 /**
  * Who is looking at the app, as far as the header, menu and guards care.

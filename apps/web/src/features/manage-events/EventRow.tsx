@@ -3,8 +3,8 @@ import { useCopy, useLanguage } from "../../app/language"
 import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { dayRangeLabel } from "@ci-calendar/core/lib/jerusalemDate"
 import { EventDetails } from "../calendar/details/EventDetails"
-import { pickTitle } from "../calendar/eventFormat"
-import type { ManagedEvent } from "../events/managedEvent"
+import { pickTitle } from "@ci-calendar/core/features/calendar/eventFormat"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
 
 // A row of legacy's management lists (ManageUserEventsPage and
 // ManageEventsList, the same rows), for my events and the admins' list.

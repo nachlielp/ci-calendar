@@ -6,7 +6,7 @@ import { event } from "../test/testEvents"
 import { createFakeDataClient } from "../test/fakeDataClient"
 import { installServiceWorkerAndCaches } from "../test/browser"
 import { renderApp } from "../test/renderApp"
-import { createMemoryStorage } from "./deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { RootLayout } from "./RootLayout"
 
 /** The app header: the bar holding the menu button. */

@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
-import { createMemoryStorage } from "../../../app/deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../../test/fakeDataClient"
 import { fakeTranslation } from "../../../test/fakeFunctions"
 import { renderApp } from "../../../test/renderApp"

@@ -1,7 +1,7 @@
 import { useCopy, useLanguage } from "../../app/language"
 import { useMachineTranslation } from "../../app/useMachineTranslation"
-import { isRequestNote } from "./requestRows"
-import { REQUEST_WORDS } from "./requestWords"
+import { isRequestNote } from "@ci-calendar/core/features/requests/requestRows"
+import { REQUEST_WORDS } from "@ci-calendar/core/features/requests/requestWords"
 
 /**
  * A request's texts in the reader's language: the notes the app stores

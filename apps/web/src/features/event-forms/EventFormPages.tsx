@@ -17,10 +17,10 @@ import {
     ALL_EVENTS_PATH,
     editPath,
     type ManagedEvent,
-} from "../events/managedEvent"
-import { myUpcomingEventsKey } from "../events/eventLists"
-import { FORM_PAGE_COPY } from "./formPageCopy"
-import { eventToEditQuery } from "./eventToEdit"
+} from "@ci-calendar/core/features/events/managedEvent"
+import { myUpcomingEventsKey } from "@ci-calendar/core/features/events/eventLists"
+import { FORM_PAGE_COPY } from "@ci-calendar/core/features/event-forms/formPageCopy"
+import { eventToEditQuery } from "@ci-calendar/core/features/event-forms/eventToEdit"
 import "./FormPage.scss"
 
 // The pages around the event forms (legacy SingleDayFormPage,

@@ -2,13 +2,16 @@ import { screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import { setPageVisibility } from "../../test/browser"
-import type { SignedInRole } from "../../app/viewer"
-import { createMemoryStorage } from "../../app/deviceStorage"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow } from "../../test/testUsers"
-import { OPEN_STATUS_TREE, REQUEST_COLUMNS } from "./requestRows"
+import {
+    OPEN_STATUS_TREE,
+    REQUEST_COLUMNS,
+} from "@ci-calendar/core/features/requests/requestRows"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 const TITLE = "הרשמה כמורה או ארגון"

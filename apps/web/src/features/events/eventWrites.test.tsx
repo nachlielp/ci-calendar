@@ -2,21 +2,20 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { act, renderHook } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { describe, expect, it } from "vitest"
-import { createMemoryStorage } from "../../app/deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { ServicesContext, type AppServices } from "../../app/services"
 import { NO_TELEMETRY } from "../../app/telemetry/telemetry"
 import { NO_UPDATES } from "../../app/updates/updates"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { directPublicFeed } from "../calendar/publicFeed"
+import { directPublicFeed } from "@ci-calendar/core/features/calendar/publicFeed"
 import { testUser } from "../../test/testUsers"
 import { event } from "../../test/testEvents"
+import { useDeleteEvents, useSetCancelled, useSetHidden } from "./eventWrites"
+import { EventsChangedError } from "@ci-calendar/core/features/events/eventWrites"
 import {
-    EventsChangedError,
-    useDeleteEvents,
-    useSetCancelled,
-    useSetHidden,
-} from "./eventWrites"
-import { toManagedEvent, type ManagedEventRow } from "./managedEvent"
+    toManagedEvent,
+    type ManagedEventRow,
+} from "@ci-calendar/core/features/events/managedEvent"
 
 // The writes as admin pages reuse them: `ownOnly: false` scopes them to
 // the event's loaded owner instead of the user (RLS lets admins write any

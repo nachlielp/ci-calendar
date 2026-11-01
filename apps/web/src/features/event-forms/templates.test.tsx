@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
+} from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
@@ -13,7 +13,7 @@ import { bio, event, eventTitles } from "../../test/testEvents"
 import {
     SINGLE_DAY_DRAFT_KEY,
     SINGLE_DAY_TEMPLATE_DRAFT_KEY,
-} from "./draftKeys"
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 

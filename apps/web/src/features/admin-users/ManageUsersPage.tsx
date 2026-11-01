@@ -4,7 +4,7 @@ import { useUserId } from "../../app/auth/personal"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { useDebouncedValue } from "../../app/useDebouncedValue"
-import type { SignedInRole } from "../../app/viewer"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { FormAlert, TextField } from "../../ui/form/fields"
@@ -13,9 +13,13 @@ import { SEARCH_DEBOUNCE_MS, usePagedAdminList } from "../admin/adminLists"
 import { CopyPhone } from "../admin/CopyPhone"
 import { RefreshButton } from "../admin/RefreshButton"
 import { ActionDialog } from "../events/ActionDialog"
-import { REQUEST_WORDS } from "../requests/requestWords"
+import { REQUEST_WORDS } from "@ci-calendar/core/features/requests/requestWords"
 import { useAssignRole } from "./roles"
-import { adminUsersQuery, adminUserStatsQuery, type AdminUser } from "./users"
+import {
+    adminUsersQuery,
+    adminUserStatsQuery,
+    type AdminUser,
+} from "@ci-calendar/core/features/admin-users/users"
 import "./ManageUsersPage.scss"
 
 // Legacy ManageUsersPage (Hebrew only there, but the toast).

@@ -8,13 +8,16 @@ import type { FormErrors } from "@ci-calendar/core/lib/form"
 import { MULTI_DAY_TYPES } from "@ci-calendar/core/lib/eventOptions"
 import { SelectField, TextField } from "../../ui/form/fields"
 import { TagPicker } from "../../ui/form/TagPicker"
-import { optionLabel } from "../calendar/eventFormat"
-import { EVENT_LOCALES } from "../calendar/eventLocales"
-import type { Tag } from "../calendar/publicEvent"
-import type { ManagedEvent } from "../events/managedEvent"
-import { MULTI_DAY_DRAFT_KEY, MULTI_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
+import { optionLabel } from "@ci-calendar/core/features/calendar/eventFormat"
+import { EVENT_LOCALES } from "@ci-calendar/core/features/calendar/eventLocales"
+import type { Tag } from "@ci-calendar/core/features/calendar/publicEvent"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
+import {
+    MULTI_DAY_DRAFT_KEY,
+    MULTI_DAY_EDIT_DRAFT_KEY,
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 import { useFormDraft } from "../../app/useFormDraft"
-import { EVENT_FORM_COPY } from "./eventFormCopy"
+import { EVENT_FORM_COPY } from "@ci-calendar/core/features/event-forms/eventFormCopy"
 import {
     BaseHeadFields,
     ClearFormButton,
@@ -37,11 +40,15 @@ import {
     validateMultiDay,
     type MultiDayValues,
     type SingleDayValues,
-} from "./eventFormValues"
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
 import { HIDE_NEW_EVENTS } from "./eventSave"
-import { useTaggable, type Taggable } from "./taggableBios"
+import { useTaggable } from "./taggableBios"
+import { type Taggable } from "@ci-calendar/core/features/event-forms/taggableBios"
 import { TemplatePicker } from "./TemplatePicker"
-import { withMultiDayTemplate, withSingleDayTemplate } from "./templateValues"
+import {
+    withMultiDayTemplate,
+    withSingleDayTemplate,
+} from "@ci-calendar/core/features/event-forms/templateValues"
 import { useCarried } from "./useCarried"
 import { useEventSubmit } from "./useEventSubmit"
 import { useErrorText } from "./useErrorText"

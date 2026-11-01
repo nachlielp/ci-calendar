@@ -1,5 +1,5 @@
 import { screen, within } from "@testing-library/react"
-import type { PublicEvent } from "../features/calendar/publicEvent"
+import type { PublicEvent } from "@ci-calendar/core/features/calendar/publicEvent"
 
 type Overrides = Record<string, unknown>
 

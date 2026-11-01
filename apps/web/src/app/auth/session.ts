@@ -1,10 +1,14 @@
 import { onlineManager, type QueryClient } from "@tanstack/react-query"
-import { LINKED_EVENT_KIND } from "../../features/calendar/linkedEvent"
-import { PUBLIC_WINDOW_KIND } from "../../features/calendar/publicWindow"
+import { LINKED_EVENT_KIND } from "@ci-calendar/core/features/calendar/linkedEvent"
+import { PUBLIC_WINDOW_KIND } from "@ci-calendar/core/features/calendar/publicWindow"
 import { afterLoadAndIdle } from "../afterLoadAndIdle"
 import type { AppServices } from "../services"
-import { forgetPersonalKeys } from "./personalStorage"
-import { PROFILE_KIND, profileQuery, recordSignIn } from "./profile"
+import { forgetPersonalKeys } from "@ci-calendar/core/app/auth/personalStorage"
+import {
+    PROFILE_KIND,
+    profileQuery,
+    recordSignIn,
+} from "@ci-calendar/core/app/auth/profile"
 
 /**
  * The query kinds holding only public data. Every other query is personal

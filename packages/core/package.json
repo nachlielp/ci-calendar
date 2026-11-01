@@ -9,6 +9,7 @@
         "./*": "./src/*.ts"
     },
     "scripts": {
+        "gen:types": "supabase gen types typescript --project-id pjgwpivkvsuernmoeebk > src/data/database.types.ts && prettier --write src/data/database.types.ts",
         "lint": "eslint . --report-unused-disable-directives",
         "test": "vitest run",
         "test:watch": "vitest",
@@ -16,6 +17,13 @@
     },
     "engines": {
         "node": "22.x"
+    },
+    "dependencies": {
+        "@supabase/auth-js": "^2.118.0",
+        "@supabase/functions-js": "^2.118.0",
+        "@supabase/postgrest-js": "^2.118.0",
+        "@supabase/storage-js": "^2.118.0",
+        "@tanstack/query-core": "^5.105.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.5",

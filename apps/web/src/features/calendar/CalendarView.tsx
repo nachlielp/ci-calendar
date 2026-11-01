@@ -9,11 +9,14 @@ import {
     monthWeeks,
 } from "@ci-calendar/core/lib/monthGrid"
 import { ChevronRightIcon } from "../../ui/icons/ChevronRightIcon"
-import { cardsByDay, type EventCard } from "./eventCards"
+import {
+    cardsByDay,
+    type EventCard,
+} from "@ci-calendar/core/features/calendar/eventCards"
 import { EventList } from "./EventList"
-import { dayLabel } from "./eventFormat"
-import { EVENT_LOCALES } from "./eventLocales"
-import { WINDOW_DAYS } from "./publicWindowSelect"
+import { dayLabel } from "@ci-calendar/core/features/calendar/eventFormat"
+import { EVENT_LOCALES } from "@ci-calendar/core/features/calendar/eventLocales"
+import { WINDOW_DAYS } from "@ci-calendar/core/features/calendar/publicWindowSelect"
 import "./CalendarView.scss"
 
 const COPY = defineCopy({

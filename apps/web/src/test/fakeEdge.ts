@@ -2,7 +2,7 @@ import {
     PUBLIC_WINDOW_ENDPOINT,
     publicWindowRange,
     readPublicWindow,
-} from "../features/calendar/publicWindowSelect"
+} from "@ci-calendar/core/features/calendar/publicWindowSelect"
 import type { FakeDataClient } from "./fakeDataClient"
 
 // The Worker's edge-cached endpoint as the page sees it (`renderApp({ edge })`):

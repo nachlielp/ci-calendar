@@ -5,10 +5,10 @@ import {
     jerusalemDateLabel,
     jerusalemDateTimeLabel,
 } from "@ci-calendar/core/lib/jerusalemDate"
-import type { UserRequest } from "./myRequests"
-import type { RequestResponse } from "./requestRows"
+import type { UserRequest } from "@ci-calendar/core/features/requests/myRequests"
+import type { RequestResponse } from "@ci-calendar/core/features/requests/requestRows"
 import { useRequestTexts } from "./requestTexts"
-import { REQUEST_WORDS } from "./requestWords"
+import { REQUEST_WORDS } from "@ci-calendar/core/features/requests/requestWords"
 
 // Legacy RequestsList (Hebrew only there; it had no heading).
 const COPY = defineCopy({
