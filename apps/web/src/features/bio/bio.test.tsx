@@ -6,7 +6,7 @@ import {
     type DeviceStorage,
 } from "../../app/deviceStorage"
 import type { SignedInRole } from "../../app/viewer"
-import { PHOTO_MAX_SIDE } from "../../lib/photo"
+import { PHOTO_MAX_SIDE } from "@ci-calendar/core/lib/photo"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { FAKE_BUCKET, FAKE_SUPABASE_URL } from "../../test/fakeFiles"
 import { renderApp } from "../../test/renderApp"

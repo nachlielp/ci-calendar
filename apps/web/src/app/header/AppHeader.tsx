@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from "react"
 import { Link, useLocation, useMatches } from "react-router"
 import { StaleDataNotice } from "../../features/calendar/StaleDataNotice"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { AccountIcon } from "../../ui/icons/AccountIcon"
 import { HomeIcon } from "../../ui/icons/HomeIcon"
 import { MenuIcon } from "../../ui/icons/MenuIcon"

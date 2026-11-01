@@ -1,0 +1,24 @@
+{
+    // The core runs in the browser, the Cloudflare Worker, React Native and
+    // Node, so it gets only what all of them share: the ES library and the
+    // few web-platform globals declared in src/platform.d.ts. No DOM, no
+    // Node types: a `window`, `document` or `process` here fails to typecheck.
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2023"],
+        "types": [],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "isolatedModules": true,
+        "verbatimModuleSyntax": false,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true
+    },
+    "include": ["src/**/*"],
+    // Tests run in Node under Vitest: tsconfig.test.json.
+    "exclude": ["src/**/*.test.ts"]
+}

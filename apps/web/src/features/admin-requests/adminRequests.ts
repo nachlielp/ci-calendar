@@ -18,7 +18,7 @@ import {
     keysetPage,
     pageHolding,
     replacedAt,
-} from "../../lib/keyset"
+} from "@ci-calendar/core/lib/keyset"
 import {
     afterNewest,
     compareNewest,

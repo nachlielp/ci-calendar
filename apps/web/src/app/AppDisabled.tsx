@@ -1,4 +1,4 @@
-import { defineCopy } from "../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { SettingsIcon } from "../ui/icons/SettingsIcon"
 import { useCopy } from "./language"
 

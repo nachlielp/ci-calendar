@@ -1,6 +1,6 @@
 import { Link, Navigate, Outlet } from "react-router"
-import { COMMON_COPY } from "../../lib/commonCopy"
-import { defineCopy } from "../../lib/copy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { useCopy } from "../language"
 import { useViewer, type SignedInRole } from "../viewer"
 

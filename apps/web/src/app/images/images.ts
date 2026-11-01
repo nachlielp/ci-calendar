@@ -1,5 +1,5 @@
 import type { ComponentType } from "react"
-import type { PixelArea, Size } from "../../lib/photo"
+import type { PixelArea, Size } from "@ci-calendar/core/lib/photo"
 
 // Image tools (`services.images`): the photo cropper and the browser's image
 // decode/resize/encode, both loaded on first use (a photo picked), never with

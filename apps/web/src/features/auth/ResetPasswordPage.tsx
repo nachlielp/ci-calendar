@@ -3,8 +3,8 @@ import { Link } from "react-router"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { useSession } from "../../app/viewer"
-import { COMMON_COPY } from "../../lib/commonCopy"
-import { defineCopy } from "../../lib/copy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { AuthAlert, PasswordField } from "./AuthFields"
 
 // Legacy translations.ts and RestPasswordPage.tsx (Hebrew only there).

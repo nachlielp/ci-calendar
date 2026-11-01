@@ -1,4 +1,7 @@
-import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
+import {
+    addDays,
+    jerusalemTimeOfDay,
+} from "@ci-calendar/core/lib/jerusalemDate"
 import {
     eventDateLabel,
     eventTimeRange,

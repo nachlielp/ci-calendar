@@ -1,5 +1,5 @@
 import type { DeviceStorage } from "./deviceStorage"
-import type { Language } from "../lib/language"
+import type { Language } from "@ci-calendar/core/lib/language"
 
 // Machine translations kept on the device across visits (legacy kept the
 // details' ones in the Cache API), so a text read again in English or

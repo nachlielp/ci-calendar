@@ -1,5 +1,5 @@
 import { useCopy } from "../app/language"
-import { defineCopy } from "../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import "./SupportEmail.scss"
 
 /** Legacy `EMAIL_SUPPORT`. */

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { Dialog } from "../../ui/Dialog"
 import { useCopy } from "../language"
 import type { Viewer } from "../viewer"

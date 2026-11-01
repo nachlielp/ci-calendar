@@ -1,7 +1,7 @@
 import { Link } from "react-router"
 import { useCopy } from "../app/language"
-import { COMMON_COPY } from "../lib/commonCopy"
-import { defineCopy } from "../lib/copy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 
 const COPY = defineCopy({
     he: { title: "הדף לא נמצא" },

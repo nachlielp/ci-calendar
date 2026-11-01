@@ -1,5 +1,5 @@
 import { useCopy } from "../../app/language"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { RefreshIcon } from "../../ui/icons/RefreshIcon"
 
 // New: legacy's admin lists updated over realtime, so it had no refresh.

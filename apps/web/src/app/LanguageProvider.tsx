@@ -5,7 +5,7 @@ import {
     useState,
     type ReactNode,
 } from "react"
-import type { Language } from "../lib/language"
+import type { Language } from "@ci-calendar/core/lib/language"
 import {
     applyLanguageToDocument,
     LanguageContext,

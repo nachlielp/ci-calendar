@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query"
 import { useServices, type AppServices } from "../../app/services"
-import { STALE_MS } from "../../lib/freshness"
+import { STALE_MS } from "@ci-calendar/core/lib/freshness"
 import {
     selectPublicEvents,
     toPublicEvent,

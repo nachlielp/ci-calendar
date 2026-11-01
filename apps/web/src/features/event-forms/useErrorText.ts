@@ -1,5 +1,5 @@
 import { useCopy } from "../../app/language"
-import type { FormErrors } from "../../lib/form"
+import type { FormErrors } from "@ci-calendar/core/lib/form"
 import { EVENT_FORM_COPY } from "./eventFormCopy"
 import type { EventFormError } from "./eventFormValues"
 

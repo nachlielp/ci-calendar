@@ -1,4 +1,4 @@
-import { HEIC_HEADER_BYTES, isHeic } from "../../lib/heic"
+import { HEIC_HEADER_BYTES, isHeic } from "@ci-calendar/core/lib/heic"
 
 /**
  * JPEG quality of a converted HEIC: the cropper's source, cropped and

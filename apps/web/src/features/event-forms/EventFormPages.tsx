@@ -11,7 +11,7 @@ import { useUserId } from "../../app/auth/personal"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { useViewer } from "../../app/viewer"
-import { COMMON_COPY } from "../../lib/commonCopy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 import { FormAlert } from "../../ui/form/fields"
 import {
     ALL_EVENTS_PATH,

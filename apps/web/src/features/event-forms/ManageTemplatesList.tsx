@@ -1,6 +1,6 @@
 import { useId, useState } from "react"
 import { useCopy } from "../../app/language"
-import { COMMON_COPY } from "../../lib/commonCopy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 import { Dialog } from "../../ui/Dialog"
 import { DeleteIcon } from "../../ui/icons/DeleteIcon"
 import { EditIcon } from "../../ui/icons/EditIcon"

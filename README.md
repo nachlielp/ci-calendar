@@ -48,15 +48,16 @@ How it fits together, and the rules to follow when changing it, are in
 An npm-workspaces monorepo (one lockfile at the root; plan in
 [#48](https://github.com/nachlielp/ci-calendar/issues/48)):
 
-| Path        | What                                                                    |
-| ----------- | ----------------------------------------------------------------------- |
-| `apps/web`  | The Vite client and its Cloudflare Worker (`worker/`, `wrangler.jsonc`) |
-| `supabase/` | The shared backend: migrations and Edge Functions                       |
-| `docs/`     | Architecture, runbooks and checklists                                   |
+| Path            | What                                                                      |
+| --------------- | ------------------------------------------------------------------------- |
+| `apps/web`      | The Vite client and its Cloudflare Worker (`worker/`, `wrangler.jsonc`)   |
+| `packages/core` | `@ci-calendar/core`: logic the apps share, with no React, no DOM, no Node |
+| `supabase/`     | The shared backend: migrations and Edge Functions                         |
+| `docs/`         | Architecture, runbooks and checklists                                     |
 
-The shared core package (`packages/core`) and the Expo app (`apps/mobile`)
-come next (#48). Install from the root; the scripts below run from the
-root too, and pass on to the web workspace.
+The Expo app (`apps/mobile`) comes later (#48). Install from the root; the
+scripts below run from the root too. `typecheck`, `lint` and `test` run in
+every workspace; the rest pass on to the web workspace.
 
 ## Getting started
 

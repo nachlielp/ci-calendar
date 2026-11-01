@@ -1,11 +1,11 @@
 import { createContext, useContext } from "react"
-import { defineCopy } from "../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import {
     DEFAULT_LANGUAGE,
     languagesToShow,
     textDirection,
     type Language,
-} from "../lib/language"
+} from "@ci-calendar/core/lib/language"
 import type { DeviceStorage } from "./deviceStorage"
 
 /** The languages offered, set per deployment (`VITE_LANGUAGES_TO_SHOW`). */

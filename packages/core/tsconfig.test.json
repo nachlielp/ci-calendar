@@ -1,0 +1,10 @@
+{
+    // The core's tests: the same rules, plus Node's types (Vitest runs them in
+    // Node). Kept apart so Node's globals never reach the source's check.
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": ["node"]
+    },
+    "include": ["src/**/*", "vitest.config.ts", "eslint.config.js"],
+    "exclude": ["src/platform.d.ts"]
+}

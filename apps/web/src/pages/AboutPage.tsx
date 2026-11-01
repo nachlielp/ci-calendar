@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { useCopy } from "../app/language"
-import { defineCopy } from "../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { StaticPage } from "./StaticPage"
 
 const EMAIL_SUPPORT = "info@ci-events.org"

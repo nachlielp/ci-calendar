@@ -1,5 +1,5 @@
 // Telling a picked photo is HEIC/HEIF (iPhones' default format), which only
-// Safari decodes: elsewhere app/images/preparePhoto.ts converts it to JPEG
+// Safari decodes: elsewhere the web's app/images/preparePhoto.ts converts it to JPEG
 // before the cropper shows it. Pure, so the bytes and names are tested here.
 
 /** How many bytes from the file's start `isHeic` needs (the `ftyp` box). */

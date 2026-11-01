@@ -1,5 +1,5 @@
 import type { DataClient } from "../../data/client"
-import { addDays, jerusalemToday } from "../../lib/jerusalemDate"
+import { addDays, jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
 import { selectPublicEvents } from "./publicEvent"
 
 // The public window's query, shared by the client (its direct read, the

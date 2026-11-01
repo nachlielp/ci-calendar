@@ -1,6 +1,6 @@
 // How an uploaded bio photo is sized and encoded (spec #34: "uploaded bio
 // photos are resized to a capped size on the client before upload"). Pure,
-// so the browser's canvas code (app/images/renderPhoto.ts) only draws and
+// so the browser's canvas code (the web's app/images/renderPhoto.ts) only draws and
 // encodes what these and ./photoEncoding.ts decide.
 //
 // Legacy scaled the crop to at most 800px and re-encoded it as JPEG,

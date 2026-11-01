@@ -1,6 +1,6 @@
 import { useCopy, useLanguage } from "../../../app/language"
 import { useMachineTranslation } from "../../../app/useMachineTranslation"
-import { defineCopy } from "../../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { OpenInNewIcon } from "../../../ui/icons/OpenInNewIcon"
 import type { PublicBio } from "../publicEvent"
 import "./BioCard.scss"

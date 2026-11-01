@@ -9,8 +9,8 @@ import {
     type Location,
     type UIMatch,
 } from "react-router"
-import { COMMON_COPY } from "../lib/commonCopy"
-import { defineCopy } from "../lib/copy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { AppDisabled } from "./AppDisabled"
 import { AppHeader } from "./header/AppHeader"
 import { InstallBanner } from "./install/InstallBanner"

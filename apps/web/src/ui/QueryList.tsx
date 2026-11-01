@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { useCopy } from "../app/language"
-import { COMMON_COPY } from "../lib/commonCopy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 
 // The shell of a list read by a query (my events, the admin pages): the
 // items once loaded, else loading or failed with a retry; empty; dimmed

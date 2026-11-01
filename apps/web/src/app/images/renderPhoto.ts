@@ -1,5 +1,5 @@
-import type { PixelArea, Size } from "../../lib/photo"
-import { encodeWithinBudget } from "../../lib/photoEncoding"
+import type { PixelArea, Size } from "@ci-calendar/core/lib/photo"
+import { encodeWithinBudget } from "@ci-calendar/core/lib/photoEncoding"
 
 /**
  * The crop drawn at its upload size and encoded (`ImageTools.renderPhoto`,

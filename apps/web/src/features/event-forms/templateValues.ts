@@ -1,5 +1,5 @@
 import type { Database } from "../../data/database.types"
-import type { FormErrors } from "../../lib/form"
+import type { FormErrors } from "@ci-calendar/core/lib/form"
 import type { Tag } from "../calendar/publicEvent"
 import { toPublicEvent } from "../calendar/publicEvent"
 import {

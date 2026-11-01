@@ -21,12 +21,13 @@ export const PHOTO_ENCODING = "image/jpeg"
 /**
  * Encodes as JPEG at `PHOTO_QUALITY`, then lowers the quality a step at a
  * time while the result is over `maxBytes`, down to `PHOTO_MIN_QUALITY`.
- * Returns the last encoding.
+ * Returns the last encoding (a `Blob` in the browser; anything with a
+ * `size` in bytes).
  */
-export async function encodeWithinBudget(
-    encode: (type: string, quality: number) => Promise<Blob>,
+export async function encodeWithinBudget<B extends { readonly size: number }>(
+    encode: (type: string, quality: number) => Promise<B>,
     maxBytes = PHOTO_MAX_BYTES,
-): Promise<Blob> {
+): Promise<B> {
     let quality = PHOTO_QUALITY
     let blob = await encode(PHOTO_ENCODING, quality)
     // Rounded, so 0.8 - 7 × 0.1 reaches 0.1 exactly.

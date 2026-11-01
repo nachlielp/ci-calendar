@@ -24,6 +24,7 @@
         "node": "22.x"
     },
     "dependencies": {
+        "@ci-calendar/core": "*",
         "@sentry/react": "^11.10.0",
         "@supabase/auth-js": "^2.118.0",
         "@supabase/functions-js": "^2.118.0",

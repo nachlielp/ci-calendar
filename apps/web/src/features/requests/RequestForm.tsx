@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react"
 import { useCopy } from "../../app/language"
 import { useForm } from "../../app/useForm"
-import { COMMON_COPY } from "../../lib/commonCopy"
-import { defineCopy } from "../../lib/copy"
-import type { FormErrors } from "../../lib/form"
-import { isIsraeliMobile, phoneInput } from "../../lib/phone"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
+import type { FormErrors } from "@ci-calendar/core/lib/form"
+import { isIsraeliMobile, phoneInput } from "@ci-calendar/core/lib/phone"
 import {
     FormAlert,
     SelectField,

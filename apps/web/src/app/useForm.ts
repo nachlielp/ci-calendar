@@ -15,7 +15,7 @@ import {
     shownErrors,
     type FormErrors,
     type FormValues,
-} from "../lib/form"
+} from "@ci-calendar/core/lib/form"
 import { useBlockReload } from "./updates/reloadGuard"
 
 /** What a form's save gets: the values, and the fields that changed. */

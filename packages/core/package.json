@@ -1,0 +1,28 @@
+{
+    "name": "@ci-calendar/core",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "description": "Logic shared by the web and mobile apps: no React, no DOM, no React Native. Shipped as TypeScript source; each app's bundler compiles it.",
+    "sideEffects": false,
+    "exports": {
+        "./*": "./src/*.ts"
+    },
+    "scripts": {
+        "lint": "eslint . --report-unused-disable-directives",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json"
+    },
+    "engines": {
+        "node": "22.x"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.5",
+        "@types/node": "^22.10.2",
+        "eslint": "^9.39.5",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.66.0",
+        "vitest": "^5.0.5"
+    }
+}

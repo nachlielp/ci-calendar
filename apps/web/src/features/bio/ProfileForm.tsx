@@ -3,8 +3,8 @@ import { useCopy } from "../../app/language"
 import { useBlockReload } from "../../app/updates/reloadGuard"
 import { useForm } from "../../app/useForm"
 import { useFormDraft } from "../../app/useFormDraft"
-import { COMMON_COPY } from "../../lib/commonCopy"
-import { defineCopy } from "../../lib/copy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { FormAlert, TextAreaField, TextField } from "../../ui/form/fields"
 import {
     ABOUT_MAX,

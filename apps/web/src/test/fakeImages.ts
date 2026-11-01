@@ -4,7 +4,7 @@ import type {
     CropperProps,
     ImageTools,
 } from "../app/images/images"
-import type { PixelArea, Size } from "../lib/photo"
+import type { PixelArea, Size } from "@ci-calendar/core/lib/photo"
 
 // The fake's image tools (`createFakeDataClient().images`, passed as
 // `services.images`). jsdom has no layout or canvas, so the cropper is a
