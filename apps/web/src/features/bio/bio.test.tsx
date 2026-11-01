@@ -8,11 +8,14 @@ import {
 import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { PHOTO_MAX_SIDE } from "@ci-calendar/core/lib/photo"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { FAKE_BUCKET, FAKE_SUPABASE_URL } from "../../test/fakeFiles"
+import {
+    FAKE_BUCKET,
+    FAKE_SUPABASE_URL,
+} from "@ci-calendar/core/testing/fakeFiles"
 import { renderApp } from "../../test/renderApp"
 import { liveObjectUrls } from "../../test/setup"
-import { testUser } from "../../test/testUsers"
-import { bio, event, tagging } from "../../test/testEvents"
+import { testUser } from "@ci-calendar/core/testing/testUsers"
+import { bio, event, tagging } from "@ci-calendar/core/testing/testEvents"
 import { MY_BIO_COLUMNS } from "@ci-calendar/core/features/bio/myBio"
 
 const NOW = new Date("2026-10-30T09:00:00Z")

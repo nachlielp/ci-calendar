@@ -5,8 +5,8 @@ import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
-import { testUser, userRow } from "../../test/testUsers"
-import { event } from "../../test/testEvents"
+import { testUser, userRow } from "@ci-calendar/core/testing/testUsers"
+import { event } from "@ci-calendar/core/testing/testEvents"
 
 const backend = () =>
     createFakeDataClient({ ci_events: [event({ title: "ג'אם" })] })

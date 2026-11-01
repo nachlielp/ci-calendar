@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest"
-import {
-    cardsByDay,
-    toEventCards,
-} from "@ci-calendar/core/features/calendar/eventCards"
-import { HEBREW } from "@ci-calendar/core/features/calendar/eventLocales"
-import { publicEvent } from "../../test/testEvents"
+import { cardsByDay, toEventCards } from "./eventCards"
+import { HEBREW } from "./eventLocales"
+import { publicEvent } from "../../testing/testEvents"
 
 const titlesByDay = (events: Parameters<typeof toEventCards>[0]) =>
     Object.fromEntries(

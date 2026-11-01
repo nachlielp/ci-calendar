@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../../test/fakeDataClient"
-import { fakeTranslation } from "../../../test/fakeFunctions"
+import { fakeTranslation } from "@ci-calendar/core/testing/fakeFunctions"
 import { renderApp } from "../../../test/renderApp"
 import {
     bio,
@@ -11,7 +11,7 @@ import {
     publicEvent,
     segment,
     tagging,
-} from "../../../test/testEvents"
+} from "@ci-calendar/core/testing/testEvents"
 import { translatableTexts } from "./detailsTranslation"
 import { TRANSLATIONS_KEY } from "../../../app/translationStore"
 

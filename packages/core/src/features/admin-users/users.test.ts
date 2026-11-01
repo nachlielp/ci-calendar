@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
-import { createFakeDataClient } from "../../test/fakeDataClient"
-import { afterNewest } from "@ci-calendar/core/features/admin/adminLists"
-import { assignUserRole } from "@ci-calendar/core/features/admin-users/roles"
+import { createFakeDataClient } from "../../testing/fakeDataClient"
+import { afterNewest } from "../admin/adminLists"
+import { assignUserRole } from "./roles"
 import {
     movedBetween,
     searchTerms,
@@ -10,7 +10,7 @@ import {
     withRole,
     type AdminUser,
     type UserPages,
-} from "@ci-calendar/core/features/admin-users/users"
+} from "./users"
 
 describe("searchTerms", () => {
     it("matches the name or the email, anywhere, as a quoted ilike", () => {

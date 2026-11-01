@@ -1,8 +1,8 @@
-import { QueryClient } from "@tanstack/react-query"
+import { QueryClient } from "@tanstack/query-core"
 import { describe, expect, it } from "vitest"
-import { publicEvent } from "../../test/testEvents"
-import { applyEventChanges } from "@ci-calendar/core/features/events/eventCache"
-import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
+import { publicEvent } from "../../testing/testEvents"
+import { applyEventChanges } from "../events/eventCache"
+import type { ManagedEvent } from "../events/managedEvent"
 import {
     adminEventsKey,
     belongsInList,
@@ -10,7 +10,7 @@ import {
     withoutPassed,
     type AdminEventPage,
     type AdminEventPages,
-} from "@ci-calendar/core/features/admin-events/adminEvents"
+} from "./adminEvents"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 const TODAY = "2026-10-30"

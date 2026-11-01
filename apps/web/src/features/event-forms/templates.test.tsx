@@ -6,10 +6,11 @@ import {
     type DeviceStorage,
 } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { fakeTranslation } from "../../test/fakeFunctions"
+import { fakeTranslation } from "@ci-calendar/core/testing/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
-import { testUser, type TestUser } from "../../test/testUsers"
-import { bio, event, eventTitles } from "../../test/testEvents"
+import { testUser, type TestUser } from "@ci-calendar/core/testing/testUsers"
+import { eventTitles } from "../../test/testEvents"
+import { bio, event } from "@ci-calendar/core/testing/testEvents"
 import {
     SINGLE_DAY_DRAFT_KEY,
     SINGLE_DAY_TEMPLATE_DRAFT_KEY,

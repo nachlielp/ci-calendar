@@ -19,6 +19,7 @@
         "noFallthroughCasesInSwitch": true
     },
     "include": ["src/**/*"],
-    // Tests run in Node under Vitest: tsconfig.test.json.
-    "exclude": ["src/**/*.test.ts"]
+    // Tests and the fake backend kit (src/testing) run only in test runners,
+    // on Node: tsconfig.test.json.
+    "exclude": ["src/**/*.test.ts", "src/testing/**"]
 }

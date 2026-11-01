@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest"
 import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { createFakeEdge, type EdgeAnswer } from "../../test/fakeEdge"
+import {
+    createFakeEdge,
+    type EdgeAnswer,
+} from "@ci-calendar/core/testing/fakeEdge"
 import { renderApp } from "../../test/renderApp"
-import { event, eventTitles } from "../../test/testEvents"
-import { testUser } from "../../test/testUsers"
+import { eventTitles } from "../../test/testEvents"
+import { event } from "@ci-calendar/core/testing/testEvents"
+import { testUser } from "@ci-calendar/core/testing/testUsers"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem.
 const NOW = new Date("2026-10-30T09:00:00Z")

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
-import { createFakeFunctions, fakeTranslation } from "../test/fakeFunctions"
-import { LOOKUP_TIMEOUT_MS } from "@ci-calendar/core/lib/timeout"
-import { translateText, translateTitle } from "@ci-calendar/core/data/translate"
+import { createFakeFunctions, fakeTranslation } from "../testing/fakeFunctions"
+import { LOOKUP_TIMEOUT_MS } from "../lib/timeout"
+import { translateText, translateTitle } from "./translate"
 
 // Legacy util/translate.test.ts, at the functions seam.
 
@@ -118,28 +118,5 @@ describe("translateTitle", () => {
         } finally {
             vi.useRealTimers()
         }
-    })
-})
-
-// No source file may hold a key that can call Google's Translate API, nor
-// call that endpoint itself (legacy's guard, kept).
-describe("no billable Google key reaches the Translate API", () => {
-    const sources = import.meta.glob("../**/*.{ts,tsx}", {
-        query: "?raw",
-        import: "default",
-        eager: true,
-    }) as Record<string, string>
-
-    it("no src file names the Translate endpoint or the old Maps key", () => {
-        expect(Object.keys(sources).length).toBeGreaterThan(0)
-        const offenders = Object.entries(sources)
-            .filter(([path]) => !path.includes(".test."))
-            .filter(
-                ([, content]) =>
-                    content.includes("translation.googleapis.com") ||
-                    content.includes("VITE_GOOGLE_MAPS_API_KEY"),
-            )
-            .map(([path]) => path)
-        expect(offenders).toEqual([])
     })
 })

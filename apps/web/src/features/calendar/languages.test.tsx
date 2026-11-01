@@ -7,7 +7,7 @@ import {
 } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp } from "../../test/renderApp"
-import { event, segment } from "../../test/testEvents"
+import { event, segment } from "@ci-calendar/core/testing/testEvents"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem.
 const NOW = new Date("2026-10-30T09:00:00Z")

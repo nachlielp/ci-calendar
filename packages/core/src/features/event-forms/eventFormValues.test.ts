@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest"
-import {
-    toManagedEvent,
-    type ManagedEventRow,
-} from "@ci-calendar/core/features/events/managedEvent"
-import { event, segment } from "../../test/testEvents"
+import { toManagedEvent, type ManagedEventRow } from "../events/managedEvent"
+import { event, segment } from "../../testing/testEvents"
 import {
     emptyMultiDay,
     emptySingleDay,
@@ -24,7 +21,7 @@ import {
     validateSingleDay,
     type MultiDayValues,
     type SingleDayValues,
-} from "@ci-calendar/core/features/event-forms/eventFormValues"
+} from "./eventFormValues"
 
 const TEACHER_ID = "11111111-1111-4111-8111-111111111111"
 const ORG_ID = "22222222-2222-4222-8222-222222222222"

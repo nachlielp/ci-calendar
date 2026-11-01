@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest"
 import { PUBLIC_EVENT_COLUMNS } from "@ci-calendar/core/features/calendar/publicEvent"
 import { createFakeDataClient } from "../src/test/fakeDataClient"
-import { event } from "../src/test/testEvents"
+import { event } from "@ci-calendar/core/testing/testEvents"
 import { createWorker } from "./app"
 import {
     CACHE_STATUS,

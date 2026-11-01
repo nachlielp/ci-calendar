@@ -1,9 +1,4 @@
-import type {
-    Auth,
-    AuthFailure,
-    AuthOutcome,
-    AuthSession,
-} from "@ci-calendar/core/data/auth"
+import type { Auth, AuthFailure, AuthOutcome, AuthSession } from "../data/auth"
 
 // The auth half of the fake backend (`createFakeDataClient().auth`): an
 // in-memory Supabase auth with accounts, a session and tokens. Every call

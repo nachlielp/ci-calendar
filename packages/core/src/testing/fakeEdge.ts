@@ -2,7 +2,7 @@ import {
     PUBLIC_WINDOW_ENDPOINT,
     publicWindowRange,
     readPublicWindow,
-} from "@ci-calendar/core/features/calendar/publicWindowSelect"
+} from "../features/calendar/publicWindowSelect"
 import type { FakeDataClient } from "./fakeDataClient"
 
 // The Worker's edge-cached endpoint as the page sees it (`renderApp({ edge })`):
@@ -28,7 +28,7 @@ export type EdgeAnswer =
 
 export interface EdgeRequest {
     url: string
-    credentials: RequestCredentials | undefined
+    credentials: RequestInit["credentials"]
     /** The Authorization header the page sent, if any. */
     authorization: string | null
 }
@@ -55,7 +55,7 @@ export function createFakeEdge(
         })
 
     const fetchEdge = async (
-        input: RequestInfo | URL,
+        input: Parameters<typeof fetch>[0],
         init?: RequestInit,
     ): Promise<Response> => {
         const url = String(input instanceof Request ? input.url : input)

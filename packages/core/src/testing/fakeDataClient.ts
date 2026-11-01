@@ -1,8 +1,7 @@
-import type { DataClient } from "@ci-calendar/core/data/client"
+import type { DataClient } from "../data/client"
 import { createFakeAuth, type FakeAuth } from "./fakeAuth"
 import { createFakeFiles, type FakeFiles } from "./fakeFiles"
 import { createFakeFunctions, type FakeFunctions } from "./fakeFunctions"
-import { createFakeImages, type FakeImages } from "./fakeImages"
 import { createFakePlaces, type FakePlaces } from "./fakePlaces"
 import { createFakeRpc, type FakeRpc } from "./fakeRpc"
 
@@ -29,9 +28,10 @@ import { createFakeRpc, type FakeRpc } from "./fakeRpc"
 // network). `insert([rows])` adds several (`ci_events_users_junction`).
 // `auth` is the fake's Supabase auth (./fakeAuth.ts), `functions` its Edge
 // Functions (./fakeFunctions.ts), `places` stands in for Google Places
-// (./fakePlaces.ts), `files` for Supabase Storage (./fakeFiles.ts),
-// `images` for the cropper and the canvas (./fakeImages.ts) and `rpc` for
-// the database's functions (`rpc(name, args)`, ./fakeRpc.ts).
+// (./fakePlaces.ts), `files` for Supabase Storage (./fakeFiles.ts) and
+// `rpc` for the database's functions (`rpc(name, args)`, ./fakeRpc.ts).
+// Shared by the apps' tests (`@ci-calendar/core/testing/…`), so it never
+// imports a test runner; each app adds its own fakes (the web's images).
 // `ilike` takes PostgREST's `*` wildcard, at the top level and in `or()`,
 // whose values may be double-quoted (`a.ilike."*x, y*"`, `\` escapes).
 // `select(columns, { count: "exact", head })` answers with the `count` of
@@ -187,8 +187,6 @@ export interface FakeDataClient {
     places: FakePlaces
     /** Supabase Storage (`services.files`). */
     files: FakeFiles
-    /** The photo cropper and canvas (`services.images`). */
-    images: FakeImages
     /** The database's functions (`rpc`): calls, handlers, failures. */
     rpc: FakeRpc
     requests: RecordedRequest[]
@@ -393,7 +391,6 @@ export function createFakeDataClient(
     const functions = createFakeFunctions(() => auth.accessToken())
     const places = createFakePlaces()
     const files = createFakeFiles(() => auth.accessToken())
-    const images = createFakeImages()
     const rpc = createFakeRpc(
         () => auth.accessToken(),
         (table) => (seed[table] ??= []),
@@ -755,7 +752,6 @@ export function createFakeDataClient(
         functions,
         places,
         files,
-        images,
         rpc,
         requests,
         rows: (table) => (seed[table] ??= []),

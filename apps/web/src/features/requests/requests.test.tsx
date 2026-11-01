@@ -5,9 +5,9 @@ import { setPageVisibility } from "../../test/browser"
 import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { fakeTranslation } from "../../test/fakeFunctions"
+import { fakeTranslation } from "@ci-calendar/core/testing/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
-import { testUser, userRow } from "../../test/testUsers"
+import { testUser, userRow } from "@ci-calendar/core/testing/testUsers"
 import {
     OPEN_STATUS_TREE,
     REQUEST_COLUMNS,

@@ -7,10 +7,11 @@ import {
 } from "@ci-calendar/core/app/deviceStorage"
 import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { fakeTranslation } from "../../test/fakeFunctions"
+import { fakeTranslation } from "@ci-calendar/core/testing/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
-import { testUser, type TestUser } from "../../test/testUsers"
-import { bio, event, eventCard, eventTitles } from "../../test/testEvents"
+import { testUser, type TestUser } from "@ci-calendar/core/testing/testUsers"
+import { eventCard, eventTitles } from "../../test/testEvents"
+import { bio, event } from "@ci-calendar/core/testing/testEvents"
 import {
     MULTI_DAY_DRAFT_KEY,
     MULTI_DAY_EDIT_DRAFT_KEY,

@@ -1,4 +1,4 @@
-import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
+import type { SignedInRole } from "../app/auth/roles"
 import type { TestAccount } from "./fakeAuth"
 
 /** An account with its `users` row, for `renderApp({ signedInAs })`. */
