@@ -1,30 +1,23 @@
 // Security headers check (#17, spec #34, #37): after `vite build`, fails
-// unless both hosts' header configs pass. Cloudflare (public/_headers, which
-// the build copies to dist/_headers) gets the checks at the end of this
-// comment; vercel.json, until Vercel is retired, these: it serves every path with the security headers and a
-// Content-Security-Policy that parses and stays strict (no 'unsafe-eval', no
-// inline scripts but the hashed ones, no bare wildcards or http: sources),
-// reports violations to Sentry's security endpoint, and has `sha256-` hashes
-// in script-src and style-src that are exactly those of the inline scripts
-// and styles in the built index.html (vercel.json is static, so a change to
-// them must be copied there: `--write` does it). Production gets that policy
-// (every host but `*.vercel.app`); previews get it plus what Vercel's
-// toolbar needs (`previewPolicy`, also written by `--write`), and nothing
-// else. The origins the build was configured with (Supabase, the Sentry
-// DSN, PostHog's hosts), the scripts index.html loads and any assets the
-// build inlined as data: URLs must be allowed. The env checks run when the
-// variables are set (Vercel builds, local builds with .env); CI has none and
-// skips them.
+// unless Cloudflare's header rules (public/_headers, which the build copies
+// to dist/_headers; docs/cloudflare.md) pass.
 //
-// Cloudflare's `_headers` (docs/cloudflare.md): every path (`/*`) gets the
-// same security headers, and the policy with reports tagged `preview`, on
-// every host (previews on *.workers.dev, `wrangler dev`); the production
-// hosts (PRODUCTION_HOSTS) detach those two headers and set production's
-// policy, which must be vercel.json's exactly. `/assets/*` (hashed names)
-// is cached immutable and nothing else is cached long (index.html, sw.js
-// keep Cloudflare's revalidate default). Every policy gets the checks
-// above. `--write` takes vercel.json's production policy (hashes updated)
-// to public/_headers too.
+// Every path (`/*`) gets the security headers and a Content-Security-Policy
+// with reports tagged `preview`, on every host (previews on *.workers.dev,
+// `wrangler dev`). The production hosts (PRODUCTION_HOSTS) detach those two
+// headers and set production's policy: the same one, reporting as
+// production. Each policy must parse and stay strict (no 'unsafe-eval', no
+// inline scripts but the hashed ones, no bare wildcards or http: sources),
+// report violations to Sentry's security endpoint, and have `sha256-`
+// hashes in script-src and style-src that are exactly those of the inline
+// scripts and styles in the built index.html. `_headers` is static, so a
+// change to them must be copied there: `--write` does it. The origins the
+// build was configured with (Supabase, the Sentry DSN, PostHog's hosts),
+// the scripts index.html loads and any assets the build inlined as data:
+// URLs must be allowed. The env checks run when the variables are set
+// (Workers Builds, local builds with .env); CI has none and skips them.
+// `/assets/*` (hashed names) is cached immutable and nothing else is cached
+// long (index.html, sw.js keep Cloudflare's revalidate default).
 //
 // Usage (after `vite build`): node scripts/check-headers.mjs [--write]
 
@@ -280,96 +273,19 @@ export function reportingProblems(directives, endpoints, { dsn, environment }) {
     return problems
 }
 
-/**
- * What previews add for Vercel's toolbar (vercel.com/docs/vercel-toolbar/
- * managing-toolbar, "Using a Content Security Policy"). `'unsafe-inline'`
- * is ignored next to a hash, so previews drop the style hashes for it.
- */
-const TOOLBAR = {
-    "script-src": ["https://vercel.live"],
-    "style-src": ["https://vercel.live", "'unsafe-inline'"],
-    "img-src": ["https://vercel.live", "https://vercel.com", "data:"],
-    "font-src": ["https://vercel.live", "https://assets.vercel.com"],
-    "connect-src": ["https://vercel.live", "wss://ws-us3.pusher.com"],
-    "frame-src": ["https://vercel.live"],
-}
-
-/** Production's policy as previews get it: the toolbar's sources added. */
-export function previewPolicy(production) {
-    return production
-        .split(";")
-        .map((part) => {
-            let [name, ...sources] = part.trim().split(/\s+/)
-            if (name === "style-src") {
-                sources = sources.filter((source) => !HASH.test(source))
-            }
-            if (name === "report-uri") {
-                sources = sources.map((url) =>
-                    url.replace(
-                        "sentry_environment=production",
-                        "sentry_environment=preview",
-                    ),
-                )
-            }
-            const added = TOOLBAR[name] ?? []
-            sources = [
-                ...sources.filter(
-                    (source) => source !== "'none'" || !added.length,
-                ),
-                ...added.filter((source) => !sources.includes(source)),
-            ]
-            return [name, ...sources].join(" ")
-        })
-        .join("; ")
-}
-
-/** Production's `Reporting-Endpoints` (or policy) reporting as previews. */
+/** Production's `Reporting-Endpoints` (or policy) reporting as preview. */
 export const previewEndpoints = (production) =>
     production.replaceAll(
         "sentry_environment=production",
         "sentry_environment=preview",
     )
 
-/** The host condition that tells previews (`*.vercel.app`) apart. */
-const PREVIEW_HOST = JSON.stringify([
-    { type: "host", value: { suf: ".vercel.app" } },
-])
-
-/**
- * vercel.json's rules for every path: `common` (the headers every host
- * gets), `production` (the policy for every host but previews') and
- * `preview` (`*.vercel.app`'s). Exactly one of the policy rules matches a
- * request, so no header is ever sent twice.
- */
-export function rulesOf(config) {
-    const all = (config.headers ?? []).filter((rule) => rule.source === "/(.*)")
-    const condition = (rule) => JSON.stringify(rule.has ?? rule.missing ?? null)
-    return {
-        common: all.find((rule) => !rule.has && !rule.missing),
-        production: all.find(
-            (rule) =>
-                rule.missing && !rule.has && condition(rule) === PREVIEW_HOST,
-        ),
-        preview: all.find(
-            (rule) =>
-                rule.has && !rule.missing && condition(rule) === PREVIEW_HOST,
-        ),
-    }
-}
-
 const valueOf = (rule, key) =>
     rule?.headers.find((header) => header.key === key)?.value
 
-/**
- * `vercel.json`'s text with production's hashes replaced by `scripts`/
- * `styles` and previews' policy and endpoints made from production's (the
- * rest of the file as it was).
- */
-export function withPolicies(configText, { scripts, styles }) {
-    const { production, preview } = rulesOf(JSON.parse(configText))
-    const policy = valueOf(production, CSP)
-    if (!policy) return configText
-    const next = policy
+/** `policy` with its `sha256-` hashes replaced by `scripts`/`styles`. */
+export function withHashes(policy, { scripts, styles }) {
+    return policy
         .split(";")
         .map((part) => {
             const [name, ...sources] = part.trim().split(/\s+/)
@@ -382,20 +298,6 @@ export function withPolicies(configText, { scripts, styles }) {
             return [name, ...keywords, ...hashes, ...rest].join(" ")
         })
         .join("; ")
-    const replace = (from, to) => {
-        if (from !== undefined && from !== to) {
-            configText = configText.replace(
-                JSON.stringify(from),
-                JSON.stringify(to),
-            )
-        }
-    }
-    replace(policy, next)
-    replace(valueOf(preview, CSP), previewPolicy(next))
-    const endpoints = valueOf(production, ENDPOINTS)
-    if (endpoints)
-        replace(valueOf(preview, ENDPOINTS), previewEndpoints(endpoints))
-    return configText
 }
 
 /**
@@ -572,46 +474,6 @@ function requiredHeaderProblems(entries) {
     return problems
 }
 
-/** Problems with the header rules of `config` (vercel.json). */
-export function headerProblems(config) {
-    const { common, production, preview } = rulesOf(config)
-    if (!common)
-        return ['vercel.json has no header rule for every path ("/(.*)")']
-    const problems = []
-    if (!production || !preview) {
-        problems.push(
-            "vercel.json needs a policy rule for production (missing host .vercel.app) and one for previews (has it)",
-        )
-    }
-    const values = new Map(common.headers.map(({ key, value }) => [key, value]))
-    problems.push(...requiredHeaderProblems(values))
-    for (const key of [CSP, ENDPOINTS]) {
-        if (values.has(key)) problems.push(`${key} belongs in the policy rules`)
-        for (const [rule, what] of [
-            [production, "production"],
-            [preview, "preview"],
-        ]) {
-            if (rule && !valueOf(rule, key))
-                problems.push(`${what} has no ${key}`)
-        }
-    }
-    if (production && preview) {
-        const policy = valueOf(production, CSP) ?? ""
-        const endpoints = valueOf(production, ENDPOINTS) ?? ""
-        if (valueOf(preview, CSP) !== previewPolicy(policy)) {
-            problems.push(
-                "the preview policy isn't production's plus the toolbar's (run --write)",
-            )
-        }
-        if (valueOf(preview, ENDPOINTS) !== previewEndpoints(endpoints)) {
-            problems.push(
-                `the preview ${ENDPOINTS} isn't production's (run --write)`,
-            )
-        }
-    }
-    return problems
-}
-
 /** The production site's hosts; every other host is a preview. */
 export const PRODUCTION_HOSTS = ["www.ci-events.org", "ci-events.org"]
 
@@ -668,11 +530,8 @@ export function cloudflareRulesOf(rules) {
     }
 }
 
-/**
- * Problems with `_headers`' rules (`parseHeadersFile`), given vercel.json's
- * production policy and endpoints (`vercel`) while it is kept.
- */
-export function cloudflareHeaderProblems(rules, vercel) {
+/** Problems with `_headers`' rules (`parseHeadersFile`). */
+export function cloudflareHeaderProblems(rules) {
     const { common, production, assets } = cloudflareRulesOf(rules)
     if (!common) return ['_headers has no rule for every path ("/*")']
     const problems = requiredHeaderProblems(
@@ -712,12 +571,6 @@ export function cloudflareHeaderProblems(rules, vercel) {
             if (valueOf(common, key) !== previewEndpoints(value)) {
                 problems.push(
                     `_headers: /*'s ${key} isn't production's reporting as preview (run --write)`,
-                )
-            }
-            const theirs = vercel?.[key]
-            if (theirs !== undefined && value !== theirs) {
-                problems.push(
-                    `_headers: production's ${key} isn't vercel.json's (run --write)`,
                 )
             }
         }
@@ -821,29 +674,27 @@ function servedPolicyProblems({ policy, endpoints, environment }, build) {
 
 function main() {
     const root = fileURLToPath(new URL("..", import.meta.url))
-    const configPath = join(root, "vercel.json")
     const headersPath = join(root, "public/_headers")
     const builtHeadersPath = join(root, "dist/_headers")
     const html = readFileSync(join(root, "dist/index.html"), "utf8")
     const inline = inlineHashes(html)
     if (process.argv.includes("--write")) {
-        const text = readFileSync(configPath, "utf8")
-        writeFileSync(configPath, withPolicies(text, inline))
-        const production = rulesOf(
-            JSON.parse(readFileSync(configPath, "utf8")),
+        const text = readFileSync(headersPath, "utf8")
+        const [production] = cloudflareRulesOf(
+            parseHeadersFile(text).rules,
         ).production
-        const headers = withCloudflarePolicies(
-            readFileSync(headersPath, "utf8"),
-            {
-                policy: valueOf(production, CSP),
+        const policy = valueOf(production, CSP)
+        if (policy) {
+            const headers = withCloudflarePolicies(text, {
+                policy: withHashes(policy, inline),
                 endpoints: valueOf(production, ENDPOINTS),
-            },
-        )
-        writeFileSync(headersPath, headers)
-        writeFileSync(builtHeadersPath, headers)
-        console.log(
-            "Wrote index.html's hashes and the preview policy to vercel.json, and production's policy to public/_headers (and dist/).",
-        )
+            })
+            writeFileSync(headersPath, headers)
+            writeFileSync(builtHeadersPath, headers)
+            console.log(
+                "Wrote index.html's hashes to public/_headers (and dist/).",
+            )
+        }
     }
     const env = { ...loadEnv("production", root, "VITE_"), ...process.env }
     const { needs, skipped } = configuredOrigins(env)
@@ -856,29 +707,7 @@ function main() {
     }
     const problems = [...inline.problems, ...deployVariableProblems(env)]
 
-    // Vercel, until it is retired.
-    const config = JSON.parse(readFileSync(configPath, "utf8"))
-    problems.push(...headerProblems(config))
-    const production = rulesOf(config).production
-    const vercel = {
-        [CSP]: valueOf(production, CSP),
-        [ENDPOINTS]: valueOf(production, ENDPOINTS),
-    }
-    let directiveCount = 0
-    if (vercel[CSP]) {
-        const checked = servedPolicyProblems(
-            {
-                policy: vercel[CSP],
-                endpoints: vercel[ENDPOINTS],
-                environment: "production",
-            },
-            build,
-        )
-        directiveCount = checked.directives.size
-        problems.push(...checked.problems.map((p) => `vercel.json: ${p}`))
-    }
-
-    // Cloudflare: the file the build shipped, which must be public/_headers.
+    // The file the build shipped, which must be public/_headers.
     const source = readFileSync(headersPath, "utf8")
     let built = null
     try {
@@ -890,12 +719,13 @@ function main() {
         problems.push("dist/_headers isn't public/_headers (build again)")
     }
     const { rules, problems: syntax } = parseHeadersFile(built ?? source)
-    problems.push(...syntax, ...cloudflareHeaderProblems(rules, vercel))
+    problems.push(...syntax, ...cloudflareHeaderProblems(rules))
     const { common, production: hosts } = cloudflareRulesOf(rules)
     const served = [
         [hosts[0], "production", "_headers (production hosts)"],
         [common, "preview", "_headers (other hosts)"],
     ]
+    let directiveCount = 0
     for (const [rule, environment, where] of served) {
         const policy = rule && valueOf(rule, CSP)
         if (!policy) continue
@@ -903,11 +733,12 @@ function main() {
             { policy, endpoints: valueOf(rule, ENDPOINTS), environment },
             build,
         )
+        directiveCount ||= checked.directives.size
         problems.push(...checked.problems.map((p) => `${where}: ${p}`))
     }
 
     console.log(
-        `CSP: ${directiveCount} directives, ${inline.scripts.length} inline script and ${inline.styles.length} inline style hashes, ${needs.length} configured origins checked, in vercel.json and _headers (${rules.length} rules); preview policies match.` +
+        `CSP: ${directiveCount} directives, ${inline.scripts.length} inline script and ${inline.styles.length} inline style hashes, ${needs.length} configured origins checked, in _headers (${rules.length} rules).` +
             (skipped.length
                 ? ` Unset, not checked: ${skipped.join(", ")}.`
                 : ""),

@@ -100,7 +100,7 @@ export const PRECACHE_GLOBS = [
 
 /**
  * Where the build puts the lazy telemetry SDKs (Sentry, its tracing and
- * replay, PostHog, Speed Insights; `vite.config.ts`). They are never
+ * replay, PostHog, Cloudflare Web Analytics; `vite.config.ts`). They are never
  * precached: a device would download ~140 KB gzip of them on every deploy
  * for nothing, and offline they have nothing to send anyway (a failed
  * import is ignored). They are still hashed and cached as `immutable`.

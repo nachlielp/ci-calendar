@@ -50,7 +50,7 @@ export interface AppServices {
     /** New versions of the app from the service worker (`SafeUpdates`). */
     updates: AppUpdates
     /**
-     * Crash reports, analytics and Speed Insights (`app/telemetry`). Tests
+     * Crash reports and analytics (`app/telemetry`). Tests
      * get `NO_TELEMETRY` unless they pass `createTestTelemetry()`.
      */
     telemetry: Telemetry

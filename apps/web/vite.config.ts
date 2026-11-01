@@ -15,8 +15,8 @@ import {
 
 /**
  * The build version (`BUILD_VERSION` in src/app/buildVersion.ts): the commit
- * SHA for builds (as Vercel, Cloudflare Workers Builds, GitHub Actions or
- * git give it), `dev-<start time>` for the dev server. A new value marks
+ * SHA for builds (as Cloudflare Workers Builds, GitHub Actions or git give
+ * it), `dev-<start time>` for the dev server. A new value marks
  * the persisted query cache stale, and changes index.html and so the service
  * worker's precache list, which is how browsers notice a deploy.
  */
@@ -24,10 +24,7 @@ function buildVersion(command: "build" | "serve"): string {
     // Each dev server start counts as a new build.
     if (command === "serve") return `dev-${Date.now()}`
     const sha =
-        process.env.VERCEL_GIT_COMMIT_SHA ??
-        process.env.WORKERS_CI_COMMIT_SHA ??
-        process.env.GITHUB_SHA ??
-        gitSha()
+        process.env.WORKERS_CI_COMMIT_SHA ?? process.env.GITHUB_SHA ?? gitSha()
     // Without git (e.g. a source tarball), every build counts as new.
     return sha ? sha.slice(0, 12) : `build-${Date.now()}`
 }
@@ -72,7 +69,7 @@ function buildVersionMeta(version: string): Plugin {
  * `TELEMETRY_ASSETS`, which the service worker never precaches.
  */
 const TELEMETRY_MODULE =
-    /\/node_modules\/(@sentry|@sentry-internal|posthog-js|@vercel\/speed-insights)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|speedInsights|cloudflareAnalytics)\.ts$/
+    /\/node_modules\/(@sentry|@sentry-internal|posthog-js)\/|\/src\/app\/telemetry\/(sentry|sentryTracing|sentryReplay|posthog|cloudflareAnalytics)\.ts$/
 
 /** The HEIC converter, whose chunk goes to `HEIC_ASSETS` (never precached). */
 const HEIC_MODULE = /\/node_modules\/heic-to\//
@@ -134,14 +131,12 @@ export default defineConfig(({ command, mode }) => {
                     globPatterns: PRECACHE_GLOBS,
                     globIgnores: PRECACHE_IGNORES,
                     // index.html is cached with its headers (the CSP), so
-                    // a change to the headers (vercel.json's or
-                    // public/_headers) must update it too
+                    // a change to public/_headers must update it too
                     // (scripts/headers-revision.mjs; `check:sw` checks).
                     manifestTransforms: [
                         (entries) => ({
                             manifest: withHeadersRevision(
                                 entries,
-                                JSON.parse(readRootFile("vercel.json")),
                                 readRootFile("public/_headers"),
                             ),
                             warnings: [],

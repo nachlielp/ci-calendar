@@ -11,7 +11,7 @@
 // converter's (assets/heic/) must stay out of the precache and be served
 // immutable, and no source map may be left in dist/
 // (they would be public). index.html's revision must cover the headers
-// (vercel.json's and public/_headers), which the precache stores it with.
+// (public/_headers), which the precache stores it with.
 //
 // Usage (after `vite build`): node scripts/check-sw.mjs
 
@@ -79,48 +79,19 @@ export const TELEMETRY_DIR = "assets/telemetry"
 export const HEIC_DIR = "assets/heic"
 
 /**
- * The `vercel.json` header rule source (path-to-regexp, only `(.*)` groups
- * used) as a regular expression.
- */
-function sourcePattern(source) {
-    const escape = (part) => part.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")
-    return new RegExp(`^${source.split("(.*)").map(escape).join("(.*)")}$`)
-}
-
-/**
  * Problems with chunks kept out of the precache (`files` in `dir`, relative
  * to dist/; `what` names them): there must be some (else the build stopped
  * sorting them out), none may be precached, and each must be served
- * `immutable` by `vercelConfig` and Cloudflare's `_headers` (text).
+ * `immutable` by Cloudflare's `_headers` (text).
  */
-function notPrecachedProblems(
-    urls,
-    files,
-    vercelConfig,
-    cloudflareHeaders,
-    { dir, what },
-) {
+function notPrecachedProblems(urls, files, cloudflareHeaders, { dir, what }) {
     const problems = []
     if (files.length === 0) {
         problems.push(`no ${what} chunks in ${dir}/`)
     }
-    const immutable = (vercelConfig.headers ?? []).filter((rule) =>
-        rule.headers.some(
-            ({ key, value }) =>
-                key.toLowerCase() === "cache-control" &&
-                value.includes("immutable"),
-        ),
-    )
     for (const file of files) {
         if (urls.includes(file)) {
             problems.push(`${file} is ${what} and must not be precached`)
-        }
-        if (
-            !immutable.some((rule) =>
-                sourcePattern(rule.source).test(`/${file}`),
-            )
-        ) {
-            problems.push(`${file} is not served as immutable (vercel.json)`)
         }
         if (!cloudflareImmutable(cloudflareHeaders, `/${file}`)) {
             problems.push(`${file} is not served as immutable (_headers)`)
@@ -130,57 +101,33 @@ function notPrecachedProblems(
 }
 
 /** `notPrecachedProblems` for the telemetry SDKs' chunks. */
-export function telemetryProblems(
-    urls,
-    telemetryFiles,
-    vercelConfig,
-    cloudflareHeaders,
-) {
-    return notPrecachedProblems(
-        urls,
-        telemetryFiles,
-        vercelConfig,
-        cloudflareHeaders,
-        {
-            dir: TELEMETRY_DIR,
-            what: "telemetry",
-        },
-    )
+export function telemetryProblems(urls, telemetryFiles, cloudflareHeaders) {
+    return notPrecachedProblems(urls, telemetryFiles, cloudflareHeaders, {
+        dir: TELEMETRY_DIR,
+        what: "telemetry",
+    })
 }
 
 /** `notPrecachedProblems` for the HEIC converter's chunks. */
-export function heicProblems(urls, heicFiles, vercelConfig, cloudflareHeaders) {
-    return notPrecachedProblems(
-        urls,
-        heicFiles,
-        vercelConfig,
-        cloudflareHeaders,
-        {
-            dir: HEIC_DIR,
-            what: "HEIC",
-        },
-    )
+export function heicProblems(urls, heicFiles, cloudflareHeaders) {
+    return notPrecachedProblems(urls, heicFiles, cloudflareHeaders, {
+        dir: HEIC_DIR,
+        what: "HEIC",
+    })
 }
 
 /**
  * Problems with the shell's precache revision: it must carry the hash of
- * the header rules, `vercelConfig`'s and `cloudflareHeaders`
- * (scripts/headers-revision.mjs), or a deploy that changes only the
+ * the header rules, `cloudflareHeaders` (scripts/headers-revision.mjs), or a deploy that changes only the
  * headers (the CSP) keeps installed apps on the old ones, which the
  * precached index.html was stored with.
  */
-export function shellRevisionProblems(
-    swSource,
-    vercelConfig,
-    cloudflareHeaders,
-) {
+export function shellRevisionProblems(swSource, cloudflareHeaders) {
     const entry = [...swSource.matchAll(/\{[^{}]*\}/g)]
         .map(([object]) => object)
         .find((object) => object.includes(`"url":"${SHELL}"`))
     const revision = entry && /"revision":"([^"]+)"/.exec(entry)?.[1]
-    return revision?.endsWith(
-        `-h${headersRevision(vercelConfig, cloudflareHeaders)}`,
-    )
+    return revision?.endsWith(`-h${headersRevision(cloudflareHeaders)}`)
         ? []
         : [`${SHELL}'s precache revision doesn't cover the headers`]
 }
@@ -253,12 +200,6 @@ function main() {
             .map((file) => `${dir}/${file}`)
     const telemetryFiles = jsIn(TELEMETRY_DIR)
     const heicFiles = jsIn(HEIC_DIR)
-    const vercelConfig = JSON.parse(
-        readFileSync(
-            fileURLToPath(new URL("../vercel.json", import.meta.url)),
-            "utf8",
-        ),
-    )
     const cloudflareHeaders = readFileSync(
         fileURLToPath(new URL("../public/_headers", import.meta.url)),
         "utf8",
@@ -272,14 +213,9 @@ function main() {
     )
     const problems = [
         ...precacheProblems(urls, buildFiles),
-        ...telemetryProblems(
-            urls,
-            telemetryFiles,
-            vercelConfig,
-            cloudflareHeaders,
-        ),
-        ...heicProblems(urls, heicFiles, vercelConfig, cloudflareHeaders),
-        ...shellRevisionProblems(built, vercelConfig, cloudflareHeaders),
+        ...telemetryProblems(urls, telemetryFiles, cloudflareHeaders),
+        ...heicProblems(urls, heicFiles, cloudflareHeaders),
+        ...shellRevisionProblems(built, cloudflareHeaders),
         ...sourceProblems(source),
         ...builtProblems(built),
         ...sourceMapProblems(

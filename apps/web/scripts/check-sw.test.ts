@@ -100,9 +100,6 @@ describe("service worker check", () => {
     })
 })
 
-const vercel = JSON.parse(
-    readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
-)
 const cloudflare = readFileSync(
     join(process.cwd(), "public", "_headers"),
     "utf8",
@@ -113,25 +110,18 @@ const cloudflareUncached = cloudflare.replace(/^\/assets\/\*\n.*\n/m, "")
 describe("HEIC converter chunks", () => {
     const files = ["assets/heic/heic-to-AbC.js"]
 
-    it("pass when none is precached and both hosts serve them immutable", () => {
-        expect(heicProblems(["index.html"], files, vercel, cloudflare)).toEqual(
-            [],
-        )
+    it("pass when none is precached and they are served immutable", () => {
+        expect(heicProblems(["index.html"], files, cloudflare)).toEqual([])
     })
 
     it("fail when one is precached, isn't immutable, or the build put none there", () => {
-        expect(heicProblems([...files], files, vercel, cloudflare)).toEqual([
+        expect(heicProblems([...files], files, cloudflare)).toEqual([
             "assets/heic/heic-to-AbC.js is HEIC and must not be precached",
         ])
-        expect(
-            heicProblems([], files, { ...vercel, headers: [] }, cloudflare),
-        ).toEqual([
-            "assets/heic/heic-to-AbC.js is not served as immutable (vercel.json)",
-        ])
-        expect(heicProblems([], files, vercel, cloudflareUncached)).toEqual([
+        expect(heicProblems([], files, cloudflareUncached)).toEqual([
             "assets/heic/heic-to-AbC.js is not served as immutable (_headers)",
         ])
-        expect(heicProblems([], [], vercel, cloudflare)).toEqual([
+        expect(heicProblems([], [], cloudflare)).toEqual([
             "no HEIC chunks in assets/heic/",
         ])
     })
@@ -156,10 +146,8 @@ describe("telemetry chunks", () => {
         "assets/telemetry/posthog-DeF.js",
     ]
 
-    it("pass when none is precached and both hosts serve them immutable", () => {
-        expect(
-            telemetryProblems(["index.html"], files, vercel, cloudflare),
-        ).toEqual([])
+    it("pass when none is precached and they are served immutable", () => {
+        expect(telemetryProblems(["index.html"], files, cloudflare)).toEqual([])
     })
 
     it("fail when one is precached", () => {
@@ -167,7 +155,6 @@ describe("telemetry chunks", () => {
             telemetryProblems(
                 ["index.html", "assets/telemetry/posthog-DeF.js"],
                 files,
-                vercel,
                 cloudflare,
             ),
         ).toEqual([
@@ -176,23 +163,12 @@ describe("telemetry chunks", () => {
     })
 
     it("fail when they aren't served immutable, or the build put none there", () => {
-        const noHeaders = { ...vercel, headers: [] }
         expect(
-            telemetryProblems([], files.slice(0, 1), noHeaders, cloudflare),
-        ).toEqual([
-            "assets/telemetry/sentry-AbC.js is not served as immutable (vercel.json)",
-        ])
-        expect(
-            telemetryProblems(
-                [],
-                files.slice(0, 1),
-                vercel,
-                cloudflareUncached,
-            ),
+            telemetryProblems([], files.slice(0, 1), cloudflareUncached),
         ).toEqual([
             "assets/telemetry/sentry-AbC.js is not served as immutable (_headers)",
         ])
-        expect(telemetryProblems([], [], vercel, cloudflare)).toEqual([
+        expect(telemetryProblems([], [], cloudflare)).toEqual([
             "no telemetry chunks in assets/telemetry/",
         ])
     })
@@ -209,30 +185,20 @@ describe("telemetry chunks", () => {
         ])
     })
 
-    it("fails unless the shell's revision covers both hosts' headers", () => {
-        const headers = { headers: [{ source: "/(.*)", headers: [] }] }
-        const changed = {
-            headers: [{ source: "/(.*)", headers: [{ key: "X", value: "1" }] }],
-        }
+    it("fails unless the shell's revision covers the headers", () => {
         const entries = withHeadersRevision(
             [
                 { url: "index.html", revision: "a1" },
                 { url: "assets/x.js", revision: null },
             ],
-            headers,
             "/*\n  X: 1\n",
         )
         expect(entries[1]).toEqual({ url: "assets/x.js", revision: null })
         const built = `Ce(${JSON.stringify(entries)});`
-        expect(shellRevisionProblems(built, headers, "/*\n  X: 1\n")).toEqual(
-            [],
-        )
-        expect(shellRevisionProblems(built, changed, "/*\n  X: 1\n")).toEqual([
+        expect(shellRevisionProblems(built, "/*\n  X: 1\n")).toEqual([])
+        expect(shellRevisionProblems(built, "/*\n  X: 2\n")).toEqual([
             "index.html's precache revision doesn't cover the headers",
         ])
-        expect(shellRevisionProblems(built, headers, "/*\n  X: 2\n")).toEqual([
-            "index.html's precache revision doesn't cover the headers",
-        ])
-        expect(shellRevisionProblems(SW_SOURCE, headers, "")).toHaveLength(1)
+        expect(shellRevisionProblems(SW_SOURCE, "")).toHaveLength(1)
     })
 })

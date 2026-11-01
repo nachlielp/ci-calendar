@@ -26,7 +26,7 @@ the switch.
 | `src/app/header`              | App header, menu (items keyed by role)                                                                    |
 | `src/app/install`             | Install banner, `beforeinstallprompt` capture, iOS steps                                                  |
 | `src/app/updates`             | Service worker registration, safe reloads, the reload guard                                               |
-| `src/app/telemetry`           | Crash reports, analytics, Speed Insights; their lazy SDKs                                                 |
+| `src/app/telemetry`           | Crash reports, analytics, Web Analytics; their lazy SDKs                                                  |
 | `src/app/images`              | Photo cropper and canvas resize (`services.images`), lazy                                                 |
 | `src/sw/`                     | The service worker (`sw.ts`) and its cache rules                                                          |
 | `src/data/`                   | Backend clients, generated database types, Places and translation lookups                                 |
@@ -113,7 +113,7 @@ the switch.
 - **One build version.** `BUILD_VERSION` (`src/app/buildVersion.ts`) is
   read from `<meta name="build-version">`, which `buildVersionMeta` in
   `vite.config.ts` writes into `index.html`: the commit SHA for builds
-  (`VERCEL_GIT_COMMIT_SHA`, `GITHUB_SHA` or `git rev-parse`),
+  (`WORKERS_CI_COMMIT_SHA`, `GITHUB_SHA` or `git rev-parse`),
   `dev-<start time>` per dev server start. It is kept out of the JS, so a
   deploy changes only the chunks whose code changed (and the service worker
   downloads only those). Tests have no `index.html`; `renderApp` passes
@@ -261,9 +261,10 @@ the switch.
   rename it. Finding legacy caches at install, it takes over at once
   (legacy pages can't hand over) and, once active, reloads every open page
   (their legacy chunks are gone); otherwise a new version waits for the
-  page. `vercel.json` answers a missing `/assets/…` with a 404 (no rewrite
-  to `index.html`, so a stale chunk fails visibly) and serves `/assets/*`
-  as `immutable` for a year. The manifest stays `public/site.webmanifest`
+  page. `public/_headers` serves `/assets/*` as `immutable` for a year. A
+  missing `/assets/…` file gets the SPA shell (Cloudflare's SPA fallback),
+  which a module import refuses, so a stale chunk still fails visibly
+  ("Cloudflare hosting" below). The manifest stays `public/site.webmanifest`
   (the plugin emits none). The footer's reset (`resetDevice`) still
   unregisters it and clears Cache Storage; the next load registers it again.
 - **Updates and the reload guard.** `services.updates` (`AppUpdates`,
@@ -1312,13 +1313,13 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   button, so no key).
 - **Telemetry.** `services.telemetry` (`Telemetry`,
   `app/telemetry/telemetry.ts`) is the one boundary for Sentry, PostHog and
-  Vercel Speed Insights; nothing else imports their SDKs. main.tsx's first
+  Cloudflare Web Analytics; nothing else imports their SDKs. main.tsx's first
   import (`appTelemetry.ts`) creates it, so window `error` and
   `unhandledrejection` are captured from boot (React 19 hands render errors
   no boundary caught to the window too), and schedules Sentry's load after
   load and idle (`afterLoadAndIdle`) whether or not the app ever renders,
   so an error that stops the boot is still reported. `AppRoot` calls
-  `start(router)`: page views, PostHog and Speed Insights (loaded after the
+  `start(router)`: page views, PostHog and Web Analytics (loaded after the
   first paint), and the router for Sentry's tracing. Until an SDK loads,
   reports, page views and events are buffered (up to `BUFFER_LIMIT`, 50)
   and flushed on arrival with the original Error objects. An SDK that fails
@@ -1331,18 +1332,19 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
   environment `production` on ci-events.org, else `preview`. Who gets
   what: dev and tests send nothing (`import.meta.env.PROD`); errors go out
   from every production build with `VITE_SENTRY_DSN`; PostHog
-  (`VITE_PUBLIC_POSTHOG_KEY`, legacy's options and persistence name) and
-  Speed Insights only on the production host, and never on a device whose
-  storage has `isInternal` = `true`. Cloudflare Web Analytics
+  (`VITE_PUBLIC_POSTHOG_KEY`, legacy's options and persistence name) only
+  on the production host, and never on a device whose storage has
+  `isInternal` = `true`. Cloudflare Web Analytics
   (`cloudflareAnalytics.ts`, only when `VITE_CF_ANALYTICS_TOKEN` is set)
   follows PostHog's rules; its beacon can't edit what it sends, so it is
   not loaded on a page whose URL holds auth secrets, and once loaded it
   can't be stopped (marking the device internal keeps it off from the
-  next page load). Speed Insights stays until the app leaves Vercel and
-  goes in the DNS switch PR (docs/cloudflare.md). The SDK chunks are built into
-  `assets/telemetry/` (`chunkFileNames` in `vite.config.ts`) and never
-  precached (`PRECACHE_IGNORES`); `check:sw` fails if one is, or if
-  `vercel.json` stops serving them `immutable`.
+  next page load). Vercel Speed Insights was removed after the move to
+  Cloudflare (2026-11-01); Web Analytics took its place. The SDK chunks
+  are built into `assets/telemetry/` (`chunkFileNames` in
+  `vite.config.ts`) and never precached (`PRECACHE_IGNORES`); `check:sw`
+  fails if one is, or if `public/_headers` stops serving them
+  `immutable`.
     - **No secrets in URLs**: Supabase auth redirects carry tokens
       (`#access_token=…`, `?code=…`, `?token=…&type=…`). Every URL
       telemetry sends goes through `scrubUrl` (`app/telemetry/scrubUrl.ts`):
@@ -1352,7 +1354,8 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       breadcrumbs, streamed spans' names and attributes), its
       `ScrubReplayEvents` processor (replay events' URLs, which
       `beforeSend` never sees), replay recordings
-      (`beforeAddRecordingEvent`) and Speed Insights' `beforeSend`. Send
+      (`beforeAddRecordingEvent`). Web Analytics can't be scrubbed, so it
+      isn't loaded on such a page (above). Send
       a URL some other way and you scrub it too. Sentry 11 streams spans
       (no transactions, so no `beforeSendTransaction`) and collects
       everything it can unless told otherwise: `DATA_COLLECTION`
@@ -1367,8 +1370,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
     - **Tracking events**: `services.telemetry.track(name, properties)`
       (PostHog `capture`). Page views are automatic: one per history entry
       (legacy recorded `$pageview` with `$current_url` on every location
-      change, filters included), and Speed Insights reports under the route
-      pattern (`/event/[eventId]`, `routePattern`).
+      change, filters included).
     - **Users**: `bootSession` calls
       `services.telemetry.identify({ id, email })` once the session is known: Sentry `setUser` (as
       legacy) and PostHog `identify(id)` (new). Legacy left every visitor
@@ -1383,17 +1385,15 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       `saveIsInternalToLocalStorage` did, after the profile row loads
       `services.telemetry.setInternal(users.is_internal)` is called. It saves the
       `isInternal` key; marking a device internal stops PostHog
-      (`opt_out_capturing`, autocapture included) and Speed Insights at
-      once; unmarking takes effect from the next page load (wired in
+      (`opt_out_capturing`, autocapture included) at once; unmarking takes effect from the next page load (wired in
       `bootSession`, `forgetUser` and `profileQuery`).
 - **Production safety.** Never write to the production database or storage
   from scripts or the browser while developing. Read-only anon checks are
   fine. Schema changes go in `supabase/migrations/` as files and are applied
   by hand by the maintainer; nothing applies them automatically.
-- **Security headers and the CSP (#17).** (On Cloudflare the same
-  headers come from `public/_headers`: "Cloudflare hosting and the edge
-  cache" below. Everything here holds for both.) `vercel.json` serves every path
-  with a Content-Security-Policy, HSTS (two years, `includeSubDomains`, no
+- **Security headers and the CSP (#17).** `public/_headers` (Cloudflare's
+  header rules: "Cloudflare hosting and the edge cache" below) serves
+  every path with a Content-Security-Policy, HSTS (two years, `includeSubDomains`, no
   `preload`), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`
   (and `frame-ancestors 'none'`), `Referrer-Policy:
 strict-origin-when-cross-origin` and a Permissions-Policy that denies
@@ -1429,52 +1429,49 @@ strict-origin-when-cross-origin` and a Permissions-Policy that denies
     security endpoint for the DSN's project (`report-uri` plus `report-to`
     and its `Reporting-Endpoints` header), tagged `production` or
     `preview`; they show up in Sentry as CSP issues.
-    - **Production and previews**: the common headers go to every host;
-      the policy rule for production matches every host but
-      `*.vercel.app` (`missing` host `{ suf: ".vercel.app" }`), the
-      preview rule only those (`has`), so exactly one CSP is ever sent.
-      The preview policy is production's plus what Vercel's toolbar needs
-      (`vercel.live`, `vercel.com`, `assets.vercel.com`,
-      `wss://ws-us3.pusher.com`, `data:` images, `'unsafe-inline'` styles
-      instead of the style hash); `--write` makes it from production's and
-      the check fails on any other difference. Edit only the production
-      rule.
+    - **Production and previews**: every host gets the policy reporting
+      as `preview`; the production hosts replace it with the same policy
+      reporting as `production` ("Cloudflare hosting" below). `--write`
+      keeps them in step and the check fails on any other difference.
+      Until 2026-11-01 Vercel served the policy too, from `vercel.json`,
+      with extra sources for its toolbar on `*.vercel.app` previews; that
+      file is gone.
     - **Installed apps get header changes**: the service worker precaches
       index.html with the headers it was served with, so its precache
-      revision carries a hash of vercel.json's header rules
+      revision carries a hash of `public/_headers`
       (`scripts/headers-revision.mjs`, a `manifestTransforms` in
       vite.config.ts); `check:sw` fails if it doesn't. A deploy that
-      changes only vercel.json's headers still updates every PWA.
+      changes only the headers still updates every PWA.
     - **Adding an origin** (a script, a request, an image host, a frame, a
-      worker): add it to the narrowest directive in `vercel.json`, in the
-      table above, and, if it comes from the env, to
+      worker): add it to the narrowest directive of production's policy in
+      `public/_headers`, run `--write` (below) to copy it to the other
+      hosts, add it to the table above, and, if it comes from the env, to
       `configuredOrigins` in `scripts/check-headers.mjs`. Never add
       `'unsafe-inline'`/`'unsafe-eval'`, a bare `*`/`https:` or `data:` in
       `script-src` (the check fails). Prefer exact hosts; use a `*.`
       wildcard only where the vendor documents one.
     - **Changing index.html's inline script or `<style>`**: build, then
-      `node scripts/check-headers.mjs --write` updates the hashes (and the
-      preview policy); build again so the precache revision follows.
+      `node scripts/check-headers.mjs --write` updates the hashes in
+      `public/_headers` (on every host); build again so the precache
+      revision follows.
     - **The check** (`npm run check:headers`, run by `npm run build`, so
-      by Vercel builds and CI's build step): the headers exist with sane
+      by Workers Builds and CI's build step): the headers exist with sane
       values, the CSP parses and stays strict, its hashes are exactly the
-      built index.html's, the preview policy is production's plus the
-      toolbar's, reports go to the DSN's Sentry security endpoint, the
+      built index.html's, the preview policy is production's reporting as
+      `preview`, reports go to the DSN's Sentry security endpoint, the
       scripts index.html loads are allowed, any asset the build inlined as
       a `data:` URL (telemetry chunks included) is allowed (`img-src` has
       no `data:`), and the Supabase, Sentry and PostHog origins of the
       build's env are allowed (skipped when unset, as in CI).
-    - **Verifying**: serve `dist/` with vercel.json's headers and the SPA
-      rewrite (Vercel serves files first, then rewrites everything but
-      `/assets/`), and watch the console for `Content Security Policy`
-      errors. PostHog, GA and Speed Insights run only on
-      `www.ci-events.org`: map that host to the local server
-      (`--host-resolver-rules`), and answer the ingest requests locally so
-      no test data reaches them.
-      Previews (`*.vercel.app`, HSTS-preloaded) need local HTTPS (a
-      self-signed certificate, `--ignore-certificate-errors`). Point the
-      report URLs at the local server too: Chrome delivers reports about a
-      minute after the violation.
+    - **Verifying**: `npm run cf:dev` serves `dist/` with `_headers` and
+      the SPA fallback (it gets the preview policy); watch the console for
+      `Content Security Policy` errors. A `*.workers.dev` preview
+      (`npm run cf:preview`) checks the same on Cloudflare. PostHog, GA and
+      Web Analytics run only on `www.ci-events.org`: to test them locally,
+      map that host to the local server (`--host-resolver-rules`), and
+      answer the ingest requests locally so no test data reaches them.
+      Point the report URLs at the local server too: Chrome delivers
+      reports about a minute after the violation.
     - **Limits**: an allowlist policy is only as strong as its hosts. On
       an HTML injection, `https://www.googletagmanager.com` in
       `script-src` lets an attacker load any GTM container (theirs, with
@@ -1489,11 +1486,12 @@ strict-origin-when-cross-origin` and a Permissions-Policy that denies
 
 ## Cloudflare hosting and the edge cache (spec #37)
 
-The app is ready to move from Vercel to Cloudflare Workers, served from
-Cloudflare's Tel Aviv data centre (about 28 ms to the first byte from
-Israel, against about 220 ms from Vercel's Frankfurt). Until DNS moves,
-Vercel stays production and every change must keep working there: the same
-commit builds and runs on both. The deploy, variables, previews, custom
+The app runs on Cloudflare Workers (production since 2026-10-31), served
+from Cloudflare's Tel Aviv data centre (about 28 ms to the first byte from
+Israel, against about 220 ms from Vercel's Frankfurt, where it ran
+before). Vercel's last deployment is kept, untouched, as a manual rollback
+target; it predates the removal of `vercel.json` and Speed Insights
+(2026-11-01). The deploy, variables, previews, custom
 domains and rollback are in `docs/cloudflare.md`. Unlike spec #37, the
 repository stays one package for now: the monorepo move waits for the
 mobile app (#36).
@@ -1503,31 +1501,30 @@ mobile app (#36).
   (`not_found_handling: "single-page-application"`), and a Worker
   (`worker/index.ts`) that runs first only for `/api/*`
   (`run_worker_first`). Every other request is a static asset: no Worker
-  invocation, no cost. One difference from Vercel: a missing `/assets/…`
+  invocation, no cost. Unlike on Vercel, a missing `/assets/…`
   or `/.well-known/…` file gets the SPA shell (200 HTML, with the
   `/assets/*` immutable header) instead of a 404. A stale chunk still
   fails to import (a module served as `text/html` is refused, under
   `nosniff`), so the app's stale-chunk handling is the same.
 - **Headers.** `public/_headers`, which the build copies to
-  `dist/_headers`, carries vercel.json's headers. Cloudflare's file can
+  `dist/_headers`, is the only source of the headers. Cloudflare's file can
   only match URLs, but a URL may name a host, so: every path (`/*`) gets
   the security headers and the CSP reporting to Sentry as `preview` (on
   every host: `*.workers.dev` previews, `wrangler dev`); the production
   hosts (`https://www.ci-events.org/*`, `https://ci-events.org/*`)
   detach those two headers (`! Content-Security-Policy`, or both values
-  would be sent, joined) and set production's policy, which is
-  vercel.json's exactly. No Worker is needed for headers. There are no
-  Vercel toolbar sources on previews (there is no toolbar). `/assets/*`
+  would be sent, joined) and set production's policy: the same, reporting
+  as `production`. No Worker is needed for headers. `/assets/*`
   is cached a year, immutable; index.html and sw.js keep Cloudflare's
   default (`max-age=0, must-revalidate`). Headers in `_headers` apply to
   static assets only; the Worker sets its own. `check:headers` checks the
   file (Cloudflare's syntax and limits: 100 rules, 2,000 characters a
-  line) and runs every policy in it through the same checks as
-  vercel.json's; `--write` updates both files; the precached shell's
-  revision covers both (`headers-revision.mjs`), and `check:sw` checks
-  the out-of-precache chunks are immutable on both hosts. While Vercel is
-  kept, edit the CSP in vercel.json and run `--write`; when Vercel is
-  retired, `_headers` becomes the only copy.
+  line) and runs every policy in it through the checks above; `--write`
+  updates the hashes in production's policy and copies it, reporting as
+  `preview`, to `/*`; the precached shell's revision covers the file
+  (`headers-revision.mjs`), and `check:sw` checks the out-of-precache
+  chunks are immutable. Edit the CSP on the production hosts' rule and
+  run `--write`.
 - **The edge-cached public window.** `GET /api/public-window`
   (`worker/publicWindow.ts`) answers `{ start, end, rows }`: the window's
   first and last day (today in Asia/Jerusalem through `WINDOW_DAYS`, the
@@ -1566,19 +1563,17 @@ mobile app (#36).
   direct select (`directPublicFeed`, with the token at hand, as before) on
   any error: an error status, no network, a body that isn't a window
   (`parsePublicWindowRows`), or no answer within 3 s (`EDGE_TIMEOUT_MS`).
-  On Vercel there is no Worker: the path is the SPA shell (200 HTML), not
-  a window, so it falls back. That costs a same-origin round trip before
-  the Supabase read on every cold start on Vercel, which is why the switch
-  should follow this soon. Single-event lookups and every personal or
+  Where no Worker answers (the old Vercel deployment), the path is the SPA
+  shell (200 HTML), not a window, so it falls back, at the cost of a
+  same-origin round trip before the Supabase read. Single-event lookups and every personal or
   admin query still go to Supabase directly. Tests read the fake's data
   through the same select (`directPublicFeed`), or pass `renderApp({ edge
 })` (Tests).
 
 ## Maintainer notes
 
-- **Toolchain: Node 22** (`.nvmrc` 22 for CI, `engines` `22.x` for
-  Vercel, which overrides the dashboard's Node.js setting; Vitest 5 needs
-  22.12+). Move both together. `vite.config.ts` is typechecked
+- **Toolchain: Node 22** (`.nvmrc` 22 for CI and Workers Builds,
+  `engines` `22.x`; Vitest 5 needs 22.12+). Move both together. `vite.config.ts` is typechecked
   (`tsconfig.node.json`). Source maps are made only when
   `SENTRY_AUTH_TOKEN` is set, and the Sentry plugin deletes them after
   upload; `check:sw` fails if any is left in `dist/`.
@@ -1607,10 +1602,10 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
   own folder only; apply it by hand. Until then the page tells them the
   photo can't be uploaded and saves the rest.
 - **The CSP (Rules, "Security headers and the CSP"): what to check.**
-  The builds' env must match `vercel.json`: `npm run build` fails on
-  Vercel if a preview or production env points at another Supabase
-  project, Sentry DSN or PostHog host than the CSP allows (add it, or
-  give previews the same values). Address suggestions were never seen
+  The builds' env must match `public/_headers`: `npm run build` fails on
+  Workers Builds if a preview or production env points at another
+  Supabase project, Sentry DSN or PostHog host than the CSP allows (add
+  it, or give previews the same values). Address suggestions were never seen
   under the CSP: the local `.env` Places key is invalid
   (`InvalidKeyMapError`), so Google's scripts loaded but no prediction
   came back; after the first deploy, type an address in a form and check
@@ -1620,11 +1615,9 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
   pixel); turning Signals off would let those sources go. PostHog's
   session recording and surveys are off; turning surveys on may need
   `style-src` for its injected styles (check the console; Sentry's CSP
-  issues will show it too). The host conditions (`has`/`missing` host
-  `suf`) were checked against a local imitation of Vercel's rules: on the
-  first preview, check that `vercel.live` loads and that production's
-  response carries one `Content-Security-Policy`. Previews on a custom
-  alias domain get production's policy (no toolbar). HSTS has no `preload`: submitting ci-events.org to
+  issues will show it too). Production's response must carry one
+  `Content-Security-Policy` (the `!` detach lines in `_headers`); check it
+  after changing the file. HSTS has no `preload`: submitting ci-events.org to
   hstspreload.org (and adding `preload`) commits every subdomain to
   HTTPS for good, so it is the owner's call.
 
@@ -1783,9 +1776,9 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
   `sinks = createTestTelemetry(options)` (`production`, `productionSite`,
   `storage`, `blocked`)
   (`src/test/fakeTelemetry.ts`) runs the real `createTelemetry` with
-  in-memory Sentry/PostHog/Speed Insights; they "load" when the test calls
+  in-memory Sentry/PostHog/Web Analytics; they "load" when the test calls
   `await sinks.arrive()`, then `errors`, `pageViews`, `events`,
-  `speedRoutes`, `tracedRouters` and `loaded` show what was sent;
+  `tracedRouters` and `loaded` show what was sent;
   `blocked: ["posthog"]` makes an SDK fail to load as Vite reports it.
   Without it, tests get
   `NO_TELEMETRY`. Nothing reaches the network.
@@ -2083,3 +2076,11 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
     (`GET /api/public-window`) and `services.publicFeed` with its direct
     fallback, Cloudflare Web Analytics behind `VITE_CF_ANALYTICS_TOKEN`,
     and `docs/cloudflare.md`. `/` stays 135.3 KB gzip.
+25. Vercel leftovers removed (after the switch to Cloudflare on
+    2026-10-31): `@vercel/speed-insights` and its sink are gone, and
+    `vercel.json` is deleted, so `public/_headers` is the only header
+    source. `check-headers --write` updates the hashes in `_headers`
+    itself, the `*.vercel.app` preview policy and toolbar sources are
+    gone, and the shell's precache revision hashes `_headers` only. The
+    production headers didn't change. Vercel's last deployment, kept as
+    the rollback target, predates this.

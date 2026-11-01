@@ -5,7 +5,7 @@ import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
 import { createMemoryStorage } from "../deviceStorage"
 import { RouteError } from "../RootLayout"
-import { BUFFER_LIMIT, routePattern } from "./telemetry"
+import { BUFFER_LIMIT } from "./telemetry"
 
 const ORIGIN = window.location.origin
 
@@ -262,24 +262,6 @@ describe("analytics", () => {
         expect(sinks.pageViews).toEqual([`${ORIGIN}/`, `${ORIGIN}/about`])
     })
 
-    it("report speed under the route's pattern, not each event's link", async () => {
-        const sinks = createTestTelemetry()
-        const { router } = renderApp({
-            telemetry: sinks.telemetry,
-            path: "/about",
-        })
-        await sinks.arrive()
-
-        await act(() =>
-            router.navigate("/event/0b7e2b4e-55a5-4b47-8b5f-1d0d5c3e9a11"),
-        )
-        // No such event in the backend.
-        await screen.findByRole("heading", { name: "הדף לא נמצא" })
-        await act(() => router.navigate("/"))
-
-        expect(sinks.speedRoutes).toEqual(["/about", "/event/[eventId]", "/"])
-    })
-
     it("load Cloudflare Web Analytics after the first paint on the production site", async () => {
         const sinks = createTestTelemetry()
         renderApp({ telemetry: sinks.telemetry })
@@ -343,7 +325,6 @@ describe("analytics", () => {
         expect(sinks.posthogCalls).toEqual(["optOut"])
         expect(sinks.pageViews).toEqual([`${ORIGIN}/`])
         expect(sinks.events).toEqual([])
-        expect(sinks.speedRoutes).toEqual(["/", "stopped"])
     })
 
     it("keep auth secrets out of page views", async () => {
@@ -366,19 +347,5 @@ describe("analytics", () => {
 
         expect(sinks.loaded).toEqual(["sentry"])
         expect(sinks.pageViews).toEqual([])
-    })
-})
-
-describe("routePattern", () => {
-    it("names routes the way Vercel groups them", () => {
-        const match = (...paths: (string | undefined)[]) =>
-            routePattern(paths.map((path) => ({ route: { path } })))
-        expect(match(undefined, undefined)).toBe("/")
-        expect(match(undefined, undefined, "event/:eventId")).toBe(
-            "/event/[eventId]",
-        )
-        expect(match(undefined, undefined, ":eventId")).toBe("/[eventId]")
-        expect(match(undefined, "about")).toBe("/about")
-        expect(match(undefined, "*")).toBe("/[...path]")
     })
 })

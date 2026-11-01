@@ -18,16 +18,13 @@ export interface TestTelemetryOptions {
      * SDKs whose file fails to load (an ad blocker), as Vite reports it:
      * `vite:preloadError`, then a rejected import.
      */
-    blocked?: (
-        "sentry" | "posthog" | "speed-insights" | "cloudflare-analytics"
-    )[]
+    blocked?: ("sentry" | "posthog" | "cloudflare-analytics")[]
 }
 
 /**
  * The app's real telemetry (`createTelemetry`) with in-memory stand-ins for
- * Sentry, PostHog, Speed Insights and Cloudflare Web Analytics: nothing
- * leaves the test. The SDKs
- * "load" only when the test calls `arrive()`, so it can act before and
+ * Sentry, PostHog and Cloudflare Web Analytics: nothing leaves the test.
+ * The SDKs "load" only when the test calls `arrive()`, so it can act before and
  * after. `loaded` lists which SDKs the app asked for at all.
  */
 export function createTestTelemetry({
@@ -41,7 +38,6 @@ export function createTestTelemetry({
     const pageViews: string[] = []
     const events: { event: string; properties?: object }[] = []
     const posthogCalls: string[] = []
-    const speedRoutes: string[] = []
     const loaded: string[] = []
     const tracedRouters: unknown[] = []
 
@@ -92,11 +88,6 @@ export function createTestTelemetry({
                 optOut: () => posthogCalls.push("optOut"),
             }),
         loadWebAnalytics: () => load("cloudflare-analytics", undefined),
-        loadSpeed: () =>
-            load("speed-insights", {
-                setRoute: (route: string) => speedRoutes.push(route),
-                stop: () => speedRoutes.push("stopped"),
-            }),
     })
     onTestFinished(() => telemetry.dispose())
 
@@ -107,7 +98,6 @@ export function createTestTelemetry({
         pageViews,
         events,
         posthogCalls,
-        speedRoutes,
         loaded,
         tracedRouters,
         /** The SDKs finish loading; resolves once they've been flushed. */

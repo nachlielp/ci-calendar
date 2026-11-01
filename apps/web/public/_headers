@@ -1,9 +1,9 @@
 # Cloudflare static-asset headers (wrangler.jsonc; docs/cloudflare.md). The
 # build copies this file to dist/_headers. Headers apply to static assets only:
 # the Worker (/api/*) sets its own. `node scripts/check-headers.mjs` checks it
-# after `vite build`; `--write` sets production's policy from vercel.json's
-# (with index.html's hashes) on the production hosts and, reporting to Sentry
-# as preview, on every other host (*.workers.dev previews, wrangler dev).
+# after `vite build`; `--write` puts index.html's inline hashes in production's
+# policy and copies that policy, reporting to Sentry as preview, to every
+# other host (*.workers.dev previews, wrangler dev).
 
 # Every path, every host.
 /*
