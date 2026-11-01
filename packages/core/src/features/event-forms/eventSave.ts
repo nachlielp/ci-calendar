@@ -200,7 +200,8 @@ function managed(row: ManagedEventRow, tagged: Junction = []): ManagedEvent {
  * Creates an event of the user's, or a recurring series of them in one
  * insert (the title and address looked up once for all). Sent again (a
  * retry after a lost answer), the same ids find the stored events instead
- * of a second copy, and a series' days added since are inserted then.
+ * of a second copy, and a series' days added since are inserted then. The
+ * app puts the stored events in every cached list (`applyEventChanges`).
  */
 export async function createEvents(
     services: CoreServices,

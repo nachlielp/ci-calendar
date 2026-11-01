@@ -130,7 +130,8 @@ export async function createTemplate(
 /**
  * Updates one of the user's templates with the changed columns (legacy
  * `updateTemplate`), only while it is still theirs; gone, it fails with
- * `TemplateGoneError` and the list is refetched.
+ * `TemplateGoneError` and the list is refetched. The app caches the saved
+ * one (`cacheTemplate`).
  */
 export async function updateTemplate(
     services: CoreServices,
@@ -169,14 +170,14 @@ export interface TemplateDelete {
 }
 
 /**
- * Deletes one of the user's templates (legacy `deleteTemplate`) and takes
- * it out of the cached list. Legacy's foreign key
+ * Deletes one of the user's templates (legacy `deleteTemplate`); the app
+ * then takes it out of the cached list and refreshes the event lists.
+ * Legacy's foreign key
  * (`ci_events.source_template_id`) deleted every event made from the
  * template with it; now the events are kept unless the user chooses to
  * delete the upcoming ones. The kept events are unlinked from the template
  * first, so they stay whatever the key's delete rule (cascade until the
- * migration making it `set null` is applied). Every event list is
- * refreshed: those on screen refetch, the rest when next shown.
+ * migration making it `set null` is applied).
  */
 export async function deleteTemplate(
     services: CoreServices,

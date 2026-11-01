@@ -209,9 +209,9 @@ const ownOpenRequest =
         whereOpen(query.eq("user_id", userId))
 
 /**
- * Sends a new role request (legacy `UserRequestVM.createRequest`'s row)
- * and adds the stored request to the cached list: no refetch. As legacy,
- * not while the user has an open one. Sent again (a retry after a lost
+ * Sends a new role request (legacy `UserRequestVM.createRequest`'s row);
+ * the app adds the stored request to the cached list (`cacheRequest`): no
+ * refetch. As legacy, not while the user has an open one. Sent again (a retry after a lost
  * answer), the same id finds the stored request instead of a second one.
  */
 export async function createRequest(
@@ -263,7 +263,8 @@ export async function createRequest(
 /**
  * Edits the user's open request: only the type, phone and message, and
  * only while it is open (else `RequestClosedError`, and the list is
- * refetched). The stored request goes into the cached list.
+ * refetched by `onWriteError`). The app puts the stored request in the
+ * cached list (`cacheRequest`).
  */
 export async function editRequest(
     services: CoreServices,
