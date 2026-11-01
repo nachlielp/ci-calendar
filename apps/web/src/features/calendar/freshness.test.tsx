@@ -7,7 +7,8 @@ import {
 import { setPageVisibility } from "../../test/browser"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp, type RenderAppOptions } from "../../test/renderApp"
-import { event, eventTitles } from "../../test/testEvents"
+import { eventTitles } from "../../test/testEvents"
+import { event } from "@ci-calendar/core/testing/testEvents"
 
 // "Today" in these tests is Friday 2026-10-30 in Asia/Jerusalem.
 const NOW = new Date("2026-10-30T09:00:00Z")

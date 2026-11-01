@@ -5,10 +5,15 @@ import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { setPageVisibility } from "../../test/browser"
 import { createFakeDataClient } from "../../test/fakeDataClient"
-import { fakeTranslation } from "../../test/fakeFunctions"
+import { fakeTranslation } from "@ci-calendar/core/testing/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
-import { testUser, userRow, type TestUser } from "../../test/testUsers"
-import { event, eventTitles } from "../../test/testEvents"
+import {
+    testUser,
+    userRow,
+    type TestUser,
+} from "@ci-calendar/core/testing/testUsers"
+import { eventTitles } from "../../test/testEvents"
+import { event } from "@ci-calendar/core/testing/testEvents"
 import { MANAGED_EVENT_COLUMNS } from "@ci-calendar/core/features/events/managedEvent"
 import {
     ADMIN_EVENTS_PAGE_SIZE,

@@ -16,8 +16,8 @@ import {
     edgePublicFeed,
 } from "@ci-calendar/core/features/calendar/publicFeed"
 import { createFakeDataClient, type FakeDataClient } from "./fakeDataClient"
-import type { FakeEdge } from "./fakeEdge"
-import { userRow, type TestUser } from "./testUsers"
+import type { FakeEdge } from "@ci-calendar/core/testing/fakeEdge"
+import { userRow, type TestUser } from "@ci-calendar/core/testing/testUsers"
 
 export interface RenderAppOptions {
     path?: string

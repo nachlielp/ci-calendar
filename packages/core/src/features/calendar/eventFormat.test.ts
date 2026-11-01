@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { toEventCards } from "@ci-calendar/core/features/calendar/eventCards"
+import { toEventCards } from "./eventCards"
 import {
     dayLabel,
     eventDateLabel,
@@ -13,13 +13,9 @@ import {
     segmentTimeRange,
     teacherNames,
     typeLabels,
-} from "@ci-calendar/core/features/calendar/eventFormat"
-import {
-    ENGLISH,
-    HEBREW,
-    RUSSIAN,
-} from "@ci-calendar/core/features/calendar/eventLocales"
-import { publicEvent } from "../../test/testEvents"
+} from "./eventFormat"
+import { ENGLISH, HEBREW, RUSSIAN } from "./eventLocales"
+import { publicEvent } from "../../testing/testEvents"
 
 const multiDay = publicEvent({
     startDate: "2026-11-06",

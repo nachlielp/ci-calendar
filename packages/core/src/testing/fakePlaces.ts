@@ -1,8 +1,4 @@
-import type {
-    PlaceSuggestion,
-    PlacesApi,
-    PlacesLoader,
-} from "@ci-calendar/core/data/places"
+import type { PlaceSuggestion, PlacesApi, PlacesLoader } from "../data/places"
 
 // The fake's Google Places (`createFakeDataClient().places`, passed as
 // `services.places`): seeded places, suggested when their label contains

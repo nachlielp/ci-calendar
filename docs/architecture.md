@@ -50,7 +50,7 @@ the switch.
 | `src/ui/`                     | Shared presentational primitives (dialog, buttons, icons, the query list shell)                           |
 | `src/ui/form`                 | Form fields, chips, switch, alert and buttons (`fields.tsx`)                                              |
 | `src/pages/`                  | Simple pages (about, legal, 404) that belong to no feature                                                |
-| `src/test/`                   | The fake backend, `renderApp`, test data (`testEvents.ts`), the realtime guard                            |
+| `src/test/`                   | `renderApp`, the web's fakes and browser conditions (the shared fake backend: the core's `src/testing/`)  |
 | `src/assets/`                 | Images, logos and the subset font ported from legacy                                                      |
 | `worker/`                     | The Cloudflare Worker (`/api/*`): the edge-cached public window (spec #37)                                |
 
@@ -1731,10 +1731,23 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
 
 Behaviour tests render the real app with `renderApp()` from `src/test/` and a
 seeded fake backend. They assert what the user sees and what was requested of
-the backend, never cache keys or hook calls. Pure logic in the core's `lib/` and
-feature helpers is tested directly. Test-only helpers live in `src/test/`
-(e.g. `testEvents.ts`: event and bio rows to seed, and the calendar's
-titles and cards), never in a feature folder.
+the backend, never cache keys or hook calls. The core's modules (queries,
+saves, cache rules, pure logic) are tested directly, in the core, on Node.
+Test-only helpers never live in a feature folder:
+
+- **The fake backend kit is shared**, in the core's `src/testing/`
+  (`@ci-calendar/core/testing/<module>`): `fakeDataClient` (the tiny
+  PostgREST), `fakeAuth`, `fakeRpc`, `fakeFunctions`, `fakeFiles`,
+  `fakePlaces`, `fakeEdge`, `testUsers` and `testEvents` (rows and events
+  to seed). It never imports a test runner (the mobile app will run it
+  under Jest) and is checked with Node's types. Its own tests
+  (`fakeDataClient.test.ts`) pin the filters every query relies on.
+- **The web's own** stay in `src/test/`: `renderApp`, `setup.ts`, the
+  browser conditions, `fakeImages`, `fakeUpdates`, `fakeTelemetry`, the
+  realtime guard, and `testEvents.ts`'s screen helpers (the calendar's
+  titles and cards). `src/test/fakeDataClient.ts` is the core's fake plus
+  the web's `images`, so `createFakeDataClient()` there gives a web test
+  everything `renderApp` needs.
 
 - **No realtime:** `setup.ts` puts `ForbiddenWebSocket`
   (`test/realtimeGuard.ts`) in place of `WebSocket`: constructing one
@@ -1774,7 +1787,7 @@ titles and cards), never in a feature folder.
   and fires Chrome's install offer (`offerInstall`). `setup.ts` resets them
   after each test.
   `vi.stubEnv` (e.g. `VITE_HIDE_EVENTS_FLAG`) lasts one test.
-- **Auth:** `fake.auth` (`src/test/fakeAuth.ts`) is the fake's Supabase
+- **Auth:** `fake.auth` (`@ci-calendar/core/testing/fakeAuth`) is the fake's Supabase
   auth: accounts (`fake.auth.accounts`), a session with tokens
   (`token-<user id>-<n>`), every call that would reach the auth server in
   `fake.auth.calls` (refresh, sign-in, sign-up, reset, update, sign-out),
@@ -1784,7 +1797,7 @@ titles and cards), never in a feature folder.
   before boot. `fake.beforeExecute(fn)` runs before each request is
   answered (another tab writing first); inserts of an existing `id` fail
   with `23505`; `update` applies to the filtered rows. `renderApp({ signedInAs: testUser(role) })`
-  (`src/test/testUsers.ts`) boots with that session stored and seeds the
+  (`@ci-calendar/core/testing/testUsers`) boots with that session stored and seeds the
   `users` row (`userRow`); add `tokenExpired: true` to need a refresh
   first. Each recorded data request has the `token` it was sent with (`null`
   = anon key), its `method` and, for inserts, the `body`;
@@ -1812,7 +1825,7 @@ titles and cards), never in a feature folder.
   (recorded as `rows`, not `body`), each given an `id` if it has none.
   Translations are remembered per session; `setup.ts` forgets them after
   each test.
-- **Database functions and counts:** `fake.rpc` (`src/test/fakeRpc.ts`,
+- **Database functions and counts:** `fake.rpc` (`@ci-calendar/core/testing/fakeRpc`,
   the client's `rpc(name, args)`) records `calls` (name, args, token);
   `assign_user_role` behaves as its migration (admin callers only, by
   `user_roles` role 1 or a `users` row of type admin; writes the three
@@ -1855,7 +1868,7 @@ handler)` adds a function, `fail(name, { message, code })` / `heal`
   Without it, tests get
   `NO_TELEMETRY`. Nothing reaches the network.
 - **The edge:** `renderApp({ edge: createFakeEdge(backend, now) })`
-  (`src/test/fakeEdge.ts`) reads the window from a fake
+  (`@ci-calendar/core/testing/fakeEdge`) reads the window from a fake
   `/api/public-window` answered from `backend`, a fake data client of its
   own (seed it apart from `fake` to tell where the events came from), put
   through the same select; `edge.answer(…)` makes it fail each way the

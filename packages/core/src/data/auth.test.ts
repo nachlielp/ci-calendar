@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
-import { createAuth } from "@ci-calendar/core/data/auth"
-import { authStorageKey } from "@ci-calendar/core/data/authSession"
-import { createDataClient } from "@ci-calendar/core/data/client"
+import { createMemoryStorage } from "../app/deviceStorage"
+import { createAuth, type StorageEvents } from "./auth"
+import { authStorageKey } from "./authSession"
+import { createDataClient } from "./client"
 
 // The real auth seam and data client, with the network stubbed: they read
 // legacy's stored session, load auth-js only when needed, and put the right
@@ -98,7 +98,7 @@ describe("auth storage", () => {
 
     it("follows other tabs signing in and out, without auth-js", () => {
         const storage = createMemoryStorage()
-        const target = new EventTarget() as unknown as Window
+        const target = new EventTarget()
         const loadClient = vi.fn()
         const auth = createAuth({
             supabaseUrl: URL,
@@ -106,13 +106,13 @@ describe("auth storage", () => {
             storage,
             hash: "",
             nowMs: now,
-            target,
+            target: target as unknown as StorageEvents,
             loadClient,
         })
         const changes = vi.fn()
         auth.subscribe(changes)
         const otherTab = (key: string | null) =>
-            target.dispatchEvent(new StorageEvent("storage", { key }))
+            target.dispatchEvent(Object.assign(new Event("storage"), { key }))
 
         storage.setItem(KEY, storedSession())
         otherTab(KEY)
@@ -145,16 +145,17 @@ describe("auth redirects", () => {
         const storage = createMemoryStorage()
         storage.setItem(KEY, storedSession())
         const token = jwt(Math.floor(Date.now() / 1000) + 3600)
-        const fetch = vi.fn(async (input: RequestInfo | URL) =>
-            String(input).endsWith("/auth/v1/user")
-                ? Response.json({
-                      id: "u2",
-                      aud: "authenticated",
-                      email: "noa@example.com",
-                      app_metadata: { provider: "email" },
-                      user_metadata: {},
-                  })
-                : new Response("{}", { status: 404 }),
+        const fetch = vi.fn(
+            async (input: Parameters<typeof globalThis.fetch>[0]) =>
+                String(input).endsWith("/auth/v1/user")
+                    ? Response.json({
+                          id: "u2",
+                          aud: "authenticated",
+                          email: "noa@example.com",
+                          app_metadata: { provider: "email" },
+                          user_metadata: {},
+                      })
+                    : new Response("{}", { status: 404 }),
         )
         vi.stubGlobal("fetch", fetch)
         const clearHash = vi.fn()
@@ -248,20 +249,22 @@ describe("ready()", () => {
     it("refreshes an expired token through auth-js, keeping legacy's format", async () => {
         const storage = createMemoryStorage()
         storage.setItem(KEY, storedSession(Math.floor(Date.now() / 1000) - 60))
-        const fetch = vi.fn(async (input: RequestInfo | URL) => {
-            const url = String(input)
-            if (url.includes("/auth/v1/token?grant_type=refresh_token")) {
-                return Response.json({
-                    access_token: "fresh-token",
-                    token_type: "bearer",
-                    expires_in: 3600,
-                    expires_at: Math.floor(Date.now() / 1000) + 3600,
-                    refresh_token: "fresh-refresh",
-                    user: JSON.parse(storedSession()).user,
-                })
-            }
-            return new Response("{}", { status: 404 })
-        })
+        const fetch = vi.fn(
+            async (input: Parameters<typeof globalThis.fetch>[0]) => {
+                const url = String(input)
+                if (url.includes("/auth/v1/token?grant_type=refresh_token")) {
+                    return Response.json({
+                        access_token: "fresh-token",
+                        token_type: "bearer",
+                        expires_in: 3600,
+                        expires_at: Math.floor(Date.now() / 1000) + 3600,
+                        refresh_token: "fresh-refresh",
+                        user: JSON.parse(storedSession()).user,
+                    })
+                }
+                return new Response("{}", { status: 404 })
+            },
+        )
         vi.stubGlobal("fetch", fetch)
         const auth = createAuth({
             supabaseUrl: URL,

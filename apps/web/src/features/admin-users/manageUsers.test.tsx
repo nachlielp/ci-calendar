@@ -7,7 +7,7 @@ import { setPageVisibility } from "../../test/browser"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
 import { renderApp } from "../../test/renderApp"
-import { testUser } from "../../test/testUsers"
+import { testUser } from "@ci-calendar/core/testing/testUsers"
 import { afterNewest } from "@ci-calendar/core/features/admin/adminLists"
 import {
     ADMIN_USER_COLUMNS,

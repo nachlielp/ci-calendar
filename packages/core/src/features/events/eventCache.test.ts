@@ -3,32 +3,28 @@ import {
     QueryClient,
     type InfiniteData,
     type QueryKey,
-} from "@tanstack/react-query"
-import { waitFor } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
-import { adminEventsKey } from "@ci-calendar/core/features/admin-events/adminEvents"
-import { LINKED_EVENT_KIND } from "@ci-calendar/core/features/calendar/linkedEvent"
-import {
-    PUBLIC_WINDOW_KIND,
-    type PublicWindow,
-} from "@ci-calendar/core/features/calendar/publicWindow"
-import type { PublicBio } from "@ci-calendar/core/features/calendar/publicEvent"
-import { publicEvent } from "../../test/testEvents"
+} from "@tanstack/query-core"
+import { describe, expect, it, vi } from "vitest"
+import { adminEventsKey } from "../admin-events/adminEvents"
+import { LINKED_EVENT_KIND } from "../calendar/linkedEvent"
+import { PUBLIC_WINDOW_KIND, type PublicWindow } from "../calendar/publicWindow"
+import type { PublicBio } from "../calendar/publicEvent"
+import { publicEvent } from "../../testing/testEvents"
 // Registers the my-events lists.
-import "@ci-calendar/core/features/manage-events/myEvents"
-import type { PastPage } from "@ci-calendar/core/features/manage-events/myEvents"
+import "../manage-events/myEvents"
+import type { PastPage } from "../manage-events/myEvents"
 import {
     applyBioChange,
     applyEventChanges,
     refreshEventQueries,
     type EventPage,
-} from "@ci-calendar/core/features/events/eventCache"
+} from "./eventCache"
 import {
     myPastEventsKey,
     myUpcomingEventsKey,
     type EventCursor,
-} from "@ci-calendar/core/features/events/eventLists"
-import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
+} from "./eventLists"
+import type { ManagedEvent } from "./managedEvent"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 const OWNER = "owner"
@@ -429,7 +425,7 @@ describe.each([
             },
         })
         const unsubscribe = observer.subscribe(() => {})
-        await waitFor(() =>
+        await vi.waitFor(() =>
             expect(observer.getCurrentResult().data).toBeDefined(),
         )
         await observer.fetchNextPage()
@@ -443,7 +439,7 @@ describe.each([
             return release
         }
         const idle = () =>
-            waitFor(() =>
+            vi.waitFor(() =>
                 expect(queryClient.getQueryState(queryKey)?.fetchStatus).toBe(
                     "idle",
                 ),
