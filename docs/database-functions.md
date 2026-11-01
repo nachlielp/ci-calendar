@@ -2,6 +2,9 @@
 
 ## check_user_is_admin
 
+> **Broken and unused:** every call fails with error `42702` (`user_id` is
+> ambiguous: the parameter has the column's name). Use `has_admin_role()`.
+
 **Return Type**: boolean  
 **Definition**:
 
@@ -32,6 +35,8 @@ $function$
 CREATE OR REPLACE FUNCTION public.has_admin_role()
  RETURNS boolean
  LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'pg_temp'
 AS $function$
 DECLARE
  is_admin boolean;
@@ -57,6 +62,8 @@ $function$
 CREATE OR REPLACE FUNCTION public.has_creator_role()
  RETURNS boolean
  LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public', 'pg_temp'
 AS $function$
 DECLARE
  has_permission BOOLEAN;

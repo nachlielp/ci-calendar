@@ -21,13 +21,13 @@ the UI correct, they do **not** keep data safe.
 
 ## Roles
 
-| Role          | How it is established                                                  |
-| ------------- | ---------------------------------------------------------------------- |
-| **anonymous** | No session. The public calendar / bio pages.                           |
-| **user**      | Authenticated (`auth.uid()` present) with no elevated role.            |
-| **creator**   | Has a `creator` row in `user_roles` → `has_creator_role()`.            |
-| **profile**   | Has a `profile` row in `user_roles` → `has_profile_role()`.            |
-| **admin**     | Has an `admin` role → `has_admin_role()` / `check_user_is_admin(uid)`. |
+| Role          | How it is established                                       |
+| ------------- | ----------------------------------------------------------- |
+| **anonymous** | No session. The public calendar / bio pages.                |
+| **user**      | Authenticated (`auth.uid()` present) with no elevated role. |
+| **creator**   | Has a `creator` row in `user_roles` → `has_creator_role()`. |
+| **profile**   | Has a `profile` row in `user_roles` → `has_profile_role()`. |
+| **admin**     | Has an `admin` role → `has_admin_role()`.                   |
 
 `owner` below means "the row belongs to the current user", i.e.
 `user_id = auth.uid()` (for `ci_events`, ownership is the `user_id` column;
@@ -256,6 +256,33 @@ window):
    so admins cannot manage other users' files — add `OR has_admin_role()` to the
    three policies if a moderation UI ever needs it. `storage.objects` has no
    SELECT policy, so public read depends on the buckets being flagged public.
+
+## Role checks run as SECURITY DEFINER (2026-09-28)
+
+The drift fix for `user_roles` (item 2 above) caused a production outage, found
+on 2026-09-28. `has_admin_role()` and `has_creator_role()` were
+`SECURITY INVOKER`, and `user_roles`'s `admin_full_crudl` policy calls
+`has_admin_role()`. Its read of `user_roles` went back through RLS, which
+called it again: `54001 stack depth limit exceeded` on creating events and on
+the users, roles and requests reads. The old `USING (true)` policy had hidden
+the loop.
+
+Both functions were changed by hand to
+`SECURITY DEFINER SET search_path = public, pg_temp`. The lookup now bypasses
+RLS, and `auth.uid()` still reads the caller's JWT. The repo copy is migration
+`20261101000000_role_checks_security_definer.sql` (verified against the live
+database on 2026-11-01).
+
+- `has_profile_role()` is still `SECURITY INVOKER`. That's safe: it's only used
+  by the bio-photo policies on `storage.objects`, and a user can read their own
+  `user_roles` row. It must become `SECURITY DEFINER` too before any
+  `user_roles` policy calls it.
+- `check_user_is_admin(uid)` fails on every call with error `42702`: its
+  parameter has the same name as the column, so `user_id` is ambiguous. No
+  policy or client code calls it; use `has_admin_role()`.
+
+**Lesson:** after any RLS change, test the real app flows signed in as a
+non-admin, a creator and an admin, not just `pg_policies`.
 
 ## Related security notes (out of scope for #13, tracked separately)
 
