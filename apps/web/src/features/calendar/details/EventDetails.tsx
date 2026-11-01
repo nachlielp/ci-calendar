@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
 import { useCopy, useLanguage } from "../../../app/language"
-import { defineCopy } from "../../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { Dialog } from "../../../ui/Dialog"
 import { CalendarAddOnIcon } from "../../../ui/icons/CalendarAddOnIcon"
 import { CalendarIcon } from "../../../ui/icons/CalendarIcon"

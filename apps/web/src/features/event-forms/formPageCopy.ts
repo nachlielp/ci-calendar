@@ -1,4 +1,4 @@
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 
 /** The form pages' headers (legacy SingleDayFormPage, MultiDayFormPage and their edit pages). */
 export const FORM_PAGE_COPY = defineCopy({

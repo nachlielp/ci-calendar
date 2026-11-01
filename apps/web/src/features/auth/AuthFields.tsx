@@ -1,6 +1,6 @@
 import { useState, type InputHTMLAttributes, type ReactNode } from "react"
 import { useCopy } from "../../app/language"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import googleLogo from "../../assets/logos/google.svg?no-inline"
 import { LockIcon } from "../../ui/icons/LockIcon"
 import { VisibilityIcon } from "../../ui/icons/VisibilityIcon"

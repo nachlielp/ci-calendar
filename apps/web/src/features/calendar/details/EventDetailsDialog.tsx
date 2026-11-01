@@ -1,6 +1,6 @@
 import { useCopy, useLanguage } from "../../../app/language"
-import { COMMON_COPY } from "../../../lib/commonCopy"
-import { defineCopy } from "../../../lib/copy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { Dialog } from "../../../ui/Dialog"
 import { pickTitle } from "../eventFormat"
 import type { LinkedEvent } from "../linkedEvent"

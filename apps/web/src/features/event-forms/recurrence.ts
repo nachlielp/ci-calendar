@@ -1,4 +1,4 @@
-import { addDays, weekday } from "../../lib/jerusalemDate"
+import { addDays, weekday } from "@ci-calendar/core/lib/jerusalemDate"
 
 // Recurring events (legacy RecurringEventSection and utilService's
 // `calculateRecurringEventDates`): the days a series falls on, from its

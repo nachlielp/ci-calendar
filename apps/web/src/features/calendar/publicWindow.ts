@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 import type { AppServices } from "../../app/services"
-import { STALE_MS } from "../../lib/freshness"
-import { jerusalemToday } from "../../lib/jerusalemDate"
+import { STALE_MS } from "@ci-calendar/core/lib/freshness"
+import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
 import {
     PUBLIC_EVENT_COLUMNS,
     toPublicEvent,

@@ -1,5 +1,5 @@
 import { useCopy } from "../app/language"
-import { defineCopy } from "../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 
 const COPY = defineCopy({
     he: { note: "" },

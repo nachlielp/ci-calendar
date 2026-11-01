@@ -8,8 +8,8 @@ import {
 } from "@tanstack/react-query"
 import { useCallback, useEffect, useState } from "react"
 import { refreshFirstPage } from "../../app/cachedQueries"
-import { STALE_MS } from "../../lib/freshness"
-import { rowsAfter } from "../../lib/keyset"
+import { STALE_MS } from "@ci-calendar/core/lib/freshness"
+import { rowsAfter } from "@ci-calendar/core/lib/keyset"
 
 // Freshness for admin pages (spec: "admin lists refresh when I come back to
 // the tab and offer a manual refresh"). A plain admin query uses

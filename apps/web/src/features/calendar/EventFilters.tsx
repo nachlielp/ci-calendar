@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useCopy } from "../../app/language"
-import { counted, defineCopy } from "../../lib/copy"
+import { counted, defineCopy } from "@ci-calendar/core/lib/copy"
 import { Dialog } from "../../ui/Dialog"
 import { CloseIcon } from "../../ui/icons/CloseIcon"
 import { InstantMixIcon } from "../../ui/icons/InstantMixIcon"

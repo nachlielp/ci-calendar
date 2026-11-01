@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react"
 import { Link, useNavigate } from "react-router"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { MailIcon } from "../../ui/icons/MailIcon"
 import { AuthAlert, AuthField, GoogleButton, PasswordField } from "./AuthFields"
 

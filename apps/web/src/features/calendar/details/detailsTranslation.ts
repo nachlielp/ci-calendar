@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { useMachineTranslation } from "../../../app/useMachineTranslation"
-import type { Language } from "../../../lib/language"
+import type { Language } from "@ci-calendar/core/lib/language"
 import { bioOf } from "../eventFormat"
 import type { PublicEvent } from "../publicEvent"
 

@@ -1,6 +1,9 @@
-import { isDistrict } from "../../lib/eventOptions"
-import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
-import type { Language } from "../../lib/language"
+import { isDistrict } from "@ci-calendar/core/lib/eventOptions"
+import {
+    addDays,
+    jerusalemTimeOfDay,
+} from "@ci-calendar/core/lib/jerusalemDate"
+import type { Language } from "@ci-calendar/core/lib/language"
 import type { EventLocale } from "./eventLocales"
 import type { PublicBio, PublicEvent, Segment, Tag } from "./publicEvent"
 

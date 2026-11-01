@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react"
 import { useCopy } from "../../app/language"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { FormAlert } from "../../ui/form/fields"
 import { ContentCopyIcon } from "../../ui/icons/ContentCopyIcon"
 

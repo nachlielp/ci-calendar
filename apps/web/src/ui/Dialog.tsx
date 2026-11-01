@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react"
 import { createPortal } from "react-dom"
 import { useCopy } from "../app/language"
-import { COMMON_COPY } from "../lib/commonCopy"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 import { ChevronRightIcon } from "./icons/ChevronRightIcon"
 import { CloseIcon } from "./icons/CloseIcon"
 import "./Dialog.scss"

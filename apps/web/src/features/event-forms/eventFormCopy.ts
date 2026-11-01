@@ -1,4 +1,4 @@
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 
 // The event forms' words (legacy SingleDayEventFormHead, EventSegmentsForm,
 // AddLinksForm, AddPricesForm, EventFromFooter, MultiDayFormHead,

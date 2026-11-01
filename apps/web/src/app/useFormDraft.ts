@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react"
-import type { FormValues } from "../lib/form"
+import type { FormValues } from "@ci-calendar/core/lib/form"
 import { useServices } from "./services"
 import type { Form } from "./useForm"
 

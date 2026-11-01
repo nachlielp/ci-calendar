@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
-import { jerusalemToday } from "../../lib/jerusalemDate"
+import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
 import { mergeIntoList, registerEventList, removesFrom } from "./eventCache"
 import { compareUpcoming } from "./eventLists"
 import {

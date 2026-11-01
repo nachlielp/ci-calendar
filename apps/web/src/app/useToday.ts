@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from "react"
-import { jerusalemToday } from "../lib/jerusalemDate"
+import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
 import { useServices } from "./services"
 
 /** How often an open page checks whether the day has changed. */

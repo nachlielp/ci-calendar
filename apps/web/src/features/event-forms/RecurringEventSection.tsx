@@ -1,9 +1,9 @@
 import { useMemo } from "react"
 import { useCopy, useLanguage } from "../../app/language"
-import { defineCopy } from "../../lib/copy"
-import type { FormErrors } from "../../lib/form"
-import { numericDayLabel } from "../../lib/jerusalemDate"
-import { INTL_LOCALES, type Language } from "../../lib/language"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
+import type { FormErrors } from "@ci-calendar/core/lib/form"
+import { numericDayLabel } from "@ci-calendar/core/lib/jerusalemDate"
+import { INTL_LOCALES, type Language } from "@ci-calendar/core/lib/language"
 import { FormAlert, SelectField, TextField } from "../../ui/form/fields"
 import type { EventFormError, RecurrenceValues } from "./eventFormValues"
 import {

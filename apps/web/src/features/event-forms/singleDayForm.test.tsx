@@ -17,7 +17,7 @@ import {
     eventTitles,
     segment,
 } from "../../test/testEvents"
-import { LOOKUP_TIMEOUT_MS } from "../../lib/timeout"
+import { LOOKUP_TIMEOUT_MS } from "@ci-calendar/core/lib/timeout"
 import { SINGLE_DAY_DRAFT_KEY, SINGLE_DAY_EDIT_DRAFT_KEY } from "./draftKeys"
 
 const NOW = new Date("2026-10-30T09:00:00Z")

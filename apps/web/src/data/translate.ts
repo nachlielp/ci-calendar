@@ -1,4 +1,4 @@
-import { withTimeout } from "../lib/timeout"
+import { withTimeout } from "@ci-calendar/core/lib/timeout"
 import type { Functions } from "./functions"
 
 // Machine translation through the `translate` Edge Function (legacy

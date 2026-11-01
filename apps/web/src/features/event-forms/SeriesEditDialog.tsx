@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useCopy } from "../../app/language"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { FormAlert } from "../../ui/form/fields"
 import { ActionDialog, EventLine, SeriesChoice } from "../events/ActionDialog"
 import type { ManagedEvent } from "../events/managedEvent"

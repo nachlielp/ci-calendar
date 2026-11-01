@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react"
 import { useCopy } from "../../app/language"
-import { addDays } from "../../lib/jerusalemDate"
-import { counted, defineCopy } from "../../lib/copy"
+import { addDays } from "@ci-calendar/core/lib/jerusalemDate"
+import { counted, defineCopy } from "@ci-calendar/core/lib/copy"
 import {
     addMonths,
     monthNumber,
     monthOf,
     monthWeeks,
-} from "../../lib/monthGrid"
+} from "@ci-calendar/core/lib/monthGrid"
 import { ChevronRightIcon } from "../../ui/icons/ChevronRightIcon"
 import { cardsByDay, type EventCard } from "./eventCards"
 import { EventList } from "./EventList"

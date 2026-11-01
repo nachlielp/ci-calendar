@@ -1,10 +1,10 @@
 import { useEffect, useId, useState } from "react"
 import { useCopy } from "../../app/language"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import {
     jerusalemDateLabel,
     jerusalemDateTimeLabel,
-} from "../../lib/jerusalemDate"
+} from "@ci-calendar/core/lib/jerusalemDate"
 import type { UserRequest } from "./myRequests"
 import type { RequestResponse } from "./requestRows"
 import { useRequestTexts } from "./requestTexts"

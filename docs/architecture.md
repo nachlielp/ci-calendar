@@ -3,6 +3,8 @@
 > **Monorepo (#48):** the web client lives in `apps/web`. Paths in this
 > file (`src/…`, `worker/…`, `scripts/…`, `public/…`, `vite.config.ts`)
 > are relative to `apps/web`, except `docs/` and `supabase/` at the root.
+> `lib/…` is in the shared core: `packages/core/src/lib/`, imported as
+> `@ci-calendar/core/lib/<module>` (see "The core package" below).
 
 The client is a Vite + React 19 + TypeScript SPA on the same Supabase backend.
 There is no realtime: freshness comes from the query cache's rules. This file
@@ -42,13 +44,40 @@ the switch.
 | `src/features/admin-users`    | `/manage-users`: users search, role changes (`useAssignRole`)                                             |
 | `src/features/admin-requests` | `/manage-support`: open/closed requests, replies, approvals                                               |
 | `src/features/admin-events`   | `/manage-all-events`: every creator's events, their actions                                               |
-| `src/lib/`                    | Pure helpers (dates, formatting, keyset pagination, freshness); tested directly                           |
 | `src/ui/`                     | Shared presentational primitives (dialog, buttons, icons, the query list shell)                           |
 | `src/ui/form`                 | Form fields, chips, switch, alert and buttons (`fields.tsx`)                                              |
 | `src/pages/`                  | Simple pages (about, legal, 404) that belong to no feature                                                |
 | `src/test/`                   | The fake backend, `renderApp`, test data (`testEvents.ts`), the realtime guard                            |
 | `src/assets/`                 | Images, logos and the subset font ported from legacy                                                      |
 | `worker/`                     | The Cloudflare Worker (`/api/*`): the edge-cached public window (spec #37)                                |
+
+## The core package
+
+`packages/core` is `@ci-calendar/core`: the logic the web app, its Worker
+and (later) the mobile app share. It holds no React, no DOM, no React
+Native, so every platform can run it.
+
+- **Imports:** one module per path, `@ci-calendar/core/lib/keyset`, with no
+  barrel file. The package's `exports` map `./*` to `./src/*.ts`.
+- **Source, not a build.** The core ships TypeScript; Vite, Vitest and
+  Wrangler compile it like the app's own files. `"sideEffects": false`, so
+  a page carries only what it imports (`check:bundle` holds `/` to its
+  limit).
+- **The boundary is checked, not reviewed.** `tsconfig.json` has
+  `lib: ["ES2023"]` and no `types`: a `window`, `document` or `process`
+  fails to typecheck. The few web-platform globals every platform has
+  (timers, `URL`) are declared in `src/platform.d.ts`; add one there only
+  if the browser, Workers, React Native and Node all have it. ESLint bans
+  React, React Native, Expo, react-query (use `@tanstack/query-core`) and
+  importing an app. The source may not import Vitest either (the mobile
+  app will run it under Jest); tests may.
+- **Tests** run in Node (`vitest.config.ts`, no jsdom) and are checked
+  with Node's types (`tsconfig.test.json`). `npm test` at the root runs
+  them with the web's.
+- **What moves here:** a module with no React and no browser API. A module
+  that mixes pure logic with a hook splits: the logic comes here, the
+  `useX` hook stays in the app. Move a module with its test, then rewrite
+  the app's imports to the package path.
 
 ## Rules
 
@@ -95,12 +124,12 @@ the switch.
 - **No component libraries.** No antd, MUI, emotion, MobX, dayjs, lodash or
   uuid. Use native elements (`<dialog>`, `<input type="date|time">`,
   `<details>`), small primitives in `src/ui/`, `Intl` and the helpers in
-  `src/lib/`. `crypto.randomUUID()` for ids.
+  `lib/` (the core). `crypto.randomUUID()` for ids.
 - **Same look.** Each component's styles are a `.scss` file next to it,
   ported from the old client's SCSS without its antd overrides. Same copy,
   same three languages.
 - **Dates.** Calendar days are `YYYY-MM-DD` strings in Asia/Jerusalem
-  (`src/lib/jerusalemDate.ts`). Read "now" from `services.now()`, never
+  (`lib/jerusalemDate.ts`). Read "now" from `services.now()`, never
   `new Date()` in features, so tests control the clock. Don't put today's
   date in a query key: a query fetched yesterday (or restored from storage)
   must stay the same query. Compute the date range inside `queryFn` and drop
@@ -353,7 +382,7 @@ the switch.
   stays mounted) but not a reload. Links inside the calendar keep
   `location.search`, so filters survive opening and closing an event.
 - **Event options.** Event types, multi-day types and districts (values,
-  `isEventType`/`isDistrict`) are in `src/lib/eventOptions.ts`; reuse them
+  `isEventType`/`isDistrict`) are in `lib/eventOptions.ts`; reuse them
   for forms and weekly-schedule filters. Their words are in the
   `EventLocale` (`optionLabel`). Rows map legacy Hebrew multi-day types
   (`ריטריט`) to their values in `toPublicEvent`.
@@ -1175,7 +1204,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
 - **Languages (i18n).** Hebrew (default, RTL), English and Russian (LTR).
   Everything that adds copy follows this:
     - **Copy is per component**, declared with `defineCopy({ he, en, ru })`
-      (`src/lib/copy.ts`) next to the component and read with
+      (`lib/copy.ts`) next to the component and read with
       `useCopy(COPY)` (`src/app/language.ts`). Hebrew sets the shape; English
       and Russian must match it key for key, so a missing translation is a
       type error. Entries are strings; `counted({ one, other, … })` for
@@ -1193,7 +1222,7 @@ sent: false, to_send: true`; declines and approvals add legacy's Hebrew
       `HebrewOnlyNote` (English and Russian). Don't machine-translate them.
     - **Shared words** (save, cancel, confirm, delete, close, retry,
       loading, back to the calendar) are in `COMMON_COPY`
-      (`src/lib/commonCopy.ts`), read with `useCopy(COMMON_COPY)`; add a word
+      (`lib/commonCopy.ts`), read with `useCopy(COMMON_COPY)`; add a word
       there once a second component needs it, rather than translating it
       twice.
     - **All three languages ship together**, eager, in the component's chunk:
@@ -1666,7 +1695,7 @@ id='ci_bio_profiles'` (null means any). `profile` users (teachers
 
 Behaviour tests render the real app with `renderApp()` from `src/test/` and a
 seeded fake backend. They assert what the user sees and what was requested of
-the backend, never cache keys or hook calls. Pure logic in `src/lib/` and
+the backend, never cache keys or hook calls. Pure logic in the core's `lib/` and
 feature helpers is tested directly. Test-only helpers live in `src/test/`
 (e.g. `testEvents.ts`: event and bio rows to seed, and the calendar's
 titles and cards), never in a feature folder.

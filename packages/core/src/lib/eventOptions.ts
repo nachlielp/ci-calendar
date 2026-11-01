@@ -2,7 +2,7 @@
 // stored in `ci_events` and as written in filter URLs and saved filters.
 // Shared by the calendar filters and, later, the event forms and the weekly
 // schedule filters. Their words in each language are in the `EventLocale`
-// (features/calendar/eventLocales.ts: `types`, `districts`).
+// (the web's features/calendar/eventLocales.ts: `types`, `districts`).
 
 /** Every event and segment type, in the order they are offered. */
 export const EVENT_TYPES = [

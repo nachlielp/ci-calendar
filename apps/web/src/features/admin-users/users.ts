@@ -6,7 +6,7 @@ import {
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
 import type { SignedInRole } from "../../app/viewer"
-import { keysetPage, quoted } from "../../lib/keyset"
+import { keysetPage, quoted } from "@ci-calendar/core/lib/keyset"
 import {
     afterNewest,
     containing,

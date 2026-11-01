@@ -1,5 +1,5 @@
 import type { DataClient } from "../../data/client"
-import { normaliseMultiDayType } from "../../lib/eventOptions"
+import { normaliseMultiDayType } from "@ci-calendar/core/lib/eventOptions"
 
 // A public event: what the calendar list and the event details show, read
 // from `ci_events` with the public bios of its tagged teachers embedded. Both

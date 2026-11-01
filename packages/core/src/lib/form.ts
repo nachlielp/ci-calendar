@@ -1,4 +1,4 @@
-// The state of an edit form, as pure functions (`useForm` in app/useForm.ts
+// The state of an edit form, as pure functions (`useForm` in the web's app/useForm.ts
 // runs them in a reducer). A form edits a copy of the saved values — what
 // the server last returned — so it always knows which fields changed (what
 // a save sends), whether there is unsaved work (the reload guard), and

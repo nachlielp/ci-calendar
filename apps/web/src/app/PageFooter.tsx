@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react"
 import { Link } from "react-router"
-import { defineCopy } from "../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { useCopy } from "./language"
 import { useServices } from "./services"
 import "./PageFooter.scss"

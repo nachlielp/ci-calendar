@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react"
 import { useLocation } from "react-router"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { CloseIcon } from "../../ui/icons/CloseIcon"
 import { TouchAppIcon } from "../../ui/icons/TouchAppIcon"
 import type { DeviceStorage } from "../deviceStorage"

@@ -5,8 +5,8 @@ import {
 } from "@tanstack/react-query"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
 import type { AppServices } from "../../app/services"
-import { jerusalemToday } from "../../lib/jerusalemDate"
-import { keysetPage } from "../../lib/keyset"
+import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
+import { keysetPage } from "@ci-calendar/core/lib/keyset"
 import {
     type EventPage,
     mergeIntoList,

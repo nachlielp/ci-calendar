@@ -4,11 +4,11 @@ import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
 import { useForm } from "../../app/useForm"
 import { useViewer } from "../../app/viewer"
-import { defineCopy } from "../../lib/copy"
+import { defineCopy } from "@ci-calendar/core/lib/copy"
 import {
     jerusalemDateLabel,
     jerusalemDateTimeLabel,
-} from "../../lib/jerusalemDate"
+} from "@ci-calendar/core/lib/jerusalemDate"
 import {
     ChoiceChips,
     FormAlert,

@@ -1,8 +1,12 @@
 import type { ReactNode } from "react"
 import { useCopy } from "../../app/language"
-import { COMMON_COPY } from "../../lib/commonCopy"
-import { DISTRICTS, EVENT_TYPES, TAGS } from "../../lib/eventOptions"
-import type { FormErrors } from "../../lib/form"
+import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
+import {
+    DISTRICTS,
+    EVENT_TYPES,
+    TAGS,
+} from "@ci-calendar/core/lib/eventOptions"
+import type { FormErrors } from "@ci-calendar/core/lib/form"
 import {
     ChoiceChips,
     FormAlert,
