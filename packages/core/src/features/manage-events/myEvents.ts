@@ -1,12 +1,9 @@
-import {
-    infiniteQueryOptions,
-    queryOptions,
-    type InfiniteData,
-} from "@tanstack/react-query"
+import { type InfiniteData } from "@tanstack/query-core"
+import { infiniteQueryOptions, queryOptions } from "../../app/queryOptions"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import type { AppServices } from "../../app/services"
-import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
-import { keysetPage } from "@ci-calendar/core/lib/keyset"
+import type { CoreServices } from "../../app/services"
+import { jerusalemToday } from "../../lib/jerusalemDate"
+import { keysetPage } from "../../lib/keyset"
 import {
     type EventPage,
     mergeIntoList,
@@ -71,7 +68,7 @@ registerEventList({
  * memoise the options on it.
  */
 export function myUpcomingEventsQuery(
-    services: AppServices,
+    services: CoreServices,
     userId: string,
     today: string = jerusalemToday(services.now()),
 ) {
@@ -103,7 +100,7 @@ export function myUpcomingEventsQuery(
  * would fetch every loaded page again in turn. The page removes it when
  * it closes, so the next visit starts again from the first page.
  */
-export function myPastEventsQuery(services: AppServices, userId: string) {
+export function myPastEventsQuery(services: CoreServices, userId: string) {
     return infiniteQueryOptions({
         queryKey: myPastEventsKey(userId),
         staleTime: Infinity,

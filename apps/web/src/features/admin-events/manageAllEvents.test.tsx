@@ -1,16 +1,19 @@
 import { act, cleanup, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { createMemoryStorage } from "../../app/deviceStorage"
-import type { SignedInRole } from "../../app/viewer"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { setPageVisibility } from "../../test/browser"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, userRow, type TestUser } from "../../test/testUsers"
 import { event, eventTitles } from "../../test/testEvents"
-import { MANAGED_EVENT_COLUMNS } from "../events/managedEvent"
-import { ADMIN_EVENTS_PAGE_SIZE, CREATOR_COLUMNS } from "./adminEvents"
+import { MANAGED_EVENT_COLUMNS } from "@ci-calendar/core/features/events/managedEvent"
+import {
+    ADMIN_EVENTS_PAGE_SIZE,
+    CREATOR_COLUMNS,
+} from "@ci-calendar/core/features/admin-events/adminEvents"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 const TODAY = "2026-10-30"

@@ -10,13 +10,19 @@ import { FormAlert, TextField } from "../../ui/form/fields"
 import { TagPicker, type PickerOption } from "../../ui/form/TagPicker"
 import { SEARCH_DEBOUNCE_MS, usePagedAdminList } from "../admin/adminLists"
 import { RefreshButton } from "../admin/RefreshButton"
-import { laterInSeries } from "../events/eventLists"
-import { FROM_ALL_EVENTS, type ManagedEvent } from "../events/managedEvent"
-import { seriesQuery } from "../events/series"
+import { laterInSeries } from "@ci-calendar/core/features/events/eventLists"
+import {
+    FROM_ALL_EVENTS,
+    type ManagedEvent,
+} from "@ci-calendar/core/features/events/managedEvent"
+import { seriesQuery } from "@ci-calendar/core/features/events/series"
 import { EventActions, type LaterEvents } from "../manage-events/EventActions"
 import { ManagedEventList } from "../manage-events/ManagedEventList"
 import { useFocusAfterDelete } from "../manage-events/useFocusAfterDelete"
-import { adminEventCreatorsQuery, adminEventsQuery } from "./adminEvents"
+import {
+    adminEventCreatorsQuery,
+    adminEventsQuery,
+} from "@ci-calendar/core/features/admin-events/adminEvents"
 import "./ManageAllEventsPage.scss"
 
 // Legacy ManageEventsList (Hebrew only there). The list's states, "load

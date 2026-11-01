@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { weekday } from "@ci-calendar/core/lib/jerusalemDate"
+import { weekday } from "../../lib/jerusalemDate"
 import { addMonths, isRecurrence, recurringDates } from "./recurrence"
 
 describe("recurringDates", () => {

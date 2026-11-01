@@ -20,7 +20,8 @@ import { usePagedAdminList } from "../admin/adminLists"
 import { CopyPhone } from "../admin/CopyPhone"
 import { RefreshButton } from "../admin/RefreshButton"
 import { useRequestTexts } from "../requests/requestTexts"
-import { REQUEST_WORDS } from "../requests/requestWords"
+import { REQUEST_WORDS } from "@ci-calendar/core/features/requests/requestWords"
+import { useApproveRequest, useRequestAction } from "./adminRequests"
 import {
     adminRequestsQuery,
     ApprovalCloseError,
@@ -29,12 +30,10 @@ import {
     FILTER_TYPES,
     RequestChangedError,
     RoleGivenRequestChangedError,
-    useApproveRequest,
-    useRequestAction,
     type AdminRequest,
     type RequestAction,
     type RequestStatus,
-} from "./adminRequests"
+} from "@ci-calendar/core/features/admin-requests/adminRequests"
 import "./ManageSupportPage.scss"
 
 // Legacy ManageSupportPage (Hebrew only there, but the toast). Replies,

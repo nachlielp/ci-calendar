@@ -1,4 +1,4 @@
-import { isWebUrl, normaliseWebUrl } from "@ci-calendar/core/lib/webUrl"
+import { isWebUrl, normaliseWebUrl } from "../../../lib/webUrl"
 
 /**
  * The links that may be rendered as `href`s: web addresses only (a stored

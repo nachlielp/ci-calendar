@@ -15,8 +15,14 @@ import { ToggleButtons } from "../../ui/ToggleButtons"
 import { EventActions } from "./EventActions"
 import { ManagedEventList } from "./ManagedEventList"
 import { useFocusAfterDelete } from "./useFocusAfterDelete"
-import { laterInSeries, myPastEventsKey } from "../events/eventLists"
-import { myPastEventsQuery, myUpcomingEventsQuery } from "./myEvents"
+import {
+    laterInSeries,
+    myPastEventsKey,
+} from "@ci-calendar/core/features/events/eventLists"
+import {
+    myPastEventsQuery,
+    myUpcomingEventsQuery,
+} from "@ci-calendar/core/features/manage-events/myEvents"
 import "./ManageEventsPage.scss"
 
 // Legacy ManageUserEventsPage (Hebrew only there).

@@ -1,4 +1,4 @@
-import { rowsAfter, type KeysetDirection } from "@ci-calendar/core/lib/keyset"
+import { rowsAfter, type KeysetDirection } from "../../lib/keyset"
 import type { ManagedEvent } from "./managedEvent"
 
 // The rules every list of managed events shares (my events, the admins'

@@ -28,12 +28,16 @@ import {
     tagLabel,
     typeLabel,
     typeLabels,
-} from "../eventFormat"
-import { EVENT_LOCALES } from "../eventLocales"
-import type { PublicBio, PublicEvent, Tag } from "../publicEvent"
+} from "@ci-calendar/core/features/calendar/eventFormat"
+import { EVENT_LOCALES } from "@ci-calendar/core/features/calendar/eventLocales"
+import type {
+    PublicBio,
+    PublicEvent,
+    Tag,
+} from "@ci-calendar/core/features/calendar/publicEvent"
 import { BioCard } from "./BioCard"
 import { useTranslated } from "./detailsTranslation"
-import { webLinks } from "./webLinks"
+import { webLinks } from "@ci-calendar/core/features/calendar/details/webLinks"
 import "./EventDetails.scss"
 
 const COPY = defineCopy({

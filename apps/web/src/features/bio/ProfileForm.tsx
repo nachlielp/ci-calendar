@@ -14,13 +14,13 @@ import {
     newBioColumns,
     validateBio,
     type BioError,
-} from "./bioValues"
+} from "@ci-calendar/core/features/bio/bioValues"
+import { useSaveBio } from "./myBio"
 import {
     BIO_DRAFT_KEY,
     PhotoUploadError,
-    useSaveBio,
     type MyBio,
-} from "./myBio"
+} from "@ci-calendar/core/features/bio/myBio"
 import { PhotoField } from "./PhotoField"
 
 // Legacy ProfileForm (Hebrew only there).

@@ -1,8 +1,8 @@
 import { useMemo } from "react"
 import { useMachineTranslation } from "../../../app/useMachineTranslation"
 import type { Language } from "@ci-calendar/core/lib/language"
-import { bioOf } from "../eventFormat"
-import type { PublicEvent } from "../publicEvent"
+import { bioOf } from "@ci-calendar/core/features/calendar/eventFormat"
+import type { PublicEvent } from "@ci-calendar/core/features/calendar/publicEvent"
 
 // Legacy FullEventCard's `translatePage`: in English and Russian, the
 // details machine-translate the texts the creator wrote in Hebrew that

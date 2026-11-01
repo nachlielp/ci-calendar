@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest"
-import { offeredRequestTypes, openRequestOf, toUserRequest } from "./myRequests"
+import {
+    offeredRequestTypes,
+    openRequestOf,
+    toUserRequest,
+} from "@ci-calendar/core/features/requests/myRequests"
 
 const row = {
     id: "r1",

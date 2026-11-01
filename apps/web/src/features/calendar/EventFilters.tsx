@@ -4,9 +4,12 @@ import { counted, defineCopy } from "@ci-calendar/core/lib/copy"
 import { Dialog } from "../../ui/Dialog"
 import { CloseIcon } from "../../ui/icons/CloseIcon"
 import { InstantMixIcon } from "../../ui/icons/InstantMixIcon"
-import { optionLabel } from "./eventFormat"
-import { EVENT_LOCALES } from "./eventLocales"
-import { DISTRICT_FILTERS, TYPE_FILTERS } from "./filters"
+import { optionLabel } from "@ci-calendar/core/features/calendar/eventFormat"
+import { EVENT_LOCALES } from "@ci-calendar/core/features/calendar/eventLocales"
+import {
+    DISTRICT_FILTERS,
+    TYPE_FILTERS,
+} from "@ci-calendar/core/features/calendar/filters"
 import "./EventFilters.scss"
 
 const COPY = defineCopy({

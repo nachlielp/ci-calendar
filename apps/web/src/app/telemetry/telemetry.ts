@@ -1,6 +1,11 @@
 import type { DataRouter, RouterState } from "react-router"
-import type { DeviceStorage } from "../deviceStorage"
+import type { DeviceStorage } from "@ci-calendar/core/app/deviceStorage"
 import { scrubUrl } from "./scrubUrl"
+import type {
+    CoreTelemetry,
+    ErrorContext,
+    TelemetryUser,
+} from "@ci-calendar/core/app/telemetry/telemetry"
 
 /**
  * Crash reports (Sentry), product analytics (PostHog) and real-user speed
@@ -12,32 +17,7 @@ import { scrubUrl } from "./scrubUrl"
  * tests, internal devices, preview sites), nothing is kept or sent. A sink
  * that fails to load (an ad blocker, no network) is silently left out.
  */
-export interface Telemetry {
-    /**
-     * Reports an error to Sentry, now or once the SDK loads. Each Error
-     * object is reported once, however many places catch it.
-     */
-    captureError(error: unknown, context: ErrorContext): void
-    /** Records a product event in PostHog. */
-    track(event: string, properties?: Record<string, unknown>): void
-    /**
-     * The signed-in user (slice 9 calls it once the session is known):
-     * Sentry gets `{ id, email }`, as legacy's `setUser`; PostHog gets
-     * `identify(id)`, which joins this device's anonymous visitor to the
-     * account (legacy kept PostHog's own anonymous id: its `reset()` ran
-     * before `init` and was a no-op, and it identified the visitor with
-     * that same id, which merges nothing and leaves it anonymous).
-     */
-    identify(user: TelemetryUser): void
-    /** Sign-out: forget the user in Sentry and start a new PostHog visitor. */
-    reset(): void
-    /**
-     * Saves legacy's `isInternal` device flag (`users.is_internal`, slice 9
-     * after the profile loads). Marking the device internal stops PostHog
-     * and Speed Insights at once; unmarking it takes effect from the next
-     * page load.
-     */
-    setInternal(internal: boolean): void
+export interface Telemetry extends CoreTelemetry {
     /**
      * Records a page view per location, loads PostHog and Speed Insights
      * after the first paint, and hands the router to Sentry's tracing.
@@ -47,21 +27,6 @@ export interface Telemetry {
     start(router: DataRouter): () => void
     /** Removes the window listeners (tests). */
     dispose(): void
-}
-
-export interface TelemetryUser {
-    id: string
-    email?: string
-}
-
-export interface ErrorContext {
-    /**
-     * Where it was caught, a Sentry tag: `window`, `rejection`, `route`,
-     * `stale-chunk`, or a feature's own name.
-     */
-    source: string
-    /** False for errors nothing handled (window, unhandled rejection). */
-    handled?: boolean
 }
 
 /** Sentry, once loaded (`./sentry.ts`). */

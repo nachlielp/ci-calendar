@@ -1,8 +1,8 @@
-import { queryOptions } from "@tanstack/react-query"
+import { queryOptions } from "../queryOptions"
 import type { AuthUser } from "../../data/auth"
-import { STALE_MS } from "@ci-calendar/core/lib/freshness"
-import type { AppServices } from "../services"
-import type { SignedInRole } from "../viewer"
+import { STALE_MS } from "../../lib/freshness"
+import type { CoreServices } from "../services"
+import type { SignedInRole } from "./roles"
 
 /** First element of the profile query's key: personal, never persisted. */
 export const PROFILE_KIND = "profile"
@@ -81,7 +81,7 @@ const DUPLICATE = "23505"
  * role an admin changed shows up. Creates the row for a new account. Marks
  * the device internal (or not) from it, as legacy did at sign-in.
  */
-export function profileQuery(services: AppServices, userId: string) {
+export function profileQuery(services: CoreServices, userId: string) {
     const { data, auth, telemetry, now, buildVersion } = services
     return queryOptions({
         queryKey: [PROFILE_KIND, userId],
@@ -132,7 +132,7 @@ export function profileQuery(services: AppServices, userId: string) {
  * fails.
  */
 export function recordSignIn(
-    { data, now, buildVersion }: AppServices,
+    { data, now, buildVersion }: CoreServices,
     userId: string,
 ) {
     void data

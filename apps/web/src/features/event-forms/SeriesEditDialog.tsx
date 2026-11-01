@@ -3,7 +3,7 @@ import { useCopy } from "../../app/language"
 import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { FormAlert } from "../../ui/form/fields"
 import { ActionDialog, EventLine, SeriesChoice } from "../events/ActionDialog"
-import type { ManagedEvent } from "../events/managedEvent"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
 import type { SeriesQuestion } from "./useEventSubmit"
 import "./SeriesEditDialog.scss"
 

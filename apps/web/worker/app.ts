@@ -1,5 +1,5 @@
-import { createDataClient } from "../src/data/client"
-import { PUBLIC_WINDOW_ENDPOINT } from "../src/features/calendar/publicWindowSelect"
+import { createDataClient } from "@ci-calendar/core/data/client"
+import { PUBLIC_WINDOW_ENDPOINT } from "@ci-calendar/core/features/calendar/publicWindowSelect"
 import {
     createPublicWindowEndpoint,
     type EdgeCache,

@@ -1,14 +1,16 @@
 import { useRef, useState } from "react"
 import type { Submission } from "../../app/useForm"
-import type { ManagedEvent } from "../events/managedEvent"
-import { taggedUserIds, type EventBaseValues } from "./eventFormValues"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
+import {
+    taggedUserIds,
+    type EventBaseValues,
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
+import { useCreateEvent, useUpdateEvent } from "./eventSave"
 import {
     EventGoneError,
-    useCreateEvent,
-    useUpdateEvent,
     type EventColumns,
     type EventPatch,
-} from "./eventSave"
+} from "@ci-calendar/core/features/event-forms/eventSave"
 
 // Every event form's save (legacy's forms' `handleSubmit`): a new event is
 // inserted with its columns and an id made once per form (a recurring

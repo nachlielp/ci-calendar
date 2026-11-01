@@ -1,9 +1,9 @@
 import { cleanup, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, describe, expect, it, vi } from "vitest"
-import type { SignedInRole } from "../../app/viewer"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { setPageVisibility } from "../../test/browser"
-import { createMemoryStorage } from "../../app/deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { createTestTelemetry } from "../../test/fakeTelemetry"
@@ -15,8 +15,11 @@ import {
     CLOSED_NOTE,
     REQUESTS_PAGE_SIZE,
     requestsFilter,
-} from "./adminRequests"
-import { CLOSED_TREE, OPEN_STATUS_TREE } from "../requests/requestRows"
+} from "@ci-calendar/core/features/admin-requests/adminRequests"
+import {
+    CLOSED_TREE,
+    OPEN_STATUS_TREE,
+} from "@ci-calendar/core/features/requests/requestRows"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 

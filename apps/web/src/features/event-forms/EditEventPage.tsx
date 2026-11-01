@@ -1,13 +1,19 @@
 import { useLocation, useNavigate } from "react-router"
 import { useCopy } from "../../app/language"
-import { editPath, type ManagedEvent } from "../events/managedEvent"
+import {
+    editPath,
+    type ManagedEvent,
+} from "@ci-calendar/core/features/events/managedEvent"
 import {
     MULTI_DAY_EDIT_DRAFT_KEY,
     SINGLE_DAY_EDIT_DRAFT_KEY,
-} from "./draftKeys"
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 import { EditEventFormPage, type EditPageState } from "./EventFormPages"
-import type { MultiDayValues, SingleDayValues } from "./eventFormValues"
-import { FORM_PAGE_COPY } from "./formPageCopy"
+import type {
+    MultiDayValues,
+    SingleDayValues,
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
+import { FORM_PAGE_COPY } from "@ci-calendar/core/features/event-forms/formPageCopy"
 import { MultiDayEventForm } from "./MultiDayEventForm"
 import { SingleDayEventForm } from "./SingleDayEventForm"
 import { SwitchingForms } from "./SwitchingForms"

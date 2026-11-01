@@ -1,6 +1,9 @@
 import { useQueries } from "@tanstack/react-query"
 import { useMemo } from "react"
-import { translateOrNull, type TranslationTarget } from "../data/translate"
+import {
+    translateOrNull,
+    type TranslationTarget,
+} from "@ci-calendar/core/data/translate"
 import type { Language } from "@ci-calendar/core/lib/language"
 import { useServices } from "./services"
 import { storeTranslation, storedTranslation } from "./translationStore"

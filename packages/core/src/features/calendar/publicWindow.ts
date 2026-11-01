@@ -1,7 +1,7 @@
-import { queryOptions } from "@tanstack/react-query"
-import type { AppServices } from "../../app/services"
-import { STALE_MS } from "@ci-calendar/core/lib/freshness"
-import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
+import { queryOptions } from "../../app/queryOptions"
+import type { CoreServices } from "../../app/services"
+import { STALE_MS } from "../../lib/freshness"
+import { jerusalemToday } from "../../lib/jerusalemDate"
 import {
     PUBLIC_EVENT_COLUMNS,
     toPublicEvent,
@@ -48,7 +48,7 @@ export const PUBLIC_WINDOW_SHAPE = `3|${PUBLIC_EVENT_COLUMNS}`
  * it, so `select` runs again when the day changes.
  */
 export function publicWindowQuery(
-    { publicFeed, now }: Pick<AppServices, "publicFeed" | "now">,
+    { publicFeed, now }: Pick<CoreServices, "publicFeed" | "now">,
     today: string = jerusalemToday(now()),
 ) {
     return queryOptions({

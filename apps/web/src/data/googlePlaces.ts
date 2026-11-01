@@ -1,4 +1,4 @@
-import type { PlaceSuggestion, PlacesApi } from "./places"
+import type { PlaceSuggestion, PlacesApi } from "@ci-calendar/core/data/places"
 
 // The Maps JavaScript API's Places library, loaded with a script tag on
 // first use (./places.ts imports this module then), in sessions

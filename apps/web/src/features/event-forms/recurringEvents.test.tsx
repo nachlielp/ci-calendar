@@ -4,13 +4,13 @@ import { describe, expect, it } from "vitest"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
+} from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
 import { testUser, type TestUser } from "../../test/testUsers"
 import { bio, event, eventTitles, segment } from "../../test/testEvents"
-import { SINGLE_DAY_DRAFT_KEY } from "./draftKeys"
+import { SINGLE_DAY_DRAFT_KEY } from "@ci-calendar/core/features/event-forms/draftKeys"
 
 // Before the clocks go back on Sunday 25 October 2026 (UTC+3 → UTC+2).
 const NOW = new Date("2026-10-15T09:00:00Z")

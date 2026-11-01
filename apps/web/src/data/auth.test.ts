@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { createMemoryStorage } from "../app/deviceStorage"
-import { createAuth } from "./auth"
-import { authStorageKey } from "./authSession"
-import { createDataClient } from "./client"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
+import { createAuth } from "@ci-calendar/core/data/auth"
+import { authStorageKey } from "@ci-calendar/core/data/authSession"
+import { createDataClient } from "@ci-calendar/core/data/client"
 
 // The real auth seam and data client, with the network stubbed: they read
 // legacy's stored session, load auth-js only when needed, and put the right

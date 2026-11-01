@@ -91,16 +91,27 @@ export interface Auth {
     signOut(): Promise<void>
 }
 
+/** Where other tabs' changes to device storage are heard (`window`). */
+export interface StorageEvents {
+    addEventListener(
+        type: "storage",
+        listener: (event: { readonly key: string | null }) => void,
+    ): void
+}
+
 export interface AuthOptions {
     supabaseUrl: string
     anonKey: string
     storage: DeviceStorage
-    /** The URL's fragment, where auth redirects arrive. */
+    /**
+     * The URL's fragment, where auth redirects arrive (the web's
+     * `browserAuthOptions`); none by default.
+     */
     hash?: string
     /** Removes the fragment from the URL and its history entry. */
     clearHash?: () => void
-    /** Where other tabs' storage changes are heard. */
-    target?: Pick<Window, "addEventListener">
+    /** Where other tabs' storage changes are heard; none by default. */
+    target?: StorageEvents
     nowMs?: () => number
     /** Loads auth-js (tests may stand in for it). */
     loadClient?: () => Promise<typeof import("./authClient")>
@@ -119,14 +130,9 @@ export function createAuth({
     supabaseUrl,
     anonKey,
     storage,
-    hash = window.location.hash,
-    clearHash = () =>
-        history.replaceState(
-            history.state,
-            "",
-            window.location.pathname + window.location.search,
-        ),
-    target = window,
+    hash = "",
+    clearHash = () => {},
+    target,
     nowMs = Date.now,
     loadClient = () => import("./authClient"),
 }: AuthOptions): Auth {
@@ -192,7 +198,7 @@ export function createAuth({
 
     // Another tab signed in or out (or refreshed), maybe before auth-js
     // ever loaded here, or without it.
-    target.addEventListener("storage", (event) => {
+    target?.addEventListener("storage", (event) => {
         if (current === undefined) return
         if (event.key !== null && event.key !== storageKey) return
         set(readStoredSession(storage, storageKey))

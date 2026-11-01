@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
-import type { SignedInRole } from "../../app/viewer"
+} from "@ci-calendar/core/app/deviceStorage"
+import type { SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { fakeTranslation } from "../../test/fakeFunctions"
 import { renderApp } from "../../test/renderApp"
@@ -15,7 +15,7 @@ import {
     MULTI_DAY_DRAFT_KEY,
     MULTI_DAY_EDIT_DRAFT_KEY,
     SINGLE_DAY_DRAFT_KEY,
-} from "./draftKeys"
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 
 const NOW = new Date("2026-10-30T09:00:00Z")
 

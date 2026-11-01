@@ -5,13 +5,16 @@ import type { FormErrors } from "@ci-calendar/core/lib/form"
 import { numericDayLabel } from "@ci-calendar/core/lib/jerusalemDate"
 import { INTL_LOCALES, type Language } from "@ci-calendar/core/lib/language"
 import { FormAlert, SelectField, TextField } from "../../ui/form/fields"
-import type { EventFormError, RecurrenceValues } from "./eventFormValues"
+import type {
+    EventFormError,
+    RecurrenceValues,
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
 import {
     addMonths,
     RECURRENCE_MONTHS,
     RECURRENCES,
     recurringDates,
-} from "./recurrence"
+} from "@ci-calendar/core/features/event-forms/recurrence"
 import { useErrorText } from "./useErrorText"
 import "./RecurringEventSection.scss"
 

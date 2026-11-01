@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { createMemoryStorage } from "../../app/deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { createFakeEdge, type EdgeAnswer } from "../../test/fakeEdge"
 import { renderApp } from "../../test/renderApp"

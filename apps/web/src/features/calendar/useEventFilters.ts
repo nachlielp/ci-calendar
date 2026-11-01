@@ -6,7 +6,7 @@ import {
     readStoredFilters,
     searchWithFilters,
     storeFilterChange,
-} from "./filters"
+} from "@ci-calendar/core/features/calendar/filters"
 
 /**
  * The calendar's selected filters, kept in the URL (`f`). As in the legacy

@@ -1,4 +1,4 @@
-import { withTimeout } from "@ci-calendar/core/lib/timeout"
+import { withTimeout } from "../lib/timeout"
 import type { PlacesLoader, PlacesSession } from "./places"
 
 // The English addresses the event forms look up through Google Places

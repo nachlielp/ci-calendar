@@ -7,7 +7,7 @@ import { TextField } from "../../ui/form/fields"
 import {
     MULTI_DAY_TEMPLATE_DRAFT_KEY,
     SINGLE_DAY_TEMPLATE_DRAFT_KEY,
-} from "./draftKeys"
+} from "@ci-calendar/core/features/event-forms/draftKeys"
 import { useFormDraft } from "../../app/useFormDraft"
 import {
     ClearFormButton,
@@ -17,7 +17,7 @@ import {
 import { MultiDayHeadFields } from "./MultiDayEventForm"
 import { SingleDayFields } from "./SingleDayEventForm"
 import { useTaggable } from "./taggableBios"
-import { TEMPLATE_COPY } from "./templateCopy"
+import { TEMPLATE_COPY } from "@ci-calendar/core/features/event-forms/templateCopy"
 import { useTemplateSubmit } from "./templates"
 import {
     emptyMultiDayTemplate,
@@ -37,7 +37,7 @@ import {
     type MultiDayTemplateValues,
     type SingleDayTemplateValues,
     type Template,
-} from "./templateValues"
+} from "@ci-calendar/core/features/event-forms/templateValues"
 import { useCarried } from "./useCarried"
 import { useErrorText } from "./useErrorText"
 

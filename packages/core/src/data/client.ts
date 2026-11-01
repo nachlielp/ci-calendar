@@ -7,7 +7,7 @@ import type { Database } from "./database.types"
  *
  * Built from the PostgREST sub-client instead of `@supabase/supabase-js`, so
  * the realtime module never reaches the bundle: the app has no realtime by
- * design (spec #34). Tests inject a fake through `AppServices` instead.
+ * design (spec #34). Tests inject a fake through `CoreServices` instead.
  */
 export type DataClient = PostgrestClient<Database>
 

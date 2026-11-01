@@ -1,6 +1,6 @@
-import { defineCopy } from "@ci-calendar/core/lib/copy"
-import type { Language } from "@ci-calendar/core/lib/language"
-import { weekday } from "@ci-calendar/core/lib/jerusalemDate"
+import { defineCopy } from "../../lib/copy"
+import type { Language } from "../../lib/language"
+import { weekday } from "../../lib/jerusalemDate"
 
 // The event vocabulary in each language (legacy util/translations.ts): the
 // words the formatters (eventFormat.ts) and the calendar components show

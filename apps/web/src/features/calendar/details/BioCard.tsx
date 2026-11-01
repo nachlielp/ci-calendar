@@ -2,9 +2,9 @@ import { useCopy, useLanguage } from "../../../app/language"
 import { useMachineTranslation } from "../../../app/useMachineTranslation"
 import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { OpenInNewIcon } from "../../../ui/icons/OpenInNewIcon"
-import type { PublicBio } from "../publicEvent"
+import type { PublicBio } from "@ci-calendar/core/features/calendar/publicEvent"
 import "./BioCard.scss"
-import { webLinks } from "./webLinks"
+import { webLinks } from "@ci-calendar/core/features/calendar/details/webLinks"
 
 const COPY = defineCopy({
     he: {

@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
+} from "@ci-calendar/core/app/deviceStorage"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp } from "../../test/renderApp"
 import { event, segment } from "../../test/testEvents"

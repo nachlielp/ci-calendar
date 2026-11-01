@@ -9,7 +9,7 @@ import {
     setViewportWidth,
 } from "../../test/browser"
 import { renderApp } from "../../test/renderApp"
-import { createMemoryStorage } from "../deviceStorage"
+import { createMemoryStorage } from "@ci-calendar/core/app/deviceStorage"
 
 const BANNER = "לקבלת עדכונים הוסיפו לעמוד הבית"
 const banner = () => screen.queryByRole("button", { name: BANNER })

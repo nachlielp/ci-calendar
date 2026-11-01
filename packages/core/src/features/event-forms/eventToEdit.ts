@@ -1,6 +1,6 @@
-import { queryOptions } from "@tanstack/react-query"
+import { queryOptions } from "../../app/queryOptions"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import type { AppServices } from "../../app/services"
+import type { CoreServices } from "../../app/services"
 import { registerEventList } from "../events/eventCache"
 import {
     selectManagedEvents,
@@ -44,7 +44,7 @@ registerEventList({
  * explicitly).
  */
 export function eventToEditQuery(
-    services: AppServices,
+    services: CoreServices,
     viewerId: string,
     eventId: string,
     scope: EventScope,

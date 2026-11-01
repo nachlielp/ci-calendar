@@ -1,5 +1,5 @@
 import { afterLoadAndIdle } from "../afterLoadAndIdle"
-import type { DeviceStorage } from "../deviceStorage"
+import type { DeviceStorage } from "@ci-calendar/core/app/deviceStorage"
 import { createTelemetry, type Telemetry } from "./telemetry"
 
 /** The production site, as index.html's Google Analytics rule has it. */

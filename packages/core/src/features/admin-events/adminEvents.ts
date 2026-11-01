@@ -1,12 +1,9 @@
-import {
-    infiniteQueryOptions,
-    queryOptions,
-    type InfiniteData,
-} from "@tanstack/react-query"
+import { type InfiniteData } from "@tanstack/query-core"
+import { infiniteQueryOptions, queryOptions } from "../../app/queryOptions"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import type { AppServices } from "../../app/services"
-import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
-import { keysetPage } from "@ci-calendar/core/lib/keyset"
+import type { CoreServices } from "../../app/services"
+import { jerusalemToday } from "../../lib/jerusalemDate"
+import { keysetPage } from "../../lib/keyset"
 import { containing, PAGED_ADMIN_FRESHNESS } from "../admin/adminLists"
 import {
     mergeIntoPages,
@@ -127,7 +124,7 @@ registerEventList({
  * memoise the options on it.
  */
 export function adminEventsQuery(
-    services: AppServices,
+    services: CoreServices,
     adminId: string,
     creators: readonly string[],
     search: string,
@@ -205,7 +202,7 @@ export const adminEventCreatorsKey = (adminId: string) =>
  * their name of each such event, deduplicated here, as legacy did.
  */
 export function adminEventCreatorsQuery(
-    services: AppServices,
+    services: CoreServices,
     adminId: string,
 ) {
     return queryOptions({

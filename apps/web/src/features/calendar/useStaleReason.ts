@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { useServices } from "../../app/services"
 import { useIsOnline } from "../../app/useIsOnline"
-import { publicWindowQuery } from "./publicWindow"
+import { publicWindowQuery } from "@ci-calendar/core/features/calendar/publicWindow"
 
 export type StaleReason = "offline" | "refreshFailed"
 

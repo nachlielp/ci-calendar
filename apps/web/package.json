@@ -10,7 +10,6 @@
         "test": "vitest run",
         "test:watch": "vitest",
         "typecheck": "tsc --noEmit && tsc --noEmit -p src/sw && tsc --noEmit -p worker && tsc --noEmit -p tsconfig.node.json",
-        "gen:types": "supabase gen types typescript --project-id pjgwpivkvsuernmoeebk > src/data/database.types.ts && prettier --write src/data/database.types.ts",
         "preview": "vite preview",
         "check:bundle": "node scripts/bundle-size.mjs",
         "check:sw": "node scripts/check-sw.mjs",

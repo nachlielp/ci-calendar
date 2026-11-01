@@ -18,10 +18,13 @@ import {
 import { TagPicker, type PickerOption } from "../../ui/form/TagPicker"
 import { AddCircleIcon } from "../../ui/icons/AddCircleIcon"
 import { DoNotDisturbIcon } from "../../ui/icons/DoNotDisturbIcon"
-import { optionLabel, tagLabel } from "../calendar/eventFormat"
-import { EVENT_LOCALES } from "../calendar/eventLocales"
+import {
+    optionLabel,
+    tagLabel,
+} from "@ci-calendar/core/features/calendar/eventFormat"
+import { EVENT_LOCALES } from "@ci-calendar/core/features/calendar/eventLocales"
 import { AddressField } from "./AddressField"
-import { EVENT_FORM_COPY } from "./eventFormCopy"
+import { EVENT_FORM_COPY } from "@ci-calendar/core/features/event-forms/eventFormCopy"
 import {
     emptySegment,
     type EventBaseValues,
@@ -29,7 +32,7 @@ import {
     type LinkValues,
     type PriceValues,
     type SegmentValues,
-} from "./eventFormValues"
+} from "@ci-calendar/core/features/event-forms/eventFormValues"
 import "./EventForm.scss"
 import { useErrorText } from "./useErrorText"
 

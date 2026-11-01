@@ -6,8 +6,8 @@ import { numericDayLabel } from "@ci-calendar/core/lib/jerusalemDate"
 import { Dialog } from "../../ui/Dialog"
 import { FormAlert } from "../../ui/form/fields"
 import { WarningIcon } from "../../ui/icons/WarningIcon"
-import { pickTitle } from "../calendar/eventFormat"
-import type { ManagedEvent } from "./managedEvent"
+import { pickTitle } from "@ci-calendar/core/features/calendar/eventFormat"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
 
 // Legacy's confirm modals for event actions (HideEventButton,
 // DeleteEventButton, CancelledEventButton, EditRecurringEventDialog):

@@ -1,11 +1,14 @@
 import { act } from "@testing-library/react"
 import { onTestFinished } from "vitest"
-import { createMemoryStorage, type DeviceStorage } from "../app/deviceStorage"
 import {
-    createTelemetry,
+    createMemoryStorage,
+    type DeviceStorage,
+} from "@ci-calendar/core/app/deviceStorage"
+import { createTelemetry } from "../app/telemetry/telemetry"
+import {
     type ErrorContext,
     type TelemetryUser,
-} from "../app/telemetry/telemetry"
+} from "@ci-calendar/core/app/telemetry/telemetry"
 
 export interface TestTelemetryOptions {
     /** A production build (default) or dev. */

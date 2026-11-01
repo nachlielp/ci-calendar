@@ -1,59 +1,28 @@
-import {
-    queryOptions,
-    useMutation,
-    useQuery,
-    useQueryClient,
-    type QueryClient,
-} from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { useLocation } from "react-router"
-import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import { useServices, type AppServices } from "../../app/services"
+import { useServices } from "../../app/services"
 import type { Submission } from "../../app/useForm"
-import type { Database } from "../../data/database.types"
 import type { FormValues } from "@ci-calendar/core/lib/form"
-import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
-import { refreshEventQueries } from "../events/eventCache"
-import { deleteEventRows } from "../events/eventWrites"
+import { refreshEventQueries } from "@ci-calendar/core/features/events/eventCache"
 import {
-    byNewest,
-    TEMPLATE_COLUMNS,
-    toTemplate,
-    type Template,
-    type TemplateColumns,
-    type TemplatePatch,
-} from "./templateValues"
+    cacheTemplate,
+    createTemplate,
+    deleteTemplate,
+    myTemplatesKey,
+    myTemplatesQuery,
+    TemplateGoneError,
+    updateTemplate,
+    type NewTemplateColumns,
+    type TemplateDelete,
+} from "@ci-calendar/core/features/event-forms/templates"
+import type {
+    Template,
+    TemplatePatch,
+} from "@ci-calendar/core/features/event-forms/templateValues"
 
-// The user's templates (legacy store `templates`, templateService): read
-// only when a page that uses them opens (the create-events chooser and the
-// new-event forms' template picker), never at boot. Personal: the user's
-// own rows (`user_id`, filtered explicitly: admins' RLS returns
-// everyone's), never persisted, forgotten on sign-out. Every write puts
-// the stored row in the cached list (no refetch).
-
-/** First element of the templates query key: personal, never persisted. */
-export const MY_TEMPLATES_KIND = "my-templates"
-
-export const myTemplatesKey = (userId: string) =>
-    [MY_TEMPLATES_KIND, userId] as const
-
-/** The user's templates, newest first (legacy `getTemplates`). */
-export function myTemplatesQuery(services: AppServices, userId: string) {
-    return queryOptions({
-        queryKey: myTemplatesKey(userId),
-        ...PERSONAL_FRESHNESS,
-        queryFn: async (): Promise<Template[]> => {
-            await sessionOf(services, userId)
-            const { data, error } = await services.data
-                .from("templates")
-                .select(TEMPLATE_COLUMNS)
-                .eq("user_id", userId)
-                .order("created_at", { ascending: false })
-            if (error) throw new Error(error.message)
-            return data.map(toTemplate)
-        },
-    })
-}
+// The templates' hooks; the queries and saves are the core's
+// features/event-forms/templates.ts.
 
 /** The user's templates (loaded when the calling page mounts). */
 export function useMyTemplates(userId: string) {
@@ -64,126 +33,26 @@ export function useMyTemplates(userId: string) {
     })
 }
 
-/**
- * Puts a stored template into the cached list, if it is cached (never
- * re-creating it, e.g. after a sign-out removed it).
- */
-function cacheTemplate(
-    queryClient: QueryClient,
-    userId: string,
-    template: Template,
-) {
-    queryClient.setQueryData<Template[]>(
-        myTemplatesKey(userId),
-        (templates) =>
-            templates &&
-            [
-                template,
-                ...templates.filter((other) => other.id !== template.id),
-            ].sort(byNewest),
-    )
-}
-
-/** The template is no longer the user's to edit (deleted elsewhere). */
-export class TemplateGoneError extends Error {
-    constructor() {
-        super("The template is gone")
-    }
-}
-
-/**
- * What a new template's form sends: its columns, and legacy's `owners`
- * (read by nothing): the multi-day form names its creator there, as
- * legacy's did; empty by default, as legacy's single-day form left it.
- */
-export type NewTemplateColumns = TemplateColumns & {
-    owners?: Database["public"]["Tables"]["templates"]["Insert"]["owners"]
-}
-
-/** Postgres' unique violation: a template with this id is stored already. */
-const DUPLICATE = "23505"
-
-/**
- * Saves a new template of the user's (legacy `createTemplate`) with an id
- * made once per form: sent again (a retry after a lost answer), it reads
- * the stored one instead of storing a second.
- */
+/** Saves a new template of the user's (`createTemplate`). */
 export function useCreateTemplate(userId: string) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async ({
-            id,
-            columns,
-        }: {
-            id: string
-            columns: NewTemplateColumns
-        }) => {
-            await sessionOf(services, userId)
-            const now = services.now().toISOString()
-            const inserted = await services.data
-                .from("templates")
-                .insert({
-                    ...columns,
-                    id,
-                    user_id: userId,
-                    owners: columns.owners ?? [],
-                    created_at: now,
-                    updated_at: now,
-                })
-                .select(TEMPLATE_COLUMNS)
-                .single()
-            const { data, error } =
-                inserted.error?.code === DUPLICATE
-                    ? await services.data
-                          .from("templates")
-                          .select(TEMPLATE_COLUMNS)
-                          .eq("id", id)
-                          .eq("user_id", userId)
-                          .single()
-                    : inserted
-            if (error) throw new Error(error.message)
-            return toTemplate(data)
-        },
+        mutationFn: (template: { id: string; columns: NewTemplateColumns }) =>
+            createTemplate(services, userId, template),
         onSuccess: (template) => cacheTemplate(queryClient, userId, template),
         onError: (error) =>
             services.telemetry.captureError(error, { source: "template-save" }),
     })
 }
 
-/**
- * Updates one of the user's templates with the changed columns (legacy
- * `updateTemplate`), only while it is still theirs; gone, it fails with
- * `TemplateGoneError` and the list is refetched.
- */
+/** Updates one of the user's templates (`updateTemplate`). */
 export function useUpdateTemplate(userId: string) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async ({
-            id,
-            patch,
-        }: {
-            id: string
-            patch: TemplatePatch
-        }) => {
-            await sessionOf(services, userId)
-            const { data, error } = await services.data
-                .from("templates")
-                .update({ ...patch, updated_at: services.now().toISOString() })
-                .eq("id", id)
-                .eq("user_id", userId)
-                .select(TEMPLATE_COLUMNS)
-                .maybeSingle()
-            if (error) throw new Error(error.message)
-            if (!data) {
-                void queryClient.invalidateQueries({
-                    queryKey: myTemplatesKey(userId),
-                })
-                throw new TemplateGoneError()
-            }
-            return toTemplate(data)
-        },
+        mutationFn: (edit: { id: string; patch: TemplatePatch }) =>
+            updateTemplate(services, queryClient, userId, edit),
         onSuccess: (template) => cacheTemplate(queryClient, userId, template),
         onError: (error) => {
             if (!(error instanceof TemplateGoneError)) {
@@ -195,62 +64,13 @@ export function useUpdateTemplate(userId: string) {
     })
 }
 
-export interface TemplateDelete {
-    id: string
-    /** Also delete the user's upcoming events made from it (past ones stay). */
-    withUpcomingEvents: boolean
-}
-
-/**
- * Deletes one of the user's templates (legacy `deleteTemplate`) and takes
- * it out of the cached list. Legacy's foreign key
- * (`ci_events.source_template_id`) deleted every event made from the
- * template with it; now the events are kept unless the user chooses to
- * delete the upcoming ones. The kept events are unlinked from the template
- * first, so they stay whatever the key's delete rule (cascade until the
- * migration making it `set null` is applied). Every event list is
- * refreshed: those on screen refetch, the rest when next shown.
- */
+/** Deletes one of the user's templates (`deleteTemplate`). */
 export function useDeleteTemplate(userId: string) {
     const services = useServices()
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: async ({ id, withUpcomingEvents }: TemplateDelete) => {
-            await sessionOf(services, userId)
-            const { data } = services
-            if (withUpcomingEvents) {
-                const upcoming = await data
-                    .from("ci_events")
-                    .select("id")
-                    .eq("source_template_id", id)
-                    .eq("user_id", userId)
-                    .gte("start_date", jerusalemToday(services.now()))
-                if (upcoming.error) throw new Error(upcoming.error.message)
-                if (upcoming.data.length > 0) {
-                    const deleted = await deleteEventRows(
-                        data,
-                        upcoming.data.map((row) => row.id),
-                        (query) => query.eq("user_id", userId),
-                    )
-                    if (deleted.error) throw new Error(deleted.error.message)
-                }
-            }
-            // Not scoped to the user: RLS lets them unlink only their own
-            // events (an admin any), and no event is left for the key.
-            const unlinked = await data
-                .from("ci_events")
-                .update({ source_template_id: null })
-                .eq("source_template_id", id)
-            if (unlinked.error) throw new Error(unlinked.error.message)
-            const { error } = await data
-                .from("templates")
-                .delete()
-                .eq("id", id)
-                .eq("user_id", userId)
-                .select("id")
-            if (error) throw new Error(error.message)
-            return id
-        },
+        mutationFn: (change: TemplateDelete) =>
+            deleteTemplate(services, userId, change),
         onSuccess: (id) => {
             queryClient.setQueryData<Template[]>(
                 myTemplatesKey(userId),

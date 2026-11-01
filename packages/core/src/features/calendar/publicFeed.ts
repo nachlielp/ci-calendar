@@ -7,7 +7,7 @@ import {
 } from "./publicWindowSelect"
 
 /**
- * Where the public window comes from (`AppServices.publicFeed`, spec #37):
+ * Where the public window comes from (`CoreServices.publicFeed`, spec #37):
  * the calendar's one list request. Single-event lookups and every personal
  * or admin query still go to Supabase directly (`services.data`).
  */

@@ -1,12 +1,9 @@
-import {
-    infiniteQueryOptions,
-    queryOptions,
-    type InfiniteData,
-} from "@tanstack/react-query"
+import { type InfiniteData } from "@tanstack/query-core"
+import { infiniteQueryOptions, queryOptions } from "../../app/queryOptions"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import type { AppServices } from "../../app/services"
-import type { SignedInRole } from "../../app/viewer"
-import { keysetPage, quoted } from "@ci-calendar/core/lib/keyset"
+import type { CoreServices } from "../../app/services"
+import type { SignedInRole } from "../../app/auth/roles"
+import { keysetPage, quoted } from "../../lib/keyset"
 import {
     afterNewest,
     containing,
@@ -134,7 +131,7 @@ export const adminUsersKey = (adminId: string, search: string) =>
  * removes these queries when it closes.
  */
 export function adminUsersQuery(
-    services: AppServices,
+    services: CoreServices,
     adminId: string,
     search: string,
 ) {
@@ -185,7 +182,7 @@ export const adminUserStatsKey = (adminId: string) =>
  * Legacy's counts (all accounts, and by `user_type`) without reading the
  * users: one counting `HEAD` request each, in parallel.
  */
-export function adminUserStatsQuery(services: AppServices, adminId: string) {
+export function adminUserStatsQuery(services: CoreServices, adminId: string) {
     return queryOptions({
         queryKey: adminUserStatsKey(adminId),
         ...PERSONAL_FRESHNESS,

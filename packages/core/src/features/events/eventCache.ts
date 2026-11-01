@@ -1,10 +1,10 @@
-import type { InfiniteData, QueryClient, QueryKey } from "@tanstack/react-query"
+import type { InfiniteData, QueryClient, QueryKey } from "@tanstack/query-core"
 import {
     refetchCachedQueries,
     updateCachedQueries,
 } from "../../app/cachedQueries"
-import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
-import { insertInOrder, pageHolding } from "@ci-calendar/core/lib/keyset"
+import { jerusalemToday } from "../../lib/jerusalemDate"
+import { insertInOrder, pageHolding } from "../../lib/keyset"
 import { LINKED_EVENT_KIND } from "../calendar/linkedEvent"
 import type { PublicBio, PublicEvent } from "../calendar/publicEvent"
 import { PUBLIC_WINDOW_KIND, type PublicWindow } from "../calendar/publicWindow"

@@ -1,4 +1,4 @@
-import { defineCopy } from "@ci-calendar/core/lib/copy"
+import { defineCopy } from "../../lib/copy"
 import { REQUEST_NOTES } from "./requestRows"
 
 // The app's shared vocabulary of roles, request types and request

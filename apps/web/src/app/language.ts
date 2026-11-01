@@ -6,7 +6,7 @@ import {
     textDirection,
     type Language,
 } from "@ci-calendar/core/lib/language"
-import type { DeviceStorage } from "./deviceStorage"
+import type { DeviceStorage } from "@ci-calendar/core/app/deviceStorage"
 
 /** The languages offered, set per deployment (`VITE_LANGUAGES_TO_SHOW`). */
 export const SHOWN_LANGUAGES = languagesToShow(

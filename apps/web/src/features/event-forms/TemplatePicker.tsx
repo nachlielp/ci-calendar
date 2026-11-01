@@ -1,9 +1,9 @@
 import { useEffect } from "react"
 import { useCopy } from "../../app/language"
 import { SelectField } from "../../ui/form/fields"
-import { TEMPLATE_COPY } from "./templateCopy"
+import { TEMPLATE_COPY } from "@ci-calendar/core/features/event-forms/templateCopy"
 import { useMyTemplates } from "./templates"
-import type { Template } from "./templateValues"
+import type { Template } from "@ci-calendar/core/features/event-forms/templateValues"
 
 /**
  * Legacy's "בחירת תבנית" at the top of the new-event forms: the user's

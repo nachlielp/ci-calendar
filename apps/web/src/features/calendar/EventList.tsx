@@ -7,9 +7,9 @@ import { PinDropIcon } from "../../ui/icons/PinDropIcon"
 import { ScheduleIcon } from "../../ui/icons/ScheduleIcon"
 import { useCopy } from "../../app/language"
 import { defineCopy } from "@ci-calendar/core/lib/copy"
-import type { EventCard } from "./eventCards"
-import { eventPath } from "./eventFormat"
-import { EVENT_LOCALES } from "./eventLocales"
+import type { EventCard } from "@ci-calendar/core/features/calendar/eventCards"
+import { eventPath } from "@ci-calendar/core/features/calendar/eventFormat"
+import { EVENT_LOCALES } from "@ci-calendar/core/features/calendar/eventLocales"
 import "./EventList.scss"
 
 const COPY = defineCopy({

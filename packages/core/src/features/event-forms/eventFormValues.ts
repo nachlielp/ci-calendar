@@ -1,12 +1,9 @@
 import type { Database } from "../../data/database.types"
-import { MULTI_DAY_TYPES } from "@ci-calendar/core/lib/eventOptions"
-import type { FormErrors } from "@ci-calendar/core/lib/form"
-import {
-    addDays,
-    jerusalemTimeOfDay,
-} from "@ci-calendar/core/lib/jerusalemDate"
-import { jerusalemInstant } from "@ci-calendar/core/lib/jerusalemInstant"
-import { isWebUrl, normaliseWebUrl } from "@ci-calendar/core/lib/webUrl"
+import { MULTI_DAY_TYPES } from "../../lib/eventOptions"
+import type { FormErrors } from "../../lib/form"
+import { addDays, jerusalemTimeOfDay } from "../../lib/jerusalemDate"
+import { jerusalemInstant } from "../../lib/jerusalemInstant"
+import { isWebUrl, normaliseWebUrl } from "../../lib/webUrl"
 import type { Tag } from "../calendar/publicEvent"
 import type { ManagedEvent } from "../events/managedEvent"
 import {

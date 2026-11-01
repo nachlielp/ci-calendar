@@ -3,7 +3,7 @@ import { act, screen } from "@testing-library/react"
 import {
     createMemoryStorage,
     type DeviceStorage,
-} from "../../app/deviceStorage"
+} from "@ci-calendar/core/app/deviceStorage"
 import { setPageVisibility } from "../../test/browser"
 import { createFakeDataClient } from "../../test/fakeDataClient"
 import { renderApp, type RenderAppOptions } from "../../test/renderApp"

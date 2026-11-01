@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest"
 import {
     EVENT_BIO_COLUMNS,
     PUBLIC_EVENT_COLUMNS,
-} from "../calendar/publicEvent"
+} from "@ci-calendar/core/features/calendar/publicEvent"
 import { bio, event } from "../../test/testEvents"
 import {
     MANAGED_EVENT_COLUMNS,
     toManagedEvent,
     toPublicOnly,
     type ManagedEventRow,
-} from "./managedEvent"
+} from "@ci-calendar/core/features/events/managedEvent"
 
 const columns = (select: string) =>
     select

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest"
 import { createFakeFunctions, fakeTranslation } from "../test/fakeFunctions"
 import { LOOKUP_TIMEOUT_MS } from "@ci-calendar/core/lib/timeout"
-import { translateText, translateTitle } from "./translate"
+import { translateText, translateTitle } from "@ci-calendar/core/data/translate"
 
 // Legacy util/translate.test.ts, at the functions seam.
 

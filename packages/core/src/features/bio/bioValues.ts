@@ -1,5 +1,5 @@
-import type { FormErrors } from "@ci-calendar/core/lib/form"
-import { isWebUrl, normaliseWebUrl } from "@ci-calendar/core/lib/webUrl"
+import type { FormErrors } from "../../lib/form"
+import { isWebUrl, normaliseWebUrl } from "../../lib/webUrl"
 
 // The profile form's values and rules (legacy ProfileForm), pure. Fields
 // are named as their `public_bio` columns, so a save's columns are the

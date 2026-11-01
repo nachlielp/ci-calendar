@@ -9,7 +9,8 @@ import { LockResetIcon } from "../../ui/icons/LockResetIcon"
 import { LogoutIcon } from "../../ui/icons/LogoutIcon"
 import { SupportAgentIcon } from "../../ui/icons/SupportAgentIcon"
 import { VerifiedUserIcon } from "../../ui/icons/VerifiedUserIcon"
-import type { Role, Viewer } from "../viewer"
+import type { Viewer } from "../viewer"
+import type { Role } from "@ci-calendar/core/app/auth/roles"
 
 export type MenuItemKey =
     | "home"

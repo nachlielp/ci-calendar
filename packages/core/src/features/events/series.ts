@@ -1,7 +1,7 @@
-import { queryOptions } from "@tanstack/react-query"
+import { queryOptions } from "../../app/queryOptions"
 import { PERSONAL_FRESHNESS, sessionOf } from "../../app/auth/personal"
-import type { AppServices } from "../../app/services"
-import { jerusalemToday } from "@ci-calendar/core/lib/jerusalemDate"
+import type { CoreServices } from "../../app/services"
+import { jerusalemToday } from "../../lib/jerusalemDate"
 import { mergeIntoList, registerEventList, removesFrom } from "./eventCache"
 import { compareUpcoming } from "./eventLists"
 import {
@@ -41,7 +41,7 @@ registerEventList({
 
 /** `ownerId`'s events of the series `refKey` from today on, by day. */
 export function seriesQuery(
-    services: AppServices,
+    services: CoreServices,
     viewerId: string,
     refKey: string,
     ownerId: string,

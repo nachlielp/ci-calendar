@@ -4,7 +4,7 @@ import {
     EVENT_TYPES,
     isDistrict,
     isEventType,
-} from "@ci-calendar/core/lib/eventOptions"
+} from "../../lib/eventOptions"
 import { isMultiDay } from "./eventFormat"
 import type { PublicEvent } from "./publicEvent"
 

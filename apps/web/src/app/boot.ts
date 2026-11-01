@@ -1,5 +1,5 @@
 import { onlineManager, QueryClient } from "@tanstack/react-query"
-import { publicWindowQuery } from "../features/calendar/publicWindow"
+import { publicWindowQuery } from "@ci-calendar/core/features/calendar/publicWindow"
 import { bootSession } from "./auth/session"
 import { persistQueryCache } from "./persistedCache"
 import type { AppServices } from "./services"

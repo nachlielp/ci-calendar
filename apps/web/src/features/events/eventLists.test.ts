@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest"
 import { publicEvent } from "../../test/testEvents"
-import { comparePast, eventsAfter, laterInSeries } from "./eventLists"
-import type { ManagedEvent } from "./managedEvent"
+import {
+    comparePast,
+    eventsAfter,
+    laterInSeries,
+} from "@ci-calendar/core/features/events/eventLists"
+import type { ManagedEvent } from "@ci-calendar/core/features/events/managedEvent"
 
 const managed = (overrides: Partial<ManagedEvent> = {}): ManagedEvent => ({
     ...publicEvent(),

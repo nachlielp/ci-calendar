@@ -1,4 +1,4 @@
-import type { Functions } from "../data/functions"
+import type { Functions } from "@ci-calendar/core/data/functions"
 
 // The fake's Edge Functions (`createFakeDataClient().functions`): every
 // call is recorded with the token it carried; a function answers through

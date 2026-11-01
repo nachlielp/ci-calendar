@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { taggableOptions, type BioRow } from "./taggableBios"
+import {
+    taggableOptions,
+    type BioRow,
+} from "@ci-calendar/core/features/event-forms/taggableBios"
 
 const row = (overrides: Partial<BioRow>): BioRow => ({
     user_id: crypto.randomUUID(),

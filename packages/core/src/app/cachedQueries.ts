@@ -3,7 +3,7 @@ import type {
     Query,
     QueryClient,
     QueryKey,
-} from "@tanstack/react-query"
+} from "@tanstack/query-core"
 
 // The one engine for writes' cache updates (docs/architecture.md, "Server
 // state" and "Pagination"): a write puts the server's answer into every

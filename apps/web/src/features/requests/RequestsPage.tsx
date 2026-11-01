@@ -4,21 +4,22 @@ import { useParams } from "react-router"
 import { useUserId } from "../../app/auth/personal"
 import { useCopy } from "../../app/language"
 import { useServices } from "../../app/services"
-import { useViewer, type SignedInRole } from "../../app/viewer"
+import { useViewer } from "../../app/viewer"
+import { type SignedInRole } from "@ci-calendar/core/app/auth/roles"
 import { COMMON_COPY } from "@ci-calendar/core/lib/commonCopy"
 import { defineCopy } from "@ci-calendar/core/lib/copy"
 import { FormAlert } from "../../ui/form/fields"
 import { SupportEmail } from "../../ui/SupportEmail"
+import { useCancelRequest } from "./myRequests"
 import {
     myRequestsQuery,
     openRequestOf,
     RequestClosedError,
-    useCancelRequest,
     type UserRequest,
-} from "./myRequests"
+} from "@ci-calendar/core/features/requests/myRequests"
 import { RequestForm, type Abandoned } from "./RequestForm"
 import { RequestList } from "./RequestList"
-import { REQUEST_WORDS } from "./requestWords"
+import { REQUEST_WORDS } from "@ci-calendar/core/features/requests/requestWords"
 import "./RequestsPage.scss"
 
 // Legacy SupportPage and OpenRequest (Hebrew only there). OpenRequest also
